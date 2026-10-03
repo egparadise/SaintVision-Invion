@@ -289,14 +289,24 @@ def create_app(
 
             category = str(error.code).split("-", 1)[0]
             if denial_recorder.is_denial(category):
-                await run_in_threadpool(
-                    denial_recorder.record_denial,
-                    denial_engine,
-                    request,
-                    code=error.code,
-                    trace_id=request.state.trace_id,
-                    now=_utc_now,
-                )
+                try:
+                    await run_in_threadpool(
+                        denial_recorder.record_denial,
+                        denial_engine,
+                        request,
+                        code=error.code,
+                        trace_id=request.state.trace_id,
+                        now=_utc_now,
+                    )
+                except Exception:
+                    # The shared invariant (tests/integration/test_canonical_denial_audit_real_pg.py)
+                    # is that an audit failure is a **generic 500** with nothing done --
+                    # never the tidy refusal it could not record, and never confused
+                    # with the 503s that mean "not observed". The Boundary turns an
+                    # arbitrary exception into SYS-0001/503, so the status is named
+                    # here instead of inherited, and the refusal's own code is dropped
+                    # so a caller cannot read the decision out of the failure.
+                    raise DomainError("SYS-0001", "Internal error", 500) from None
         return problem(error, request.state.trace_id)
 
     @api.exception_handler(RequestValidationError)

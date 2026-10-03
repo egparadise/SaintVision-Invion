@@ -799,3 +799,155 @@ def test_the_pre_io_phase_issues_on_the_transaction_it_already_holds(collector):
     assert "self.samples.issue(" not in pre_io
     # And the method it must not use is still there for its own callers.
     assert hasattr(collector_obj.samples, "issue")
+
+
+# ===========================================================================
+# Card 266 r3 (Codex r2 F1): the boundary is decided under the folder's lock.
+#
+# r2's probe: commit another project's location right after the final phase's
+# catalogue check and the collect still recorded a check. The order is what
+# fixes it -- the Run and the contribution row are locked before the question
+# is asked -- and these tests hold that order rather than the comment about it.
+# ===========================================================================
+
+
+def _move_locations(sample, project_id):  # noqa: F811
+    """Catalogue the folder into another project the way the product would.
+
+    Through ``locked_contribution``'s rule rather than around it: the product's
+    catalogue write takes the contribution row FOR UPDATE first, so this helper
+    does too. That is the invariant the boundary read depends on, and a helper that
+    skipped it would prove nothing about the real race.
+    """
+    import psycopg
+
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "SELECT contribution_id FROM public.storage_contributions "
+            "WHERE contribution_id=%s FOR UPDATE",
+            (sample.contribution,),
+        )
+        connection.execute(
+            "UPDATE public.data_locations SET project_id=%s WHERE contribution_id=%s",
+            (project_id, sample.contribution),
+        )
+        connection.commit()
+
+
+def test_the_product_catalogue_write_locks_the_row_the_boundary_relies_on(sample):  # noqa: F811
+    """The invariant, asserted rather than assumed.
+
+    ``CatalogueProjectReader`` reads on another connection, so it is only safe
+    because every writer of this folder's catalogue must first take the folder row
+    that the collect path is holding. If that stopped being true the boundary would
+    be a read with nothing behind it, so the contract is pinned here.
+    """
+    import inspect
+
+    from saintvision.api.v1 import storage_project
+    from saintvision.services import storage as storage_service
+
+    assert "FOR UPDATE" in inspect.getsource(storage_service.locked_contribution).upper()
+    # And the catalogue route goes through it rather than inserting directly.
+    route = inspect.getsource(storage_project)
+    assert "storage_service.locked_contribution(" in route
+
+
+def test_a_location_moved_out_mid_flight_is_refused_not_recorded(collector, sample):  # noqa: F811
+    """r2's schedule, with the move attempted **while** the final phase holds the lock.
+
+    The request is paused inside its node call. The move is then attempted from
+    another connection: it blocks on the contribution row the moment the final
+    transaction takes it, so the two possible orders are "move first, collect
+    refuses" and "collect first, move lands after" -- never "collect records a
+    check for a folder that had already left the project".
+    """
+    import threading
+
+    collector_obj, transport = collector
+    other = _project(sample, "c266-midflight")
+    released = threading.Event()
+    in_flight = threading.Event()
+
+    def pause_once():
+        if transport.calls == 1:
+            in_flight.set()
+            released.wait(timeout=30)
+
+    transport.before_call = pause_once
+    outcome: dict[str, object] = {}
+
+    def run():
+        try:
+            outcome["result"] = _collect(collector, sample, key="c266-midflight")
+        except Exception as error:
+            outcome["result"] = error
+
+    worker = threading.Thread(target=run)
+    worker.start()
+    assert in_flight.wait(timeout=30), "the request never reached the node call"
+
+    mover = threading.Thread(target=lambda: _move_locations(sample, other))
+    mover.start()
+    released.set()
+    worker.join(timeout=60)
+    mover.join(timeout=60)
+
+    result = outcome["result"]
+    if isinstance(result, Exception):
+        # The move won the race: the boundary refuses, and nothing is recorded.
+        assert isinstance(result, DomainError), result
+        assert (result.code, result.status) == ("RES-0004", 404)
+        assert _counts(sample)[:3] == (0, 0, 0)
+        assert _counts(sample)[3] == [None]
+    else:
+        # The collect won: one check, and the move landed afterwards. What must not
+        # happen is a recorded check *plus* the folder already outside the project.
+        assert _counts(sample)[:3] == (1, 1, 1)
+    # Either way the folder is now in the other project, so a retry refuses.
+    with pytest.raises(DomainError) as retried:
+        _collect(collector, sample, key="c266-midflight-retry")
+    assert (retried.value.code, retried.value.status) == ("RES-0004", 404)
+
+
+def test_the_replay_branch_also_decides_under_the_lock(collector, sample):  # noqa: F811
+    """A stored answer is not handed back for a folder that has left the project.
+
+    The same race on the replay side: the response exists, and the boundary has to
+    be re-asked under the lock before it is returned.
+    """
+    first, replayed = _collect(collector, sample, key="c266-replay-boundary")
+    assert replayed is False
+    stored = _counts(sample)
+    _move_locations(sample, _project(sample, "c266-replay-moved"))
+
+    _, transport = collector
+    calls = transport.calls
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-replay-boundary")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    # No node call, and the stored answer stayed where it was.
+    assert transport.calls == calls
+    assert _counts(sample) == stored
+
+
+def test_the_boundary_is_asked_after_the_locks_in_both_phases(collector):  # noqa: F811
+    """Source-level, and it says so: the ordering is what the fix *is*.
+
+    A behavioural test can show the race is closed for the schedules it runs; it
+    cannot show that no future edit moves the question back above the locks. This
+    pins the shape -- ``_locked_boundary`` takes the locks itself, and both phases
+    call it before deciding anything.
+    """
+    import inspect
+
+    collector_obj, _ = collector
+    locked = inspect.getsource(type(collector_obj)._locked_boundary)
+    assert "self.samples._scope(" in locked
+    assert locked.index("self.samples._scope(") < locked.index("self._project_boundary(")
+
+    source = inspect.getsource(type(collector_obj).collect)
+    pre_io, final = source.split("--- 3. final", 1)
+    for phase in (pre_io, final):
+        assert "self._locked_boundary(" in phase
+        assert phase.index("self._locked_boundary(") < phase.index("if prior is not None:")

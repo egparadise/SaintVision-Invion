@@ -2,8 +2,9 @@
   "card": 266,
   "scope": "storage-check-collect-and-replica-repair-project-binding",
   "note": "Only pytest exit code 1 counts as KILLED. The runner restores each file and verifies the restore, so a survivor is a test gap rather than a leftover mutant.",
-  "killed": 18,
-  "total": 18,
+  "killed": 21,
+  "equivalent": 1,
+  "total": 22,
   "mutants": [
     {
       "id": "M1",
@@ -16,8 +17,9 @@
       "id": "M2",
       "what": "phase three replays before authority is re-read",
       "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
-      "verdict": "KILLED",
-      "exitCode": 1
+      "verdict": "EQUIVALENT",
+      "exitCode": 0,
+      "equivalentBecause": "_locked_boundary -> _scope re-checks grant and ownership under the lock (storage_commit.py:48-49), so removing the earlier call changes nothing"
     },
     {
       "id": "M3",
@@ -107,6 +109,34 @@
       "id": "M15",
       "what": "a configured collector no longer requires the business surface",
       "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M19",
+      "what": "the boundary is asked before the Run and folder are locked",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M20",
+      "what": "the final phase decides replay before re-asking the boundary",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M21",
+      "what": "an audit write failure degrades to the unavailable 503",
+      "file": "services\\control-plane\\src\\inv\\app.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M22",
+      "what": "storageSample leaves the strict allow-list again",
+      "file": "services\\control-plane\\src\\inv\\app.py",
       "verdict": "KILLED",
       "exitCode": 1
     },

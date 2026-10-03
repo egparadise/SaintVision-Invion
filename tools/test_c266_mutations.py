@@ -41,6 +41,7 @@ REPAIR = ROOT / "src/saintvision/services/replica_repair.py"
 
 SERVICE_TESTS = ["tests/integration/test_storage_check_collect.py"]
 HTTP_TESTS = ["tests/integration/test_storage_check_collect_http.py"]
+STARTUP_TESTS = ["tests/integration/test_storage_check_collect_startup.py"]
 REPAIR_TESTS = [
     "tests/test_replica_repair.py",
     "tests/integration/test_replica_repair_plan_route_real_pg.py",
@@ -51,30 +52,31 @@ MUTANTS = [
         "id": "M1",
         "what": "phase one replays before authority is re-read",
         "file": COLLECT,
-        "from": """            prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
-            self._authority(conn, principal, project, contribution)
-            if prior is not None:
-                return prior, True
-            # ``locked_issue``, not ``issue``""",
-        "to": """            prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
-            if prior is not None:
-                return prior, True
-            self._authority(conn, principal, project, contribution)
-            # ``locked_issue``, not ``issue``""",
+        "from": """            self._authority(conn, principal, project, contribution)
+            # Locks first, boundary second, decision third""",
+        "to": """            # Locks first, boundary second, decision third""",
         "tests": SERVICE_TESTS,
     },
     {
         "id": "M2",
         "what": "phase three replays before authority is re-read",
         "file": COLLECT,
-        "from": """            prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
-            self._authority(conn, principal, project, contribution)
-            if prior is not None:
-                # A concurrent request already won.""",
-        "to": """            prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
-            if prior is not None:
-                # A concurrent request already won.""",
+        "from": """            self._authority(conn, principal, project, contribution)
+            # The idempotency row is locked""",
+        "to": """            # The idempotency row is locked""",
         "tests": SERVICE_TESTS,
+        # Declared equivalent, with the reason measured rather than assumed: in
+        # phase three the call this removes is followed by ``_locked_boundary``,
+        # whose ``_scope`` re-checks the same grant and the same folder ownership
+        # -- ``storage_commit.py:48-49`` calls ``_grant`` and
+        # ``permission(..., linked=True)`` -- and does so **under the lock**, which
+        # is strictly later than the removed call. So no behaviour changes and no
+        # test can tell the two apart. Left in the set rather than deleted, because
+        # the next person to move that line deserves to see this note.
+        "equivalent": (
+            "_locked_boundary -> _scope re-checks grant and ownership under the lock "
+            "(storage_commit.py:48-49), so removing the earlier call changes nothing"
+        ),
     },
     {
         "id": "M3",
@@ -195,6 +197,51 @@ MUTANTS = [
         "tests": HTTP_TESTS,
     },
     {
+        "id": "M19",
+        "what": "the boundary is asked before the Run and folder are locked",
+        "file": COLLECT,
+        "from": (
+            "        self.samples._scope(conn, principal, project, run_id, contribution)\n"
+            "        self._project_boundary(principal, project, contribution)"
+        ),
+        "to": (
+            "        self._project_boundary(principal, project, contribution)\n"
+            "        self.samples._scope(conn, principal, project, run_id, contribution)"
+        ),
+        "tests": SERVICE_TESTS,
+    },
+    {
+        "id": "M20",
+        "what": "the final phase decides replay before re-asking the boundary",
+        "file": COLLECT,
+        "from": (
+            "            self._locked_boundary(conn, principal, project, run_id, contribution)\n"
+            "            if prior is not None:\n"
+            "                # A concurrent request already won."
+        ),
+        "to": (
+            "            if prior is not None:\n"
+            "                # A concurrent request already won."
+        ),
+        "tests": SERVICE_TESTS,
+    },
+    {
+        "id": "M21",
+        "what": "an audit write failure degrades to the unavailable 503",
+        "file": KERNEL_APP,
+        "from": '                    raise DomainError("SYS-0001", "Internal error", 500) from None',
+        "to": '                    raise DomainError("SYS-0001", "Internal error", 503) from None',
+        "tests": HTTP_TESTS,
+    },
+    {
+        "id": "M22",
+        "what": "storageSample leaves the strict allow-list again",
+        "file": KERNEL_APP,
+        "from": '                "storageSample",\n',
+        "to": "",
+        "tests": STARTUP_TESTS,
+    },
+    {
         "id": "M16",
         "what": "the repair list drops its project condition",
         "file": REPAIR,
@@ -246,7 +293,7 @@ def main() -> int:
         print("INV_TEST_ADMIN_DSN is required: these guards are about rows and grants")
         return 2
 
-    baseline = run(SERVICE_TESTS + HTTP_TESTS + REPAIR_TESTS)
+    baseline = run(SERVICE_TESTS + HTTP_TESTS + STARTUP_TESTS + REPAIR_TESTS)
     summary = (baseline.stdout.strip().splitlines() or [""])[-1]
     print(f"unmutated suite -> exit {baseline.returncode}: {summary}")
     if baseline.returncode != 0:
@@ -271,17 +318,30 @@ def main() -> int:
         finally:
             path.write_text(original, encoding="utf-8", newline="")
             assert path.read_text(encoding="utf-8") == original, path
-        verdict = "KILLED" if done.returncode == 1 else f"SURVIVED (exit {done.returncode})"
-        print(f"{verdict:<28} {mutant['id']} {mutant['what']}")
-        results.append({
+        if done.returncode == 1:
+            verdict = "KILLED"
+        elif mutant.get("equivalent") and done.returncode == 0:
+            # An equivalent mutant is not a gap: the behaviour is unchanged, and the
+            # reason is recorded beside it so the claim can be checked rather than
+            # taken. It is never counted as a kill.
+            verdict = "EQUIVALENT"
+        else:
+            verdict = "SURVIVED"
+        shown = verdict if verdict != "SURVIVED" else f"SURVIVED (exit {done.returncode})"
+        print(f"{shown:<28} {mutant['id']} {mutant['what']}")
+        row = {
             "id": mutant["id"], "what": mutant["what"],
             "file": str(path.relative_to(ROOT)),
-            "verdict": "KILLED" if done.returncode == 1 else "SURVIVED",
+            "verdict": verdict,
             "exitCode": done.returncode,
-        })
+        }
+        if mutant.get("equivalent"):
+            row["equivalentBecause"] = mutant["equivalent"]
+        results.append(row)
 
     killed = sum(1 for row in results if row["verdict"] == "KILLED")
-    print(f"\n{killed}/{len(results)} killed")
+    equivalent = sum(1 for row in results if row["verdict"] == "EQUIVALENT")
+    print(f"\n{killed}/{len(results)} killed, {equivalent} equivalent")
     if arguments.json:
         RESULTS.write_text(
             json.dumps(
@@ -294,6 +354,7 @@ def main() -> int:
                         "rather than a leftover mutant."
                     ),
                     "killed": killed,
+                    "equivalent": equivalent,
                     "total": len(results),
                     "mutants": results,
                 },
@@ -302,7 +363,7 @@ def main() -> int:
             encoding="utf-8", newline="",
         )
         print("wrote", RESULTS.relative_to(ROOT))
-    return 0 if killed == len(results) else 1
+    return 0 if killed + equivalent == len(results) else 1
 
 
 if __name__ == "__main__":

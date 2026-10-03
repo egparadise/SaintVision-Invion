@@ -107,16 +107,24 @@ class CatalogueProjectReader:
     business attributes) do not cover it. The catalogue is the app role's domain, so
     the question is asked there instead of widening the kernel's reach.
 
-    **The limitation, stated rather than hidden.** This read is on another connection
-    and therefore another transaction: it cannot be locked together with the
-    kernel's rows, so a catalogue change committed between this check and the write
-    is not excluded by it. The gate is applied in **both** phases, so a change has
-    to land inside a window that also survives phase three's re-check, and the
-    write path's own locks still bind the Run, the folder and the channel. Making
-    the binding lockable from the kernel needs one of three reviewed changes --
-    granting the column, a SECURITY DEFINER function (which moves the definer count
-    and therefore the AC-11 reviewed set), or moving the surface into the app --
-    and choosing is not this card's to make.
+    **How the window is closed without the column.** This read is on another
+    connection, so it cannot be locked *with* the kernel's rows -- and on its own
+    that left a real race: r2's probe committed another project's ``data_locations``
+    right after the check and the collect still recorded a check (Codex r2 F1).
+
+    What closes it is the order, not the connection. The caller takes the
+    contribution row ``FOR UPDATE`` **before** asking this question, and the product
+    path that catalogues a location takes **that same row** ``FOR UPDATE`` first
+    (``saintvision.services.storage.locked_contribution``, used by
+    ``api/v1/storage_project.py``). So while the lock is held no location of that
+    folder can be added or moved, and the answer cannot go stale between the check
+    and the write. The lock is what makes a cross-connection read safe here; the
+    read alone never was.
+
+    Granting the column, or a SECURITY DEFINER function (which would move the
+    definer count and therefore the AC-11 reviewed set), or moving the surface into
+    the app, would each remove the need for that ordering argument -- and choosing
+    among them is not this card's to make.
     """
 
     def __init__(self, engine):
@@ -175,6 +183,12 @@ class StorageCheckCollector:
 
     # ------------------------------------------------------------------ authority
     def _authority(self, conn, principal, project, contribution):
+        """The kernel-side half: grant, then the folder's owner and status.
+
+        The project boundary is **not** here. It needs another connection, so it
+        has to be asked after this transaction has locked the folder row -- see
+        :meth:`_locked_boundary` and :class:`CatalogueProjectReader`.
+        """
         """What must hold **now**, before any answer -- stored or fresh.
 
         Three things, and the refusal differs by what the answer would disclose:
@@ -217,8 +231,19 @@ class StorageCheckCollector:
             or row["registered_by_user_id"] != granted["userId"]
         ):
             raise DomainError("RES-0004", "Storage contribution not found", 404)
-        self._project_boundary(principal, project, contribution)
         return granted
+
+    def _locked_boundary(self, conn, principal, project, run_id, contribution):
+        """Lock the Run and the folder, **then** ask whether the folder is in scope.
+
+        The order is the whole point (Codex r2 F1). ``_scope`` takes the Run lock and
+        the contribution row ``FOR UPDATE``; only then is the catalogue asked. Since
+        the product's own catalogue write takes the same contribution row first,
+        nothing can move a location into or out of this folder between the answer
+        and the write that relies on it.
+        """
+        self.samples._scope(conn, principal, project, run_id, contribution)
+        self._project_boundary(principal, project, contribution)
 
     def _project_boundary(self, principal, project, contribution):
         """The folder's catalogue must belong to **this** project, all of it.
@@ -264,6 +289,10 @@ class StorageCheckCollector:
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
             self._authority(conn, principal, project, contribution)
+            # Locks first, boundary second, decision third -- in this order even on
+            # the replay branch, so a stored answer is not handed back for a folder
+            # that has since moved out of this project.
+            self._locked_boundary(conn, principal, project, run_id, contribution)
             if prior is not None:
                 return prior, True
             # ``locked_issue``, not ``issue``: ``db.transaction`` opens its own
@@ -284,6 +313,10 @@ class StorageCheckCollector:
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
             self._authority(conn, principal, project, contribution)
+            # The idempotency row is locked, and this takes the Run and the folder
+            # before re-asking the boundary. Everything after this line decides with
+            # the catalogue held still (Codex r2 F1).
+            self._locked_boundary(conn, principal, project, run_id, contribution)
             if prior is not None:
                 # A concurrent request already won. Its answer is the answer; the
                 # envelope this call just received is dropped rather than recorded.

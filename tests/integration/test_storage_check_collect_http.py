@@ -313,13 +313,18 @@ def test_a_failing_audit_write_is_not_served_as_a_tidy_refusal(served, monkeypat
         )
         connection.commit()
     response = _post(served, key="http-audit-broken")
-    assert response.status_code in (500, 503), response.text
-    assert response.status_code != 403
+    # Exactly 500, the same invariant the core app's audit test pins. Not 403 (the
+    # refusal it could not record) and **not** 503 (which in this surface means
+    # "not observed" and is a different answer). Accepting either would have let a
+    # revert pass, which is what Codex r2 found in my first version.
+    assert response.status_code == 500, response.text
     body = response.json()
-    # Sanitized: the internal failure is not described to the caller.
+    # Sanitized: neither the decision nor the internal failure reaches the caller.
     assert body["code"] == "SYS-0001"
+    assert "AUTH-0030" not in response.text
     assert "audit" not in body["detail"].lower()
     assert _checks(served) == 0
+    assert _denials(served) == []
 
 
 # =================================================== the startup refusal (F1/F4)
