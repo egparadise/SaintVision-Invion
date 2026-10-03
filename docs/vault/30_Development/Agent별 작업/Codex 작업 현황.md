@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.311"
+version: "1.0.312"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T13:05:15+09:00"
+updated: "2026-10-03T13:25:52+09:00"
 source_of_truth: "Git"
 active_card: "CARD-262 server_config volume split"
-active_card_status: "API and worker configuration are split into distinct read-only volumes; focused PG-free and rendered Compose tests pass, while hosted candidate-image isolation and exact-head CI remain review gates"
-active_card_next: "Run the candidate-image container boundary on hosted CI, confirm exact-head Backend/Core, and request Claude review"
+active_card_status: "Claude r1 boundary review passed; all-service override sweeps and fail-closed symlink and special-file cases now close the two surviving mutations, while hosted candidate-image JUnit remains the final gate"
+active_card_next: "Confirm exact-head Backend/Core and prove from Core JUnit that both candidate-image container cases ran without skips"
 ---
 
 ## 2026-10-03 Card 262 — server_config volume split
@@ -21,8 +21,11 @@ active_card_next: "Run the candidate-image container boundary on hosted CI, conf
 - The preparation tool now assigns API and worker files to exact roots, rejects cross-root worker
   TLS references and existing/equal volumes, and verifies each volume before returning a redacted
   receipt. A failed two-volume preparation removes only volumes owned by that invocation.
-- Focused local results: server-config **26 passed / 3 candidate-image skips**, rendered deployment
-  boundary **17 passed**, VF Compose boundary **3 passed**. Hosted container and full exact-head CI
+- Claude r1's two surviving mutations are now covered: rendered base/Workspace/PITR/all-override
+  graphs sweep every service for forbidden worker mounts, and the file boundary rejects symlink,
+  hardlink, directory, FIFO, and oversized inputs. Focused local results are server-config
+  **32 passed / 7 explicit platform-or-candidate-image skips**, rendered deployment boundary
+  **20 passed**, and VF Compose boundary **3 passed**. Hosted container JUnit and full exact-head CI
   are not yet claimed. [[2026-10-03_13-05-15_KST_Card262_server_config_volume_split_Codex]].
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement

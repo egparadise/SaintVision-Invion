@@ -168,39 +168,61 @@ def test_worker_service_is_private_configured_and_build_dispatch_defaults_off():
     assert worker["depends_on"]["postgres"]["condition"] == "service_healthy"
 
 
-def test_rendered_compose_never_mounts_worker_credentials_into_api(tmp_path):
+@pytest.mark.parametrize(
+    "overlays",
+    [
+        (),
+        ("docker-compose.workspace.yml",),
+        ("docker-compose.pitr.yml",),
+        ("docker-compose.workspace.yml", "docker-compose.pitr.yml"),
+    ],
+)
+def test_rendered_compose_limits_config_volumes_to_intended_services(tmp_path, overlays):
     if not shutil.which("docker"):
         pytest.skip("Docker Compose unavailable")
     if subprocess.run(["docker", "compose", "version"], capture_output=True).returncode:
         pytest.skip("Docker Compose unavailable")
     empty = tmp_path / "empty.env"
     empty.write_text("")
+    compose_files = [ROOT / "docker-compose.prod.yml", *(ROOT / item for item in overlays)]
+    command = ["docker", "compose", "--env-file", str(empty)]
+    for compose_file in compose_files:
+        command.extend(["-f", str(compose_file)])
+    command.extend(["config", "--format", "json"])
     result = subprocess.run(
-        [
-            "docker",
-            "compose",
-            "--env-file",
-            str(empty),
-            "-f",
-            str(ROOT / "docker-compose.prod.yml"),
-            "config",
-            "--format",
-            "json",
-        ],
-        env={**os.environ, **REQUIRED},
+        command,
+        env={
+            **os.environ,
+            **REQUIRED,
+            "INV_WORKSPACE_VOLUME": "synthetic-workspace-volume",
+            "INV_WAL_ARCHIVE_VOLUME": "synthetic-wal-archive-volume",
+        },
         capture_output=True,
         text=True,
         timeout=30,
     )
     assert result.returncode == 0, result.stderr
     config = json.loads(result.stdout)
-    control = config["services"]["control-plane"]
-    worker = config["services"]["worker"]
-    control_targets = {mount["target"] for mount in control["volumes"]}
-    worker_mounts = {mount["target"]: mount for mount in worker["volumes"]}
-    assert control_targets == {"/run/saintvision"}
-    assert "/run/saintvision-worker" not in control_targets
-    assert set(worker_mounts) == {"/run/saintvision", "/run/saintvision-worker"}
-    assert all(mount["read_only"] is True for mount in worker_mounts.values())
+    api_consumers = set()
+    worker_consumers = set()
+    for service_name, service in config["services"].items():
+        mounts = service.get("volumes", [])
+        api_mounts = [mount for mount in mounts if mount["target"] == "/run/saintvision"]
+        worker_mounts = [
+            mount
+            for mount in mounts
+            if mount["target"] == "/run/saintvision-worker"
+            or mount.get("source") == REQUIRED["INV_WORKER_CONFIG_VOLUME"]
+        ]
+        if api_mounts:
+            api_consumers.add(service_name)
+            assert len(api_mounts) == 1 and api_mounts[0]["read_only"] is True
+        if worker_mounts:
+            worker_consumers.add(service_name)
+            assert len(worker_mounts) == 1
+            assert worker_mounts[0]["target"] == "/run/saintvision-worker"
+            assert worker_mounts[0]["read_only"] is True
+    assert api_consumers == {"control-plane", "worker"}
+    assert worker_consumers == {"worker"}
     assert config["volumes"]["api_config"]["name"] == REQUIRED["INV_CONFIG_VOLUME"]
     assert config["volumes"]["worker_config"]["name"] == REQUIRED["INV_WORKER_CONFIG_VOLUME"]

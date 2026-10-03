@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD262-SERVER-CONFIG-VOLUME-SPLIT-CODEX-001"
 title: "Card 262 server configuration volume split"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T13:05:15+09:00"
+updated: "2026-10-03T13:25:52+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,13 +34,17 @@ migration and `INV_BUILDKIT_PRODUCT_ENABLED` remains default off.
 
 ## Verification
 
-- `python -m pytest -q tests/core/test_server_config_volume.py -m "not postgres"`:
-  **26 passed, 3 explicit candidate-image skips**, exit 0. The opt-in candidate-image case mounts
+- `python -m pytest -q tests/core/test_server_config_volume.py`:
+  **32 passed, 7 explicit local skips**, exit 0. Four platform skips cover Windows hosts without
+  symlink privilege or FIFO support; three require the pinned hosted candidate image. The
+  input-boundary matrix rejects symlinks, hardlinks, directories, FIFOs, and files over 64 KiB.
+  The opt-in candidate-image case mounts
   the two real volumes into separate container namespaces and asserts that the API namespace has
   neither `worker.json` nor the worker TLS key.
 - `python -m pytest -q tests/core/test_deployment_credentials.py`:
-  **17 passed**, exit 0. This includes rendered `docker compose config --format json` checks for
-  the split external volume names, read-only mounts, API exclusion, and unchanged default-off flag.
+  **20 passed**, exit 0. Rendered `docker compose config --format json` checks cover the base,
+  Workspace, PITR, and combined override graphs. Every service is swept: only `control-plane` and
+  `worker` may mount API configuration, and only `worker` may mount worker configuration.
 - `python -m pytest -q tests/core/test_vf_deployment.py`: **3 passed**, exit 0.
 - `python tools/check_docs.py`, `python tools/check_ontology.py`, and
   `python tools/check_doc_single_source.py --ratchet`: exit 0. Obsidian sync check reported no

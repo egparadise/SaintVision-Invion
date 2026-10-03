@@ -16,6 +16,78 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+def write_minimal_worker_bundle(directory):
+    (directory / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    (directory / "jwks.json").write_text("{}")
+    (directory / "worker.json").write_text(
+        json.dumps(
+            {
+                "tenantId": "11111111-1111-4111-8111-111111111111",
+                "tls": {
+                    "ca_file": "/run/saintvision-worker/node-ca.pem",
+                    "certificate_file": "/run/saintvision-worker/worker.pem",
+                    "key_file": "/run/saintvision-worker/worker.key",
+                },
+            }
+        )
+    )
+    for name in ("node-ca.pem", "worker.pem", "worker.key"):
+        (directory / name).write_text("synthetic")
+
+
+@pytest.mark.parametrize("target_name", ["worker.json", "worker.key"])
+def test_configuration_symlinks_are_rejected(tmp_path, target_name):
+    write_minimal_worker_bundle(tmp_path)
+    target = tmp_path / target_name
+    backing = tmp_path / f"{target_name}.backing"
+    target.replace(backing)
+    try:
+        target.symlink_to(backing.name)
+    except OSError as error:
+        pytest.skip(f"symlink creation unavailable on this host: {error}")
+    with pytest.raises(ValueError, match="Bounded regular configuration files required"):
+        module.collect(tmp_path)
+
+
+@pytest.mark.parametrize("target_name", ["worker.json", "worker.key"])
+def test_configuration_hardlinks_are_rejected(tmp_path, target_name):
+    write_minimal_worker_bundle(tmp_path)
+    os.link(tmp_path / target_name, tmp_path / f"{target_name}.alias")
+    with pytest.raises(ValueError, match="Bounded regular configuration files required"):
+        module.collect(tmp_path)
+
+
+@pytest.mark.parametrize("target_name", ["worker.json", "worker.key"])
+def test_configuration_directories_are_rejected(tmp_path, target_name):
+    write_minimal_worker_bundle(tmp_path)
+    target = tmp_path / target_name
+    target.unlink()
+    target.mkdir()
+    with pytest.raises(ValueError, match="Bounded regular configuration files required"):
+        module.collect(tmp_path)
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="FIFO creation is unavailable")
+@pytest.mark.parametrize("target_name", ["worker.json", "worker.key"])
+def test_configuration_fifos_are_rejected_without_reading(tmp_path, target_name):
+    write_minimal_worker_bundle(tmp_path)
+    target = tmp_path / target_name
+    target.unlink()
+    os.mkfifo(target)
+    with pytest.raises(ValueError, match="Bounded regular configuration files required"):
+        module.collect(tmp_path)
+
+
+@pytest.mark.parametrize("target_name", ["worker.json", "worker.key"])
+def test_configuration_files_over_64_kib_are_rejected(tmp_path, target_name):
+    write_minimal_worker_bundle(tmp_path)
+    (tmp_path / target_name).write_bytes(b"x" * 65537)
+    with pytest.raises(ValueError, match="Bounded regular configuration files required"):
+        module.collect(tmp_path)
+
+
 @pytest.mark.parametrize(
     "reference",
     [
