@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD262-SERVER-CONFIG-VOLUME-SPLIT-CODEX-001"
 title: "Card 262 server configuration volume split"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T13:25:52+09:00"
+updated: "2026-10-03T13:50:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -54,6 +54,9 @@ migration and `INV_BUILDKIT_PRODUCT_ENABLED` remains default off.
   repaired. The baseline was not widened or edited; clean hosted Docs remains the citation gate.
 - Hosted candidate-image execution and the exact-head Backend/Core result remain review gates; this
   document does not treat the locally skipped container case as measured success.
+- Backend run `37096574185` first exposed the intended third candidate-image skip while all 8,124
+  Python 3.14 product tests passed. The exact skip map now names all three cases; this preserves the
+  fail-closed ratchet rather than deleting or weakening the new namespace-isolation test.
 
 ## Operational effect
 
