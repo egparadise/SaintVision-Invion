@@ -27,6 +27,20 @@ active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 dis
   **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI at `e627bc61` succeeded
   (Backend run `37110979411` 3.12/3.14, Docs run `37110979408`; coordinator update).
 - [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
+## 2026-10-03 Card 268 — inv_audit_reader disposition removal
+
+- Train 43 (`1d2d5289`) still has no product connection, role switch, membership grant, or read
+  route for `inv_audit_reader`; the role exists only as legacy audit DDL and as a measured
+  security boundary. The 2026-11-30 exception is therefore not extended.
+- Migration `0067_audit_reader_revoke` removes `SELECT`, schema `USAGE`, and the unconditional
+  read policy. Its irreversible downgrade repeats those exact removals, and the migration graph
+  accepts only the reviewed 0066/0067 operation sets.
+- The generated allowlist has zero `accepted-with-expiry` rows. The evaluator independently
+  requires the reader role to remain non-login/non-inheriting/non-member, with no audit-table
+  privilege and no reader policy; any restored visibility is `MEASURED_FAIL`.
+- Focused PG-free checks pass; disposable-PostgreSQL execution, target-registry repin, hosted
+  security evidence, and Claude review remain.
+  [[2026-10-03_17-58-55_KST_Card268_audit_reader_disposition_removal_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
 
