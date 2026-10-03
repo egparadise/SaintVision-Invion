@@ -21,13 +21,16 @@
 #   source tools/post_landing_lane_guard.sh
 #   require_sha LAND "$LAND"
 #   RUN=$(select_and_await s12-acceptance-evidence.yml "$LAND" workflow_dispatch "$CID")
-#   ac11_dispatch_in_order "$LAND"
+#   ac11_dispatch_in_order "$LAND" ".work/post-landing/$LAND/ac11-exact-sha-orchestration.json"
 #
 # Tunables (the tests set them; a real landing wants the defaults):
 #   GUARD_LIST_ATTEMPTS (default 10)  how many times to look for a just-dispatched run
 #   GUARD_LIST_SLEEP    (default 6)   seconds between those attempts
 #   GUARD_DISPATCH_REF  (default integration/all-agents-unified)
 #   GUARD_PYTHON        (default python)  the interpreter that runs the run selector
+#   GUARD_AC11_PYTHON   (default GUARD_PYTHON)  interpreter for the canonical AC-11 orchestrator
+#   GUARD_AC11_ORCHESTRATOR (default run_ac11_exact_sha_aggregate.py beside this file)
+#   GUARD_REPOSITORY    (default egparadise/SaintVision-Invion)
 
 # The directory this file lives in, so the selector beside it is found however the runbook's
 # shell session was started.
@@ -122,23 +125,25 @@ select_and_await() {
   printf '%s\n' "$run"
 }
 
-# ac11_dispatch_in_order <landed sha> -- the order the runbook's table declares, enforced.
-# Each producer is dispatched, found by its own correlation id at that head, and waited for
-# before the next step; the aggregator is dispatched only after both have succeeded, so a
-# producer that is still running, failed, or ran at another head means zero aggregate calls.
+# ac11_dispatch_in_order <landed sha> [receipt path] -- delegate to the canonical exact-SHA
+# orchestrator.  That tool owns the complete producer set (security, accessibility and migration
+# rehearsal), artifact/run/ref/expiry checks, prior-failure and duplicate-run refusal, and the
+# final aggregate recomputation.  Keeping a second shell implementation here would let the
+# runbook silently lose a producer again.
 ac11_dispatch_in_order() {
   local land="${1-}" ref="${GUARD_DISPATCH_REF:-integration/all-agents-unified}"
-  local workflow cid run
+  local output="${2:-.work/post-landing/${land}/ac11-exact-sha-orchestration.json}"
+  local repository="${GUARD_REPOSITORY:-egparadise/SaintVision-Invion}"
+  local orchestrator="${GUARD_AC11_ORCHESTRATOR:-$GUARD_DIR/run_ac11_exact_sha_aggregate.py}"
+  local interpreter="${GUARD_AC11_PYTHON:-${GUARD_PYTHON:-python}}"
   require_sha LAND "$land" || return $?
-  for workflow in ac11-security-scan.yml ac11-accessibility-e2e.yml; do
-    cid="post-landing-$workflow-$land"
-    gh workflow run "$workflow" --ref "$ref" -f correlation_id="$cid" || return $?
-    run=$(select_and_await "$workflow" "$land" workflow_dispatch "$cid") || return $?
-    printf '%s\t%s\n' "$workflow" "$run"
-  done
-  cid="post-landing-aggregate-$land"
-  gh workflow run ac11-aggregate.yml --ref "$ref" \
-    -f source_sha="$land" -f correlation_id="$cid" || return $?
-  run=$(select_and_await ac11-aggregate.yml "$land" workflow_dispatch "$cid") || return $?
-  printf '%s\t%s\n' ac11-aggregate.yml "$run"
+  if [ ! -f "$orchestrator" ]; then
+    guard_refuse "canonical AC-11 exact-SHA orchestrator is unavailable"
+    return 2
+  fi
+  "$interpreter" "$orchestrator" \
+    --source-sha "$land" \
+    --ref "$ref" \
+    --repository "$repository" \
+    --output "$output"
 }

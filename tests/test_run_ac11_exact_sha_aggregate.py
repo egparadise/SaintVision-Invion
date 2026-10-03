@@ -249,9 +249,11 @@ def test_reuses_exact_producers_and_dispatches_only_aggregate(monkeypatch: pytes
     assert receipt["secretsRequired"] is False
 
 
-def test_dispatches_only_the_missing_producer_then_aggregate(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize("missing", sorted(subject.EXPECTED_WORKFLOWS))
+def test_dispatches_only_each_missing_producer_then_aggregate(
+    monkeypatch: pytest.MonkeyPatch, missing: str
+) -> None:
     fake = FakeGh()
-    missing = ".github/workflows/ac11-security-scan.yml"
     run_id = int(fake.runs[missing][0]["databaseId"])
     artifact_id = int(fake.artifacts[run_id][0]["id"])
     fake.runs[missing].clear()

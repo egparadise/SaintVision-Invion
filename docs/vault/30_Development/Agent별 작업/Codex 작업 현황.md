@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.314"
+version: "1.0.315"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T14:20:37+09:00"
+updated: "2026-10-03T16:53:11+09:00"
 source_of_truth: "Git"
-active_card: "CARD-264 public.tenants E2-E5 disposition re-review before the 2026-10-31 expiry"
-active_card_status: "Card 262 #357 is approved by Claude r3 at 5002d2fc: the API mounts only api_config and no service but the worker can reach worker_config, with Backend 37097898581 and Core 37097898556 green and the candidate-image, four-combination compose sweep and symlink/FIFO cases executed, not skipped"
-active_card_next: "Re-measure the public.tenants accepted-with-expiry disposition (E2-E5, expires 2026-10-31) on the current tree and renew with evidence or remove it; product dispatch stays off by default"
+active_card: "CARD-267 post-landing AC-11 exact-SHA orchestration binding"
+active_card_status: "The shell guard now delegates once to Card 260's canonical three-producer exact-SHA orchestrator; focused guard 23/23 and fake-gh orchestrator 37/37 pass, with evaluator/schema/target/workflow/migration unchanged"
+active_card_next: "Run documentation gates and exact-head hosted CI, then request Claude independent review; actual post-landing workflow dispatch remains an operator action"
 ---
+
+## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
+
+- Started from train 42 `9e9a551cd25b9a237d5d439c317854d927a5640d`. The old shell guard
+  listed only security and accessibility producers, so migration rehearsal could be absent when
+  the aggregate lane ran.
+- `ac11_dispatch_in_order` now delegates once to Card 260's exact-SHA orchestrator. That existing
+  authority owns all three producers, run/ref/SHA/attempt and artifact expiry/digest checks,
+  duplicate/prior-failure refusal, final producer-set recheck and canonical aggregate recomputation.
+- The runbook records one redacted JSON receipt instead of a partial TSV run list. No evaluator,
+  schema, target, workflow, migration or score rule changed.
+- Focused local results are **23 passed** for the real-Bash guard boundary and **37 passed** for the
+  fake-gh exact-SHA orchestration. Hosted CI and Claude review are pending.
+- [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
 
