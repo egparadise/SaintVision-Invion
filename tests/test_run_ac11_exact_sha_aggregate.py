@@ -49,6 +49,7 @@ class FakeGh:
             workflow: [] for workflow in (*subject.EXPECTED_WORKFLOWS, subject.AGGREGATE_WORKFLOW)
         }
         self.views: dict[int, dict[str, object]] = {}
+        self.api_runs: dict[int, dict[str, object]] = {}
         self.artifacts: dict[int, list[dict[str, object]]] = {}
         self.artifact_details: dict[int, dict[str, object]] = {}
         self.archives: dict[int, bytes] = {}
@@ -97,6 +98,16 @@ class FakeGh:
         row = self._run(workflow, identifier, title)
         self.runs[workflow].append(row)
         self.views[identifier] = deepcopy(row)
+        self.api_runs[identifier] = {
+            "id": identifier,
+            "path": workflow,
+            "head_sha": SHA,
+            "head_branch": REF,
+            "event": "workflow_dispatch",
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "success",
+        }
         artifact_id = self.next_artifact
         self.next_artifact += 1
         body = archive if archive is not None else f"artifact-{artifact_id}".encode()
@@ -130,6 +141,9 @@ class FakeGh:
                 run_id = int(endpoint.split("/actions/runs/")[1].split("/")[0])
                 rows = self.artifacts.get(run_id, [])
                 return 0, json_bytes({"total_count": len(rows), "artifacts": rows})
+            if "/actions/runs/" in endpoint:
+                run_id = int(endpoint.rsplit("/", 1)[1])
+                return 0, json_bytes(self.api_runs[run_id])
             if "/actions/artifacts/" in endpoint and endpoint.endswith("/zip"):
                 artifact_id = int(endpoint.split("/actions/artifacts/")[1].split("/")[0])
                 return 0, self.archives[artifact_id]
@@ -265,7 +279,6 @@ def test_remote_ref_must_still_equal_the_exact_sha(monkeypatch: pytest.MonkeyPat
         ("headSha", "f" * 40, "headSha differs"),
         ("headBranch", "other/ref", "headBranch differs"),
         ("event", "push", "event differs"),
-        ("workflowName", ".github/workflows/backend.yml", "workflowName differs"),
         ("attempt", 2, "attempt differs"),
     ],
 )
@@ -276,6 +289,22 @@ def test_run_view_identity_mismatch_is_refused(
     row = fake.runs[".github/workflows/ac11-security-scan.yml"][0]
     fake.views[int(row["databaseId"])][field] = value
     with pytest.raises(subject.Refused, match=message):
+        run(fake, monkeypatch)
+
+
+def test_rest_workflow_path_not_unstable_workflow_name_is_authoritative(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeGh()
+    workflow = ".github/workflows/ac11-accessibility-e2e.yml"
+    row = fake.runs[workflow][0]
+    row["workflowName"] = "AC-11 Accessibility E2E Evidence"
+    fake.views[int(row["databaseId"])]["workflowName"] = "AC-11 Accessibility E2E Evidence"
+    run(fake, monkeypatch)
+    fake = FakeGh()
+    row = fake.runs[workflow][0]
+    fake.api_runs[int(row["databaseId"])]["path"] = ".github/workflows/backend.yml"
+    with pytest.raises(subject.Refused, match="REST path differs"):
         run(fake, monkeypatch)
 
 
@@ -405,6 +434,36 @@ def test_duplicate_aggregate_correlation_is_refused(monkeypatch: pytest.MonkeyPa
     fake.duplicate_aggregate = True
     with pytest.raises(subject.Refused, match="duplicate aggregate runs"):
         run(fake, monkeypatch)
+
+
+@pytest.mark.parametrize("conclusion", ["failure", "cancelled"])
+def test_prior_non_success_aggregate_is_refused_before_another_dispatch(
+    monkeypatch: pytest.MonkeyPatch, conclusion: str
+) -> None:
+    fake = FakeGh()
+    row = fake.add_success(
+        subject.AGGREGATE_WORKFLOW,
+        subject.AGGREGATE_ARTIFACT_PREFIX + SHA,
+        title="prior-aggregate",
+    )
+    row["conclusion"] = conclusion
+    with pytest.raises(subject.Refused, match="non-success conclusion"):
+        run(fake, monkeypatch)
+    assert subject.AGGREGATE_WORKFLOW not in fake.dispatched
+
+
+def test_prior_successful_aggregate_is_not_reused_or_duplicated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeGh()
+    fake.add_success(
+        subject.AGGREGATE_WORKFLOW,
+        subject.AGGREGATE_ARTIFACT_PREFIX + SHA,
+        title="unowned-prior-correlation",
+    )
+    with pytest.raises(subject.Refused, match="correlation cannot be reused"):
+        run(fake, monkeypatch)
+    assert subject.AGGREGATE_WORKFLOW not in fake.dispatched
 
 
 def test_concurrent_producer_added_after_binding_is_caught_by_final_recheck(

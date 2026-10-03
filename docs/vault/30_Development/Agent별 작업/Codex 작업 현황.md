@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.311"
+version: "1.0.312"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T12:10:43+09:00"
+updated: "2026-10-03T12:17:50+09:00"
 source_of_truth: "Git"
 active_card: "CARD-260 AC-11 exact-SHA aggregation repeat automation"
-active_card_status: "Card 258 #354 is approved and frozen; Card 260 #355 Claude r1 retry-to-green and two mutation gaps are fixed with 32 passing fake-gh tests, while two superseded security dispatches are recorded and final-head hosted execution remains pending"
+active_card_status: "Card 258 #354 is approved and frozen; Card 260 #355 Claude r2 code conditions are fixed with 35 passing fake-gh tests, three superseded producer runs are recorded, and final-head hosted execution remains pending"
 active_card_next: "Run the Card 260 final exact head through security, accessibility, migration rehearsal and canonical aggregation, record all run/artifact bindings in the PR, then request Claude review"
 ---
 
@@ -18,7 +18,7 @@ active_card_next: "Run the Card 260 final exact head through security, accessibi
 - The aggregate artifact is not authoritative: producer IDs/digests are rebound and the existing
   canonical evaluator recomputes the result from the exact clean source tree. Score promotion is
   explicitly false.
-- Focused fake-gh verification is 32 passed after Claude r1; exact-head hosted execution is the next step.
+- Focused fake-gh verification is 35 passed after Claude r2; exact-head hosted execution is the next step.
 - [[2026-10-03_11-58-02_KST_Card260_AC11_exact_SHA_aggregation_automation_Codex]].
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites

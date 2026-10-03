@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD260-AC11-EXACT-SHA-AUTOMATION-CODEX-001"
 title: "Card 260 AC-11 exact-SHA aggregation automation"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T12:10:43+09:00"
+updated: "2026-10-03T12:17:50+09:00"
 source_of_truth: "Git"
 ---
 
@@ -44,7 +44,7 @@ does not turn `MEASURED_FAIL` or `INVALID_RUN` into success and `promotesScore` 
 
 ## Verification before hosted execution
 
-- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **32 passed**.
+- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **35 passed**.
 - The fake-gh suite covers missing-only dispatch and the SHA/ref/event/workflow/attempt, duplicate
   run/correlation, run-id reuse, saturated run/artifact listings, artifact identity/expiry/digest
   and canonical-result boundaries.
@@ -62,10 +62,11 @@ the PG-free fake-gh result above.
 Claude r1 found that a completed non-success dispatch at the exact SHA was discarded before the
 tool considered dispatching again. That is retry-to-green laundering even if a later run passes.
 There is now no override: any exact workflow/ref/SHA `workflow_dispatch` with a completed
-non-success conclusion refuses the procedure before another dispatch. Failure followed by success,
-each supported non-success conclusion, expiry by time with `expired=false`, and a concurrent
-producer appearing after binding all have independent regressions. The focused result is the 32
-passed count above.
+non-success conclusion refuses the procedure before another dispatch. The aggregate lane performs
+the same pre-dispatch check and also refuses an unowned prior successful aggregate rather than
+reusing its correlation or creating a duplicate. Failure followed by success, each supported
+non-success conclusion, expiry by time with `expired=false`, and a concurrent producer appearing
+after binding all have independent regressions. The focused result is the 35 passed count above.
 
 Two security runs were created while bringing up the live procedure and are not final Card 260
 evidence:
@@ -76,7 +77,18 @@ evidence:
   later documentation and fail-closed corrections superseded that head.
 - Run `37092129615`, head `f9227a630b6267ebc1447ad8aa1eb848aa2f58e2`, completed success with
   artifact `11263290786` (`sha256:3502d87d6a8a1b1877a2febb0290a56624ef03cf5dc83aac487c2aa877ea1183`).
-  Claude r1 arrived while it was running; the local orchestrator was interrupted before it could
-  dispatch accessibility, migration or aggregate at a head that required correction.
+  It was followed by accessibility run `37092192002` at the same head, completed success with
+  artifact `11263161184`
+  (`sha256:46233a2faa555775f9de02783472ae74881991b7ad970b63bbf83852d52a5294`).
+  Claude r1 arrived before migration or aggregate; the local orchestrator was then interrupted so
+  it would not continue measuring a head that required correction.
 
-Neither run is promoted, substituted for a final-head measurement, or counted as an aggregate.
+None of these runs is promoted, substituted for a final-head measurement, or counted as an
+aggregate.
+
+The live accessibility run also exposed that GitHub's `workflowName` is not a stable workflow path:
+that run reports `AC-11 Accessibility E2E Evidence`, while some security runs report their YAML
+path. Candidate discovery remains server-filtered by workflow file, but completed runs are now
+bound to the authoritative REST `path`, SHA, ref, event, attempt, status and conclusion before an
+artifact is accepted. A friendly-name candidate is accepted only when that REST path is exact; a
+changed REST path is refused.

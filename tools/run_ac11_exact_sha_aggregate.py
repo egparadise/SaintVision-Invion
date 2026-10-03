@@ -266,7 +266,11 @@ def exact_rows(rows: list[dict[str, Any]], producer: Producer, sha: str, ref: st
     for row in rows:
         if row.get("headSha") != sha or row.get("headBranch") != ref:
             continue
-        if row.get("event") != "workflow_dispatch" or row.get("workflowName") != producer.workflow:
+        # `gh run list --workflow <file>` is the server-side workflow filter. Do not compare its
+        # `workflowName` field with the path: GitHub returns the YAML `name:` for some registered
+        # workflows and the path for others. The authoritative REST run `path` is checked below
+        # after a candidate completes.
+        if row.get("event") != "workflow_dispatch":
             continue
         _row_id(row)
         attempt = row.get("attempt")
@@ -309,6 +313,33 @@ def view_run(runner: Runner, repository: str, run_id: int) -> dict[str, Any]:
     return doc
 
 
+def validate_run_path(runner: Runner, repository: str, row: dict[str, Any], producer: Producer,
+                      sha: str, ref: str) -> None:
+    """Bind a candidate to the REST run identity; `workflowName` is not a stable path field."""
+
+    run_id = _row_id(row)
+    doc = command_json(
+        runner,
+        ["gh", "api", f"repos/{repository}/actions/runs/{run_id}"],
+        f"read run {run_id} metadata",
+    )
+    expected = {
+        "id": run_id,
+        "path": producer.workflow,
+        "head_sha": sha,
+        "head_branch": ref,
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+    }
+    if not isinstance(doc, dict):
+        raise Refused(f"run {run_id} REST metadata is not an object")
+    for key, value in expected.items():
+        if doc.get(key) != value:
+            raise Refused(f"run {run_id} REST {key} differs from the exact workflow binding")
+
+
 def validate_run(row: dict[str, Any], producer: Producer, sha: str, ref: str, *,
                  correlation_id: str | None = None) -> None:
     if _row_id(row) <= 0:
@@ -317,7 +348,6 @@ def validate_run(row: dict[str, Any], producer: Producer, sha: str, ref: str, *,
         "headSha": sha,
         "headBranch": ref,
         "event": "workflow_dispatch",
-        "workflowName": producer.workflow,
         "attempt": 1,
     }
     for key, value in expected.items():
@@ -343,6 +373,7 @@ def wait_existing(runner: Runner, repository: str, row: dict[str, Any], producer
         current = view_run(runner, repository, run_id)
         if current.get("status") == "completed":
             validate_run(current, producer, sha, ref)
+            validate_run_path(runner, repository, current, producer, sha, ref)
             return current
         _deadline_wait(started, deadline_seconds, now)
         sleep(poll_seconds)
@@ -387,6 +418,7 @@ def dispatch_and_wait(runner: Runner, repository: str, ref: str, sha: str, produ
         current = view_run(runner, repository, run_id)
         if current.get("status") == "completed":
             validate_run(current, producer, sha, ref, correlation_id=correlation)
+            validate_run_path(runner, repository, current, producer, sha, ref)
             return current, correlation
         _deadline_wait(started, deadline_seconds, now)
         sleep(poll_seconds)
@@ -621,6 +653,9 @@ def orchestrate(*, source: str, ref: str, repository: str, runner: Runner = real
     aggregate = Producer(AGGREGATE_WORKFLOW, AGGREGATE_ARTIFACT_PREFIX, (), True)
     ensure_remote_ref(runner, repo, branch, sha)
     aggregate_rows = list_runs(runner, repo, branch, aggregate.workflow)
+    prior_aggregate = exact_rows(aggregate_rows, aggregate, sha, branch)
+    if prior_aggregate:
+        raise Refused("an exact-SHA aggregate run already exists; its correlation cannot be reused")
     aggregate_correlation = correlation_factory(aggregate.workflow)
     baseline_id = max((_row_id(row) for row in aggregate_rows), default=0)
     command(
@@ -654,6 +689,7 @@ def orchestrate(*, source: str, ref: str, repository: str, runner: Runner = real
         if aggregate_run.get("status") != "completed":
             sleep(poll_seconds)
     validate_run(aggregate_run, aggregate, sha, branch, correlation_id=aggregate_correlation)
+    validate_run_path(runner, repo, aggregate_run, aggregate, sha, branch)
     if _row_id(aggregate_run) in run_ids:
         raise Refused("aggregate run id reuses a producer run id")
     aggregate_artifact = artifact_for_run(
