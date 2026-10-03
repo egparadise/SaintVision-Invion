@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD266-VF-CL-04-STORAGE-CHECK-COLLECT-20261003"
 title: "카드 266 — 서명된 폴더 점검을 돌리는 제품 경로를 설계대로 구현했다. ledger 응답이 쓰기와 같은 transaction에서 커밋되고, 저장된 응답은 지금 권한이 있는 주체에게만 돌아간다"
-version: "1.2.0"
+version: "1.2.1"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-03T20:45:40+09:00"
+updated: "2026-10-03T21:14:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9e9a551c"
@@ -152,7 +152,7 @@ r2까지 나는 cross-connection 경계 읽기를 "잠글 수 없는 한계"로 
 
 **고친 것은 connection이 아니라 순서다.** `_locked_boundary`가 `_scope`로 **Run과 contribution 행을 `FOR UPDATE`로 잡고 그다음에** catalogue를 묻는다. 두 phase 모두 **replay 분기보다 먼저** 그것을 지난다 — 저장된 답도 project를 떠난 폴더에 대해서는 돌아가지 않는다.
 
-cross-connection 읽기가 **안전한 이유**도 이제 단언한다: 제품의 catalogue 쓰기가 **같은 contribution 행을 먼저 `FOR UPDATE`로 잡는다**(`services/storage.py locked_contribution`, `api/v1/storage_project.py`가 그것을 쓴다). 그래서 잠금을 든 동안 그 폴더의 location은 들어오거나 나갈 수 없다. **잠금이 그 읽기를 안전하게 만드는 것이고, 읽기 혼자서는 처음부터 안전하지 않았다.**
+cross-connection 읽기가 **안전한 이유**도 이제 단언한다: 제품의 catalogue 쓰기가 **같은 contribution 행을 먼저 `FOR UPDATE`로 잡는다**(`src/saintvision/services/storage.py:350 locked_contribution`, `src/saintvision/api/v1/storage_project.py`가 그것을 쓴다). 그래서 잠금을 든 동안 그 폴더의 location은 들어오거나 나갈 수 없다. **잠금이 그 읽기를 안전하게 만드는 것이고, 읽기 혼자서는 처음부터 안전하지 않았다.**
 
 시험 셋: 잠금을 든 동안 이동을 시도하는 **mid-flight schedule**(가능한 결과가 "이동 먼저 → 거부"와 "collect 먼저 → 이동은 뒤에" 둘뿐이고, "떠난 폴더에 대한 check 기록"은 없다) · **replay 분기의 같은 경쟁** · 질문이 두 phase 모두에서 잠금 아래에 남아 있다는 **source 수준 단언**(그 시험이 스스로 그렇게 적는다).
 
@@ -167,3 +167,27 @@ Boundary가 임의 예외를 `SYS-0001` 503으로 바꾸므로 감사 쓰기 실
 ### 10-4. 변이 22개 — 21 사살 + 1 equivalent
 
 **M2를 equivalent로 선언했고 사유를 측정했다**: phase 3에서 그것이 지우는 호출 뒤에 `_locked_boundary`가 오고, 그 `_scope`가 **같은 grant와 같은 소유권을 잠금 아래에서 다시 본다**(`storage_commit.py:48-49`의 `_grant`·`permission(..., linked=True)`). 그래서 동작이 바뀌지 않고 어떤 시험도 둘을 구별할 수 없다. 집합에서 지우지 않고 남긴 이유는, 그 줄을 다음에 옮길 사람이 이 메모를 봐야 하기 때문이다.
+### 10-5. `08fd8844`의 Backend red — 인용 래칫, 그리고 내가 게이트를 **너무 일찍** 돌렸다
+
+`08fd8844`에서 Backend(3.12·3.14 동일)가 하나 떨어졌다: `tests/test_check_doc_path_citations.py::test_real_vault_ratchet_is_green`, 새로 깨진 인용 **2건**.
+
+```
++ 30_Development/Agent별 작업/Claude 작업 현황.md || services/storage.py locked_contribution  [path does not exist]
++ 30_Development/History/2026-10-03_17-15-47_KST_..._Claude.md || services/storage.py locked_contribution  [path does not exist]
+```
+
+둘 다 **§10-1에서 내가 쓴 줄**이다. 실재 경로는 `src/saintvision/services/storage.py:350`인데 **`src/saintvision/` 접두사를 뺀 꼴**로 적었다. 그 꼴이 그냥 틀린 이름으로 끝나지 않는 이유는 스캐너를 재 보면 나온다 — `CITATION_ROOTS`(`tools/check_doc_path_citations.py:68`)에 **`services`가 들어 있고** 저장소 루트에 실제로 그 디렉터리가 있으므로(`services/control-plane`), 접두사가 빠진 토큰이 **저장소 경로로 읽혀** "없는 경로"가 된다. 같은 문장의 `storage_project.py`는 루트에 `api`가 없어 애초에 경로로 읽히지 않았지만 그것도 전체 경로(`src/saintvision/api/v1/storage_project.py`)로 고쳤다.
+
+그리고 **이 절을 처음 쓸 때 같은 함정을 한 번 더 밟았다**: 실패를 설명하려고 틀린 경로를 **inline code span에 그대로 인용**했더니 래칫이 그 인용을 새 깨진 인용으로 다시 셌다. 측정으로 규칙을 확인했다 — fenced block은 `strip_fenced_blocks`(`:83`)가 떼어내므로 위 코드 블록의 인용은 세지 않고, 검사 대상은 **inline span**(`_SPAN` `:74`)뿐이다. 그래서 틀린 꼴의 인용은 코드 블록 안에만 남겼다.
+
+**원인은 순서다**: r3 작업에서 래칫을 돌린 **뒤에** 이 두 문단을 썼다. 그래서 직전 코멘트의 "인용 래칫 PASS"는 **그 두 줄을 포함하지 않은 상태**의 측정이었다 — 통과를 보고한 명령이 보고 대상의 최종 상태를 보지 않았다. 카드 261에서 caller sweep을 `head`로 자른 것과 같은 모양의 실수다: 측정이 대상의 전부를 덮는지 확인하지 않았다.
+
+baseline은 **늘리지 않았다**(새 발명을 floor로 올리지 않는다). 문서 두 줄을 고쳐서 닫았고, CI와 같은 명령으로 재측정했다:
+
+```
+python tools/check_doc_path_citations.py --ratchet --base-ref 9e9a551cd25b9a237d5d439c317854d927a5640d
+PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.   exit 0
+python -m pytest tests/test_check_doc_path_citations.py -q   ->  20 passed, 1 skipped
+```
+
+(한 skip은 Windows에서 symlink 생성 권한이 없어서이고 이 수정과 무관하다.)
