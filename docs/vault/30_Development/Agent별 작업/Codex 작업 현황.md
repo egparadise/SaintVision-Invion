@@ -38,8 +38,10 @@ active_card_next: "Review Card 266 #362 against the #358 r8 contract; remaining 
 - The generated allowlist has zero `accepted-with-expiry` rows. The evaluator independently
   requires the reader role to remain non-login/non-inheriting/non-member, with no audit-table
   privilege and no reader policy; any restored visibility is `MEASURED_FAIL`.
-- Focused PG-free checks pass; disposable-PostgreSQL execution, target-registry repin, hosted
-  security evidence, and Claude review remain.
+- Focused PG-free checks pass. Completed afterwards (coordinator update): disposable-PostgreSQL
+  execution (Claude r2: isolation 18 passed, 618 migration/allowlist/evidence tests passed),
+  target-registry repin, hosted security evidence (run 37112573662, MEASURED_PASS) and
+  Claude review (r2 approved at a24bc64c).
   [[2026-10-03_17-58-55_KST_Card268_audit_reader_disposition_removal_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
