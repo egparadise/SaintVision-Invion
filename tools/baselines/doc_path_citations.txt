@@ -49,7 +49,6 @@
 30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:98-128
 30_Development/Agent별 작업/Claude 작업 현황.md || services/lineage.py
 30_Development/Agent별 작업/Claude 작업 현황.md || src/saintvision/demo_server.py
-30_Development/Agent별 작업/Gemini 작업 현황.md || apps/web/dist
 30_Development/Agent별 작업/Gemini 작업 현황.md || contracts/pool-list-response
 30_Development/Agent별 작업/Gemini 작업 현황.md || contracts/types.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || deploy/certs
@@ -171,7 +170,6 @@
 30_Development/History/2026-09-15_15-30-00_KST_VF-CL-05_Claude_VF-CX-03-04독립검토.md || migrations/0042 model_retry_lineage
 30_Development/History/2026-09-15_STUDIO-AUTH-ENTRY_Codex_검증보고.md || tests/core/test_contracts.py
 30_Development/History/2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고.md || src/server.ts
-30_Development/History/2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고.md || apps/web/dist/index.html
 30_Development/History/2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고.md || deploy/certs/saintvision.crt
 30_Development/History/2026-09-18_22-30-00_KST_VF-CX_Claude_원격권한결속과CAS_fixture독립검토.md || migrations/0005_node_channels.sql
 30_Development/History/2026-09-18_CX01착지전_공통진행판보존.md || apps/web/App.tsx
@@ -185,7 +183,6 @@
 30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs
 30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs/saintvision.crt
 30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs/saintvision.key
-30_Development/History/2026-09-19_Launcher_우선순위5_감사_Codex.md || apps/web/node_modules/vite/bin/vite.js
 30_Development/History/2026-09-19_Launcher_우선순위5_감사_Codex.md || deploy/certs
 30_Development/History/2026-09-19_TLS_Docker_마운트_검증_보류_Codex.md || deploy/certs
 30_Development/History/2026-09-19_TLS_Docker_마운트_재검증_Codex.md || deploy/certs
@@ -240,8 +237,6 @@
 30_Development/History/2026-09-22_PR61_WebDesktop_UI불변식_9종_수용계획_독립검토_Claude.md || tests/browser/desktop.tsx
 30_Development/History/2026-09-22_PR61_WebDesktop_UI불변식_9종_수용계획_독립검토_Claude.md || tests/desktop-layout.test.tsx
 30_Development/History/2026-09-22_WorkspaceItem_잉여어휘소거_및_WorkspaceList_5대상태정직화_Chrome153_Gemini.md || tests/workspace-execution.test.ts
-30_Development/History/2026-09-22_WorkspaceSummary_status_enum_좁힘_tsc가_죽은active분기_발견_Claude.md || apps/web/node_modules
-30_Development/History/2026-09-22_set_workspace_status_후속확인_잔여와레인_Claude.md || apps/web/node_modules
 30_Development/History/2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude.md || contracts/types.ts:33
 30_Development/History/2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude.md || services/nodes.py:120
 30_Development/History/2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude.md || tests/freshness-and-staleness-wiring.test.tsx

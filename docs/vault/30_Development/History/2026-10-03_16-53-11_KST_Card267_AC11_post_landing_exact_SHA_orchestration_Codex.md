@@ -53,10 +53,13 @@ schema, target, workflow와 migration을 바꾸지 않고 runbook이 그 단일 
 해석돼 2건 실패했다. fixture source가 `\\n`을 쓰게 고친 뒤 같은 시험 파일을 다시 실행해 23건
 전부 통과했다. 제품·workflow·evaluator 동작 실패가 아니며 실패 이력을 삭제하지 않는다.
 
-`check_doc_path_citations.py --ratchet --base-ref origin/coord/train42a-ci-1511`은 이 카드가
-추가한 새 결함이 아니라 이미 고쳐져 baseline에서 제거해야 하는 기존 citation 5건을
-`stale baseline`으로 보고 exit 1이었다. 이 카드 범위 밖 Gemini/Claude/과거 History의
-`apps/web/dist`·`node_modules` baseline을 늘리거나 되살리지 않았다.
+`check_doc_path_citations.py --ratchet --base-ref origin/coord/train42a-ci-1511`은 이미 고쳐진
+기존 citation 5건을 `stale baseline`으로 보고 exit 1이었다. floor에 slack을 남기지 않도록
+해당 5줄만 baseline에서 제거했고 새 예외는 추가하지 않았다.
+
+첫 exact-head Documentation Build `37108118606`은 위 설명에 쓴 실재하지 않는 빌드
+산출물 디렉터리 이름을 새 경로 인용으로 분류해 실패했다. baseline 추가 없이 경로
+리터럴을 일반 설명으로 바꿨으며, 제품·orchestrator 동작 실패는 아니다.
 
 ## 상태와 다음 행동
 
