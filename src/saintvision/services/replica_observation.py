@@ -8,7 +8,7 @@ from ..errors import InvError, RES_ARTIFACT_NOT_FOUND
 from ..storage.pathsafe import parse_uri
 
 
-def observe_replicas(session, *, tenant_id, reader_user_id, uri):
+def observe_replicas(session, *, tenant_id, reader_user_id, uri, project_id=None):
     parse_uri(uri)
     # One statement binds the access gate and every count to the same snapshot.
     # At most five state rows (or one empty outer-join row) cross the DB boundary.
@@ -30,6 +30,10 @@ def observe_replicas(session, *, tenant_id, reader_user_id, uri):
             DataLocation.tenant_id == tenant_id, DataLocation.uri == uri,
             StorageContribution.registered_by_user_id == reader_user_id,
             StorageContribution.status == "active",
+            # 0062: one project's bindings, or every binding of this reader when
+            # the caller is the tenant-wide route. A row in another project is
+            # the same absence as a row that does not exist.
+            *( (DataLocation.project_id == project_id,) if project_id is not None else () ),
         )
         .group_by(DataLocation.location_id, DataLocation.version, DataReplica.state)
     ).all()

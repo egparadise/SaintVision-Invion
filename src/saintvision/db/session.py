@@ -26,6 +26,15 @@ from saintvision.ids import is_id
 #: it as a plain string setting.
 TENANT_GUC = "inv.tenant_id"
 
+#: The GUC that says which project the request was authorised for (0062).
+#:
+#: Phase 1 does not change any policy, so nothing in the database reads this yet.
+#: It is set anyway, by the one route that has checked the caller's membership,
+#: so that Phase 2 can replace ``data_locations_tenant_isolation`` with a
+#: tenant+project policy without touching the route -- and so that any future
+#: reader which forgets to set it gets zero rows rather than another project's.
+PROJECT_GUC = "inv.project_id"
+
 #: The GUC that says which human the request was verified as.
 #:
 #: Why this exists as transaction state rather than a function argument: the
@@ -71,6 +80,36 @@ def tenant_scope(session: Session, tenant_id: uuid.UUID | str) -> Iterator[Sessi
         yield session
     finally:
         # The scope dies with the transaction. Nothing to unset.
+        pass
+
+
+@contextlib.contextmanager
+def project_scope(session: Session, project_id: str) -> Iterator[Session]:
+    """Run a block with one project scope applied for that transaction only (0062).
+
+    The value must be a project the request has already been authorised for --
+    ``project_service.require_project_access`` judged it and the route re-checked
+    it after taking its locks. A raw path segment that has not been through that
+    check must not reach this function: the GUC exists so the database reads a
+    project the caller could not choose for themselves.
+
+    Transaction-local for the same reason as :func:`tenant_scope`: a pooled
+    backend must not carry one request's project into the next one.
+    """
+    value = str(project_id)
+    # SET LOCAL takes no bind parameter, so the value is inlined -- which means it
+    # must be proven to be an ID first. ``prj_`` plus 26 Crockford base32
+    # characters has no quote, no space and no semicolon in its alphabet.
+    if not is_id(value, "project"):
+        raise ValueError("project scope requires an authorised project ID")
+
+    if not session.in_transaction():
+        session.begin()
+    session.execute(text(f"SET LOCAL {PROJECT_GUC} = '{value}'"))
+    try:
+        yield session
+    finally:
+        # The scope dies with the transaction, like the tenant's.
         pass
 
 
