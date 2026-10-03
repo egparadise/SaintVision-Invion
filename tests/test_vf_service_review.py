@@ -36,7 +36,12 @@ def test_departure_preserves_retention_and_marks_pinned_replica_stale(
                 session, tenant_id=location["tenant_a"], node_id=location["nodes"][0], now=NOW
             ) == 0
             health = replica_repair.replica_health(
-                session, tenant_id=location["tenant_a"], location_id=location["location_id"]
+                session, tenant_id=location["tenant_a"],
+                location_id=location["location_id"],
+                # Card 266 made the project an authority input; the shared fixture
+                # supplies it. The claim this test makes -- departure keeps the
+                # retention pin and marks the copy stale -- is unchanged.
+                project_id=location["project_id"],
             )
             assert health.classification == "at_risk"
             assert health.source_nodes == []

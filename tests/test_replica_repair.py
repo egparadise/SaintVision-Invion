@@ -101,7 +101,14 @@ def location(owner_engine, two_tenants):
                 ),
                 {
                     "l": ids[key], "t": tenant_a, "p": project, "c": ids["contribution_id"],
-                    "uri": f"inv://datasets/corpus@1/{key}.bin", "rel": f"{key}.bin",
+                    # The first location keeps the URI this fixture has always used:
+                    # other suites import it and assert on that exact address, so the
+                    # two rows card 266 added take names of their own instead.
+                    "uri": (
+                        "inv://datasets/corpus@1/data.bin" if key == "location_id"
+                        else f"inv://datasets/corpus@1/{key}.bin"
+                    ),
+                    "rel": "data.bin" if key == "location_id" else f"{key}.bin",
                     "b": ids["bytes"], "s": SHA,
                 },
             )
