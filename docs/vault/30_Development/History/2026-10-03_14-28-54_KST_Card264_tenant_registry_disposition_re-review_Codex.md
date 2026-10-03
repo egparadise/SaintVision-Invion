@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD264-TENANT-REGISTRY-DISPOSITION-CODEX"
 title: "Card 264 public.tenants E2-E5 disposition re-review"
-version: "1.0.0"
-status: "in_progress"
+version: "1.0.1"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T14:28:54+09:00"
+updated: "2026-10-03T14:49:24+09:00"
 source_of_truth: "Git"
 base_sha: "2ed65f5f9f16d06ce3d4f55953f9338df422d78e"
 ---
@@ -51,5 +51,18 @@ baseline·policy Git blob에 맞춰 함께 회전했다.
 - RLS collector: 25 passed, PostgreSQL 8 skipped
 - migration rehearsal PG-free: 21 passed
 
-최종 hosted security run ID와 `SEC-RLS-001` 재계산 결과는 exact-head 실행 뒤 이
-문서에 추가한다. 이 카드에서 AC-11 점수나 전체 gate 완료를 주장하지 않는다.
+hosted security run `37100881089`는 source head
+`4fc5a11729f92e8f4d9f0259020a7526cab0d39d`에서 모든 step을 통과했다. artifact
+`11266490616`의 GitHub digest는
+`sha256:23b9b46a83ca25f83470f6b795bc9e1fd06a3fc22d1f74c9d5a58915683c1999`이고
+만료 시각은 `2026-11-02T05:47:00Z`다. artifact의 RLS 원관측을 정본
+`evaluate_rls()`로 다시 계산한 결과는 `MEASURED_PASS`였다. `inv_app`의
+`public.tenants` privilege 네 종류는 모두 null이고 visible probe 자체가 없었으며,
+violations/unmeasured는 각각 0이었다. accepted는 discovery issuer의 tenant-id-only
+E2-E5, budget guard E2, audit reader E3-E5뿐이다.
+
+이 보고서의 `cleanCheckout`은 scanner가 먼저 만든 evidence 파일 때문에 false로
+기록된다. checkout 대상 SHA와 artifact 결속은 run metadata에서 일치하지만, 이
+필드는 AC-11 전체 envelope의 clean-checkout 증거라고 주장하지 않는다. 최종 문서
+commit 뒤 같은 security lane을 한 번 더 실행해 exact final head를 PR 코멘트에 남긴다.
+이 카드에서 AC-11 점수나 전체 gate 완료를 주장하지 않는다.

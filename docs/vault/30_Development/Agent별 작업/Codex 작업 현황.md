@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.314"
-status: "in_progress"
+version: "1.0.315"
+status: "review"
 author: "Codex"
-updated: "2026-10-03T14:28:54+09:00"
+updated: "2026-10-03T14:49:24+09:00"
 source_of_truth: "Git"
 active_card: "CARD-264 re-review and remove inv_app public.tenants cross-tenant visibility"
-active_card_status: "Static product-path review found no inv_app caller for public.tenants; the only non-test readers are operator-owner tooling and the tenant_id-only discovery issuer"
-active_card_next: "Revoke the legacy table-wide grant in migration 0066, regenerate the reviewed allowlist and pins, then measure SEC-RLS-001 in the hosted security lane"
+active_card_status: "PR #360 removes the unused inv_app registry SELECT; hosted security run 37100881089 recomputed SEC-RLS-001 MEASURED_PASS with inv_app tenant privileges all absent"
+active_card_next: "Confirm exact-final-head Backend/Core/security green and receive Claude independent review; if card 263 creates revision 0065, reparent 0066 before train assembly"
 ---
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
