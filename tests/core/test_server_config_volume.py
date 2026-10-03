@@ -125,6 +125,65 @@ def test_worker_json_and_only_its_flat_tls_references_enter_volume(tmp_path):
 @pytest.mark.parametrize(
     "mutation",
     [
+        lambda value: value.update({"productReceiptDirectory": "/private/receipts"}),
+        lambda value: value.update({"tls": {"key_file": "/private/key"}}),
+        lambda value: value.pop("sourceRoot"),
+        lambda value: value.__setitem__("providerRecoveryEpoch", "1"),
+    ],
+)
+def test_api_build_plan_authority_is_minimal_non_secret_and_exact(tmp_path, mutation):
+    authority = {
+        "buildctlPath": "/usr/bin/buildctl",
+        "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+        "sourceRoot": "/workspaces",
+        "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+        "builderInstanceId": "builder-rootless-01",
+        "builderProfileId": "buildkit-rootless-v1",
+        "providerRecoveryEpoch": 7,
+        "nodeId": "nod_00000000000000000000000000",
+    }
+    mutation(authority)
+    (tmp_path / "api.json").write_text(
+        json.dumps(
+            {
+                "identity": {"jwks_file": "/run/saintvision/jwks.json"},
+                "buildPlanAuthority": authority,
+            }
+        )
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    with pytest.raises(ValueError, match="build plan authority"):
+        module.collect(tmp_path)
+
+
+def test_api_build_plan_authority_adds_no_secret_file_to_server_volume(tmp_path):
+    authority = {
+        "buildctlPath": "/usr/bin/buildctl",
+        "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+        "sourceRoot": "/workspaces",
+        "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+        "builderInstanceId": "builder-rootless-01",
+        "builderProfileId": "buildkit-rootless-v1",
+        "providerRecoveryEpoch": 7,
+        "nodeId": "nod_00000000000000000000000000",
+    }
+    (tmp_path / "api.json").write_text(
+        json.dumps(
+            {
+                "identity": {"jwks_file": "/run/saintvision/jwks.json"},
+                "buildPlanAuthority": authority,
+            }
+        )
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    files, private = module.collect(tmp_path)
+    assert set(files) == {"api.json", "jwks.json"}
+    assert private == set()
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
         lambda worker: worker.update({"unknown": True}),
         lambda worker: worker.update({"tenantId": "not-a-uuid"}),
         lambda worker: worker["tls"].update({"key_file": "/outside/worker.key"}),

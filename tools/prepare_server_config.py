@@ -26,6 +26,7 @@ BUILD_EXECUTION_KEYS = {
     "providerRecoveryEpoch",
     "nodeId",
 }
+BUILD_PLAN_AUTHORITY_KEYS = BUILD_EXECUTION_KEYS - {"productReceiptDirectory"}
 
 
 def strict_json(raw):
@@ -108,6 +109,18 @@ def collect(directory):
             }:
                 raise ValueError("Invalid objectStore settings")
             reference(object_store["credentialFile"], secret=True)
+    plan_authority = config.get("buildPlanAuthority")
+    if plan_authority is not None and (
+        not isinstance(plan_authority, dict)
+        or set(plan_authority) != BUILD_PLAN_AUTHORITY_KEYS
+        or any(
+            not isinstance(plan_authority[name], str) or not plan_authority[name]
+            for name in BUILD_PLAN_AUTHORITY_KEYS - {"providerRecoveryEpoch"}
+        )
+        or type(plan_authority["providerRecoveryEpoch"]) is not int
+        or plan_authority["providerRecoveryEpoch"] < 1
+    ):
+        raise ValueError("Invalid API build plan authority configuration")
     workspace = config.get("workspace")
     if workspace is not None:
         targets = [workspace, *workspace.get("destinations", [])]

@@ -121,6 +121,10 @@
     {
       "revision": "0062_data_location_project_scope",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0063_build_policy_resource_budgets",
+      "expected": "PRESERVED"
     }
   ]
 }

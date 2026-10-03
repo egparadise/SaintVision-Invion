@@ -12,8 +12,10 @@ import pytest
 from inv.approvals import Principal
 from inv.build_preparations import (
     BuildPreparationService,
+    PLAN_AUTHORITY_KEYS,
     TERMINAL_ENQUEUE_CODES,
     _git_source_identity,
+    _pinned_base_image_digests,
     validate_build_input,
 )
 from inv.errors import DomainError
@@ -173,17 +175,19 @@ def test_configured_app_installs_measured_plan_authority_only_under_exact_flag()
     compose = (ROOT / "docker-compose.prod.yml").read_text("utf-8")
     assert "configured_build_plan_authority(" in app
     assert "os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE" in app
-    assert 'trusted_file(os.environ["INV_WORKER_CONFIG"])' in app
+    assert 'settings.get("buildPlanAuthority")' in app
+    assert 'trusted_file(os.environ["INV_WORKER_CONFIG"])' not in app
     assert "class ConfiguredBuildPlanAuthority" in authority
     assert "self.transport.measure()" in authority
     assert "LeaseStore(self.db)._reserve_prepared_locked(" in authority
     assert '"buildSessionId": str(uuid4())' in authority
     assert 'return plan, new_id("evd")' in authority
-    assert "INV_WORKER_CONFIG=/run/saintvision/worker.json" in compose
+    control_plane = compose[compose.index("  control-plane:") : compose.index("  worker:")]
+    assert "INV_WORKER_CONFIG" not in control_plane
     assert "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}" in compose
 
 
-def test_product_enabled_app_reads_real_worker_json_bytes_and_installs_authority(
+def test_product_enabled_app_reads_minimal_api_plan_authority_and_not_worker_secrets(
     monkeypatch, tmp_path
 ):
     """Exercise the production factory boundary, not a constructor bypass."""
@@ -193,37 +197,23 @@ def test_product_enabled_app_reads_real_worker_json_bytes_and_installs_authority
 
     tenant = str(uuid4())
     api_config = tmp_path / "api.json"
-    worker_config = tmp_path / "worker.json"
+    plan_authority = {
+        "buildctlPath": "/usr/local/bin/buildctl",
+        "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+        "sourceRoot": "/run/saintvision/build-sources",
+        "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+        "builderInstanceId": "builder-hosted-fixture",
+        "builderProfileId": "rootless-v1",
+        "providerRecoveryEpoch": 1,
+        "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    }
     api_config.write_text(
-        json.dumps({"identity": {}, "buildCapsuleProviderId": "fixture-capsules"}),
-        encoding="utf-8",
-    )
-    worker_config.write_text(
-        json.dumps(
-            {
-                "tenantId": tenant,
-                "tls": {
-                    "ca_file": "/run/saintvision/node-ca.pem",
-                    "certificate_file": "/run/saintvision/worker.pem",
-                    "key_file": "/run/saintvision/worker-key.pem",
-                },
-                "buildExecution": {
-                    "buildctlPath": "/usr/local/bin/buildctl",
-                    "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
-                    "sourceRoot": "/run/saintvision/build-sources",
-                    "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
-                    "productReceiptDirectory": "/run/saintvision/build-receipts",
-                    "builderInstanceId": "builder-hosted-fixture",
-                    "builderProfileId": "rootless-v1",
-                    "providerRecoveryEpoch": 1,
-                    "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
-                },
-            }
-        ),
+        json.dumps({"identity": {}, "buildCapsuleProviderId": "fixture-capsules",
+                    "buildPlanAuthority": plan_authority}),
         encoding="utf-8",
     )
     monkeypatch.setenv("INV_API_CONFIG", str(api_config))
-    monkeypatch.setenv("INV_WORKER_CONFIG", str(worker_config))
+    monkeypatch.delenv("INV_WORKER_CONFIG", raising=False)
     monkeypatch.setenv("INV_RUNTIME_DSN", "postgresql://not-connected")
     monkeypatch.setenv("INV_RECOVERY_EPOCH", str(uuid4()))
     monkeypatch.setenv("INV_BUILDKIT_PRODUCT_ENABLED", "1")
@@ -250,6 +240,34 @@ def test_product_enabled_app_reads_real_worker_json_bytes_and_installs_authority
         service.plan_factory.transport.configuration.builder_instance_id
         == "builder-hosted-fixture"
     )
+    assert set(plan_authority) == PLAN_AUTHORITY_KEYS
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda value: value.update({"productReceiptDirectory": "/private/receipts"}),
+        lambda value: value.update({"tls": {"key_file": "/private/key"}}),
+        lambda value: value.pop("referenceHealthReceipt"),
+        lambda value: value.__setitem__("providerRecoveryEpoch", 0),
+    ],
+)
+def test_api_plan_authority_rejects_worker_private_or_incomplete_surface(mutation):
+    from inv.build_preparations import configured_build_plan_authority
+
+    value = {
+        "buildctlPath": "/usr/bin/buildctl",
+        "address": "unix:///run/buildkit/buildkitd.sock",
+        "sourceRoot": "/srv/build",
+        "referenceHealthReceipt": "/run/buildkit-health.json",
+        "builderInstanceId": "builder-1",
+        "builderProfileId": "rootless-v1",
+        "providerRecoveryEpoch": 1,
+        "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    }
+    mutation(value)
+    with pytest.raises(ValueError, match="Build execution configuration unavailable"):
+        configured_build_plan_authority(object(), value)
 
 
 def test_secret_aliases_require_a_server_owned_resolver():
@@ -289,3 +307,59 @@ def test_source_identity_is_a_real_deterministic_git_tree_and_commit():
     assert "hashlib.sha1(framed, usedforsecurity=False)" in source
     with pytest.raises(DomainError, match="VERIFY-0002"):
         _git_source_identity(raw, workspace, "src", "Dockerfile")
+
+
+def _snapshot_with_dockerfile(body: bytes):
+    import base64
+    import hashlib
+    from inv.workspace_files import canonical
+
+    workspace = "wsp_01M3PTP800EEMWMDYKEZZ3CWNP"
+    return workspace, canonical(
+        {
+            "format": "workspace-snapshot:1",
+            "workspaceId": workspace,
+            "directories": ["src"],
+            "files": [
+                {
+                    "path": "src/Dockerfile",
+                    "executable": False,
+                    "sha256": hashlib.sha256(body).hexdigest(),
+                    "sizeBytes": len(body),
+                    "dataBase64": base64.b64encode(body).decode(),
+                }
+            ],
+        }
+    )
+
+
+def test_base_image_measurement_uses_the_immutable_snapshot_and_exact_pins():
+    body = (
+        "FROM --platform=linux/amd64 saintvision.invalid/base@sha256:"
+        + "1" * 64
+        + " AS build\nFROM saintvision.invalid/runtime@sha256:"
+        + "2" * 64
+        + " AS runtime\n"
+    ).encode()
+    workspace, raw = _snapshot_with_dockerfile(body)
+    assert _pinned_base_image_digests(raw, workspace, "src/Dockerfile") == (
+        "sha256:" + "1" * 64,
+        "sha256:" + "2" * 64,
+    )
+
+
+@pytest.mark.parametrize(
+    "dockerfile",
+    [
+        b"FROM ubuntu:latest\n",
+        b"ARG BASE\nFROM ${BASE}\n",
+        b"FROM scratch\n",
+        b"FROM repo@example.invalid\n",
+        ("FROM repo@sha256:" + "A" * 64 + "\n").encode(),
+        ("FROM repo@sha256:" + "1" * 63 + "\n").encode(),
+    ],
+)
+def test_base_image_measurement_rejects_unpinned_or_unmeasured_snapshot(dockerfile):
+    workspace, raw = _snapshot_with_dockerfile(dockerfile)
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _pinned_base_image_digests(raw, workspace, "src/Dockerfile")

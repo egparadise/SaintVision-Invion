@@ -21,7 +21,7 @@ pytestmark = pytest.mark.postgres
 
 FK = "fk_eval_suites_tenant_id_project_id"
 INDEX = "ix_eval_suites_tenant_id_project_id"
-CURRENT_HEAD = "0062_data_location_project_scope"
+CURRENT_HEAD = "0063_build_policy_resource_budgets"
 
 
 def _project(connection, *, tenant_id, now, label):

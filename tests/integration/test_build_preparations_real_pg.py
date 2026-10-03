@@ -27,6 +27,7 @@ from test_snapshots import storage  # noqa: F401 - registers workspace fixture d
 from test_workspace_api import workspace_http
 
 pytestmark = pytest.mark.postgres
+BASE_IMAGE_DIGEST = "sha256:" + "1" * 64
 
 
 class _MeasuredService:
@@ -43,7 +44,12 @@ class _MeasuredService:
         return BuildExecutionResult(new_id("evd"), "a" * 64, True, True)
 
 
-def _setup_prepared_build(workspace_http, *, key="build-prepare"):
+def _setup_prepared_build(
+    workspace_http,
+    *,
+    key="build-prepare",
+    profile_budget=(10, 1048576, 1048576),
+):
     a = workspace_http
     source_url = a.url + "/checkouts/" + a.checkout_id + "/files"
     original = a.http.get(source_url, headers=a.headers()).json()
@@ -59,7 +65,9 @@ def _setup_prepared_build(workspace_http, *, key="build-prepare"):
                  "dataBase64": base64.b64encode(b"print('build capsule')\n").decode()},
                 {"path": "src/Dockerfile", "expectedSha256": None,
                  "executable": False,
-                 "dataBase64": base64.b64encode(b"FROM scratch\n").decode()},
+                 "dataBase64": base64.b64encode(
+                     ("FROM saintvision.invalid/base@" + BASE_IMAGE_DIGEST + " AS runtime\n").encode()
+                 ).decode()},
             ],
         },
         headers=a.headers(key="build-source-edit"),
@@ -80,10 +88,17 @@ def _setup_prepared_build(workspace_http, *, key="build-prepare"):
             """INSERT INTO inv.build_policy_profiles(
             tenant_id,profile_id,version,project_ids,context_path,dockerfile_path,
             target_platform,target_stage,network_policy_id,cache_policy_id,
-            cache_mode,secret_aliases,timeout_seconds)
+            cache_mode,secret_aliases,timeout_seconds,budget_cpu_millis,
+            budget_memory_bytes,budget_storage_bytes,base_image_digests)
             VALUES(%s,%s,1,%s,'src','src/Dockerfile','linux/amd64','runtime','none',
-                   'cachepol_s08-default','read-only','{}',300)""",
-            (a.e.tenant, profile_id, [a.e.project]),
+                   'cachepol_s08-default','read-only','{}',300,%s,%s,%s,%s)""",
+            (
+                a.e.tenant,
+                profile_id,
+                [a.e.project],
+                *profile_budget,
+                [BASE_IMAGE_DIGEST] if all(value is not None for value in profile_budget) else None,
+            ),
         )
         conn.execute(
             "INSERT INTO inv.resources VALUES(%s,%s,%s,'cpu',10,10)",
@@ -194,7 +209,71 @@ def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monke
               (SELECT count(*) FROM inv.build_execution_intents WHERE run_id=%s) AS intents""",
             (build_run["runId"], build_run["runId"], build_run["runId"]),
         ).fetchone()
+        plan = conn.execute(
+            "SELECT plan FROM inv.build_execution_admissions WHERE run_id=%s",
+            (build_run["runId"],),
+        ).fetchone()["plan"]
+        limits = conn.execute(
+            "SELECT cpu_millis,memory_bytes FROM inv.project_resource_limits WHERE project_id=%s",
+            (a.e.project,),
+        ).fetchone()
+        storage = conn.execute(
+            "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s",
+            (a.e.project,),
+        ).fetchone()
     assert counts == {"preparations": 1, "admissions": 1, "intents": 1}
+    assert plan["budget"] == {
+        "cpuMillis": 10,
+        "memoryBytes": 1048576,
+        "storageBytes": 1048576,
+    }
+    assert plan["budget"]["cpuMillis"] <= limits["cpu_millis"]
+    assert plan["budget"]["memoryBytes"] <= limits["memory_bytes"]
+    assert plan["budget"]["storageBytes"] <= storage["quota_bytes"]
+    assert plan["resolvedBaseImageDigests"] == [BASE_IMAGE_DIGEST]
+
+
+def test_missing_positive_storage_policy_fails_before_admission(workspace_http, monkeypatch):
+    context = _setup_prepared_build(workspace_http)
+    a, prepared = context["a"], context["prepared"]
+    row = _approve_prepared_build(context)
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE inv.storage_budgets SET quota_bytes=0 WHERE tenant_id=%s AND project_id=%s",
+            (a.e.tenant, a.e.project),
+        )
+    monkeypatch.setenv(PRODUCT_ENABLE_SETTING, "1")
+    with pytest.raises(DomainError) as refused:
+        context["service"].enqueue(
+            context["requester"],
+            a.e.project,
+            context["build_run"]["runId"],
+            prepared["buildId"],
+            {"approvalId": prepared["approvalId"], "expectedRunVersion": row["runVersion"]},
+            key="build-enqueue-no-storage-policy",
+        )
+    assert (refused.value.code, refused.value.status, refused.value.retryable) == (
+        "RES-0006",
+        503,
+        True,
+    )
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert conn.execute(
+            "SELECT count(*) AS n FROM inv.build_execution_admissions WHERE run_id=%s",
+            (context["build_run"]["runId"],),
+        ).fetchone()["n"] == 0
+
+
+def test_pre_0063_profile_without_budget_or_base_pin_fails_closed_during_prepare(
+    workspace_http,
+):
+    with pytest.raises(DomainError) as refused:
+        _setup_prepared_build(workspace_http, profile_budget=(None, None, None))
+    assert (refused.value.code, refused.value.status, refused.value.retryable) == (
+        "RES-0006",
+        503,
+        True,
+    )
 
 
 def test_build_authority_rows_are_immutable_even_to_the_owner(workspace_http):

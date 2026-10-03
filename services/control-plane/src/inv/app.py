@@ -1197,6 +1197,7 @@ def create_configured_app():
                 "placementShortCommit",
                 "configurationReadiness",
                 "buildCapsuleProviderId",
+                "buildPlanAuthority",
             }
         ):
             raise ValueError()
@@ -1265,7 +1266,7 @@ def create_configured_app():
             if os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE:
                 plan_authority = configured_build_plan_authority(
                     database,
-                    trusted_file(os.environ["INV_WORKER_CONFIG"]),
+                    settings.get("buildPlanAuthority"),
                     environment=os.environ,
                 )
 

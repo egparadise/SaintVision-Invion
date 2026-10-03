@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import hashlib
 import os
 from pathlib import Path
+import re
 from typing import Callable, Mapping
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
@@ -34,6 +35,37 @@ PREPARE_LIMITS = (("subject", "prepare", 5), ("project", "combined", 30),
 ENQUEUE_LIMITS = (("subject", "enqueue", 10), ("project", "combined", 30),
                   ("tenant-project", "combined", 60))
 TERMINAL_ENQUEUE_CODES = frozenset({"GRAPH-0003", "VERIFY-0002"})
+PLAN_AUTHORITY_KEYS = frozenset(
+    {
+        "buildctlPath",
+        "address",
+        "sourceRoot",
+        "referenceHealthReceipt",
+        "builderInstanceId",
+        "builderProfileId",
+        "providerRecoveryEpoch",
+        "nodeId",
+    }
+)
+_PINNED_IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+_PINNED_FROM = re.compile(
+    r"(?i)^FROM(?:\s+--platform=[^\s]+)?\s+([^\s]+)(?:\s+AS\s+[A-Za-z0-9_.-]+)?$"
+)
+
+
+def _validated_plan_authority_config(value: object) -> dict:
+    if (
+        not isinstance(value, dict)
+        or set(value) != PLAN_AUTHORITY_KEYS
+        or any(
+            not isinstance(value[name], str) or not value[name]
+            for name in PLAN_AUTHORITY_KEYS - {"providerRecoveryEpoch"}
+        )
+        or type(value["providerRecoveryEpoch"]) is not int
+        or value["providerRecoveryEpoch"] < 1
+    ):
+        raise ValueError("Build execution configuration unavailable")
+    return dict(value)
 
 
 def validate_build_input(contract: str, value: Mapping) -> None:
@@ -95,6 +127,49 @@ def _git_source_identity(raw: bytes, workspace_id: str, context: str, dockerfile
     return _git_hash(b"commit", commit).hex(), tree_hex
 
 
+def _pinned_base_image_digests(raw: bytes, workspace_id: str, dockerfile: str) -> tuple[str, ...]:
+    """Read literal digest-pinned bases from the canonical immutable snapshot."""
+
+    _manifest, content = decode_snapshot(raw, workspace_id)
+    body = content.get(dockerfile)
+    if body is None or not body or len(body) > 1024 * 1024 or b"\x00" in body:
+        raise DomainError("VERIFY-0002", "Build base image authority unavailable", 422)
+    try:
+        text = body.decode("utf-8")
+    except UnicodeDecodeError:
+        raise DomainError("VERIFY-0002", "Build base image authority unavailable", 422) from None
+    logical: list[str] = []
+    continued = ""
+    for physical in text.splitlines():
+        stripped = physical.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        continued += stripped
+        if continued.endswith("\\"):
+            continued = continued[:-1].rstrip() + " "
+            continue
+        logical.append(continued)
+        continued = ""
+    if continued:
+        raise DomainError("VERIFY-0002", "Build base image authority unavailable", 422)
+    digests: list[str] = []
+    for instruction in logical:
+        if not instruction.upper().startswith("FROM "):
+            continue
+        matched = _PINNED_FROM.fullmatch(instruction)
+        reference = matched.group(1) if matched else ""
+        if "@" not in reference:
+            raise DomainError("VERIFY-0002", "Build base image is not digest pinned", 422)
+        name, image_digest = reference.rsplit("@", 1)
+        if not name or not _PINNED_IMAGE_DIGEST.fullmatch(image_digest):
+            raise DomainError("VERIFY-0002", "Build base image is not digest pinned", 422)
+        if image_digest not in digests:
+            digests.append(image_digest)
+    if not digests:
+        raise DomainError("VERIFY-0002", "Build base image measurement is absent", 422)
+    return tuple(digests)
+
+
 def _identity_decision(decision: Mapping) -> dict:
     result = deepcopy(dict(decision))
     result.pop("approvedBy", None)
@@ -104,7 +179,8 @@ def _identity_decision(decision: Mapping) -> dict:
 class ConfiguredBuildPlanAuthority:
     """Measure the configured builder, then create plan/lease authority in DB.
 
-    The worker configuration is operator-owned.  Only the health read and
+    The dedicated API planning configuration is operator-owned.  It excludes
+    worker TLS, output and product-receipt paths.  Only the health read and
     ``buildctl debug workers`` call happen outside the business transaction;
     resource selection, the lease, session and evidence identities are created
     after the approval transaction has locked the Run and preparation.
@@ -115,11 +191,7 @@ class ConfiguredBuildPlanAuthority:
             BuildkitTransportConfiguration,
             RootlessBuildkitTransport,
         )
-        from .worker import BUILD_EXECUTION_KEYS
-
-        values = dict(build_execution)
-        if set(values) != BUILD_EXECUTION_KEYS:
-            raise ValueError("Exact build execution configuration required")
+        values = _validated_plan_authority_config(build_execution)
         self.db = database
         self.node_id = values["nodeId"]
         self.transport = RootlessBuildkitTransport(
@@ -155,6 +227,36 @@ class ConfiguredBuildPlanAuthority:
         ).fetchone()
         if not limits:
             raise DomainError("RES-0006", "Build resource ceiling unavailable", 503, True)
+        profile = conn.execute(
+            """SELECT budget_cpu_millis,budget_memory_bytes,budget_storage_bytes,
+            base_image_digests
+            FROM inv.build_policy_profiles WHERE profile_id=%s AND version=%s""",
+            (preparation["profile_id"], preparation["profile_version"]),
+        ).fetchone()
+        storage = conn.execute(
+            "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s FOR UPDATE",
+            (preparation["project_id"],),
+        ).fetchone()
+        budget = (
+            profile["budget_cpu_millis"] if profile else None,
+            profile["budget_memory_bytes"] if profile else None,
+            profile["budget_storage_bytes"] if profile else None,
+        )
+        base_image_digests = tuple(profile["base_image_digests"] or ()) if profile else ()
+        if (
+            any(type(value) is not int or value <= 0 for value in budget)
+            or not 1 <= len(base_image_digests) <= 64
+            or len(set(base_image_digests)) != len(base_image_digests)
+            or any(
+                not isinstance(value, str) or not _PINNED_IMAGE_DIGEST.fullmatch(value)
+                for value in base_image_digests
+            )
+            or not storage
+            or budget[0] > limits["cpu_millis"]
+            or budget[1] > limits["memory_bytes"]
+            or budget[2] > storage["quota_bytes"]
+        ):
+            raise DomainError("RES-0006", "Build resource policy is unavailable", 503, True)
         candidates = conn.execute(
             """SELECT r.resource_id FROM inv.resources r
             JOIN inv.project_nodes p USING(tenant_id,node_id)
@@ -222,9 +324,9 @@ class ConfiguredBuildPlanAuthority:
             "devices": [],
             "binds": [],
             "budget": {
-                "cpuMillis": 1,
-                "memoryBytes": 1,
-                "storageBytes": 1,
+                "cpuMillis": budget[0],
+                "memoryBytes": budget[1],
+                "storageBytes": budget[2],
             },
             "lease": {
                 "leaseId": lease["leaseId"],
@@ -240,27 +342,16 @@ class ConfiguredBuildPlanAuthority:
                 }
             ),
             "secretRefsDigest": digest(request["secretRefIds"]),
-            "resolvedBaseImageDigests": ["sha256:" + digest(request)],
+            "resolvedBaseImageDigests": list(base_image_digests),
         }
         validate_contract("BuildPlan", plan)
         return plan, new_id("evd")
 
 
-def configured_build_plan_authority(database, worker_config, *, environment=None):
-    """Construct the API-side authority from the strict shared worker document."""
+def configured_build_plan_authority(database, authority_config, *, environment=None):
+    """Construct the API authority from its minimal non-secret config surface."""
 
-    from .worker import validated_worker_configuration
-
-    # ``create_configured_app`` deliberately passes the bytes returned by
-    # ``trusted_file``.  Keep that trust boundary intact: the worker validator
-    # owns duplicate-key rejection and the exact JSON shape.  Converting here
-    # with ``dict(...)`` rejects bytes before the canonical parser can inspect
-    # them and made every product-enabled API startup fail closed.
-    config = validated_worker_configuration(worker_config)
-    build = config.get("buildExecution")
-    if build is None:
-        raise ValueError("Build execution configuration unavailable")
-    return ConfiguredBuildPlanAuthority(database, build, environment=environment)
+    return ConfiguredBuildPlanAuthority(database, authority_config, environment=environment)
 
 
 class BuildPreparationService:
@@ -381,6 +472,21 @@ class BuildPreparationService:
         if not checkout or not profile:
             raise DomainError("RES-0004", "Build preparation authority was not found", 404)
         if (
+            any(
+                type(profile[name]) is not int or profile[name] <= 0
+                for name in (
+                    "budget_cpu_millis",
+                    "budget_memory_bytes",
+                    "budget_storage_bytes",
+                )
+            )
+            or not isinstance(profile["base_image_digests"], list)
+            or not 1 <= len(profile["base_image_digests"]) <= 64
+        ):
+            raise DomainError(
+                "RES-0006", "Build policy profile activation authority unavailable", 503, True
+            )
+        if (
             checkout["source_state"] != "recovering"
             or checkout["current_source_attempt"] != checkout["source_attempt"]
             or str(checkout["recovery_epoch"]) != self.db.recovery_epoch
@@ -390,6 +496,11 @@ class BuildPreparationService:
         commit_sha, tree_sha = _git_source_identity(
             raw, checkout["workspace_id"], profile["context_path"], profile["dockerfile_path"]
         )
+        base_image_digests = _pinned_base_image_digests(
+            raw, checkout["workspace_id"], profile["dockerfile_path"]
+        )
+        if tuple(profile["base_image_digests"]) != base_image_digests:
+            raise DomainError("VERIFY-0002", "Build base image profile pin differs", 422)
         snapshot_sha = hashlib.sha256(raw).hexdigest()
         if snapshot_sha != checkout["content_hash"]:
             raise DomainError("VERIFY-0002", "Workspace snapshot digest differs", 422)
@@ -473,7 +584,8 @@ class BuildPreparationService:
             ).fetchone()
             if (not current or current["revision"] != checkout["revision"]
                     or current["content_hash"] != snapshot_sha or not locked_profile
-                    or project_id not in locked_profile["project_ids"]):
+                    or project_id not in locked_profile["project_ids"]
+                    or tuple(locked_profile["base_image_digests"] or ()) != base_image_digests):
                 raise DomainError("VERIFY-0002", "Build source or policy profile drifted", 422)
             conn.execute(
                 """INSERT INTO inv.build_preparations(
