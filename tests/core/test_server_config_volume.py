@@ -499,6 +499,7 @@ def test_real_container_mounts_hide_worker_credentials_from_api(tmp_path):
             "from pathlib import Path; "
             "assert Path('/run/saintvision/api.json').is_file(); "
             "assert not Path('/run/saintvision/worker.json').exists(); "
+            "assert not Path('/run/saintvision/worker-key.pem').exists(); "
             "assert not Path('/run/saintvision-worker').exists()",
         )
         module.docker(
