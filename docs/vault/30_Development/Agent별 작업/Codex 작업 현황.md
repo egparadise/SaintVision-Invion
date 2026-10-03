@@ -1,15 +1,48 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.316"
+version: "1.0.320"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T16:42:33+09:00"
+updated: "2026-10-03T22:55:21+09:00"
 source_of_truth: "Git"
-active_card: "CARD-264 complete; next Codex card under measurement"
-active_card_status: "Card 264 #360 is approved by Claude r3 at d709c7f4: irreversible migration 0066 revokes the unused inv_app public.tenants SELECT, the irreversible marker is bound to exactly {0066} with a single exact REVOKE downgrade, hosted security run 37100881089 recomputed SEC-RLS-001 MEASURED_PASS, and only the inv_audit_reader 2026-11-30 disposition remains"
-active_card_next: "Propose the next Codex-owned card from measurement before implementing; product dispatch stays off by default"
+active_card: "No hosted-only Codex card remains (measured row by row); independent review of incoming Claude PRs"
+active_card_status: "Card 266 #362 is approved by Codex r3 at 3286817d (exact-head Backend 3.12/3.14, Core, security and docs green) and is in this train; Card 268 #363 removed the last accepted-with-expiry disposition with migration 0067"
+active_card_next: "Review Card 269 #364 (48-task rescore v1.17) and later Claude PRs; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
+
+- Started from train 42 `9e9a551cd25b9a237d5d439c317854d927a5640d`. The old shell guard
+  listed only security and accessibility producers, so migration rehearsal could be absent when
+  the aggregate lane ran.
+- `ac11_dispatch_in_order` now delegates once to Card 260's exact-SHA orchestrator. That existing
+  authority owns all three producers, run/ref/SHA/attempt and artifact expiry/digest checks,
+  duplicate/prior-failure refusal, final producer-set recheck and canonical aggregate recomputation.
+- The runbook records one redacted JSON receipt instead of a partial TSV run list. No evaluator,
+  schema, target, workflow, migration or score rule changed.
+- Claude r1's dispatched failure/unfinished/missing-run gaps are fixed before aggregate, and the
+  runbook now switches to a clean detached `$LAND` checkout before loading the guard. The override
+  seam is test-only. Focused local results are **24 passed** for the real-Bash guard boundary and
+  **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI at `e627bc61` succeeded
+  (Backend run `37110979411` 3.12/3.14, Docs run `37110979408`; coordinator update).
+- [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
+## 2026-10-03 Card 268 — inv_audit_reader disposition removal
+
+- Train 43 (`1d2d5289`) still has no product connection, role switch, membership grant, or read
+  route for `inv_audit_reader`; the role exists only as legacy audit DDL and as a measured
+  security boundary. The 2026-11-30 exception is therefore not extended.
+- Migration `0067_audit_reader_revoke` removes `SELECT`, schema `USAGE`, and the unconditional
+  read policy. Its irreversible downgrade repeats those exact removals, and the migration graph
+  accepts only the reviewed 0066/0067 operation sets.
+- The generated allowlist has zero `accepted-with-expiry` rows. The evaluator independently
+  requires the reader role to remain non-login/non-inheriting/non-member, with no audit-table
+  privilege and no reader policy; any restored visibility is `MEASURED_FAIL`.
+- Focused PG-free checks pass. Completed afterwards (coordinator update): disposable-PostgreSQL
+  execution (Claude r2: isolation 18 passed, 618 migration/allowlist/evidence tests passed),
+  target-registry repin, hosted security evidence (run 37112573662, MEASURED_PASS) and
+  Claude review (r2 approved at a24bc64c).
+  [[2026-10-03_17-58-55_KST_Card268_audit_reader_disposition_removal_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
 

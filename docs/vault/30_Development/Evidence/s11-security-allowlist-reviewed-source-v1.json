@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-03T14:28:54+09:00",
+  "verifiedAt": "2026-10-03T17:46:10+09:00",
   "definerReview": {
-    "policyRevision": "0066_tenant_registry_revoke",
+    "policyRevision": "0067_audit_reader_revoke",
     "reviewDocument": "docs/vault/30_Development/S11_AC11_SEC_DEF_001_allowlist_보안검토_Codex.md",
     "signatures": [
       "public.apply_capability_offer(uuid, character, character, bigint)",
@@ -78,14 +78,6 @@
       "rules": ["E2"],
       "disposition": "false-positive-with-proof",
       "proof": "0045 defines a NOLOGIN guard used only by the budget trigger to enforce issuer-wide budgets."
-    },
-    {
-      "role": "inv_audit_reader",
-      "table": "public.audit_events",
-      "rules": ["E3", "E4", "E5"],
-      "disposition": "accepted-with-expiry",
-      "expiresAt": "2026-11-30T23:59:59+09:00",
-      "proof": "Card 254 re-reviewed the 0061 tree: 0047 remains the only migration that names inv_audit_reader and still fixes NOLOGIN, NOINHERIT, NOBYPASSRLS, direct members 0, SELECT-only on public.audit_events, FORCE RLS, audit_events_audit_read USING (true), and inv_app SELECT revoked. Product src/services contain explanatory references only and no connection, SET ROLE, or operational reader grant path. The hosted report now records granted_to and the evaluator requires the whole boundary before accepting E3/E4/E5. These are real privileged visibility, not false positives; monthly expiry requires another live membership/grant/path review."
     }
   ]
 }

@@ -18,7 +18,7 @@ Three rules this module keeps:
   transaction is open. A row without one cannot satisfy any tenant policy and
   goes through ``public.record_auth_denial``, the one narrow primitive allowed
   to append a tenant-less denial. The application role can no longer read this
-  table at all; reading is ``inv_audit_reader``'s job.
+  table at all; 0067 removes the unused cross-tenant reader as well.
 """
 
 from __future__ import annotations

@@ -1,12 +1,12 @@
 ---
 doc_id: "S11-AC11-SEC-DEF-001-ALLOWLIST-REVIEW-CODEX"
 title: "AC-11 SEC-DEF-001 SECURITY DEFINER allowlist 보안 검토"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:09:44+09:00"
+updated: "2026-10-03T17:46:10+09:00"
 source_of_truth: "Git"
-base_sha: "752245861eb0af1e3a4e714cb77c0948ce6f76b7"
+base_sha: "1d2d52890ca29f902f37fc8c403c34aea04cda5b"
 reviewer: "Claude"
 ---
 
@@ -40,18 +40,18 @@ review source와 definer policy·RLS baseline의 exact set이 일치할 때만 a
 정의 hash와 실제 EXECUTE role은 `tools/check_definer_functions.py`가 live catalogue에서
 다시 대조한다.
 
-# `inv_audit_reader` E3/E4/E5 disposition
+# `inv_audit_reader` E3/E4/E5 disposition — Card 268에서 제거
 
-`public.audit_events`에는 tenant 없는 인증 거부도 보존된다. 전용 audit reader가
-`USING (true)`로 그 행과 모든 tenant의 감사를 읽는 것은 역할의 목적 자체이므로,
-E3(GUC unset), E4(foreign tenant), E5(unknown tenant) 관측은 실제 privileged visibility다.
-따라서 세 건을 `false-positive-with-proof`로 낮추지 않고
-`accepted-with-expiry`로 분류한다.
+Card 254는 0047의 실제 cross-tenant visibility를 거짓 양성으로 낮추지 않고
+`accepted-with-expiry`로 임시 수용했다. Card 268은 0066까지 포함한 train 43 tree에서
+다시 측정했다. 제품 `src/`·`services/`에는 reader 연결, `SET ROLE`, membership 발급,
+감사 조회 route가 여전히 0건이다. 소비자가 없는 무조건 SELECT를 유지할 이유가 없으므로
+만료를 연장하지 않고 0067에서 `SELECT`·schema `USAGE`와
+`audit_events_audit_read USING (true)` policy를 제거한다.
 
-수용 경계는 0047이 강제하는 `NOLOGIN`, `NOINHERIT`, `NOBYPASSRLS`, direct member 0,
-SELECT-only, `inv_app` SELECT 없음이다. 만료는 `2026-11-30T23:59:59+09:00`이다.
-그 전에 실제 운영 reader membership·grant 경로를 재검토하지 않으면 canonical evaluator가
-`MEASURED_FAIL`을 내며, 만료를 자동 연장하지 않는다. 정의·E1~E6 자체는 완화하지 않는다.
+역할은 cluster-scoped라 남기되 `NOLOGIN`, `NOINHERIT`, `NOBYPASSRLS`, member 양방향 0,
+table privilege 0, reader policy 0을 정본 evaluator가 live report에서 재검산한다. 이 중
+하나라도 되살아나면 calendar 예외 없이 `MEASURED_FAIL`이다. E1~E6 정의는 바뀌지 않는다.
 
 ## Card 254 재검토 — 0061 tree
 
@@ -72,6 +72,17 @@ SELECT-only, `inv_app` SELECT 없음이다. 만료는 `2026-11-30T23:59:59+09:00
 `granted_to`를 live catalogue에서 기록하고, evaluator는 login/inherit/bypass/member 양방향,
 SELECT-only, FORCE RLS, exact policy가 모두 일치해야만 임시 disposition을 적용한다. 하나라도
 달라지면 만료 전이라도 `MEASURED_FAIL`이다.
+
+## Card 268 재측정 — 0066 tree
+
+- `git grep`으로 확인한 role의 실행 가능 정의는 0047 DDL뿐이다. 제품 tree의 세 설명
+  문구도 0067 경계에 맞춰 role 이름 의존을 제거했다.
+- 0067은 `DROP POLICY`, `REVOKE SELECT`, `REVOKE USAGE`만 수행한다. downgrade도 같은
+  세 연산을 반복하며 옛 cross-tenant 권한을 복원하지 않는다.
+- migration graph·rehearsal runner·AC-11 evaluator는 0067 marker를 revision과 정확한 세
+  연산에 결속한다. GRANT, table drop, 일부 연산 누락은 비가역 장벽으로 인정하지 않는다.
+- reviewed source와 collector baseline에서 E3·E4·E5 disposition을 삭제한다. 따라서
+  2026-11-30 만료 일정도 사라지고 별도 연장 일정은 없다.
 
 # 생성·pin 절차
 

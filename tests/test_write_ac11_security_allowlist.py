@@ -89,18 +89,20 @@ def test_rls_decisions_must_exactly_cover_the_collector_baseline(mutation):
         tool.build_allowlist(source, policy, baseline)
 
 
-def test_inv_audit_reader_visibility_is_expiring_not_a_false_positive():
+def test_inv_audit_reader_visibility_exception_is_removed_not_extended():
     source, policy, baseline = inputs()
     generated = tool.build_allowlist(source, policy, baseline)
-    reader = next(
-        row
+    assert all(
+        row["role"] != "inv_audit_reader"
         for row in generated["rlsAcceptedDispositions"]
-        if row["role"] == "inv_audit_reader"
     )
-    assert reader["table"] == "public.audit_events"
-    assert reader["rules"] == ["E3", "E4", "E5"]
-    assert reader["disposition"] == "accepted-with-expiry"
-    assert reader["expiresAt"] == "2026-11-30T23:59:59+09:00"
+    assert all(
+        row["role"] != "inv_audit_reader" for row in baseline["accepted"]
+    )
+    assert all(
+        row["disposition"] != "accepted-with-expiry"
+        for row in generated["rlsAcceptedDispositions"]
+    )
 
 
 def test_inv_app_tenant_registry_exception_was_removed_with_the_grant():
@@ -147,13 +149,8 @@ def test_no_product_path_reads_public_tenant_registry_as_inv_app():
     assert matches == []
 
 
-def test_audit_reader_review_matches_the_only_grant_and_has_no_product_caller():
-    """Card 254 re-review: the privilege is dormant and its DDL boundary is unchanged.
-
-    The exact product-source occurrence set is a ratchet.  Those three references are explanatory
-    docstrings/comments, not a connection or role-assumption path; adding any product reference
-    forces this reviewed disposition back through security review before its next expiry.
-    """
+def test_audit_reader_grant_and_unconditional_policy_are_removed_without_a_product_caller():
+    """Card 268 turns the dormant privilege into an exact least-privilege ratchet."""
 
     migration = (ROOT / "migrations/versions/0047_audit_events_isolation.py").read_text(
         encoding="utf-8"
@@ -166,12 +163,26 @@ def test_audit_reader_review_matches_the_only_grant_and_has_no_product_caller():
     assert "GRANT SELECT ON audit_events TO inv_audit_reader" in migration
     assert "REVOKE SELECT ON audit_events FROM inv_app" in migration
 
+    revoke = (ROOT / "migrations/versions/0067_audit_reader_revoke.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'revision = "0067_audit_reader_revoke"' in revoke
+    assert 'down_revision = "0066_tenant_registry_revoke"' in revoke
+    assert "irreversible = True" in revoke
+    for operation in (
+        "DROP POLICY IF EXISTS audit_events_audit_read ON public.audit_events",
+        "REVOKE SELECT ON public.audit_events FROM inv_audit_reader",
+        "REVOKE USAGE ON SCHEMA public FROM inv_audit_reader",
+    ):
+        assert revoke.count(operation) == 2, operation
+    assert "GRANT" not in revoke.split("def downgrade():", 1)[1]
+
     later_migrations = [
         path for path in (ROOT / "migrations/versions").glob("*.py")
         if path.name > "0047_audit_events_isolation.py"
         and "inv_audit_reader" in path.read_text(encoding="utf-8")
     ]
-    assert later_migrations == []
+    assert later_migrations == [ROOT / "migrations/versions/0067_audit_reader_revoke.py"]
 
     product_refs = {
         path.relative_to(ROOT).as_posix()
@@ -179,8 +190,4 @@ def test_audit_reader_review_matches_the_only_grant_and_has_no_product_caller():
         for path in parent.rglob("*.py")
         if re.search(r"\binv_audit_reader\b", path.read_text(encoding="utf-8"))
     }
-    assert product_refs == {
-        "src/saintvision/db/models/__init__.py",
-        "src/saintvision/db/models/operations.py",
-        "src/saintvision/services/audit.py",
-    }
+    assert product_refs == set()

@@ -251,12 +251,10 @@ def rls_population() -> dict:
     reader["inherit"] = False
     reader_table = reader["tables"]["public.audit_events"]
     reader_table["privileges"] = {
-        "select": "table", "insert": None, "update": None, "delete": None,
+        "select": None, "insert": None, "update": None, "delete": None,
     }
-    reader_table["policies"] = [{
-        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
-        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
-    }]
+    reader_table["policies"] = []
+    reader_table.pop("visible", None)
     return roles
 
 

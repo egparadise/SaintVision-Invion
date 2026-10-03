@@ -426,28 +426,25 @@ def before_and_after(audit_db):
 
 
 def audit_cells(report):
-    table = report["roles"]["inv_audit_reader"]["tables"]["public.audit_events"]
-    return table["visible"]
+    return report["roles"]["inv_audit_reader"]["tables"]["public.audit_events"]
 
 
-def test_an_empty_audit_table_observes_nothing_and_the_axis_says_so(before_and_after):
-    """Why this card exists: "the role sees none of the other tenant's rows" over no rows.
-
-    Every visibility cell is 0 because the table is empty, the identity fingerprints are both the
-    digest of nothing, and the canonical evaluator answers NOT_OBSERVED -- the axis is not claiming
-    a measured boundary, which is correct and is also why nothing here is evidence of isolation.
-    """
+def test_an_empty_audit_table_measures_reader_revocation_but_not_bridge_identity(before_and_after):
+    """Reader revocation is measured, while an empty bridge identity stays unobserved."""
 
     before, _summary, _after = before_and_after
-    cells = audit_cells(before)
+    table = audit_cells(before)
     assert before["ground_truth"]["public.audit_events"] == {
         "total": {"rows": 0}, "tenant_a": {"rows": 0}, "other_tenants": {"rows": 0}
     }
-    assert {name: cell.get("rows") for name, cell in cells.items() if name != "identity"} == {
-        "guc_unset": 0, "guc_tenant_a": 0, "guc_tenant_a_foreign_rows": 0,
-        "guc_unknown_tenant": 0, "guc_not_uuid": 0,
+    assert table["privileges"] == {
+        "select": None, "insert": None, "update": None, "delete": None,
     }
-    assert cells["identity"]["owner_a"]["rows"] == 0 and cells["identity"]["role_a"]["rows"] == 0
+    assert table["policies"] == []
+    assert "visible" not in table
+    assert aggregator.evaluate_rls(document(before), APPROVED_ALLOWLIST, NOW) is (
+        aggregator.Verdict.NOT_OBSERVED
+    )
 
 
 def test_the_seed_writes_two_tenants_through_the_product_writers(before_and_after, audit_db):
@@ -522,35 +519,21 @@ def test_the_seed_is_not_a_bypass(before_and_after, audit_db):
         )
 
 
-def test_the_seeded_table_makes_the_cross_tenant_comparison_real(before_and_after):
-    """What the card asked for: the comparison now has rows on both sides.
-
-    The owner sees tenant A's two rows; ``inv_audit_reader`` sees all four, of which two belong to
-    the other tenant -- so E3/E4/E5 are statements about rows that exist, and the identity
-    fingerprints differ instead of both being the digest of nothing.
-    """
+def test_the_seeded_table_does_not_restore_reader_visibility(before_and_after):
+    """Rows exist on both tenants, but the retired reader has no readable cell."""
 
     _before, _summary, after = before_and_after
-    cells = audit_cells(after)
+    table = audit_cells(after)
     assert after["ground_truth"]["public.audit_events"] == {
         "total": {"rows": 4}, "tenant_a": {"rows": 2}, "other_tenants": {"rows": 2}
     }
-    assert cells["guc_unset"]["rows"] == 4
-    assert cells["guc_tenant_a_foreign_rows"]["rows"] == 2
-    identity = cells["identity"]
-    assert identity["owner_a"]["rows"] == 2 and identity["role_a"]["rows"] == 4
-    assert identity["match"] is False
-    assert identity["owner_a"]["fp"] != identity["role_a"]["fp"]
+    assert table["privileges"]["select"] is None
+    assert table["policies"] == []
+    assert "visible" not in table
 
 
-def test_the_axis_now_measures_a_verdict_instead_of_observing_nothing(before_and_after):
-    """NOT_OBSERVED before, MEASURED_FAIL after -- and the three rows name why.
-
-    The failure is the audit reader's cross-tenant SELECT, which 0047 grants on purpose and the
-    S02-DB baseline excepts with its reason -- but the **reviewed** AC-11 dispositions do not carry
-    that exception.  Adding it is a review decision on the axis's source document, so this card
-    measures and reports rather than deciding (card 236 Codex decision request #1).
-    """
+def test_the_axis_passes_only_after_seed_from_the_same_revoked_boundary(before_and_after):
+    """The verdict needs both revoked reader privilege and non-vacuous bridge identity."""
 
     before, _summary, after = before_and_after
     before_document = document(before)
@@ -560,18 +543,25 @@ def test_the_axis_now_measures_a_verdict_instead_of_observing_nothing(before_and
     assert aggregator.evaluate_rls(before_document, APPROVED_ALLOWLIST, NOW) is (
         aggregator.Verdict.NOT_OBSERVED
     )
-    reviewed = reviewed_triples()
-    expected_violations = [row for row in AUDIT_READER_ROWS if row not in reviewed]
-    # Whether this is a FAIL or a PASS is the reviewed allowlist's decision, not this test's.
-    # What the seed changed is that the comparison is **measured** at all: before it, the axis
-    # said NOT_OBSERVED over an empty table.
-    expected = (
-        aggregator.Verdict.MEASURED_FAIL if expected_violations else aggregator.Verdict.MEASURED_PASS
+    assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is (
+        aggregator.Verdict.MEASURED_PASS
     )
-    assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is expected
-    assert [(row["role"], row["table"], row["rule"]) for row in after["violations"]] == (
-        expected_violations
-    )
+    assert after["violations"] == []
+    assert not any(item["role"] == "inv_audit_reader" for item in after["accepted"])
+
+
+def test_the_retired_reader_cannot_select_seeded_audit_rows(before_and_after, audit_db):
+    """The database, not a report field, refuses the old cross-tenant reader."""
+
+    import psycopg
+
+    dsn, _tenant_a = audit_db
+    _before, _summary, _after = before_and_after
+    with psycopg.connect(str(dsn)) as conn:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            with conn.transaction():
+                conn.execute("SET LOCAL ROLE inv_audit_reader")
+                conn.execute("SELECT count(*) FROM public.audit_events").fetchone()
 
 
 @pytest.fixture
