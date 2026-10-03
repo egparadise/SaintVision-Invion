@@ -13,6 +13,7 @@ REQUIRED = {
     "INV_RUNTIME_DSN": "postgresql://kernel:example@postgres/saintvision",
     "INV_RECOVERY_EPOCH": "11111111-1111-4111-8111-111111111111",
     "INV_CONFIG_VOLUME": "synthetic-config-volume",
+    "INV_WORKER_CONFIG_VOLUME": "synthetic-worker-config-volume",
     "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
     "POSTGRES_PASSWORD": "synthetic-admin-only",
     "MINIO_ROOT_USER": "synthetic-admin",
@@ -146,14 +147,60 @@ def test_worker_service_is_private_configured_and_build_dispatch_defaults_off():
     assert worker["command"] == ["python", "-m", "inv.worker"]
     assert "ports" not in worker
     environment = worker["environment"]
-    assert environment.count("INV_WORKER_CONFIG=/run/saintvision/worker.json") == 1
+    assert environment.count("INV_WORKER_CONFIG=/run/saintvision-worker/worker.json") == 1
     assert environment.count("INV_API_CONFIG=/run/saintvision/api.json") == 1
     build_flags = [item for item in environment if item.startswith("INV_BUILDKIT_PRODUCT_ENABLED=")]
-    assert build_flags == [
-        "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}"
-    ]
+    assert build_flags == ["INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}"]
     assert not any(item.startswith("INV_BUSINESS_DSN=") for item in environment)
-    mount = next(item for item in worker["volumes"] if item["target"] == "/run/saintvision")
-    assert mount["source"] == "server_config"
-    assert mount["read_only"] is True and mount["volume"]["nocopy"] is True
+    mounts = {item["target"]: item for item in worker["volumes"]}
+    assert set(mounts) == {"/run/saintvision", "/run/saintvision-worker"}
+    assert mounts["/run/saintvision"]["source"] == "api_config"
+    assert mounts["/run/saintvision-worker"]["source"] == "worker_config"
+    assert all(
+        mount["read_only"] is True and mount["volume"]["nocopy"] is True
+        for mount in mounts.values()
+    )
+    control = compose["services"]["control-plane"]
+    assert "INV_WORKER_CONFIG" not in "\n".join(control["environment"])
+    control_mounts = {item["target"]: item for item in control["volumes"]}
+    assert set(control_mounts) == {"/run/saintvision"}
+    assert control_mounts["/run/saintvision"]["source"] == "api_config"
     assert worker["depends_on"]["postgres"]["condition"] == "service_healthy"
+
+
+def test_rendered_compose_never_mounts_worker_credentials_into_api(tmp_path):
+    if not shutil.which("docker"):
+        pytest.skip("Docker Compose unavailable")
+    if subprocess.run(["docker", "compose", "version"], capture_output=True).returncode:
+        pytest.skip("Docker Compose unavailable")
+    empty = tmp_path / "empty.env"
+    empty.write_text("")
+    result = subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--env-file",
+            str(empty),
+            "-f",
+            str(ROOT / "docker-compose.prod.yml"),
+            "config",
+            "--format",
+            "json",
+        ],
+        env={**os.environ, **REQUIRED},
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    config = json.loads(result.stdout)
+    control = config["services"]["control-plane"]
+    worker = config["services"]["worker"]
+    control_targets = {mount["target"] for mount in control["volumes"]}
+    worker_mounts = {mount["target"]: mount for mount in worker["volumes"]}
+    assert control_targets == {"/run/saintvision"}
+    assert "/run/saintvision-worker" not in control_targets
+    assert set(worker_mounts) == {"/run/saintvision", "/run/saintvision-worker"}
+    assert all(mount["read_only"] is True for mount in worker_mounts.values())
+    assert config["volumes"]["api_config"]["name"] == REQUIRED["INV_CONFIG_VOLUME"]
+    assert config["volumes"]["worker_config"]["name"] == REQUIRED["INV_WORKER_CONFIG_VOLUME"]

@@ -37,8 +37,9 @@ def test_unreferenced_private_files_never_copied(tmp_path):
     )
     (tmp_path / "jwks.json").write_text("{}")
     (tmp_path / "unrelated-key.pem").write_text("synthetic-unrelated-secret")
-    files, private = module.collect(tmp_path)
-    assert set(files) == {"api.json", "jwks.json"} and not private
+    api_files, api_private, worker_files, worker_private = module.collect(tmp_path)
+    assert set(api_files) == {"api.json", "jwks.json"} and not api_private
+    assert not worker_files and not worker_private
 
 
 def test_operational_ca_bundle_is_copied_only_when_api_json_references_it(tmp_path):
@@ -52,9 +53,9 @@ def test_operational_ca_bundle_is_copied_only_when_api_json_references_it(tmp_pa
     (tmp_path / "api.json").write_text(json.dumps(config))
     (tmp_path / "jwks.json").write_text("{}")
     (tmp_path / "node-mtls-ca.pem").write_text("synthetic-public-ca")
-    files, private = module.collect(tmp_path)
-    assert set(files) == {"api.json", "jwks.json", "node-mtls-ca.pem"}
-    assert not private
+    api_files, api_private, worker_files, worker_private = module.collect(tmp_path)
+    assert set(api_files) == {"api.json", "jwks.json", "node-mtls-ca.pem"}
+    assert not api_private and not worker_files and not worker_private
 
 
 def test_object_store_credential_is_the_only_new_private_file(tmp_path):
@@ -76,9 +77,10 @@ def test_object_store_credential_is_the_only_new_private_file(tmp_path):
     (tmp_path / "object-store.json").write_text(
         json.dumps({"accessKeyId": "synthetic", "secretAccessKey": "secret"})
     )
-    files, private = module.collect(tmp_path)
-    assert set(files) == {"api.json", "jwks.json", "object-store.json"}
-    assert private == {"object-store.json"}
+    api_files, api_private, worker_files, worker_private = module.collect(tmp_path)
+    assert set(api_files) == {"api.json", "jwks.json", "object-store.json"}
+    assert api_private == {"object-store.json"}
+    assert not worker_files and not worker_private
 
 
 def test_worker_json_and_only_its_flat_tls_references_enter_volume(tmp_path):
@@ -88,9 +90,9 @@ def test_worker_json_and_only_its_flat_tls_references_enter_volume(tmp_path):
     worker = {
         "tenantId": "11111111-1111-4111-8111-111111111111",
         "tls": {
-            "ca_file": "/run/saintvision/node-ca.pem",
-            "certificate_file": "/run/saintvision/worker.pem",
-            "key_file": "/run/saintvision/worker.key",
+            "ca_file": "/run/saintvision-worker/node-ca.pem",
+            "certificate_file": "/run/saintvision-worker/worker.pem",
+            "key_file": "/run/saintvision-worker/worker.key",
         },
         "buildExecution": {
             "buildctlPath": "/usr/bin/buildctl",
@@ -109,17 +111,17 @@ def test_worker_json_and_only_its_flat_tls_references_enter_volume(tmp_path):
         (tmp_path / name).write_text("synthetic")
     (tmp_path / "unreferenced.key").write_text("must-not-enter")
 
-    files, private = module.collect(tmp_path)
+    api_files, api_private, worker_files, worker_private = module.collect(tmp_path)
 
-    assert set(files) == {
-        "api.json",
+    assert set(api_files) == {"api.json", "jwks.json"}
+    assert not api_private
+    assert set(worker_files) == {
         "worker.json",
-        "jwks.json",
         "node-ca.pem",
         "worker.pem",
         "worker.key",
     }
-    assert private == {"worker.key"}
+    assert worker_private == {"worker.key"}
 
 
 @pytest.mark.parametrize(
@@ -176,9 +178,10 @@ def test_api_build_plan_authority_adds_no_secret_file_to_server_volume(tmp_path)
         )
     )
     (tmp_path / "jwks.json").write_text("{}")
-    files, private = module.collect(tmp_path)
-    assert set(files) == {"api.json", "jwks.json"}
-    assert private == set()
+    api_files, api_private, worker_files, worker_private = module.collect(tmp_path)
+    assert set(api_files) == {"api.json", "jwks.json"}
+    assert api_private == set()
+    assert not worker_files and not worker_private
 
 
 @pytest.mark.parametrize(
@@ -187,7 +190,8 @@ def test_api_build_plan_authority_adds_no_secret_file_to_server_volume(tmp_path)
         lambda worker: worker.update({"unknown": True}),
         lambda worker: worker.update({"tenantId": "not-a-uuid"}),
         lambda worker: worker["tls"].update({"key_file": "/outside/worker.key"}),
-        lambda worker: worker["tls"].update({"key_file": "/run/saintvision/worker.json"}),
+        lambda worker: worker["tls"].update({"key_file": "/run/saintvision/worker.key"}),
+        lambda worker: worker["tls"].update({"key_file": "/run/saintvision-worker/worker.json"}),
         lambda worker: worker.update({"buildExecution": {"nodeId": "node"}}),
     ],
 )
@@ -199,14 +203,56 @@ def test_worker_configuration_is_strict_and_flat(tmp_path, mutation):
     worker = {
         "tenantId": "11111111-1111-4111-8111-111111111111",
         "tls": {
-            "ca_file": "/run/saintvision/node-ca.pem",
-            "certificate_file": "/run/saintvision/worker.pem",
-            "key_file": "/run/saintvision/worker.key",
+            "ca_file": "/run/saintvision-worker/node-ca.pem",
+            "certificate_file": "/run/saintvision-worker/worker.pem",
+            "key_file": "/run/saintvision-worker/worker.key",
         },
     }
     mutation(worker)
     (tmp_path / "worker.json").write_text(json.dumps(worker))
     with pytest.raises(ValueError):
+        module.collect(tmp_path)
+
+
+def test_api_and_worker_references_cannot_copy_the_same_source_file(tmp_path):
+    (tmp_path / "api.json").write_text(
+        json.dumps(
+            {
+                "identity": {"jwks_file": "/run/saintvision/jwks.json"},
+                "workspace": {
+                    "signingKeyFile": "/run/saintvision/worker.key",
+                    "tls": {
+                        "ca_file": "/run/saintvision/api-ca.pem",
+                        "certificate_file": "/run/saintvision/api.pem",
+                        "key_file": "/run/saintvision/api.key",
+                    },
+                },
+            }
+        )
+    )
+    (tmp_path / "worker.json").write_text(
+        json.dumps(
+            {
+                "tenantId": "11111111-1111-4111-8111-111111111111",
+                "tls": {
+                    "ca_file": "/run/saintvision-worker/node-ca.pem",
+                    "certificate_file": "/run/saintvision-worker/worker.pem",
+                    "key_file": "/run/saintvision-worker/worker.key",
+                },
+            }
+        )
+    )
+    for name in (
+        "jwks.json",
+        "worker.key",
+        "api-ca.pem",
+        "api.pem",
+        "api.key",
+        "node-ca.pem",
+        "worker.pem",
+    ):
+        (tmp_path / name).write_text("synthetic")
+    with pytest.raises(ValueError, match="distinct files"):
         module.collect(tmp_path)
 
 
@@ -284,3 +330,207 @@ def test_real_volume_copy_or_failure_cleanup(tmp_path, expired):
             )
             assert len(label) == 32
             module.docker("volume", "rm", volume)
+
+
+def test_worker_document_requires_a_distinct_worker_volume(tmp_path):
+    (tmp_path / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    (tmp_path / "worker.json").write_text(
+        json.dumps(
+            {
+                "tenantId": "11111111-1111-4111-8111-111111111111",
+                "tls": {
+                    "ca_file": "/run/saintvision-worker/node-ca.pem",
+                    "certificate_file": "/run/saintvision-worker/worker.pem",
+                    "key_file": "/run/saintvision-worker/worker.key",
+                },
+            }
+        )
+    )
+    for name in ("node-ca.pem", "worker.pem", "worker.key"):
+        (tmp_path / name).write_text("synthetic")
+    with pytest.raises(ValueError, match="Separate worker configuration volume required"):
+        module.prepare(tmp_path, "sv-api-config", "sha256:" + "0" * 64)
+
+
+def test_api_and_worker_volume_names_must_be_distinct(tmp_path):
+    with pytest.raises(ValueError, match="volumes must differ"):
+        module.prepare(
+            tmp_path,
+            "sv-config",
+            "sha256:" + "0" * 64,
+            worker_volume="sv-config",
+        )
+
+
+def test_worker_volume_without_worker_document_is_rejected_before_docker(tmp_path):
+    (tmp_path / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    with pytest.raises(ValueError, match="Worker configuration required"):
+        module.prepare(
+            tmp_path,
+            "sv-api-config",
+            "sha256:" + "0" * 64,
+            worker_volume="sv-worker-config",
+        )
+
+
+def test_failed_worker_verification_cleans_only_both_new_owned_volumes(tmp_path, monkeypatch):
+    (tmp_path / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    (tmp_path / "worker.json").write_text(
+        json.dumps(
+            {
+                "tenantId": "11111111-1111-4111-8111-111111111111",
+                "tls": {
+                    "ca_file": "/run/saintvision-worker/node-ca.pem",
+                    "certificate_file": "/run/saintvision-worker/worker.pem",
+                    "key_file": "/run/saintvision-worker/worker.key",
+                },
+            }
+        )
+    )
+    for name in ("node-ca.pem", "worker.pem", "worker.key"):
+        (tmp_path / name).write_text("synthetic")
+    labels = {}
+    removed = []
+
+    def fake_docker(*args, payload=None):
+        assert payload is None
+        if args[:2] == ("volume", "ls"):
+            return "operator-existing-volume"
+        if args[:2] == ("volume", "create"):
+            labels[args[-1]] = next(
+                value.split("=", 1)[1]
+                for value in args
+                if value.startswith("ai.saintvision.config=")
+            )
+            return args[-1]
+        if args[:2] == ("volume", "inspect"):
+            return labels[args[-1]]
+        if args[:2] == ("volume", "rm"):
+            removed.append(args[-1])
+            labels.pop(args[-1])
+            return args[-1]
+        raise AssertionError(args)
+
+    def fail_worker(_volume, _image, _files, _private, *, target, verify):
+        assert verify
+        if target == module.WORKER_ROOT:
+            raise RuntimeError("synthetic worker verification failure")
+
+    monkeypatch.setattr(module, "docker", fake_docker)
+    monkeypatch.setattr(module, "_write_and_verify", fail_worker)
+    with pytest.raises(RuntimeError, match="worker verification"):
+        module.prepare(
+            tmp_path,
+            "sv-api-config",
+            "sha256:" + "0" * 64,
+            worker_volume="sv-worker-config",
+        )
+    assert removed == ["sv-worker-config", "sv-api-config"]
+    assert labels == {}
+
+
+def test_real_container_mounts_hide_worker_credentials_from_api(tmp_path):
+    image = os.environ.get("INV_TEST_CONFIG_IMAGE")
+    if not image:
+        pytest.skip("Explicit pinned local candidate image required")
+    from jwt_support import jwt_fixture
+    from pki_support import authority, credentials, issue
+
+    identity = jwt_fixture(tmp_path, str(uuid4()))
+    (tmp_path / "api.json").write_text(
+        json.dumps(
+            {
+                "identity": {
+                    "tenant_id": identity.tenant,
+                    "issuer": identity.issuer,
+                    "audience": identity.audience,
+                    "client_ids": ["synthetic-web"],
+                    "jwks_file": "/run/saintvision/jwks.json",
+                }
+            }
+        )
+    )
+    ca = authority()
+    client = issue(ca, "spiffe://saintvision.test/worker")
+    tls_files = credentials(tmp_path, ca, client, prefix="worker")
+    (tmp_path / "worker.json").write_text(
+        json.dumps(
+            {
+                "tenantId": "11111111-1111-4111-8111-111111111111",
+                "tls": {
+                    name: "/run/saintvision-worker/" + path.name for name, path in tls_files.items()
+                },
+            }
+        )
+    )
+    api_volume = "sv-api-config-test-" + uuid4().hex
+    worker_volume = "sv-worker-config-test-" + uuid4().hex
+    try:
+        receipt = module.prepare(
+            tmp_path,
+            api_volume,
+            image,
+            worker_volume=worker_volume,
+        )
+        assert receipt["apiFilesVerified"] == 2
+        assert receipt["workerFilesVerified"] == 4
+        module.docker(
+            "run",
+            "--rm",
+            "--network",
+            "none",
+            "--read-only",
+            "--user",
+            "65532:65532",
+            "--mount",
+            f"type=volume,source={api_volume},target=/run/saintvision,readonly",
+            image,
+            "python",
+            "-c",
+            "from pathlib import Path; "
+            "assert Path('/run/saintvision/api.json').is_file(); "
+            "assert not Path('/run/saintvision/worker.json').exists(); "
+            "assert not Path('/run/saintvision-worker').exists()",
+        )
+        module.docker(
+            "run",
+            "--rm",
+            "--network",
+            "none",
+            "--read-only",
+            "--user",
+            "65532:65532",
+            "--mount",
+            f"type=volume,source={api_volume},target=/run/saintvision,readonly",
+            "--mount",
+            f"type=volume,source={worker_volume},target=/run/saintvision-worker,readonly",
+            image,
+            "python",
+            "-c",
+            "from pathlib import Path; "
+            "assert Path('/run/saintvision/api.json').is_file(); "
+            "assert Path('/run/saintvision-worker/worker.json').is_file(); "
+            "assert Path('/run/saintvision-worker/worker-key.pem').is_file()",
+        )
+    finally:
+        existing = set(module.docker("volume", "ls", "--format", "{{.Name}}").splitlines())
+        for volume in (api_volume, worker_volume):
+            if volume in existing:
+                label = module.docker(
+                    "volume",
+                    "inspect",
+                    "--format",
+                    '{{index .Labels "ai.saintvision.config"}}',
+                    volume,
+                )
+                assert len(label) == 32
+                module.docker("volume", "rm", volume)

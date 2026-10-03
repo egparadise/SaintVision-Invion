@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.310"
+version: "1.0.311"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:59:37+09:00"
+updated: "2026-10-03T13:05:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-260 AC-11 exact-SHA aggregation automation"
-active_card_status: "Card 258 #354 is approved by Claude r1 at 6be1339d: exact target 694217b0 has same-SHA security, accessibility and migration artifacts and canonical aggregation assembled 4/8 axes, recomputing INVALID_RUN without changing any contract or target"
-active_card_next: "Build the fail-closed producer-run discovery, missing-lane dispatch and aggregate tool with fake-gh tests (Card 260); evaluator, schema and targets stay unchanged"
+active_card: "CARD-262 server_config volume split"
+active_card_status: "API and worker configuration are split into distinct read-only volumes; focused PG-free and rendered Compose tests pass, while hosted candidate-image isolation and exact-head CI remain review gates"
+active_card_next: "Run the candidate-image container boundary on hosted CI, confirm exact-head Backend/Core, and request Claude review"
 ---
+
+## 2026-10-03 Card 262 — server_config volume split
+
+- Started from train 38 candidate `ce63a5e8136742389e8148adc64d466df0f7af77` because Card 255
+  left one activation residual: API and worker mounted the same volume containing worker TLS bytes.
+- `api_config` remains the API authority at `/run/saintvision`; the new `worker_config` volume is
+  mounted only by the worker at `/run/saintvision-worker`. Both are read-only and the product flag
+  remains default off.
+- The preparation tool now assigns API and worker files to exact roots, rejects cross-root worker
+  TLS references and existing/equal volumes, and verifies each volume before returning a redacted
+  receipt. A failed two-volume preparation removes only volumes owned by that invocation.
+- Focused local results: server-config **26 passed / 3 candidate-image skips**, rendered deployment
+  boundary **17 passed**, VF Compose boundary **3 passed**. Hosted container and full exact-head CI
+  are not yet claimed. [[2026-10-03_13-05-15_KST_Card262_server_config_volume_split_Codex]].
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
 
