@@ -560,6 +560,52 @@ class ReplicaObservationResponse(Strict):
     requires_execution_revalidation: Literal[True] = Field(alias="requiresExecutionRevalidation")
 
 
+class ReplicaRepairItem(Strict):
+    """One location that is short of ready copies, and where a copy can come from.
+
+    ``desired`` and ``ready`` are both reported and neither is derived from the
+    other: the replica factor is a policy input with a stated default, and the
+    ready count is an observation. A reader that saw only the deficit could not
+    tell a policy change from a lost copy.
+    """
+
+    location_id: str = Field(alias="locationId")
+    ready: int = Field(ge=0)
+    desired: int = Field(ge=1)
+    deficit: int = Field(ge=0)
+    classification: Literal["under_replicated", "at_risk", "unreplicated"]
+    unusable: dict[str, int] = Field(default_factory=dict)
+    #: Nodes that still hold a ready copy, so a transfer has somewhere to read
+    #: from. Empty for ``unreplicated`` and ``at_risk`` -- there is nothing to copy.
+    source_nodes: list[str] = Field(default_factory=list, alias="sourceNodes", max_length=64)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReplicaRepairPlanResponse(Strict):
+    """What this project's catalogue needs, and what this answer is not.
+
+    It is a **plan**, not an action: establishing a new replica is a node-runtime
+    transfer and this route moves no bytes. ``observedAt`` is when the counts were
+    read; nothing here promises the bytes are reachable now.
+    """
+
+    project_id: str = Field(alias="projectId")
+    observed_at: dt.datetime = Field(alias="observedAt")
+    replica_factor: int = Field(ge=1, alias="replicaFactor")
+    locations: int = Field(ge=0)
+    healthy: int = Field(ge=0)
+    under_replicated: int = Field(ge=0, alias="underReplicated")
+    at_risk: int = Field(ge=0, alias="atRisk")
+    unreplicated: int = Field(ge=0)
+    items: list[ReplicaRepairItem] = Field(default_factory=list, max_length=200)
+    truncated: bool
+    #: Stated rather than implied: this route plans and reports, it does not repair.
+    repair_performed: Literal[False] = Field(alias="repairPerformed")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class PageResponse(Strict):
     items: list[dict]
     next_cursor: str | None = Field(default=None, alias="nextCursor")

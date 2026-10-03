@@ -19,6 +19,9 @@ What this service does and does not do:
 * the **replica factor** (how many ready copies a location should have) is a
   policy decision, not invented here: it is a parameter with a stated default,
   and the real per-classification policy is the operator's / Codex's to set.
+* **every entry point takes ``project_id`` and filters both scope columns**
+  (card 266). ``tenant_id`` alone was enough while only tests called these, and
+  stopped being enough the moment a project-scoped route read them.
 
 Only ``ready`` counts as a usable copy. ``transferring`` is not yet readable,
 ``stale`` is a copy on a departed or unverified node, ``corrupt`` failed its
@@ -88,13 +91,29 @@ def replica_health(
     *,
     tenant_id: uuid.UUID,
     location_id: str,
+    project_id: str,
     desired: int = DEFAULT_REPLICA_FACTOR,
 ) -> ReplicaHealth:
-    """Assess one location's replica health against the replica factor."""
+    """Assess one location's replica health against the replica factor.
+
+    ``project_id`` is an **authority input**, not a filter for convenience. Before
+    card 266 these functions narrowed by tenant alone, so a project-scoped reader
+    would have been handed the whole tenant's catalogue. A row in another project
+    -- and a ``0062`` legacy row whose ``project_id`` is still NULL -- is the same
+    answer as a row that does not exist, because telling those cases apart would
+    say that somebody else's location id exists.
+    """
     if desired < 1:
         raise InvError(VAL_SCHEMA, "replica factor must be at least 1")
     location = session.get(DataLocation, location_id)
-    if location is None or location.tenant_id != tenant_id:
+    if (
+        location is None
+        or location.tenant_id != tenant_id
+        # NULL is not "every project": a location catalogued before 0062 has no
+        # project, so it belongs to no project's answer.
+        or location.project_id is None
+        or location.project_id != project_id
+    ):
         raise InvError(RES_ARTIFACT_NOT_FOUND, "data location not found")
 
     rows = session.execute(
@@ -138,25 +157,37 @@ def locations_needing_repair(
     session: Session,
     *,
     tenant_id: uuid.UUID,
+    project_id: str,
     desired: int = DEFAULT_REPLICA_FACTOR,
     limit: int | None = None,
 ) -> list[ReplicaHealth]:
-    """Every catalogued location with fewer than ``desired`` ready replicas.
+    """Every location **of this project** with fewer than ``desired`` ready replicas.
 
     Locations with no replica at all are included: ``unreplicated`` is the most
     urgent repair, not an item to skip because it has nothing to count.
+
+    Both scope columns are filtered and the legacy NULL ``project_id`` is excluded
+    (see ``replica_health``). One condition is not enough -- that was the gap a
+    project-scoped route would have inherited.
     """
     location_ids = list(
         session.scalars(
             select(DataLocation.location_id)
-            .where(DataLocation.tenant_id == tenant_id)
+            .where(
+                DataLocation.tenant_id == tenant_id,
+                DataLocation.project_id == project_id,
+            )
             .order_by(DataLocation.location_id)
         ).all()
     )
     out: list[ReplicaHealth] = []
     for location_id in location_ids:
         health = replica_health(
-            session, tenant_id=tenant_id, location_id=location_id, desired=desired
+            session,
+            tenant_id=tenant_id,
+            location_id=location_id,
+            project_id=project_id,
+            desired=desired,
         )
         if health.needs_repair:
             out.append(health)
@@ -200,25 +231,34 @@ def fleet_replica_summary(
     session: Session,
     *,
     tenant_id: uuid.UUID,
+    project_id: str,
     desired: int = DEFAULT_REPLICA_FACTOR,
 ) -> FleetReplicaSummary:
-    """Aggregate every catalogued location's classification into one summary.
+    """Aggregate one project's locations into a single classification summary.
 
     The observability source for VF-CL-04: a metrics endpoint or runbook reads
     this rather than recomputing per-location classification itself, so the
-    definition of "at risk" lives in one place.
+    definition of "at risk" lives in one place. Scoped exactly as
+    ``locations_needing_repair`` is, for the same reason.
     """
     if desired < 1:
         raise InvError(VAL_SCHEMA, "replica factor must be at least 1")
     tally = {"healthy": 0, "under_replicated": 0, "at_risk": 0, "unreplicated": 0}
     location_ids = list(
         session.scalars(
-            select(DataLocation.location_id).where(DataLocation.tenant_id == tenant_id)
+            select(DataLocation.location_id).where(
+                DataLocation.tenant_id == tenant_id,
+                DataLocation.project_id == project_id,
+            )
         ).all()
     )
     for location_id in location_ids:
         health = replica_health(
-            session, tenant_id=tenant_id, location_id=location_id, desired=desired
+            session,
+            tenant_id=tenant_id,
+            location_id=location_id,
+            project_id=project_id,
+            desired=desired,
         )
         tally[health.classification] += 1
     return FleetReplicaSummary(
