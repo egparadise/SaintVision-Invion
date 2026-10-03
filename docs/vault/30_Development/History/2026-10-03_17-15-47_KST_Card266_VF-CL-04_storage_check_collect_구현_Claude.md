@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD266-VF-CL-04-STORAGE-CHECK-COLLECT-20261003"
 title: "카드 266 — 서명된 폴더 점검을 돌리는 제품 경로를 설계대로 구현했다. ledger 응답이 쓰기와 같은 transaction에서 커밋되고, 저장된 응답은 지금 권한이 있는 주체에게만 돌아간다"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-03T17:15:47+09:00"
+updated: "2026-10-03T18:23:39+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9e9a551c"
@@ -18,7 +18,7 @@ tags: ["vf-cl-04", "storage-check", "idempotency", "concurrency", "replica-repai
 
 ## 0. 한 줄
 
-`#358`(카드 263) 설계가 Codex r8 승인(`e14aa8ce`)이고 **그 설계가 구현 계약**이었다. 사슬은 전부 있었고 **그것을 돌리는 것이 없었다** — `StorageSampleStore`를 생성하는 코드가 저장소 전체에서 시험 한 곳뿐이었고, 그래서 AC-12 인수 항목 `contributed-folders-checked`가 폴더 0개일 때 `PASS`, 1개부터는 영원히 `FAIL`이었다. 이제 **공개 write surface 하나**(`POST /v1/projects/{project}/runs/{run_id}/storage-samples`)가 세 단계로 그것을 돌리고, **ledger 응답이 다섯 쓰기와 같은 transaction에서 커밋되며**, **저장된 응답은 지금 권한이 있는 주체에게만** 돌아간다. 시험 **39**(새 route 6 + collect 17 + replica 16), 변이 **10/10 사살**, migration **0건**(`0065` 비움).
+`#358`(카드 263) 설계가 Codex r8 승인(`e14aa8ce`)이고 **그 설계가 구현 계약**이었다. 사슬은 전부 있었고 **그것을 돌리는 것이 없었다** — `StorageSampleStore`를 생성하는 코드가 저장소 전체에서 시험 한 곳뿐이었고, 그래서 AC-12 인수 항목 `contributed-folders-checked`가 폴더 0개일 때 `PASS`, 1개부터는 영원히 `FAIL`이었다. 이제 **공개 write surface 하나**(`POST /v1/projects/{project}/runs/{run_id}/storage-samples`)가 세 단계로 그것을 돌리고, **ledger 응답이 다섯 쓰기와 같은 transaction에서 커밋되며**, **저장된 응답은 지금 권한이 있는 주체에게만** 돌아간다. **r2 기준** 시험 **61**(collect 28 + HTTP 11 + repair route 6 + replica 16), 변이 **18/18 사살**(runner와 결과가 tree에 있다), migration **0건**(`0065` 비움). r2에서 고친 차단 다섯과 **측정이 뒤집은 전제 하나**는 §9다.
 
 ## 1. 무엇이 들어갔는가
 
@@ -34,7 +34,7 @@ tags: ["vf-cl-04", "storage-check", "idempotency", "concurrency", "replica-repai
 
 ## 2. 세 단계가 왜 세 단계인가
 
-kernel transaction은 **network I/O를 금지한다**(`db.py:211`). 그래서 node 호출을 transaction 안에 둘 수 없고, node 응답이 `observedAt`과 **서명**을 담으므로 **두 요청이 같은 봉투를 받지 않는다**. ledger 응답이 쓰기와 다른 transaction에 있으면 같은 key 동시 요청 둘 중 하나가 **`IDEM-0001`**을 받는다 — 멱등이 막아야 할 바로 그 일이다.
+kernel transaction은 **network I/O를 금지한다**(`db.py:211`). 그래서 node 호출을 transaction 안에 둘 수 없고, node 응답이 `observedAt`과 **서명**을 담으므로 **두 요청이 같은 봉투를 받는다는 보장이 없다**(같은 초 안에서는 실제로 같다 — §9-4의 정정). ledger 응답이 쓰기와 다른 transaction에 있으면 같은 key 동시 요청 둘 중 하나가 **`IDEM-0001`**을 받는다 — 멱등이 막아야 할 바로 그 일이다.
 
 | 단계 | transaction | 하는 일 |
 |---|---|---|
@@ -62,7 +62,7 @@ kernel transaction은 **network I/O를 금지한다**(`db.py:211`). 그래서 no
 1. **kernel에는 감사 경로가 아예 없었다.** 설계 r4에서 "kernel handler에 단일 recorder 연결"을 구현 범위로 적었고, 실제로 붙여 보니 필요한 것은 **engine 하나**였다 — `record_denial_out_of_band`는 `inv_app` role의 SQLAlchemy engine을 받고, 그 engine은 이 process에서 `configured_business`가 만드는 것 하나뿐이다. 그래서 그것을 `app.state.denial_engine`으로 노출했다(반환 타입을 바꾸면 기존 호출자 5곳이 깨진다).
 2. **recorder의 collaborator 둘을 인자로 남겼다.** closure를 그대로 module로 옮기면 `app_module.record_denial_out_of_band`·`audit_action`을 patch하는 **기존 시험 9파일 11자리**가 전부 뚫린다. 규칙은 한 곳에 두고 **두 collaborator만** 인자로 받게 해서 각 앱의 handler가 자기 이름을 넘기게 했다 — 정본은 하나, 시험 seam은 그대로다.
 
-## 5. 실제 검증 증거
+## 5. 실제 검증 증거 (r1 시점 — **현재 수치는 §9-3**)
 
 | 무엇 | 결과 |
 |---|---|
@@ -82,7 +82,7 @@ kernel transaction은 **network I/O를 금지한다**(`db.py:211`). 그래서 no
 * **3단계 권한 검사를 빼도 죽지 않았다.** 모든 철회 시험이 **재시도 전에** 철회해서 1단계가 잡았고, 3단계가 "저장된 응답 + 철회된 권한"으로 도달한 적이 없었다. **설계가 이름까지 적어 둔 schedule을 내가 안 쓴 것**이다 — 한 요청을 node 호출 안에서 멈추고, 두 번째가 완주해 응답을 저장하고, 그 뒤 grant를 철회하고, 그제서야 첫 요청을 풀어 **3단계 replay가 거부**되는 것을 단언한다.
 * **contribution 소유자 비교를 빼도 죽지 않았다.** 비활성·없음만 덮고 **소유권 변경**을 안 썼다. 지금은 폴더를 다른 user에게 넘긴 뒤 같은 key가 **node 호출 0회**로 `RES-0004`를 받는 것을 단언한다.
 
-둘을 더한 뒤 **10/10**이다.
+둘을 더한 뒤 10/10이었고, r2에서 변이가 **18개로 늘어 18/18**이다(§9-3).
 
 ## 6. migration
 
@@ -98,3 +98,48 @@ kernel transaction은 **network I/O를 금지한다**(`db.py:211`). 그래서 no
 ## 8. 다음
 
 exact-head Backend/Core/security green 뒤 **'검토 기준 head' 코멘트 1회**. 검토는 Codex.
+
+## 9. r2 — Codex r1의 차단 다섯, 그리고 측정이 뒤집은 전제 하나
+
+### 9-1. 다섯 가지
+
+| | 무엇이었나 | 고친 것 |
+|---|---|---|
+| **F1** | `storageSample`이 strict top-level 허용 집합에 없어 **넣으면 startup 거부, 빼면 route가 항상 503**인 dead branch였다 | 허용 키에 넣고, 그 block도 **알 수 없는 키를 거부**하도록 strict하게 |
+| **F2** | contribution에 **project 경계가 전혀 없었다** — 같은 tenant 소유자가 다른 project 또는 NULL legacy 카탈로그 폴더를 수집할 수 있었다 | §9-2 |
+| **F3** | pre-I/O가 **한 transaction이 아니었다** — `db.transaction`이 자기 connection을 열므로 outer tx 안의 `issue()`가 pending을 **먼저 커밋**하고, 이후 실패 시 pending만 남았다 | `locked_issue(conn, …)`를 뽑아 **같은 connection·tx**에서 ledger와 함께 커밋. `issue()`는 기존 호출자용 wrapper |
+| **F4** | kernel이 **identity를 pin하지 않아** 인증된 거부가 `anonymous`·tenant 없음으로 기록되고, recorder가 읽는 `path_params["project_id"]`와 route의 `{project}`가 어긋나 **project도 없었다** | 검증 **뒤** identity를 pin, route를 recorder 계약 이름으로, **collector만 구성되고 recorder가 없으면 startup 거부** |
+| **추가** | `business_permission`을 `linked=True` 없이 불러 **kernel-only project에서 None → `granted["userId"]` 500** | `linked=True`로 **fail-closed `AUTH-0030`**, 그 project 모양을 만드는 부정 시험 추가 |
+| **F5** | 실행 증거 부족 — HTTP 시험 0건, 변이 runner가 tree에 없음 | §9-3 |
+
+### 9-2. F2를 고칠 **자리**는 측정이 정했다
+
+경계가 필요한 것은 `data_locations.project_id`인데 **kernel role이 그 열을 읽을 수 없다.** 추정이 아니라 head에서 쟀다.
+
+```
+has_column_privilege('inv_kernel','public.data_locations','project_id','SELECT') -> False
+has_column_privilege('inv_app',   'public.data_locations','project_id','SELECT') -> True
+```
+
+`0062`(내 카드 253)가 열을 더하면서 **GRANT를 바꾸지 않았고**, kernel의 column 단위 grant 일곱 개에 그 열이 없다. 그래서 **kernel의 손을 넓히지 않고** 카탈로그의 주인인 app role 연결에서 그 한 질문만 묻는다(그 읽기는 RLS 아래이므로 tenant GUC를 세운다). 규칙은 **전부 아니면 거부**다 — 이 project에 **하나 이상** 있고 **밖에 하나도 없어야** 하며 **NULL은 밖**이다.
+
+**한계도 적었다**: 그 읽기는 다른 transaction이므로 kernel의 행들과 **함께 잠글 수 없다**. 양쪽 phase에서 확인하고 쓰기 경로의 잠금은 그대로지만, 잠글 수 있게 만드는 길은 셋(열 GRANT, definer 함수 — **definer 수가 움직여 AC-11 검토 집합을 건드린다**, surface를 app으로 이동)이고 **고르는 것은 이 카드의 몫이 아니다**.
+
+### 9-3. 증거
+
+| 무엇 | 결과 |
+|---|---|
+| collect surface (실 PG·실제 서명) | **28 passed** |
+| **HTTP route** (실 PG, 실제 app·recorder 배선) | **11 passed** |
+| repair plan route · `replica_repair` | **6 · 16 passed** |
+| kernel 회귀(storage·transport·model·control·account·resolver) | **52 passed**, 27 Docker skip |
+| denial recorder 계열 | **73 passed** |
+| **변이** | **18/18 KILLED** — runner와 결과가 **tree에 있다**(`tools/test_c266_mutations.py`, `Evidence/c266-mutation-results.json`) |
+
+HTTP 시험이 드는 것: 201·replay 200 · **인증된 거부가 정확히 1행**(실 actor·tenant·project·bounded action·trace, action에 식별자 없음) · 없음은 **denial 0행** · 불가 셋(`NODE-0030`·`NODE-0050`·`RES-0007`)이 각각 **ProblemDetails 10 key 정확히·`storage_checks` 0행·denial 0행** · strict body와 필수 key 422 · **감사 쓰기 실패가 단정한 403으로 포장되지 않는다**.
+
+**변이 둘이 처음에 살아남았고 둘 다 시험 공백이었다** — (i) 일부만 migrate된 폴더(`project_id` 일부 NULL)를 안 써서 "NULL은 밖"을 지워도 죽지 않았고, (ii) phase 1이 `locked_issue`를 쓰는지는 **커밋 자체를 실패시키지 않으면 외부에서 구별되지 않아** source 수준으로 단언했다 — 그 시험이 스스로 그렇다고 적는다.
+
+### 9-4. 측정이 뒤집은 전제
+
+설계와 나(그리고 r5의 논의)가 공유한 전제는 "두 요청이 **같은 봉투를 받지 않는다**"였다. **틀렸다** — `observedAt`이 **초 단위**이고 서명이 결정론적이므로 **같은 초 안의 두 표본은 byte 단위로 같다**(실측). 세 단계가 존재하는 이유는 "항상 다르다"가 아니라 **"초가 넘어가면 다르다"**이고, 시험이 양쪽을 단언한다. 같은 초에서는 응답 hash 비교만으로도 우연히 맞아 보이기 때문에, 빠른 시험에서 괜찮아 보이고 운영에서 깨지는 모양이다.
