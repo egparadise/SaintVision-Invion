@@ -45,10 +45,9 @@ migration and `INV_BUILDKIT_PRODUCT_ENABLED` remains default off.
 - `python tools/check_docs.py`, `python tools/check_ontology.py`, and
   `python tools/check_doc_single_source.py --ratchet`: exit 0. Obsidian sync check reported no
   conflicts and made no writes.
-- The local path-citation ratchet did not produce a valid clean-checkout result: ignored
-  `apps/web/dist` and `apps/web/node_modules` artifacts made five historical baseline citations
-  appear newly repaired. The baseline was not widened or edited; clean hosted Docs remains the
-  citation gate.
+- The local path-citation ratchet did not produce a valid clean-checkout result: ignored frontend
+  build-output and dependency directories made five historical baseline citations appear newly
+  repaired. The baseline was not widened or edited; clean hosted Docs remains the citation gate.
 - Hosted candidate-image execution and the exact-head Backend/Core result remain review gates; this
   document does not treat the locally skipped container case as measured success.
 
