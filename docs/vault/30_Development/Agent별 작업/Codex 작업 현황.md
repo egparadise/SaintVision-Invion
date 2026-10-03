@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.318"
+version: "1.0.319"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T18:27:48+09:00"
+updated: "2026-10-03T20:01:36+09:00"
 source_of_truth: "Git"
-active_card: "CARD-268 inv_audit_reader disposition re-measurement before the 2026-11-30 expiry"
-active_card_status: "Card 267 #361 is approved by Claude r2 at a8cc5352: the post-landing guard runs the Card 260 orchestrator at the landed clean detached $LAND, requires security, accessibility and migration exactly, refuses failed, unfinished or missing new runs before aggregate, and Backend 3.12/3.14 and Docs are green"
-active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 disposition on the train 43 tree and either remove the privilege or record the still-valid rationale for a mid-November review; product dispatch stays off by default"
+active_card: "No hosted-only Codex card remains (measured row by row); reviewing Card 266 #362"
+active_card_status: "Card 268 #363 is approved by Claude r2 at a24bc64c: irreversible migration 0067 removes the dormant inv_audit_reader audit SELECT, schema USAGE and reader policy, the marker is bound to exactly {0066, 0067}, and no accepted-with-expiry disposition remains"
+active_card_next: "Review Card 266 #362 against the #358 r8 contract; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
