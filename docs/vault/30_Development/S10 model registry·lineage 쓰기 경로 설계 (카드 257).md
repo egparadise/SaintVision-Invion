@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-CARD257-S10-MODEL-REGISTRY-LINEAGE-WRITE"
 title: "카드 257 — S10 model registry·lineage: 읽기는 이미 있다. 없는 것은 계보를 만드는 제품 경로다"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-03T10:56:12+09:00"
+updated: "2026-10-03T11:12:02+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "694217b0"
@@ -22,7 +22,7 @@ tags: ["s10-db", "s10-st", "lineage", "model-registry", "design", "vf-cl", "clau
 
 **측정으로 나온 공백은 하나의 모양이다 — 계보의 subject를 만드는 제품 경로가 없다.** `register_dataset_version`·`register_commit`·`register_image`·`record_deployment` 네 service 함수는 **제품 호출자가 0건**이고 시험만 부른다. 그리고 공개 등록 route는 `producedByRunId`와 `lineage`를 **의도적으로 받지 않는데**, 그 docstring이 적은 두 선행 조건 중 **하나는 이 tree에서 이미 해소됐다**.
 
-외부 전제(실 Provider CLI 인수 `G-25`, 배포 digest 운영 인수 `G-23`) 없이 닫을 수 있는 것은 **셋**이고, 그 셋은 모두 "기록을 만드는 쓰기 경로"다. **r2에서 그 셋의 계약을 고쳤다** — subject의 project는 kind별 사슬로 증명하고 증명 못 하는 둘은 거부하며(§4-2), 배포 digest는 **호출자가 주지 않고** 기존 정본이 model version에서 파생한다(§4-3), 그 route의 권한·멱등·감사는 카드 250 계약 그대로이고(§4-3-1), `0064`는 기존 dangling 값을 **측정하고 거부**한다(§4-4). 점수를 올리는 것은 이 카드의 목표가 아니다 — 네 행의 100은 외부 인수이고, 이 설계는 **그 인수가 가능해지는 자리**를 만든다.
+외부 전제(실 Provider CLI 인수 `G-25`, 배포 digest 운영 인수 `G-23`) 없이 닫을 수 있는 것은 **셋**이고, 그 셋은 모두 "기록을 만드는 쓰기 경로"다. **r2·r3에서 그 셋의 계약을 고쳤다** — subject의 project는 kind별 사슬로 증명하고 증명 못 하는 둘은 거부하며(§4-2), 배포 digest는 **호출자가 주지 않고** 기존 정본이 model version에서 파생한다(§4-3), 그 route의 권한·멱등·감사는 카드 250 계약 그대로이고(§4-3-1), `0064`는 기존 dangling 값을 **측정하고 거부**한다(§4-4). **r3에서 둘을 더 고쳤다** — 간선의 거부를 service에서 **공개 edge로** 옮겼고(r2의 결정은 release를 불가능하게 만들었다, §4-2-1), 배포 route는 **승인의 project를 세 hop으로 증명**하고 `imageId`를 받지 않으며 service를 **lock/validate와 apply로 쪼개** 3차 재검사 자리를 만든다(§4-3·§4-3-1). 점수를 올리는 것은 이 카드의 목표가 아니다 — 네 행의 100은 외부 인수이고, 이 설계는 **그 인수가 가능해지는 자리**를 만든다.
 
 ## 1. 측정 — train 36 후보 `694217b0`에서 무엇이 있는가
 
@@ -139,56 +139,75 @@ r1의 "tenant까지만 검사"는 **틀렸다** — tenant만 보면 **같은 te
 
 | 무엇 | 확정 |
 |---|---|
-| 검사 지점 | `record_lineage`(`src/saintvision/services/lineage.py:253`) 안이다. route가 아니라 service에 두는 이유: 그 함수를 부르는 **모든** 경로(지금은 `register_model_version` 하나)가 같은 규칙을 받아야 한다 |
+| 검사 지점 | **존재 검사**는 `record_lineage`(`src/saintvision/services/lineage.py:253`) 안이다(모든 호출자가 같은 규칙을 받아야 한다). **project 증명**은 공개 edge의 kind 집합으로 거른다 — 그 이유가 §4-2-1이다 |
 | 거부 코드 | 증명 실패·subject 없음·다른 project·다른 tenant는 **모두 같은** `RES-0004` 404 `"No such resource."`다. 네 가지를 구별하면 **존재 oracle**이 된다(읽기 설계 §5의 같은 원칙) |
-| `code_commit`·`container_image` | **그래서 공개 `lineage`가 지금 받을 수 있는 kind는 세 개**(`dataset_version`·`eval_run`·`approval`)다. 나머지 둘을 받으려면 그 두 표에 project 열이 필요하고 **그것은 이 카드의 migration이 아니다** — 별 카드로 남긴다(§6). r1처럼 "tenant까지만 검사하고 한계를 시험에 적는다"로 열지 않는다 |
+| `code_commit`·`container_image` | **공개 `lineage`가 받는 kind는 세 개**(`dataset_version`·`eval_run`·`approval`)다. 나머지 둘은 project를 증명할 수 없으므로 **공개 입력에 넣지 않는다** — 다만 **service가 거부하는 것은 아니다**(r3 정정, §4-2-1). 그 둘을 공개하려면 그 두 표에 project 열이 필요하고 **별 카드**다 |
 | 순서 | **(ㄴ)이 먼저 들어가고 그 다음에** 요청의 `lineage`를 받는다. 역순이면 dangling·교차 project 간선이 생기고, 그것은 읽기 설계가 "없는 간선보다 나쁘다"고 적은 상태다 |
 
-### 4-3. (ㄷ) **배포 기록 route** 하나 — digest는 호출자가 주지 않는다 (r2, Codex F2)
+#### 4-2-1. r3 정정 — 거부를 **service에서 edge로** 옮긴다 (Codex r2 F3)
 
-r1은 몸체에 `deployedDigest`를 두고 "승인 digest와 대조한다"고 적었다. **그것은 기존 정본과 모순이다.** `record_deployment`(`src/saintvision/services/lineage.py:527-615`)를 다시 읽으면 권위 사슬이 이미 전부 그 안에 있다.
+r2는 "`record_lineage`가 `code_commit`·`container_image`를 **언제나 거부**한다"고 적었다. **그 결정은 틀렸고, 측정으로 틀렸다.**
 
-| 기존 함수가 이미 하는 것 | 자리 |
+| 측정 | 결과 |
 |---|---|
-| `environment`를 `('lab','staging','pilot')`로 제한 | `:554` |
-| model version을 **`FOR UPDATE`** 로 잠그고 `populate_existing` | `:558-566` |
-| `stage != 'released'`면 거부 | `:569-574` |
-| 승인을 **`FOR UPDATE read=True`** 로 잠금 | `:576-581` |
-| `decision != 'approved'`면 거부 | `:584` |
-| **반열린 유효구간** `decided_at <= now < expires_at` 아니면 거부 | `:586` |
-| **`approval.subject_sha256 != version.content_sha256`면 거부** | `:588-593` |
-| 같은 environment의 기존 `active` 배포를 **같은 transaction에서 `superseded`** | `:596-603` |
-| `deployed_digest`를 **`version.content_sha256`에서 파생** | `:611` |
+| `REQUIRED_KINDS` | `src/saintvision/services/lineage.py:56-61` = `dataset_version` · **`code_commit`** · `eval_run` · `approval`. AC-10이 요구하는 kind 집합이고 `trace_model`이 `missing`을 이것으로 센다(`:492`, `:790`) |
+| release gate | `src/saintvision/api/v1/model_release.py:369-377`이 **`trace["missing"]`이 비어 있지 않으면 `GRAPH-0002` 409**로 release를 거부한다 |
+| 그래서 r2의 결정이 참이면 | `code_commit` 간선을 **아무도 쓸 수 없고** → `missing`에 항상 그 kind가 남고 → **어떤 model version도 release될 수 없다**. 즉 "기존 무회귀"와 동시에 참일 수 없다는 Codex의 지적이 맞다 |
+| 기존 시험 | `tests/test_lineage.py:121-176 _full_lineage`가 네 kind를 다 쓰고, `tests/core/test_model_release_route.py:1179-1181`이 seed의 subject 집합이 `REQUIRED_KINDS`와 같음을 단언한다 |
 
-즉 **digest는 호출자가 주는 값이 아니다.** 그래서 설계를 고친다.
+**그래서 결정을 바꾼다 — 거부의 자리를 service에서 공개 edge로 옮긴다.**
 
-| 무엇 | 확정 |
+| 자리 | r2(틀림) | **r3(확정)** |
+|---|---|---|
+| `record_lineage`(service) | 다섯 kind 중 둘을 **항상 거부** | **거부하지 않는다.** 모든 kind를 그대로 쓰고, 더하는 것은 **tenant 범위 subject 존재 검사** 하나다 |
+| 공개 요청의 `lineage` | 다섯 kind를 받되 둘은 거부 | **project를 증명할 수 있는 세 kind만 받는다** — `dataset_version` · `eval_run` · `approval`. 계약의 enum이 셋이고 `code_commit`·`container_image`는 **애초에 보낼 수 없다** |
+| `code_commit`·`container_image` 간선 | (쓸 수 없게 됨) | **내부 경로로만** 쓰인다(지금 제품 호출자 0건, §2). 공개로 열려면 그 두 표에 project 열이 필요하고 **별 카드**다 |
+| `REQUIRED_KINDS`·`trace_model`·release gate | (깨짐) | **건드리지 않는다.** AC-10 완전성과 release 가능성이 그대로다 |
+
+**존재 검사가 기존 시험을 깨지 않는다는 것도 측정했다.** `tests/test_lineage.py:380 test_an_edge_whose_subject_vanished_is_reported_as_dangling`은 간선을 쓴 **뒤에** subject를 지우고 `:405`에서 `code_commit` dangling을 단언한다 — 쓰기 시점에는 subject가 있으므로 그 시험은 그대로 통과하고, `trace_model`의 `dangling` 보고도 그대로 필요하다. `_full_lineage`도 실제 subject를 만들어 쓰므로 영향이 없다.
+
+**이행 계획**: service 변경은 **존재 검사 하나**이므로 기존 호출자(`register_model_version` 한 곳, §2)와 시험을 바꾸지 않는다. 공개 enum 셋은 **새 필드**이므로 회귀 대상이 없다. 그 두 kind를 공개하려면 (ㄱ) `code_commits`·`container_images`에 project 열 + migration, (ㄴ) 그 뒤 enum 확장, (ㄷ) 교차 project 음성 시험 — 셋을 묶은 별 카드로 남긴다.
+
+### 4-3. (ㄷ) **배포 기록 route** — digest도 승인도 호출자가 증명하지 않는다 (r3, Codex r2 F1)
+
+r2에서 `deployedDigest`를 뺀 것은 맞았지만 **`approvalId`·`imageId`의 project 결속이 빠져 있었다.** 측정: `record_deployment`는 승인을 `(tenant_id, approval_id)`로만 읽고(`src/saintvision/services/lineage.py:574-581`) digest·decision·유효구간만 본다(`:584-593`) — **project는 보지 않는다.** 그래서 같은 tenant의 **다른 project**에서 같은 content digest로 받은 승인으로 이 project의 배포를 기록할 수 있다. 같은 tenant 안의 provenance 위조이고 §4-2가 간선에서 금지한 것과 **같은 모양**이다.
+
+| 무엇 | r3 확정 |
 |---|---|
-| route | `POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/deployments` |
-| 요청 몸체 | `environment`(enum `lab|staging|pilot`) · `approvalId` · `imageId`(optional). **`deployedDigest`는 없다** — `additionalProperties:false`가 보낸 것을 거부한다. `notes`도 받지 않는다(서버가 쓰는 자리이고 호출자 text를 넣을 이유가 없다) |
-| 권위 | **route는 새 권위를 만들지 않는다.** 위 표의 검사는 전부 기존 함수의 것이고, route는 경로의 `(project, model, version)`을 `_version_in_project`로 풀어 `model_version_id`를 넘기는 일만 더한다 |
-| 응답 | 기록된 행(`deploymentId`·`environment`·`status`·`deployedDigest`·`imageId`·`approvalId`·`deployedAt`)을 strict 계약으로 돌려준다. `deployedDigest`는 **응답에만** 있다 |
-| 읽기 | `trace_model`에 `deployments`를 **더하지 않는다** — 읽기 설계 §1-3이 그 부재를 의도로 적었으므로 그 변경은 그 문서 owner의 결정이다 |
-| 외부 경계 | **실제 배포를 수행하지 않는다.** 함수 docstring이 "it does not perform deployment or issue a kernel execution permit"라고 적고, `G-23`(배포 digest 운영 인수)은 그대로 외부다 |
+| 요청 몸체 | **`environment` · `approvalId` 둘뿐이다.** `deployedDigest`는 r2에서 뺐고, **`imageId`도 뺀다** — `container_images`에 `project_id`가 없어(`src/saintvision/db/models/lineage.py:156`) 서버가 그 image의 project를 **증명할 수 없다**. 증명 못 하는 것을 받지 않는다(§4-2-1과 같은 규칙). `imageId`는 내부 경로에만 남고, 공개로 열려면 그 표의 project 열이 선행이다 |
+| 승인의 project 증명 | `approvals.run_id`(NOT NULL) → `runs.workload_id` → `workloads.project_id`(NOT NULL) 세 hop이 **경로의 project와 같아야** 한다. 세 표 전부 이 앱 안이고(`src/saintvision/db/models/execution.py:337`·`:170`·`:141`) 값이 NOT NULL이므로 **증명 가능**하다 |
+| model version의 project 증명 | `_version_in_project`(`src/saintvision/api/v1/lineage_query.py:144-167`)로 부모 `models.project_id`를 거친다 |
+| 거부 코드 | 승인이 **없음·다른 project·다른 tenant·`decision != approved`·유효구간 밖·digest 불일치** 여섯이 **모두 같은 `GRAPH-0002` 409**다. 하나라도 다른 코드를 주면 **승인 id의 존재·소유 oracle**이 된다 |
+| 기존 함수가 이미 하는 것 | §4-3의 표 그대로다(`stage='released'`, 두 잠금, 반열린 유효구간, `subject_sha256` 일치, 기존 active supersede, digest를 `content_sha256`에서 파생) — **route는 거기에 project 증명 하나를 더한다** |
 
-#### 4-3-1. 그 route의 권한·동시성·멱등·감사 계약 (r2, Codex F3 — 카드 250에서 맞춘 계약 그대로)
+### 4-3-1. 그 route의 권한·동시성·멱등·감사 계약 (r3 — service를 둘로 쪼갠다, Codex r2 F2)
 
-`#345`(카드 250) §3-2-2·§3-2-3에서 Codex와 맞춘 쓰기 계약을 **그대로** 쓴다. 순서가 계약이다.
+r2는 "권한 3차(insert 직전)"를 적었지만 **현재 호출 경계로는 불가능하다.** 측정: `record_deployment`(`src/saintvision/services/lineage.py:556-615`)가 **잠금 → 검증 → 기존 active supersede → INSERT → flush**를 한 호출에서 끝낸다. 그 사이에 route가 끼어들 자리가 없다.
+
+**그래서 service를 둘로 쪼개는 것을 설계에 넣는다.** 공개 함수 하나를 두 개로 나누고, 기존 함수는 **둘을 순서대로 부르는 얇은 wrapper**로 남겨 기존 호출자·시험(제품 0건, 시험 20건)을 깨지 않는다.
+
+| 새 경계 | 무엇을 하는가 | 무엇을 하지 않는가 |
+|---|---|---|
+| `locked_deployment_authority(session, *, tenant_id, project_id, model_version_id, environment, approval_id, now)` | `environment` enum 검사 · model version을 **`FOR UPDATE`** · 승인을 **`FOR UPDATE read=True`** · `stage='released'` · `decision` · 반열린 유효구간 · `subject_sha256 == content_sha256` · **승인의 project 세 hop 증명**(§4-3). 검증된 권위(version 행·승인 행·파생 digest)를 돌려준다 | **쓰지 않는다** — supersede도 INSERT도 하지 않는다 |
+| `apply_deployment(session, *, authority, deployed_by_user_id, notes=None, now)` | 같은 environment의 기존 `active`를 `superseded`로 바꾸고 새 행을 INSERT·flush | 다시 검증하지 않는다(권위는 이미 잠긴 행에서 왔다) |
+| `record_deployment(...)` (기존 이름) | 위 둘을 차례로 부른다 — **기존 계약 유지** | — |
+
+그 경계가 생기면 쓰기 순서가 카드 250 계약과 같아진다.
 
 | # | 단계 | 확정 |
 |---|---|---|
-| 1 | 필수 key | `_require_idempotency_key`(`src/saintvision/api/v1/model_versions.py:192`)를 **edge에서** 부른다 — 없거나 `[A-Za-z0-9._:-]{1,128}` 밖이면 **`VAL-0003` 422**이고 그 앞에 아무 일도 일어나지 않는다 |
-| 2 | 권한 1차 | `project_service.require_project_access`(`src/saintvision/services/projects.py:204`)를 부르고 **`canApprove` boolean을 읽는다**. 이유: 이 행은 "이 내용이 그 승인 아래 나갔다"는 **결정 등급의 진술**이고 `canRequest`로는 만들 수 없다. `effective_permission`은 archived project·suspended user에서 **예외 없이 false 셋**을 주므로 "예외가 없었다"를 승인으로 쓰지 않는다 |
-| 3 | 직렬화 | `serialise_idempotent_write`를 **자원 행보다 먼저** 잡는다(그 docstring이 잠금 순서를 고정한다). 그래서 이 lane의 잠금 순서는 **key → model version 행 → 승인 행**이고 기존 함수의 두 잠금이 그 뒤에 온다 |
-| 4 | 권한 2차 | **replay 판단 전에** 다시 읽는다 — 그 lock을 기다리는 동안 등급을 잃은 호출자에게 저장된 성공을 돌려주면 안 된다 |
-| 5 | ledger 결속 | `replay_or_reserve`가 `(tenant, project, endpoint, key)`로 조회하고 본문을 `request_digest`로 비교한다(`src/saintvision/api/deps.py:164`). 그 본문에 **경로의 `modelId`·`version`을 함께 넣는다** — 그러지 않으면 같은 key로 **다른 version**의 저장된 응답이 replay된다. `ENDPOINT`는 식별자 없는 bounded template `"POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/deployments"` |
-| 6 | 자원 | `record_deployment`가 version을 `FOR UPDATE`, 승인을 `FOR UPDATE read=True`로 잡고 §4-3의 검사를 한다 |
-| 7 | 권한 3차 | **insert 직전** 한 번 더 — 행 잠금도 대기이고 그 사이에 같은 철회가 커밋될 수 있다(카드 253에서 `T21`·`T22`로 고정한 것과 같은 이유) |
-| 8 | 기록 | `store_idempotent_response` + **allow 감사 1행**(`model.deployment.record`, `target_type="deployment"`, `detail`은 `projectId`·`modelVersionId`·`environment`만 — digest와 notes는 넣지 않는다), 전부 **같은 transaction 경계** |
-| 9 | 거부 감사 | `AUTH-0030` 403은 `src/saintvision/api/app.py`의 단일 recorder가 범주로 적는다. 없는 version·없는 승인은 **`RES-0004` 404**이고 카드 253의 `_absent` 방식으로 `audit_action`을 붙여 **감사된다** |
-| 10 | 번역표 | route가 자기 `TRANSLATION` 표를 갖고 `AUTH_APPROVAL_DIGEST_MISMATCH`·`VAL_SCHEMA`·`RES_ARTIFACT_NOT_FOUND`·`GRAPH_IDEMPOTENCY_CONFLICT`를 공개 코드로 바꾼다. **표의 빈칸은 `SYS-0002` 500**이 되므로 **coverage 시험**을 둔다(선례: `tests/core/test_eval_run_route.py`) |
+| 1 | 필수 key | `_require_idempotency_key` — 없거나 패턴 밖이면 **`VAL-0003` 422** |
+| 2 | 권한 1차 | `require_project_access` → **`canApprove` boolean을 읽는다**(결정 등급의 진술이므로 `canRequest`로는 못 만든다) |
+| 3 | 직렬화 | `serialise_idempotent_write` — **자원 행보다 먼저**. 잠금 순서: key → model version → 승인 |
+| 4 | 권한 2차 | **replay 판단 전**에 다시 읽는다 |
+| 5 | ledger | `replay_or_reserve`, 본문에 **경로의 `modelId`·`version`** 포함(같은 key의 교차 version replay 금지), `ENDPOINT`는 식별자 없는 template |
+| 6 | 권위 | **`locked_deployment_authority`** — 여기서 두 행이 잠기고 §4-3의 여섯 거부가 판정된다 |
+| 7 | **권한 3차** | **`apply_deployment` 직전.** 두 행 잠금도 대기이고 그 사이 등급 철회가 커밋될 수 있다 — 이제 그 자리가 **존재한다** |
+| 8 | 적용·기록 | `apply_deployment` → allow 감사 1행(`model.deployment.record`, target `deployment`, detail은 `projectId`·`modelVersionId`·`environment`만) → `store_idempotent_response`. 전부 같은 transaction 경계 |
+| 9 | 거부 감사 | `AUTH-0030` 403은 단일 recorder가 범주로 적는다. **경로의 model version이 없으면 `RES-0004` 404**(`_version_in_project`)이고 카드 253의 `_absent` 방식으로 감사된다 |
+| 10 | 번역표 | `AUTH_APPROVAL_DIGEST_MISMATCH`·`VAL_SCHEMA`·`RES_ARTIFACT_NOT_FOUND`·`GRAPH_IDEMPOTENCY_CONFLICT`를 덮고 coverage 시험을 둔다(빈칸은 `SYS-0002` 500이 된다) |
 
-승인 digest 불일치의 **공개 코드**를 정한다 — 내부 `AUTH_APPROVAL_DIGEST_MISMATCH`는 "승인이 다른 내용에 주어졌다"는 **상태** 거부이므로 공개는 **`GRAPH-0002` 409**다(`AUTH-0030`은 호출자의 권한 이야기이고 여기서는 권한이 아니다). 없는 승인과 결정이 승인이 아닌 경우도 같은 409로 묶어 **승인 id의 존재 oracle을 만들지 않는다**.
+**승인 부재 오류 계약의 모순을 정리한다(r2 F2의 둘째 절).** r2는 §4-3에서 "없는 승인도 409"라고 적고 §4-3-1에서 "없는 version·**없는 승인**은 `RES-0004` 404"라고 적어 **서로 모순**이었다. r3의 확정은 하나다 — **승인 쪽 실패 여섯은 전부 `GRAPH-0002` 409**(존재 oracle 금지), **경로의 model version 부재만 `RES-0004` 404**다. 내부 `AUTH_APPROVAL_DIGEST_MISMATCH`가 그 409로 번역된다.
 
 ### 4-4. migration `0064` 예약 — `produced_by_run_id`의 복합 FK와 **기존 행 경계** (r2, Codex F4)
 
@@ -244,7 +263,13 @@ SELECT mv.tenant_id, mv.model_version_id, mv.produced_by_run_id
 | T16 (r2) | `eval_suites.project_id`가 **NULL인 suite의 `eval_run`** 간선은 거부된다(증명 불가) | 실 PG | nullable을 통과로 읽는 것 |
 | T17 (r2) | `canRequest`만 가진 주체의 배포 기록은 **`AUTH-0030` 403 + denial audit 1행**이고 `deployments`에 행이 0이다. `canApprove`는 성공한다 | 실 PG | §4-3-1의 등급 |
 | T18 (r2) | 요청 계약에 **`deployedDigest`가 없고** 보내면 거부된다. 응답에는 있고 그 값이 `model_versions.content_sha256`과 같다 | PG 없음 | 호출자가 digest를 주는 것 |
-| T19 (r2) | 승인 불일치 셋(없는 승인·`decision != approved`·`subject_sha256` 불일치)이 **같은 `GRAPH-0002` 409**이고 서로 구별되지 않는다 | 실 PG | 승인 id 존재 oracle |
+| T19 (r3 확장) | 승인 쪽 실패 **여섯**(없는 승인·다른 project·다른 tenant·`decision != approved`·유효구간 밖·digest 불일치)이 **같은 `GRAPH-0002` 409**이고 서로 구별되지 않는다. 경로의 model version 부재만 `RES-0004` 404다 | 실 PG | 승인 id 존재·소유 oracle |
+| T20 (r3) | **같은 tenant 다른 project**의 승인(같은 content digest)으로 이 project 배포를 기록하면 거부되고 `deployments`에 행이 0이다 | 실 PG | §4-3의 provenance 위조 |
+| T21 (r3) | 요청 계약에 **`imageId`가 없고** 보내면 거부된다 | PG 없음 | 증명 못 하는 값을 받는 것 |
+| T22 (r3) | `locked_deployment_authority`는 **쓰지 않는다** — 그것만 부르고 rollback하면 `deployments`에 행이 0이고 기존 `active` 행의 `status`도 그대로다. `apply_deployment`만이 쓴다 | 실 PG | §4-3-1의 경계 |
+| T23 (r3) | 두 행이 잠긴 뒤 등급이 철회되면 **3차 재검사가 거부**하고 행이 0이다(카드 253 `T22`와 같은 schedule) | 실 PG | §4-3-1의 7단계 |
+| T24 (r3) | `record_lineage`에 **존재 검사를 넣어도** `tests/test_lineage.py:380`의 dangling 보고와 `_full_lineage`의 네 kind가 그대로 통과한다 | 기존 | §4-2-1의 무회귀 주장 |
+| T25 (r3) | **release가 여전히 가능하다** — `REQUIRED_KINDS` 네 kind가 다 있는 version은 `trace["missing"]`이 비고 release가 409를 내지 않는다 | 기존 | r2가 깨뜨렸던 자리 |
 
 ## 6. 이 카드가 하지 않는 것
 
