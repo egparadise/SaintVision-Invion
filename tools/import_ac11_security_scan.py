@@ -45,7 +45,7 @@ EMITTED_AXES: tuple[str, ...] = (
 #: it: the aggregator refuses a targetRef whose blob is not the reviewed one.
 REGISTRY_COMMIT = "141ef51d58e4c64feca4118b0c23b456ddd63124"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "c3db4aafd1c90e12e93b1cd2c465438d2763a5b3"
+REGISTRY_BLOB = "45fa057257e4002d80d6ce4045e1decf52793f59"
 TARGET_ID = "s11-security-critical-high-zero-v0"
 #: The four threat reports the aggregator requires for this axis.  Only SEC-SCAN-001 has a
 #: producer in this repository, so an envelope built from the security-scan artifact alone
