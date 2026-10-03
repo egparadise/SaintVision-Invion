@@ -218,6 +218,123 @@ class DataLocationPageResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+#: The four catalogue kinds, and the one place this module says so. The same set
+#: is held by ``saintvision.db.models.storage.LOCATION_KINDS`` and by the
+#: ``kind_allowed`` check constraint; a test requires the three to agree
+#: (card 250 §3-1-1).
+LocationKindName = Literal["artifact", "dataset", "model", "workspace"]
+
+#: Which identifiers each kind requires, and which it refuses. This mirrors the
+#: ``inv://`` grammar in ``saintvision.storage.pathsafe.build_uri`` one for one,
+#: so a request that could not produce a URI is refused at the edge instead of
+#: deep inside the service (card 250 §3-2-3).
+LOCATION_IDENTITY_RULES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "dataset": (("name", "version"), ("runId", "artifactId", "workspaceId")),
+    "model": (("name", "version"), ("runId", "artifactId", "workspaceId")),
+    "artifact": (("runId", "artifactId"), ("name", "version", "workspaceId")),
+    "workspace": (("workspaceId",), ("name", "version", "runId", "artifactId")),
+}
+
+
+def _identity_branch(kind: str) -> dict:
+    """One ``oneOf`` branch: this kind, its required ids, and its forbidden ids."""
+    required, forbidden = LOCATION_IDENTITY_RULES[kind]
+    return {
+        "properties": {
+            "kind": {"const": kind},
+            **{name: {"not": {}} for name in forbidden},
+        },
+        "required": ["kind", *required],
+    }
+
+
+class ProjectDataLocationRequest(Strict):
+    """Catalogue one item of a contribution into a project (card 253).
+
+    ``projectId`` is deliberately **not** a field. The project comes from the
+    path, after ``require_project_access`` has judged the caller's membership;
+    accepting it in the body would let a caller name a project the server never
+    checked. ``extra="forbid"`` refuses it, so sending one is an error rather
+    than a silently ignored hint.
+    """
+
+    contribution_id: str = Field(min_length=1, max_length=30, alias="contributionId")
+    kind: LocationKindName
+    relative_path: str = Field(min_length=1, max_length=4096, alias="relativePath")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    name: str | None = Field(default=None, max_length=200)
+    version: str | None = Field(default=None, max_length=200)
+    run_id: str | None = Field(default=None, max_length=30, alias="runId")
+    artifact_id: str | None = Field(default=None, max_length=30, alias="artifactId")
+    workspace_id: str | None = Field(default=None, max_length=30, alias="workspaceId")
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "oneOf": [_identity_branch(kind) for kind in sorted(LOCATION_IDENTITY_RULES)]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _identity_matches_kind(self) -> "ProjectDataLocationRequest":
+        """Enforce what the ``oneOf`` documents, in the same table.
+
+        The schema and this check read ``LOCATION_IDENTITY_RULES``, so a kind
+        cannot be documented one way and validated another.
+        """
+        by_alias = {
+            "name": self.name,
+            "version": self.version,
+            "runId": self.run_id,
+            "artifactId": self.artifact_id,
+            "workspaceId": self.workspace_id,
+        }
+        required, forbidden = LOCATION_IDENTITY_RULES[self.kind]
+        missing = [field for field in required if not by_alias[field]]
+        if missing:
+            raise ValueError(f"{self.kind} location requires {' and '.join(sorted(missing))}")
+        present = [field for field in forbidden if by_alias[field] is not None]
+        if present:
+            raise ValueError(f"{self.kind} location must not carry {' or '.join(sorted(present))}")
+        return self
+
+
+class ProjectDataLocationResponse(Strict):
+    """A catalogued location as a project-scoped reader sees it (card 253).
+
+    The same fields the tenant-wide contract carries, plus the project the row
+    is bound to. ``contributionId`` stays a reference: a contribution belongs to
+    a node and a tenant, not to a project, so there is no project-scoped
+    contribution list to point at (card 250 §3-2-1).
+    """
+
+    location_id: str = Field(alias="locationId")
+    project_id: str = Field(alias="projectId")
+    contribution_id: str = Field(alias="contributionId")
+    uri: str
+    kind: LocationKindName
+    relative_path: str = Field(alias="relativePath")
+    byte_size: int = Field(alias="byteSize")
+    checksum_sha256: str | None = Field(default=None, alias="checksumSha256")
+    ready: bool
+    verified_at: dt.datetime | None = Field(default=None, alias="verifiedAt")
+    retention_pinned_until: dt.datetime | None = Field(
+        default=None, alias="retentionPinnedUntil"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectDataLocationPageResponse(Strict):
+    """Paginated project-scoped catalogue locations (card 253)."""
+
+    items: list[ProjectDataLocationResponse]
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 WorkspaceStatusName = Literal[
     "provisioning", "ready", "suspended", "deleting", "deleted"
 ]

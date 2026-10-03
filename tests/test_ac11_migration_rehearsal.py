@@ -41,7 +41,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert {
         key
         for key in mapping
-        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_", "0061_"))
+        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_", "0061_", "0062_"))
     } == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
@@ -54,6 +54,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0059_build_execution_intents",
         "0060_build_execution_admissions",
         "0061_build_preparations",
+        "0062_data_location_project_scope",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -66,6 +67,9 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     # 0059 refuses downgrade while any intent exists and otherwise drops only an empty
     # queue, so it joins the reversible PRESERVED tail rather than the restore fixtures.
     # 0060 applies the same rule to the committed admission authority.
+    # 0062 (card 253) is the same shape as 0053 -- a project column on an existing
+    # table -- and refuses while any data location holds a binding, so dropping the
+    # column can never discard one.
     assert all(
         mapping[key] == "PRESERVED"
         for key in (
@@ -80,6 +84,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
             "0059_build_execution_intents",
             "0060_build_execution_admissions",
             "0061_build_preparations",
+            "0062_data_location_project_scope",
         )
     )
     ordered = chain()
@@ -94,6 +99,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0059_build_execution_intents",
         "0060_build_execution_admissions",
         "0061_build_preparations",
+        "0062_data_location_project_scope",
     ]
 
 

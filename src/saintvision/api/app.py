@@ -33,6 +33,7 @@ from .v1 import release_acceptance as release_acceptance_router
 from .v1 import release_manifests as release_manifests_router
 from .v1 import settings as settings_router
 from .v1 import storage as storage_router
+from .v1 import storage_project as storage_project_router
 
 TRACEPARENT_VERSION = "00"
 
@@ -220,6 +221,7 @@ def create_app(
 
     app.include_router(nodes_router.router)
     app.include_router(storage_router.router)
+    app.include_router(storage_project_router.router)
     app.include_router(pools_router.router)
     app.include_router(settings_router.router)
     app.include_router(adapters_router.router)
