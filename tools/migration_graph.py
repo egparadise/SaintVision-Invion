@@ -43,6 +43,11 @@ REVIEWED_SECURITY_PRESERVING_DOWNGRADES = {
     "0066_tenant_registry_revoke": (
         "REVOKE SELECT ON public.tenants FROM inv_app",
     ),
+    "0067_audit_reader_revoke": (
+        "DROP POLICY IF EXISTS audit_events_audit_read ON public.audit_events",
+        "REVOKE SELECT ON public.audit_events FROM inv_audit_reader",
+        "REVOKE USAGE ON SCHEMA public FROM inv_audit_reader",
+    ),
 }
 
 
@@ -77,10 +82,11 @@ def _normalized_sql(value: str) -> str:
 
 
 def reviewed_security_preserving_downgrade(tree: ast.Module, revision: str) -> bool:
-    """Validate the sole reviewed executable irreversible downgrade.
+    """Validate a reviewed executable irreversible downgrade.
 
     A marked revision outside the reviewed set, or any statement other than
-    the exact reviewed REVOKE call, is invalid rather than irreversible.
+    the exact reviewed security-preserving calls, is invalid rather than
+    irreversible.
     """
     if not _explicit_irreversible_marker(tree):
         return False
@@ -116,10 +122,14 @@ def reviewed_security_preserving_downgrade(tree: ast.Module, revision: str) -> b
             and isinstance(node.value.args[0], ast.Constant)
             and isinstance(node.value.args[0].value, str)
         ):
-            raise ValueError(f"{revision}: security-preserving downgrade must contain REVOKE only")
+            raise ValueError(
+                f"{revision}: security-preserving downgrade must contain reviewed SQL only"
+            )
         statements.append(_normalized_sql(node.value.args[0].value))
     if tuple(statements) != tuple(_normalized_sql(sql) for sql in expected):
-        raise ValueError(f"{revision}: security-preserving downgrade differs from reviewed REVOKE")
+        raise ValueError(
+            f"{revision}: security-preserving downgrade differs from reviewed operations"
+        )
     return True
 
 
