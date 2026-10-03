@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.312"
+version: "1.0.314"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T13:25:52+09:00"
+updated: "2026-10-03T14:20:37+09:00"
 source_of_truth: "Git"
-active_card: "CARD-262 server_config volume split"
-active_card_status: "Claude r1 boundary review passed; all-service override sweeps and fail-closed symlink and special-file cases now close the two surviving mutations, while hosted candidate-image JUnit remains the final gate"
-active_card_next: "Confirm exact-head Backend/Core and prove from Core JUnit that both candidate-image container cases ran without skips"
+active_card: "CARD-264 public.tenants E2-E5 disposition re-review before the 2026-10-31 expiry"
+active_card_status: "Card 262 #357 is approved by Claude r3 at 5002d2fc: the API mounts only api_config and no service but the worker can reach worker_config, with Backend 37097898581 and Core 37097898556 green and the candidate-image, four-combination compose sweep and symlink/FIFO cases executed, not skipped"
+active_card_next: "Re-measure the public.tenants accepted-with-expiry disposition (E2-E5, expires 2026-10-31) on the current tree and renew with evidence or remove it; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 262 — server_config volume split
