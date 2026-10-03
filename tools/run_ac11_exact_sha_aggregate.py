@@ -41,6 +41,12 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Protocol, Sequence
 from urllib.parse import quote
 
+# Support the documented direct invocation (`python tools/<name>.py`) as well as module imports.
+# Python otherwise puts only `tools/` on sys.path, so `from tools ...` fails before argument
+# validation and no operator can run the exact-SHA procedure.
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from tools import aggregate_ac11_evidence as canonical
 from tools.operational_evidence import assert_no_secrets
 

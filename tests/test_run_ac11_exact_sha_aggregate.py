@@ -4,6 +4,8 @@ import datetime as dt
 import hashlib
 import io
 import json
+import subprocess
+import sys
 import zipfile
 from copy import deepcopy
 from pathlib import Path
@@ -208,6 +210,18 @@ def test_source_map_is_exactly_the_three_reviewed_producers_and_four_axes() -> N
         "migration-reversible-segment",
         "irreversible-restore-forward",
     }
+
+
+def test_documented_direct_cli_invocation_loads_the_tools_package() -> None:
+    completed = subprocess.run(
+        [sys.executable, "tools/run_ac11_exact_sha_aggregate.py", "--help"],
+        cwd=subject.ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "--source-sha" in completed.stdout
 
 
 def test_reuses_exact_producers_and_dispatches_only_aggregate(monkeypatch: pytest.MonkeyPatch) -> None:
