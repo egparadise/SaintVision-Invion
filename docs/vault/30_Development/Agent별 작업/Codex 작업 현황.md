@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.307"
+version: "1.0.308"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T10:15:54+09:00"
+updated: "2026-10-03T11:06:13+09:00"
 source_of_truth: "Git"
-active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
-active_card_status: "Card 255 Claude r1 corrections close the partial-NULL constraint and five mutation gaps; PG-free gates are green and exact-head hosted real-PG evidence is pending"
-active_card_next: "Run exact-head hosted Core/Backend/security, record all 16 NULL combinations and M1/M2/M3/M5/M8 results, and request Claude r2; product dispatch stays off"
+active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
+active_card_status: "Card 255 #351 is approved by Claude r2 at 1c2d06da with exact-head Backend/Core/security green: migration 0063 enforces all-or-none positive budgets and base-image pins, plans compare them with locked project ceilings and the immutable snapshot Dockerfile, and the API no longer parses worker.json"
+active_card_next: "Measure which AC-11 axes the hosted aggregation lane can add without physical nodes, long soak or user device acceptance, and propose before implementing; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
