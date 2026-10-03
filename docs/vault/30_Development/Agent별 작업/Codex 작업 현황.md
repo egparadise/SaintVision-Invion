@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.308"
+version: "1.0.313"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:06:13+09:00"
+updated: "2026-10-03T12:47:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
-active_card_status: "Card 255 #351 is approved by Claude r2 at 1c2d06da with exact-head Backend/Core/security green: migration 0063 enforces all-or-none positive budgets and base-image pins, plans compare them with locked project ceilings and the immutable snapshot Dockerfile, and the API no longer parses worker.json"
-active_card_next: "Measure which AC-11 axes the hosted aggregation lane can add without physical nodes, long soak or user device acceptance, and propose before implementing; product dispatch stays off by default"
+active_card: "CARD-262 split the shared server_config volume so the API cannot read worker.json"
+active_card_status: "Card 260 #355 is approved by Claude r3 at 2122b103: the exact-SHA tool refuses any prior non-success run before dispatch, and hosted runs 37092807238/37092895354/37093057306/37093146441 at that head recompute 4/8 axes and INVALID_RUN exactly"
+active_card_next: "Remove the remaining S08 activation residual by giving the API and worker separate read-only config volumes, with deployment and real-container tests; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 260 — AC-11 exact-SHA aggregation automation
+
+- Reads the three complete producer chains from the canonical axis source map, dispatches only a
+  missing exact-SHA lane, and refuses reruns, duplicate candidates and stale/mismatched artifacts.
+- The aggregate artifact is not authoritative: producer IDs/digests are rebound and the existing
+  canonical evaluator recomputes the result from the exact clean source tree. Score promotion is
+  explicitly false.
+- Focused fake-gh verification is 35 passed after Claude r2; exact-head hosted execution is the next step.
+- [[2026-10-03_11-58-02_KST_Card260_AC11_exact_SHA_aggregation_automation_Codex]].
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
 
