@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.107"
+version: "1.2.108"
 status: "review"
 author: "Claude"
-updated: "2026-10-03T22:16:34+09:00"
+updated: "2026-10-03T22:34:31+09:00"
 
 
 
@@ -756,3 +756,5 @@ PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, �
 d59b8a6 전체를 b378785로 integration에 반영했다. 사용자독립24passed/0failed(실Docker포함), Codex오프라인22passed/2실Docker제외·격리import통과, 병합후동일22/2. R2~R5 보류해제와 image미검증6건/business-kernel-role미검증 운영인수는 구분한다. 8c347b7/e89a415의 Claude sound 소스검토 수신, 새 e2908a5 registry 실행 연결 독립검토는 다음 Claude(미실시).
 
 동기화 중 외부 공유판 v1.0.10과 Git branch의 과거 v1.0.0 계보 차이를 확인했다. 외부 원문 전체와 hash는 ../Evidence/claude-d59-landing/shared-claude-before.txt 및 shared-proposal.json에 보존했다. 과거 credential/storage/RPO 후속 인계를 삭제하지 않고 제안 원문으로 수신한다. 이 과거 상태를 현재 착지·운영 인수 완료로 자동 적용하지 않는다. 최신 정본은 이 페이지와 [[2026-09-18_Registry_실행권한결속_Codex]]의 고정 SHA 증거다.
+
+2026-10-03 **48 task 재산정 v1.17 (카드 269, branch `docs/claude/c269-rescore-v1-17`, base train 46 `2b2af9d2`)** = **문서만.** `git ls-remote`로 다시 읽은 착지 tip이 여전히 `6fc0428b`이라 **착지 3,425/4,800(71.35%)은 열다섯 번째로 같고**, train 46 후보도 **U(train 41)와 같은 3,475/4,800(72.40%)**으로 **새로 오르는 행은 0**이다. 일곱 PR(`#356`·`#358`~`#363`) 전부 V 안이고 **어느 것도 착지 tree의 조상이 아니다**(`#356`만 U에 이미 있었으므로 새로운 것은 여섯). inventory 112 → **121**(+9 merge, 새 PR 번호 여섯 — `#359` 3회·`#361` 2회 merge가 차이). **이 판의 측정은 점수가 아니라 증거 사슬이다**: U 이후 **성공한 AC-11 집계가 0건**이고 가장 새로운 성공은 여전히 `37093146441`(head `2122b103`)인데, 그 artifact를 **V의 평가기로** 돌리면 **네 축 전부 `INVALID_RUN`**(사유 네 번 모두 `target registry blob is not the reviewed registry`, exit 2)이라 U에서 재계산 `MEASURED_PASS`였던 두 축이 **0개**가 된다. 원인은 `#360`(`d1306e97`·`ed1e3283`)·`#363`(`c8de43ad`·`b1a0fb57`)이 자기 변경과 같은 검토 안에서 registry blob을 회전시킨 것(`c3db4aaf…` → `ef956db6…`)이고, **결함으로 적지 않았다** — v1.16.1에서 같은 종류를 '결함'이라 적었다가 철회한 그 규칙(`releaseSha == sourceHeadSha`, 착지 runbook §5)이 그대로 적용된다. 정본 조치도 같은 재생산 하나이고 `#361`이 그것을 `tools/post_landing_lane_guard.sh`로 묶었다(V에서 그 시험 둘 **64 passed**). 그리고 **V의 pin 셋이 처음으로 자기 tree와 일치한다** — target registry·security allowlist·definer policy 세 blob 전부 `git hash-object`로 일치 확인, `definer-policy.json` `revision`=**`0067`**(V의 migration head)·서명 **15**; 일치는 재생산의 **선행 조건**이고 `MEASURED_PASS`가 아니므로 축 결과는 추정하지 않았다. 행 판정: **`S12-ST` 50 유지**(점수가 움직일 수 있던 유일한 행 — `public.storage_checks`에 적는 제품 경로가 **0건→1건**이지만 core `record_storage_check`는 여전히 시험만 부르고, 남은 둘이 둘 다 외부 `G-20`·`G-22`이며 축이 **7일 주기** 점검을 요구한다) · **`S02-ST` 75** · **S10 네 행 움직임 0**(`#356`은 U에 이미 있었고 V에서 S10 scope를 건드린 PR 없음) · **`S08-DB` 75**(`#360`·`#363`은 권한을 좁히는 disposition) · **`S11-BE`·`S11-ST` 유지**. `0065`는 여전히 비어 있다(`0066`·`0067`이 건너뛰었다). 공통 진행판은 건드리지 않았다(train 시점 참만 적을 수 있고 이 판은 현재 상태를 바꾸지 않는다). **다음 첫 행동**: PR 열고 한 줄 보고, 검토 Codex. 전문 [[2026-09-28 48 task 진행률 재채점]]
