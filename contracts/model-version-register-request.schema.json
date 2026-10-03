@@ -1,7 +1,43 @@
 {
+  "$defs": {
+    "ProvableLineageEdge": {
+      "additionalProperties": false,
+      "description": "One asserted lineage edge, in a kind whose project can be proven.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "approval",
+            "dataset_version",
+            "eval_run"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "relation": {
+          "default": "derived_from",
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Relation",
+          "type": "string"
+        },
+        "subjectId": {
+          "maxLength": 30,
+          "minLength": 1,
+          "title": "Subjectid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "subjectId"
+      ],
+      "title": "ProvableLineageEdge",
+      "type": "object"
+    }
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "What an importer must state to register one model build (G-04 W2).\n\nThe fields are exactly ``register_model_version``'s own required arguments,\nand nothing more: the service is the judge of what a registration means, so\na field here that it does not take would be this route inventing state.\n\n``contentSha256`` carries the service's rule as a pattern rather than\ntrusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest\nand the column has ``checksum_is_lowercase``, so a caller who sends\n``ABC...`` gets a request error at the boundary instead of a service error\ntranslated later. Both defences stay.\n\n``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted\nand stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and\nanother model version's ``inv://`` address all persisted -- and the kernel\nmanifest's join key assumes the URI's version *is* the row's version. The\ncanonical address is fully determined by the model's name and the version, so\nthe server derives it instead of validating a string that has no reason to\nvary.\n\n``producedByRunId`` and ``lineage`` are deliberately absent -- see the\nmodule docstring of ``api/v1/model_versions.py`` for why neither can be\nbound to the path's project on this branch.",
+  "description": "What an importer must state to register one model build (G-04 W2).\n\nThe fields are exactly ``register_model_version``'s own required arguments,\nand nothing more: the service is the judge of what a registration means, so\na field here that it does not take would be this route inventing state.\n\n``contentSha256`` carries the service's rule as a pattern rather than\ntrusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest\nand the column has ``checksum_is_lowercase``, so a caller who sends\n``ABC...`` gets a request error at the boundary instead of a service error\ntranslated later. Both defences stay.\n\n``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted\nand stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and\nanother model version's ``inv://`` address all persisted -- and the kernel\nmanifest's join key assumes the URI's version *is* the row's version. The\ncanonical address is fully determined by the model's name and the version, so\nthe server derives it instead of validating a string that has no reason to\nvary.\n\n``producedByRunId`` and ``lineage`` are here **since card 261**, and each one\nwaited for a different thing to exist (card 257 §4-1·§4-2):\n\n* ``producedByRunId`` needed a way to prove the run belongs to the path's\n  project. ``project_scope.run_in_project`` does that through the workload,\n  so an unbound value can no longer attach this version to another project's\n  run, and ``0064`` adds the composite key underneath.\n* ``lineage`` needed subject validation. ``record_lineage`` now refuses a\n  subject that is not in this tenant, and the kinds accepted **here** are\n  only the three whose project can be proven -- ``code_commit`` and\n  ``container_image`` carry no project anywhere in the schema, so a caller\n  cannot assert them (the service still writes them for server-derived\n  paths; see the design's §4-2-1).",
   "properties": {
     "byteSize": {
       "default": 0,
@@ -13,6 +49,36 @@
       "pattern": "^[0-9a-f]{64}$",
       "title": "Contentsha256",
       "type": "string"
+    },
+    "lineage": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ProvableLineageEdge"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lineage"
+    },
+    "producedByRunId": {
+      "anyOf": [
+        {
+          "maxLength": 30,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Producedbyrunid"
     },
     "version": {
       "maxLength": 64,

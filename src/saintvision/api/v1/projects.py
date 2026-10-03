@@ -52,6 +52,7 @@ from . import (  # noqa: E402
     lineage_query,
     model_release,
     model_retention,
+    model_deployments,
     model_verify,
     model_versions,
     run_records,
@@ -68,6 +69,7 @@ conformance_status.register(router)
 eval_runs.register(router)
 model_retention.register(router)
 model_verify.register(router)
+model_deployments.register(router)
 
 
 @router.get("/projects", response_model=schemas.ProjectListResponse)
