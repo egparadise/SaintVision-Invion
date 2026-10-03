@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.309"
+version: "1.0.310"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:21:53+09:00"
+updated: "2026-10-03T11:59:37+09:00"
 source_of_truth: "Git"
-active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
-active_card_status: "Exact target 694217b0 now has same-SHA security, accessibility and migration artifacts; canonical aggregation assembled 4/8 axes and independently recomputed INVALID_RUN without changing any contract or target"
-active_card_next: "Hand the docs-only measurement to Claude; missing-lane discovery and dispatch automation remains a separate card, and no AC-11 score promotion is claimed"
+active_card: "CARD-260 AC-11 exact-SHA aggregation automation"
+active_card_status: "Card 258 #354 is approved by Claude r1 at 6be1339d: exact target 694217b0 has same-SHA security, accessibility and migration artifacts and canonical aggregation assembled 4/8 axes, recomputing INVALID_RUN without changing any contract or target"
+active_card_next: "Build the fail-closed producer-run discovery, missing-lane dispatch and aggregate tool with fake-gh tests (Card 260); evaluator, schema and targets stay unchanged"
 ---
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
