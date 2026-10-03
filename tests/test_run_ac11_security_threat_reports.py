@@ -429,8 +429,8 @@ def audit_cells(report):
     return report["roles"]["inv_audit_reader"]["tables"]["public.audit_events"]
 
 
-def test_an_empty_audit_table_still_measures_the_revoked_reader_boundary(before_and_after):
-    """The catalogue boundary is measurable without treating an empty row set as isolation."""
+def test_an_empty_audit_table_measures_reader_revocation_but_not_bridge_identity(before_and_after):
+    """Reader revocation is measured, while an empty bridge identity stays unobserved."""
 
     before, _summary, _after = before_and_after
     table = audit_cells(before)
@@ -443,7 +443,7 @@ def test_an_empty_audit_table_still_measures_the_revoked_reader_boundary(before_
     assert table["policies"] == []
     assert "visible" not in table
     assert aggregator.evaluate_rls(document(before), APPROVED_ALLOWLIST, NOW) is (
-        aggregator.Verdict.MEASURED_PASS
+        aggregator.Verdict.NOT_OBSERVED
     )
 
 
@@ -532,8 +532,8 @@ def test_the_seeded_table_does_not_restore_reader_visibility(before_and_after):
     assert "visible" not in table
 
 
-def test_the_axis_passes_before_and_after_seed_from_the_same_revoked_boundary(before_and_after):
-    """The verdict comes from the measured absence of privilege, not row-count vacuity."""
+def test_the_axis_passes_only_after_seed_from_the_same_revoked_boundary(before_and_after):
+    """The verdict needs both revoked reader privilege and non-vacuous bridge identity."""
 
     before, _summary, after = before_and_after
     before_document = document(before)
@@ -541,7 +541,7 @@ def test_the_axis_passes_before_and_after_seed_from_the_same_revoked_boundary(be
     assert aggregator.rls_report_shape(before_document) is None
     assert aggregator.rls_report_shape(after_document) is None
     assert aggregator.evaluate_rls(before_document, APPROVED_ALLOWLIST, NOW) is (
-        aggregator.Verdict.MEASURED_PASS
+        aggregator.Verdict.NOT_OBSERVED
     )
     assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is (
         aggregator.Verdict.MEASURED_PASS

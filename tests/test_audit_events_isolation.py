@@ -2,12 +2,14 @@
 
 The baseline granted ``inv_app`` SELECT and INSERT on ``audit_events`` and left
 the table outside the RLS loop, so the application role could read every
-tenant's authorisation decisions. The model docstring claimed the opposite --
-that NULL-tenant rows are read through a *separate* audit role -- and that role
-did not exist. These tests hold the shape that closes the gap:
+tenant's authorisation decisions. Migration 0047 first introduced a separate
+reader role; migration 0067 retired its unused cross-tenant read boundary.
+These tests hold the resulting shape:
 
 * the application role has no read path at all, and the policy still closes if
   someone re-grants SELECT (fail-closed twice over);
+* the retired audit reader has neither a SELECT policy nor table/schema read
+  privileges, while the database owner remains the only operational reader;
 * an authentication denial with no resolvable tenant is still recorded, through
   one narrow SECURITY DEFINER primitive that can write nothing else (AC-02);
 * the application role cannot forge a NULL-tenant row or another tenant's row;
@@ -139,20 +141,31 @@ def test_audit_events_rls_is_enabled_forced_and_policed(app_engine, migrated):
                 "ORDER BY policyname"
             )
         ).mappings().all()
+        retired_reader = connection.execute(
+            text(
+                "SELECT has_schema_privilege(:role, 'public', 'USAGE') AS schema_usage, "
+                "has_table_privilege(:role, 'public.audit_events', 'SELECT') AS table_select, "
+                "has_any_column_privilege(:role, 'public.audit_events', 'SELECT') AS column_select"
+            ),
+            {"role": READER_ROLE},
+        ).mappings().one()
     assert row["enabled"] and row["forced"]
     assert [(p["policyname"], p["cmd"]) for p in policies] == [
-        ("audit_events_audit_read", "SELECT"),
         ("audit_events_denial_append", "INSERT"),
         ("audit_events_tenant_isolation", "ALL"),
         ("cancel_bridge_audit_append", "INSERT"),
         ("cancel_bridge_audit_read", "SELECT"),
     ]
     by_name = {p["policyname"]: p["roles"] for p in policies}
-    assert READER_ROLE in by_name["audit_events_audit_read"]
     assert WRITER_ROLE in by_name["audit_events_denial_append"]
     assert APP_ROLE in by_name["audit_events_tenant_isolation"]
     assert BRIDGE_ROLE in by_name["cancel_bridge_audit_append"]
     assert BRIDGE_ROLE in by_name["cancel_bridge_audit_read"]
+    assert retired_reader == {
+        "schema_usage": False,
+        "table_select": False,
+        "column_select": False,
+    }
     # A policy for PUBLIC would apply to every role, including the two new ones.
     assert not any("public" in p["roles"].lower().strip("{}").split(",") for p in policies)
 
@@ -246,18 +259,25 @@ def test_the_policy_still_closes_when_select_is_re_granted(
             connection.execute(text(f"REVOKE SELECT ON audit_events FROM {APP_ROLE}"))
 
 
-def test_only_the_audit_reader_role_sees_null_tenant_and_cross_tenant_rows(
+def test_only_the_owner_sees_null_tenant_and_cross_tenant_rows_after_reader_retirement(
     owner_engine, seeded_audit
 ):
     _, _, ids = seeded_audit
     with owner_engine.connect() as connection:
-        with connection.begin():
-            connection.execute(text(f"SET LOCAL ROLE {READER_ROLE}"))
-            rows = connection.execute(
-                text("SELECT event_id FROM audit_events ORDER BY event_id")
-            ).scalars().all()
+        rows = connection.execute(
+            text("SELECT event_id FROM audit_events ORDER BY event_id")
+        ).scalars().all()
         assert sorted(r.strip() for r in rows) == sorted(ids.values())
-    # The reader reads; it never writes.
+
+    # The retired reader can assume its NOLOGIN role for measurement, but 0067
+    # removed both its SELECT grant and its policy. It therefore reads nothing
+    # by permission denial, rather than by accepting a vacuous zero-row result.
+    with owner_engine.connect() as connection:
+        with pytest.raises((ProgrammingError, DBAPIError)), connection.begin():
+            connection.execute(text(f"SET LOCAL ROLE {READER_ROLE}"))
+            connection.execute(text("SELECT event_id FROM audit_events"))
+
+    # Retirement does not accidentally grant a write path either.
     with owner_engine.connect() as connection:
         with pytest.raises((ProgrammingError, DBAPIError)), connection.begin():
             connection.execute(text(f"SET LOCAL ROLE {READER_ROLE}"))
