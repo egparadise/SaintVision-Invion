@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.310"
+version: "1.0.313"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:59:37+09:00"
+updated: "2026-10-03T12:47:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-260 AC-11 exact-SHA aggregation automation"
-active_card_status: "Card 258 #354 is approved by Claude r1 at 6be1339d: exact target 694217b0 has same-SHA security, accessibility and migration artifacts and canonical aggregation assembled 4/8 axes, recomputing INVALID_RUN without changing any contract or target"
-active_card_next: "Build the fail-closed producer-run discovery, missing-lane dispatch and aggregate tool with fake-gh tests (Card 260); evaluator, schema and targets stay unchanged"
+active_card: "CARD-262 split the shared server_config volume so the API cannot read worker.json"
+active_card_status: "Card 260 #355 is approved by Claude r3 at 2122b103: the exact-SHA tool refuses any prior non-success run before dispatch, and hosted runs 37092807238/37092895354/37093057306/37093146441 at that head recompute 4/8 axes and INVALID_RUN exactly"
+active_card_next: "Remove the remaining S08 activation residual by giving the API and worker separate read-only config volumes, with deployment and real-container tests; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
@@ -23,6 +23,15 @@ active_card_next: "Build the fail-closed producer-run discovery, missing-lane di
   axes were absent, and overall stayed `INVALID_RUN` / `done=false`.
 - No evaluator, schema, target, workflow or product file changed, and this card makes no score or
   completion claim. [[2026-10-03_11-21-53_KST_Card258_AC11_exact_SHA_axis_coverage_Codex]].
+## 2026-10-03 Card 260 — AC-11 exact-SHA aggregation automation
+
+- Reads the three complete producer chains from the canonical axis source map, dispatches only a
+  missing exact-SHA lane, and refuses reruns, duplicate candidates and stale/mismatched artifacts.
+- The aggregate artifact is not authoritative: producer IDs/digests are rebound and the existing
+  canonical evaluator recomputes the result from the exact clean source tree. Score promotion is
+  explicitly false.
+- Focused fake-gh verification is 35 passed after Claude r2; exact-head hosted execution is the next step.
+- [[2026-10-03_11-58-02_KST_Card260_AC11_exact_SHA_aggregation_automation_Codex]].
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
 
