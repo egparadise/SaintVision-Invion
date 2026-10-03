@@ -21,7 +21,7 @@ pytestmark = pytest.mark.postgres
 
 FK = "fk_eval_suites_tenant_id_project_id"
 INDEX = "ix_eval_suites_tenant_id_project_id"
-CURRENT_HEAD = "0064_model_version_run_fk"
+CURRENT_HEAD = "0066_tenant_registry_revoke"
 
 
 def _project(connection, *, tenant_id, now, label):

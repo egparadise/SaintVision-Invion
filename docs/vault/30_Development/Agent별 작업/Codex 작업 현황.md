@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.313"
-status: "review"
+version: "1.0.314"
+status: "in_progress"
 author: "Codex"
-updated: "2026-10-03T12:47:15+09:00"
+updated: "2026-10-03T14:28:54+09:00"
 source_of_truth: "Git"
-active_card: "CARD-262 split the shared server_config volume so the API cannot read worker.json"
-active_card_status: "Card 260 #355 is approved by Claude r3 at 2122b103: the exact-SHA tool refuses any prior non-success run before dispatch, and hosted runs 37092807238/37092895354/37093057306/37093146441 at that head recompute 4/8 axes and INVALID_RUN exactly"
-active_card_next: "Remove the remaining S08 activation residual by giving the API and worker separate read-only config volumes, with deployment and real-container tests; product dispatch stays off by default"
+active_card: "CARD-264 re-review and remove inv_app public.tenants cross-tenant visibility"
+active_card_status: "Static product-path review found no inv_app caller for public.tenants; the only non-test readers are operator-owner tooling and the tenant_id-only discovery issuer"
+active_card_next: "Revoke the legacy table-wide grant in migration 0066, regenerate the reviewed allowlist and pins, then measure SEC-RLS-001 in the hosted security lane"
 ---
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement

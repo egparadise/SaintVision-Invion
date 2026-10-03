@@ -94,21 +94,13 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         )
     )
     ordered = chain()
+    tenant_registry = next(
+        item for item in ordered if item.revision == "0066_tenant_registry_revoke"
+    )
+    assert tenant_registry.irreversible is True
+    assert tenant_registry.recovery_note and "forward fix" in tenant_registry.recovery_note
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
-    assert [item.revision for item in ordered[last_irreversible + 1 :]] == [
-        "0053_eval_suite_project_scope",
-        "0054_model_version_measurements",
-        "0055_adapter_conformance_records",
-        "0056_kernel_cancel_audit_bridge",
-        "0057_release_acceptance_quorum",
-        "0058_release_acceptance_resolver",
-        "0059_build_execution_intents",
-        "0060_build_execution_admissions",
-        "0061_build_preparations",
-        "0062_data_location_project_scope",
-        "0063_build_policy_budgets",
-        "0064_model_version_run_fk",
-    ]
+    assert [item.revision for item in ordered[last_irreversible + 1 :]] == []
 
 
 def test_noop_downgrade_is_invalid_before_any_database_call(tmp_path, monkeypatch):

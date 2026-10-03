@@ -15,9 +15,9 @@ def test_0063_is_the_single_head_and_preserves_old_profiles_as_unusable_authorit
     assert len(chain()[-1].revision) <= 32
     assert 'down_revision = "0062_data_location_project_scope"' in source
     assert any(r.revision == "0063_build_policy_budgets" for r in chain())
-    # 0064 (card 261) sits above it now; the head assertion lives in
+    # 0066 (card 264) sits above it now; the head assertion lives in
     # tests/core/test_object_store_locator_migration.py.
-    assert chain()[-1].revision == "0064_model_version_run_fk"
+    assert chain()[-1].revision == "0066_tenant_registry_revoke"
     assert "nullable=True" in source
     assert source.count("num_nulls(budget_cpu_millis,budget_memory_bytes,budget_storage_bytes,") == 2
     assert '"base_image_digests) = 4 OR "' in source

@@ -835,11 +835,9 @@ def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
 
 
 def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
-    # The accepted row is a real derivation: public.tenants is observed without forced RLS, and
-    # the reviewed baseline accepts E2 there.  An accepted row nothing derives is refused.
-    roles = rls_roles({**default_tables(), "public.tenants": rls_table(rls_forced=False)})
-    report = rls_report(allowlist, roles=roles)
-    report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
+    # Card 264 removed the expiring inv_app/public.tenants exception.  The audit-reader
+    # visibility remains genuinely privileged and keeps the axis on a calendar review.
+    report = rls_report(allowlist)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
     expired = datetime(2026, 12, 1, tzinfo=timezone.utc)
     assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL

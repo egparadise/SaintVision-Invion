@@ -2,6 +2,7 @@
 import pytest
 from pathlib import Path
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 from db_login import application_test_engine
 
 pytestmark = pytest.mark.postgres
@@ -28,7 +29,13 @@ def test_temporary_login_cleanup_and_group_preservation(migrated, clean_tables, 
                 flags = c.execute(text("""SELECT rolsuper,rolbypassrls,rolcreatedb,rolcreaterole,
                     pg_has_role(current_user,'inv_app','MEMBER') FROM pg_roles WHERE rolname=current_user""")).one()
                 assert tuple(flags) == (False, False, False, False, True)
-                assert c.execute(text("SELECT count(*) FROM public.tenants")).scalar_one() == 0
+                # 0066 removes the unused table-wide registry read.  Testing an
+                # empty result would not catch a re-grant, so require the
+                # database privilege refusal itself.
+                with pytest.raises(DBAPIError) as denied:
+                    c.execute(text("SELECT count(*) FROM public.tenants")).scalar_one()
+                assert getattr(denied.value.orig, "sqlstate", None) == "42501"
+                c.rollback()
             if fail_body:
                 raise RuntimeError("synthetic test-body failure")
     except RuntimeError as error:
