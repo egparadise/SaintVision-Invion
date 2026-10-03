@@ -18,6 +18,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -134,8 +135,32 @@ else:
     sys.exit(90)
 '''
 
+FAKE_AC11_ORCHESTRATOR = '''# -*- coding: utf-8 -*-
+import json
+import os
+import pathlib
+import sys
 
-def run_guard(tmp_path: Path, script: str, state: dict) -> subprocess.CompletedProcess:
+args = sys.argv[1:]
+pathlib.Path(os.environ["GUARD_AC11_LOG"]).write_text(
+    json.dumps(args), encoding="utf-8"
+)
+if os.environ.get("GUARD_AC11_EXIT"):
+    raise SystemExit(int(os.environ["GUARD_AC11_EXIT"]))
+output = pathlib.Path(args[args.index("--output") + 1])
+output.parent.mkdir(parents=True, exist_ok=True)
+output.write_text('{"schemaVersion":"fake-ac11-receipt:1"}\\n', encoding="utf-8")
+print(output.read_text(encoding="utf-8"), end="")
+'''
+
+
+def run_guard(
+    tmp_path: Path,
+    script: str,
+    state: dict,
+    *,
+    extra_env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess:
     """Run a snippet with the guard sourced and a fake gh first on PATH."""
 
     if BASH is None:  # the test above already failed; do not add two dozen more
@@ -170,6 +195,8 @@ def run_guard(tmp_path: Path, script: str, state: dict) -> subprocess.CompletedP
         GUARD_LIST_SLEEP="0",
         GUARD_DISPATCH_REF="integration/all-agents-unified",
     )
+    if extra_env:
+        environment.update(extra_env)
     # ``as_posix`` because Git Bash on Windows would eat the backslashes of a native path.
     result = subprocess.run(
         [BASH, body.as_posix()], capture_output=True, text=True, env=environment, timeout=120
@@ -313,101 +340,88 @@ def test_await_run_accepts_a_successful_run_at_that_head(tmp_path):
     assert run_guard(tmp_path, f'await_run 11 "{LAND}"', state).returncode == 0
 
 
-# ---------------------------------------------------------------- F3: the aggregator waits
+# ------------------------------------------------------- F3: one canonical AC-11 orchestrator
 
 
-def ac11_state(*, security: dict | None = None, accessibility: dict | None = None,
-               aggregate: dict | None = None) -> dict:
-    """Three listed runs plus their watch/view results, overridable per lane."""
-
-    runs: dict = {}
-    watch: dict = {}
-    view: dict = {}
-    defaults = [
-        ("ac11-security-scan.yml", 21, security),
-        ("ac11-accessibility-e2e.yml", 22, accessibility),
-        ("ac11-aggregate.yml", 23, aggregate),
-    ]
-    for workflow, run_id, override in defaults:
-        override = override or {}
-        title = (f"post-landing-aggregate-{LAND}" if workflow == "ac11-aggregate.yml"
-                 else f"post-landing-{workflow}-{LAND}")
-        if override.get("listed") == []:
-            runs[workflow] = []
-        else:
-            runs[workflow] = [{
-                "databaseId": run_id,
-                "headSha": override.get("sha", LAND),
-                "event": override.get("event", "workflow_dispatch"),
-                "displayTitle": title,
-            }]
-        watch[str(run_id)] = override.get("watch", 0)
-        view[str(run_id)] = {
-            "status": override.get("status", "completed"),
-            "conclusion": override.get("conclusion", "success"),
-            "headSha": override.get("viewSha", override.get("sha", LAND)),
-        }
-    return {"runs": runs, "watch": watch, "view": view}
+def ac11_environment(tmp_path: Path, *, exit_code: int | None = None) -> tuple[dict[str, str], Path]:
+    orchestrator = tmp_path / "fake_ac11_orchestrator.py"
+    orchestrator.write_text(FAKE_AC11_ORCHESTRATOR, encoding="utf-8", newline="\n")
+    log = tmp_path / "ac11-orchestrator.json"
+    environment = {
+        "GUARD_AC11_PYTHON": sys.executable.replace("\\", "/"),
+        "GUARD_AC11_ORCHESTRATOR": orchestrator.as_posix(),
+        "GUARD_AC11_TEST_OVERRIDE": "1",
+        "GUARD_AC11_LOG": log.as_posix(),
+        "GUARD_REPOSITORY": "egparadise/SaintVision-Invion",
+    }
+    if exit_code is not None:
+        environment["GUARD_AC11_EXIT"] = str(exit_code)
+    return environment, log
 
 
-def test_the_aggregator_runs_only_after_both_producers_succeeded(tmp_path):
-    state = ac11_state()
-    result = run_guard(tmp_path, f'ac11_dispatch_in_order "{LAND}"', state)
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "ac11-aggregate.yml\t23" in result.stdout
-    dispatches = [line for line in result.log.splitlines() if line.startswith("workflow run")]
-    assert dispatches == [
-        "workflow run ac11-security-scan.yml --ref integration/all-agents-unified"
-        f" -f correlation_id=post-landing-ac11-security-scan.yml-{LAND}",
-        "workflow run ac11-accessibility-e2e.yml --ref integration/all-agents-unified"
-        f" -f correlation_id=post-landing-ac11-accessibility-e2e.yml-{LAND}",
-        "workflow run ac11-aggregate.yml --ref integration/all-agents-unified"
-        f" -f source_sha={LAND} -f correlation_id=post-landing-aggregate-{LAND}",
-    ]
-    # The order is not only "three dispatches": each producer was waited for before the next.
-    assert result.log.index("run watch 21") < result.log.index(
-        "workflow run ac11-accessibility-e2e.yml"
-    )
-    assert result.log.index("run watch 22") < result.log.index("workflow run ac11-aggregate.yml")
+def test_ac11_guard_delegates_once_to_the_exact_sha_orchestrator(tmp_path: Path) -> None:
+    """The shell must not keep a second, incomplete producer list.
 
-
-@pytest.mark.parametrize(
-    ("label", "override"),
-    [
-        ("producer-still-running", {"security": {"status": "in_progress", "conclusion": ""}}),
-        ("producer-failed", {"security": {"watch": 1, "conclusion": "failure"}}),
-        ("producer-at-another-head", {"security": {"sha": OTHER}}),
-        ("producer-not-listed", {"security": {"listed": []}}),
-        ("second-producer-failed", {"accessibility": {"watch": 1, "conclusion": "failure"}}),
-        ("second-producer-raced",
-         {"accessibility": {}}),
-    ],
-)
-def test_a_producer_that_is_not_finished_green_at_this_head_means_no_aggregate(
-    tmp_path, label, override
-):
-    """#320 r2 F3: the aggregator reads the producers' artifacts, so it must not start first.
-
-    The old block dispatched both producers and then the aggregator with a comment between
-    them.  Here each case leaves one producer unfinished, failed, missing or at another head,
-    and the assertion is about the thing that was wrong: ``ac11-aggregate.yml`` is dispatched
-    zero times.
+    Card 260's Python tool owns the three-producer fake-gh coverage, including migration
+    rehearsal, prior failures, duplicate runs, artifact expiry and canonical recomputation.
+    This boundary test proves the runbook guard invokes that tool once with the landed SHA,
+    branch, repository and durable receipt path, while making no direct ``gh`` call itself.
     """
 
-    state = ac11_state(**override)
-    if label == "second-producer-raced":
-        state["runs"]["ac11-accessibility-e2e.yml"].append({
-            "databaseId": 99, "headSha": LAND, "event": "workflow_dispatch",
-            "displayTitle": f"post-landing-ac11-accessibility-e2e.yml-{LAND}",
-        })
-    result = run_guard(tmp_path, f'ac11_dispatch_in_order "{LAND}"', state)
-    assert result.returncode in (3, 4), result.stdout + result.stderr
-    assert "workflow run ac11-aggregate.yml" not in result.log
+    environment, log = ac11_environment(tmp_path)
+    receipt = tmp_path / "ac11-receipt.json"
+    result = run_guard(
+        tmp_path,
+        f'ac11_dispatch_in_order "{LAND}" "{receipt.as_posix()}"',
+        {},
+        extra_env=environment,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.log == ""
+    assert receipt.is_file()
+    assert json.loads(log.read_text(encoding="utf-8")) == [
+        "--source-sha", LAND,
+        "--ref", "integration/all-agents-unified",
+        "--repository", "egparadise/SaintVision-Invion",
+        "--output", receipt.as_posix(),
+    ]
 
 
-def test_a_prefix_sha_never_reaches_a_dispatch(tmp_path):
-    """The two findings meet here: a truncated $LAND must not dispatch anything."""
-
-    result = run_guard(tmp_path, 'ac11_dispatch_in_order "deadbeef"', ac11_state())
+def test_ac11_orchestrator_refusal_is_preserved_without_legacy_dispatch(tmp_path: Path) -> None:
+    environment, _ = ac11_environment(tmp_path, exit_code=2)
+    result = run_guard(
+        tmp_path,
+        f'ac11_dispatch_in_order "{LAND}" "{(tmp_path / "receipt.json").as_posix()}"',
+        {},
+        extra_env=environment,
+    )
     assert result.returncode == 2
-    assert "workflow run" not in result.log
+    assert result.log == ""
+
+
+def test_ac11_orchestrator_override_is_refused_outside_the_explicit_test_seam(tmp_path: Path) -> None:
+    environment, log = ac11_environment(tmp_path)
+    environment.pop("GUARD_AC11_TEST_OVERRIDE")
+    result = run_guard(
+        tmp_path,
+        f'ac11_dispatch_in_order "{LAND}" "{(tmp_path / "receipt.json").as_posix()}"',
+        {},
+        extra_env=environment,
+    )
+    assert result.returncode == 2
+    assert "reserved for the test harness" in result.stderr
+    assert not log.exists()
+    assert result.log == ""
+
+
+def test_a_prefix_sha_never_reaches_the_ac11_orchestrator(tmp_path: Path) -> None:
+    environment, log = ac11_environment(tmp_path)
+    result = run_guard(
+        tmp_path,
+        'ac11_dispatch_in_order "deadbeef"',
+        {},
+        extra_env=environment,
+    )
+    assert result.returncode == 2
+    assert not log.exists()
+    assert result.log == ""
