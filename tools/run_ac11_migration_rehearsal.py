@@ -43,7 +43,11 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-from migration_graph import Revision, chain  # noqa: E402
+from migration_graph import (  # noqa: E402
+    Revision,
+    chain,
+    reviewed_security_preserving_downgrade,
+)
 
 
 SCHEMA_VERSION = "1.0.0"
@@ -132,13 +136,21 @@ def validate_checkout(source_head_sha: str) -> tuple[str, bool]:
 def downgrade_body_kind(source: str) -> str:
     """Classify downgrade behavior without importing migration code."""
     tree = ast.parse(source)
-    explicitly_irreversible = any(
-        isinstance(node, ast.Assign)
-        and any(isinstance(target, ast.Name) and target.id == "irreversible" for target in node.targets)
-        and isinstance(node.value, ast.Constant)
-        and node.value.value is True
-        for node in tree.body
-    )
+    revision = None
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(isinstance(target, ast.Name) and target.id == "revision" for target in node.targets):
+            try:
+                revision = ast.literal_eval(node.value)
+            except (ValueError, TypeError):
+                revision = None
+    if not isinstance(revision, str):
+        revision = "<missing>"
+    try:
+        security_preserving = reviewed_security_preserving_downgrade(tree, revision)
+    except ValueError as exc:
+        raise RehearsalError(str(exc)) from None
     for node in tree.body:
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name != "downgrade":
             continue
@@ -165,7 +177,7 @@ def downgrade_body_kind(source: str) -> str:
             return "invalid-noop"
         if len(body) == 1 and isinstance(body[0], ast.Raise):
             return "refusal"
-        return "security-preserving" if explicitly_irreversible else "reversible"
+        return "security-preserving" if security_preserving else "reversible"
     return "refusal"
 
 

@@ -26,6 +26,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
 
+try:
+    from tools.migration_graph import reviewed_security_preserving_downgrade
+except ModuleNotFoundError:  # direct ``python tools/aggregate_ac11_evidence.py``
+    from migration_graph import reviewed_security_preserving_downgrade
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST_REPO_PATH = "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json"
@@ -459,16 +464,7 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
             parents = () if down is None else (down,) if isinstance(down, str) else tuple(down)
             if not parents and down is not None or any(not isinstance(item, str) for item in parents):
                 raise ValueError("invalid down_revision")
-            explicit_irreversible = any(
-                isinstance(node, ast.Assign)
-                and any(
-                    isinstance(target, ast.Name) and target.id == "irreversible"
-                    for target in node.targets
-                )
-                and isinstance(node.value, ast.Constant)
-                and node.value.value is True
-                for node in tree.body
-            )
+            security_preserving = reviewed_security_preserving_downgrade(tree, revision)
             if downgrade is None:
                 irreversible = True
             else:
@@ -479,7 +475,7 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
                 # A no-op ``pass`` is not an approved irreversible declaration. Treat
                 # it as a reversible tail candidate so a structural N/A cannot hide
                 # the stage-2 negative fixture that must reject no-op downgrades.
-                irreversible = explicit_irreversible or (
+                irreversible = security_preserving or (
                     len(body) == 1 and isinstance(body[0], ast.Raise)
                 )
             revisions[revision] = (parents, irreversible or len(parents) > 1)

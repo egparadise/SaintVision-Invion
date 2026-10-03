@@ -35,6 +35,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 VERSIONS = ROOT / "migrations" / "versions"
 
+# An executable downgrade can be treated as an irreversible security boundary
+# only after its revision and exact fail-closed operation have been reviewed.
+# Keeping the SQL here makes adding ``irreversible = True`` to an arbitrary
+# future migration insufficient to erase the reversible AC-11 axis.
+REVIEWED_SECURITY_PRESERVING_DOWNGRADES = {
+    "0066_tenant_registry_revoke": (
+        "REVOKE SELECT ON public.tenants FROM inv_app",
+    ),
+}
+
 
 @dataclass(frozen=True, slots=True)
 class Revision:
@@ -62,9 +72,60 @@ def _explicit_irreversible_marker(tree: ast.Module) -> bool:
     return False
 
 
-def _downgrade_is_refusal(tree: ast.Module) -> tuple[bool, str | None]:
+def _normalized_sql(value: str) -> str:
+    return " ".join(value.strip().removesuffix(";").split())
+
+
+def reviewed_security_preserving_downgrade(tree: ast.Module, revision: str) -> bool:
+    """Validate the sole reviewed executable irreversible downgrade.
+
+    A marked revision outside the reviewed set, or any statement other than
+    the exact reviewed REVOKE call, is invalid rather than irreversible.
+    """
+    if not _explicit_irreversible_marker(tree):
+        return False
+    expected = REVIEWED_SECURITY_PRESERVING_DOWNGRADES.get(revision)
+    if expected is None:
+        raise ValueError(f"{revision}: unreviewed explicit irreversible marker")
+    downgrade = next(
+        (
+            node
+            for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == "downgrade"
+        ),
+        None,
+    )
+    if downgrade is None:
+        raise ValueError(f"{revision}: reviewed security downgrade is missing")
+    body = list(downgrade.body)
+    if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant):
+        if isinstance(body[0].value.value, str):
+            body = body[1:]
+    statements: list[str] = []
+    for node in body:
+        if not (
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Attribute)
+            and isinstance(node.value.func.value, ast.Name)
+            and node.value.func.value.id == "op"
+            and node.value.func.attr == "execute"
+            and len(node.value.args) == 1
+            and not node.value.keywords
+            and isinstance(node.value.args[0], ast.Constant)
+            and isinstance(node.value.args[0].value, str)
+        ):
+            raise ValueError(f"{revision}: security-preserving downgrade must contain REVOKE only")
+        statements.append(_normalized_sql(node.value.args[0].value))
+    if tuple(statements) != tuple(_normalized_sql(sql) for sql in expected):
+        raise ValueError(f"{revision}: security-preserving downgrade differs from reviewed REVOKE")
+    return True
+
+
+def _downgrade_is_refusal(tree: ast.Module, revision: str) -> tuple[bool, str | None]:
     """Whether a downgrade is an explicit irreversible security boundary."""
-    if _explicit_irreversible_marker(tree):
+    if reviewed_security_preserving_downgrade(tree, revision):
         return True, None
     for node in tree.body:
         if not isinstance(node, ast.FunctionDef) or node.name != "downgrade":
@@ -101,7 +162,7 @@ def load() -> list[Revision]:
                         assignments[target.id] = ast.literal_eval(node.value)
         if set(assignments) != {"revision", "down_revision"}:
             raise ValueError(f"{path.name}: revision or down_revision not declared")
-        irreversible, message = _downgrade_is_refusal(tree)
+        irreversible, message = _downgrade_is_refusal(tree, assignments["revision"])
         docstring = ast.get_docstring(tree) or ""
         note = message
         if note is None and irreversible:

@@ -209,14 +209,36 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
 
 class ZeroTailGit(FakeGit):
     def show(self, commit: str, path: str) -> str:
-        if path == "migrations/versions/0002_head.py":
+        if path == "migrations/versions/0066_tenant_registry_revoke.py":
             return (
-                'revision = "0002_head"\n'
+                'revision = "0066_tenant_registry_revoke"\n'
                 'down_revision = "0001_base"\n'
                 'irreversible = True\n'
-                'def downgrade():\n    op.execute("REVOKE SELECT ON sample FROM app")\n'
+                'def downgrade():\n'
+                '    op.execute("REVOKE SELECT ON public.tenants FROM inv_app")\n'
             )
         return super().show(commit, path)
+
+    def list_paths(self, commit: str, prefix: str) -> list[str]:
+        if prefix == "migrations/versions":
+            return [
+                "migrations/versions/0001_base.py",
+                "migrations/versions/0066_tenant_registry_revoke.py",
+            ]
+        return super().list_paths(commit, prefix)
+
+
+class UnsafeZeroTailGit(ZeroTailGit):
+    replacement = 'op.execute("GRANT SELECT ON public.tenants TO inv_app")'
+
+    def show(self, commit: str, path: str) -> str:
+        source = super().show(commit, path)
+        if path == "migrations/versions/0066_tenant_registry_revoke.py":
+            return source.replace(
+                'op.execute("REVOKE SELECT ON public.tenants FROM inv_app")',
+                self.replacement,
+            )
+        return source
 
 
 def security_reports(allowlist: dict) -> list[dict]:
@@ -1938,6 +1960,31 @@ def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
     assert axis_result(value, allowlist, ZeroTailGit()).verdict is tool.Verdict.NOT_APPLICABLE
     value["axis"] = tool.REQUIRED_AXES[1]
     assert axis_result(value, allowlist, ZeroTailGit()).verdict is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    "replacement",
+    [
+        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
+        'op.drop_table("tenants", schema="public")',
+    ],
+    ids=["grant", "drop-table"],
+)
+def test_zero_tail_rejects_an_unsafe_explicit_irreversible_downgrade(
+    replacement, allowlist, monkeypatch
+):
+    monkeypatch.setattr(UnsafeZeroTailGit, "replacement", replacement)
+    value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
+    value.update(
+        observations=[],
+        structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
+    )
+    value.pop("reversibleSegment")
+    result = axis_result(value, allowlist, UnsafeZeroTailGit())
+    assert result.verdict is tool.Verdict.INVALID_RUN
+    assert result.reasons == (
+        "invalid migration graph entry: migrations/versions/0066_tenant_registry_revoke.py",
+    )
 
 
 def test_zero_tail_is_conditionally_excluded_only_when_restore_passes(allowlist):

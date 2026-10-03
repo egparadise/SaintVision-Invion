@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD264-TENANT-REGISTRY-DISPOSITION-CODEX"
 title: "Card 264 public.tenants E2-E5 disposition re-review"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T15:18:57+09:00"
+updated: "2026-10-03T16:02:08+09:00"
 source_of_truth: "Git"
 base_sha: "2ed65f5f9f16d06ce3d4f55953f9338df422d78e"
 ---
@@ -80,3 +80,18 @@ E2-E5, budget guard E2, audit reader E3-E5뿐이다.
 필드는 AC-11 전체 envelope의 clean-checkout 증거라고 주장하지 않는다. 최종 문서
 commit 뒤 같은 security lane을 한 번 더 실행해 exact final head를 PR 코멘트에 남긴다.
 이 카드에서 AC-11 점수나 전체 gate 완료를 주장하지 않는다.
+
+# Claude r2 조건 — 검토된 irreversible 경계
+
+실행 가능한 irreversible marker는 더 이상 임의 migration의 탈출구가 아니다. migration
+graph, rehearsal runner, 정본 AC-11 evaluator가 공유하는 검토 집합은
+`0066_tenant_registry_revoke` 하나뿐이다. 이 revision의 downgrade도 검토된
+`REVOKE SELECT ON public.tenants FROM inv_app`와 정확히 같아야 한다. 검토되지 않은
+marker, GRANT, table drop, 그 밖의 연산은 reversible 축을 `NOT_APPLICABLE`로 바꾸지
+못하고 거부된다.
+
+`2026-10-03T16:02:08+09:00` 기준 PG-free focused 검증은
+`tests/test_ac11_migration_rehearsal.py`, `tests/test_aggregate_ac11_evidence.py`,
+`tests/test_migrations.py` 합계 **201 passed**다. GRANT와 `drop_table` 반례를 세 consumer
+각각에 결속했다. exact-head Backend, Core, security 결과는 hosted 완료 뒤 PR 코멘트에
+기록한다.
