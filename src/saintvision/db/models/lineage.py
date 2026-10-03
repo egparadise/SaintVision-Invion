@@ -206,6 +206,14 @@ class ModelVersion(Base):
         ForeignKeyConstraint(
             ["tenant_id", "model_id"], ["models.tenant_id", "models.model_id"]
         ),
+        # 0064: a producing run may only be one of this tenant's. The column stays
+        # nullable -- a version that did not come out of a run claims nothing --
+        # and project membership stays the route's check, through the workload.
+        ForeignKeyConstraint(
+            ["tenant_id", "produced_by_run_id"],
+            ["runs.tenant_id", "runs.run_id"],
+            name="fk_model_versions_tenant_id_produced_by_run_id",
+        ),
         UniqueConstraint(
             "tenant_id", "model_version_id", name="uq_model_versions_tenant_id_version_id"
         ),

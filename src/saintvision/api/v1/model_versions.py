@@ -86,7 +86,8 @@ from ...errors import (
 from ...identity.principal import Principal
 from ...services import projects as project_service
 from ...services.audit import record_event
-from ...services.lineage import register_model_version
+from ...services.lineage import LineageEdge, register_model_version, subject_project
+from .project_scope import run_in_project
 from ...storage.pathsafe import build_uri
 from .. import schemas
 from ..deps import (
@@ -114,6 +115,7 @@ REGISTER_PATH = "/projects/{project_id}/models/{model_id}/versions"
 #: The idempotency ledger's ``endpoint`` for this route (IDEM-2). A constant
 #: rather than the request's path, so two projects' keys cannot collide through
 #: the ledger and a renamed path cannot silently start a new key space.
+NO_SUCH_SUBJECT = "No such resource."
 ENDPOINT = "POST /v1/projects/{project_id}/models/{model_id}/versions"
 
 #: The same answer for every way the path can fail to name a model. Held here so
@@ -244,6 +246,29 @@ def _unique_conflict(error: IntegrityError) -> CanonicalProblem | None:
     if constraint in UNIQUE_CONFLICTS:
         return CanonicalProblem(GRAPH_PRECONDITION, 409, UNIQUE_CONFLICTS[constraint])
     return None
+
+
+def _provable_edges(session, *, tenant_id, project_id, asserted):
+    """Turn asserted edges into service edges, refusing any the project cannot own.
+
+    ``subject_project`` returns the project a subject can **prove** through the
+    chain its own table supports, or ``None`` when the schema cannot prove one.
+    ``None`` is refused: "cannot prove" is not "any project". A subject in another
+    project, in another tenant, or absent are **one answer** -- the same 404 the
+    rest of this route gives for a model version it will not confirm -- so a
+    caller cannot use a subject id to probe for one that exists.
+    """
+    edges = []
+    for edge in asserted or []:
+        owner = subject_project(
+            session, tenant_id=tenant_id, kind=edge.kind, subject_id=edge.subject_id
+        )
+        if owner != project_id:
+            raise CanonicalProblem(RES_NOT_FOUND, 404, NO_SUCH_SUBJECT)
+        edges.append(
+            LineageEdge(kind=edge.kind, subject_id=edge.subject_id, relation=edge.relation)
+        )
+    return edges
 
 
 def _derived_uri(model: Model, version: str) -> str:
@@ -379,6 +404,23 @@ async def register_version(
                     project_id=project_id,
                     model_id=model_id,
                 )
+                # Both of these resolve **before** the write and both answer the
+                # same question -- does the thing the caller names belong to the
+                # project in the path? A value that cannot prove it is refused
+                # with the one absence answer, never recorded as provenance.
+                if proposal.produced_by_run_id is not None:
+                    run_in_project(
+                        session,
+                        tenant_id=principal.tenant_id,
+                        project_id=project_id,
+                        run_id=proposal.produced_by_run_id,
+                    )
+                edges = _provable_edges(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    project_id=project_id,
+                    asserted=proposal.lineage,
+                )
                 try:
                     row = register_model_version(
                         session,
@@ -389,6 +431,8 @@ async def register_version(
                         uri=_derived_uri(model, proposal.version),
                         now=now,
                         byte_size=proposal.byte_size,
+                        produced_by_run_id=proposal.produced_by_run_id,
+                        lineage=edges,
                     )
                 except IntegrityError as error:
                     conflict = _unique_conflict(error)

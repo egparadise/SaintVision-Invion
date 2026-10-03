@@ -228,7 +228,26 @@ def test_record_lineage_rejects_unknown_kinds_and_is_idempotent(app_sessionmaker
                         model_version_id=mv.model_version_id,
                         edge=LineageEdge(kind="astrology", subject_id="x"), now=NOW,
                     )
-                edge = LineageEdge(kind="approval", subject_id="apr_1")
+                # Card 261: a subject that does not exist is refused here rather
+                # than reported as ``dangling`` by every later trace. The refusal
+                # is the one absence answer, so a fabricated id cannot be used to
+                # probe for a real one.
+                with pytest.raises(InvError, match="lineage subject not found"):
+                    lineage_service.record_lineage(
+                        session, tenant_id=registry["tenant_a"],
+                        model_version_id=mv.model_version_id,
+                        edge=LineageEdge(kind="approval", subject_id=new_id("approval")),
+                        now=NOW,
+                    )
+                # Idempotence needs a subject that is really there.
+                dataset_version = lineage_service.register_dataset_version(
+                    session, tenant_id=registry["tenant_a"],
+                    dataset_id=registry["dataset_id"], version="1.0.0",
+                    content_sha256="c" * 64, uri="inv://datasets/corpus@1.0.0", now=NOW,
+                )
+                edge = LineageEdge(
+                    kind="dataset_version", subject_id=dataset_version.dataset_version_id
+                )
                 first = lineage_service.record_lineage(
                     session, tenant_id=registry["tenant_a"],
                     model_version_id=mv.model_version_id, edge=edge, now=NOW,
@@ -240,6 +259,12 @@ def test_record_lineage_rejects_unknown_kinds_and_is_idempotent(app_sessionmaker
                 assert (first.model_version_id, first.subject_id) == (
                     again.model_version_id, again.subject_id
                 )
+                # Another tenant's subject is the same refusal as an absent one.
+                with pytest.raises(InvError, match="lineage subject not found"):
+                    lineage_service.record_lineage(
+                        session, tenant_id=registry["tenant_b"],
+                        model_version_id=mv.model_version_id, edge=edge, now=NOW,
+                    )
 
 
 def test_trace_reports_missing_required_kinds_and_shrinks_as_they_are_recorded(
