@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.318"
+version: "1.0.319"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T18:27:48+09:00"
+updated: "2026-10-03T20:01:36+09:00"
 source_of_truth: "Git"
-active_card: "CARD-268 inv_audit_reader disposition re-measurement before the 2026-11-30 expiry"
-active_card_status: "Card 267 #361 is approved by Claude r2 at a8cc5352: the post-landing guard runs the Card 260 orchestrator at the landed clean detached $LAND, requires security, accessibility and migration exactly, refuses failed, unfinished or missing new runs before aggregate, and Backend 3.12/3.14 and Docs are green"
-active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 disposition on the train 43 tree and either remove the privilege or record the still-valid rationale for a mid-November review; product dispatch stays off by default"
+active_card: "No hosted-only Codex card remains (measured row by row); reviewing Card 266 #362"
+active_card_status: "Card 268 #363 is approved by Claude r2 at a24bc64c: irreversible migration 0067 removes the dormant inv_audit_reader audit SELECT, schema USAGE and reader policy, the marker is bound to exactly {0066, 0067}, and no accepted-with-expiry disposition remains"
+active_card_next: "Review Card 266 #362 against the #358 r8 contract; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
@@ -27,6 +27,22 @@ active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 dis
   **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI at `e627bc61` succeeded
   (Backend run `37110979411` 3.12/3.14, Docs run `37110979408`; coordinator update).
 - [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
+## 2026-10-03 Card 268 — inv_audit_reader disposition removal
+
+- Train 43 (`1d2d5289`) still has no product connection, role switch, membership grant, or read
+  route for `inv_audit_reader`; the role exists only as legacy audit DDL and as a measured
+  security boundary. The 2026-11-30 exception is therefore not extended.
+- Migration `0067_audit_reader_revoke` removes `SELECT`, schema `USAGE`, and the unconditional
+  read policy. Its irreversible downgrade repeats those exact removals, and the migration graph
+  accepts only the reviewed 0066/0067 operation sets.
+- The generated allowlist has zero `accepted-with-expiry` rows. The evaluator independently
+  requires the reader role to remain non-login/non-inheriting/non-member, with no audit-table
+  privilege and no reader policy; any restored visibility is `MEASURED_FAIL`.
+- Focused PG-free checks pass. Completed afterwards (coordinator update): disposable-PostgreSQL
+  execution (Claude r2: isolation 18 passed, 618 migration/allowlist/evidence tests passed),
+  target-registry repin, hosted security evidence (run 37112573662, MEASURED_PASS) and
+  Claude review (r2 approved at a24bc64c).
+  [[2026-10-03_17-58-55_KST_Card268_audit_reader_disposition_removal_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
 
