@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD260-AC11-EXACT-SHA-AUTOMATION-CODEX-001"
 title: "Card 260 AC-11 exact-SHA aggregation automation"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:58:02+09:00"
+updated: "2026-10-03T12:02:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -44,9 +44,10 @@ does not turn `MEASURED_FAIL` or `INVALID_RUN` into success and `promotesScore` 
 
 ## Verification before hosted execution
 
-- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **23 passed**.
+- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **25 passed**.
 - The fake-gh suite covers missing-only dispatch and the SHA/ref/event/workflow/attempt, duplicate
-  run/correlation, run-id reuse, artifact identity/expiry/digest and canonical-result boundaries.
+  run/correlation, run-id reuse, saturated run/artifact listings, artifact identity/expiry/digest
+  and canonical-result boundaries.
 - `python -m py_compile` and `git diff --check`: exit 0.
 - The first direct CLI smoke found that package imports worked under pytest but not under
   `python tools/...`; no workflow had been dispatched. The direct invocation is now a regression
@@ -55,4 +56,3 @@ does not turn `MEASURED_FAIL` or `INVALID_RUN` into success and `promotesScore` 
 The exact-head hosted producer/aggregate run IDs belong in the PR verification comment after this
 documentation commit fixes the final code SHA. Until those runs complete, this record claims only
 the PG-free fake-gh result above.
-

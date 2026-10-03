@@ -70,6 +70,7 @@ EXPECTED_WORKFLOWS = {
 RUN_JSON_FIELDS = (
     "attempt,databaseId,displayTitle,event,headBranch,headSha,status,conclusion,workflowName,url,createdAt"
 )
+RUN_LIST_LIMIT = 100
 RUN_STATUSES = frozenset({"queued", "requested", "waiting", "pending", "in_progress", "completed"})
 
 
@@ -242,12 +243,14 @@ def list_runs(runner: Runner, repository: str, ref: str, workflow: str) -> list[
         runner,
         [
             "gh", "run", "list", "--repo", repository, "--workflow", Path(workflow).name,
-            "--branch", ref, "--limit", "100", "--json", RUN_JSON_FIELDS,
+            "--branch", ref, "--limit", str(RUN_LIST_LIMIT), "--json", RUN_JSON_FIELDS,
         ],
         f"list {workflow} runs",
     )
     if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
         raise Refused(f"{workflow} run listing is not an object list")
+    if len(rows) >= RUN_LIST_LIMIT:
+        raise Refused(f"{workflow} run listing reached its limit; uniqueness is not provable")
     return rows
 
 
@@ -394,6 +397,9 @@ def artifact_for_run(runner: Runner, repository: str, run: dict[str, Any], expec
     rows = listing.get("artifacts") if isinstance(listing, dict) else None
     if not isinstance(rows, list):
         raise Refused(f"run {run_id} artifact listing has no artifacts array")
+    total_count = listing.get("total_count")
+    if not isinstance(total_count, int) or isinstance(total_count, bool) or total_count != len(rows):
+        raise Refused(f"run {run_id} artifact listing is truncated or has no exact count")
     matching = [row for row in rows if isinstance(row, dict) and row.get("name") == expected_name]
     if len(matching) != 1:
         raise Refused(f"run {run_id} must have exactly one artifact named {expected_name}")

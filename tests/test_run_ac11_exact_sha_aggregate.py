@@ -128,7 +128,8 @@ class FakeGh:
                 return 0, json_bytes({"object": {"sha": self.remote_sha}})
             if "/actions/runs/" in endpoint and endpoint.endswith("/artifacts?per_page=100"):
                 run_id = int(endpoint.split("/actions/runs/")[1].split("/")[0])
-                return 0, json_bytes({"artifacts": self.artifacts.get(run_id, [])})
+                rows = self.artifacts.get(run_id, [])
+                return 0, json_bytes({"total_count": len(rows), "artifacts": rows})
             if "/actions/artifacts/" in endpoint and endpoint.endswith("/zip"):
                 artifact_id = int(endpoint.split("/actions/artifacts/")[1].split("/")[0])
                 return 0, self.archives[artifact_id]
@@ -293,6 +294,20 @@ def test_duplicate_usable_producer_run_is_refused(monkeypatch: pytest.MonkeyPatc
         run(fake, monkeypatch)
 
 
+def test_saturated_run_listing_is_refused_instead_of_silently_truncated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeGh()
+    workflow = ".github/workflows/ac11-security-scan.yml"
+    template = fake.runs[workflow][0]
+    fake.runs[workflow] = [
+        {**template, "databaseId": 5000 + index, "headSha": "f" * 40}
+        for index in range(subject.RUN_LIST_LIMIT)
+    ]
+    with pytest.raises(subject.Refused, match="listing reached its limit"):
+        run(fake, monkeypatch)
+
+
 @pytest.mark.parametrize(
     "damage", ["missing", "duplicate", "expired", "wrong-run", "wrong-sha", "wrong-ref", "digest"]
 )
@@ -325,6 +340,34 @@ def test_artifact_boundary_is_fail_closed(
         fake.archives[artifact_id] += b"tampered"
     with pytest.raises(subject.Refused):
         run(fake, monkeypatch)
+
+
+def test_truncated_artifact_listing_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeGh()
+    original = fake.__call__
+
+    def truncated(args, *, timeout=300.0):
+        command = list(args)
+        if command[:2] == ["gh", "api"] and command[2].endswith("/artifacts?per_page=100"):
+            code, body = original(args, timeout=timeout)
+            doc = json.loads(body)
+            doc["total_count"] += 1
+            return code, json_bytes(doc)
+        return original(args, timeout=timeout)
+
+    with pytest.raises(subject.Refused, match="listing is truncated"):
+        subject.orchestrate(
+            source=SHA,
+            ref=REF,
+            repository=REPOSITORY,
+            runner=truncated,
+            poll_seconds=0,
+            deadline_seconds=30,
+            sleep=lambda _: None,
+            monotonic=lambda: 1,
+            now_utc=lambda: NOW,
+            correlation_factory=fixed_correlation,
+        )
 
 
 def test_duplicate_aggregate_correlation_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
