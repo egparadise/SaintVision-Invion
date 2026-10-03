@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Record that a released version went to an environment (card 261).\n\nTwo fields, and the absences are the contract:\n\n* **no ``deployedDigest``** -- the digest comes from the model version and the\n  approval is checked against it, so accepting one would let a caller name\n  content the approval never covered;\n* **no ``imageId``** -- ``container_images`` carries no project, so the server\n  cannot prove an image belongs to this project and does not accept what it\n  cannot prove;\n* **no ``notes``** -- that column is the server's, not a place for caller text.",
+  "properties": {
+    "approvalId": {
+      "maxLength": 30,
+      "minLength": 1,
+      "title": "Approvalid",
+      "type": "string"
+    },
+    "environment": {
+      "enum": [
+        "lab",
+        "pilot",
+        "staging"
+      ],
+      "title": "Environment",
+      "type": "string"
+    }
+  },
+  "required": [
+    "environment",
+    "approvalId"
+  ],
+  "title": "ModelDeploymentRequest",
+  "type": "object"
+}

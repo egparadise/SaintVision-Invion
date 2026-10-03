@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The recorded deployment. ``deployedDigest`` is server-derived, so it is\nreturned even though it cannot be sent.",
+  "properties": {
+    "approvalId": {
+      "title": "Approvalid",
+      "type": "string"
+    },
+    "deployedAt": {
+      "format": "date-time",
+      "title": "Deployedat",
+      "type": "string"
+    },
+    "deployedDigest": {
+      "title": "Deployeddigest",
+      "type": "string"
+    },
+    "deploymentId": {
+      "title": "Deploymentid",
+      "type": "string"
+    },
+    "environment": {
+      "title": "Environment",
+      "type": "string"
+    },
+    "imageId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Imageid"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "supersededAt": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersededat"
+    }
+  },
+  "required": [
+    "deploymentId",
+    "modelVersionId",
+    "environment",
+    "status",
+    "deployedDigest",
+    "approvalId",
+    "deployedAt"
+  ],
+  "title": "ModelDeploymentResponse",
+  "type": "object"
+}

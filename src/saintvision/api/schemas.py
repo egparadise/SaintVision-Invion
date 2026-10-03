@@ -909,6 +909,60 @@ class ModelReleaseResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+#: The lineage kinds a **caller** may assert. The service knows five
+#: (``saintvision.services.lineage.SUBJECT_TABLES``); these three are the ones
+#: whose project the schema can prove, and proving it is what stops a same-tenant
+#: cross-project provenance claim (card 257 §4-2).
+ProvableLineageKind = Literal["approval", "dataset_version", "eval_run"]
+
+
+class ProvableLineageEdge(Strict):
+    """One asserted lineage edge, in a kind whose project can be proven."""
+
+    kind: ProvableLineageKind
+    subject_id: str = Field(min_length=1, max_length=30, alias="subjectId")
+    relation: str = Field(default="derived_from", min_length=1, max_length=32)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelDeploymentRequest(Strict):
+    """Record that a released version went to an environment (card 261).
+
+    Two fields, and the absences are the contract:
+
+    * **no ``deployedDigest``** -- the digest comes from the model version and the
+      approval is checked against it, so accepting one would let a caller name
+      content the approval never covered;
+    * **no ``imageId``** -- ``container_images`` carries no project, so the server
+      cannot prove an image belongs to this project and does not accept what it
+      cannot prove;
+    * **no ``notes``** -- that column is the server's, not a place for caller text.
+    """
+
+    environment: Literal["lab", "pilot", "staging"]
+    approval_id: str = Field(min_length=1, max_length=30, alias="approvalId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelDeploymentResponse(Strict):
+    """The recorded deployment. ``deployedDigest`` is server-derived, so it is
+    returned even though it cannot be sent."""
+
+    deployment_id: str = Field(alias="deploymentId")
+    model_version_id: str = Field(alias="modelVersionId")
+    environment: str
+    status: str
+    deployed_digest: str = Field(alias="deployedDigest")
+    approval_id: str = Field(alias="approvalId")
+    image_id: str | None = Field(default=None, alias="imageId")
+    deployed_at: dt.datetime = Field(alias="deployedAt")
+    superseded_at: dt.datetime | None = Field(default=None, alias="supersededAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ModelVersionRegisterRequest(Strict):
     """What an importer must state to register one model build (G-04 W2).
 
@@ -930,14 +984,28 @@ class ModelVersionRegisterRequest(Strict):
     the server derives it instead of validating a string that has no reason to
     vary.
 
-    ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
-    module docstring of ``api/v1/model_versions.py`` for why neither can be
-    bound to the path's project on this branch.
+    ``producedByRunId`` and ``lineage`` are here **since card 261**, and each one
+    waited for a different thing to exist (card 257 §4-1·§4-2):
+
+    * ``producedByRunId`` needed a way to prove the run belongs to the path's
+      project. ``project_scope.run_in_project`` does that through the workload,
+      so an unbound value can no longer attach this version to another project's
+      run, and ``0064`` adds the composite key underneath.
+    * ``lineage`` needed subject validation. ``record_lineage`` now refuses a
+      subject that is not in this tenant, and the kinds accepted **here** are
+      only the three whose project can be proven -- ``code_commit`` and
+      ``container_image`` carry no project anywhere in the schema, so a caller
+      cannot assert them (the service still writes them for server-derived
+      paths; see the design's §4-2-1).
     """
 
     version: str = Field(min_length=1, max_length=64)
     content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
     byte_size: int = Field(default=0, ge=0, alias="byteSize")
+    produced_by_run_id: str | None = Field(
+        default=None, min_length=1, max_length=30, alias="producedByRunId"
+    )
+    lineage: list[ProvableLineageEdge] | None = Field(default=None, max_length=64)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 

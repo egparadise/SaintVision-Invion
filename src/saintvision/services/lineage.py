@@ -28,9 +28,12 @@ from ..db.models import (
     DatasetVersion,
     Deployment,
     EvalRun,
+    EvalSuite,
     Model,
     ModelLineage,
     ModelVersion,
+    Run,
+    Workload,
 )
 from ..errors import (
     AUTH_APPROVAL_DIGEST_MISMATCH,
@@ -250,6 +253,84 @@ def register_model_version(
     return row
 
 
+#: The row each lineage kind points at, and the column that identifies it. One
+#: table per kind, so "does the subject exist" is one lookup rather than five
+#: branches at every call site (card 257 §4-2).
+SUBJECT_TABLES: dict[str, tuple[Any, str]] = {
+    "dataset_version": (DatasetVersion, "dataset_version_id"),
+    "code_commit": (CodeCommit, "commit_id"),
+    "container_image": (ContainerImage, "image_id"),
+    "eval_run": (EvalRun, "eval_run_id"),
+    "approval": (Approval, "approval_id"),
+}
+
+
+def subject_exists(session: Session, *, tenant_id: uuid.UUID, kind: str, subject_id: str):
+    """The subject row, in this tenant, or the one refusal absence gets.
+
+    An edge whose subject is not there is worse than a missing edge -- the trace
+    then claims a link it cannot substantiate, which is why ``trace_model``
+    reports ``dangling`` at all. Checking at write time is cheaper than reporting
+    it forever, and it is checked **here** rather than at a route so that every
+    caller of :func:`record_lineage` gets the same rule.
+
+    Absence and another tenant's row are **one refusal**: distinguishing them
+    would confirm that a subject id exists to someone who cannot see it.
+    """
+    entity, column = SUBJECT_TABLES[kind]
+    row = session.scalar(
+        select(entity).where(
+            getattr(entity, column) == subject_id, entity.tenant_id == tenant_id
+        )
+    )
+    if row is None:
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "lineage subject not found")
+    return row
+
+
+def subject_project(session: Session, *, tenant_id: uuid.UUID, kind: str, subject_id: str) -> str | None:
+    """The project a subject can **prove** it belongs to, or ``None``.
+
+    None means "this kind cannot prove a project in the current schema", not
+    "any project" -- the caller fails closed on it (card 257 §4-2). The chains
+    are the only ones the tables support, and each hop is read in this tenant:
+
+    * ``dataset_version`` -> ``datasets.project_id`` (NOT NULL);
+    * ``eval_run`` -> ``eval_suites.project_id`` (**nullable**: an unscoped suite
+      proves nothing, so that is ``None`` too);
+    * ``approval`` -> ``runs.workload_id`` -> ``workloads.project_id`` (NOT NULL);
+    * ``code_commit``, ``container_image`` -> the tables carry no project at all.
+    """
+    subject = subject_exists(session, tenant_id=tenant_id, kind=kind, subject_id=subject_id)
+    if kind == "dataset_version":
+        dataset = session.scalar(
+            select(Dataset).where(
+                Dataset.dataset_id == subject.dataset_id, Dataset.tenant_id == tenant_id
+            )
+        )
+        return dataset.project_id if dataset is not None else None
+    if kind == "eval_run":
+        suite = session.scalar(
+            select(EvalSuite).where(
+                EvalSuite.suite_id == subject.suite_id, EvalSuite.tenant_id == tenant_id
+            )
+        )
+        return suite.project_id if suite is not None else None
+    if kind == "approval":
+        run = session.scalar(
+            select(Run).where(Run.run_id == subject.run_id, Run.tenant_id == tenant_id)
+        )
+        if run is None:
+            return None
+        workload = session.scalar(
+            select(Workload).where(
+                Workload.workload_id == run.workload_id, Workload.tenant_id == tenant_id
+            )
+        )
+        return workload.project_id if workload is not None else None
+    return None
+
+
 def record_lineage(
     session: Session,
     *,
@@ -258,14 +339,9 @@ def record_lineage(
     edge: LineageEdge,
     now: dt.datetime,
 ) -> ModelLineage:
-    if edge.kind not in (
-        "dataset_version",
-        "code_commit",
-        "container_image",
-        "eval_run",
-        "approval",
-    ):
+    if edge.kind not in SUBJECT_TABLES:
         raise InvError(VAL_SCHEMA, f"unknown lineage kind: {edge.kind!r}")
+    subject_exists(session, tenant_id=tenant_id, kind=edge.kind, subject_id=edge.subject_id)
 
     existing = session.get(
         ModelLineage, (tenant_id, model_version_id, edge.kind, edge.subject_id)
@@ -524,31 +600,48 @@ def trace_model(
     }
 
 
-def record_deployment(
+@dataclass(frozen=True, slots=True)
+class DeploymentAuthority:
+    """Everything a deployment write may rest on, read from rows it has locked.
+
+    Produced by :func:`locked_deployment_authority`, consumed by
+    :func:`apply_deployment`. The split exists so a caller can re-judge the
+    actor's permission **after** the rows are locked and **before** anything is
+    written -- the window a single function cannot offer (card 257 §4-3-1).
+    """
+
+    version: Any
+    approval: Any
+    deployed_digest: str
+    environment: str
+
+
+def locked_deployment_authority(
     session: Session,
     *,
     tenant_id: uuid.UUID,
+    project_id: str,
     model_version_id: str,
     environment: str,
     approval_id: str,
-    deployed_by_user_id: str,
     now: dt.datetime,
-    image_id: str | None = None,
-    notes: dict[str, Any] | None = None,
-) -> Deployment:
-    """Deploy a released version, pinning the digest that actually shipped.
+) -> DeploymentAuthority:
+    """Lock the rows a deployment depends on and judge them. **Writes nothing.**
 
-    The digest comes from the model version, not the caller, and the approval
-    is checked against it. Approving one build does not authorise shipping a
-    different one under the same version name — the same rule the workload
-    spec digest enforces in S03.
+    The digest is **not an argument**: it comes from the model version, and the
+    approval is checked against it. Approving one build does not authorise
+    shipping a different one under the same version name.
 
-    An existing active deployment of this version in this environment is marked
-    superseded in the same transaction, so "what is live" is never ambiguous.
+    Six failures are **one refusal** (``AUTH_APPROVAL_DIGEST_MISMATCH``): the
+    approval is absent, belongs to another tenant, cannot prove this project, is
+    not an approval, is outside its validity, or was given for other content.
+    Separating them would confirm that an approval id exists to someone who
+    cannot see it -- the same oracle rule the lineage subjects follow.
 
-    This records registry metadata at the trusted caller's timezone-aware
-    ``now``; it does not perform deployment or issue a kernel execution permit.
-    Approval validity is the half-open interval [decided_at, expires_at).
+    The project proof is the chain the schema supports: ``approvals.run_id`` ->
+    ``runs.workload_id`` -> ``workloads.project_id``. Without it a same-tenant
+    approval from another project would authorise this project's deployment,
+    because the digest alone does not say whose build it was.
     """
     if environment not in ("lab", "staging", "pilot"):
         raise InvError(VAL_SCHEMA, f"unknown environment: {environment!r}")
@@ -588,12 +681,62 @@ def record_deployment(
             "the approval was given for different content than this model version",
             cause_ref=approval_id,
         )
+    if approval_project(session, tenant_id=tenant_id, approval=approval) != project_id:
+        raise InvError(
+            AUTH_APPROVAL_DIGEST_MISMATCH,
+            "the approval does not belong to this project",
+            cause_ref=approval_id,
+        )
+    return DeploymentAuthority(
+        version=version,
+        approval=approval,
+        deployed_digest=version.content_sha256,
+        environment=environment,
+    )
 
+
+def approval_project(session: Session, *, tenant_id: uuid.UUID, approval: Any) -> str | None:
+    """The project an approval can prove, through its run's workload, or ``None``.
+
+    ``None`` is "cannot prove", never "any project": every caller refuses on it.
+    """
+    run = session.scalar(
+        select(Run).where(Run.run_id == approval.run_id, Run.tenant_id == tenant_id)
+    )
+    if run is None:
+        return None
+    workload = session.scalar(
+        select(Workload).where(
+            Workload.workload_id == run.workload_id, Workload.tenant_id == tenant_id
+        )
+    )
+    return workload.project_id if workload is not None else None
+
+
+def apply_deployment(
+    session: Session,
+    *,
+    authority: DeploymentAuthority,
+    deployed_by_user_id: str,
+    now: dt.datetime,
+    image_id: str | None = None,
+    notes: dict[str, Any] | None = None,
+) -> Deployment:
+    """Write the deployment the locked authority permits. **Validates nothing.**
+
+    An existing active deployment of this version in this environment is marked
+    superseded in the same transaction, so "what is live" is never ambiguous.
+
+    This records registry metadata at the trusted caller's timezone-aware
+    ``now``; it does not perform deployment or issue a kernel execution permit.
+    """
+    version = authority.version
+    tenant_id = version.tenant_id
     session.execute(
         update(Deployment).where(
             Deployment.tenant_id == tenant_id,
-            Deployment.model_version_id == model_version_id,
-            Deployment.environment == environment,
+            Deployment.model_version_id == version.model_version_id,
+            Deployment.environment == authority.environment,
             Deployment.status == "active",
         ).values(status="superseded", superseded_at=now)
     )
@@ -601,12 +744,12 @@ def record_deployment(
     deployment = Deployment(
         deployment_id=new_id("deployment"),
         tenant_id=tenant_id,
-        model_version_id=model_version_id,
-        environment=environment,
+        model_version_id=version.model_version_id,
+        environment=authority.environment,
         status="active",
-        deployed_digest=version.content_sha256,
+        deployed_digest=authority.deployed_digest,
         image_id=image_id,
-        approval_id=approval_id,
+        approval_id=authority.approval.approval_id,
         deployed_by_user_id=deployed_by_user_id,
         deployed_at=now,
         notes=notes or {},
@@ -624,6 +767,54 @@ def record_deployment(
         now=now,
     )
     return deployment
+
+
+def record_deployment(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    model_version_id: str,
+    environment: str,
+    approval_id: str,
+    deployed_by_user_id: str,
+    now: dt.datetime,
+    image_id: str | None = None,
+    notes: dict[str, Any] | None = None,
+    project_id: str | None = None,
+) -> Deployment:
+    """Lock, judge and write in one call -- the shape every existing caller uses.
+
+    Kept so the split above is not a breaking change. ``project_id`` is optional
+    **only** for callers that already proved the project themselves; when it is
+    absent the approval's own chain supplies it, which keeps the old behaviour
+    for a caller that has no path project to compare with.
+    """
+    if project_id is None:
+        approval = session.scalar(
+            select(Approval).where(
+                Approval.tenant_id == tenant_id, Approval.approval_id == approval_id
+            )
+        )
+        if approval is None:
+            raise InvError(AUTH_APPROVAL_DIGEST_MISMATCH, "approval not found")
+        project_id = approval_project(session, tenant_id=tenant_id, approval=approval)
+    authority = locked_deployment_authority(
+        session,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        model_version_id=model_version_id,
+        environment=environment,
+        approval_id=approval_id,
+        now=now,
+    )
+    return apply_deployment(
+        session,
+        authority=authority,
+        deployed_by_user_id=deployed_by_user_id,
+        now=now,
+        image_id=image_id,
+        notes=notes,
+    )
 
 
 def _load_model_version(
