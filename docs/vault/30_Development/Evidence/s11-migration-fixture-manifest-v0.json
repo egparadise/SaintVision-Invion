@@ -125,6 +125,10 @@
     {
       "revision": "0063_build_policy_budgets",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0064_model_version_run_fk",
+      "expected": "PRESERVED"
     }
   ]
 }
