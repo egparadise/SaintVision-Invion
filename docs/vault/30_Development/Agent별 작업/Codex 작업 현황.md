@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.316"
+version: "1.0.317"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T17:09:36+09:00"
+updated: "2026-10-03T17:49:17+09:00"
 source_of_truth: "Git"
-active_card: "CARD-267 post-landing AC-11 exact-SHA orchestration binding"
-active_card_status: "Claude r1 conditions are closed: the landed clean detached checkout is explicit, newly dispatched failure/unfinished/missing runs refuse before aggregate, and focused guard 24/24 plus fake-gh 40/40 pass"
-active_card_next: "Confirm exact-head Backend 3.12/3.14 and Docs, then hold the reviewed head; actual post-landing workflow dispatch remains an operator action"
+active_card: "CARD-268 inv_audit_reader disposition re-measurement before the 2026-11-30 expiry"
+active_card_status: "Card 267 #361 is approved by Claude r2 at a8cc5352: the post-landing guard runs the Card 260 orchestrator at the landed clean detached $LAND, requires security, accessibility and migration exactly, refuses failed, unfinished or missing new runs before aggregate, and Backend 3.12/3.14 and Docs are green"
+active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 disposition on the train 43 tree and either remove the privilege or record the still-valid rationale for a mid-November review; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
