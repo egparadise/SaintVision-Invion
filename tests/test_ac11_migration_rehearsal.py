@@ -41,7 +41,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert {
         key
         for key in mapping
-        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_", "0061_", "0062_"))
+        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_", "0061_", "0062_", "0063_"))
     } == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
@@ -55,6 +55,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0060_build_execution_admissions",
         "0061_build_preparations",
         "0062_data_location_project_scope",
+        "0063_build_policy_budgets",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -70,6 +71,8 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     # 0062 (card 253) is the same shape as 0053 -- a project column on an existing
     # table -- and refuses while any data location holds a binding, so dropping the
     # column can never discard one.
+    # 0063 likewise refuses while any immutable profile version carries an activation
+    # budget; an empty authority extension can be removed without discarding data.
     assert all(
         mapping[key] == "PRESERVED"
         for key in (
@@ -85,6 +88,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
             "0060_build_execution_admissions",
             "0061_build_preparations",
             "0062_data_location_project_scope",
+            "0063_build_policy_budgets",
         )
     )
     ordered = chain()
@@ -100,6 +104,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0060_build_execution_admissions",
         "0061_build_preparations",
         "0062_data_location_project_scope",
+        "0063_build_policy_budgets",
     ]
 
 

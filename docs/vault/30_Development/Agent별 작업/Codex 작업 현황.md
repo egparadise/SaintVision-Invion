@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.305"
+version: "1.0.308"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:48:03+09:00"
+updated: "2026-10-03T11:06:13+09:00"
 source_of_truth: "Git"
-active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
-active_card_status: "Card 254 #349 is approved by Claude r1 at 280045f8; hosted run 37077352052 recomputed SEC-RLS-001 MEASURED_PASS and the inv_audit_reader E3/E4/E5 dispositions are renewed until 2026-11-30 with fail-closed boundary checks. Card 251 #347 is approved with hosted run 37072629027"
-active_card_next: "Close the three pre-enable Mediums recorded in the Card 247 History before any S08 flag enablement; product dispatch stays off by default"
+active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
+active_card_status: "Card 255 #351 is approved by Claude r2 at 1c2d06da with exact-head Backend/Core/security green: migration 0063 enforces all-or-none positive budgets and base-image pins, plans compare them with locked project ceilings and the immutable snapshot Dockerfile, and the API no longer parses worker.json"
+active_card_next: "Measure which AC-11 axes the hosted aggregation lane can add without physical nodes, long soak or user device acceptance, and propose before implementing; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 255 — S08-BE activation prerequisites
+
+- Replaces the synthetic `1/1/1` plan budget with an immutable per-profile CPU/RAM/storage policy
+  bounded by the locked project ceilings. Old profile versions have NULL authority and fail closed.
+- Replaces the request-derived fake image digest with literal digest-pinned Dockerfile bases measured
+  from the exact clean source SHA. Missing or tag-only bases cannot produce an admission.
+- The API reads a minimal `buildPlanAuthority` object and no longer parses or receives worker TLS,
+  output or product-receipt configuration. Product enablement remains default off.
+- Migration head is 0063 on reviewed 0062; hosted real-PG evidence and Claude review are next.
+- Claude r1 correction uses `num_nulls(...)=4 OR (=0 AND positive bounds)` and tests all 16 NULL
+  combinations plus M1/M2/M3/M5/M8 independently. The shared config volume remains an explicitly
+  recorded OS trust-base residual; the API parser itself cannot consume worker-private fields.
+- [[2026-10-03_09-10-30_KST_Card255_S08-BE_activation_prerequisites_Codex]].
 
 ## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence
 

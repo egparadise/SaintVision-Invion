@@ -110,7 +110,7 @@ def test_migration_is_linear_invoker_only_and_caller_values_are_not_preserved():
 
 def test_definer_policy_tracks_the_new_head_without_claiming_invoker_functions():
     policy = json.loads(DEFINER_POLICY.read_text(encoding="utf-8"))
-    assert policy["revision"] == "0062_data_location_project_scope"
+    assert policy["revision"] == "0063_build_policy_budgets"
     assert all("evidence_envelope" not in signature for signature in policy["functions"])
 
 
