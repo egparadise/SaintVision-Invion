@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.319"
+version: "1.0.320"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T20:01:36+09:00"
+updated: "2026-10-03T22:55:21+09:00"
 source_of_truth: "Git"
-active_card: "No hosted-only Codex card remains (measured row by row); reviewing Card 266 #362"
-active_card_status: "Card 268 #363 is approved by Claude r2 at a24bc64c: irreversible migration 0067 removes the dormant inv_audit_reader audit SELECT, schema USAGE and reader policy, the marker is bound to exactly {0066, 0067}, and no accepted-with-expiry disposition remains"
-active_card_next: "Review Card 266 #362 against the #358 r8 contract; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
+active_card: "No hosted-only Codex card remains (measured row by row); independent review of incoming Claude PRs"
+active_card_status: "Card 266 #362 is approved by Codex r3 at 3286817d (exact-head Backend 3.12/3.14, Core, security and docs green) and is in this train; Card 268 #363 removed the last accepted-with-expiry disposition with migration 0067"
+active_card_next: "Review Card 269 #364 (48-task rescore v1.17) and later Claude PRs; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
