@@ -53,11 +53,12 @@ schema, target, workflow와 migration을 바꾸지 않고 runbook이 그 단일 
 해석돼 2건 실패했다. fixture source가 `\\n`을 쓰게 고친 뒤 같은 시험 파일을 다시 실행해 23건
 전부 통과했다. 제품·workflow·evaluator 동작 실패가 아니며 실패 이력을 삭제하지 않는다.
 
-`check_doc_path_citations.py --ratchet --base-ref origin/coord/train42a-ci-1511`은 이미 고쳐진
-기존 citation 5건을 `stale baseline`으로 보고 exit 1이었다. floor에 slack을 남기지 않도록
-해당 5줄만 baseline에서 제거했고 새 예외는 추가하지 않았다.
+로컬 `check_doc_path_citations.py --ratchet --base-ref origin/coord/train42a-ci-1511`은 생성된
+프런트엔드 산출물 때문에 기존 citation 5건을 `stale baseline`으로 오판했다. clean hosted
+checkout `37108255660`은 그 5건이 여전히 깨진 경로임을 확인했으므로 baseline 원문을
+복원했다. baseline의 최종 delta는 0이며 새 예외를 추가하지 않았다.
 
-첫 exact-head Documentation Build `37108118606`은 위 설명에 쓴 실재하지 않는 빌드
+첫 exact-head Documentation Build `37108118606`은 이전 설명에 쓴 실재하지 않는 빌드
 산출물 디렉터리 이름을 새 경로 인용으로 분류해 실패했다. baseline 추가 없이 경로
 리터럴을 일반 설명으로 바꿨으며, 제품·orchestrator 동작 실패는 아니다.
 
