@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.308"
+version: "1.0.309"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:06:13+09:00"
+updated: "2026-10-03T11:58:02+09:00"
 source_of_truth: "Git"
-active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
-active_card_status: "Card 255 #351 is approved by Claude r2 at 1c2d06da with exact-head Backend/Core/security green: migration 0063 enforces all-or-none positive budgets and base-image pins, plans compare them with locked project ceilings and the immutable snapshot Dockerfile, and the API no longer parses worker.json"
-active_card_next: "Measure which AC-11 axes the hosted aggregation lane can add without physical nodes, long soak or user device acceptance, and propose before implementing; product dispatch stays off by default"
+active_card: "CARD-260 AC-11 exact-SHA aggregation repeat automation"
+active_card_status: "Card 258 #354 is approved by Claude r1 and frozen for the next train; Card 260 has a fail-closed exact-SHA three-producer orchestrator and 23 passing fake-gh tests, with exact-head hosted execution pending"
+active_card_next: "Run the Card 260 final exact head through security, accessibility, migration rehearsal and canonical aggregation, record all run/artifact bindings in the PR, then request Claude review"
 ---
+
+## 2026-10-03 Card 260 — AC-11 exact-SHA aggregation automation
+
+- Reads the three complete producer chains from the canonical axis source map, dispatches only a
+  missing exact-SHA lane, and refuses reruns, duplicate candidates and stale/mismatched artifacts.
+- The aggregate artifact is not authoritative: producer IDs/digests are rebound and the existing
+  canonical evaluator recomputes the result from the exact clean source tree. Score promotion is
+  explicitly false.
+- Focused fake-gh verification is 23 passed; exact-head hosted execution is the next step.
+- [[2026-10-03_11-58-02_KST_Card260_AC11_exact_SHA_aggregation_automation_Codex]].
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
 
