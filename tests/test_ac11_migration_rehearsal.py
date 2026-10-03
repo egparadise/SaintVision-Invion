@@ -55,7 +55,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0060_build_execution_admissions",
         "0061_build_preparations",
         "0062_data_location_project_scope",
-        "0063_build_policy_resource_budgets",
+        "0063_build_policy_budgets",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -88,7 +88,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
             "0060_build_execution_admissions",
             "0061_build_preparations",
             "0062_data_location_project_scope",
-            "0063_build_policy_resource_budgets",
+            "0063_build_policy_budgets",
         )
     )
     ordered = chain()
@@ -104,7 +104,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0060_build_execution_admissions",
         "0061_build_preparations",
         "0062_data_location_project_scope",
-        "0063_build_policy_resource_budgets",
+        "0063_build_policy_budgets",
     ]
 
 

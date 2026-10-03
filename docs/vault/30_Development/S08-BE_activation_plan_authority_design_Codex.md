@@ -16,7 +16,7 @@ This decision closes the three Medium prerequisites left by Card 247. It does no
 ## Decision
 
 1. A build budget is an immutable build-profile policy, not a literal and not a caller field.
-   Migration `0063_build_policy_resource_budgets` adds three all-or-none positive fields to
+   Migration `0063_build_policy_budgets` adds three all-or-none positive fields to
    `inv.build_policy_profiles`. Existing versions remain NULL and therefore cannot be used for
    product enqueue. A new version must fit the locked project CPU/RAM ceilings and storage quota.
 2. A base image authority is measured from the exact clean source checkout. Every effective

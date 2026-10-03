@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision = "0063_build_policy_resource_budgets"
+revision = "0063_build_policy_budgets"
 down_revision = "0062_data_location_project_scope"
 branch_labels = None
 depends_on = None
@@ -55,7 +55,7 @@ def downgrade() -> None:
         if populated:
             identities = ", ".join(f"{row[0]}@{row[1]}" for row in populated)
             raise RuntimeError(
-                "0063_build_policy_resource_budgets cannot discard active profile budgets "
+                "0063_build_policy_budgets cannot discard active profile budgets "
                 f"({identities}); restore a reviewed pre-0063 database instead"
             )
     op.drop_constraint(

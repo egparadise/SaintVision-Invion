@@ -17,7 +17,7 @@ enablement: the synthetic `1/1/1` budget, the request-derived fake base-image di
 to private worker configuration. Card 254 was already approved, so this card started from train 35
 candidate `e025492527d94734de1c0514719c6691bca4cefa`. Because migration 0063 was necessary and 0062
 was reserved to PR #348, the reviewed #348 head `47039aaac36aaee0b8b86c6829e07b279ed5176c`
-was merged first. The graph is one head: `0063_build_policy_resource_budgets`.
+was merged first. The graph is one head: `0063_build_policy_budgets`.
 
 ## Changes
 
@@ -39,7 +39,7 @@ was merged first. The graph is one head: `0063_build_policy_resource_budgets`.
 
 - Focused PG-free contract, transport, deployment-config, migration rehearsal and pin tests:
   **254 passed, 2 declared environment skips**.
-- `tools/migration_graph.py --head`: `0063_build_policy_resource_budgets`.
+- `tools/migration_graph.py --head`: `0063_build_policy_budgets`.
 - Hosted real-PostgreSQL and exact-head Backend/Core/security results are pending and must be added
   before merge review is complete.
 

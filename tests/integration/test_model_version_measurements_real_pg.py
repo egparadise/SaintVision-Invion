@@ -38,7 +38,7 @@ from test_model_version_digest_scope_real_pg import _insert, _project_with_model
 
 pytestmark = pytest.mark.postgres
 
-CURRENT_HEAD = "0063_build_policy_resource_budgets"
+CURRENT_HEAD = "0063_build_policy_budgets"
 
 MIGRATION = Path(__file__).resolve().parents[2] / "migrations/versions/0054_model_version_measurements.py"
 MEASUREMENTS = "inv.model_version_measurements"

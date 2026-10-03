@@ -11,9 +11,10 @@ MIGRATION = ROOT / "migrations/versions/0063_build_policy_resource_budgets.py"
 
 def test_0063_is_the_single_head_and_preserves_old_profiles_as_unusable_authority():
     source = MIGRATION.read_text(encoding="utf-8")
-    assert 'revision = "0063_build_policy_resource_budgets"' in source
+    assert 'revision = "0063_build_policy_budgets"' in source
+    assert len(chain()[-1].revision) <= 32
     assert 'down_revision = "0062_data_location_project_scope"' in source
-    assert chain()[-1].revision == "0063_build_policy_resource_budgets"
+    assert chain()[-1].revision == "0063_build_policy_budgets"
     assert "nullable=True" in source
     assert "budget_cpu_millis IS NULL AND budget_memory_bytes IS NULL" in source
     assert "budget_storage_bytes IS NULL" in source

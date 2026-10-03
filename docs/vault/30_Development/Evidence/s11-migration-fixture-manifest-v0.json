@@ -123,7 +123,7 @@
       "expected": "PRESERVED"
     },
     {
-      "revision": "0063_build_policy_resource_budgets",
+      "revision": "0063_build_policy_budgets",
       "expected": "PRESERVED"
     }
   ]
