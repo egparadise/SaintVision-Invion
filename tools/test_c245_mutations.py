@@ -365,7 +365,7 @@ def test_mutant(mutant, original_bytes, timeout=120, head_sha=""):
     mutant_id = mutant["id"]
     desc = mutant["desc"]
     observed_time = datetime.now(timezone.utc).isoformat()
-    
+
     print(f"\n--- Testing Mutant {mutant_id}: {desc} ---")
     try:
         apply_mutation(mutant["target"], mutant["replacement"])
