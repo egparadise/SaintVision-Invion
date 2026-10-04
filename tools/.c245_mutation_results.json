@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+  "observedAt": "2026-10-04T18:06:18.131637+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "pending config: fg==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:54:04.778113+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "pending config: border==bg collision (border: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:54:39.348984+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "approved config: fg==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:55:07.283724+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "approved config: border==bg collision (border: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:55:31.602263+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "two-person badge: fg==bg collision (color: bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:55:56.099074+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "two-person badge: border==bg collision (border: bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:56:26.799695+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "dispatched config: text token as bg (bg: var(--color-text-primary))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:56:44.365380+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "freshness indicator: text token as bg (backgroundColor: text-primary)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:56:59.539832+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "stale warning banner: fg==bg collision (backgroundColor: offline)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:57:15.164395+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "stale warning banner: border==bg collision (border: bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:57:29.830103+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "status badge: opacity degradation (opacity: 0.4)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:57:44.042310+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "two-person badge: opacity degradation (opacity: 0.35)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:58:00.479427+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "pending badge: opacity degradation (opacity: 0.45)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:58:19.720584+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "two-person badge: unstarted opacity degradation (opacity: 0.5)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:58:35.266107+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "dispatched config: comment decoy with legacy hex",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:58:50.108711+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "rejected config: comment decoy with legacy hex",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:59:07.349770+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "freshness indicator: revert text to legacy #93c5fd",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:59:21.092572+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "stale warning banner: revert border to legacy #fca5a5",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:59:34.162323+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "stale warning note: revert color to legacy #fed7aa",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T17:59:50.164228+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "error retry button: revert bg to legacy #3b82f6",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:00:05.017218+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "pending config: degraded color collapsed to status-online",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:00:22.277393+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "expired config: offline color collapsed to status-online",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:00:48.949992+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "rejected config: offline color collapsed to status-online",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:01:21.918537+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "pending config: label mutated to '대기중'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:01:50.863560+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "two-person badge: text mutated to '1차 완료'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:02:08.772825+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "error retry button: text mutated to '다시 시도'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:02:23.309136+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "refresh button: outline: 'none' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:02:41.097106+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "error retry button: outline: 'none' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:02:56.963955+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "refresh button: outline: 0 suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:03:11.764605+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "error retry button: outlineWidth: '0px' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:03:26.560733+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "fail-closed: bypass Object.hasOwn with in operator",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:03:40.741135+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "fail-closed: prototype key hijack with plain indexing lookup",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:03:55.952303+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "fail-closed: fallback returns approved color instead of unknown",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:04:19.556547+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "contract bypass: map out-of-contract 'admitted' to approved",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:04:34.385653+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "contract bypass: drop approved out of contract to unknown",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:04:48.760078+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "named color: status badge border injected with yellow",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:05:03.826190+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "named color: error banner color injected with red",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:05:18.803984+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "unknown label: remove 'UNKNOWN (' prefix",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:05:33.946086+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "unknown label: bypass UNKNOWN format and return raw uppercase",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:05:48.322795+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "case-insensitive lookup: toLowerCase() lookup bypass",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "fc7b7bed2a7dddaecbc7a77c906ad45ec7a9b71a",
+      "observedAt": "2026-10-04T18:06:03.280579+00:00"
+    }
+  ]
+}
