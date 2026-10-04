@@ -361,9 +361,10 @@ def restore_file(original_bytes):
         raise RuntimeError(f"Git diff non-zero after restoration of {TARGET_FILE}")
 
 
-def test_mutant(mutant, original_bytes, timeout=120):
+def test_mutant(mutant, original_bytes, timeout=120, head_sha=""):
     mutant_id = mutant["id"]
     desc = mutant["desc"]
+    observed_time = datetime.now(timezone.utc).isoformat()
     
     print(f"\n--- Testing Mutant {mutant_id}: {desc} ---")
     try:
@@ -376,6 +377,8 @@ def test_mutant(mutant, original_bytes, timeout=120):
             "status": "ERROR",
             "reason": str(e),
             "killed": False,
+            "sourceHeadSha": head_sha,
+            "observedAt": observed_time,
         }
 
     # Verify compilation
@@ -389,6 +392,8 @@ def test_mutant(mutant, original_bytes, timeout=120):
             "status": "TSC_FAIL",
             "killed": False,
             "output": tsc_out[:300],
+            "sourceHeadSha": head_sha,
+            "observedAt": observed_time,
         }
 
     retcode, stdout, stderr, timed_out = run_vitest_acc09(timeout=timeout)
@@ -401,6 +406,8 @@ def test_mutant(mutant, original_bytes, timeout=120):
             "desc": desc,
             "status": "TIMEOUT",
             "killed": False,
+            "sourceHeadSha": head_sha,
+            "observedAt": observed_time,
         }
 
     if retcode != 0:
@@ -417,6 +424,8 @@ def test_mutant(mutant, original_bytes, timeout=120):
             "status": "KILLED",
             "killed": True,
             "killer": failed_test,
+            "sourceHeadSha": head_sha,
+            "observedAt": observed_time,
         }
     else:
         print(f"  [SURVIVED] Vitest passed! Mutant was NOT killed!")
@@ -425,6 +434,8 @@ def test_mutant(mutant, original_bytes, timeout=120):
             "desc": desc,
             "status": "SURVIVED",
             "killed": False,
+            "sourceHeadSha": head_sha,
+            "observedAt": observed_time,
         }
 
 
@@ -456,76 +467,74 @@ def main():
             print(f"{missing} mutant targets missing!")
             return 1
 
-    selected_mutants = []
-    if args.mutant:
-        selected_mutants = [m for m in MUTANTS if m["id"] == args.mutant.upper()]
-        if not selected_mutants:
-            print(f"Mutant {args.mutant} not found.")
+    clean_head_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(WORKTREE_ROOT), text=True).strip()
+    status_proc = subprocess.check_output(["git", "status", "--porcelain"], cwd=str(WORKTREE_ROOT), text=True).strip()
+
+    if args.all:
+        if status_proc:
+            print(f"[ERROR] Cannot run --all on a dirty working tree! git status --porcelain returned:\n{status_proc}")
             return 1
+        selected_mutants = MUTANTS
+        print(f"Running all {len(selected_mutants)} mutants sequentially on clean HEAD {clean_head_sha[:8]}...")
     elif args.batch:
         batch_size = 8
         start_idx = (args.batch - 1) * batch_size
         end_idx = start_idx + batch_size
         selected_mutants = MUTANTS[start_idx:end_idx]
-        print(f"Running Batch {args.batch} ({len(selected_mutants)} mutants: {selected_mutants[0]['id']}..{selected_mutants[-1]['id']})")
-    elif args.all:
-        selected_mutants = MUTANTS
-        print(f"Running all {len(selected_mutants)} mutants...")
+        print(f"Running Batch {args.batch} ({len(selected_mutants)} mutants: {selected_mutants[0]['id']}..{selected_mutants[-1]['id']}) on HEAD {clean_head_sha[:8]}")
+    elif args.mutant:
+        selected_mutants = [m for m in MUTANTS if m["id"] == args.mutant.upper()]
+        if not selected_mutants:
+            print(f"Mutant {args.mutant} not found.")
+            return 1
+        print(f"Running Mutant {args.mutant.upper()} on HEAD {clean_head_sha[:8]}")
     else:
         parser.print_help()
         return 0
 
+    # Only record results for this execution run (no merging of old runs)
     results = []
-    if RESULTS_FILE.exists():
-        try:
-            raw = json.loads(RESULTS_FILE.read_text(encoding="utf-8"))
-            if isinstance(raw, dict) and "mutations" in raw:
-                results = raw["mutations"]
-            elif isinstance(raw, list):
-                results = raw
-        except Exception:
-            results = []
-
-    res_dict = {r["id"]: r for r in results}
 
     for m in selected_mutants:
-        res = test_mutant(m, original_bytes, timeout=args.timeout)
-        res_dict[m["id"]] = res
-        all_res = list(res_dict.values())
-        killed_count = sum(1 for r in all_res if r.get("killed"))
-        survived_count = sum(1 for r in all_res if r.get("status") == "SURVIVED")
-        timeouts_count = sum(1 for r in all_res if r.get("status") == "TIMEOUT")
-        tsc_fails_count = sum(1 for r in all_res if r.get("status") == "TSC_FAIL")
-        head_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(WORKTREE_ROOT), text=True).strip()
-        payload = {
-            "sourceHeadSha": head_sha,
-            "observedAt": datetime.now(timezone.utc).isoformat(),
-            "total": len(MUTANTS),
-            "killed": killed_count,
-            "survived": survived_count,
-            "timeouts": timeouts_count,
-            "tsc_fails": tsc_fails_count,
-            "mutations": all_res,
-        }
-        RESULTS_FILE.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="")
+        res = test_mutant(m, original_bytes, timeout=args.timeout, head_sha=clean_head_sha)
+        results.append(res)
 
-    all_res = list(res_dict.values())
-    total_tested = len(all_res)
-    killed = sum(1 for r in all_res if r.get("killed"))
-    survived = sum(1 for r in all_res if r.get("status") == "SURVIVED")
-    timeouts = sum(1 for r in all_res if r.get("status") == "TIMEOUT")
-    tsc_fails = sum(1 for r in all_res if r.get("status") == "TSC_FAIL")
+        # ONLY write results file when running all mutants sequentially
+        if args.all:
+            killed_count = sum(1 for r in results if r.get("killed"))
+            survived_count = sum(1 for r in results if r.get("status") == "SURVIVED")
+            timeouts_count = sum(1 for r in results if r.get("status") == "TIMEOUT")
+            tsc_fails_count = sum(1 for r in results if r.get("status") == "TSC_FAIL")
+            payload = {
+                "sourceHeadSha": clean_head_sha,
+                "observedAt": datetime.now(timezone.utc).isoformat(),
+                "totalTested": len(results),
+                "totalMutants": len(MUTANTS),
+                "killed": killed_count,
+                "survived": survived_count,
+                "timeouts": timeouts_count,
+                "tsc_fails": tsc_fails_count,
+                "mutations": results,
+            }
+            RESULTS_FILE.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="")
+
+    total_tested = len(results)
+    killed = sum(1 for r in results if r.get("killed"))
+    survived = sum(1 for r in results if r.get("status") == "SURVIVED")
+    timeouts = sum(1 for r in results if r.get("status") == "TIMEOUT")
+    tsc_fails = sum(1 for r in results if r.get("status") == "TSC_FAIL")
 
     print("\n" + "=" * 60)
-    print(f"MUTATION TESTING SUMMARY ({total_tested} tested)")
-    print(f"  KILLED:   {killed}")
-    print(f"  SURVIVED: {survived}")
-    print(f"  TIMEOUT:  {timeouts}")
-    print(f"  TSC_FAIL: {tsc_fails}")
+    print(f"MUTATION TESTING SUMMARY ({total_tested} tested in this execution)")
+    print(f"  Source Head SHA : {clean_head_sha}")
+    print(f"  KILLED          : {killed}")
+    print(f"  SURVIVED        : {survived}")
+    print(f"  TIMEOUT         : {timeouts}")
+    print(f"  TSC_FAIL        : {tsc_fails}")
     print("=" * 60)
 
-    if killed == len(MUTANTS):
-        print("ALL 40 MUTANTS KILLED! (100.0% kill rate)")
+    if args.all and killed == len(MUTANTS):
+        print("ALL 40 MUTANTS KILLED ON CLEAN HEAD! (100.0% verified kill rate)")
         return 0
     elif survived > 0 or timeouts > 0 or tsc_fails > 0:
         return 1

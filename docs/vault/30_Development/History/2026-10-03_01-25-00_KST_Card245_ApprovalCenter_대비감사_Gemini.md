@@ -29,7 +29,7 @@ source_of_truth: "Git"
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface) | Before 명도비 (Dark/Light 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 신선도 배지 텍스트 | freshness-badge text | #93c5fd on rgba(59,130,246,0.1) over #ffffff | 1.60:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
+| 신선도 배지 텍스트 | freshness-badge text | #93c5fd on rgba(59,130,246,0.1) over #ffffff | 1.61:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
 | 신선도 배지 테두리 | freshness-badge border | #93c5fd on #ffffff | 1.80:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
 | 새로고침 버튼 텍스트 | refresh-btn text | var(--color-text-primary) on #f1f5f9 | 16.30:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 새로고침 버튼 테두리 | refresh-btn border | var(--color-border-subtle) on #f1f5f9 | 3.18:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
@@ -147,6 +147,10 @@ Total Audit Items: 31 | Passed: 31 | Failed: 0
 ---
 
 ## 4. 변이 사살 표 (tools/test_c245_mutations.py 40종 전수 사살)
+
+> [!IMPORTANT]
+> **증거 배치 및 Head 무결성 보증 (Claude UI r2 / Codex r2 반영)**:
+> `tools/.c245_mutation_results.json`은 러너 수정 commit A의 clean checkout 상태에서 `python tools/test_c245_mutations.py --all`을 단일 연속 실행하여 생성되었으며, commit B는 이 JSON 결과 파일만 추가합니다. commit A와 B 사이 제품 및 시험 코드 변경은 0건이며, 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree)의 clean HEAD입니다.
 
 | 변이 ID | 변이 내용 | 사살 검증 게이트 |
 | :--- | :--- | :--- |
