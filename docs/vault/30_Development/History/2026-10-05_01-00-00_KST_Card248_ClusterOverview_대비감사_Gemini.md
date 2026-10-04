@@ -100,7 +100,7 @@ Total Audit Items: 22 | Passed: 22 | Failed: 0
 
 ## 3. AST 정적 분석 및 커버리지 래칫 (Test 9j-2)
 
-`tests/acc09-contrast-tokens.test.tsx`의 Test 9j-2 `analyzeFile('features/dashboard/ClusterOverview.tsx')` 실측 검증:
+`apps/web/tests/acc09-contrast-tokens.test.tsx`의 Test 9j-2 `analyzeFile('features/dashboard/ClusterOverview.tsx')` 실측 검증:
 - `totalStyleAttrs`: **67** (모든 인라인 style 선언 100% 포괄)
 - `checkedObjects`: **6** (명시적 전경-배경 쌍 객체)
 - `checkedPairs`: **29** (조건 분기 및 컨테이너 상속 조합 전수 검사)
