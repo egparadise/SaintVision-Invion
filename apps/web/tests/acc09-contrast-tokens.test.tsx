@@ -42,6 +42,11 @@ import {
   getApprovalStatusConfig,
 } from '../src/features/approvals/ApprovalCenter';
 import {
+  ClusterOverview,
+  NODE_STATUS_CONFIG,
+  getClusterNodeStatusConfig,
+} from '../src/features/dashboard/ClusterOverview';
+import {
   PlacementSimulator,
   DISCOVERY_CANDIDATE_STATE_CONFIG,
   getDiscoveryCandidateStateConfig,
@@ -319,7 +324,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/agent/NaturalLanguageRunView.tsx": {},
   "features/approvals/ApprovalCenter.tsx": {},
   "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
-  "features/dashboard/ClusterOverview.tsx": {"#10b981": 1, "#38bdf8": 1, "#64748b": 2, "#8b5cf6": 1, "#d29922": 1, "#ef4444": 4, "#f59e0b": 1, "#fca5a5": 3, "#fff": 1, "rgba(239,68,68,0.1)": 2},
+  "features/dashboard/ClusterOverview.tsx": {},
   "features/deployment/IntranetDeploymentView.tsx": {},
   "features/desktop/DesktopShell.tsx": {},
   "features/desktop/DesktopWindow.tsx": {"#0f172a": 1, "#10b981": 1, "#1e293b": 1, "#333": 1, "#334155": 1, "#64748b": 1, "#94a3b8": 1, "#ef4444": 1, "#f59e0b": 1, "#f8fafc": 1, "rgba(0,0,0,0.25)": 1, "rgba(0,0,0,0.3)": 4, "rgba(0,0,0,0.45)": 1, "rgba(0,0,0,0.5)": 1},
@@ -6597,8 +6602,473 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator & ApprovalCenter
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9q. [Card 248 / ACC-09] ClusterOverview DOM Rendering & Strict Token Parity
+  it('ACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockNodes: NodeItem[] = [
+      {
+        id: 'nod_001',
+        hostname: 'node-online.sv.lan',
+        status: 'online',
+        os: 'linux',
+        cpuCores: 32,
+        cpuUsagePercent: 45,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 32 * 1024 ** 3,
+        gpuName: 'NVIDIA H100',
+        gpuCount: 2,
+        gpuVramTotalBytes: 160 * 1024 ** 3,
+        gpuVramUsedBytes: 80 * 1024 ** 3,
+        storageTotalBytes: 2 * 1024 ** 4,
+        storageUsedBytes: 1 * 1024 ** 4,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_002',
+        hostname: 'node-active.sv.lan',
+        status: 'active',
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 16 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 1 * 1024 ** 4,
+        storageUsedBytes: 500 * 1024 ** 3,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_003',
+        hostname: 'node-degraded.sv.lan',
+        status: 'degraded',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 85,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 14 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 400 * 1024 ** 3,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_004',
+        hostname: 'node-lost.sv.lan',
+        status: 'lost',
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 1 * 1024 ** 4,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 1, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_005',
+        hostname: 'node-unknown.sv.lan',
+        status: 'unknown',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 10,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 2 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 100 * 1024 ** 3,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_006',
+        hostname: 'node-offline.sv.lan',
+        status: 'offline',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 0, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_007',
+        hostname: 'node-draining.sv.lan',
+        status: 'draining',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 5,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 1 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 50 * 1024 ** 3,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_008',
+        hostname: 'node-enrolling.sv.lan',
+        status: 'enrolling',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_009',
+        hostname: 'node-retired.sv.lan',
+        status: 'retired',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 2, 0, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_010',
+        hostname: 'node-admitted.sv.lan',
+        status: 'admitted' as any,
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_011',
+        hostname: 'node-upper.sv.lan',
+        status: 'ONLINE' as any,
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+      {
+        id: 'nod_012',
+        hostname: 'node-proto.sv.lan',
+        status: 'toString' as any,
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+    ];
+
+    const mockRuns: RunItem[] = [
+      {
+        id: 'run_101',
+        state: 'running',
+        objective: 'Batch model inference',
+        datasetRef: 'ds_test',
+        modelRef: 'mod_llama',
+        createdAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+      },
+    ];
+
+    try {
+      // 1. Normal render with warning banner (nodesState="error", nodes present)
+      await act(async () => {
+        root.render(
+          <ClusterOverview
+            nodes={mockNodes}
+            runs={mockRuns}
+            pendingApprovalsCount={3}
+            onNavigate={vi.fn()}
+            nodesState="error"
+            nodeError="Connection reset by peer"
+            lastFetchedAt={new Date(2026, 9, 3, 2, 30, 0)}
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      // 1a. Warning Banner in normal branch
+      const warningBanner = container.querySelector('[data-testid="cluster-stale-warning"]') as HTMLElement;
+      expect(warningBanner, 'Cluster stale warning banner must be present').not.toBeNull();
+      expect(warningBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(warningBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(warningBanner.style.color).toBe('var(--color-status-offline)');
+      expect(warningBanner.textContent).toContain('⚠️');
+      expect(warningBanner.textContent).toContain('[동기화 실패]');
+
+      // 1b. Freshness indicator
+      const freshness = container.querySelector('[data-testid="cluster-freshness-indicator"]') as HTMLElement;
+      expect(freshness).not.toBeNull();
+      expect(freshness.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(freshness.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(freshness.style.color).toBe('var(--color-text-muted)');
+
+      // 1c. Refresh button focus ring preservation
+      const refreshBtn = container.querySelector('[data-testid="cluster-refresh-btn"]') as HTMLButtonElement;
+      expect(refreshBtn).not.toBeNull();
+      expect(refreshBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(refreshBtn.style.color).toBe('var(--color-text-secondary)');
+      refreshBtn.focus();
+      const compRefresh = window.getComputedStyle(refreshBtn);
+      expect(compRefresh.outlineStyle !== 'none' || compRefresh.outline !== 'none', 'Refresh button focus ring must be preserved').toBe(true);
+
+      // 1d. Resource gauge bar tokens
+      const gaugeTracks = container.querySelectorAll('div[style*="height: 6px"]');
+      const ramBar = gaugeTracks[1]?.firstElementChild as HTMLElement;
+      expect(ramBar).not.toBeNull();
+      expect(ramBar.style.backgroundColor).toBe('var(--color-status-online)');
+
+      const gpuBar = gaugeTracks[2]?.firstElementChild as HTMLElement;
+      expect(gpuBar).not.toBeNull();
+      expect(gpuBar.style.backgroundColor).toBe('var(--color-brand-hover)');
+
+      const storageBar = gaugeTracks[3]?.firstElementChild as HTMLElement;
+      expect(storageBar).not.toBeNull();
+      expect(storageBar.style.backgroundColor).toBe('var(--color-status-degraded)');
+
+      // 1e. Heartbeat color token
+      const hb001 = container.querySelector('[data-testid="node-heartbeat-nod_001"]') as HTMLElement;
+      expect(hb001).not.toBeNull();
+      expect(hb001.style.color).toBe('var(--color-text-muted)');
+
+      // 1f. Status badges in DOM for all wire contract statuses
+      const badgeOnline = container.querySelector('[data-testid="node-status-badge-nod_001"]') as HTMLElement;
+      expect(badgeOnline.textContent).toBe('● ONLINE');
+      expect(badgeOnline.style.color).toBe('var(--color-status-online)');
+      expect(badgeOnline.style.opacity, 'Node status badge opacity must not be degraded').toBe('');
+
+      const badgeActive = container.querySelector('[data-testid="node-status-badge-nod_002"]') as HTMLElement;
+      expect(badgeActive.textContent).toBe('● ACTIVE (활성 · 헬스 미결정)');
+      expect(badgeActive.style.color).toBe('var(--color-status-active)');
+
+      const badgeDegraded = container.querySelector('[data-testid="node-status-badge-nod_003"]') as HTMLElement;
+      expect(badgeDegraded.textContent).toBe('● DEGRADED');
+      expect(badgeDegraded.style.color).toBe('var(--color-status-degraded)');
+
+      const badgeLost = container.querySelector('[data-testid="node-status-badge-nod_004"]') as HTMLElement;
+      expect(badgeLost.textContent).toBe('● LOST (단절)');
+      expect(badgeLost.style.color).toBe('var(--color-status-lost)');
+
+      const badgeUnknown = container.querySelector('[data-testid="node-status-badge-nod_005"]') as HTMLElement;
+      expect(badgeUnknown.textContent).toBe('● UNKNOWN (미확인)');
+      expect(badgeUnknown.style.color).toBe('var(--color-status-unknown)');
+
+      const badgeOffline = container.querySelector('[data-testid="node-status-badge-nod_006"]') as HTMLElement;
+      expect(badgeOffline.textContent).toBe('● OFFLINE');
+      expect(badgeOffline.style.color).toBe('var(--color-status-offline)');
+
+      const badgeDraining = container.querySelector('[data-testid="node-status-badge-nod_007"]') as HTMLElement;
+      expect(badgeDraining.textContent).toBe('● DRAINING');
+      expect(badgeDraining.style.color).toBe('var(--color-status-offline)');
+
+      const badgeEnrolling = container.querySelector('[data-testid="node-status-badge-nod_008"]') as HTMLElement;
+      expect(badgeEnrolling.textContent).toBe('● ENROLLING');
+      expect(badgeEnrolling.style.color).toBe('var(--color-status-offline)');
+
+      const badgeRetired = container.querySelector('[data-testid="node-status-badge-nod_009"]') as HTMLElement;
+      expect(badgeRetired.textContent).toBe('● RETIRED');
+      expect(badgeRetired.style.color).toBe('var(--color-status-offline)');
+
+      // Out-of-contract, casing, prototype defense in DOM
+      const badgeAdmitted = container.querySelector('[data-testid="node-status-badge-nod_010"]') as HTMLElement;
+      expect(badgeAdmitted.textContent).toBe('● UNKNOWN (admitted)');
+      expect(badgeAdmitted.style.color).toBe('var(--color-status-unknown)');
+
+      const badgeUpper = container.querySelector('[data-testid="node-status-badge-nod_011"]') as HTMLElement;
+      expect(badgeUpper.textContent).toBe('● UNKNOWN (ONLINE)');
+      expect(badgeUpper.style.color).toBe('var(--color-status-unknown)');
+
+      const badgeProto = container.querySelector('[data-testid="node-status-badge-nod_012"]') as HTMLElement;
+      expect(badgeProto.textContent).toBe('● UNKNOWN (toString)');
+      expect(badgeProto.style.color).toBe('var(--color-status-unknown)');
+
+      // 2. Fetch error view (nodesState="error" and nodes.length === 0)
+      await act(async () => {
+        root.render(
+          <ClusterOverview
+            nodes={[]}
+            runs={[]}
+            pendingApprovalsCount={0}
+            onNavigate={vi.fn()}
+            nodesState="error"
+            nodeError="Failed to reach control plane"
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      const fetchErrorSection = container.querySelector('[data-testid="cluster-overview-fetch-error"]') as HTMLElement;
+      expect(fetchErrorSection).not.toBeNull();
+      expect(fetchErrorSection.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(fetchErrorSection.style.borderColor).toBe('var(--color-status-offline)');
+      expect(fetchErrorSection.textContent).toContain('⚠️');
+      expect(fetchErrorSection.textContent).toContain('클러스터 노드 동기화 실패');
+
+      const heading = fetchErrorSection.querySelector('h1') as HTMLElement;
+      expect(heading).not.toBeNull();
+      expect(heading.style.color).toBe('var(--color-status-offline)');
+
+      const errorRetryBtn = container.querySelector('[data-testid="cluster-error-retry-btn"]') as HTMLButtonElement;
+      expect(errorRetryBtn).not.toBeNull();
+      expect(errorRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(errorRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(errorRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(errorRetryBtn.textContent).toContain('다시 시도');
+      errorRetryBtn.focus();
+      const compErrRetry = window.getComputedStyle(errorRetryBtn);
+      expect(compErrRetry.outlineStyle !== 'none' || compErrRetry.outline !== 'none', 'Error retry button focus ring must be preserved').toBe(true);
+
+      // 3. Telemetry unavailable branch
+      const telemetryNode: NodeItem = {
+        id: 'nod_telemetry',
+        hostname: 'node-telemetry.sv.lan',
+        status: 'online',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        gpuCount: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        heartbeatAt: new Date(2026, 9, 3, 2, 0, 0).toISOString(),
+        telemetryUnavailable: true,
+      };
+
+      await act(async () => {
+        root.render(
+          <ClusterOverview
+            nodes={[telemetryNode]}
+            runs={[]}
+            pendingApprovalsCount={0}
+            onNavigate={vi.fn()}
+            nodesState="error"
+            nodeError="Telemetry agent disconnected"
+            lastFetchedAt={new Date(2026, 9, 3, 2, 35, 0)}
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      const telemWarning = container.querySelector('[data-testid="cluster-stale-warning"]') as HTMLElement;
+      expect(telemWarning).not.toBeNull();
+      expect(telemWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(telemWarning.style.borderColor).toBe('var(--color-status-offline)');
+      expect(telemWarning.style.color).toBe('var(--color-status-offline)');
+
+      const telemHb = container.querySelector('[data-testid="node-heartbeat-nod_telemetry"]') as HTMLElement;
+      expect(telemHb).not.toBeNull();
+      expect(telemHb.style.color).toBe('var(--color-text-muted)');
+
+      // 4. Contract exact key set check
+      expect(Object.keys(NODE_STATUS_CONFIG).sort()).toEqual([
+        'active',
+        'degraded',
+        'draining',
+        'enrolling',
+        'lost',
+        'offline',
+        'online',
+        'retired',
+        'unknown',
+      ]);
+
+      // 5. Unit helper fail-closed and prototype defense
+      const normOnline = getClusterNodeStatusConfig('online');
+      expect(normOnline.color).toBe('var(--color-status-online)');
+      expect(normOnline.label).toBe('ONLINE');
+
+      const normActive = getClusterNodeStatusConfig('active');
+      expect(normActive.color).toBe('var(--color-status-active)');
+      expect(normActive.label).toBe('ACTIVE (활성 · 헬스 미결정)');
+
+      const normDegraded = getClusterNodeStatusConfig('degraded');
+      expect(normDegraded.color).toBe('var(--color-status-degraded)');
+      expect(normDegraded.label).toBe('DEGRADED');
+
+      const normLost = getClusterNodeStatusConfig('lost');
+      expect(normLost.color).toBe('var(--color-status-lost)');
+      expect(normLost.label).toBe('LOST (단절)');
+
+      const normUnknown = getClusterNodeStatusConfig('unknown');
+      expect(normUnknown.color).toBe('var(--color-status-unknown)');
+      expect(normUnknown.label).toBe('UNKNOWN (미확인)');
+
+      const normOffline = getClusterNodeStatusConfig('offline');
+      expect(normOffline.color).toBe('var(--color-status-offline)');
+      expect(normOffline.label).toBe('OFFLINE');
+
+      const normDraining = getClusterNodeStatusConfig('draining');
+      expect(normDraining.color).toBe('var(--color-status-offline)');
+      expect(normDraining.label).toBe('DRAINING');
+
+      const normEnrolling = getClusterNodeStatusConfig('enrolling');
+      expect(normEnrolling.color).toBe('var(--color-status-offline)');
+      expect(normEnrolling.label).toBe('ENROLLING');
+
+      const normRetired = getClusterNodeStatusConfig('retired');
+      expect(normRetired.color).toBe('var(--color-status-offline)');
+      expect(normRetired.label).toBe('RETIRED');
+
+      const unknownOut = getClusterNodeStatusConfig('admitted');
+      expect(unknownOut.color).toBe('var(--color-status-unknown)');
+      expect(unknownOut.label).toBe('UNKNOWN (admitted)');
+
+      const unknownUpper = getClusterNodeStatusConfig('ONLINE');
+      expect(unknownUpper.color).toBe('var(--color-status-unknown)');
+      expect(unknownUpper.label).toBe('UNKNOWN (ONLINE)');
+
+      const nullCfg = getClusterNodeStatusConfig(null);
+      expect(nullCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCfg.label).toBe('UNKNOWN');
+
+      const undefCfg = getClusterNodeStatusConfig(undefined);
+      expect(undefCfg.color).toBe('var(--color-status-unknown)');
+      expect(undefCfg.label).toBe('UNKNOWN');
+
+      const emptyCfg = getClusterNodeStatusConfig('');
+      expect(emptyCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCfg.label).toBe('UNKNOWN');
+
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getClusterNodeStatusConfig(pk as any);
+        expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter & ClusterOverview
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -7020,6 +7490,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(approvalStats.checkedBorderObjects, 'Border objects in ApprovalCenter must be exactly 18').toBe(18);
     expect(approvalStats.checkedBorderPairs, 'Border pairs in ApprovalCenter must be exactly 19').toBe(19);
     expect(approvalStats.violations, `ApprovalCenter violations:\n${approvalStats.violations.join('\n')}`).toEqual([]);
+
+    const clusterStats = analyzeFile('features/dashboard/ClusterOverview.tsx');
+    expect(clusterStats.violations, `ClusterOverview violations:\n${clusterStats.violations.join('\n')}`).toEqual([]);
+    expect(clusterStats.totalStyleAttrs, 'Total style attributes in ClusterOverview must be exactly 67').toBe(67);
+    expect(clusterStats.checkedObjects, 'Explicit style objects in ClusterOverview must be exactly 6').toBe(6);
+    expect(clusterStats.checkedPairs, 'Evaluated pairs in ClusterOverview must be exactly 29').toBe(29);
+    expect(clusterStats.unboundColorObjects, 'Unbound color objects in ClusterOverview must be exactly 23').toBe(23);
+    expect(clusterStats.coveredColorObjects, 'Total covered color objects in ClusterOverview must be exactly 29').toBe(29);
+    expect(clusterStats.checkedBorderObjects, 'Border objects in ClusterOverview must be exactly 16').toBe(16);
+    expect(clusterStats.checkedBorderPairs, 'Border pairs in ClusterOverview must be exactly 16').toBe(16);
   });
 
 
@@ -7550,6 +8030,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe105Cr, 'ApprovalCenter former #ef4444 on dark subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe105Cr).toBeCloseTo(3.89, 1);
 
+    // Probe 106 [Card 248]: ClusterOverview former error heading #fca5a5 on light surface strictly fails 4.5:1
+    const probe106Cr = getContrast('#fca5a5', lightTokens['--color-bg-surface']);
+    expect(probe106Cr, 'ClusterOverview former #fca5a5 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe106Cr).toBeCloseTo(1.90, 1);
+
+    // Probe 107 [Card 248]: ClusterOverview former retry button text #ffffff on #ef4444 strictly fails 4.5:1
+    const probe107Cr = getContrast('#ffffff', '#ef4444');
+    expect(probe107Cr, 'ClusterOverview former #ffffff on #ef4444 fails 4.5:1').toBeLessThan(4.5);
+    expect(probe107Cr).toBeCloseTo(3.76, 1);
+
+    // Probe 108 [Card 248]: ClusterOverview former heartbeat text #64748b on dark canvas strictly fails 4.5:1
+    const probe108Cr = getContrast('#64748b', darkTokens['--color-bg-canvas']);
+    expect(probe108Cr, 'ClusterOverview former #64748b on dark canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe108Cr).toBeCloseTo(4.08, 1);
+
+    // Probe 109 [Card 248]: ClusterOverview former active node text #38bdf8 on light canvas strictly fails 4.5:1
+    const probe109Cr = getContrast('#38bdf8', lightTokens['--color-bg-canvas']);
+    expect(probe109Cr, 'ClusterOverview former #38bdf8 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe109Cr).toBeCloseTo(2.05, 1);
+
+    // Probe 110 [Card 248]: ClusterOverview former degraded node text #d29922 on light canvas strictly fails 4.5:1
+    const probe110Cr = getContrast('#d29922', lightTokens['--color-bg-canvas']);
+    expect(probe110Cr, 'ClusterOverview former #d29922 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe110Cr).toBeCloseTo(2.41, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -7562,8 +8067,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 459/31 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 459/31 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -7645,7 +8150,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 459').toBe(459);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
@@ -7653,8 +8158,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(Object.keys(observedFileMultisets).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
 
     // Ratchet assertions for specific legacy literals (occurrences & files)
-    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 3').toBeLessThanOrEqual(3);
-    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 2').toBeLessThanOrEqual(2);
+    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 1').toBeLessThanOrEqual(1);
+    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 1').toBeLessThanOrEqual(1);
 
     expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 5').toBeLessThanOrEqual(5);
     expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 3').toBeLessThanOrEqual(3);
