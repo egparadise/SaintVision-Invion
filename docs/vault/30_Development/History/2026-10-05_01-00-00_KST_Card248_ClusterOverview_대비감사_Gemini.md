@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261005-CARD248-GEMINI"
 title: "Card 248 클러스터 대시보드 개요 (ClusterOverview) 색상 리터럴 전수 토큰화, 상태 색 정합성 및 접근성 승격"
-version: "1.0.0"
+version: "1.0.1"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T01:00:00+09:00"
-updated: "2026-10-05T01:00:00+09:00"
+updated: "2026-10-05T03:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -25,32 +25,32 @@ source_of_truth: "Git"
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
 
-아래 Before 값은 베이스(`fddca9d1`)의 실제 렌더링 합성값(라이트 캔버스 `#f8fafc` 위 카드 표면 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#131b2e`, `#1a243b`)을 기준으로 하며, 하드코딩 리터럴의 라이트 테마 전환 시 심각한 명도 결손(Probes 106~110 실측)이 존재했습니다. After 값은 `python tools/reproduce_c248_contrast.py` 실행 결과와 100% 일치합니다.
+아래 Before 값은 PR 베이스(`349a2c73`)의 실제 렌더링 합성값(라이트 캔버스 `#f8fafc` 위 카드 표면 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#111827`, `#1f2937`)을 기준으로 하며, 하드코딩 리터럴의 라이트 테마 전환 시 심각한 명도 결손(Probes 106~110 실측)이 존재했습니다. 베이스 `349a2c73`의 실제 리터럴은 총 17건(10종: `#10b981`, `#1e293b`, `#38bdf8`, `#64748b`, `#8b5cf6`, `#d29922`, `#ef4444`, `#f1f5f9`, `#f59e0b`, `#ffffff`)이며, 베이스에 없는 리터럴(`#f85149`, `#8b949e`, `#94a3b8`, `#cbd5e1`, `#e2e8f0`) 행은 "base에서 이미 토큰"으로 정정되었습니다. After 값은 `python tools/reproduce_c248_contrast.py` 실행 결과와 100% 일치합니다.
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface) | Before 명도비 (Light/Dark 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 에러 섹션 제목 | error-section heading | #fca5a5 on #ffffff | 1.90:1 (FAIL) / 6.41:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 4.5:1 | PASS |
 | 에러 섹션 테두리 | error-section border | #ef4444 on #ffffff | 3.76:1 (PASS) / 3.42:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 3.0:1 | PASS |
-| 에러 섹션 본문 | error-section message | #94a3b8 on #ffffff | 2.68:1 (FAIL) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 에러 섹션 본문 | error-section message | base에서 이미 토큰화됨 (var(--color-text-muted) on #ffffff) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
 | 에러 재시도 버튼 텍스트 | error-retry-btn text | #ffffff on #ef4444 | 3.76:1 (FAIL) / 3.76:1 (FAIL) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 에러 재시도 버튼 테두리 | error-retry-btn border | (border: none) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239,68,68,0.15) over #ffffff | 1.56:1 (FAIL) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| 동기화 실패 경고 테두리 | stale-warning border | #ef4444 on #f1f5f9 (light subtle) | 3.52:1 (PASS) / 3.90:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
-| 신선도 지표 텍스트 | freshness-indicator text | #94a3b8 on #ffffff | 2.68:1 (FAIL) / 5.78:1 (PASS) | --color-text-muted on --color-bg-subtle | 5.25:1 | 5.78:1 | >= 4.5:1 | PASS |
-| 신선도 지표 테두리 | freshness-indicator border | #e2e8f0 on #f1f5f9 | 1.15:1 (FAIL) / 1.25:1 (FAIL) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 상단 새로고침 버튼 텍스트 | topbar-refresh-btn text | #64748b on transparent over #ffffff | 4.34:1 (FAIL) / 14.33:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
-| 상단 새로고침 버튼 테두리 | topbar-refresh-btn border | #cbd5e1 on #ffffff | 1.63:1 (FAIL) / 1.70:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
-| RAM 게이지 바 | ram-gauge-bar | #10b981 on #f1f5f9 | 2.34:1 (FAIL) / 8.53:1 (PASS) | --color-status-online on --color-bg-subtle | 4.79:1 | 8.53:1 | >= 3.0:1 | PASS |
-| VRAM 게이지 바 | vram-gauge-bar | #8b5cf6 on #f1f5f9 | 3.45:1 (PASS) / 10.78:1 (PASS) | --color-brand-hover on --color-bg-subtle | 6.41:1 | 10.78:1 | >= 3.0:1 | PASS |
-| 스토리지 게이지 바 | storage-gauge-bar | #f59e0b on #f1f5f9 | 2.14:1 (FAIL) / 9.05:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.80:1 | 9.05:1 | >= 3.0:1 | PASS |
-| 하트비트 텍스트 | heartbeat text | #64748b on #f8fafc (light canvas) | 4.34:1 (FAIL) / 4.08:1 (FAIL on #090d16) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Online | node-status-online | #10b981 on #f8fafc | 2.45:1 (FAIL) / 8.53:1 (PASS) | --color-status-online on --color-bg-canvas | 4.79:1 | 8.53:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Active | node-status-active | #38bdf8 on #f8fafc | 2.05:1 (FAIL) / 9.07:1 (PASS) | --color-status-active on --color-bg-canvas | 5.67:1 | 9.07:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Degraded | node-status-degraded | #d29922 on #f8fafc | 2.41:1 (FAIL) / 9.05:1 (PASS) | --color-status-degraded on --color-bg-canvas | 4.80:1 | 9.05:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Lost | node-status-lost | #f85149 on #f8fafc | 3.52:1 (FAIL) / 7.02:1 (PASS) | --color-status-lost on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Offline | node-status-offline | #f85149 on #f8fafc | 3.52:1 (FAIL) / 7.02:1 (PASS) | --color-status-offline on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Unknown | node-status-unknown | #8b949e on #f8fafc | 2.87:1 (FAIL) / 7.70:1 (PASS) | --color-status-unknown on --color-bg-canvas | 6.78:1 | 7.70:1 | >= 4.5:1 | PASS |
-| 최근 실행 상태 텍스트 | recent-run-state text | #8b5cf6 on #ffffff | 3.87:1 (FAIL) / 10.78:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.41:1 | 10.78:1 | >= 4.5:1 | PASS |
+| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239, 68, 68, 0.1) over #ffffff | 1.60:1 (FAIL) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 동기화 실패 경고 테두리 | stale-warning border | #ef4444 on rgba(239, 68, 68, 0.1) over #ffffff | 3.29:1 (PASS) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
+| 신선도 지표 텍스트 | freshness-indicator text | base에서 이미 토큰화됨 (var(--color-text-muted) on #f1f5f9) | 5.25:1 (PASS) / 5.78:1 (PASS) | --color-text-muted on --color-bg-subtle | 5.25:1 | 5.78:1 | >= 4.5:1 | PASS |
+| 신선도 지표 테두리 | freshness-indicator border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #f1f5f9) | 3.18:1 (PASS) / 3.08:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
+| 상단 새로고침 버튼 텍스트 | topbar-refresh-btn text | #64748b on #ffffff | 4.76:1 (PASS) / 14.33:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
+| 상단 새로고침 버튼 테두리 | topbar-refresh-btn border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #ffffff) | 3.48:1 (PASS) / 3.73:1 (PASS) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
+| RAM 게이지 바 | ram-gauge-bar | #10b981 on #f1f5f9 | 2.32:1 (FAIL) / 8.53:1 (PASS) | --color-status-online on --color-bg-subtle | 4.79:1 | 8.53:1 | >= 3.0:1 | PASS |
+| VRAM 게이지 바 | vram-gauge-bar | #8b5cf6 on #f1f5f9 | 3.87:1 (PASS) / 10.78:1 (PASS) | --color-brand-hover on --color-bg-canvas | 6.41:1 | 10.78:1 | >= 3.0:1 | PASS |
+| 스토리지 게이지 바 | storage-gauge-bar | #f59e0b on #f1f5f9 | 1.96:1 (FAIL) / 9.05:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.80:1 | 9.05:1 | >= 3.0:1 | PASS |
+| 하트비트 텍스트 | heartbeat text | #64748b on #f8fafc / #090d16 | 4.34:1 (FAIL) / 4.08:1 (FAIL) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Online | node-status-online | #10b981 on #f8fafc / #090d16 | 2.45:1 (FAIL) / 7.66:1 (PASS) | --color-status-online on --color-bg-canvas | 4.79:1 | 8.53:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Active | node-status-active | #38bdf8 on #f8fafc / #090d16 | 2.05:1 (FAIL) / 9.07:1 (PASS) | --color-status-active on --color-bg-canvas | 5.67:1 | 9.07:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Degraded | node-status-degraded | #d29922 on #f8fafc / #090d16 | 2.41:1 (FAIL) / 7.70:1 (PASS) | --color-status-degraded on --color-bg-canvas | 4.80:1 | 9.05:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Lost | node-status-lost | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 5.80:1 (PASS) | --color-status-lost on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Offline | node-status-offline | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 5.80:1 (PASS) | --color-status-offline on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Unknown | node-status-unknown | #d29922 on #f8fafc / #090d16 | 2.41:1 (FAIL) / 6.32:1 (PASS) | --color-status-unknown on --color-bg-canvas | 6.78:1 | 7.70:1 | >= 4.5:1 | PASS |
+| 최근 실행 상태 텍스트 | recent-run-state text | base에서 이미 토큰화됨 (var(--color-brand-primary) on #f8fafc / #090d16) | 2.53:1 (FAIL) / 9.07:1 (PASS) | --color-brand-hover on --color-bg-canvas | 6.41:1 | 10.78:1 | >= 4.5:1 | PASS |
 
 > [!NOTE]
 > **라이트/다크 테마 Revert-Fail Probes (Probes 106~110)**:
@@ -101,11 +101,11 @@ Total Audit Items: 22 | Passed: 22 | Failed: 0
 ## 3. AST 정적 분석 및 커버리지 래칫 (Test 9j-2)
 
 `apps/web/tests/acc09-contrast-tokens.test.tsx`의 Test 9j-2 `analyzeFile('features/dashboard/ClusterOverview.tsx')` 실측 검증:
-- `totalStyleAttrs`: **67** (모든 인라인 style 선언 100% 포괄)
-- `checkedObjects`: **6** (명시적 전경-배경 쌍 객체)
-- `checkedPairs`: **29** (조건 분기 및 컨테이너 상속 조합 전수 검사)
+- `totalStyleAttrs`: **76** (모든 인라인 style 선언 및 `NODE_STATUS_CONFIG` 9종 100% 포괄)
+- `checkedObjects`: **15** (명시적 전경-배경 쌍 객체: 인라인 6개 + `NODE_STATUS_CONFIG` 9개)
+- `checkedPairs`: **38** (조건 분기 및 컨테이너 상속 조합 전수 검사)
 - `unboundColorObjects`: **23** (컨테이너 배경 상속 전경 객체)
-- `coveredColorObjects`: **29** (`checkedObjects + unboundColorObjects` = 100% 커버리지)
+- `coveredColorObjects`: **38** (`checkedObjects + unboundColorObjects` = 100% 커버리지)
 - `checkedBorderObjects`: **16** (명시적 테두리 토큰 선언 객체)
 - `checkedBorderPairs`: **16** (테두리-배경 명도비 검사 조합)
 - `violations`: `[]` (대비 위반 및 1:1 충돌 0건)

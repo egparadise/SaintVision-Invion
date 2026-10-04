@@ -7059,6 +7059,24 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
         expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
       }
+
+      // 6. Contrast verification for getClusterNodeStatusConfig UNKNOWN fallback and NODE_STATUS_CONFIG entries on canvas
+      const unkLightCr = getContrast(resolveTokenHex('--color-status-unknown', lightTokens), resolveTokenHex('--color-bg-canvas', lightTokens));
+      expect(unkLightCr, 'ClusterOverview UNKNOWN status fallback on light canvas must pass 4.5:1').toBeCloseTo(6.78, 2);
+      expect(unkLightCr).toBeGreaterThanOrEqual(4.5);
+      const unkDarkCr = getContrast(resolveTokenHex('--color-status-unknown', darkTokens), resolveTokenHex('--color-bg-canvas', darkTokens));
+      expect(unkDarkCr, 'ClusterOverview UNKNOWN status fallback on dark canvas must pass 4.5:1').toBeCloseTo(7.70, 2);
+      expect(unkDarkCr).toBeGreaterThanOrEqual(4.5);
+
+      for (const [stKey, cfg] of Object.entries(NODE_STATUS_CONFIG)) {
+        const tokenMatch = cfg.color.match(/var\((--color-[a-z0-9-]+)\)/);
+        expect(tokenMatch, `Status ${stKey} color must be a CSS variable`).not.toBeNull();
+        const token = tokenMatch![1];
+        const lCr = getContrast(resolveTokenHex(token, lightTokens), resolveTokenHex('--color-bg-canvas', lightTokens));
+        expect(lCr, `NODE_STATUS_CONFIG.${stKey} contrast on light canvas must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        const dCr = getContrast(resolveTokenHex(token, darkTokens), resolveTokenHex('--color-bg-canvas', darkTokens));
+        expect(dCr, `NODE_STATUS_CONFIG.${stKey} contrast on dark canvas must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+      }
     } finally {
       act(() => {
         root.unmount();
@@ -7357,7 +7375,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG') && node.initializer) {
+          const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
             init = init.expression;
@@ -7380,6 +7399,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                       if (pName === 'border') borderToken = m[1];
                     }
                   }
+                }
+                if (varName === 'NODE_STATUS_CONFIG' && !bgToken) {
+                  bgToken = '--color-bg-canvas';
                 }
                 if (bgToken && fgToken) {
                   checkedObjects++;
@@ -7493,11 +7515,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     const clusterStats = analyzeFile('features/dashboard/ClusterOverview.tsx');
     expect(clusterStats.violations, `ClusterOverview violations:\n${clusterStats.violations.join('\n')}`).toEqual([]);
-    expect(clusterStats.totalStyleAttrs, 'Total style attributes in ClusterOverview must be exactly 67').toBe(67);
-    expect(clusterStats.checkedObjects, 'Explicit style objects in ClusterOverview must be exactly 6').toBe(6);
-    expect(clusterStats.checkedPairs, 'Evaluated pairs in ClusterOverview must be exactly 29').toBe(29);
+    expect(clusterStats.totalStyleAttrs, 'Total style attributes in ClusterOverview must be exactly 76').toBe(76);
+    expect(clusterStats.checkedObjects, 'Explicit style objects in ClusterOverview must be exactly 15').toBe(15);
+    expect(clusterStats.checkedPairs, 'Evaluated pairs in ClusterOverview must be exactly 38').toBe(38);
     expect(clusterStats.unboundColorObjects, 'Unbound color objects in ClusterOverview must be exactly 23').toBe(23);
-    expect(clusterStats.coveredColorObjects, 'Total covered color objects in ClusterOverview must be exactly 29').toBe(29);
+    expect(clusterStats.coveredColorObjects, 'Total covered color objects in ClusterOverview must be exactly 38').toBe(38);
     expect(clusterStats.checkedBorderObjects, 'Border objects in ClusterOverview must be exactly 16').toBe(16);
     expect(clusterStats.checkedBorderPairs, 'Border pairs in ClusterOverview must be exactly 16').toBe(16);
   });
