@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+  "observedAt": "2026-10-04T18:35:55.536072+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "online config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:25:54.249670+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "active config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:26:26.528300+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "degraded config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:26:43.664289+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "lost config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:26:57.921121+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "unknown config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:27:12.095108+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "offline config: fg==bg collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:27:27.044331+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "ram gauge bar: fg==bg collision (backgroundColor: bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:27:41.758986+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "vram gauge bar: fg==bg collision (backgroundColor: bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:27:56.699344+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "storage gauge bar: fg==bg collision (backgroundColor: bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:28:12.302237+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "recent run state: fg==bg collision (color: bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:28:27.258371+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "error banner: fg==bg collision (backgroundColor: offline)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:28:41.694645+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "error banner: border==bg collision (border: bg-surface)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:28:57.905673+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "stale warning: fg==bg collision (backgroundColor: offline)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:29:12.793993+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "stale warning: border==bg collision (border: bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:29:27.665552+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "node status badge: opacity degradation (opacity: 0.35)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:29:42.429973+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "stale warning: opacity degradation (opacity: 0.4)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:29:56.773929+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "online config: comment decoy with legacy hex #10b981",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:30:11.796459+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "active config: comment decoy with legacy hex #38bdf8",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:30:25.294772+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "error heading: revert to legacy hex #fca5a5",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:30:38.986908+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "error retry button: revert bg to legacy hex #ef4444",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:30:53.033357+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "heartbeat text: revert color to legacy hex #64748b",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:31:07.001973+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "active node config: revert color to legacy hex #38bdf8",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:31:19.929292+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "degraded node config: revert color to legacy hex #d29922",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:31:33.641657+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "ram gauge: revert bg to legacy hex #10b981",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:31:47.513861+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "vram gauge: revert bg to legacy hex #8b5cf6",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:32:01.470426+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "storage gauge: revert bg to legacy hex #f59e0b",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:32:15.408340+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "refresh button: outline: 'none' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:32:28.708359+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "error retry button: outline: 'none' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:32:42.905929+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "refresh button: outline: 0 suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:32:56.886407+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "error retry button: outlineWidth: '0px' suppressing focus ring",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:33:11.314490+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "fail-closed: bypass Object.hasOwn with in operator",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:33:26.414331+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "fail-closed: prototype key hijack with direct indexing lookup",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:33:41.734387+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "fail-closed: fallback returns online color instead of unknown",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:33:57.249653+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "contract bypass: map out-of-contract 'admitted' to online",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:34:12.717281+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "contract bypass: drop online out of contract to unknown",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:34:27.565183+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "unknown label: remove 'UNKNOWN (' prefix",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:34:42.559867+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "unknown label: return raw uppercase directly",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:34:57.459361+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "case-insensitive lookup: toLowerCase() lookup bypass",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:35:11.927477+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "error heading text: mutated to '클러스터 에러 발생'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:35:26.056629+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "stale warning: remove '⚠️' icon",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 248: ClusterOverview component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "06c13e642486c086143a1fab2a0a06198fc93ff5",
+      "observedAt": "2026-10-04T18:35:40.453857+00:00"
+    }
+  ]
+}
