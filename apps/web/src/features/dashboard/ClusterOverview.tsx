@@ -1,6 +1,56 @@
 import React from 'react';
-import { NodeItem, RunItem } from '@/contracts/types';
+import type { NodeItem, NodeStatus, RunItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+
+export const NODE_STATUS_CONFIG = {
+  active: {
+    color: 'var(--color-status-active)',
+    label: 'ACTIVE (활성 · 헬스 미결정)',
+  },
+  degraded: {
+    color: 'var(--color-status-degraded)',
+    label: 'DEGRADED',
+  },
+  draining: {
+    color: 'var(--color-status-offline)',
+    label: 'DRAINING',
+  },
+  enrolling: {
+    color: 'var(--color-status-offline)',
+    label: 'ENROLLING',
+  },
+  lost: {
+    color: 'var(--color-status-lost)',
+    label: 'LOST (단절)',
+  },
+  offline: {
+    color: 'var(--color-status-offline)',
+    label: 'OFFLINE',
+  },
+  online: {
+    color: 'var(--color-status-online)',
+    label: 'ONLINE',
+  },
+  retired: {
+    color: 'var(--color-status-offline)',
+    label: 'RETIRED',
+  },
+  unknown: {
+    color: 'var(--color-status-unknown)',
+    label: 'UNKNOWN (미확인)',
+  },
+} as const satisfies Record<NodeStatus, { color: string; label: string }>;
+
+export function getClusterNodeStatusConfig(status: unknown): { color: string; label: string } {
+  if (status && typeof status === 'string' && Object.hasOwn(NODE_STATUS_CONFIG, status)) {
+    return NODE_STATUS_CONFIG[status as keyof typeof NODE_STATUS_CONFIG];
+  }
+  const raw = status ? String(status) : '';
+  return {
+    color: 'var(--color-status-unknown)',
+    label: raw ? `UNKNOWN (${raw})` : 'UNKNOWN',
+  };
+}
 
 export interface ClusterOverviewProps {
   nodes: NodeItem[];
@@ -33,13 +83,13 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
           padding: '40px 20px',
           textAlign: 'center',
           backgroundColor: 'var(--color-bg-surface)',
-          border: '1px solid #ef4444',
+          border: '1px solid var(--color-status-offline)',
           borderRadius: 'var(--radius-lg)',
           margin: '20px 0',
         }}
       >
         <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚠️</div>
-        <h1 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#fca5a5', margin: '0 0 8px 0' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-status-offline)', margin: '0 0 8px 0' }}>
           클러스터 노드 동기화 실패
         </h1>
         <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: '0 auto 16px auto', maxWidth: '500px' }}>
@@ -52,9 +102,9 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
             onClick={() => onRefresh()}
             style={{
               padding: '8px 16px',
-              backgroundColor: '#ef4444',
-              color: '#fff',
-              border: 'none',
+              backgroundColor: 'var(--color-bg-subtle)',
+              color: 'var(--color-text-primary)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: 'var(--radius-md)',
               fontWeight: 600,
               cursor: 'pointer',
@@ -109,10 +159,10 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
             style={{
               padding: '12px 16px',
               marginBottom: '16px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid #ef4444',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-offline)',
               borderRadius: 'var(--radius-md)',
-              color: '#fca5a5',
+              color: 'var(--color-status-offline)',
               fontSize: '0.8125rem',
             }}
           >
@@ -161,7 +211,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
           {nodes.map(node => (
             <li key={node.id} data-testid={`node-item-${node.id}`}>
               {node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}
-              <span data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginLeft: '8px' }}>
+              <span data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginLeft: '8px' }}>
                 마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
               </span>
             </li>
@@ -212,10 +262,10 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
           style={{
             padding: '12px 16px',
             marginBottom: '16px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid #ef4444',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: 'var(--radius-md)',
-            color: '#fca5a5',
+            color: 'var(--color-status-offline)',
             fontSize: '0.8125rem',
           }}
         >
@@ -368,7 +418,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
               style={{
                 width: `${Math.round((usedRamGb / (totalRamGb || 1)) * 100)}%`,
                 height: '100%',
-                backgroundColor: '#10b981',
+                backgroundColor: 'var(--color-status-online)',
               }}
             />
           </div>
@@ -405,7 +455,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
               style={{
                 width: `${Math.round((usedVramGb / (totalVramGb || 1)) * 100)}%`,
                 height: '100%',
-                backgroundColor: '#8b5cf6',
+                backgroundColor: 'var(--color-brand-hover)',
               }}
             />
           </div>
@@ -442,7 +492,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
               style={{
                 width: `${Math.round((Number(usedStorageTb) / (Number(totalStorageTb) || 1)) * 100)}%`,
                 height: '100%',
-                backgroundColor: '#f59e0b',
+                backgroundColor: 'var(--color-status-degraded)',
               }}
             />
           </div>
@@ -474,47 +524,44 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {nodes.map((node) => (
-              <div
-                key={node.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 14px',
-                  backgroundColor: 'var(--color-bg-canvas)',
-                  borderRadius: 'var(--radius-md)',
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                    {(node.os ? node.os.toUpperCase() : 'LINUX')} · {node.cpuCores}C / {Math.round(node.memoryTotalBytes / 1024 ** 3)}G
-                    {node.gpuCount > 0 && ` · ${node.gpuName}`}
-                    <div data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginTop: '2px' }}>
-                      마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
-                    </div>
-                  </div>
-                </div>
-
-                <span
+            {nodes.map((node) => {
+              const statusCfg = getClusterNodeStatusConfig(node.status);
+              return (
+                <div
+                  key={node.id}
                   style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color:
-                      node.status === 'online'
-                        ? 'var(--color-status-online)'
-                        : node.status === 'active'
-                        ? '#38bdf8'
-                        : node.status === 'degraded' || node.status === 'unknown'
-                        ? '#d29922'
-                        : 'var(--color-status-offline)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '10px 14px',
+                    backgroundColor: 'var(--color-bg-canvas)',
+                    borderRadius: 'var(--radius-md)',
                   }}
                 >
-                  ● {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
-                </span>
-              </div>
-            ))}
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                      {(node.os ? node.os.toUpperCase() : 'LINUX')} · {node.cpuCores}C / {Math.round(node.memoryTotalBytes / 1024 ** 3)}G
+                      {node.gpuCount > 0 && ` · ${node.gpuName}`}
+                      <div data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                        마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <span
+                    data-testid={`node-status-badge-${node.id}`}
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: statusCfg.color,
+                    }}
+                  >
+                    ● {statusCfg.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -548,7 +595,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                   <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.8125rem' }}>
                     {run.id}
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-brand-primary)' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-brand-hover)' }}>
                     {run.state.toUpperCase()}
                   </span>
                 </div>
