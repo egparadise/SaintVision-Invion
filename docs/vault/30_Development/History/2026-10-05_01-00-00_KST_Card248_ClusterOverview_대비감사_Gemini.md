@@ -114,8 +114,12 @@ Total Audit Items: 22 | Passed: 22 | Failed: 0
 
 ## 4. 컴파일 검증 변이 테스트 (W1~W40) 사살 실측
 
+> [!IMPORTANT]
+> **증거 배치 및 Head 무결성 보증 (Card 245 합의 프로토콜 준수)**:
+> `tools/.c248_mutation_results.json`은 러너 수정 commit A의 clean checkout 상태에서 `python tools/test_c248_mutations.py --all`을 단일 연속 실행하여 생성되었으며, commit B는 이 JSON 결과 파일만 추가합니다. commit A와 B 사이 제품 및 시험 코드 변경은 0건이며, 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree)의 clean HEAD입니다.
+
 `tools/test_c248_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
-결과 메타데이터는 `tools/.c248_mutation_results.json`에 `sourceHeadSha`(`fddca9d1`) 및 `observedAt`과 함께 영구 보존되었습니다.
+결과 메타데이터는 `tools/.c248_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존되었습니다.
 
 | 변이 ID | 변이 설명 | 대상 코드 | 변이 내용 | 판정 | 사살 시험 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
