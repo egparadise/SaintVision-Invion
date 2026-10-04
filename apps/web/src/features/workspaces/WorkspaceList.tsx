@@ -2,10 +2,57 @@ import React from 'react';
 import { WorkspaceItem, NodeItem, WorkspaceStatusName } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 
+export const WORKSPACE_STATUS_CONFIG = {
+  ready: {
+    label: '준비 완료 (Ready)',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-status-online)',
+    border: 'var(--color-status-online)',
+  },
+  provisioning: {
+    label: '프로비저닝 중 (Provisioning)',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-status-degraded)',
+    border: 'var(--color-status-degraded)',
+  },
+  suspended: {
+    label: '일시 중단 (Suspended)',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-text-muted)',
+    border: 'var(--color-border-subtle)',
+  },
+  deleting: {
+    label: '삭제 중 (Deleting)',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-status-offline)',
+    border: 'var(--color-status-offline)',
+  },
+  deleted: {
+    label: '삭제됨 (Deleted)',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-text-muted)',
+    border: 'var(--color-border-subtle)',
+  },
+} as const satisfies Record<WorkspaceStatusName, { label: string; bg: string; color: string; border: string }>;
+
+export function getWorkspaceStatusConfig(status: unknown): { label: string; bg: string; color: string; border: string } {
+  if (status && typeof status === 'string' && Object.hasOwn(WORKSPACE_STATUS_CONFIG, status)) {
+    return WORKSPACE_STATUS_CONFIG[status as keyof typeof WORKSPACE_STATUS_CONFIG];
+  }
+  const raw = status ? String(status) : '';
+  return {
+    label: raw ? `UNKNOWN (${raw})` : 'UNKNOWN',
+    bg: 'var(--color-bg-subtle)',
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+  };
+}
+
 export interface WorkspaceListProps {
   workspaces: WorkspaceItem[];
   nodes: NodeItem[];
   isLoading?: boolean;
+  errorMessage?: string;
   onCreateWorkspace: () => void;
   onSelectWorkspace: (workspaceId: string) => void;
   onOpenStudio?: (workspaceId: string) => void;
@@ -15,6 +62,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
   workspaces,
   nodes,
   isLoading = false,
+  errorMessage,
   onCreateWorkspace,
   onSelectWorkspace,
   onOpenStudio,
@@ -37,6 +85,28 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
           + 새 Workspace 생성
         </Button>
       </div>
+
+      {errorMessage && (
+        <div
+          role="alert"
+          data-testid="workspace-error-banner"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--color-status-offline)',
+            fontSize: '0.875rem',
+            marginBottom: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span aria-hidden="true">⚠️</span>
+            <strong style={{ color: 'var(--color-status-offline)' }}>작업공간 오류</strong>
+          </div>
+          <p style={{ marginTop: '4px', color: 'var(--color-text-primary)' }}>{errorMessage}</p>
+        </div>
+      )}
 
       {isLoading ? (
         <div
@@ -79,19 +149,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {workspaces.map((wsp) => {
-            const statusConfig: Record<WorkspaceStatusName, { label: string; bg: string; color: string; border: string }> = {
-              ready: { label: '준비 완료 (Ready)', bg: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-brand-success, #34d399)', border: 'rgba(16, 185, 129, 0.3)' },
-              provisioning: { label: '프로비저닝 중 (Provisioning)', bg: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-brand-warning, #f59e0b)', border: 'rgba(245, 158, 11, 0.3)' },
-              suspended: { label: '일시 중단 (Suspended)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
-              deleting: { label: '삭제 중 (Deleting)', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' },
-              deleted: { label: '삭제됨 (Deleted)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
-            };
-            const cfg = statusConfig[wsp.status] || {
-              label: `미확인 상태 (${wsp.status})`,
-              bg: 'var(--color-bg-subtle)',
-              color: 'var(--color-text-muted)',
-              border: 'var(--color-border-subtle)',
-            };
+            const cfg = getWorkspaceStatusConfig(wsp.status);
             return (
               <div
                 key={wsp.id}
