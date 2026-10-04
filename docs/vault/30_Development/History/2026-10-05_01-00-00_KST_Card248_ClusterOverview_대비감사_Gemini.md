@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261005-CARD248-GEMINI"
 title: "Card 248 클러스터 대시보드 개요 (ClusterOverview) 색상 리터럴 전수 토큰화, 상태 색 정합성 및 접근성 승격"
-version: "1.0.1"
+version: "1.0.2"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T01:00:00+09:00"
-updated: "2026-10-05T03:30:00+09:00"
+updated: "2026-10-05T03:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,7 +34,7 @@ source_of_truth: "Git"
 | 에러 섹션 본문 | error-section message | base에서 이미 토큰화됨 (var(--color-text-muted) on #ffffff) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
 | 에러 재시도 버튼 텍스트 | error-retry-btn text | #ffffff on #ef4444 | 3.76:1 (FAIL) / 3.76:1 (FAIL) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 에러 재시도 버튼 테두리 | error-retry-btn border | (border: none) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239, 68, 68, 0.1) over #ffffff | 1.60:1 (FAIL) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239, 68, 68, 0.1) over #ffffff | 1.66:1 (FAIL) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | 동기화 실패 경고 테두리 | stale-warning border | #ef4444 on rgba(239, 68, 68, 0.1) over #ffffff | 3.29:1 (PASS) / 5.31:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 신선도 지표 텍스트 | freshness-indicator text | base에서 이미 토큰화됨 (var(--color-text-muted) on #f1f5f9) | 5.25:1 (PASS) / 5.78:1 (PASS) | --color-text-muted on --color-bg-subtle | 5.25:1 | 5.78:1 | >= 4.5:1 | PASS |
 | 신선도 지표 테두리 | freshness-indicator border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #f1f5f9) | 3.18:1 (PASS) / 3.08:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
@@ -43,14 +43,14 @@ source_of_truth: "Git"
 | RAM 게이지 바 | ram-gauge-bar | #10b981 on #f1f5f9 | 2.32:1 (FAIL) / 8.53:1 (PASS) | --color-status-online on --color-bg-subtle | 4.79:1 | 8.53:1 | >= 3.0:1 | PASS |
 | VRAM 게이지 바 | vram-gauge-bar | #8b5cf6 on #f1f5f9 | 3.87:1 (PASS) / 10.78:1 (PASS) | --color-brand-hover on --color-bg-canvas | 6.41:1 | 10.78:1 | >= 3.0:1 | PASS |
 | 스토리지 게이지 바 | storage-gauge-bar | #f59e0b on #f1f5f9 | 1.96:1 (FAIL) / 9.05:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.80:1 | 9.05:1 | >= 3.0:1 | PASS |
-| 하트비트 텍스트 | heartbeat text | #64748b on #f8fafc / #090d16 | 4.34:1 (FAIL) / 4.08:1 (FAIL) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Online | node-status-online | #10b981 on #f8fafc / #090d16 | 2.45:1 (FAIL) / 7.66:1 (PASS) | --color-status-online on --color-bg-canvas | 4.79:1 | 8.53:1 | >= 4.5:1 | PASS |
+| 하트비트 텍스트 | heartbeat text | #64748b on #f8fafc / #090d16 | 4.55:1 (PASS) / 4.08:1 (FAIL) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Online | node-status-online | base에서 이미 토큰화됨 (var(--color-status-online) on #f8fafc / #090d16) | 4.79:1 (PASS) / 8.53:1 (PASS) | --color-status-online on --color-bg-canvas | 4.79:1 | 8.53:1 | >= 4.5:1 | PASS |
 | 노드 상태 배지 Active | node-status-active | #38bdf8 on #f8fafc / #090d16 | 2.05:1 (FAIL) / 9.07:1 (PASS) | --color-status-active on --color-bg-canvas | 5.67:1 | 9.07:1 | >= 4.5:1 | PASS |
 | 노드 상태 배지 Degraded | node-status-degraded | #d29922 on #f8fafc / #090d16 | 2.41:1 (FAIL) / 7.70:1 (PASS) | --color-status-degraded on --color-bg-canvas | 4.80:1 | 9.05:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Lost | node-status-lost | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 5.80:1 (PASS) | --color-status-lost on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Offline | node-status-offline | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 5.80:1 (PASS) | --color-status-offline on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
-| 노드 상태 배지 Unknown | node-status-unknown | #d29922 on #f8fafc / #090d16 | 2.41:1 (FAIL) / 6.32:1 (PASS) | --color-status-unknown on --color-bg-canvas | 6.78:1 | 7.70:1 | >= 4.5:1 | PASS |
-| 최근 실행 상태 텍스트 | recent-run-state text | base에서 이미 토큰화됨 (var(--color-brand-primary) on #f8fafc / #090d16) | 2.53:1 (FAIL) / 9.07:1 (PASS) | --color-brand-hover on --color-bg-canvas | 6.41:1 | 10.78:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Lost | node-status-lost | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 7.02:1 (PASS) | --color-status-lost on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Offline | node-status-offline | base에서 이미 토큰화됨 (var(--color-status-offline) on #f8fafc / #090d16) | 6.18:1 (PASS) / 7.02:1 (PASS) | --color-status-offline on --color-bg-canvas | 6.18:1 | 7.02:1 | >= 4.5:1 | PASS |
+| 노드 상태 배지 Unknown | node-status-unknown | #d29922 on #f8fafc / #090d16 | 2.41:1 (FAIL) / 7.70:1 (PASS) | --color-status-unknown on --color-bg-canvas | 6.78:1 | 7.70:1 | >= 4.5:1 | PASS |
+| 최근 실행 상태 텍스트 | recent-run-state text | base에서 이미 토큰화됨 (var(--color-brand-primary) on #f8fafc / #090d16) | 4.94:1 (PASS) / 7.64:1 (PASS) | --color-brand-hover on --color-bg-canvas | 6.41:1 | 10.78:1 | >= 4.5:1 | PASS |
 
 > [!NOTE]
 > **라이트/다크 테마 Revert-Fail Probes (Probes 106~110)**:
@@ -117,6 +117,7 @@ Total Audit Items: 22 | Passed: 22 | Failed: 0
 > [!IMPORTANT]
 > **증거 배치 및 Head 무결성 보증 (Card 245 합의 프로토콜 준수)**:
 > `tools/.c248_mutation_results.json`은 러너 수정 commit A의 clean checkout 상태에서 `python tools/test_c248_mutations.py --all`을 단일 연속 실행하여 생성되었으며, commit B는 이 JSON 결과 파일만 추가합니다. commit A와 B 사이 제품 및 시험 코드 변경은 0건이며, 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree)의 clean HEAD입니다.
+> receipt는 A3 06c13e64 tree의 증거이며 B3 이후 commit은 History 문서만 바꿨다.
 
 `tools/test_c248_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
 결과 메타데이터는 `tools/.c248_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존되었습니다.
