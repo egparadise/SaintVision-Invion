@@ -29,21 +29,21 @@ source_of_truth: "Git"
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface) | Before 명도비 (Dark/Light 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 신선도 배지 텍스트 | freshness-badge text | #93c5fd on rgba(59,130,246,0.1) over #ffffff | 1.80:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
+| 신선도 배지 텍스트 | freshness-badge text | #93c5fd on rgba(59,130,246,0.1) over #ffffff | 1.60:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
 | 신선도 배지 테두리 | freshness-badge border | #93c5fd on #ffffff | 1.80:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
 | 새로고침 버튼 텍스트 | refresh-btn text | var(--color-text-primary) on #f1f5f9 | 16.30:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 새로고침 버튼 테두리 | refresh-btn border | var(--color-border-subtle) on #f1f5f9 | 3.18:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239,68,68,0.1) over #ffffff | 1.90:1 (FAIL) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 동기화 실패 경고 텍스트 | stale-warning text | #fca5a5 on rgba(239,68,68,0.15) over #ffffff | 1.56:1 (FAIL) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | 동기화 실패 경고 보조문구 | stale-warning subtext | #fed7aa on rgba(239,68,68,0.1) over #ffffff | 1.35:1 (FAIL) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| 동기화 실패 경고 테두리 | stale-warning border | #ef4444 on #161b22 (dark) | 3.89:1 (FAIL text/UI) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
-| 지표 대기건 텍스트 | metric-pending text | var(--color-brand-warning) on #ffffff | 2.15:1 (FAIL on light) | --color-status-degraded on --color-bg-surface | 5.02:1 | 8.26:1 | >= 4.5:1 | PASS |
-| 지표 승인건 텍스트 | metric-approved text | var(--color-brand-success) on #ffffff | 2.54:1 (FAIL on light) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
-| 지표 반려건 텍스트 | metric-rejected text | var(--color-brand-danger) on #ffffff | 4.31:1 (FAIL on light) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 4.5:1 | PASS |
+| 동기화 실패 경고 테두리 | stale-warning border | #ef4444 on #1f2937 (dark subtle) | 3.90:1 (FAIL) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
+| 지표 대기건 텍스트 | metric-pending text | N/A (미정의 변수 / 상속색) | N/A (미정의 변수 / 상속색) | --color-status-degraded on --color-bg-surface | 5.02:1 | 8.26:1 | >= 4.5:1 | PASS |
+| 지표 승인건 텍스트 | metric-approved text | N/A (미정의 변수 / 상속색) | N/A (미정의 변수 / 상속색) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
+| 지표 반려건 텍스트 | metric-rejected text | N/A (미정의 변수 / 상속색) | N/A (미정의 변수 / 상속색) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 4.5:1 | PASS |
 | 에러 상태 제목 | error-state-title | #fca5a5 on #ffffff | 1.90:1 (FAIL) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 4.5:1 | PASS |
-| 에러 상태 테두리 | error-state-border | #ef4444 on #ffffff | 3.99:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 3.0:1 | PASS |
+| 에러 상태 테두리 | error-state-border | #ef4444 on #ffffff | 3.76:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 3.0:1 | PASS |
 | 재시도 버튼 텍스트 | error-retry-btn text | #ffffff on #3b82f6 | 3.68:1 (FAIL) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 재시도 버튼 테두리 | error-retry-btn border | (border: none) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 안건 선택 좌측 테두리 | card-selected-border | 3px solid var(--color-brand-primary) | 4.72:1 (PASS) | --color-brand-primary on --color-bg-surface | 4.72:1 | 5.77:1 | >= 3.0:1 | PASS |
+| 안건 선택 좌측 테두리 | card-selected-border | 3px solid var(--color-brand-primary) | 4.72:1 (PASS) | --color-brand-primary on --color-bg-subtle | 4.72:1 | 5.77:1 | >= 3.0:1 | PASS |
 | 상태 배지 대기 텍스트 | status-badge-pending text | #d97706 on rgba(234,179,8,0.15) | 3.42:1 (FAIL) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
 | 상태 배지 대기 테두리 | status-badge-pending border | (border: none) | N/A (경계 미식별) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 3.0:1 | PASS |
 | 상태 배지 승인 텍스트 | status-badge-approved text | #059669 on rgba(16,185,129,0.15) | 3.82:1 (FAIL) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
@@ -68,7 +68,7 @@ source_of_truth: "Git"
 > - Probe 102 (`#fca5a5` on light surface `#ffffff`): **1.90:1** (< 4.5:1 FAIL)
 > - Probe 103 (`#fed7aa` on light surface `#ffffff`): **1.35:1** (< 4.5:1 FAIL)
 > - Probe 104 (`#3b82f6` on light surface `#ffffff`): **3.68:1** (< 4.5:1 FAIL)
-> - Probe 105 (`#ef4444` on dark subtle `#161b22`): **3.89:1** (< 4.5:1 FAIL text)
+> - Probe 105 (`#ef4444` on dark subtle `#1f2937`): **3.90:1** (< 4.5:1 FAIL text)
 
 ### 2.2 tools/reproduce_c245_contrast.py 실행 결과
 ```text
@@ -120,7 +120,7 @@ Total Audit Items: 31 | Passed: 31 | Failed: 0
 
 ### 3.1 로컬 검증 실행 기록
 1. `npx vitest run tests/acc09-contrast-tokens.test.tsx`:
-   - 결과: **33 passed** (100% 통과, Test 9p 및 Test 9j-2 AST 커버리지 래칫 통과)
+   - 결과: **33 passed** (100% 통과, Test 9p DOM 결속·UNKNOWN fallback 대비 단언 및 Test 9j-2 AST 커버리지 래칫 42/10/24/13/23/18/19 통과)
 2. `npx vitest run tests/acc-interactive-navigation.test.tsx tests/freshness-and-staleness-wiring.test.tsx tests/truth-time-and-freshness-axis.test.tsx tests/approval-review-panel-dom.test.tsx tests/approval-timeline.test.ts`:
    - 결과: **35 passed** (형제 승인/접근성 스위트 100% 통과)
 3. `npx vitest run`:
@@ -194,6 +194,6 @@ Total Audit Items: 31 | Passed: 31 | Failed: 0
 ---
 
 ## 5. 다음 행동 및 인계
-- **현재 상태**: Card 245 구현 완료, 로컬 전체 게이트 100% 통과, 40종 변이 전원 사살 실측 완료, PR 생성 준비 완료.
-- **다음 행동**: `agent/gemini/c245-approval-center-contrast` 브랜치 커밋 및 푸시, PR 생성 (base: `agent/gemini/c235-placement-contrast`), 리뷰 요청 코멘트 등록 (Zero bot tags `@...`).
+- **현재 상태**: Card 245 PR #342 [r2] 리뷰 수정 완료 (R1~R5 전수 반영: APPROVAL_STATUS_CONFIG 래칫 수집, 9p 위험 배너 DOM 결속, Before 열 6행 정정, 변이 러너 바이트 복원/봉인 및 40/40 전수 사살 재현, F2 제목 래칫 동기화).
+- **다음 행동**: `agent/gemini/c245-approval-center-contrast` 브랜치 커밋 및 푸시, PR #342 리뷰 답변 코멘트 등록 (Zero bot tags `@...`), Card 248 병합 및 재개.
 - **다음 담당자**: Claude UI (기본 리뷰어) 및 Codex (보조 리뷰어).

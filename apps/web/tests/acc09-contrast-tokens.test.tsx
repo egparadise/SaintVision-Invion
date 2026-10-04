@@ -6417,6 +6417,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(staleWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(staleWarning.style.borderColor).toBe('var(--color-status-offline)');
       expect(staleWarning.style.color).toBe('var(--color-status-offline)');
+      expect(staleWarning.textContent).toContain('⚠️');
+      expect(staleWarning.textContent).toContain('승인 목록 동기화 실패');
+      const staleSubtext = staleWarning.children[1] as HTMLElement;
+      expect(staleSubtext).not.toBeNull();
+      expect(staleSubtext.style.color).toBe('var(--color-status-offline)');
+      expect(staleSubtext.textContent).toContain('화면 확인 시점 스냅샷입니다');
 
       // 4. Status badges
       const status001 = container.querySelector('[data-testid="approval-status-apr_001"]') as HTMLElement;
@@ -6501,6 +6507,18 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const errBox = container.querySelector('[data-testid="approval-fetch-error-state"]') as HTMLElement;
       expect(errBox).not.toBeNull();
       expect(errBox.style.borderColor).toBe('var(--color-status-offline)');
+      expect(errBox.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(errBox.textContent).toContain('⚠️');
+
+      const errHeading = errBox.querySelector('h3') as HTMLElement;
+      expect(errHeading).not.toBeNull();
+      expect(errHeading.textContent).toBe('승인 안건 동기화 실패');
+      expect(errHeading.style.color).toBe('var(--color-status-offline)');
+
+      const errBody = errBox.querySelector('p') as HTMLElement;
+      expect(errBody).not.toBeNull();
+      expect(errBody.textContent).toContain('서버와 통신할 수 없어 승인 요청 목록을 조회하지 못했습니다');
+      expect(errBody.style.color).toBe('var(--color-text-muted)');
 
       const retryBtn = container.querySelector('[data-testid="approval-error-retry-btn"]') as HTMLElement;
       expect(retryBtn).not.toBeNull();
@@ -6563,6 +6581,14 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
         expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
       }
+
+      // 8. Contrast verification for getApprovalStatusConfig UNKNOWN fallback
+      const unkLightCr = getContrast(resolveTokenHex('--color-status-unknown', lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+      expect(unkLightCr, 'ApprovalCenter UNKNOWN status fallback on light subtle must pass 4.5:1').toBeCloseTo(6.47, 2);
+      expect(unkLightCr).toBeGreaterThanOrEqual(4.5);
+      const unkDarkCr = getContrast(resolveTokenHex('--color-status-unknown', darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+      expect(unkDarkCr, 'ApprovalCenter UNKNOWN status fallback on dark subtle must pass 4.5:1').toBeCloseTo(5.82, 2);
+      expect(unkDarkCr).toBeGreaterThanOrEqual(4.5);
     } finally {
       act(() => {
         root.unmount();
@@ -6861,7 +6887,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG') && node.initializer) {
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
             init = init.expression;
@@ -6986,13 +7012,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(placementStats.violations, `PlacementSimulator violations:\n${placementStats.violations.join('\n')}`).toEqual([]);
 
     const approvalStats = analyzeFile('features/approvals/ApprovalCenter.tsx');
-    expect(approvalStats.totalStyleAttrs, 'Total style attributes in ApprovalCenter must be exactly 37').toBe(37);
-    expect(approvalStats.checkedObjects, 'Explicit style objects in ApprovalCenter must be exactly 5').toBe(5);
-    expect(approvalStats.checkedPairs, 'Evaluated pairs in ApprovalCenter must be exactly 19').toBe(19);
+    expect(approvalStats.totalStyleAttrs, 'Total style attributes in ApprovalCenter must be exactly 42').toBe(42);
+    expect(approvalStats.checkedObjects, 'Explicit style objects in ApprovalCenter must be exactly 10').toBe(10);
+    expect(approvalStats.checkedPairs, 'Evaluated pairs in ApprovalCenter must be exactly 24').toBe(24);
     expect(approvalStats.unboundColorObjects, 'Unbound color objects in ApprovalCenter must be exactly 13').toBe(13);
-    expect(approvalStats.coveredColorObjects, 'Total covered color objects in ApprovalCenter must be exactly 18').toBe(18);
-    expect(approvalStats.checkedBorderObjects, 'Border objects in ApprovalCenter must be exactly 13').toBe(13);
-    expect(approvalStats.checkedBorderPairs, 'Border pairs in ApprovalCenter must be exactly 14').toBe(14);
+    expect(approvalStats.coveredColorObjects, 'Total covered color objects in ApprovalCenter must be exactly 23').toBe(23);
+    expect(approvalStats.checkedBorderObjects, 'Border objects in ApprovalCenter must be exactly 18').toBe(18);
+    expect(approvalStats.checkedBorderPairs, 'Border pairs in ApprovalCenter must be exactly 19').toBe(19);
     expect(approvalStats.violations, `ApprovalCenter violations:\n${approvalStats.violations.join('\n')}`).toEqual([]);
   });
 
@@ -7536,8 +7562,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 356/25 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 356/25 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 

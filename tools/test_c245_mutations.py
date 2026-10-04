@@ -19,6 +19,7 @@ import sys
 import json
 import argparse
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 WORKTREE_ROOT = Path(__file__).resolve().parent.parent
@@ -341,11 +342,14 @@ def apply_mutation(target_text, replacement_text):
     if target_text not in content:
         raise ValueError("Target pattern not found in file")
     new_content = content.replace(target_text, replacement_text, 1)
-    TARGET_FILE.write_text(new_content, encoding="utf-8")
+    TARGET_FILE.write_text(new_content, encoding="utf-8", newline="")
 
 
-def restore_file(original_content):
-    TARGET_FILE.write_text(original_content, encoding="utf-8")
+def restore_file(original_bytes):
+    TARGET_FILE.write_bytes(original_bytes)
+    restored_bytes = TARGET_FILE.read_bytes()
+    if restored_bytes != original_bytes:
+        raise RuntimeError(f"Byte mismatch after restoration of {TARGET_FILE}! Expected {len(original_bytes)} bytes, got {len(restored_bytes)} bytes")
     # Verify git diff
     res = subprocess.run(
         ["git", "diff", "--exit-code", str(TARGET_FILE)],
@@ -357,8 +361,7 @@ def restore_file(original_content):
         raise RuntimeError(f"Git diff non-zero after restoration of {TARGET_FILE}")
 
 
-def test_mutant(mutant, timeout=120):
-    original_content = TARGET_FILE.read_text(encoding="utf-8")
+def test_mutant(mutant, original_bytes, timeout=120):
     mutant_id = mutant["id"]
     desc = mutant["desc"]
     
@@ -379,7 +382,7 @@ def test_mutant(mutant, timeout=120):
     compiled_ok, tsc_out = run_tsc_check()
     if not compiled_ok:
         print(f"  [COMPILATION FAILED] Mutant does not compile under TypeScript!")
-        restore_file(original_content)
+        restore_file(original_bytes)
         return {
             "id": mutant_id,
             "desc": desc,
@@ -389,7 +392,7 @@ def test_mutant(mutant, timeout=120):
         }
 
     retcode, stdout, stderr, timed_out = run_vitest_acc09(timeout=timeout)
-    restore_file(original_content)
+    restore_file(original_bytes)
 
     if timed_out:
         print(f"  [TIMEOUT] Execution timed out after {timeout}s (NOT counted as killed)")
@@ -434,7 +437,8 @@ def main():
     parser.add_argument("--timeout", type=int, default=120, help="Per-mutant vitest timeout in seconds")
     args = parser.parse_args()
 
-    original_content = TARGET_FILE.read_text(encoding="utf-8")
+    original_bytes = TARGET_FILE.read_bytes()
+    original_content = original_bytes.decode("utf-8")
 
     if args.verify_targets:
         print("Verifying all mutation targets exist in target file...")
@@ -474,16 +478,36 @@ def main():
     results = []
     if RESULTS_FILE.exists():
         try:
-            results = json.loads(RESULTS_FILE.read_text(encoding="utf-8"))
+            raw = json.loads(RESULTS_FILE.read_text(encoding="utf-8"))
+            if isinstance(raw, dict) and "mutations" in raw:
+                results = raw["mutations"]
+            elif isinstance(raw, list):
+                results = raw
         except Exception:
             results = []
 
     res_dict = {r["id"]: r for r in results}
 
     for m in selected_mutants:
-        res = test_mutant(m, timeout=args.timeout)
+        res = test_mutant(m, original_bytes, timeout=args.timeout)
         res_dict[m["id"]] = res
-        RESULTS_FILE.write_text(json.dumps(list(res_dict.values()), indent=2, ensure_ascii=False), encoding="utf-8")
+        all_res = list(res_dict.values())
+        killed_count = sum(1 for r in all_res if r.get("killed"))
+        survived_count = sum(1 for r in all_res if r.get("status") == "SURVIVED")
+        timeouts_count = sum(1 for r in all_res if r.get("status") == "TIMEOUT")
+        tsc_fails_count = sum(1 for r in all_res if r.get("status") == "TSC_FAIL")
+        head_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(WORKTREE_ROOT), text=True).strip()
+        payload = {
+            "sourceHeadSha": head_sha,
+            "observedAt": datetime.now(timezone.utc).isoformat(),
+            "total": len(MUTANTS),
+            "killed": killed_count,
+            "survived": survived_count,
+            "timeouts": timeouts_count,
+            "tsc_fails": tsc_fails_count,
+            "mutations": all_res,
+        }
+        RESULTS_FILE.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="")
 
     all_res = list(res_dict.values())
     total_tested = len(all_res)
