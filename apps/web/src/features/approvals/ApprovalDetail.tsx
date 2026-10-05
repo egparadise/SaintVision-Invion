@@ -4,6 +4,7 @@ import { ApprovalItem } from '@/contracts/types';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { Button } from '@/shared/ui/Button';
 import { useModalA11y } from '@/shared/ui/useModalA11y';
+import { getApprovalStatusConfig } from './ApprovalCenter';
 
 export interface ApprovalDetailProps {
   approval: ApprovalItem;
@@ -115,15 +116,37 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
             승인 요청: <code>{approval.id}</code>
           </h2>
+          {/* Approval Status Badge */}
+          {(() => {
+            const statusCfg = getApprovalStatusConfig(approval.status);
+            return (
+              <span
+                data-testid={`approval-detail-status-${approval.status}`}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 600,
+                  backgroundColor: statusCfg.bg,
+                  color: statusCfg.color,
+                  border: `1px solid ${statusCfg.border}`,
+                }}
+              >
+                {statusCfg.label}
+              </span>
+            );
+          })()}
           {approval.boundRunVersion && (
             <span
+              data-testid="bound-version-badge"
               style={{
                 fontSize: '0.75rem',
                 padding: '2px 8px',
                 borderRadius: '12px',
                 fontWeight: 600,
-                backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                color: '#58a6ff',
+                backgroundColor: 'var(--color-bg-surface)',
+                color: 'var(--color-brand-primary)',
+                border: '1px solid var(--color-brand-primary)',
               }}
             >
               Bound Version: v{approval.boundRunVersion}
@@ -197,12 +220,13 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
         {/* Rollback Warning Badge */}
         {!approval.rollbackPlan && (
           <div
+            data-testid="rollback-warning-banner"
             style={{
               padding: '12px 16px',
-              backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              border: '1px solid var(--color-status-offline)',
+              backgroundColor: 'var(--color-risk-l3-bg)',
+              border: '1px solid var(--color-risk-l3-border)',
               borderRadius: 'var(--radius-md)',
-              color: 'var(--color-status-offline)',
+              color: 'var(--color-risk-l3-text)',
               fontSize: '0.875rem',
               fontWeight: 500,
               marginBottom: '20px',
@@ -230,15 +254,15 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <pre
             style={{
               padding: '14px',
-              backgroundColor: '#0d1117',
-              color: '#c9d1d9',
+              backgroundColor: 'var(--color-bg-canvas)',
+              color: 'var(--color-text-primary)',
               borderRadius: 'var(--radius-md)',
               fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
               fontSize: '0.8125rem',
               overflowX: 'auto',
               maxHeight: '260px',
               lineHeight: 1.5,
-              border: isDiffLoadFailed ? '1px solid var(--color-status-offline)' : '1px solid #30363d',
+              border: isDiffLoadFailed ? '1px solid var(--color-status-offline)' : '1px solid var(--color-border-strong)',
             }}
           >
             {hasDiff
@@ -278,6 +302,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
         {/* Action Buttons */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <Button
+            data-testid="approval-reject-button"
             variant="secondary"
             size="md"
             disabled={isExpired || isSubmitting || approval.status !== 'pending' || !approval.actionDigest}
@@ -310,7 +335,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

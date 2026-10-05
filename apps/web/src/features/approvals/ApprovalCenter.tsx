@@ -1,10 +1,20 @@
 import type { ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState } from 'react';
-import { ApprovalItem } from '@/contracts/types';
+import type { ApprovalItem } from '@/contracts/types';
 import { ApprovalReviewPanel } from './ApprovalReviewPanel';
 import { reviewIdentity } from '@/shared/api/approvalReview';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { EmptyState } from '@/shared/ui/EmptyState';
+
+export type ApprovalStatus = ApprovalItem['status'];
+export const APPROVAL_STATUSES = ['approved', 'dispatched', 'expired', 'pending', 'rejected'] as const satisfies readonly ApprovalStatus[];
+
+export interface ApprovalStatusConfigItem {
+  bg: string;
+  color: string;
+  border: string;
+  label: string;
+}
 
 export const APPROVAL_STATUS_CONFIG = {
   approved: {
@@ -37,13 +47,13 @@ export const APPROVAL_STATUS_CONFIG = {
     border: 'var(--color-status-offline)',
     label: 'REJECTED',
   },
-} as const;
+} as const satisfies Record<ApprovalStatus, ApprovalStatusConfigItem>;
 
-export function getApprovalStatusConfig(status: unknown) {
+export function getApprovalStatusConfig(status: unknown): ApprovalStatusConfigItem {
   if (status && typeof status === 'string' && Object.hasOwn(APPROVAL_STATUS_CONFIG, status)) {
-    return APPROVAL_STATUS_CONFIG[status as keyof typeof APPROVAL_STATUS_CONFIG];
+    return APPROVAL_STATUS_CONFIG[status as ApprovalStatus];
   }
-  const raw = status ? String(status) : '';
+  const raw = status ? String(status).trim() : '';
   return {
     bg: 'var(--color-bg-subtle)',
     color: 'var(--color-status-unknown)',
