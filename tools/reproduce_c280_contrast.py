@@ -127,10 +127,10 @@ def verify_tokens_against_index_css():
     if not root_match or not dark_match:
         print("Warning: Could not parse root or dark theme from index.css", file=sys.stderr)
         return
-    
+
     root_block = root_match.group(1)
     dark_block = dark_match.group(1)
-    
+
     for theme, block in [('light', root_block), ('dark', dark_block)]:
         for token, expected in TOKENS[theme].items():
             pattern = re.compile(rf'{re.escape(token)}\s*:\s*([^;]+);')
