@@ -34,7 +34,7 @@ export function getTerminalShellConfig(shellType: unknown): TerminalShellStyle {
   }
   return {
     color: 'var(--color-status-unknown)',
-    label: typeof shellType === 'string' && shellType.trim() ? shellType.toUpperCase() : 'UNKNOWN',
+    label: typeof shellType === 'string' && shellType.trim() ? `UNKNOWN (${shellType})` : 'UNKNOWN',
   };
 }
 
@@ -80,13 +80,14 @@ export interface TerminalSessionViewProps {
   initialMode?: 'terminal' | 'ide';
   commandId?: string | null;
   onCreateSessionError?: (err: string) => void;
+  initialSessions?: ActiveSessionTab[];
 }
 
-interface ActiveSessionTab {
+export interface ActiveSessionTab {
   id: string;
   title: string;
   nodeId: string;
-  shellType: TerminalShellType;
+  shellType: unknown;
   mode: 'terminal' | 'ide';
   workspaceId: string;
 }
@@ -100,6 +101,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
   initialMode = 'terminal',
   commandId,
   onCreateSessionError,
+  initialSessions: initialSessionsProp,
 }) => {
   const [activeCommandId, setActiveCommandId] = useState<string>(commandId ?? '');
 
@@ -119,6 +121,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
   }, [nodes, defaultNodeId, eligibleNodes]);
 
   const initialSessions: ActiveSessionTab[] = useMemo(() => {
+    if (initialSessionsProp && initialSessionsProp.length > 0) {
+      return initialSessionsProp;
+    }
     if (!primaryNode) return [];
     const list: ActiveSessionTab[] = [];
     const isWin = primaryNode.os === 'windows';

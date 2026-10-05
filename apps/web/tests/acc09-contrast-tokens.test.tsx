@@ -8919,23 +8919,26 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getTerminalShellConfig('cmd').color).toBe('var(--color-text-primary)');
 
     // Strict case-sensitive and fallback label tests (kills mutation variations)
-    expect(getTerminalShellConfig('POWERSHELL').label).toBe('POWERSHELL');
-    expect(getTerminalShellConfig('Bash').label).toBe('BASH');
-    expect(getTerminalShellConfig('ZSH').label).toBe('ZSH');
-    expect(getTerminalShellConfig('CMD').label).toBe('CMD');
+    expect(getTerminalShellConfig('POWERSHELL').label).toBe('UNKNOWN (POWERSHELL)');
+    expect(getTerminalShellConfig('Bash').label).toBe('UNKNOWN (Bash)');
+    expect(getTerminalShellConfig('ZSH').label).toBe('UNKNOWN (ZSH)');
+    expect(getTerminalShellConfig('CMD').label).toBe('UNKNOWN (CMD)');
 
     // Fail-closed fallback verification for shell
     const unknownShell = getTerminalShellConfig('unknown_shell');
-    expect(unknownShell.label).toBe('UNKNOWN_SHELL');
+    expect(unknownShell.label).toBe('UNKNOWN (unknown_shell)');
     expect(unknownShell.color).toBe('var(--color-status-unknown)');
 
-    // Prototype injection attacks fall back to UNKNOWN
+    // Prototype injection attacks fall back to UNKNOWN (<protoKey>)
     for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
       const protoRes = getTerminalShellConfig(protoKey);
       expect(protoRes.color).toBe('var(--color-status-unknown)');
+      expect(protoRes.label).toBe(`UNKNOWN (${protoKey})`);
     }
     expect(getTerminalShellConfig(null).label).toBe('UNKNOWN');
     expect(getTerminalShellConfig(undefined).label).toBe('UNKNOWN');
+    expect(getTerminalShellConfig('').label).toBe('UNKNOWN');
+    expect(getTerminalShellConfig('   ').label).toBe('UNKNOWN');
 
     // 2. Fail-closed PTY_AUTH_STATUS_CONFIG verification (ticket_bound, awaiting_command)
     expect(UI_PTY_AUTH_PROJECTION_STATUSES).toEqual(['ticket_bound', 'awaiting_command']);
@@ -9132,6 +9135,34 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const shellBadge = container.querySelector('[data-testid="active-shell-type"]') as HTMLElement;
       expect(shellBadge, 'Shell badge must render').not.toBeNull();
       expect(shellBadge.style.color).toBe('var(--color-brand-hover)');
+      expect(shellBadge.textContent).toBe('POWERSHELL');
+
+      // Verify case variants, unknown values, and prototype keys render UNKNOWN (<raw>) with unknown color in DOM
+      for (const fallbackShell of ['POWERSHELL', 'Bash', 'ZSH', 'CMD', 'unknown_custom_shell', 'toString']) {
+        await act(async () => {
+          root.render(
+            <TerminalSessionView
+              key={`term_fb_${fallbackShell}`}
+              nodes={mockNodes}
+              defaultNodeId="nod_01"
+              commandId=""
+              initialSessions={[
+                {
+                  id: `sess_test_${fallbackShell}`,
+                  title: `Test ${fallbackShell}`,
+                  nodeId: 'nod_01',
+                  shellType: fallbackShell,
+                  mode: 'terminal',
+                  workspaceId: 'ws_test',
+                },
+              ]}
+            />
+          );
+        });
+        const fbShellBadge = container.querySelector('[data-testid="active-shell-type"]') as HTMLElement;
+        expect(fbShellBadge.textContent).toBe(`UNKNOWN (${fallbackShell})`);
+        expect(fbShellBadge.style.color).toBe('var(--color-status-unknown)');
+      }
 
       const authBadge = container.querySelector('[data-testid="pty-ticket-badge"]') as HTMLElement;
       expect(authBadge, 'PTY auth badge must render').not.toBeNull();

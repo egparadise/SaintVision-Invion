@@ -86,9 +86,9 @@ MUTANTS = [
     },
     {
         "id": "M10",
-        "desc": "getTerminalShellConfig fallback color regression: var(--color-brand-hover)",
-        "target": "  return {\n    color: 'var(--color-status-unknown)',\n    label: typeof shellType === 'string' && shellType.trim() ? shellType.toUpperCase() : 'UNKNOWN',",
-        "replacement": "  return {\n    color: 'var(--color-brand-hover)',\n    label: typeof shellType === 'string' && shellType.trim() ? shellType.toUpperCase() : 'UNKNOWN',",
+        "desc": "getTerminalShellConfig fallback label UNKNOWN indicator stripping regression",
+        "target": "  return {\n    color: 'var(--color-status-unknown)',\n    label: typeof shellType === 'string' && shellType.trim() ? `UNKNOWN (${shellType})` : 'UNKNOWN',",
+        "replacement": "  return {\n    color: 'var(--color-status-unknown)',\n    label: typeof shellType === 'string' && shellType.trim() ? `${shellType}` : 'UNKNOWN',",
     },
     # M11-M16: PTY_AUTH_STATUS_CONFIG
     {
