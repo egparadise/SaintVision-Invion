@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+  "observedAt": "2026-10-05T16:38:54.526337+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "M1",
+      "desc": "App: Global error banner color==bg 1:1 collision (color: var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:27:12.529049+00:00"
+    },
+    {
+      "id": "M2",
+      "desc": "App: Global error banner border collision (borderBottom: 1px solid var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:27:40.376956+00:00"
+    },
+    {
+      "id": "M3",
+      "desc": "App: Global error banner low-contrast text (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:27:58.259481+00:00"
+    },
+    {
+      "id": "M4",
+      "desc": "App: Global error banner inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:28:17.606013+00:00"
+    },
+    {
+      "id": "M5",
+      "desc": "App: Global error banner literal regression (color: #991b1b)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:28:37.187270+00:00"
+    },
+    {
+      "id": "M6",
+      "desc": "App: Global error banner bg literal regression (backgroundColor: #fee2e2)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:28:54.418253+00:00"
+    },
+    {
+      "id": "M7",
+      "desc": "App: Global error banner border literal regression (borderBottom: 1px solid #f87171)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:29:10.678170+00:00"
+    },
+    {
+      "id": "M8",
+      "desc": "App: Dismiss button color==bg 1:1 collision (color: var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:29:27.379408+00:00"
+    },
+    {
+      "id": "M9",
+      "desc": "App: Dismiss button border collision (border: 1px solid var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:29:44.788189+00:00"
+    },
+    {
+      "id": "M10",
+      "desc": "App: Dismiss button border literal regression (border: 1px solid #dc2626)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:30:04.835969+00:00"
+    },
+    {
+      "id": "M11",
+      "desc": "App: Dismiss button text literal regression (color: #991b1b)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:30:22.921066+00:00"
+    },
+    {
+      "id": "M12",
+      "desc": "App: Dismiss button bg literal regression (backgroundColor: #ffffff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:30:39.880915+00:00"
+    },
+    {
+      "id": "M13",
+      "desc": "App: Dismiss button outline:0 focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:30:55.848108+00:00"
+    },
+    {
+      "id": "M14",
+      "desc": "App: Node sim active button text==bg 1:1 collision (color: var(--color-brand-primary-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:31:13.185097+00:00"
+    },
+    {
+      "id": "M15",
+      "desc": "App: Node sim active button border collision (border: var(--color-brand-primary-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:31:30.357629+00:00"
+    },
+    {
+      "id": "M16",
+      "desc": "App: Node sim active button low-contrast text (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:31:47.744512+00:00"
+    },
+    {
+      "id": "M17",
+      "desc": "App: Node sim active button literal regression (color: #ffffff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:32:05.433127+00:00"
+    },
+    {
+      "id": "M18",
+      "desc": "App: Node sim button outlineStyle:none suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:32:21.344151+00:00"
+    },
+    {
+      "id": "M19",
+      "desc": "App: Node sim inactive button text==bg 1:1 collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:32:38.854922+00:00"
+    },
+    {
+      "id": "M20",
+      "desc": "App: Node sim inactive button border collision (border: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:32:56.289046+00:00"
+    },
+    {
+      "id": "M21",
+      "desc": "App: Workspace error banner color==bg 1:1 collision (color: var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:33:14.507960+00:00"
+    },
+    {
+      "id": "M22",
+      "desc": "App: Workspace error banner border collision (border: 1px solid var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:33:32.118866+00:00"
+    },
+    {
+      "id": "M23",
+      "desc": "App: Workspace error banner low-contrast text (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:33:49.758842+00:00"
+    },
+    {
+      "id": "M24",
+      "desc": "App: Workspace error banner literal regression (color: #fca5a5)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:34:05.919866+00:00"
+    },
+    {
+      "id": "M25",
+      "desc": "App: Workspace error banner bg literal regression (backgroundColor: rgba(239, 68, 68, 0.1))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:34:22.523094+00:00"
+    },
+    {
+      "id": "M26",
+      "desc": "App: Workspace error banner border literal regression (border: 1px solid #ef4444)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:34:38.911267+00:00"
+    },
+    {
+      "id": "M27",
+      "desc": "App: Terminal notice guidance text literal regression (color: #fed7aa)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:34:55.884807+00:00"
+    },
+    {
+      "id": "M28",
+      "desc": "App: Terminal notice guidance low-contrast text (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:35:11.692481+00:00"
+    },
+    {
+      "id": "M29",
+      "desc": "App: Terminal notice outlineWidth:0 focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:35:28.364695+00:00"
+    },
+    {
+      "id": "M30",
+      "desc": "App: Terminal notice guidance color==bg 1:1 collision (color: var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:35:45.552481+00:00"
+    },
+    {
+      "id": "M31",
+      "desc": "releaseEngine: WCAG 1.4.3 description literal regression (#0d1117)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:36:03.578477+00:00"
+    },
+    {
+      "id": "M32",
+      "desc": "releaseEngine: WCAG 1.4.3 description literal regression (#c9d1d9)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:36:21.623937+00:00"
+    },
+    {
+      "id": "M33",
+      "desc": "releaseEngine: WCAG 1.4.11 description literal regression (#6e7681)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:36:39.679838+00:00"
+    },
+    {
+      "id": "M34",
+      "desc": "releaseEngine: WCAG 1.4.11 description literal regression (#0d1117)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:36:56.878817+00:00"
+    },
+    {
+      "id": "M35",
+      "desc": "releaseEngine: WCAG 1.4.3 ratio regression (contrastRatio: 3.5)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:37:13.897318+00:00"
+    },
+    {
+      "id": "M36",
+      "desc": "releaseEngine: WCAG 1.4.11 ratio regression (contrastRatio: 2.1)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:37:31.924668+00:00"
+    },
+    {
+      "id": "M37",
+      "desc": "releaseEngine: WCAG 1.4.3 status regression (status: fail)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:37:49.345201+00:00"
+    },
+    {
+      "id": "M38",
+      "desc": "releaseEngine: WCAG 1.4.11 status regression (status: fail)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:38:08.543720+00:00"
+    },
+    {
+      "id": "M39",
+      "desc": "releaseEngine: WCAG 1.4.11 description token omission (remove --color-border-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:38:27.073374+00:00"
+    },
+    {
+      "id": "M40",
+      "desc": "releaseEngine: WCAG 1.4.3 audit deletion (filter out wcag21-1.4.3-contrast-minimum)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "9220f8d8ec3220648ea7579d6b9537af5d37e215",
+      "observedAt": "2026-10-05T16:38:45.864734+00:00"
+    }
+  ]
+}

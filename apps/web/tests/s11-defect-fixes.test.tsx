@@ -722,7 +722,7 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
     expect(text).toContain('모의 활성 (서버 API 미노출 · 실 인프라 미배포)');
     expect(text).toContain('미측정 (대기)');
-    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): 12.26:1');
+    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): 7.24:1');
 
     // DEF-S11-17: Table wrapper has overflowX auto
     const tableWrappers = container.querySelectorAll('div[style*="overflow-x: auto"], div[style*="overflowX: auto"]');

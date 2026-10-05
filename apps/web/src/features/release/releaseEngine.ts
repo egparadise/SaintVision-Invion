@@ -73,16 +73,16 @@ export class ReleaseManager {
     {
       ruleId: 'wcag21-1.4.3-contrast-minimum',
       wcagLevel: 'AA',
-      description: '본문 텍스트와 배경 간 명도 대비가 최소 4.5:1 이상이어야 함',
+      description: '본문 텍스트와 배경 간 명도 대비가 최소 4.5:1 이상이어야 함 (--color-text-secondary on --color-bg-canvas: 실측 라이트 7.24:1, 다크 15.69:1)',
       status: 'pass',
-      contrastRatio: 12.26, // #c9d1d9 on #0d1117 (actual computed ratio 12.26:1)
+      contrastRatio: 7.24, // var(--color-text-secondary) on var(--color-bg-canvas) (WCAG 2.1 AA text >= 4.5:1, min 7.24:1)
     },
     {
       ruleId: 'wcag21-1.4.11-non-text-contrast',
       wcagLevel: 'AA',
-      description: '버튼, 칩, 입력창 등 UI 컴포넌트 인터랙티브 경계선(#6e7681 on #0d1117) 명도 대비가 최소 3:1 이상(실측 4.12:1)이어야 함',
+      description: '버튼, 칩, 입력창 등 UI 컴포넌트 인터랙티브 경계선(--color-border-subtle on --color-bg-canvas) 명도 대비가 최소 3:1 이상(실측 라이트 3.33:1, 다크 4.08:1)이어야 함',
       status: 'pass',
-      contrastRatio: 4.12, // #6e7681 on #0d1117 (WCAG 2.1 AA non-text >= 3.0:1)
+      contrastRatio: 3.33, // var(--color-border-subtle) on var(--color-bg-canvas) (WCAG 2.1 AA non-text >= 3.0:1, min 3.33:1)
     },
     {
       ruleId: 'wcag21-2.1.1-keyboard-navigation',
