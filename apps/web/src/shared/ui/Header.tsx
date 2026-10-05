@@ -182,12 +182,12 @@ export const Header: React.FC<HeaderProps> = ({
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: gatewayStatus.online ? 'var(--color-status-online)' : '#f85149',
+              backgroundColor: gatewayStatus.online ? 'var(--color-status-online)' : 'var(--color-status-offline)',
               display: 'inline-block',
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: '#f85149' }}>Offline</strong>}
+            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: 'var(--color-status-offline)' }}>Offline</strong>}
           </span>
         </div>
 
@@ -198,28 +198,28 @@ export const Header: React.FC<HeaderProps> = ({
               alignItems: 'center',
               gap: '8px',
               padding: '4px 10px',
-              backgroundColor: 'rgba(56, 139, 253, 0.12)',
-              border: '1px solid rgba(56, 139, 253, 0.3)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-strong)',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.8125rem',
             }}
           >
-            <span style={{ fontWeight: 600, color: '#58a6ff' }}>
+            <span style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>
               👤 {currentUser.name}
             </span>
             <span
               style={{
                 fontSize: '0.6875rem',
-                backgroundColor: 'rgba(56, 139, 253, 0.25)',
+                backgroundColor: 'var(--color-bg-surface)',
                 padding: '1px 5px',
                 borderRadius: 'var(--radius-sm)',
-                color: '#79c0ff',
+                color: 'var(--color-text-secondary)',
               }}
             >
               {currentUser.role}
             </span>
             {onLogout && (
-              <Button variant="ghost" size="sm" onClick={onLogout} style={{ padding: '2px 6px', fontSize: '0.75rem', color: '#f85149' }}>
+              <Button variant="ghost" size="sm" onClick={onLogout} style={{ padding: '2px 6px', fontSize: '0.75rem', color: 'var(--color-status-offline)' }}>
                 로그아웃
               </Button>
             )}
@@ -240,9 +240,9 @@ export const Header: React.FC<HeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              backgroundColor: 'rgba(59, 130, 246, 0.2)',
-              border: '1px solid rgba(59, 130, 246, 0.4)',
-              color: '#60a5fa',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-brand-primary)',
+              color: 'var(--color-brand-primary)',
             }}
           >
             <span>🖥️</span>

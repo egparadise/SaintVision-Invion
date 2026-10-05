@@ -100,7 +100,10 @@ import {
   deriveIntegrityStatus,
   type UiIntegrityProjectionStatus,
 } from '../src/features/evidence/EvidenceViewer';
-import type { RiskLevel, PlacementExplainResult, RunResultView } from '../src/contracts/types';
+import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
+import { Header } from '../src/shared/ui/Header';
+import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
+import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
 import type {
   ReleaseManifestResponse,
@@ -348,7 +351,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/admin/AdminSecurityConsole.tsx": {},
   "features/agent/NaturalLanguageRunView.tsx": {},
   "features/approvals/ApprovalCenter.tsx": {},
-  "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
+  "features/approvals/ApprovalDetail.tsx": {},
   "features/dashboard/ClusterOverview.tsx": {},
   "features/deployment/IntranetDeploymentView.tsx": {},
   "features/desktop/DesktopShell.tsx": {},
@@ -380,7 +383,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/workspaces/WorkspaceCreateModal.tsx": {},
   "features/workspaces/WorkspaceList.tsx": {},
   "shared/ui/Button.tsx": {},
-  "shared/ui/Header.tsx": {"#58a6ff": 1, "#60a5fa": 1, "#79c0ff": 1, "#f85149": 3, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.25)": 1, "rgba(56,139,253,0.3)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.4)": 1},
+  "shared/ui/Header.tsx": {},
   "shared/ui/RiskBadge.tsx": {},
 };
 
@@ -8335,9 +8338,212 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9z. [Card 276 / ACC-09] ApprovalDetail & Header Contrast, Canonical Wire Contracts, & Fail-Closed DOM Token Binding
+  it('ACC-09 / Card 276: ApprovalDetail and Header comply with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList & RiskBadge
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList, and RiskBadge style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    try {
+      // 1. APPROVAL_STATUS_CONFIG exact key set equality with canonical ApprovalStatus wire contract
+      const expectedApprovalKeys = [...APPROVAL_STATUSES];
+      expect(expectedApprovalKeys.length, 'Canonical contracts must define 5 ApprovalStatus items').toBe(5);
+      expect(Object.keys(APPROVAL_STATUS_CONFIG).sort(), 'APPROVAL_STATUS_CONFIG keys must exactly match canonical ApprovalStatus wire enum').toEqual([...expectedApprovalKeys].sort());
+
+      // 2. Numerical contrast calculations for each status config (text >= 4.5:1, border >= 3.0:1 on subtle & surface)
+      const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+      const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+      const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+      const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+
+      for (const [status, cfg] of Object.entries(APPROVAL_STATUS_CONFIG)) {
+        const fgTok = cfg.color.replace(/^var\(|\)$/g, '');
+        const bgTok = cfg.bg.replace(/^var\(|\)$/g, '');
+        const borderTok = cfg.border.replace(/^var\(|\)$/g, '');
+
+        const lFg = resolveTokenHex(fgTok, lightTokens);
+        const dFg = resolveTokenHex(fgTok, darkTokens);
+        const lBg = resolveTokenHex(bgTok, lightTokens);
+        const dBg = resolveTokenHex(bgTok, darkTokens);
+        const lBorder = resolveTokenHex(borderTok, lightTokens);
+        const dBorder = resolveTokenHex(borderTok, darkTokens);
+
+        // Text contrast on own badge background
+        const lightTextCr = getContrast(lFg, lBg);
+        const darkTextCr = getContrast(dFg, dBg);
+        expect(lightTextCr, `APPROVAL_STATUS_CONFIG[${status}] text light contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(darkTextCr, `APPROVAL_STATUS_CONFIG[${status}] text dark contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+
+        // Border contrast on parent card surface
+        const lightBorderCr = getContrast(lBorder, lSurface);
+        const darkBorderCr = getContrast(dBorder, dSurface);
+        expect(lightBorderCr, `APPROVAL_STATUS_CONFIG[${status}] border light contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(darkBorderCr, `APPROVAL_STATUS_CONFIG[${status}] border dark contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // 3. Fail-closed UNKNOWN fallback test: Object.hasOwn defense & prototype key rejection
+      const unknownFallback = getApprovalStatusConfig('UNKNOWN_STATUS');
+      expect(unknownFallback.label).toContain('UNKNOWN (UNKNOWN_STATUS)');
+      expect(unknownFallback.color).toBe('var(--color-status-unknown)');
+      expect(unknownFallback.bg).toBe('var(--color-bg-subtle)');
+      expect(unknownFallback.border).toBe('var(--color-status-unknown)');
+
+      // Prototype property injection attacks must fall back to UNKNOWN
+      for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+        const protoRes = getApprovalStatusConfig(protoKey);
+        expect(protoRes.label, `Prototype key ${protoKey} must trigger UNKNOWN fallback`).toContain('UNKNOWN');
+      }
+
+      // Null and undefined fall back to clean UNKNOWN without raw string
+      expect(getApprovalStatusConfig(null).label).toBe('UNKNOWN');
+      expect(getApprovalStatusConfig(undefined).label).toBe('UNKNOWN');
+
+      // UNKNOWN fallback contrast verification
+      const lUnknownFg = resolveTokenHex('--color-status-unknown', lightTokens);
+      const dUnknownFg = resolveTokenHex('--color-status-unknown', darkTokens);
+      expect(getContrast(lUnknownFg, lSubtle), 'UNKNOWN text light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dUnknownFg, dSubtle), 'UNKNOWN text dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lUnknownFg, lSurface), 'UNKNOWN border light contrast on surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(dUnknownFg, dSurface), 'UNKNOWN border dark contrast on surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 4. ApprovalDetail DOM rendering tests
+      const testApproval: ApprovalItem = {
+        id: 'app-c276-01',
+        requestedBy: 'operator-1',
+        requestedAt: '2026-10-05T12:00:00Z',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+        riskLevel: 'L2',
+        status: 'pending',
+        actionType: 'HOTFIX_DEPLOY',
+        description: 'Card 276 contrast tokenization verification',
+        boundRunVersion: '1.4.2-hotfix',
+        unifiedDiff: '--- a/kernel.c\n+++ b/kernel.c\n@@ -10,3 +10,3 @@\n- old_code();\n+ new_code();',
+        nonce: 'nonce-c276',
+        target: 'node-01',
+        command: 'systemctl restart saintvision',
+        actionDigest: 'sha256-abcdef1234567890',
+        requiredApprovals: 1,
+      };
+
+      await act(async () => {
+        root.render(
+          <ApprovalDetail
+            approval={testApproval}
+            currentUserId="reviewer-2"
+            onApprove={async () => {}}
+            onReject={async () => {}}
+          />
+        );
+      });
+
+      // 4-1. Status badge in ApprovalDetail top banner
+      const statusBadge = container.querySelector('[data-testid="approval-detail-status-pending"]') as HTMLElement;
+      expect(statusBadge, 'Approval status badge must render').not.toBeNull();
+      expect(statusBadge.textContent).toContain('PENDING');
+      expect(statusBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(statusBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(statusBadge.style.borderColor || statusBadge.style.border).toContain('var(--color-status-degraded)');
+
+      // 4-2. Bound Version badge
+      const boundBadge = container.querySelector('[data-testid="bound-version-badge"]') as HTMLElement;
+      expect(boundBadge, 'Bound version badge must render').not.toBeNull();
+      expect(boundBadge.textContent).toContain('1.4.2-hotfix');
+      expect(boundBadge.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(boundBadge.style.color).toBe('var(--color-brand-primary)');
+      expect(boundBadge.style.borderColor || boundBadge.style.border).toContain('var(--color-brand-primary)');
+
+      // 4-3. Rollback risk warning banner
+      const rollbackBanner = container.querySelector('[data-testid="rollback-warning-banner"]') as HTMLElement;
+      expect(rollbackBanner, 'Rollback warning banner must render').not.toBeNull();
+      expect(rollbackBanner.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+      expect(rollbackBanner.style.color).toBe('var(--color-risk-l3-text)');
+      expect(rollbackBanner.style.borderColor || rollbackBanner.style.border).toContain('var(--color-risk-l3-border)');
+
+      // 4-4. Unified Diff <pre>
+      const diffPre = container.querySelector('pre') as HTMLElement;
+      expect(diffPre, 'Unified Diff <pre> must render').not.toBeNull();
+      expect(diffPre.style.backgroundColor).toBe('var(--color-bg-canvas)');
+      expect(diffPre.style.color).toBe('var(--color-text-primary)');
+      expect(diffPre.style.borderColor || diffPre.style.border).toContain('var(--color-border-strong)');
+
+      // 4-5. Reject modal backdrop tokenization
+      const rejectButton = container.querySelector('[data-testid="approval-reject-button"]') as HTMLButtonElement;
+      expect(rejectButton, 'Reject button must exist').not.toBeNull();
+      await act(async () => {
+        rejectButton.click();
+      });
+
+      const modalDialog = container.querySelector('[role="dialog"]') as HTMLElement;
+      expect(modalDialog, 'Reject modal dialog must open').not.toBeNull();
+      expect(modalDialog.style.backgroundColor).toBe('var(--color-bg-backdrop)');
+
+      // 5. Header DOM rendering tests
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={() => {}}
+            onlineNodesCount={5}
+            totalNodesCount={5}
+            activeTab="approvals"
+            onSelectTab={() => {}}
+            currentUser={{ id: 'admin-1', name: 'Master Operator', role: 'SecAdmin' }}
+            onLogout={() => {}}
+            onSwitchToDesktop={() => {}}
+          />
+        );
+      });
+
+      // 5-1. User name
+      const userNameEl = container.querySelector('span[style*="font-weight: 600"]') as HTMLElement;
+      expect(userNameEl, 'User name element must render').not.toBeNull();
+      expect(userNameEl.textContent).toContain('Master Operator');
+      expect(userNameEl.style.color).toBe('var(--color-brand-primary)');
+
+      // 5-2. Role badge
+      const roleBadgeEl = container.querySelector('span[style*="font-size: 0.6875rem"]') as HTMLElement;
+      expect(roleBadgeEl, 'Role badge element must render').not.toBeNull();
+      expect(roleBadgeEl.textContent).toContain('SecAdmin');
+      expect(roleBadgeEl.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(roleBadgeEl.style.color).toBe('var(--color-text-secondary)');
+
+      // 5-3. Web Desktop switch button
+      const desktopButton = container.querySelector('button[aria-label="Web Desktop으로 전환"]') as HTMLButtonElement;
+      expect(desktopButton, 'Web Desktop switch button must render').not.toBeNull();
+      expect(desktopButton.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(desktopButton.style.color).toBe('var(--color-brand-primary)');
+      expect(desktopButton.style.borderColor || desktopButton.style.border).toContain('var(--color-brand-primary)');
+
+      // 6. Token Declaration Verification: all tokens used in ApprovalDetail.tsx & Header.tsx exist in index.css
+      const cssPath = path.resolve(__dirname, '../src/index.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf-8');
+      const declaredCssTokens = new Set<string>();
+      const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+      let declMatch;
+      while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+        declaredCssTokens.add(declMatch[1].trim());
+      }
+
+      for (const relPath of ['features/approvals/ApprovalDetail.tsx', 'shared/ui/Header.tsx']) {
+        const fullPath = path.resolve(__dirname, '../src', relPath);
+        const fileContent = fs.readFileSync(fullPath, 'utf-8');
+        const varMatches = fileContent.match(/var\((--[a-z0-9-]+)/g) || [];
+        for (const v of varMatches) {
+          const tokenName = v.replace('var(', '');
+          expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in ${relPath} must be declared in index.css`).toBe(true);
+        }
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -8894,6 +9100,26 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(evidenceStats.coveredColorObjects, 'Total covered color objects in EvidenceViewer must be exactly 15').toBe(15);
     expect(evidenceStats.checkedBorderObjects, 'Border objects in EvidenceViewer must be exactly 12').toBe(12);
     expect(evidenceStats.checkedBorderPairs, 'Border pairs in EvidenceViewer must be exactly 12').toBe(12);
+
+    const approvalDetailStats = analyzeFile('features/approvals/ApprovalDetail.tsx');
+    expect(approvalDetailStats.violations, `ApprovalDetail violations:\n${approvalDetailStats.violations.join('\n')}`).toEqual([]);
+    expect(approvalDetailStats.totalStyleAttrs, 'Total style attributes in ApprovalDetail must be exactly 35').toBe(35);
+    expect(approvalDetailStats.checkedObjects, 'Explicit style objects in ApprovalDetail must be exactly 3').toBe(3);
+    expect(approvalDetailStats.checkedPairs, 'Evaluated pairs in ApprovalDetail must be exactly 14').toBe(14);
+    expect(approvalDetailStats.unboundColorObjects, 'Unbound color objects in ApprovalDetail must be exactly 10').toBe(10);
+    expect(approvalDetailStats.coveredColorObjects, 'Total covered color objects in ApprovalDetail must be exactly 13').toBe(13);
+    expect(approvalDetailStats.checkedBorderObjects, 'Border objects in ApprovalDetail must be exactly 5').toBe(5);
+    expect(approvalDetailStats.checkedBorderPairs, 'Border pairs in ApprovalDetail must be exactly 6').toBe(6);
+
+    const headerStats = analyzeFile('shared/ui/Header.tsx');
+    expect(headerStats.violations, `Header violations:\n${headerStats.violations.join('\n')}`).toEqual([]);
+    expect(headerStats.totalStyleAttrs, 'Total style attributes in Header must be exactly 20').toBe(20);
+    expect(headerStats.checkedObjects, 'Explicit style objects in Header must be exactly 3').toBe(3);
+    expect(headerStats.checkedPairs, 'Evaluated pairs in Header must be exactly 11').toBe(11);
+    expect(headerStats.unboundColorObjects, 'Unbound color objects in Header must be exactly 7').toBe(7);
+    expect(headerStats.coveredColorObjects, 'Total covered color objects in Header must be exactly 10').toBe(10);
+    expect(headerStats.checkedBorderObjects, 'Border objects in Header must be exactly 4').toBe(4);
+    expect(headerStats.checkedBorderPairs, 'Border pairs in Header must be exactly 4').toBe(4);
   });
 
 
@@ -9590,6 +9816,36 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe135Cr = getContrast('#10b981', lightTokens['--color-bg-surface']);
     expect(probe135Cr, 'EvidenceViewer former copy feedback text #10b981 on light surface fails 4.5:1').toBeLessThan(4.5);
     expect(probe135Cr).toBeCloseTo(2.54, 1);
+
+    // Probe 136 [Card 276]: Former ApprovalDetail bound version badge text #58a6ff on light subtle composite strictly fails 4.5:1
+    const lightSubtleComp276 = blendRgba([56, 139, 253], 0.15, lightTokens['--color-bg-subtle']);
+    const probe136Cr = getContrast('#58a6ff', lightSubtleComp276);
+    expect(probe136Cr, 'ApprovalDetail former bound version text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe136Cr).toBeCloseTo(1.97, 1);
+
+    // Probe 137 [Card 276]: Former Header user pill border rgba(56, 139, 253, 0.3) on light surface composite strictly fails 3.0:1
+    const lightPillBorderComp276 = blendRgba([56, 139, 253], 0.30, lightTokens['--color-bg-surface']);
+    const probe137Cr = getContrast(lightPillBorderComp276, lightTokens['--color-bg-surface']);
+    expect(probe137Cr, 'Header former user pill border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe137Cr).toBeCloseTo(1.40, 1);
+
+    // Probe 138 [Card 276]: Former Header user name #58a6ff on light surface composite strictly fails 4.5:1
+    const lightUserNameComp276 = blendRgba([56, 139, 253], 0.12, lightTokens['--color-bg-surface']);
+    const probe138Cr = getContrast('#58a6ff', lightUserNameComp276);
+    expect(probe138Cr, 'Header former user name on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe138Cr).toBeCloseTo(2.22, 1);
+
+    // Probe 139 [Card 276]: Former Header role badge text #79c0ff on light surface composite strictly fails 4.5:1
+    const lightRoleComp276 = blendRgba([56, 139, 253], 0.25, lightTokens['--color-bg-surface']);
+    const probe139Cr = getContrast('#79c0ff', lightRoleComp276);
+    expect(probe139Cr, 'Header former role badge text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe139Cr).toBeCloseTo(1.47, 1);
+
+    // Probe 140 [Card 276]: Former Header Web Desktop button text #60a5fa on light surface composite strictly fails 4.5:1
+    const lightDesktopComp276 = blendRgba([59, 130, 246], 0.20, lightTokens['--color-bg-surface']);
+    const probe140Cr = getContrast('#60a5fa', lightDesktopComp276);
+    expect(probe140Cr, 'Header former Web Desktop button text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe140Cr).toBeCloseTo(2.02, 1);
 
 
 
