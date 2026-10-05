@@ -1,6 +1,48 @@
 import React from 'react';
 import { DesktopWindow as IDesktopWindow } from '@/contracts/virtualFabric';
 
+export type WindowControlAction = 'close' | 'minimize' | 'maximize';
+
+export interface WindowControlStyle {
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+}
+
+export const WINDOW_CONTROL_CONFIG: Record<WindowControlAction, WindowControlStyle> = {
+  close: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '창 닫기',
+  },
+  minimize: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: '최소화',
+  },
+  maximize: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: '최대화',
+  },
+} as const satisfies Record<WindowControlAction, WindowControlStyle>;
+
+export function getWindowControlConfig(action?: string | null): WindowControlStyle {
+  if (action && Object.hasOwn(WINDOW_CONTROL_CONFIG, action)) {
+    return WINDOW_CONTROL_CONFIG[action as WindowControlAction];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: action ? `UNKNOWN (${action})` : 'UNKNOWN',
+  };
+}
+
 export interface DesktopWindowProps {
   window: IDesktopWindow;
   isActive: boolean;
@@ -50,55 +92,53 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
 
   const { isMaximized, position, size, zIndex, title, icon } = window;
 
-  const style: React.CSSProperties = isMaximized
-    ? {
-        position: 'absolute',
-        top: '36px', // below top menu bar
-        left: 0,
-        right: 0,
-        bottom: '68px', // above bottom dock
-        width: '100%',
-        height: 'calc(100% - 104px)',
-        zIndex,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'var(--color-bg-surface)',
-        borderRadius: 0,
-        boxShadow: isActive
-          ? '0 12px 36px rgba(0, 0, 0, 0.45)'
-          : '0 4px 16px rgba(0, 0, 0, 0.25)',
-        border: '1px solid var(--color-border-subtle)',
-        overflow: 'hidden',
-        transition: 'all 0.15s ease-out',
-      }
-    : {
-        position: 'absolute',
-        top: `${Math.max(40, position.y)}px`,
-        left: `${Math.max(16, position.x)}px`,
-        width: `${size.width}px`,
-        height: `${size.height}px`,
-        maxWidth: 'calc(100vw - 32px)',
-        maxHeight: 'calc(100vh - 120px)',
-        zIndex,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'var(--color-bg-surface)',
-        borderRadius: 'var(--radius-lg, 12px)',
-        boxShadow: isActive
-          ? '0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--color-brand-primary)'
-          : '0 6px 20px rgba(0, 0, 0, 0.3)',
-        border: '1px solid var(--color-border-strong, #333)',
-        overflow: 'hidden',
-        transition: 'box-shadow 0.15s ease',
-      };
-
   return (
     <div
       role="dialog"
       aria-labelledby={`window-title-${window.id}`}
       aria-modal="false"
       tabIndex={-1}
-      style={style}
+      style={
+        isMaximized
+          ? {
+              position: 'absolute',
+              top: '36px', // below top menu bar
+              left: 0,
+              right: 0,
+              bottom: '68px', // above bottom dock
+              width: '100%',
+              height: 'calc(100% - 104px)',
+              zIndex,
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: 'var(--color-bg-surface)',
+              borderRadius: 0,
+              boxShadow: isActive ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+              border: '1px solid var(--color-border-subtle)',
+              overflow: 'hidden',
+              transition: 'all 0.15s ease-out',
+            }
+          : {
+              position: 'absolute',
+              top: `${Math.max(40, position.y)}px`,
+              left: `${Math.max(16, position.x)}px`,
+              width: `${size.width}px`,
+              height: `${size.height}px`,
+              maxWidth: 'calc(100vw - 32px)',
+              maxHeight: 'calc(100vh - 120px)',
+              zIndex,
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: 'var(--color-bg-surface)',
+              borderRadius: 'var(--radius-lg, 12px)',
+              boxShadow: isActive
+                ? 'var(--shadow-lg), 0 0 0 1px var(--color-brand-primary)'
+                : 'var(--shadow-md)',
+              border: '1px solid var(--color-border-strong)',
+              overflow: 'hidden',
+              transition: 'box-shadow 0.15s ease',
+            }
+      }
       onMouseDown={onFocus}
       onKeyDown={isActive ? handleKeyDown : undefined}
     >
@@ -109,8 +149,8 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 14px',
-          backgroundColor: isActive ? 'var(--color-bg-subtle, #1e293b)' : 'var(--color-bg-surface, #0f172a)',
-          borderBottom: '1px solid var(--color-border-subtle, #334155)',
+          backgroundColor: isActive ? 'var(--color-bg-subtle)' : 'var(--color-bg-surface)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           userSelect: 'none',
           cursor: 'grab',
           minHeight: '38px',
@@ -121,7 +161,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             type="button"
-            title="창 닫기"
+            title={WINDOW_CONTROL_CONFIG.close.label}
             aria-label={`창 닫기: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -131,16 +171,16 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: '#ef4444',
+              backgroundColor: 'var(--color-status-offline)',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           />
           <button
             type="button"
-            title="최소화"
+            title={WINDOW_CONTROL_CONFIG.minimize.label}
             aria-label={`창 최소화: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -150,16 +190,16 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: '#f59e0b',
+              backgroundColor: 'var(--color-status-degraded)',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           />
           <button
             type="button"
-            title={isMaximized ? '원래 크기로 복원' : '최대화'}
+            title={isMaximized ? '원래 크기로 복원' : WINDOW_CONTROL_CONFIG.maximize.label}
             aria-label={isMaximized ? `원래 크기로 복원: ${title}` : `최대화: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -169,11 +209,11 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: '#10b981',
+              backgroundColor: 'var(--color-status-online)',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           />
         </div>
@@ -188,7 +228,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
             gap: '8px',
             fontSize: '0.8125rem',
             fontWeight: 600,
-            color: isActive ? 'var(--color-text-primary, #f8fafc)' : 'var(--color-text-muted, #94a3b8)',
+            color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
             letterSpacing: '0.02em',
           }}
         >
@@ -197,7 +237,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
         </div>
 
         {/* Right: Window Status indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.6875rem', color: 'var(--color-text-muted, #64748b)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
           <span>{window.appId}</span>
         </div>
       </div>
