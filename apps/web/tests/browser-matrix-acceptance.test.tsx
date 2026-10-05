@@ -240,11 +240,11 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
 
     const textContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.3-contrast-minimum');
     expect(textContrast?.contrastRatio).toBeGreaterThanOrEqual(4.5);
-    expect(textContrast?.contrastRatio).toBe(12.26);
+    expect(textContrast?.contrastRatio).toBe(7.24);
 
     const nonTextContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
     expect(nonTextContrast?.contrastRatio).toBeGreaterThanOrEqual(3.0);
-    expect(nonTextContrast?.contrastRatio).toBe(4.12);
+    expect(nonTextContrast?.contrastRatio).toBe(3.33);
   });
 
   it('Test 7: Renders DesktopShell across responsive desktop viewport with active taskbar and window manager', async () => {

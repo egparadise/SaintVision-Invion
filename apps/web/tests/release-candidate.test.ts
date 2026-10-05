@@ -86,13 +86,12 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
     it('verifies color contrast exceeds WCAG AA 4.5:1 minimum threshold', () => {
       const rm = new ReleaseManager();
       const audits = rm.getAccessibilityAudits();
-
       const textContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.3-contrast-minimum');
       expect(textContrast).toBeDefined();
       expect(textContrast?.status).toBe('pass');
       expect(textContrast?.wcagLevel).toBe('AA');
       expect(textContrast?.contrastRatio).toBeGreaterThanOrEqual(4.5);
-      expect(textContrast?.contrastRatio).toBe(12.26); // #c9d1d9 on #0d1117 (actual computed ratio 12.26:1)
+      expect(textContrast?.contrastRatio).toBe(7.24); // var(--color-text-secondary) on var(--color-bg-canvas) (actual computed ratio 7.24:1)
 
       const uiContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
       expect(uiContrast).toBeDefined();

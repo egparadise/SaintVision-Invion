@@ -8551,22 +8551,37 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const audits = releaseMgr.getAccessibilityAudits();
     expect(audits.length, 'Accessibility audits must have at least 4 items').toBeGreaterThanOrEqual(4);
 
+    const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
+    const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
+    const lTextSec = resolveTokenHex('--color-text-secondary', lightTokens);
+    const dTextSec = resolveTokenHex('--color-text-secondary', darkTokens);
+    const lBorderSubtle = resolveTokenHex('--color-border-subtle', lightTokens);
+    const dBorderSubtle = resolveTokenHex('--color-border-subtle', darkTokens);
+
     const bodyContrastAudit = audits.find((a) => a.ruleId === 'wcag21-1.4.3-contrast-minimum');
     expect(bodyContrastAudit, 'WCAG 1.4.3 body text contrast audit must exist').toBeDefined();
     expect(bodyContrastAudit?.status).toBe('pass');
-    expect(bodyContrastAudit?.contrastRatio).toBe(12.26);
+    const expectedBodyCr = Math.min(
+      parseFloat(getContrast(lTextSec, lCanvas).toFixed(2)),
+      parseFloat(getContrast(dTextSec, dCanvas).toFixed(2))
+    );
+    expect(bodyContrastAudit?.contrastRatio).toBe(expectedBodyCr);
+    expect(bodyContrastAudit?.contrastRatio).toBe(7.24);
 
     const nonTextAudit = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
     expect(nonTextAudit, 'WCAG 1.4.11 non-text boundary contrast audit must exist').toBeDefined();
     expect(nonTextAudit?.status).toBe('pass');
-    expect(nonTextAudit?.contrastRatio).toBe(4.12);
+    const expectedNonTextCr = Math.min(
+      parseFloat(getContrast(lBorderSubtle, lCanvas).toFixed(2)),
+      parseFloat(getContrast(dBorderSubtle, dCanvas).toFixed(2))
+    );
+    expect(nonTextAudit?.contrastRatio).toBe(expectedNonTextCr);
+    expect(nonTextAudit?.contrastRatio).toBe(3.33);
     expect(nonTextAudit?.description).toContain('--color-border-subtle');
     expect(nonTextAudit?.description).toContain('--color-bg-canvas');
     expect(nonTextAudit?.description).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
 
     // 2. Numerical contrast calculations for App Shell tokenized items (WCAG 2.2 AA criteria)
-    const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
-    const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
     const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
     const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
     const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
@@ -8583,10 +8598,6 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const dPrimaryFg = resolveTokenHex('--color-brand-primary-fg', darkTokens);
     const lBorderStrong = resolveTokenHex('--color-border-strong', lightTokens);
     const dBorderStrong = resolveTokenHex('--color-border-strong', darkTokens);
-    const lBorderSubtle = resolveTokenHex('--color-border-subtle', lightTokens);
-    const dBorderSubtle = resolveTokenHex('--color-border-subtle', darkTokens);
-    const lTextSec = resolveTokenHex('--color-text-secondary', lightTokens);
-    const dTextSec = resolveTokenHex('--color-text-secondary', darkTokens);
     const lTextMuted = resolveTokenHex('--color-text-muted', lightTokens);
     const dTextMuted = resolveTokenHex('--color-text-muted', darkTokens);
     const lDegraded = resolveTokenHex('--color-status-degraded', lightTokens);

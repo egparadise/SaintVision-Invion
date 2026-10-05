@@ -2,41 +2,49 @@
 """
 tools/reproduce_c277_contrast.py
 
-Card 277: ACC-09 App Shell (App.tsx) & Release Engine (releaseEngine.ts)
-Color Tokenization & WCAG 2.2 AA Contrast Verification.
-Evaluates WCAG 2.2 AA contrast compliance across all 21 audit items in both Light and Dark themes.
-Uses authentic mathematical alpha blending: round(alpha * fg + (1 - alpha) * bg).
+Reproduce WCAG 2.2 AA Contrast Compliance for Card 277 (App Shell & Release Engine Contrast Tokenization).
+Audits:
+- App.tsx (Global action error banner, simulation controls, workspace error banner, terminal notice)
+- releaseEngine.ts (WCAG 1.4.3 text contrast audit, WCAG 1.4.11 non-text boundary audit)
+
+Strict compliance:
+- WCAG SC 1.4.3: Contrast (Minimum) >= 4.5:1 for normal text.
+- WCAG SC 1.4.11: Non-text Contrast >= 3.0:1 for user interface component boundaries and states.
+- Non-boundary fills (component backgrounds against underlays) classified as INFO.
+- All tokens verified directly against apps/web/src/index.css declarations.
 """
 
-import math
-from typing import Dict, Tuple
+import sys
+import re
+from pathlib import Path
+from typing import Dict, Any
 
-def parse_hex(hex_str: str) -> Tuple[int, int, int]:
-    s = hex_str.lstrip('#')
-    if len(s) == 3:
-        s = ''.join(c * 2 for c in s)
-    return tuple(int(s[i:i+2], 16) for i in (0, 2, 4))
+def parse_hex(hex_str: str):
+    h = hex_str.lstrip('#')
+    if len(h) == 3:
+        h = ''.join(c * 2 for c in h)
+    return [int(h[i:i+2], 16) for i in (0, 2, 4)]
 
-def parse_rgba(rgba_str: str) -> Tuple[int, int, int, float]:
-    cleaned = rgba_str.strip().replace('rgba(', '').replace('rgb(', '').replace(')', '')
-    parts = [p.strip() for p in cleaned.split(',')]
-    r, g, b = int(parts[0]), int(parts[1]), int(parts[2])
-    a = float(parts[3]) if len(parts) > 3 else 1.0
-    return (r, g, b, a)
+def parse_rgba(rgba_str: str):
+    m = re.match(r'rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)', rgba_str)
+    if not m:
+        raise ValueError(f"Invalid rgba: {rgba_str}")
+    r, g, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    a = float(m.group(4)) if m.group(4) is not None else 1.0
+    return [r, g, b, a]
 
-def blend_rgba(fg_rgba: Tuple[int, int, int, float], bg_hex: str) -> str:
-    r_fg, g_fg, b_fg, a = fg_rgba
-    r_bg, g_bg, b_bg = parse_hex(bg_hex)
-    r = round(a * r_fg + (1 - a) * r_bg)
-    g = round(a * g_fg + (1 - a) * g_bg)
-    b = round(a * b_fg + (1 - a) * b_bg)
+def blend_rgba(fg_rgba, bg_hex: str) -> str:
+    r_f, g_f, b_f, a = fg_rgba
+    r_b, g_b, b_b = parse_hex(bg_hex)
+    r = round((1 - a) * r_b + a * r_f)
+    g = round((1 - a) * g_b + a * g_f)
+    b = round((1 - a) * b_b + a * b_f)
     return f"#{r:02x}{g:02x}{b:02x}"
 
 def get_luminance(hex_str: str) -> float:
-    r, g, b = parse_hex(hex_str)
-    def channel(c: int) -> float:
-        v = c / 255.0
-        return v / 12.92 if v <= 0.03928 else math.pow((v + 0.055) / 1.055, 2.4)
+    r, g, b = [x / 255.0 for x in parse_hex(hex_str)]
+    def channel(c: float) -> float:
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
     return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
 
 def get_contrast(c1: str, c2: str) -> float:
@@ -78,7 +86,7 @@ TOKENS = {
         '--color-text-secondary': '#e5e7eb',
         '--color-text-muted': '#9ca3af',
         '--color-brand-primary': '#60a5fa',
-        '--color-brand-primary-bg': '#2563eb',
+        '--color-brand-primary-bg': '#1d4ed8',
         '--color-brand-primary-fg': '#ffffff',
         '--color-status-online': '#22c55e',
         '--color-status-offline': '#f87171',
@@ -89,6 +97,30 @@ TOKENS = {
         '--color-risk-l3-text': '#fecaca',
     }
 }
+
+def verify_tokens_against_index_css():
+    """Verify that TOKENS table exactly matches index.css declarations."""
+    css_path = Path(__file__).resolve().parent.parent / 'apps' / 'web' / 'src' / 'index.css'
+    content = css_path.read_text(encoding='utf-8')
+    root_match = re.search(r':root\s*\{([^}]+)\}', content)
+    dark_match = re.search(r"\[data-theme=['\"]dark['\"]\]\s*\{([^}]+)\}", content)
+    assert root_match and dark_match, "Failed to parse index.css theme blocks"
+
+    def parse_block(block_str):
+        decl = {}
+        for m in re.finditer(r'(--[a-z0-9-]+)\s*:\s*([^;]+);', block_str):
+            decl[m.group(1).strip()] = m.group(2).strip()
+        return decl
+
+    light_decl = parse_block(root_match.group(1))
+    dark_decl = parse_block(dark_match.group(1))
+
+    for token, val in TOKENS['light'].items():
+        assert token in light_decl, f"Token {token} missing in index.css :root"
+        assert light_decl[token] == val, f"Token {token} mismatch in light: script={val}, css={light_decl[token]}"
+    for token, val in TOKENS['dark'].items():
+        assert token in dark_decl, f"Token {token} missing in index.css dark"
+        assert dark_decl[token] == val, f"Token {token} mismatch in dark: script={val}, css={dark_decl[token]}"
 
 AUDIT_ITEMS = [
     # App.tsx items
@@ -113,11 +145,11 @@ AUDIT_ITEMS = [
     {
         'id': 'AP-3',
         'component': 'App',
-        'name': 'Global error dismiss button background',
-        'type': 'border',
-        'target': '3.0:1 non-text',
-        'before': {'border_raw': '#dc2626', 'parent_token': '--color-risk-l3-bg'},
-        'after': {'border_token': '--color-risk-l3-border', 'parent_token': '--color-risk-l3-bg'},
+        'name': 'Global error dismiss button background (fill on banner)',
+        'type': 'background',
+        'target': 'INFO (non-boundary fill; boundary defined by risk-l3-border AP-5)',
+        'before': {'bg_raw': '#ffffff', 'parent_raw': '#fee2e2'},
+        'after': {'bg_token': '--color-bg-surface', 'parent_token': '--color-risk-l3-bg'},
     },
     {
         'id': 'AP-4',
@@ -134,17 +166,17 @@ AUDIT_ITEMS = [
         'name': 'Global error dismiss button border',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'border_raw': '#dc2626', 'parent_token': '--color-bg-surface'},
+        'before': {'border_raw': '#dc2626', 'parent_raw': '#ffffff'},
         'after': {'border_token': '--color-risk-l3-border', 'parent_token': '--color-bg-surface'},
     },
     {
         'id': 'AP-6',
         'component': 'App',
-        'name': 'Node simulation active button background',
-        'type': 'border',
-        'target': '3.0:1 non-text',
-        'before': {'border_raw': 'var(--color-brand-primary-bg)', 'parent_token': '--color-bg-canvas'},
-        'after': {'border_token': '--color-brand-primary-bg', 'parent_token': '--color-bg-canvas'},
+        'name': 'Node simulation active button background (fill on surface)',
+        'type': 'background',
+        'target': 'INFO (fill underlay; boundary defined by brand-primary-fg border AP-8)',
+        'before': {'bg_token': '--color-brand-primary-bg', 'parent_token': '--color-bg-surface'},
+        'after': {'bg_token': '--color-brand-primary-bg', 'parent_token': '--color-bg-surface'},
     },
     {
         'id': 'AP-7',
@@ -152,7 +184,7 @@ AUDIT_ITEMS = [
         'name': 'Node simulation active button text',
         'type': 'text',
         'target': '4.5:1 text',
-        'before': {'fg_raw': '#ffffff', 'bg_raw': 'var(--color-brand-primary-bg)'},
+        'before': {'fg_raw': '#ffffff', 'bg_token': '--color-brand-primary-bg'},
         'after': {'fg_token': '--color-brand-primary-fg', 'bg_token': '--color-brand-primary-bg'},
     },
     {
@@ -161,7 +193,7 @@ AUDIT_ITEMS = [
         'name': 'Node simulation active button border',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'border_raw': 'var(--color-border-strong)', 'parent_token': '--color-brand-primary-bg'},
+        'before': {'border_token': '--color-border-strong', 'parent_token': '--color-brand-primary-bg'},
         'after': {'border_token': '--color-brand-primary-fg', 'parent_token': '--color-brand-primary-bg'},
     },
     {
@@ -179,17 +211,17 @@ AUDIT_ITEMS = [
         'name': 'Node simulation inactive button border',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'border_token': '--color-border-strong', 'parent_token': '--color-bg-canvas'},
-        'after': {'border_token': '--color-border-strong', 'parent_token': '--color-bg-canvas'},
+        'before': {'border_token': '--color-border-strong', 'parent_token': '--color-bg-surface'},
+        'after': {'border_token': '--color-border-strong', 'parent_token': '--color-bg-surface'},
     },
     {
         'id': 'AP-11',
         'component': 'App',
-        'name': 'Workspace error banner background',
-        'type': 'border',
-        'target': '3.0:1 non-text',
-        'before': {'border_raw': '#ef4444', 'parent_token': '--color-bg-canvas'},
-        'after': {'border_token': '--color-risk-l3-border', 'parent_token': '--color-bg-canvas'},
+        'name': 'Workspace error banner background (fill on canvas)',
+        'type': 'background',
+        'target': 'INFO (container fill; boundary defined by risk-l3-border AP-12)',
+        'before': {'bg_raw': 'rgba(239, 68, 68, 0.1)', 'parent_token': '--color-bg-canvas'},
+        'after': {'bg_token': '--color-risk-l3-bg', 'parent_token': '--color-bg-canvas'},
     },
     {
         'id': 'AP-12',
@@ -197,7 +229,7 @@ AUDIT_ITEMS = [
         'name': 'Workspace error banner border',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'border_raw': '#ef4444', 'parent_token': '--color-bg-canvas'},
+        'before': {'border_raw': '#ef4444', 'parent_token': '--color-bg-surface'},
         'after': {'border_token': '--color-risk-l3-border', 'parent_token': '--color-bg-canvas'},
     },
     {
@@ -206,17 +238,17 @@ AUDIT_ITEMS = [
         'name': 'Workspace error banner text',
         'type': 'text',
         'target': '4.5:1 text',
-        'before': {'fg_raw': '#fca5a5', 'bg_raw': 'rgba(239, 68, 68, 0.1)', 'parent_token': '--color-bg-canvas'},
+        'before': {'fg_raw': '#fca5a5', 'bg_raw': 'rgba(239, 68, 68, 0.1)', 'parent_token': '--color-bg-surface'},
         'after': {'fg_token': '--color-risk-l3-text', 'bg_token': '--color-risk-l3-bg'},
     },
     {
         'id': 'AP-14',
         'component': 'App',
-        'name': 'Terminal notice container background',
-        'type': 'border',
-        'target': '3.0:1 non-text',
-        'before': {'border_token': '--color-border-subtle', 'parent_token': '--color-bg-canvas'},
-        'after': {'border_token': '--color-border-subtle', 'parent_token': '--color-bg-canvas'},
+        'name': 'Terminal notice container background (fill on canvas)',
+        'type': 'background',
+        'target': 'INFO (container fill; boundary defined by border-subtle AP-15)',
+        'before': {'bg_token': '--color-bg-surface', 'parent_token': '--color-bg-canvas'},
+        'after': {'bg_token': '--color-bg-surface', 'parent_token': '--color-bg-canvas'},
     },
     {
         'id': 'AP-15',
@@ -270,7 +302,7 @@ AUDIT_ITEMS = [
         'name': 'WCAG 1.4.3 minimum body text contrast audit',
         'type': 'text',
         'target': '4.5:1 text',
-        'before': {'ratio': 12.26},
+        'before': {'fg_raw': '#c9d1d9', 'bg_raw': '#0d1117'},
         'after': {'fg_token': '--color-text-secondary', 'bg_token': '--color-bg-canvas'},
     },
     {
@@ -279,7 +311,7 @@ AUDIT_ITEMS = [
         'name': 'WCAG 1.4.11 non-text interactive boundary contrast audit',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'ratio': 4.12},
+        'before': {'border_raw': '#6e7681', 'parent_raw': '#0d1117'},
         'after': {'border_token': '--color-border-subtle', 'parent_token': '--color-bg-canvas'},
     },
 ]
@@ -294,6 +326,8 @@ def resolve_color(spec: Dict[str, str], theme: str) -> str:
         return tokens[spec['border_token']]
     if 'parent_token' in spec:
         return tokens[spec['parent_token']]
+    if 'parent_raw' in spec:
+        return spec['parent_raw']
     if 'fg_raw' in spec:
         raw = spec['fg_raw']
         if raw.startswith('rgba'):
@@ -322,59 +356,106 @@ def resolve_color(spec: Dict[str, str], theme: str) -> str:
         return raw
     raise ValueError(f"Unknown color spec: {spec}")
 
+def compute_contrast(item: Dict[str, Any], state: 'before' or 'after') -> (float, float):
+    spec = item[state]
+    item_type = item['type']
+
+    if item_type == 'text':
+        # fg vs bg
+        fg_spec = {'fg_token': spec['fg_token']} if 'fg_token' in spec else {'fg_raw': spec['fg_raw']}
+        if 'bg_token' in spec:
+            bg_spec = {'bg_token': spec['bg_token']}
+        elif 'bg_raw' in spec:
+            bg_spec = {'bg_raw': spec['bg_raw'], 'parent_token': spec.get('parent_token', '--color-bg-surface')}
+        else:
+            raise ValueError(f"No bg in {spec}")
+        l_fg = resolve_color(fg_spec, 'light')
+        l_bg = resolve_color(bg_spec, 'light')
+        d_fg = resolve_color(fg_spec, 'dark')
+        d_bg = resolve_color(bg_spec, 'dark')
+        return get_contrast(l_fg, l_bg), get_contrast(d_fg, d_bg)
+
+    elif item_type == 'border':
+        # border vs parent
+        b_spec = {'border_token': spec['border_token']} if 'border_token' in spec else {'border_raw': spec['border_raw']}
+        if 'parent_token' in spec:
+            p_spec = {'parent_token': spec['parent_token']}
+        elif 'parent_raw' in spec:
+            p_spec = {'parent_raw': spec['parent_raw']}
+        else:
+            raise ValueError(f"No parent in {spec}")
+        l_b = resolve_color(b_spec, 'light')
+        l_p = resolve_color(p_spec, 'light')
+        d_b = resolve_color(b_spec, 'dark')
+        d_p = resolve_color(p_spec, 'dark')
+        return get_contrast(l_b, l_p), get_contrast(d_b, d_p)
+
+    elif item_type == 'background':
+        # bg vs parent
+        bg_spec = {'bg_token': spec['bg_token']} if 'bg_token' in spec else {'bg_raw': spec['bg_raw']}
+        if 'parent_token' in spec:
+            p_spec = {'parent_token': spec['parent_token']}
+        elif 'parent_raw' in spec:
+            p_spec = {'parent_raw': spec['parent_raw']}
+        else:
+            raise ValueError(f"No parent in {spec}")
+        l_bg = resolve_color(bg_spec, 'light')
+        l_p = resolve_color(p_spec, 'light')
+        d_bg = resolve_color(bg_spec, 'dark')
+        d_p = resolve_color(p_spec, 'dark')
+        return get_contrast(l_bg, l_p), get_contrast(d_bg, d_p)
+
+    raise ValueError(f"Unknown type: {item_type}")
+
 def main():
     print("=" * 80)
     print("Card 277: ACC-09 App Shell & Release Engine WCAG 2.2 AA Contrast Reproduction")
     print("=" * 80)
 
+    verify_tokens_against_index_css()
+    print("[PASS] Verified TOKENS table against apps/web/src/index.css declarations.")
+
     pass_count = 0
     total_count = len(AUDIT_ITEMS)
+
+    print(f"\n{'ID':<6} | {'Target':<10} | {'Before (L/D)':<14} | {'After (L/D)':<14} | {'Status':<6} | {'Item Name'}")
+    print("-" * 88)
 
     for item in AUDIT_ITEMS:
         item_id = item['id']
         name = item['name']
         item_type = item['type']
+        target_desc = item['target']
 
-        if item_id == 'RE-1':
-            l_cr, d_cr = 12.26, 12.26
+        l_before, d_before = compute_contrast(item, 'before')
+        l_after, d_after = compute_contrast(item, 'after')
+
+        if item_type == 'text':
             min_req = 4.5
-        elif item_id == 'RE-2':
-            l_cr, d_cr = 4.12, 4.12
+            is_pass = (l_after >= min_req and d_after >= min_req)
+            status = "PASS" if is_pass else "FAIL"
+            target_str = ">= 4.5:1"
+        elif item_type == 'border':
             min_req = 3.0
-        else:
-            if item_type == 'text':
-                min_req = 4.5
-                l_fg = resolve_color({'fg_token': item['after']['fg_token']}, 'light')
-                l_bg = resolve_color({'bg_token': item['after']['bg_token']}, 'light')
-                d_fg = resolve_color({'fg_token': item['after']['fg_token']}, 'dark')
-                d_bg = resolve_color({'bg_token': item['after']['bg_token']}, 'dark')
-                l_cr = get_contrast(l_fg, l_bg)
-                d_cr = get_contrast(d_fg, d_bg)
-            else: # border
-                min_req = 3.0
-                l_border = resolve_color({'border_token': item['after']['border_token']}, 'light')
-                l_bg = resolve_color({'parent_token': item['after']['parent_token']}, 'light')
-                d_border = resolve_color({'border_token': item['after']['border_token']}, 'dark')
-                d_bg = resolve_color({'parent_token': item['after']['parent_token']}, 'dark')
-                l_cr = get_contrast(l_border, l_bg)
-                d_cr = get_contrast(d_border, d_bg)
+            is_pass = (l_after >= min_req and d_after >= min_req)
+            status = "PASS" if is_pass else "FAIL"
+            target_str = ">= 3.0:1"
+        else: # background / fill
+            is_pass = True
+            status = "INFO"
+            target_str = "INFO"
 
-        l_pass = l_cr >= min_req
-        d_pass = d_cr >= min_req
-        item_pass = l_pass and d_pass
-
-        status_str = "PASS" if item_pass else "FAIL"
-        if item_pass:
+        if is_pass:
             pass_count += 1
 
-        print(f"[{item_id}] {name} ({item_type}): {status_str} (Light: {l_cr:.2f}:1, Dark: {d_cr:.2f}:1, Min: {min_req}:1)")
+        before_str = f"{l_before:.2f} / {d_before:.2f}"
+        after_str = f"{l_after:.2f} / {d_after:.2f}"
+        print(f"{item_id:<6} | {target_str:<10} | {before_str:<14} | {after_str:<14} | {status:<6} | {name}")
 
-    print("-" * 80)
-    print(f"Result: {pass_count}/{total_count} items passed WCAG 2.2 AA requirements.")
-    print("=" * 80)
-
-    if pass_count != total_count:
-        exit(1)
+    print("-" * 88)
+    print(f"Total Audit Items: {total_count}, Passed / Info: {pass_count}/{total_count}")
+    assert pass_count == total_count, f"Contrast audit failed: {pass_count}/{total_count} passed"
+    print("ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.")
 
 if __name__ == '__main__':
     main()
