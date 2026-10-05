@@ -1,8 +1,8 @@
 {
   "card": "CARD-278",
   "component": "DesktopWindow",
-  "sourceHeadSha": "637c21f4bdf07eab91dfa085f052a540b5042b1b",
-  "startedAt": "2026-10-05T17:43:07.864244+00:00",
+  "sourceHeadSha": "4a629d6a6ba4c8c3dca0603ffda8bc525f013075",
+  "startedAt": "2026-10-05T18:34:27.457382+00:00",
   "mutants": [
     {
       "id": "M1",
@@ -210,6 +210,6 @@
   "survived": 0,
   "timeouts": 0,
   "tsc_fails": 0,
-  "completedAt": "2026-10-05T17:55:08.036473+00:00",
+  "completedAt": "2026-10-05T18:46:29.022710+00:00",
   "killRate": "100.0%"
 }
