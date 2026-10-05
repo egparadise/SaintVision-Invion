@@ -82,6 +82,16 @@ import {
   getCandidateStatusConfig,
 } from '../src/features/release/ReleaseCandidateView';
 import { ReleaseManager } from '../src/features/release/releaseEngine';
+import {
+  RiskBadge,
+  RISK_CONFIG,
+  getRiskLevelConfig,
+} from '../src/shared/ui/RiskBadge';
+import { Button } from '../src/shared/ui/Button';
+import { ExecutionResultView } from '../src/features/workspaces/ExecutionResultView';
+import { WorkspaceCreateModal } from '../src/features/workspaces/WorkspaceCreateModal';
+import type { RiskLevel } from '../src/contracts/types';
+
 import type {
   ReleaseManifestResponse,
   ReleaseManifestDetailResponse,
@@ -356,12 +366,12 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/runs/SealRecordPanel.tsx": {},
   "features/studio/DeveloperStudio.tsx": {},
   "features/terminal/WebTerminal.tsx": {"#090d16": 1, "#0d1117": 1, "#161b22": 1, "#1c1917": 1, "#238636": 1, "#30363d": 2, "#451a03": 1, "#58a6ff": 1, "#6b7280": 1, "#7f1d1d": 1, "#8b949e": 5, "#c9d1d9": 2, "#d29922": 1, "#d97706": 1, "#ea580c": 1, "#ef4444": 2, "#f0f6fc": 2, "#f85149": 1, "#fb923c": 1, "#fde68a": 2, "#fecaca": 1, "#fed7aa": 1, "#fff": 1},
-  "features/workspaces/ExecutionResultView.tsx": {"rgba(16,185,129,0.15)": 1},
-  "features/workspaces/WorkspaceCreateModal.tsx": {"rgba(0,0,0,0.65)": 1},
+  "features/workspaces/ExecutionResultView.tsx": {},
+  "features/workspaces/WorkspaceCreateModal.tsx": {},
   "features/workspaces/WorkspaceList.tsx": {},
-  "shared/ui/Button.tsx": {"#ffffff": 2},
+  "shared/ui/Button.tsx": {},
   "shared/ui/Header.tsx": {"#58a6ff": 1, "#60a5fa": 1, "#79c0ff": 1, "#f85149": 3, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.25)": 1, "rgba(56,139,253,0.3)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.4)": 1},
-  "shared/ui/RiskBadge.tsx": {"rgba(16,185,129,0.15)": 1, "rgba(239,68,68,0.15)": 1, "rgba(245,158,11,0.15)": 1, "rgba(59,130,246,0.15)": 1},
+  "shared/ui/RiskBadge.tsx": {},
 };
 
 describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory', () => {
@@ -7539,8 +7549,200 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList & NodeList
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9w. [Card 273 / ACC-09] Shared & Minor UI Components Contrast & DOM Token Binding: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal
+  it('ACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      // 1. RISK_CONFIG exact key set equality with RiskLevel wire enum
+      const expectedRiskKeys: RiskLevel[] = ['L0', 'L1', 'L2', 'L3'];
+      expect(Object.keys(RISK_CONFIG).sort(), 'RISK_CONFIG keys must exactly match RiskLevel wire enum').toEqual(expectedRiskKeys.sort());
+
+      // 2. RISK_CONFIG entries numerical contrast calculation (text >= 4.5:1, border >= 3.0:1)
+      for (const [level, cfg] of Object.entries(RISK_CONFIG)) {
+        expect(cfg.bgVar, `RiskBadge ${level} must use subtle background`).toBe('var(--color-bg-subtle)');
+        const fgTok = cfg.colorVar.replace(/^var\(|\)$/g, '');
+        const bgTok = cfg.bgVar.replace(/^var\(|\)$/g, '');
+        const lightFg = resolveTokenHex(fgTok, lightTokens);
+        const lightBg = resolveTokenHex(bgTok, lightTokens);
+        const darkFg = resolveTokenHex(fgTok, darkTokens);
+        const darkBg = resolveTokenHex(bgTok, darkTokens);
+
+        const lightTextCr = getContrast(lightFg, lightBg);
+        expect(lightTextCr, `RiskBadge ${level} text on light subtle must achieve >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        const darkTextCr = getContrast(darkFg, darkBg);
+        expect(darkTextCr, `RiskBadge ${level} text on dark subtle must achieve >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+
+        const lightBorderCr = getContrast(lightFg, lightBg);
+        expect(lightBorderCr, `RiskBadge ${level} border on light subtle must achieve >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        const darkBorderCr = getContrast(darkFg, darkBg);
+        expect(darkBorderCr, `RiskBadge ${level} border on dark subtle must achieve >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // 3. Fail-closed UNKNOWN fallback verification with Object.hasOwn
+      const fallbackPrototypeKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'toLocaleString', 'hasOwnProperty'];
+      for (const key of fallbackPrototypeKeys) {
+        const fallbackConfig = getRiskLevelConfig(key);
+        expect(fallbackConfig.label, `Prototype key ${key} must resolve to fail-closed UNKNOWN fallback`).toBe(`UNKNOWN (${key})`);
+        expect(fallbackConfig.colorVar).toBe('var(--color-status-unknown)');
+        expect(fallbackConfig.bgVar).toBe('var(--color-bg-subtle)');
+      }
+
+      const invalidRiskKeys = ['l0', 'L4', 'HIGH', 'CRITICAL', ''];
+      for (const key of invalidRiskKeys) {
+        const fallbackConfig = getRiskLevelConfig(key);
+        const expectedLabel = key ? `UNKNOWN (${key})` : 'UNKNOWN';
+        expect(fallbackConfig.label, `Invalid key '${key}' must resolve to fail-closed UNKNOWN fallback`).toBe(expectedLabel);
+        expect(fallbackConfig.colorVar).toBe('var(--color-status-unknown)');
+        expect(fallbackConfig.bgVar).toBe('var(--color-bg-subtle)');
+      }
+
+      const nullUndefinedConfig = getRiskLevelConfig(null);
+      expect(nullUndefinedConfig.label).toBe('UNKNOWN');
+      expect(nullUndefinedConfig.colorVar).toBe('var(--color-status-unknown)');
+      expect(nullUndefinedConfig.bgVar).toBe('var(--color-bg-subtle)');
+
+      // Fallback numerical contrast calculation
+      const lightUnknownFg = resolveTokenHex('--color-status-unknown', lightTokens);
+      const lightUnknownBg = resolveTokenHex('--color-bg-subtle', lightTokens);
+      const darkUnknownFg = resolveTokenHex('--color-status-unknown', darkTokens);
+      const darkUnknownBg = resolveTokenHex('--color-bg-subtle', darkTokens);
+      expect(getContrast(lightUnknownFg, lightUnknownBg), 'UNKNOWN fallback text on light subtle must achieve >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkUnknownFg, darkUnknownBg), 'UNKNOWN fallback text on dark subtle must achieve >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 4. DOM Rendering of RiskBadge for all canonical levels and UNKNOWN
+      for (const level of expectedRiskKeys) {
+        act(() => {
+          root.render(<RiskBadge level={level} />);
+        });
+        const badge = container.querySelector('[role="status"]');
+        expect(badge, `RiskBadge ${level} must render with role="status"`).not.toBeNull();
+        expect(badge?.getAttribute('aria-label')).toContain(`위험 등급 ${RISK_CONFIG[level].label}`);
+        expect((badge as HTMLElement)?.style.color).toBe(RISK_CONFIG[level].colorVar);
+        expect((badge as HTMLElement)?.style.backgroundColor).toBe(RISK_CONFIG[level].bgVar);
+        expect(badge?.getAttribute('style')).toContain(`border-color: ${RISK_CONFIG[level].colorVar}`);
+      }
+
+      // Render UNKNOWN RiskBadge
+      act(() => {
+        root.render(<RiskBadge level={'ATTACK' as any} />);
+      });
+      const unknownBadge = container.querySelector('[role="status"]');
+      expect(unknownBadge?.textContent).toContain('UNKNOWN (ATTACK)');
+      expect((unknownBadge as HTMLElement)?.style.color).toBe('var(--color-status-unknown)');
+      expect((unknownBadge as HTMLElement)?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      // 5. Button variant token contrast and DOM rendering
+      // Primary button
+      const lightBtnPrimaryFg = resolveTokenHex('--color-brand-primary-fg', lightTokens);
+      const lightBtnPrimaryBg = resolveTokenHex('--color-brand-primary-bg', lightTokens);
+      const darkBtnPrimaryFg = resolveTokenHex('--color-brand-primary-fg', darkTokens);
+      const darkBtnPrimaryBg = resolveTokenHex('--color-brand-primary-bg', darkTokens);
+      expect(getContrast(lightBtnPrimaryFg, lightBtnPrimaryBg), 'Button primary text on primary bg light must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkBtnPrimaryFg, darkBtnPrimaryBg), 'Button primary text on primary bg dark must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // Danger button
+      const lightBtnDangerBg = resolveTokenHex('--color-status-offline-bg', lightTokens);
+      const darkBtnDangerBg = resolveTokenHex('--color-status-offline-bg', darkTokens);
+      expect(getContrast(lightBtnPrimaryFg, lightBtnDangerBg), 'Button danger text on offline bg light must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkBtnPrimaryFg, darkBtnDangerBg), 'Button danger text on offline bg dark must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // Secondary button
+      const lightBtnSecFg = resolveTokenHex('--color-text-primary', lightTokens);
+      const lightBtnSecBg = resolveTokenHex('--color-bg-subtle', lightTokens);
+      const darkBtnSecFg = resolveTokenHex('--color-text-primary', darkTokens);
+      const darkBtnSecBg = resolveTokenHex('--color-bg-subtle', darkTokens);
+      expect(getContrast(lightBtnSecFg, lightBtnSecBg), 'Button secondary text on subtle light must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkBtnSecFg, darkBtnSecBg), 'Button secondary text on subtle dark must pass 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // Secondary border
+      const lightBtnSecBorder = resolveTokenHex('--color-border-strong', lightTokens);
+      const darkBtnSecBorder = resolveTokenHex('--color-border-strong', darkTokens);
+      expect(getContrast(lightBtnSecBorder, lightBtnSecBg), 'Button secondary border on subtle light must pass 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkBtnSecBorder, darkBtnSecBg), 'Button secondary border on subtle dark must pass 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // DOM render Button
+      act(() => {
+        root.render(
+          <div>
+            <Button variant="primary">실행</Button>
+            <Button variant="secondary">취소</Button>
+            <Button variant="danger">삭제</Button>
+            <Button variant="ghost">더보기</Button>
+          </div>
+        );
+      });
+      const buttons = container.querySelectorAll('button');
+      expect(buttons).toHaveLength(4);
+      expect(buttons[0].style.color).toBe('var(--color-brand-primary-fg)');
+      expect(buttons[0].style.backgroundColor).toBe('var(--color-brand-primary-bg, var(--color-brand-primary))');
+      expect(buttons[1].style.color).toBe('var(--color-text-primary)');
+      expect(buttons[1].style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(buttons[1].getAttribute('style')).toContain('var(--color-border-strong');
+      expect(buttons[2].style.color).toBe('var(--color-brand-primary-fg)');
+      expect(buttons[2].style.backgroundColor).toBe('var(--color-status-offline-bg, var(--color-status-offline))');
+
+      // 6. ExecutionResultView DOM rendering & token verification
+      const sampleExecutionResult = {
+        runId: 'run-c273-01',
+        workspaceId: 'wsp-c273-01',
+        command: 'python test.py',
+        exitCode: 0,
+        executedAt: '2026-10-05T00:00:00Z',
+        completedAt: '2026-10-05T00:00:01Z',
+        resourceReclaimed: true,
+        evidenceId: 'evi-c273-001',
+        allowedEvents: [{ action: 'READ', path: '/app', timestamp: '2026-10-05T00:00:00Z' }],
+        deniedEvents: [],
+      };
+
+      act(() => {
+        root.render(<ExecutionResultView result={sampleExecutionResult} onBack={() => {}} />);
+      });
+      expect(container.textContent).toContain('격리 실행 결과 (AC-03 증거 뷰)');
+      expect(container.textContent).toContain('정상 종료 (SUCCESS)');
+
+      // Verify success status pill background and text color
+      const successPill = Array.from(container.querySelectorAll('span')).find(el => el.textContent === '정상 종료 (SUCCESS)');
+      expect(successPill, 'Success pill element must exist').toBeDefined();
+      expect(successPill?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(successPill?.style.color).toBe('var(--color-brand-success)');
+
+      // Verify exit code card background
+      const exitCodeSpan = Array.from(container.querySelectorAll('span')).find(
+        el => el.textContent?.includes('종료 코드 (EXIT CODE)')
+      );
+      const exitCodeCard = exitCodeSpan?.parentElement as HTMLElement;
+      expect(exitCodeCard?.style.backgroundColor).toBe('var(--color-bg-surface)');
+
+      // Verify allowed event row background
+      const eventCode = Array.from(container.querySelectorAll('code')).find(
+        el => el.textContent === '/app'
+      );
+      const eventRow = eventCode?.parentElement?.parentElement as HTMLElement;
+      expect(eventRow?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      // 7. WorkspaceCreateModal DOM rendering & backdrop token verification
+      act(() => {
+        root.render(<WorkspaceCreateModal isOpen={true} onClose={() => {}} onCreate={async () => {}} projectId="prj-c273" />);
+      });
+      const modalBackdrop = container.querySelector('[role="dialog"]');
+      expect(modalBackdrop, 'Modal dialog container must exist').not.toBeNull();
+      expect((modalBackdrop as HTMLElement)?.style.backgroundColor).toBe('var(--color-bg-backdrop)');
+      const dialogSurface = modalBackdrop?.firstElementChild as HTMLElement;
+      expect(dialogSurface?.style.backgroundColor).toBe('var(--color-bg-surface)');
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList & RiskBadge
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList, and RiskBadge style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -7829,7 +8031,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -7856,6 +8058,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 }
                 if (varName === 'NODE_STATUS_CONFIG' && !bgToken) {
                   bgToken = '--color-bg-canvas';
+                }
+                if (varName === 'RISK_CONFIG' && !borderToken && fgToken) {
+                  borderToken = fgToken;
                 }
                 if (bgToken && fgToken) {
                   checkedObjects++;
@@ -8607,6 +8812,33 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe120Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
     expect(probe120Cr, 'Synchronized text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe120Cr).toBeCloseTo(1.10, 1);
+
+    // Probe 121 [Card 273]: ExecutionResultView former success badge text (#059669) on former rgba(16, 185, 129, 0.15) over light surface composite (#dbf4ec) strictly fails 4.5:1
+    const lightSuccessComp = blendRgba([16, 185, 129], 0.15, lightTokens['--color-bg-surface']);
+    const probe121Cr = getContrast('#059669', lightSuccessComp);
+    expect(probe121Cr, 'ExecutionResultView former success badge on light surface composite strictly fails 4.5:1').toBeLessThan(4.5);
+    expect(probe121Cr).toBeCloseTo(3.26, 1);
+
+    // Probe 122 [Card 273]: RiskBadge synchronized mutation to var(--color-text-inverse) on light subtle strictly fails 4.5:1
+    const probe122Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
+    expect(probe122Cr, 'RiskBadge synchronized text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe122Cr).toBeCloseTo(1.10, 1);
+
+    // Probe 123 [Card 273]: Button primary text mutated to var(--color-text-muted) on primary bg strictly fails 4.5:1
+    const probe123Cr = getContrast(lightTokens['--color-text-muted'], lightTokens['--color-brand-primary-bg']);
+    expect(probe123Cr, 'Button text-muted on primary bg fails 4.5:1').toBeLessThan(4.5);
+    expect(probe123Cr).toBeCloseTo(1.11, 1);
+
+    // Probe 124 [Card 273]: Button danger text mutated to var(--color-text-secondary) on offline bg strictly fails 4.5:1
+    const probe124Cr = getContrast(lightTokens['--color-text-secondary'], lightTokens['--color-status-offline-bg']);
+    expect(probe124Cr, 'Button secondary text on offline bg fails 4.5:1').toBeLessThan(4.5);
+    expect(probe124Cr).toBeCloseTo(1.57, 1);
+
+    // Probe 125 [Card 273]: RiskBadge former 15% red tint border rgba(239, 68, 68, 0.15) on light subtle fails 3.0:1
+    const lightRedTint = blendRgba([239, 68, 68], 0.15, lightTokens['--color-bg-subtle']);
+    const probe125Cr = getContrast(lightRedTint, lightTokens['--color-bg-subtle']);
+    expect(probe125Cr, 'RiskBadge former 15% red tint border on light subtle fails 3.0:1').toBeLessThan(3.0);
+    expect(probe125Cr).toBeCloseTo(1.21, 1);
 
 
     // Legacy Token Reverts:

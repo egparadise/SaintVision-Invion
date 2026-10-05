@@ -63,7 +63,7 @@ export const ExecutionResultView: React.FC<ExecutionResultViewProps> = ({
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.75rem',
                 fontWeight: 600,
-                backgroundColor: isSuccess ? 'rgba(16, 185, 129, 0.15)' : 'var(--color-risk-l3-bg)',
+                backgroundColor: isSuccess ? 'var(--color-bg-subtle)' : 'var(--color-risk-l3-bg)',
                 color: isSuccess ? 'var(--color-brand-success)' : 'var(--color-brand-danger)',
               }}
             >
