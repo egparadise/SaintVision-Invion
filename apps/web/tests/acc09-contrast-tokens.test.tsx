@@ -146,6 +146,12 @@ import {
   getWorkspaceTerminalStatusStyle,
   type WorkspaceTerminalStatus,
 } from '../src/features/editor/MonacoWorkspaceEditor';
+import {
+  WebTerminal,
+  WEB_TERMINAL_CONNECTION_STATUS_CONFIG,
+  getWebTerminalConnectionStatusConfig,
+  type WebTerminalConnectionStatus,
+} from '../src/features/terminal/WebTerminal';
 import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
 import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
@@ -422,7 +428,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/runs/RunList.tsx": {},
   "features/runs/SealRecordPanel.tsx": {},
   "features/studio/DeveloperStudio.tsx": {},
-  "features/terminal/WebTerminal.tsx": {"#090d16": 1, "#0d1117": 1, "#161b22": 1, "#1c1917": 1, "#238636": 1, "#30363d": 2, "#451a03": 1, "#58a6ff": 1, "#6b7280": 1, "#7f1d1d": 1, "#8b949e": 5, "#c9d1d9": 2, "#d29922": 1, "#d97706": 1, "#ea580c": 1, "#ef4444": 2, "#f0f6fc": 2, "#f85149": 1, "#fb923c": 1, "#fde68a": 2, "#fecaca": 1, "#fed7aa": 1, "#fff": 1},
+  "features/terminal/WebTerminal.tsx": {},
   "features/workspaces/ExecutionResultView.tsx": {},
   "features/workspaces/WorkspaceCreateModal.tsx": {},
   "features/workspaces/WorkspaceList.tsx": {},
@@ -9576,6 +9582,133 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     container.remove();
   });
 
+  // 9af. [Card 282 / ACC-09] WebTerminal Contrast, Configs, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 282: WebTerminal complies with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. WEB_TERMINAL_CONNECTION_STATUS_CONFIG verification
+    expect(Object.keys(WEB_TERMINAL_CONNECTION_STATUS_CONFIG).sort()).toEqual(['connected', 'connecting', 'disconnected', 'error']);
+    for (const status of ['connected', 'connecting', 'disconnected', 'error'] as const) {
+      expect(Object.hasOwn(WEB_TERMINAL_CONNECTION_STATUS_CONFIG, status)).toBe(true);
+      const cfg = getWebTerminalConnectionStatusConfig(status);
+      expect(cfg.label).toBeDefined();
+      expect(cfg.dotColor).toMatch(/^var\(--color-(status-online|status-degraded|text-muted|status-offline)\)$/);
+      expect(cfg.promptColor).toMatch(/^var\(--color-(brand-primary|status-degraded|text-muted|status-offline)\)$/);
+      expect(cfg.borderVar).toMatch(/^var\(--color-(status-online|status-degraded|border-subtle|status-offline)\)$/);
+      expect(cfg.bgVar).toMatch(/^var\(--color-(diff-added-bg|bg-subtle|risk-l3-bg)\)$/);
+    }
+
+    // Pin connected terminal status tokens explicitly to kill subtle token collisions (M4)
+    const connCfg = getWebTerminalConnectionStatusConfig('connected');
+    expect(connCfg.bgVar, 'Connected bgVar must strictly bind to diff-added-bg').toBe('var(--color-diff-added-bg)');
+    expect(connCfg.dotColor, 'Connected dotColor must strictly bind to status-online').toBe('var(--color-status-online)');
+    expect(connCfg.textColor, 'Connected textColor must strictly bind to status-online').toBe('var(--color-status-online)');
+    expect(connCfg.promptColor, 'Connected promptColor must strictly bind to brand-primary').toBe('var(--color-brand-primary)');
+    expect(connCfg.borderVar, 'Connected borderVar must strictly bind to status-online').toBe('var(--color-status-online)');
+
+    // Dynamic contrast verification for terminal status tokens
+    const connBgL = lightTokens['--color-diff-added-bg'];
+    const connFgL = lightTokens['--color-status-online'];
+    const connBorderL = lightTokens['--color-diff-added-border'];
+    const connBgD = darkTokens['--color-diff-added-bg'];
+    const connFgD = darkTokens['--color-status-online'];
+    const connBorderD = darkTokens['--color-diff-added-border'];
+
+    expect(getContrast(connFgL, connBgL), 'Light connected text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(connFgD, connBgD), 'Dark connected text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(connBorderL, connBgL), 'Light connected border on added bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(connBorderD, connBgD), 'Dark connected border on added bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    const degBgL = lightTokens['--color-bg-subtle'];
+    const degFgL = lightTokens['--color-status-degraded'];
+    const degBgD = darkTokens['--color-bg-subtle'];
+    const degFgD = darkTokens['--color-status-degraded'];
+
+    expect(getContrast(degFgL, degBgL), 'Light degraded text on subtle bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(degFgD, degBgD), 'Dark degraded text on subtle bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    const offBgL = lightTokens['--color-risk-l3-bg'];
+    const offFgL = lightTokens['--color-status-offline'];
+    const offBorderL = lightTokens['--color-risk-l3-border'];
+    const offBgD = darkTokens['--color-risk-l3-bg'];
+    const offFgD = darkTokens['--color-status-offline'];
+    const offBorderD = darkTokens['--color-risk-l3-border'];
+
+    expect(getContrast(offFgL, offBgL), 'Light offline text on risk-l3 bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(offFgD, offBgD), 'Dark offline text on risk-l3 bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(offBorderL, offBgL), 'Light offline border on risk-l3 bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(offBorderD, offBgD), 'Dark offline border on risk-l3 bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Fail-closed fallback for unknown and prototype keys
+    const unknownStatus = getWebTerminalConnectionStatusConfig('unknown_status');
+    expect(unknownStatus.label).toBe('UNKNOWN (unknown_status)');
+    expect(unknownStatus.dotColor).toBe('var(--color-status-unknown)');
+    expect(unknownStatus.bgVar).toBe('var(--color-bg-subtle)');
+    expect(unknownStatus.borderVar).toBe('var(--color-status-unknown)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      const protoStyle = getWebTerminalConnectionStatusConfig(protoKey);
+      expect(protoStyle.dotColor).toBe('var(--color-status-unknown)');
+      expect(protoStyle.label).toBe(`UNKNOWN (${protoKey})`);
+    }
+
+    // Null and undefined fall back to clean UNKNOWN without raw string
+    expect(getWebTerminalConnectionStatusConfig(null).label).toBe('UNKNOWN');
+    expect(getWebTerminalConnectionStatusConfig(undefined).label).toBe('UNKNOWN');
+
+    // 2. DOM Rendering & Token Binding
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_test_term"
+          sessionId="sess_1"
+          commandId="cmd_authorized_1"
+        />
+      );
+    });
+
+    const termContainer = container.querySelector('[data-testid="web-terminal-container"]') as HTMLElement;
+    expect(termContainer).toBeDefined();
+    expect(termContainer.style.backgroundColor).toBe('var(--color-bg-canvas)');
+    expect(termContainer.style.color).toBe('var(--color-text-primary)');
+    expect(termContainer.style.borderColor || termContainer.style.border).toContain('var(--color-border-subtle)');
+
+    const dot = container.querySelector('[data-testid="connection-status-dot"]') as HTMLElement;
+    expect(dot).toBeDefined();
+    expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
+
+    const reconnectBtn = container.querySelector('[data-testid="terminal-reconnect-btn"]') as HTMLElement;
+    expect(reconnectBtn).toBeDefined();
+
+    const a11yBtn = container.querySelector('[data-testid="terminal-toggle-a11y-btn"]') as HTMLElement;
+    expect(a11yBtn).toBeDefined();
+    expect(a11yBtn.style.color).toBe('var(--color-text-primary)');
+
+    // Render with missing command to verify warning notice banner
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_test_term"
+          sessionId="sess_1"
+          commandId=""
+        />
+      );
+    });
+
+    const cmdNotice = container.querySelector('[data-testid="terminal-command-required-notice"]') as HTMLElement;
+    expect(cmdNotice).toBeDefined();
+    expect(cmdNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+    expect(cmdNotice.style.color).toBe('var(--color-status-degraded)');
+    expect(cmdNotice.style.borderBottom || cmdNotice.style.border).toContain('var(--color-status-degraded)');
+
+    await act(async () => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+
 
 
 
@@ -9887,7 +10020,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG' || node.name.getText(sf) === 'DIFF_LINE_TYPE_CONFIG' || node.name.getText(sf) === 'CONFLICT_STATUS_CONFIG' || node.name.getText(sf) === 'CONFLICT_RESOLUTION_ACTION_CONFIG' || node.name.getText(sf) === 'GIT_FILE_STATUS_CONFIG' || node.name.getText(sf) === 'GIT_STAGE_STATE_CONFIG' || node.name.getText(sf) === 'WORKSPACE_TERMINAL_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG' || node.name.getText(sf) === 'DIFF_LINE_TYPE_CONFIG' || node.name.getText(sf) === 'CONFLICT_STATUS_CONFIG' || node.name.getText(sf) === 'CONFLICT_RESOLUTION_ACTION_CONFIG' || node.name.getText(sf) === 'GIT_FILE_STATUS_CONFIG' || node.name.getText(sf) === 'GIT_STAGE_STATE_CONFIG' || node.name.getText(sf) === 'WORKSPACE_TERMINAL_STATUS_CONFIG' || node.name.getText(sf) === 'WEB_TERMINAL_CONNECTION_STATUS_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -10237,6 +10370,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(monacoStats.coveredColorObjects, 'Total covered color objects in MonacoWorkspaceEditor must be exactly 41').toBe(41);
     expect(monacoStats.checkedBorderObjects, 'Border objects in MonacoWorkspaceEditor must be exactly 21').toBe(21);
     expect(monacoStats.checkedBorderPairs, 'Border pairs in MonacoWorkspaceEditor must be exactly 22').toBe(22);
+
+    const webTerminalStats = analyzeFile('features/terminal/WebTerminal.tsx');
+    expect(webTerminalStats.violations, `WebTerminal violations:\n${webTerminalStats.violations.join('\n')}`).toEqual([]);
+    expect(webTerminalStats.totalStyleAttrs, 'Total style attributes in WebTerminal must be exactly 28').toBe(28);
+    expect(webTerminalStats.checkedObjects, 'Explicit style objects in WebTerminal must be exactly 6').toBe(6);
+    expect(webTerminalStats.checkedPairs, 'Evaluated pairs in WebTerminal must be exactly 15').toBe(15);
+    expect(webTerminalStats.unboundColorObjects, 'Unbound color objects in WebTerminal must be exactly 8').toBe(8);
+    expect(webTerminalStats.coveredColorObjects, 'Total covered color objects in WebTerminal must be exactly 14').toBe(14);
+    expect(webTerminalStats.checkedBorderObjects, 'Border objects in WebTerminal must be exactly 9').toBe(9);
+    expect(webTerminalStats.checkedBorderPairs, 'Border pairs in WebTerminal must be exactly 9').toBe(9);
   });
 
 
@@ -11092,6 +11235,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe165Cr, 'MonacoWorkspaceEditor former raw #f85149 on light canvas fails 4.5:1').toBeLessThan(4.5);
     expect(probe165Cr).toBeCloseTo(3.20, 1);
 
+    // Probe 166 [Card 282]: WebTerminal baseline raw #fb923c on light canvas fails 4.5:1 (2.16:1)
+    const probe166Cr = getContrast('#fb923c', lightTokens['--color-bg-canvas']);
+    expect(probe166Cr, 'WebTerminal former raw #fb923c on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe166Cr).toBeCloseTo(2.16, 1);
+
+    // Probe 167 [Card 282]: WebTerminal baseline raw #fecaca on light canvas fails 4.5:1 (1.38:1)
+    const probe167Cr = getContrast('#fecaca', lightTokens['--color-bg-canvas']);
+    expect(probe167Cr, 'WebTerminal former raw #fecaca on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe167Cr).toBeCloseTo(1.38, 1);
+
+    // Probe 168 [Card 282]: WebTerminal baseline raw #fde68a on light canvas fails 4.5:1 (1.19:1)
+    const probe168Cr = getContrast('#fde68a', lightTokens['--color-bg-canvas']);
+    expect(probe168Cr, 'WebTerminal former raw #fde68a on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe168Cr).toBeCloseTo(1.19, 1);
+
+    // Probe 169 [Card 282]: WebTerminal baseline raw #ef4444 on light canvas fails 4.5:1 (3.60:1)
+    const probe169Cr = getContrast('#ef4444', lightTokens['--color-bg-canvas']);
+    expect(probe169Cr, 'WebTerminal former raw #ef4444 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe169Cr).toBeCloseTo(3.60, 1);
+
+    // Probe 170 [Card 282]: WebTerminal baseline raw #238636 on light canvas fails 4.5:1 (4.43:1)
+    const probe170Cr = getContrast('#238636', lightTokens['--color-bg-canvas']);
+    expect(probe170Cr, 'WebTerminal former raw #238636 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe170Cr).toBeCloseTo(4.43, 1);
+
 
 
     // Legacy Token Reverts:
@@ -11188,12 +11356,21 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 484').toBe(484);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 35').toBe(35);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 487').toBe(487);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 36').toBe(36);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
     expect(Object.keys(observedFileMultisets).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
+
+    // ACC-09 Milestone Grand Completion Invariant: All registered files in COLOR_LITERAL_MULTISET_BASELINE must have empty multiset ({})
+    for (const [file, multiset] of Object.entries(COLOR_LITERAL_MULTISET_BASELINE)) {
+      expect(
+        Object.keys(multiset).length,
+        `File ${file} in COLOR_LITERAL_MULTISET_BASELINE must be empty (0 color literals remaining in ACC-09)`
+      ).toBe(0);
+    }
+    expect(Object.keys(observedFileMultisets).length, 'Zero files with color literals must remain across entire apps/web/src').toBe(0);
 
     // Ratchet assertions for specific legacy literals (occurrences & files)
     expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 1').toBeLessThanOrEqual(1);
