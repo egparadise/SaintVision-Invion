@@ -476,9 +476,9 @@ export const App: React.FC = () => {
       data-testid="app-global-action-error"
       style={{
         padding: '10px 16px',
-        backgroundColor: '#fee2e2',
-        color: '#991b1b',
-        borderBottom: '1px solid #f87171',
+        backgroundColor: 'var(--color-risk-l3-bg)',
+        color: 'var(--color-risk-l3-text)',
+        borderBottom: '1px solid var(--color-risk-l3-border)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -495,10 +495,10 @@ export const App: React.FC = () => {
         style={{
           marginLeft: '12px',
           padding: '2px 8px',
-          border: '1px solid #dc2626',
+          border: '1px solid var(--color-risk-l3-border)',
           borderRadius: '4px',
-          backgroundColor: '#ffffff',
-          color: '#991b1b',
+          backgroundColor: 'var(--color-bg-surface)',
+          color: 'var(--color-risk-l3-text)',
           cursor: 'pointer',
           fontSize: '0.75rem',
         }}
@@ -671,9 +671,9 @@ export const App: React.FC = () => {
                         borderRadius: 'var(--radius-sm)',
                         fontSize: '0.75rem',
                         cursor: 'pointer',
-                        border: '1px solid var(--color-border-strong)',
+                        border: nodeSimState === key ? '1px solid var(--color-brand-primary-fg)' : '1px solid var(--color-border-strong)',
                         backgroundColor: nodeSimState === key ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
-                        color: nodeSimState === key ? '#ffffff' : 'var(--color-text-secondary)',
+                        color: nodeSimState === key ? 'var(--color-brand-primary-fg)' : 'var(--color-text-secondary)',
                       }}
                     >
                       {label}
@@ -754,10 +754,10 @@ export const App: React.FC = () => {
                 data-testid="workspace-error-banner"
                 style={{
                   padding: '12px 16px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid #ef4444',
+                  backgroundColor: 'var(--color-risk-l3-bg)',
+                  border: '1px solid var(--color-risk-l3-border)',
                   borderRadius: 'var(--radius-md)',
-                  color: '#fca5a5',
+                  color: 'var(--color-risk-l3-text)',
                   fontSize: '0.875rem',
                   marginBottom: '16px',
                 }}
@@ -929,7 +929,7 @@ export const App: React.FC = () => {
                   }}
                 >
                   <div>⚠️ 등록되거나 선택된 워크스페이스가 없습니다. 터미널 세션을 시작할 수 없습니다. (유효 워크스페이스 필요)</div>
-                  <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fed7aa' }}>
+                  <div style={{ marginTop: '4px', fontSize: '0.75rem', color: 'var(--color-status-degraded)' }}>
                     👉 <strong>[사용자 조치 필요]</strong>: 상단 작업 공간 메뉴에서 워크스페이스를 선택하거나 새로 생성하십시오.
                   </div>
                 </div>
