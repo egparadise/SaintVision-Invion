@@ -90,7 +90,9 @@ import {
 import { Button } from '../src/shared/ui/Button';
 import { ExecutionResultView } from '../src/features/workspaces/ExecutionResultView';
 import { WorkspaceCreateModal } from '../src/features/workspaces/WorkspaceCreateModal';
-import type { RiskLevel } from '../src/contracts/types';
+import { PlacementExplainView } from '../src/features/placement/PlacementExplainView';
+import { ResourceTopologyGraph } from '../src/features/placement/ResourceTopologyGraph';
+import type { RiskLevel, PlacementExplainResult } from '../src/contracts/types';
 
 import type {
   ReleaseManifestResponse,
@@ -353,11 +355,11 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
   "features/mlops/ModelLineageView.tsx": {},
-  "features/nodes/NodeDetail.tsx": {"rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1},
+  "features/nodes/NodeDetail.tsx": {},
   "features/nodes/NodeList.tsx": {},
-  "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
+  "features/placement/PlacementExplainView.tsx": {},
   "features/placement/PlacementSimulator.tsx": {},
-  "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
+  "features/placement/ResourceTopologyGraph.tsx": {},
   "features/recovery/DistributedRecoveryView.tsx": {},
   "features/release/ReleaseCandidateView.tsx": {},
   "features/release/releaseEngine.ts": {"#0d1117": 1, "#6e7681": 1},
@@ -1029,11 +1031,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[calloutBorderVar], calloutBgDark), 'Callout border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[calloutTextVar], calloutBgDark), 'Callout text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-      // Strict alpha and RGB tint checks (kills alpha mutation)
-      const calloutRgba = parseRgba(callout.style.backgroundColor);
-      expect(calloutRgba, 'Callout background must be rgba alpha tint').not.toBeNull();
-      expect(calloutRgba?.a, 'Callout alpha tint must be exactly 0.12').toBe(0.12);
-      expect(calloutRgba?.rgb, 'Callout tint RGB must match amber [210, 153, 34]').toEqual([210, 153, 34]);
+      // Tokenized background check (ACC-09 Card 274)
+      expect(callout.style.backgroundColor, 'Callout background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
 
       // Schedulable card when observationOnly
       const schedBox = container.querySelector('[data-testid="node-detail-schedulable-box"]') as HTMLElement;
@@ -1057,10 +1056,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[schedLabelVar], schedObsBgDark), 'Schedulable obs label dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[schedValueVar], schedObsBgDark), 'Schedulable obs value dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-      const schedObsRgba = parseRgba(schedBox.style.backgroundColor);
-      expect(schedObsRgba, 'Schedulable obs background must be rgba alpha tint').not.toBeNull();
-      expect(schedObsRgba?.a, 'Schedulable obs alpha tint must be exactly 0.15').toBe(0.15);
-      expect(schedObsRgba?.rgb, 'Schedulable obs tint RGB must match amber [210, 153, 34]').toEqual([210, 153, 34]);
+      // Tokenized background check (ACC-09 Card 274)
+      expect(schedBox.style.backgroundColor, 'Schedulable obs background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
 
       // Timeline status for active node
       const timelineActive = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
@@ -1103,10 +1100,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[errBorderVar], errBgDark), 'Error border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[errTextVar], errBgDark), 'Error text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-      const errRgba = parseRgba(errAlert.style.backgroundColor);
-      expect(errRgba, 'Error alert background must be rgba alpha tint').not.toBeNull();
-      expect(errRgba?.a, 'Error alert alpha tint must be exactly 0.1').toBe(0.1);
-      expect(errRgba?.rgb, 'Error alert tint RGB must match red [248, 81, 73]').toEqual([248, 81, 73]);
+      // Tokenized background check (ACC-09 Card 274)
+      expect(errAlert.style.backgroundColor, 'Error alert background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
 
       // Timeline status for lost node
       const timelineLost = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
@@ -7741,6 +7736,274 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9x. [Card 274 / ACC-09] Node & Placement Detail Screens Contrast & DOM Token Binding: NodeDetail, PlacementExplainView, and ResourceTopologyGraph
+  it('ACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      // 1. PlacementExplainView DOM rendering & token verification
+      const mockExplainResult: PlacementExplainResult = {
+        selectedNodeId: 'node-01',
+        evaluations: [
+          {
+            nodeId: 'node-01',
+            hostname: 'compute-alpha',
+            os: 'linux',
+            hardFilterPassed: true,
+            rejectionReasons: [],
+            scores: { localityScore: 90, headroomScore: 85, networkCostScore: 80, totalScore: 86 },
+          },
+          {
+            nodeId: 'node-02',
+            hostname: 'compute-beta',
+            os: 'linux',
+            hardFilterPassed: true,
+            rejectionReasons: [],
+            scores: { localityScore: 70, headroomScore: 60, networkCostScore: 75, totalScore: 68 },
+          },
+          {
+            nodeId: 'node-03',
+            hostname: 'storage-gamma',
+            os: 'linux',
+            hardFilterPassed: false,
+            rejectionReasons: ['VRAM 부족: 필요 16GB / 가용 8GB'],
+          },
+        ],
+        policyVersion: 'v1.4',
+        snapshotVersion: 'snap-402',
+        decidedAt: '2026-10-05T12:00:00Z',
+      };
+
+      await act(async () => {
+        root.render(<PlacementExplainView explainResult={mockExplainResult} />);
+      });
+
+      // 1-1. Simulation badge: token binding and contrast
+      const simBadge = container.querySelector('[data-testid="placement-explain-simulation-badge"]') as HTMLElement;
+      expect(simBadge, 'Simulation badge must render').not.toBeNull();
+      expect(simBadge.style.backgroundColor, 'Simulation badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(simBadge.style.color, 'Simulation badge text must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(simBadge.style.borderColor || simBadge.style.border, 'Simulation badge border must bind to var(--color-status-unknown)').toContain('var(--color-status-unknown)');
+
+      const simTextCrLight = getContrast(lightTokens['--color-status-unknown'], lightTokens['--color-bg-subtle']);
+      const simTextCrDark = getContrast(darkTokens['--color-status-unknown'], darkTokens['--color-bg-subtle']);
+      expect(simTextCrLight, 'Simulation badge text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(simTextCrDark, 'Simulation badge text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const simBorderCrLight = getContrast(lightTokens['--color-status-unknown'], lightTokens['--color-bg-subtle']);
+      const simBorderCrDark = getContrast(darkTokens['--color-status-unknown'], darkTokens['--color-bg-subtle']);
+      expect(simBorderCrLight, 'Simulation badge border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(simBorderCrDark, 'Simulation badge border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-2. Winner banner with selected node
+      const winnerBanner = container.querySelector('[data-testid="placement-explain-winner-banner"]') as HTMLElement;
+      expect(winnerBanner, 'Winner banner must render').not.toBeNull();
+      expect(winnerBanner.style.backgroundColor, 'Winner banner bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(winnerBanner.style.borderColor || winnerBanner.style.border, 'Winner banner border must bind to var(--color-status-online)').toContain('var(--color-status-online)');
+      expect(winnerBanner.textContent).toContain('최적 배치 노드 선정: node-01');
+
+      // 1-3. Candidate badges: passed vs rejected
+      const candidateBadges = Array.from(container.querySelectorAll('[data-testid="placement-explain-candidate-badge"]')) as HTMLElement[];
+      expect(candidateBadges.length, 'Must render candidate badges for each evaluation').toBe(3);
+
+      // Passed candidate badge (node-01)
+      expect(candidateBadges[0].style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candidateBadges[0].style.color).toBe('var(--color-status-online)');
+      expect(candidateBadges[0].style.borderColor || candidateBadges[0].style.border).toContain('var(--color-status-online)');
+      expect(candidateBadges[0].textContent).toContain('통과 (PASSED)');
+
+      // Rejected candidate badge (node-03)
+      expect(candidateBadges[2].style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candidateBadges[2].style.color).toBe('var(--color-status-lost)');
+      expect(candidateBadges[2].style.borderColor || candidateBadges[2].style.border).toContain('var(--color-status-lost)');
+      expect(candidateBadges[2].textContent).toContain('탈락 (REJECTED)');
+
+      // 1-4. Score labels and winner score highlight
+      const scoreValues = Array.from(container.querySelectorAll('[data-testid="placement-explain-score-value"]')) as HTMLElement[];
+      expect(scoreValues.length, 'Must render score values for passed candidates').toBe(2);
+      expect(scoreValues[0].style.color, 'Winner score value must use var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(scoreValues[1].style.color, 'Non-winner score value must use var(--color-text-primary)').toBe('var(--color-text-primary)');
+
+      // 1-5. Winner banner without selected node (fail-closed/no winner path)
+      const noWinnerResult: PlacementExplainResult = {
+        ...mockExplainResult,
+        selectedNodeId: null,
+      };
+      await act(async () => {
+        root.render(<PlacementExplainView explainResult={noWinnerResult} />);
+      });
+      const noWinnerBanner = container.querySelector('[data-testid="placement-explain-winner-banner"]') as HTMLElement;
+      expect(noWinnerBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(noWinnerBanner.style.borderColor || noWinnerBanner.style.border).toContain('var(--color-status-lost)');
+      expect(noWinnerBanner.textContent).toContain('배치 가능한 노드가 없습니다');
+
+      // 2. ResourceTopologyGraph DOM rendering & token verification
+      const mockGraphNodes: NodeItem[] = [
+        {
+          id: 'node-alpha',
+          hostname: 'compute-alpha',
+          status: 'online',
+          ipAddress: '192.168.1.10',
+          os: 'linux',
+          cpuCores: 16,
+          cpuUsagePercent: 25,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsedBytes: 16 * 1024 ** 3,
+          gpuCount: 0,
+          gpuName: '',
+          gpuVramTotalBytes: 0,
+          gpuVramUsedBytes: 0,
+          telemetryUnavailable: false,
+          observationOnly: false,
+        },
+        {
+          id: 'node-fenced',
+          hostname: 'compute-fenced',
+          status: 'online',
+          ipAddress: '192.168.1.11',
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 50,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsedBytes: 16 * 1024 ** 3,
+          gpuCount: 0,
+          gpuName: '',
+          gpuVramTotalBytes: 0,
+          gpuVramUsedBytes: 0,
+          telemetryUnavailable: false,
+          observationOnly: false,
+        },
+        {
+          id: 'node-normal',
+          hostname: 'compute-normal',
+          status: 'online',
+          ipAddress: '192.168.1.12',
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 10,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsedBytes: 4 * 1024 ** 3,
+          gpuCount: 0,
+          gpuName: '',
+          gpuVramTotalBytes: 0,
+          gpuVramUsedBytes: 0,
+          telemetryUnavailable: false,
+          observationOnly: false,
+        },
+      ];
+
+      const fencedSet = new Set(['node-fenced']);
+      let toggledNodeId: string | null = null;
+      await act(async () => {
+        root.render(
+          <ResourceTopologyGraph
+            nodes={mockGraphNodes}
+            fencedNodeIds={fencedSet}
+            selectedNodeId="node-alpha"
+            onToggleFence={(id) => {
+              toggledNodeId = id;
+            }}
+          />
+        );
+      });
+
+      // 2-1. Selected node card & badge
+      const selectedNodeEl = container.querySelector('[data-testid="resource-topology-node-node-alpha"]') as HTMLElement;
+      expect(selectedNodeEl, 'Selected node card must render').not.toBeNull();
+      expect(selectedNodeEl.style.borderColor || selectedNodeEl.style.border, 'Selected node card border must bind to var(--color-status-online)').toContain('var(--color-status-online)');
+      expect(selectedNodeEl.style.backgroundColor, 'Selected node card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+
+      const selectedBadge = container.querySelector('[data-testid="resource-topology-selected-badge"]') as HTMLElement;
+      expect(selectedBadge, 'Selected badge must render').not.toBeNull();
+      expect(selectedBadge.style.backgroundColor, 'Selected badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(selectedBadge.style.color, 'Selected badge text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(selectedBadge.style.borderColor || selectedBadge.style.border, 'Selected badge border must bind to var(--color-status-online)').toContain('var(--color-status-online)');
+      expect(selectedBadge.textContent).toContain('1순위 배치');
+
+      // Contrast for selected badge: text >= 4.5:1, border >= 3.0:1
+      const selTextCrLight = getContrast(lightTokens['--color-status-online'], lightTokens['--color-bg-subtle']);
+      const selTextCrDark = getContrast(darkTokens['--color-status-online'], darkTokens['--color-bg-subtle']);
+      expect(selTextCrLight, 'Selected badge text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(selTextCrDark, 'Selected badge text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const selBorderCrLight = getContrast(lightTokens['--color-status-online'], lightTokens['--color-bg-subtle']);
+      const selBorderCrDark = getContrast(darkTokens['--color-status-online'], darkTokens['--color-bg-subtle']);
+      expect(selBorderCrLight, 'Selected badge border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(selBorderCrDark, 'Selected badge border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // Non-text card border contrast on surface: >= 3.0:1
+      const selCardBorderCrLight = getContrast(lightTokens['--color-status-online'], lightTokens['--color-bg-surface']);
+      const selCardBorderCrDark = getContrast(darkTokens['--color-status-online'], darkTokens['--color-bg-surface']);
+      expect(selCardBorderCrLight, 'Selected card border on light surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(selCardBorderCrDark, 'Selected card border on dark surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-2. Fenced node card & badge
+      const fencedNodeEl = container.querySelector('[data-testid="resource-topology-node-node-fenced"]') as HTMLElement;
+      expect(fencedNodeEl, 'Fenced node card must render').not.toBeNull();
+      expect(fencedNodeEl.style.borderColor || fencedNodeEl.style.border, 'Fenced node card border must bind to var(--color-status-lost)').toContain('var(--color-status-lost)');
+      expect(fencedNodeEl.style.backgroundColor, 'Fenced node card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+
+      const fencedBadge = container.querySelector('[data-testid="resource-topology-fenced-badge"]') as HTMLElement;
+      expect(fencedBadge, 'Fenced badge must render').not.toBeNull();
+      expect(fencedBadge.style.backgroundColor, 'Fenced badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(fencedBadge.style.color, 'Fenced badge text must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      expect(fencedBadge.style.borderColor || fencedBadge.style.border, 'Fenced badge border must bind to var(--color-status-lost)').toContain('var(--color-status-lost)');
+      expect(fencedBadge.textContent).toContain('FENCED');
+
+      const fencedTextCrLight = getContrast(lightTokens['--color-status-lost'], lightTokens['--color-bg-subtle']);
+      const fencedTextCrDark = getContrast(darkTokens['--color-status-lost'], darkTokens['--color-bg-subtle']);
+      expect(fencedTextCrLight, 'Fenced badge text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(fencedTextCrDark, 'Fenced badge text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const fencedBorderCrLight = getContrast(lightTokens['--color-status-lost'], lightTokens['--color-bg-subtle']);
+      const fencedBorderCrDark = getContrast(darkTokens['--color-status-lost'], darkTokens['--color-bg-subtle']);
+      expect(fencedBorderCrLight, 'Fenced badge border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(fencedBorderCrDark, 'Fenced badge border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // Non-text fenced card border contrast on surface: >= 3.0:1
+      const fencedCardBorderCrLight = getContrast(lightTokens['--color-status-lost'], lightTokens['--color-bg-surface']);
+      const fencedCardBorderCrDark = getContrast(darkTokens['--color-status-lost'], darkTokens['--color-bg-surface']);
+      expect(fencedCardBorderCrLight, 'Fenced card border on light surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(fencedCardBorderCrDark, 'Fenced card border on dark surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-3. Normal node card
+      const normalNodeEl = container.querySelector('[data-testid="resource-topology-node-node-normal"]') as HTMLElement;
+      expect(normalNodeEl, 'Normal node card must render').not.toBeNull();
+      expect(normalNodeEl.style.borderColor || normalNodeEl.style.border, 'Normal node card border must bind to var(--color-border-subtle)').toContain('var(--color-border-subtle)');
+      expect(normalNodeEl.style.backgroundColor, 'Normal node card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+
+      // 3. NodeDetail fail-closed timeline status & getClusterNodeStatusConfig integration
+      const testOfflineNode = {
+        ...mockGraphNodes[0],
+        status: 'offline',
+      };
+      await act(async () => {
+        root.render(<NodeDetail node={testOfflineNode as any} onBack={() => {}} />);
+      });
+      const timelineOffline = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
+      expect(timelineOffline.style.color, 'Offline timeline must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(timelineOffline.textContent).toContain('Heartbeat FAILED (OFFLINE)');
+
+      const testCorruptNode = {
+        ...mockGraphNodes[0],
+        status: 'corrupted_state',
+      };
+      await act(async () => {
+        root.render(<NodeDetail node={testCorruptNode as any} onBack={() => {}} />);
+      });
+      const timelineCorrupt = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
+      expect(timelineCorrupt.style.color, 'Corrupt status must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(timelineCorrupt.textContent).toContain('Heartbeat FAILED (UNKNOWN (corrupted_state))');
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
   // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList & RiskBadge
   it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList, and RiskBadge style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
@@ -8840,6 +9103,34 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe125Cr, 'RiskBadge former 15% red tint border on light subtle fails 3.0:1').toBeLessThan(3.0);
     expect(probe125Cr).toBeCloseTo(1.21, 1);
 
+    // Probe 126 [Card 274]: Hardcoded #ffffff text on dark --color-status-online (#22c55e) strictly fails 4.5:1
+    const probe126Cr = getContrast('#ffffff', darkTokens['--color-status-online']);
+    expect(probe126Cr, 'Hardcoded #ffffff text on dark status-online strictly fails 4.5:1').toBeLessThan(4.5);
+    expect(probe126Cr).toBeCloseTo(2.28, 1);
+
+    // Probe 127 [Card 274]: Former ResourceTopologyGraph selected card bg rgba(16, 185, 129, 0.08) border contrast on light surface fails 3.0:1
+    const lightGreenComp = blendRgba([16, 185, 129], 0.08, lightTokens['--color-bg-surface']);
+    const probe127Cr = getContrast(lightGreenComp, lightTokens['--color-bg-surface']);
+    expect(probe127Cr, 'ResourceTopologyGraph former selected card bg tint on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe127Cr).toBeCloseTo(1.08, 1);
+
+    // Probe 128 [Card 274]: Former PlacementExplainView simulation badge #d97706 text on light surface composite fails 4.5:1
+    const lightAmberComp = blendRgba([234, 179, 8], 0.15, lightTokens['--color-bg-surface']);
+    const probe128Cr = getContrast('#d97706', lightAmberComp);
+    expect(probe128Cr, 'PlacementExplainView former simulation badge text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe128Cr).toBeCloseTo(2.90, 1);
+
+    // Probe 129 [Card 274]: Former PlacementExplainView simulation badge border rgba(234, 179, 8, 0.3) on composite fails 3.0:1
+    const lightAmberBorderComp = blendRgba([234, 179, 8], 0.30, lightTokens['--color-bg-surface']);
+    const probe129Cr = getContrast(lightAmberBorderComp, lightAmberComp);
+    expect(probe129Cr, 'PlacementExplainView former simulation badge border on composite fails 3.0:1').toBeLessThan(3.0);
+    expect(probe129Cr).toBeCloseTo(1.11, 1);
+
+    // Probe 130 [Card 274]: NodeDetail former observation callout text mutated to --color-text-inverse (#ffffff) on light subtle strictly fails 4.5:1
+    const probe130Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
+    expect(probe130Cr, 'NodeDetail observation text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe130Cr).toBeCloseTo(1.10, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -8946,8 +9237,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 5').toBeLessThanOrEqual(5);
-    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 3').toBeLessThanOrEqual(3);
+    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 4').toBeLessThanOrEqual(4);
+    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 2').toBeLessThanOrEqual(2);
 
     expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 0').toBeLessThanOrEqual(0);
     expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 0').toBeLessThanOrEqual(0);

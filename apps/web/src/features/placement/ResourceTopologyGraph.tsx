@@ -53,16 +53,17 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
           let bgColor = 'var(--color-bg-subtle)';
 
           if (isFenced) {
-            borderColor = 'var(--color-risk-l3-border)';
-            bgColor = 'var(--color-risk-l3-bg)';
+            borderColor = 'var(--color-status-lost)';
+            bgColor = 'var(--color-bg-subtle)';
           } else if (isSelected) {
-            borderColor = 'var(--color-brand-success)';
-            bgColor = 'rgba(16, 185, 129, 0.08)';
+            borderColor = 'var(--color-status-online)';
+            bgColor = 'var(--color-bg-subtle)';
           }
 
           return (
             <div
               key={node.id}
+              data-testid={`resource-topology-node-${node.id}`}
               style={{
                 padding: '16px',
                 borderRadius: 'var(--radius-md)',
@@ -81,13 +82,15 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
                 </div>
                 {isSelected && (
                   <span
+                    data-testid="resource-topology-selected-badge"
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontSize: '0.6875rem',
                       fontWeight: 700,
-                      backgroundColor: 'var(--color-brand-success)',
-                      color: '#ffffff',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-status-online)',
+                      border: '1px solid var(--color-status-online)',
                     }}
                   >
                     1순위 배치
@@ -95,13 +98,15 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
                 )}
                 {isFenced && (
                   <span
+                    data-testid="resource-topology-fenced-badge"
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontSize: '0.6875rem',
                       fontWeight: 700,
-                      backgroundColor: 'var(--color-brand-danger)',
-                      color: '#ffffff',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-status-lost)',
+                      border: '1px solid var(--color-status-lost)',
                     }}
                   >
                     FENCED
