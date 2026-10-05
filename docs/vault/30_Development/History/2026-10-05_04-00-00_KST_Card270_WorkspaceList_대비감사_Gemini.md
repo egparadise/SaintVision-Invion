@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T04:00:00+09:00"
-updated: "2026-10-05T04:15:00+09:00"
+updated: "2026-10-05T14:31:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 ## 1. 작업 개요
 - **목표**: 격리 작업공간 목록 뷰(`apps/web/src/features/workspaces/WorkspaceList.tsx`)의 색상 리터럴 전수(9건→0건) 토큰화 및 디자인 토큰 체계 승격:
   1. 작업공간 상태 설정 객체 최상단 정의 및 export: `WORKSPACE_STATUS_CONFIG` (`ready`, `provisioning`, `suspended`, `deleting`, `deleted` 5종 wire 계약 enum `WorkspaceStatusName`과 엄밀 일치).
-  2. `getWorkspaceStatusConfig` fail-closed own-key 방어: `Object.hasOwn` 기반 검사로 prototype key(`toString`, `constructor`, `__proto__`, `valueOf`, `hasOwnProperty`, `isPrototypeOf`), 대소문자 변형(`READY`), 계약 밖 값(`admitted`, `migrating_cluster`)의 fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식으로 안전 강등 매핑 (WCAG 1.4.1 준수).
+  2. `getWorkspaceStatusConfig` fail-closed own-key 방어: `Object.hasOwn` 기반 검사로 prototype key(`toString`, `constructor`, `__proto__`, `valueOf`, `hasOwnProperty`, `isPrototypeOf`), 대소문자 변형(`READY`), 계약 밖 값(`admitted`, `migrating_cluster`)의 fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식으로 안전 강등 매핑 (WCAG 1.4.1 준수). 계약 밖 fallback 레이블이 base의 "미확인 상태 (<status>)"에서 "UNKNOWN (<raw>)"(card 245·248과 같은 형식)로 바뀌었고 `workspace-list-5state-contract.test.tsx` 기대 문자열 한 줄이 함께 바뀜, 계약 5상태 레이블은 불변.
   3. 에러 배너 시맨틱 보존: `errorMessage` prop 전달 시 `role="alert"`, `data-testid="workspace-error-banner"`, `⚠️` 아이콘, `작업공간 오류` 헤딩 및 `var(--color-status-offline)` 테두리/텍스트 렌더링.
   4. 키보드 포커스 링 보존: 새 작업공간 생성 버튼, Studio 바로가기 버튼 및 작업공간 카드 `div[role="button"]`에 `outline: none/0`, `outlineWidth: 0` 등 포커스 링 억제 스타일 배제 및 DOM computed outline 검증.
   5. Multiset Baseline 래칫 강제: `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/workspaces/WorkspaceList.tsx` 허용 인벤토리를 `{}` (0건)으로 전면 래칫 고정. `var(--color-border-subtle)` 사용 횟수: 458건 / 31개 파일 엄밀 래칫.
@@ -28,11 +28,11 @@ source_of_truth: "Git"
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface/Subtle) | Before 명도비 (Light/Dark 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 상태 배지 Ready 텍스트 | status-ready text | #34d399 on composite #dbf4ec / #14352b | 1.66:1 (FAIL) / 7.30:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
+| 상태 배지 Ready 텍스트 | status-ready text | #34d399 on composite #dbf4ec / #113034 | 1.66:1 (FAIL) / 7.30:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
 | 상태 배지 Ready 테두리 | status-ready border | rgba(16, 185, 129, 0.3) on #ffffff / #111827 | 1.33:1 (FAIL) / 1.71:1 (FAIL) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
-| 상태 배지 Provisioning 텍스트 | status-provisioning text | #f59e0b on composite #fef4e7 / #332717 | 1.91:1 (FAIL) / 6.41:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
+| 상태 배지 Provisioning 텍스트 | status-provisioning text | #f59e0b on composite #fef4e7 / #332c23 | 1.91:1 (FAIL) / 6.41:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
 | 상태 배지 Provisioning 테두리 | status-provisioning border | rgba(245, 158, 11, 0.3) on #ffffff / #111827 | 1.26:1 (FAIL) / 1.81:1 (FAIL) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 3.0:1 | PASS |
-| 상태 배지 Deleting 텍스트 | status-deleting text | #f87171 on composite #fde9e9 / #331f23 | 2.28:1 (FAIL) / 5.56:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 상태 배지 Deleting 텍스트 | status-deleting text | #f87171 on composite #fde9e9 / #321f2b | 2.28:1 (FAIL) / 5.56:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | 상태 배지 Deleting 테두리 | status-deleting border | rgba(239, 68, 68, 0.3) on #ffffff / #111827 | 1.49:1 (FAIL) / 1.42:1 (FAIL) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 상태 배지 Suspended 텍스트 | status-suspended text | base에서 이미 토큰화됨 (var(--color-text-muted) on #f1f5f9) | 5.25:1 (PASS) / 5.78:1 (PASS) | --color-text-muted on --color-bg-subtle | 5.25:1 | 5.78:1 | >= 4.5:1 | PASS |
 | 상태 배지 Suspended 테두리 | status-suspended border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #f1f5f9) | 3.18:1 (PASS) / 3.08:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
@@ -40,15 +40,16 @@ source_of_truth: "Git"
 | 상태 배지 Deleted 테두리 | status-deleted border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #f1f5f9) | 3.18:1 (PASS) / 3.08:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
 | 상태 배지 Unknown 텍스트 | status-unknown fallback text | base에서 이미 토큰화됨 (var(--color-text-muted) on #f1f5f9) | 5.25:1 (PASS) / 5.78:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
 | 상태 배지 Unknown 테두리 | status-unknown fallback border | base에서 이미 토큰화됨 (var(--color-border-subtle) on #f1f5f9) | 3.18:1 (PASS) / 3.08:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
-| 에러 배너 헤딩/본문 | error-banner heading/body | 신규 추가 | N/A | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 에러 배너 헤딩 | error-banner heading | 신규 추가 | N/A | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 에러 배너 본문 | error-banner body | 신규 추가 | N/A | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 에러 배너 테두리 | error-banner border | 신규 추가 | N/A | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
-| 헤더 제목 | header-title text | base에서 이미 토큰화됨 (#0f172a on #f8fafc / #f9fafb on #090d16) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-canvas | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 헤더 부제목 | header-subtitle text | base에서 이미 토큰화됨 (var(--color-text-muted) on canvas) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-canvas | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 헤더 제목 | header-title text | base에서 이미 토큰화됨 (#0f172a on #f8fafc / #f9fafb on #090d16) | 17.06:1 (PASS) / 18.59:1 (PASS) | --color-text-primary on --color-bg-canvas | 17.06:1 | 18.59:1 | >= 4.5:1 | PASS |
+| 헤더 부제목 | header-subtitle text | base에서 이미 토큰화됨 (var(--color-text-muted) on canvas) | 5.50:1 (PASS) / 7.65:1 (PASS) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
 | 작업공간 생성 버튼 | btn-create-workspace text | base에서 이미 토큰화됨 (--color-brand-primary-fg on bg) | 5.17:1 (PASS) / 6.70:1 (PASS) | --color-brand-primary-fg on bg | 5.17:1 | 6.70:1 | >= 4.5:1 | PASS |
 | 작업공간 카드 테두리 | card-border | base에서 이미 토큰화됨 (var(--color-border-subtle) on canvas) | 3.33:1 (PASS) / 4.08:1 (PASS) | --color-border-subtle on --color-bg-canvas | 3.33:1 | 4.08:1 | >= 3.0:1 | PASS |
 | 작업공간 카드 제목 | card-title text | base에서 이미 토큰화됨 (상속 텍스트 on #ffffff / #111827) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
 | 작업공간 카드 메타 | card-meta text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| Studio 바로가기 버튼 | card-studio-btn text | base에서 이미 토큰화됨 (var(--color-text-primary) on subtle) | 16.30:1 (PASS) / 14.05:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
+| Studio 바로가기 버튼 | card-studio-btn text | base에서 이미 토큰화됨 (var(--color-brand-hover) on surface) | 6.70:1 (PASS) / 9.84:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
 | 빈 화면 제목 | empty-title text | base에서 이미 토큰화됨 (var(--color-text-primary) on surface) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
 | 빈 화면 설명 | empty-description text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
 
@@ -80,19 +81,20 @@ IT09  | badge-deleted text           | 4.5   | 5.25       | 5.78       | PASS
 IT10  | badge-deleted border         | 3.0   | 3.18       | 3.08       | PASS
 IT11  | badge-unknown fallback text  | 4.5   | 6.47       | 5.82       | PASS
 IT12  | badge-unknown fallback border| 3.0   | 6.47       | 5.82       | PASS
-IT13  | error-banner heading/body    | 4.5   | 6.47       | 6.41       | PASS
-IT14  | error-banner border          | 3.0   | 6.47       | 6.41       | PASS
-IT15  | header-title text            | 4.5   | 17.85      | 16.98      | PASS
-IT16  | header-subtitle text         | 4.5   | 5.75       | 6.99       | PASS
-IT17  | btn-create-workspace text    | 4.5   | 5.17       | 6.70       | PASS
-IT18  | card-border                  | 3.0   | 3.33       | 4.08       | PASS
-IT19  | card-title text              | 4.5   | 17.85      | 16.98      | PASS
-IT20  | card-meta text               | 4.5   | 5.75       | 6.99       | PASS
-IT21  | card-studio-btn text         | 4.5   | 6.70       | 9.84       | PASS
-IT22  | empty-title text             | 4.5   | 17.85      | 16.98      | PASS
-IT23  | empty-description text       | 4.5   | 5.75       | 6.99       | PASS
+IT13  | error-banner heading         | 4.5   | 5.91       | 5.31       | PASS
+IT14  | error-banner body            | 4.5   | 16.30      | 14.05      | PASS
+IT15  | error-banner border          | 3.0   | 5.91       | 5.31       | PASS
+IT16  | header-title text            | 4.5   | 17.06      | 18.59      | PASS
+IT17  | header-subtitle text         | 4.5   | 5.50       | 7.65       | PASS
+IT18  | btn-create-workspace text    | 4.5   | 5.17       | 6.70       | PASS
+IT19  | card-border                  | 3.0   | 3.33       | 4.08       | PASS
+IT20  | card-title text              | 4.5   | 17.85      | 16.98      | PASS
+IT21  | card-meta text               | 4.5   | 5.75       | 6.99       | PASS
+IT22  | card-studio-btn text         | 4.5   | 6.70       | 9.84       | PASS
+IT23  | empty-title text             | 4.5   | 17.85      | 16.98      | PASS
+IT24  | empty-description text       | 4.5   | 5.75       | 6.99       | PASS
 ----------------------------------------------------------------------------------------------------
-Total Audit Items: 23 | Passed: 23 | Failed: 0
+Total Audit Items: 24 | Passed: 24 | Failed: 0
 ====================================================================================================
 [SUCCESS] All items strictly pass WCAG AA contrast thresholds in both Light and Dark themes.
 ```
@@ -116,8 +118,8 @@ Total Audit Items: 23 | Passed: 23 | Failed: 0
 ## 4. 컴파일 검증 변이 테스트 (W1~W40) 사살 실측
 
 > [!IMPORTANT]
-> **증거 배치 및 Head 무결성 보증 (Card 245 합의 프로토콜 준수)**:
-> `tools/.c270_mutation_results.json`은 러너 수정 commit A의 clean checkout 상태에서 `python tools/test_c270_mutations.py --all`을 단일 연속 실행하여 생성되었으며, commit B는 이 JSON 결과 파일만 추가합니다. commit A와 B 사이 제품 및 시험 코드 변경은 0건이며, 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree)의 clean HEAD입니다.
+> **증거 배치 및 Head 무결성 보증 (Card 245/248 합의 프로토콜 준수)**:
+> `tools/.c270_mutation_results.json` receipt는 commit A `59146c32` tree의 mutation 증거이며, commit B(`e93f629d`)는 이 JSON 결과 파일만 추가했습니다. 후속 commit C는 mutation 러너·시험·제품 코드를 바꾸지 않고 reproduce 스크립트와 문서만 변경(tools/reproduce_c270_contrast.py 및 History 정합)하였으므로 mutation 러너 및 receipt 재생성이 불필요합니다. 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree `59146c32`)의 clean HEAD입니다.
 
 `tools/test_c270_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
 결과 메타데이터는 `tools/.c270_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존되었습니다.

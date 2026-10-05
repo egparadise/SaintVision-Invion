@@ -1,10 +1,11 @@
 """
 Dynamic contrast reproduction script for Card 270: WorkspaceList
 Validates WCAG 2.2 AA contrast compliance against apps/web/src/index.css tokens.
-Audit Items: 23
+Audit Items: 24
 """
 import re
 from pathlib import Path
+
 
 def parse_tokens(css_text):
     root_match = re.search(r':root\s*\{([^}]+)\}', css_text)
@@ -16,6 +17,7 @@ def parse_tokens(css_text):
     dark_tokens = dict(token_pat.findall(dark_match.group(1)))
     return light_tokens, dark_tokens
 
+
 def parse_hex(hex_str):
     hex_str = hex_str.strip().lstrip('#')
     if len(hex_str) == 3:
@@ -24,6 +26,7 @@ def parse_hex(hex_str):
         hex_str = hex_str[:6]
     return [int(hex_str[i:i+2], 16) for i in (0, 2, 4)]
 
+
 def get_luminance(rgb):
     def channel(c):
         c = c / 255.0
@@ -31,12 +34,14 @@ def get_luminance(rgb):
     r, g, b = [channel(v) for v in rgb]
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
+
 def get_contrast(rgb1, rgb2):
     l1 = get_luminance(rgb1)
     l2 = get_luminance(rgb2)
     lighter = max(l1, l2)
     darker = min(l1, l2)
     return (lighter + 0.05) / (darker + 0.05)
+
 
 def main():
     css_path = Path('apps/web/src/index.css')
@@ -69,24 +74,25 @@ def main():
         ("IT11", "badge-unknown fallback text", 4.5, light['--color-status-unknown'], dark['--color-status-unknown'], l_subtle, d_subtle),
         ("IT12", "badge-unknown fallback border", 3.0, light['--color-status-unknown'], dark['--color-status-unknown'], l_subtle, d_subtle),
 
-        # 2. Error Banner (on --color-bg-surface)
-        ("IT13", "error-banner heading/body", 4.5, light['--color-status-offline'], dark['--color-status-offline'], l_surface, d_surface),
-        ("IT14", "error-banner border", 3.0, light['--color-status-offline'], dark['--color-status-offline'], l_surface, d_surface),
+        # 2. Error Banner (on --color-bg-subtle)
+        ("IT13", "error-banner heading", 4.5, light['--color-status-offline'], dark['--color-status-offline'], l_subtle, d_subtle),
+        ("IT14", "error-banner body", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_subtle, d_subtle),
+        ("IT15", "error-banner border", 3.0, light['--color-status-offline'], dark['--color-status-offline'], l_subtle, d_subtle),
 
-        # 3. Header & Actions
-        ("IT15", "header-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
-        ("IT16", "header-subtitle text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
-        ("IT17", "btn-create-workspace text", 4.5, light['--color-brand-primary-fg'], dark['--color-brand-primary-fg'], parse_hex(light['--color-brand-primary-bg']), parse_hex(dark['--color-brand-primary-bg'])),
+        # 3. Header & Actions (header on canvas, button on brand-bg)
+        ("IT16", "header-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_canvas, d_canvas),
+        ("IT17", "header-subtitle text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_canvas, d_canvas),
+        ("IT18", "btn-create-workspace text", 4.5, light['--color-brand-primary-fg'], dark['--color-brand-primary-fg'], parse_hex(light['--color-brand-primary-bg']), parse_hex(dark['--color-brand-primary-bg'])),
 
         # 4. Workspace Cards
-        ("IT18", "card-border", 3.0, light['--color-border-subtle'], dark['--color-border-subtle'], l_canvas, d_canvas),
-        ("IT19", "card-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
-        ("IT20", "card-meta text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
-        ("IT21", "card-studio-btn text", 4.5, light['--color-brand-hover'], dark['--color-brand-hover'], l_surface, d_surface),
+        ("IT19", "card-border", 3.0, light['--color-border-subtle'], dark['--color-border-subtle'], l_canvas, d_canvas),
+        ("IT20", "card-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
+        ("IT21", "card-meta text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
+        ("IT22", "card-studio-btn text", 4.5, light['--color-brand-hover'], dark['--color-brand-hover'], l_surface, d_surface),
 
         # 5. Empty State
-        ("IT22", "empty-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
-        ("IT23", "empty-description text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
+        ("IT23", "empty-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
+        ("IT24", "empty-description text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
     ]
 
     print("=" * 100)
@@ -115,8 +121,12 @@ def main():
     print("=" * 100)
     if passed_count == len(items):
         print("[SUCCESS] All items strictly pass WCAG AA contrast thresholds in both Light and Dark themes.")
+        return 0
     else:
         print("[FAILURE] Some items failed contrast thresholds.")
+        return 1
+
 
 if __name__ == '__main__':
-    main()
+    import sys
+    sys.exit(main())
