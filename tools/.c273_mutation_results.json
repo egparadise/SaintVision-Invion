@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+  "observedAt": "2026-10-05T08:03:56.927355+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "RiskBadge: L0 colorVar==bgVar collision (colorVar: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:48:40.617241+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "RiskBadge: L0 bgVar==colorVar collision (bgVar: var(--color-risk-l0))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:49:04.472027+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "RiskBadge: L1 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:49:24.725632+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "RiskBadge: L2 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:49:44.849908+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "RiskBadge: L3 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:50:05.275636+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "RiskBadge: RISK_CONFIG key mutation (rename L3 to L4, breaking contract key set)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:50:23.696300+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "RiskBadge: fail-closed prototype check bypass (remove Object.hasOwn, use 'in' operator)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:50:42.767423+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "RiskBadge: UNKNOWN label mutation (change UNKNOWN to UNKNOWN_BAD)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:51:02.008027+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "RiskBadge: fallback colorVar==bgVar collision (colorVar: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:51:21.670799+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "RiskBadge: fallback bgVar==colorVar collision (bgVar: var(--color-status-unknown))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:51:39.190277+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "RiskBadge: fallback low-contrast text mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:52:00.968666+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "RiskBadge: container border==bgVar collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:52:28.259108+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "RiskBadge: rendered label mutated to static HARDCODED string",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:52:49.647593+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "RiskBadge: accessibility role='status' removed from container",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:53:11.431950+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "RiskBadge: accessibility aria-label suppressed to empty string",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:53:32.718058+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "RiskBadge: L0 bgVar mutated to var(--color-bg-canvas) breaking uniform subtle styling",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:53:56.841258+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "Button: primary color==bg collision (color: var(--color-brand-primary-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:54:23.018416+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "Button: primary low-contrast text mutation (color: var(--color-text-muted))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:54:45.193785+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "Button: primary bg==color collision (backgroundColor: var(--color-brand-primary-fg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:55:04.916438+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "Button: danger color==bg collision (color: var(--color-status-offline-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:55:25.735606+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "Button: danger low-contrast text mutation (color: var(--color-text-secondary))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:55:58.470628+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "Button: secondary color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:56:24.855658+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "Button: secondary bg==color collision (backgroundColor: var(--color-text-primary))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:56:52.285171+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "Button: secondary border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:57:21.091941+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "Button: primary color revert to raw literal #ffffff (multiset ratchet failure)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:57:50.558502+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "Button: danger color revert to raw literal #ffffff (multiset ratchet failure)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:58:18.189051+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "ExecutionResultView: success pill bg revert to raw literal rgba(16, 185, 129, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:58:43.878377+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "ExecutionResultView: success pill bg==color collision (backgroundColor: var(--color-brand-success))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:59:05.254812+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "ExecutionResultView: success pill color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:59:32.844516+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "ExecutionResultView: exit code card bg mutated to var(--color-bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T07:59:54.730152+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "ExecutionResultView: success status text changed from '정상 종료 (SUCCESS)' to 'SUCCESS'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:00:13.221264+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "ExecutionResultView: allowed event row bg mutated to var(--color-bg-surface)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:00:32.623209+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "WorkspaceCreateModal: backdrop bg revert to raw literal rgba(0, 0, 0, 0.65)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:00:52.058421+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "WorkspaceCreateModal: backdrop bg mutated to var(--color-bg-surface)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:01:09.810965+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "WorkspaceCreateModal: dialog surface bg mutated to var(--color-bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:01:27.824142+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "WorkspaceCreateModal: dialog accessibility role='dialog' removed",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:01:45.539332+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "RiskBadge: L0 bgVar revert to raw literal rgba(16, 185, 129, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:02:03.689511+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "RiskBadge: L1 bgVar revert to raw literal rgba(59, 130, 246, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:02:33.289306+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "RiskBadge: L2 bgVar revert to raw literal rgba(245, 158, 11, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:02:58.992197+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "RiskBadge: L3 bgVar revert to raw literal rgba(239, 68, 68, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 273: Button, RiskBadge, ExecutionResultView, and WorkspaceCreateModal comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "4a287d04d99e89b8f2559fdce57b80ad2944b83e",
+      "observedAt": "2026-10-05T08:03:28.406524+00:00"
+    }
+  ]
+}
