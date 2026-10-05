@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.217"
+version: "1.0.218"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-05T15:49:00+09:00"
+updated: "2026-10-05T16:25:00+09:00"
 source_of_truth: "Git"
 ---
 
