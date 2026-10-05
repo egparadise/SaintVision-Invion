@@ -347,7 +347,7 @@ function scanColorLiterals(text: string): Record<string, number> {
 
 // Fail-closed multiset inventory of registered files and their exact color literal counts (literal -> max allowed occurrences)
 const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = {
-  "app/App.tsx": {"#991b1b": 2, "#dc2626": 1, "#ef4444": 1, "#f87171": 1, "#fca5a5": 1, "#fed7aa": 1, "#fee2e2": 1, "#ffffff": 2, "rgba(239,68,68,0.1)": 1},
+  "app/App.tsx": {},
   "features/admin/AdminSecurityConsole.tsx": {},
   "features/agent/NaturalLanguageRunView.tsx": {},
   "features/approvals/ApprovalCenter.tsx": {},
@@ -373,7 +373,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/placement/ResourceTopologyGraph.tsx": {},
   "features/recovery/DistributedRecoveryView.tsx": {},
   "features/release/ReleaseCandidateView.tsx": {},
-  "features/release/releaseEngine.ts": {"#0d1117": 1, "#6e7681": 1},
+  "features/release/releaseEngine.ts": {},
   "features/runs/RunDetail.tsx": {},
   "features/runs/RunList.tsx": {},
   "features/runs/SealRecordPanel.tsx": {},
@@ -8544,9 +8544,121 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9aa. [Card 277 / ACC-09] App Shell & Release Engine Contrast, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 277: App Shell and releaseEngine comply with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. ReleaseManager Accessibility Audits compliance
+    const releaseMgr = new ReleaseManager();
+    const audits = releaseMgr.getAccessibilityAudits();
+    expect(audits.length, 'Accessibility audits must have at least 4 items').toBeGreaterThanOrEqual(4);
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
+    const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
+    const lTextSec = resolveTokenHex('--color-text-secondary', lightTokens);
+    const dTextSec = resolveTokenHex('--color-text-secondary', darkTokens);
+    const lBorderSubtle = resolveTokenHex('--color-border-subtle', lightTokens);
+    const dBorderSubtle = resolveTokenHex('--color-border-subtle', darkTokens);
+
+    const bodyContrastAudit = audits.find((a) => a.ruleId === 'wcag21-1.4.3-contrast-minimum');
+    expect(bodyContrastAudit, 'WCAG 1.4.3 body text contrast audit must exist').toBeDefined();
+    expect(bodyContrastAudit?.status).toBe('pass');
+    const expectedBodyCr = Math.min(
+      parseFloat(getContrast(lTextSec, lCanvas).toFixed(2)),
+      parseFloat(getContrast(dTextSec, dCanvas).toFixed(2))
+    );
+    expect(bodyContrastAudit?.contrastRatio).toBe(expectedBodyCr);
+    expect(bodyContrastAudit?.contrastRatio).toBe(7.24);
+
+    const nonTextAudit = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
+    expect(nonTextAudit, 'WCAG 1.4.11 non-text boundary contrast audit must exist').toBeDefined();
+    expect(nonTextAudit?.status).toBe('pass');
+    const expectedNonTextCr = Math.min(
+      parseFloat(getContrast(lBorderSubtle, lCanvas).toFixed(2)),
+      parseFloat(getContrast(dBorderSubtle, dCanvas).toFixed(2))
+    );
+    expect(nonTextAudit?.contrastRatio).toBe(expectedNonTextCr);
+    expect(nonTextAudit?.contrastRatio).toBe(3.33);
+    expect(nonTextAudit?.description).toContain('--color-border-subtle');
+    expect(nonTextAudit?.description).toContain('--color-bg-canvas');
+    expect(nonTextAudit?.description).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+
+    // 2. Numerical contrast calculations for App Shell tokenized items (WCAG 2.2 AA criteria)
+    const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+    const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+    const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+    const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+    const lRiskL3Bg = resolveTokenHex('--color-risk-l3-bg', lightTokens);
+    const dRiskL3Bg = resolveTokenHex('--color-risk-l3-bg', darkTokens);
+    const lRiskL3Text = resolveTokenHex('--color-risk-l3-text', lightTokens);
+    const dRiskL3Text = resolveTokenHex('--color-risk-l3-text', darkTokens);
+    const lRiskL3Border = resolveTokenHex('--color-risk-l3-border', lightTokens);
+    const dRiskL3Border = resolveTokenHex('--color-risk-l3-border', darkTokens);
+    const lPrimaryBg = resolveTokenHex('--color-brand-primary-bg', lightTokens);
+    const dPrimaryBg = resolveTokenHex('--color-brand-primary-bg', darkTokens);
+    const lPrimaryFg = resolveTokenHex('--color-brand-primary-fg', lightTokens);
+    const dPrimaryFg = resolveTokenHex('--color-brand-primary-fg', darkTokens);
+    const lBorderStrong = resolveTokenHex('--color-border-strong', lightTokens);
+    const dBorderStrong = resolveTokenHex('--color-border-strong', darkTokens);
+    const lTextMuted = resolveTokenHex('--color-text-muted', lightTokens);
+    const dTextMuted = resolveTokenHex('--color-text-muted', darkTokens);
+    const lDegraded = resolveTokenHex('--color-status-degraded', lightTokens);
+    const dDegraded = resolveTokenHex('--color-status-degraded', darkTokens);
+
+    // Global action error banner text & border
+    expect(getContrast(lRiskL3Text, lRiskL3Bg), 'Global error text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dRiskL3Text, dRiskL3Bg), 'Global error text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lRiskL3Border, lRiskL3Bg), 'Global error border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dRiskL3Border, dRiskL3Bg), 'Global error border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Global error dismiss button text & border
+    expect(getContrast(lRiskL3Text, lSurface), 'Dismiss button text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dRiskL3Text, dSurface), 'Dismiss button text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lRiskL3Border, lSurface), 'Dismiss button border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dRiskL3Border, dSurface), 'Dismiss button border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Node simulation active button
+    expect(getContrast(lPrimaryFg, lPrimaryBg), 'Node sim active text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dPrimaryFg, dPrimaryBg), 'Node sim active text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lPrimaryFg, lPrimaryBg), 'Node sim active border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dPrimaryFg, dPrimaryBg), 'Node sim active border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Node simulation inactive button
+    expect(getContrast(lTextSec, lSubtle), 'Node sim inactive text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextSec, dSubtle), 'Node sim inactive text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lBorderStrong, lSubtle), 'Node sim inactive border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderStrong, dSubtle), 'Node sim inactive border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Terminal notice container & guidance text
+    expect(getContrast(lBorderSubtle, lCanvas), 'Terminal notice border on canvas light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderSubtle, dCanvas), 'Terminal notice border on canvas dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lTextMuted, lSurface), 'Terminal notice muted text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextMuted, dSurface), 'Terminal notice muted text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lDegraded, lSurface), 'Terminal notice degraded guidance light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dDegraded, dSurface), 'Terminal notice degraded guidance dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // 3. Token Declaration Verification: all tokens used in App.tsx & releaseEngine.ts exist in index.css
+    const cssPath = path.resolve(__dirname, '../src/index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf-8');
+    const declaredCssTokens = new Set<string>();
+    const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+    let declMatch;
+    while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+      declaredCssTokens.add(declMatch[1].trim());
+    }
+
+    for (const relPath of ['app/App.tsx', 'features/release/releaseEngine.ts']) {
+      const fullPath = path.resolve(__dirname, '../src', relPath);
+      const fileContent = fs.readFileSync(fullPath, 'utf-8');
+      const varMatches = fileContent.match(/var\((--[a-z0-9-]+)/g) || [];
+      for (const v of varMatches) {
+        const tokenName = v.replace('var(', '');
+        expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in ${relPath} must be declared in index.css`).toBe(true);
+      }
+    }
+  });
+
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -9123,6 +9235,20 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(headerStats.coveredColorObjects, 'Total covered color objects in Header must be exactly 10').toBe(10);
     expect(headerStats.checkedBorderObjects, 'Border objects in Header must be exactly 4').toBe(4);
     expect(headerStats.checkedBorderPairs, 'Border pairs in Header must be exactly 4').toBe(4);
+
+    const appStats = analyzeFile('app/App.tsx');
+    expect(appStats.violations, `App violations:\n${appStats.violations.join('\n')}`).toEqual([]);
+    expect(appStats.totalStyleAttrs, 'Total style attributes in App must be exactly 19').toBe(19);
+    expect(appStats.checkedObjects, 'Explicit style objects in App must be exactly 7').toBe(7);
+    expect(appStats.checkedPairs, 'Evaluated pairs in App must be exactly 12').toBe(12);
+    expect(appStats.unboundColorObjects, 'Unbound color objects in App must be exactly 4').toBe(4);
+    expect(appStats.coveredColorObjects, 'Total covered color objects in App must be exactly 11').toBe(11);
+    expect(appStats.checkedBorderObjects, 'Border objects in App must be exactly 9').toBe(9);
+    expect(appStats.checkedBorderPairs, 'Border pairs in App must be exactly 10').toBe(10);
+
+    const releaseEngineStats = analyzeFile('features/release/releaseEngine.ts');
+    expect(releaseEngineStats.violations, `releaseEngine violations:\n${releaseEngineStats.violations.join('\n')}`).toEqual([]);
+    expect(releaseEngineStats.totalStyleAttrs, 'Total style attributes in releaseEngine must be exactly 0').toBe(0);
   });
 
 
@@ -9849,6 +9975,32 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe140Cr = getContrast('#60a5fa', lightDesktopComp276);
     expect(probe140Cr, 'Header former Web Desktop button text on light composite fails 4.5:1').toBeLessThan(4.5);
     expect(probe140Cr).toBeCloseTo(2.02, 1);
+
+    // Probe 141 [Card 277]: Former workspace-error text #fca5a5 on light canvas fails 4.5:1 (1.81:1)
+    const probe141Cr = getContrast('#fca5a5', lightTokens['--color-bg-canvas']);
+    expect(probe141Cr, 'App former workspace-error text #fca5a5 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe141Cr).toBeCloseTo(1.81, 1);
+
+    // Probe 142 [Card 277]: Former terminal notice text #fed7aa on light surface fails 4.5:1 (1.35:1)
+    const probe142Cr = getContrast('#fed7aa', lightTokens['--color-bg-surface']);
+    expect(probe142Cr, 'App former terminal notice text #fed7aa on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe142Cr).toBeCloseTo(1.35, 1);
+
+    // Probe 143 [Card 277]: Former workspace-error text #fca5a5 on rgba(239, 68, 68, 0.1) over light canvas composite fails 4.5:1 (1.60:1)
+    const lightWorkspaceComp277 = blendRgba([239, 68, 68], 0.10, lightTokens['--color-bg-canvas']);
+    const probe143Cr = getContrast('#fca5a5', lightWorkspaceComp277);
+    expect(probe143Cr, 'App former workspace-error text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe143Cr).toBeCloseTo(1.60, 1);
+
+    // Probe 144 [Card 277]: Former nodeSimState button text #ffffff on light subtle fails 4.5:1 (1.10:1)
+    const probe144Cr = getContrast('#ffffff', lightTokens['--color-bg-subtle']);
+    expect(probe144Cr, 'App former nodeSimState button text #ffffff on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe144Cr).toBeCloseTo(1.10, 1);
+
+    // Probe 145 [Card 277]: Former terminal notice text #fed7aa on light subtle fails 4.5:1 (1.24:1)
+    const probe145Cr = getContrast('#fed7aa', lightTokens['--color-bg-subtle']);
+    expect(probe145Cr, 'App former terminal notice text #fed7aa on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe145Cr).toBeCloseTo(1.24, 1);
 
 
 
