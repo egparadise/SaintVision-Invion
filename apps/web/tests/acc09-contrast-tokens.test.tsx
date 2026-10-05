@@ -96,9 +96,11 @@ import {
   EvidenceViewer,
   EVIDENCE_INTEGRITY_CONFIG,
   getEvidenceIntegrityConfig,
+  UI_INTEGRITY_PROJECTION_STATUSES,
+  deriveIntegrityStatus,
+  type UiIntegrityProjectionStatus,
 } from '../src/features/evidence/EvidenceViewer';
-import { INTEGRITY_VERIFICATION_STATUSES } from '../src/contracts/types';
-import type { RiskLevel, PlacementExplainResult, IntegrityVerificationStatus, RunResultView } from '../src/contracts/types';
+import type { RiskLevel, PlacementExplainResult, RunResultView } from '../src/contracts/types';
 
 import type {
   ReleaseManifestResponse,
@@ -8096,10 +8098,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const root = createRoot(container);
 
     try {
-      // 1. EVIDENCE_INTEGRITY_CONFIG exact key set equality with canonical IntegrityVerificationStatus wire contract
-      const expectedIntegrityKeys = [...INTEGRITY_VERIFICATION_STATUSES];
-      expect(expectedIntegrityKeys.length, 'Canonical contracts must define IntegrityVerificationStatus items').toBe(4);
-      expect(Object.keys(EVIDENCE_INTEGRITY_CONFIG).sort(), 'EVIDENCE_INTEGRITY_CONFIG keys must exactly match canonical IntegrityVerificationStatus wire enum').toEqual([...expectedIntegrityKeys].sort());
+      // 1. EVIDENCE_INTEGRITY_CONFIG exact key set equality with UI-derived projection statuses
+      const expectedIntegrityKeys = [...UI_INTEGRITY_PROJECTION_STATUSES];
+      expect(expectedIntegrityKeys.length, 'UI integrity projection must define 4 status items').toBe(4);
+      expect(Object.keys(EVIDENCE_INTEGRITY_CONFIG).sort(), 'EVIDENCE_INTEGRITY_CONFIG keys must exactly match UI projection statuses').toEqual([...expectedIntegrityKeys].sort());
+
+      // 1b. Verify derivation projection rules strictly derive all statuses from canonical RunResultView fields:
+      expect(deriveIntegrityStatus({ output: { verified: true } })).toBe('PASS');
+      expect(deriveIntegrityStatus({ output: { verified: false } })).toBe('FAIL');
+      expect(deriveIntegrityStatus({ state: 'failed' })).toBe('RUN_FAILED');
+      expect(deriveIntegrityStatus({})).toBe('UNVERIFIED');
 
       // 2. Numerical contrast calculations for each status config (text >= 4.5:1, border >= 3.0:1 on subtle & surface)
       const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
@@ -8288,9 +8296,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         ...baseRunResult,
         id: 'run-c275-unknown',
         runId: 'run-c275-unknown',
-        output: { sha256: 'c'.repeat(64), sizeBytes: 1024, verified: false as any },
+        output: { sha256: 'c'.repeat(64), sizeBytes: 1024, verified: 'CORRUPTED_VALUE' as any },
       };
-      (unknownResult as any).integrityVerification = 'CORRUPTED_CUSTOM_STATUS';
       vi.spyOn(client, 'apiClient').mockResolvedValueOnce(unknownResult);
       await act(async () => {
         root.render(<EvidenceViewer runId="run-c275-unknown" projectId="prj-c275" onBack={() => {}} />);

@@ -1,12 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
-import type { RunResultView, IntegrityVerificationStatus } from '@/contracts/types';
+import type { RunResultView } from '@/contracts/types';
 
 export interface EvidenceViewerProps {
   runId: string;
   projectId?: string;
   onBack: () => void;
+}
+
+/**
+ * UI-derived projection of output verification state based strictly on canonical RunResultView fields
+ * (output.verified, state). Not a wire contract enum.
+ */
+export const UI_INTEGRITY_PROJECTION_STATUSES = ['PASS', 'FAIL', 'RUN_FAILED', 'UNVERIFIED'] as const;
+export type UiIntegrityProjectionStatus = (typeof UI_INTEGRITY_PROJECTION_STATUSES)[number];
+export type IntegrityVerificationStatus = UiIntegrityProjectionStatus;
+export const INTEGRITY_VERIFICATION_STATUSES = UI_INTEGRITY_PROJECTION_STATUSES;
+
+export function deriveIntegrityStatus(res: { output?: { verified?: boolean } | null; state?: string | null }): UiIntegrityProjectionStatus | string {
+  let integrityStatus: UiIntegrityProjectionStatus | string = 'UNVERIFIED';
+  if (res.output?.verified === true) {
+    integrityStatus = 'PASS';
+  } else if (res.output && (res.output.verified as unknown) === false) {
+    // [계약 방어]: core.schema.json에서 ResultOutputMetadata.verified는 현재 "const": true 이므로
+    // 정상 백엔드 응답에서 verified === false는 도달할 수 없습니다.
+    // 다만 향후 계약이 boolean으로 확장되어 서버가 무결성 실패를 200 OK로 전달하거나,
+    // 프록시/모의 환경에서 명시적 false가 주입될 경우를 대비한 선제적 방어 분기입니다.
+    integrityStatus = 'FAIL';
+  } else if (res.state === 'failed') {
+    // [실행 실패 분리]: 실행 자체가 실패한 경우, 출력물이 손상된 것이 아니라
+    // 프로세스 비정상 종료로 인해 검증할 출력물 대상 자체가 생성되지 않은 상태입니다.
+    // 이를 '출력 무결성 검증 실패(FAIL)'로 왜곡하지 않고 정직하게 '실행 실패(RUN_FAILED)'로 분리합니다.
+    integrityStatus = 'RUN_FAILED';
+  } else if (res.output && (res.output.verified as unknown) !== undefined && typeof (res.output.verified as unknown) !== 'boolean') {
+    // [비정형/오염 방어]: verified 필드가 boolean이 아닌 오염된 값일 경우 fail-closed UNKNOWN으로 처리
+    integrityStatus = `UNKNOWN (${String((res.output as any).verified)})`;
+  } else {
+    integrityStatus = 'UNVERIFIED';
+  }
+  return integrityStatus;
 }
 
 export interface EvidenceIntegrityConfigItem {
@@ -51,11 +84,11 @@ export const EVIDENCE_INTEGRITY_CONFIG = {
     borderVar: 'var(--color-status-unknown)',
     description: '독립적 암호학적 대조가 수행되지 않았거나 검증 정보 부재',
   },
-} as const satisfies Record<IntegrityVerificationStatus, EvidenceIntegrityConfigItem>;
+} as const satisfies Record<UiIntegrityProjectionStatus, EvidenceIntegrityConfigItem>;
 
 export function getEvidenceIntegrityConfig(status: unknown): EvidenceIntegrityConfigItem {
   if (typeof status === 'string' && Object.hasOwn(EVIDENCE_INTEGRITY_CONFIG, status)) {
-    return EVIDENCE_INTEGRITY_CONFIG[status as IntegrityVerificationStatus];
+    return EVIDENCE_INTEGRITY_CONFIG[status as UiIntegrityProjectionStatus];
   }
   const raw = status === null || status === undefined ? '' : String(status).trim();
   return {
@@ -108,25 +141,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     try {
       const prjId = projectId.trim();
       const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${runId}/result`);
-      let integrityStatus: IntegrityVerificationStatus | string = 'UNVERIFIED';
-      if ((res as any).integrityVerification) {
-        integrityStatus = (res as any).integrityVerification;
-      } else if (res.output?.verified === true) {
-        integrityStatus = 'PASS';
-      } else if (res.output && (res.output.verified as unknown) === false) {
-        // [계약 방어]: core.schema.json에서 ResultOutputMetadata.verified는 현재 "const": true 이므로
-        // 정상 백엔드 응답에서 verified === false는 도달할 수 없습니다.
-        // 다만 향후 계약이 boolean으로 확장되어 서버가 무결성 실패를 200 OK로 전달하거나,
-        // 프록시/모의 환경에서 명시적 false가 주입될 경우를 대비한 선제적 방어 분기입니다.
-        integrityStatus = 'FAIL';
-      } else if (res.state === 'failed') {
-        // [실행 실패 분리]: 실행 자체가 실패한 경우, 출력물이 손상된 것이 아니라
-        // 프로세스 비정상 종료로 인해 검증할 출력물 대상 자체가 생성되지 않은 상태입니다.
-        // 이를 '출력 무결성 검증 실패(FAIL)'로 왜곡하지 않고 정직하게 '실행 실패(RUN_FAILED)'로 분리합니다.
-        integrityStatus = 'RUN_FAILED';
-      } else {
-        integrityStatus = 'UNVERIFIED';
-      }
+      const integrityStatus = deriveIntegrityStatus(res);
 
       const data: EvidenceData = {
         evidenceId: res.evidence?.evidenceId || '미발급 (출력 미봉인)',
