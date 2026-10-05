@@ -8345,10 +8345,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const root = createRoot(container);
 
     try {
-      // 1. APPROVAL_STATUS_CONFIG exact key set equality with canonical ApprovalStatus wire contract
-      const expectedApprovalKeys = [...APPROVAL_STATUSES];
-      expect(expectedApprovalKeys.length, 'Canonical contracts must define 5 ApprovalStatus items').toBe(5);
-      expect(Object.keys(APPROVAL_STATUS_CONFIG).sort(), 'APPROVAL_STATUS_CONFIG keys must exactly match canonical ApprovalStatus wire enum').toEqual([...expectedApprovalKeys].sort());
+      // 1. APPROVAL_STATUS_CONFIG exact key set equality with canonical ApprovalView wire enum (Card 273 F-R3 pattern)
+      const schemaPath = path.resolve(__dirname, '../../../contracts/v1alpha1/core.schema.json');
+      const canonicalCoreSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+      const expectedApprovalKeys: string[] = canonicalCoreSchema.$defs?.ApprovalView?.properties?.status?.enum ?? [];
+      expect(expectedApprovalKeys.length, 'Canonical schema must define 5 ApprovalView status items').toBe(5);
+      expect(Object.keys(APPROVAL_STATUS_CONFIG).sort(), 'APPROVAL_STATUS_CONFIG keys must exactly match canonical ApprovalView status wire enum').toEqual([...expectedApprovalKeys].sort());
+      expect([...APPROVAL_STATUSES].sort(), 'APPROVAL_STATUSES exported from ApprovalCenter must match canonical ApprovalView status wire enum').toEqual([...expectedApprovalKeys].sort());
 
       // 2. Numerical contrast calculations for each status config (text >= 4.5:1, border >= 3.0:1 on subtle & surface)
       const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
