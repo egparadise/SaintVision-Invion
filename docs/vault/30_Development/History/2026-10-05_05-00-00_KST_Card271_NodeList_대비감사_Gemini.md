@@ -127,48 +127,48 @@ Total Audit Items: 25 | Passed: 25 | Failed: 0
 `tools/test_c271_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
 결과 메타데이터는 `tools/.c271_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존됩니다.
 
-| 변이 ID | 변이 설명 | 대상 코드 | 변이 내용 | 판정 | 사살 시험 |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| W1 | telemetry badge: color==bg collision | badge.color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W2 | telemetry badge: border==bg collision | badge.borderColor | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W3 | telemetry badge: synchronized low-contrast | badge.color | `var(--color-text-inverse)` | KILLED | Test 9v 계산 단언 |
-| W4 | node-status-active-badge: color collision | badge.color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W5 | node-status-active-badge: border collision | badge.borderColor | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W6 | node-status-active-badge: synchronized low-contrast | badge.color | `var(--color-text-inverse)` | KILLED | Test 9v 계산 단언 |
-| W7 | node-status-online-badge: color collision | badge.color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W8 | node-status-online-badge: border collision | badge.borderColor | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W9 | node-status-online-badge: synchronized low-contrast | badge.color | `var(--color-text-inverse)` | KILLED | Test 9v 계산 단언 |
-| W10 | node-status-degraded-badge: color collision | badge.color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W11 | node-status-degraded-badge: border collision | badge.borderColor | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W12 | node-status-degraded-badge: synchronized low-contrast | badge.color | `var(--color-text-inverse)` | KILLED | Test 9v 계산 단언 |
-| W13 | node-status-offline-badge: color collision | badge.color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W14 | node-status-offline-badge: border collision | badge.borderColor | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W15 | node-status-offline-badge: synchronized low-contrast | badge.color | `var(--color-text-inverse)` | KILLED | Test 9v 계산 단언 |
-| W16 | code block: revert bg to literal #1e1e1e | code block bg | `#1e1e1e` | KILLED | Test 10 Multiset 래칫 |
-| W17 | code block: revert color to literal #4ade80 | code block text | `#4ade80` | KILLED | Test 10 Multiset 래칫 |
-| W18 | copy button: revert bg to literal #2d3748 | copy btn bg | `#2d3748` | KILLED | Test 10 Multiset 래칫 |
-| W19 | copy button: revert text to literal #fff | copy btn text | `#fff` | KILLED | Test 10 Multiset 래칫 |
-| W20 | copy feedback: revert text to literal #4ade80 | feedback text | `#4ade80` | KILLED | Test 10 Multiset 래칫 |
-| W21 | obs-banner: revert bg to rgba(210,153,34,0.15) | banner bg | `rgba(210,153,34,0.15)` | KILLED | Test 10 Multiset 래칫 |
-| W22 | active-notice: revert bg to rgba(56,189,248,0.12) | notice bg | `rgba(56,189,248,0.12)` | KILLED | Test 10 Multiset 래칫 |
-| W23 | active-notice: revert border to rgba(56,189,248,0.3) | notice border | `rgba(56,189,248,0.3)` | KILLED | Test 10 Multiset 래칫 |
-| W24 | studio-btn: revert text to #ffffff | studio btn text | `#ffffff` | KILLED | Test 10 Multiset 래칫 |
-| W25 | obs-banner: color collision on subtle | banner color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W26 | obs-banner: border collision on subtle | banner border | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W27 | active-notice: color collision on subtle | notice color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W28 | active-notice: border collision on subtle | notice border | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W29 | copy button: outline none | copy btn outline | `outline: 'none'` | KILLED | Test 9v 포커스 링 단언 |
-| W30 | copy button: outline 0 | copy btn outline | `outline: 0` | KILLED | Test 9v 포커스 링 단언 |
-| W31 | select-all button: outline none | select btn outline | `outline: 'none'` | KILLED | Test 9v 포커스 링 단언 |
-| W32 | studio-btn: outline none | studio btn outline | `outline: 'none'` | KILLED | Test 9v 포커스 링 단언 |
-| W33 | telemetry badge: remove 'UNKNOWN (' label prefix | badge label | `(${raw})` | KILLED | Test 9v 레이블 단언 |
-| W34 | obs-banner: remove '⚠️' warning icon | banner icon | `(no ⚠️)` | KILLED | Test 9v 아이콘 단언 |
-| W35 | active-notice: remove 'ℹ️' info icon | notice icon | `(no ℹ️)` | KILLED | Test 9v 아이콘 단언 |
-| W36 | obs-banner: mutate aria-label text | banner aria-label | `관측 안내` | KILLED | Test 9v ARIA 단언 |
-| W37 | active-notice: mutate aria-label text | notice aria-label | `노드 안내` | KILLED | Test 9v ARIA 단언 |
-| W38 | code block: color collision on subtle | code color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W39 | copy button: color collision on subtle | copy btn color | `var(--color-bg-subtle)` | KILLED | Test 9v DOM |
-| W40 | copy feedback: color collision on surface | feedback color | `var(--color-bg-surface)` | KILLED | Test 9v DOM |
+| 변이 ID | 변이 설명 | 판정 | 사살 시험 |
+| :--- | :--- | :--- | :--- |
+| W1 | telemetry badge: color==bg collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W2 | telemetry badge: border==bg collision (border: 1px solid var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W3 | telemetry badge: synchronized low-contrast mutation (color: var(--color-text-inverse)) | KILLED | Test 9v / Probes 119~120 계산 단언 |
+| W4 | telemetry badge: dot background collision with subtle | KILLED | Test 9v DOM / Test 9j-2 |
+| W5 | telemetry card: lost border collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W6 | telemetry card: unknown border collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W7 | telemetry notice: lost text collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W8 | telemetry notice: unknown text collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W9 | standard badge: color==bg collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W10 | standard badge: border==bg collision (border: 1px solid var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W11 | standard badge: synchronized low-contrast mutation (color: var(--color-text-inverse)) | KILLED | Test 9v / Probes 119~120 계산 단언 |
+| W12 | standard badge: dot collision with subtle | KILLED | Test 9v DOM / Test 9j-2 |
+| W13 | standard card: border collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W14 | standard card: CPU usage bar color collision with subtle | KILLED | Test 9v DOM / Test 9j-2 |
+| W15 | standard card: GPU box background collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W16 | telemetry detail button: background collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W17 | observation banner: bg==color collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W18 | observation banner: border==bg collision (border: 1px solid var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W19 | observation banner: revert to raw rgba background | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W20 | observation banner: remove warning emoji icon | KILLED | Test 9v 아이콘 단언 |
+| W21 | active notice: bg==color collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W22 | active notice: border==bg collision (border: 1px solid var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W23 | active notice: revert to raw rgba background | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W24 | active notice: remove info emoji icon | KILLED | Test 9v 아이콘 단언 |
+| W25 | schedulable text: observationOnly color collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W26 | schedulable text: allocatable color collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W27 | studio open button: normal color collision (color: var(--color-brand-primary-bg)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W28 | studio open button: normal revert to raw literal #ffffff | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W29 | studio open button: obsOnly color collision with border-strong | KILLED | Test 9v DOM / Test 9j-2 |
+| W30 | studio open button: focus ring suppression via outline: none | KILLED | Test 9v 포커스 링 / Test 9j-2 |
+| W31 | studio open button: focus ring suppression via outline: '0' | KILLED | Test 9v 포커스 링 / Test 9j-2 |
+| W32 | schedulable section: borderTop collision with surface | KILLED | Test 9v DOM / Test 9j-2 |
+| W33 | code block: revert background to raw literal #1e1e1e | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W34 | code block: revert text to raw literal #4ade80 | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W35 | code block: bg==color collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W36 | copy button: bg==color collision (color: var(--color-bg-subtle)) | KILLED | Test 9v DOM / Test 9j-2 |
+| W37 | copy button: focus ring suppression via outline: none | KILLED | Test 9v 포커스 링 / Test 9j-2 |
+| W38 | copy button: revert background to raw literal #2d3748 | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W39 | copy feedback text: revert to raw literal #4ade80 | KILLED | Test 10 Multiset 래칫 / Test 9v |
+| W40 | node select button: focus ring suppression via outline: none | KILLED | Test 9v 포커스 링 / Test 9j-2 |
 
 - 총 변이 수: **40**
 - 사살 (KILLED): **40** (100.0%)

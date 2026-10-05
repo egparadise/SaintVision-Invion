@@ -7476,6 +7476,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(regularStudioBtn.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
       expect(regularStudioBtn.style.color).toBe('var(--color-brand-primary-fg)');
 
+      // Hardware specs (CPU bar & GPU box) and telemetry detail button bindings
+      const onlineCard = container.querySelector('[data-testid="node-card-nod-online"]') as HTMLElement;
+      expect(onlineCard, 'Online card must render').not.toBeNull();
+      const cpuBarTrack = Array.from(onlineCard.querySelectorAll('div')).find((d) => d.style.height === '4px');
+      const cpuBar = cpuBarTrack?.firstElementChild as HTMLElement;
+      expect(cpuBar, 'CPU bar must exist').toBeDefined();
+      expect(cpuBar.style.backgroundColor).toBe('var(--color-brand-primary)');
+
+      const gpuBox = Array.from(onlineCard.querySelectorAll('div')).find((d) => d.textContent?.includes('🎮') && d.style.padding === '6px 8px') as HTMLElement;
+      expect(gpuBox, 'GPU box must exist').toBeDefined();
+      expect(gpuBox.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      const detailBtn = container.querySelector('[data-testid="node-detail-btn-nod-telem-lost"]') as HTMLElement;
+      expect(detailBtn, 'Telemetry detail button must render').not.toBeNull();
+      expect(detailBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(detailBtn.style.color).toBe('var(--color-text-primary)');
+
       // 7. Empty state install guide & copy button
       act(() => {
         root.render(<NodeList nodes={[]} isLoading={false} error={null} />);
