@@ -8601,6 +8601,36 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(modalStats.coveredColorObjects, 'Total covered color objects in WorkspaceCreateModal must be exactly 8').toBe(8);
     expect(modalStats.checkedBorderObjects, 'Border objects in WorkspaceCreateModal must be exactly 4').toBe(4);
     expect(modalStats.checkedBorderPairs, 'Border pairs in WorkspaceCreateModal must be exactly 4').toBe(4);
+
+    const nodeDetailStats = analyzeFile('features/nodes/NodeDetail.tsx');
+    expect(nodeDetailStats.violations, `NodeDetail violations:\n${nodeDetailStats.violations.join('\n')}`).toEqual([]);
+    expect(nodeDetailStats.totalStyleAttrs, 'Total style attributes in NodeDetail must be exactly 66').toBe(66);
+    expect(nodeDetailStats.checkedObjects, 'Explicit style objects in NodeDetail must be exactly 6').toBe(6);
+    expect(nodeDetailStats.checkedPairs, 'Evaluated pairs in NodeDetail must be exactly 38').toBe(38);
+    expect(nodeDetailStats.unboundColorObjects, 'Unbound color objects in NodeDetail must be exactly 27').toBe(27);
+    expect(nodeDetailStats.coveredColorObjects, 'Total covered color objects in NodeDetail must be exactly 33').toBe(33);
+    expect(nodeDetailStats.checkedBorderObjects, 'Border objects in NodeDetail must be exactly 16').toBe(16);
+    expect(nodeDetailStats.checkedBorderPairs, 'Border pairs in NodeDetail must be exactly 18').toBe(18);
+
+    const explainStats = analyzeFile('features/placement/PlacementExplainView.tsx');
+    expect(explainStats.violations, `PlacementExplainView violations:\n${explainStats.violations.join('\n')}`).toEqual([]);
+    expect(explainStats.totalStyleAttrs, 'Total style attributes in PlacementExplainView must be exactly 30').toBe(30);
+    expect(explainStats.checkedObjects, 'Explicit style objects in PlacementExplainView must be exactly 2').toBe(2);
+    expect(explainStats.checkedPairs, 'Evaluated pairs in PlacementExplainView must be exactly 14').toBe(14);
+    expect(explainStats.unboundColorObjects, 'Unbound color objects in PlacementExplainView must be exactly 10').toBe(10);
+    expect(explainStats.coveredColorObjects, 'Total covered color objects in PlacementExplainView must be exactly 12').toBe(12);
+    expect(explainStats.checkedBorderObjects, 'Border objects in PlacementExplainView must be exactly 5').toBe(5);
+    expect(explainStats.checkedBorderPairs, 'Border pairs in PlacementExplainView must be exactly 8').toBe(8);
+
+    const topologyStats = analyzeFile('features/placement/ResourceTopologyGraph.tsx');
+    expect(topologyStats.violations, `ResourceTopologyGraph violations:\n${topologyStats.violations.join('\n')}`).toEqual([]);
+    expect(topologyStats.totalStyleAttrs, 'Total style attributes in ResourceTopologyGraph must be exactly 23').toBe(23);
+    expect(topologyStats.checkedObjects, 'Explicit style objects in ResourceTopologyGraph must be exactly 2').toBe(2);
+    expect(topologyStats.checkedPairs, 'Evaluated pairs in ResourceTopologyGraph must be exactly 9').toBe(9);
+    expect(topologyStats.unboundColorObjects, 'Unbound color objects in ResourceTopologyGraph must be exactly 7').toBe(7);
+    expect(topologyStats.coveredColorObjects, 'Total covered color objects in ResourceTopologyGraph must be exactly 9').toBe(9);
+    expect(topologyStats.checkedBorderObjects, 'Border objects in ResourceTopologyGraph must be exactly 4').toBe(4);
+    expect(topologyStats.checkedBorderPairs, 'Border pairs in ResourceTopologyGraph must be exactly 6').toBe(6);
   });
 
 

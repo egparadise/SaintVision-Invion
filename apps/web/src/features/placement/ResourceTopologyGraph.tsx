@@ -49,17 +49,6 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
           const availableRamGb = ((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1);
           const totalRamGb = (node.memoryTotalBytes / 1024 ** 3).toFixed(0);
 
-          let borderColor = 'var(--color-border-subtle)';
-          let bgColor = 'var(--color-bg-subtle)';
-
-          if (isFenced) {
-            borderColor = 'var(--color-status-lost)';
-            bgColor = 'var(--color-bg-subtle)';
-          } else if (isSelected) {
-            borderColor = 'var(--color-status-online)';
-            bgColor = 'var(--color-bg-subtle)';
-          }
-
           return (
             <div
               key={node.id}
@@ -67,8 +56,8 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
               style={{
                 padding: '16px',
                 borderRadius: 'var(--radius-md)',
-                border: `2px solid ${borderColor}`,
-                backgroundColor: bgColor,
+                border: `2px solid ${isFenced ? 'var(--color-status-lost)' : isSelected ? 'var(--color-status-online)' : 'var(--color-border-subtle)'}`,
+                backgroundColor: 'var(--color-bg-subtle)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
