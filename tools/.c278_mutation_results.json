@@ -1,0 +1,215 @@
+{
+  "card": "CARD-278",
+  "component": "DesktopWindow",
+  "sourceHeadSha": "637c21f4bdf07eab91dfa085f052a540b5042b1b",
+  "startedAt": "2026-10-05T17:43:07.864244+00:00",
+  "mutants": [
+    {
+      "id": "M1",
+      "desc": "Maximized window bg collision: backgroundColor: 'var(--color-bg-canvas)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M2",
+      "desc": "Maximized window border collision: border: '1px solid var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M3",
+      "desc": "Maximized window border literal regression: border: '1px solid #334155'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M4",
+      "desc": "Maximized window shadow literal regression: 0 12px 36px rgba(0, 0, 0, 0.45)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M5",
+      "desc": "Floating window bg collision: backgroundColor: 'var(--color-bg-canvas)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M6",
+      "desc": "Floating focused window border collision: border: '1px solid var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M7",
+      "desc": "Floating focused window border literal regression: border: '1px solid #333'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M8",
+      "desc": "Floating window brand ring outline regression: remove 0 0 0 1px var(--color-brand-primary)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M9",
+      "desc": "Floating window shadow literal regression: 0 6px 20px rgba(0, 0, 0, 0.3)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M10",
+      "desc": "Window dialog inline outline: none focus suppression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M11",
+      "desc": "Titlebar active bg collision: backgroundColor: isActive ? 'var(--color-bg-surface)' : 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M12",
+      "desc": "Titlebar active borderBottom collision: borderBottom: '1px solid var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M13",
+      "desc": "Titlebar active bg literal regression: #1e293b",
+      "status": "KILLED"
+    },
+    {
+      "id": "M14",
+      "desc": "Titlebar inactive bg literal regression: #0f172a",
+      "status": "KILLED"
+    },
+    {
+      "id": "M15",
+      "desc": "Titlebar borderBottom literal regression: #334155",
+      "status": "KILLED"
+    },
+    {
+      "id": "M16",
+      "desc": "Title text active color collision: color: isActive ? 'var(--color-bg-subtle)' : 'var(--color-text-muted)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M17",
+      "desc": "Title text active literal regression: #f8fafc",
+      "status": "KILLED"
+    },
+    {
+      "id": "M18",
+      "desc": "Title text inactive literal regression: #94a3b8",
+      "status": "KILLED"
+    },
+    {
+      "id": "M19",
+      "desc": "Title text low-contrast text: color: 'var(--color-text-inverse)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M20",
+      "desc": "AppId text literal regression: color: 'var(--color-text-muted, #64748b)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M21",
+      "desc": "AppId text color collision: color: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M22",
+      "desc": "AppId text low contrast: color: 'var(--color-text-inverse)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M23",
+      "desc": "Traffic light close button literal regression: backgroundColor: '#ef4444'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M24",
+      "desc": "Traffic light close button shadow literal regression: 0 1px 3px rgba(0,0,0,0.3)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M25",
+      "desc": "Traffic light close button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M26",
+      "desc": "Traffic light close button inline outline: none focus suppression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M27",
+      "desc": "Traffic light minimize button literal regression: backgroundColor: '#f59e0b'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M28",
+      "desc": "Traffic light minimize button shadow literal regression: 0 1px 3px rgba(0,0,0,0.3)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M29",
+      "desc": "Traffic light minimize button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M30",
+      "desc": "Traffic light minimize button inline outline: none focus suppression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M31",
+      "desc": "Traffic light maximize button literal regression: backgroundColor: '#10b981'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M32",
+      "desc": "Traffic light maximize button shadow literal regression: 0 1px 3px rgba(0,0,0,0.3)",
+      "status": "KILLED"
+    },
+    {
+      "id": "M33",
+      "desc": "Traffic light maximize button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M34",
+      "desc": "WINDOW_CONTROL_CONFIG close bg token mutation: color: 'var(--color-brand-primary)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M35",
+      "desc": "WINDOW_CONTROL_CONFIG minimize bg token mutation: color: 'var(--color-status-offline)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M36",
+      "desc": "WINDOW_CONTROL_CONFIG maximize bg token mutation: color: 'var(--color-status-degraded)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M37",
+      "desc": "getWindowControlConfig prototype pollution fail-open: replace Object.hasOwn with in operator",
+      "status": "KILLED"
+    },
+    {
+      "id": "M38",
+      "desc": "getWindowControlConfig case-insensitive fail-open: add toLowerCase() lookup",
+      "status": "KILLED"
+    },
+    {
+      "id": "M39",
+      "desc": "getWindowControlConfig fallback color mutation: color: 'var(--color-status-online)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M40",
+      "desc": "getWindowControlConfig fallback label mutation: omit UNKNOWN prefix",
+      "status": "KILLED"
+    }
+  ],
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "completedAt": "2026-10-05T17:55:08.036473+00:00",
+  "killRate": "100.0%"
+}
