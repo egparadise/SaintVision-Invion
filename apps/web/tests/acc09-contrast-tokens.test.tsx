@@ -102,6 +102,11 @@ import {
 } from '../src/features/evidence/EvidenceViewer';
 import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
 import { Header } from '../src/shared/ui/Header';
+import {
+  DesktopWindowComponent,
+  WINDOW_CONTROL_CONFIG,
+  getWindowControlConfig,
+} from '../src/features/desktop/DesktopWindow';
 import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
 import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
@@ -355,7 +360,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/dashboard/ClusterOverview.tsx": {},
   "features/deployment/IntranetDeploymentView.tsx": {},
   "features/desktop/DesktopShell.tsx": {},
-  "features/desktop/DesktopWindow.tsx": {"#0f172a": 1, "#10b981": 1, "#1e293b": 1, "#333": 1, "#334155": 1, "#64748b": 1, "#94a3b8": 1, "#ef4444": 1, "#f59e0b": 1, "#f8fafc": 1, "rgba(0,0,0,0.25)": 1, "rgba(0,0,0,0.3)": 4, "rgba(0,0,0,0.45)": 1, "rgba(0,0,0,0.5)": 1},
+  "features/desktop/DesktopWindow.tsx": {},
   "features/desktop/InvFileExplorer.tsx": {},
   "features/desktop/ModelStudioView.tsx": {},
   "features/desktop/ResourceExplorer.tsx": {},
@@ -8656,9 +8661,236 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9ab. [Card 278 / ACC-09] DesktopWindow Frame Contrast, Traffic Light Controls, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 278: DesktopWindow frame complies with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. Fail-closed WINDOW_CONTROL_CONFIG verification
+    expect(Object.keys(WINDOW_CONTROL_CONFIG)).toEqual(['close', 'minimize', 'maximize']);
+    for (const action of ['close', 'minimize', 'maximize'] as const) {
+      expect(Object.hasOwn(WINDOW_CONTROL_CONFIG, action)).toBe(true);
+      const cfg = getWindowControlConfig(action);
+      expect(cfg.color).toMatch(/^var\(--color-status-(offline|degraded|online)\)$/);
+      expect(cfg.bg).toBe('var(--color-bg-subtle)');
+      expect(cfg.border).toMatch(/^var\(--color-status-(offline|degraded|online)\)$/);
+      expect(cfg.label).toBeDefined();
+    }
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    expect(WINDOW_CONTROL_CONFIG.close.color).toBe('var(--color-status-offline)');
+    expect(WINDOW_CONTROL_CONFIG.minimize.color).toBe('var(--color-status-degraded)');
+    expect(WINDOW_CONTROL_CONFIG.maximize.color).toBe('var(--color-status-online)');
+    expect(WINDOW_CONTROL_CONFIG.close.label).toBe('창 닫기');
+    expect(WINDOW_CONTROL_CONFIG.minimize.label).toBe('최소화');
+    expect(WINDOW_CONTROL_CONFIG.maximize.label).toBe('최대화');
+
+    expect(getWindowControlConfig('close').color).toBe('var(--color-status-offline)');
+    expect(getWindowControlConfig('minimize').color).toBe('var(--color-status-degraded)');
+    expect(getWindowControlConfig('maximize').color).toBe('var(--color-status-online)');
+
+    // Strict case-sensitive and fallback label tests (kills M38, M40)
+    expect(getWindowControlConfig('CLOSE').label).toBe('UNKNOWN (CLOSE)');
+    expect(getWindowControlConfig('Close').label).toBe('UNKNOWN (Close)');
+    expect(getWindowControlConfig('MINIMIZE').label).toBe('UNKNOWN (MINIMIZE)');
+
+    // Fail-closed fallback verification
+    const unknownFallback = getWindowControlConfig('unknown_action');
+    expect(unknownFallback.label).toBe('UNKNOWN (unknown_action)');
+    expect(unknownFallback.color).toBe('var(--color-status-unknown)');
+    expect(unknownFallback.bg).toBe('var(--color-bg-subtle)');
+    expect(unknownFallback.border).toBe('var(--color-status-unknown)');
+
+    // Prototype injection attacks fall back to UNKNOWN
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      const protoRes = getWindowControlConfig(protoKey);
+      expect(protoRes.label, `Prototype key ${protoKey} must trigger UNKNOWN fallback`).toContain('UNKNOWN');
+    }
+    expect(getWindowControlConfig(null).label).toBe('UNKNOWN');
+    expect(getWindowControlConfig(undefined).label).toBe('UNKNOWN');
+
+    // 2. Numerical contrast calculations for DesktopWindow tokens (WCAG 2.2 AA criteria)
+    const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
+    const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
+    const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+    const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+    const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+    const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+    const lBorderStrong = resolveTokenHex('--color-border-strong', lightTokens);
+    const dBorderStrong = resolveTokenHex('--color-border-strong', darkTokens);
+    const lBorderSubtle = resolveTokenHex('--color-border-subtle', lightTokens);
+    const dBorderSubtle = resolveTokenHex('--color-border-subtle', darkTokens);
+    const lTextPrimary = resolveTokenHex('--color-text-primary', lightTokens);
+    const dTextPrimary = resolveTokenHex('--color-text-primary', darkTokens);
+    const lTextMuted = resolveTokenHex('--color-text-muted', lightTokens);
+    const dTextMuted = resolveTokenHex('--color-text-muted', darkTokens);
+    const lStatusOffline = resolveTokenHex('--color-status-offline', lightTokens);
+    const dStatusOffline = resolveTokenHex('--color-status-offline', darkTokens);
+    const lStatusDegraded = resolveTokenHex('--color-status-degraded', lightTokens);
+    const dStatusDegraded = resolveTokenHex('--color-status-degraded', darkTokens);
+    const lStatusOnline = resolveTokenHex('--color-status-online', lightTokens);
+    const dStatusOnline = resolveTokenHex('--color-status-online', darkTokens);
+    const lStatusUnknown = resolveTokenHex('--color-status-unknown', lightTokens);
+    const dStatusUnknown = resolveTokenHex('--color-status-unknown', darkTokens);
+
+    // Traffic light buttons on subtle title bar (>= 3.0:1 non-text)
+    expect(getContrast(lStatusOffline, lSubtle), 'Close button on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusOffline, dSubtle), 'Close button on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lStatusDegraded, lSubtle), 'Minimize button on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusDegraded, dSubtle), 'Minimize button on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lStatusOnline, lSubtle), 'Maximize button on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusOnline, dSubtle), 'Maximize button on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Traffic light buttons on surface title bar (>= 3.0:1 non-text)
+    expect(getContrast(lStatusOffline, lSurface), 'Close button on surface light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusOffline, dSurface), 'Close button on surface dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lStatusDegraded, lSurface), 'Minimize button on surface light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusDegraded, dSurface), 'Minimize button on surface dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lStatusOnline, lSurface), 'Maximize button on surface light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusOnline, dSurface), 'Maximize button on surface dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // UNKNOWN fallback contrast
+    expect(getContrast(lStatusUnknown, lSubtle), 'Unknown status on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dStatusUnknown, dSubtle), 'Unknown status on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Title bar text contrast (>= 4.5:1 text)
+    expect(getContrast(lTextPrimary, lSubtle), 'Active title text on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextPrimary, dSubtle), 'Active title text on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lTextMuted, lSurface), 'Inactive title text on surface light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextMuted, dSurface), 'Inactive title text on surface dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lTextMuted, lSubtle), 'Inactive title text on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextMuted, dSubtle), 'Inactive title text on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // Frame borders on canvas (>= 3.0:1 non-text)
+    expect(getContrast(lBorderStrong, lCanvas), 'Normal window border on canvas light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderStrong, dCanvas), 'Normal window border on canvas dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lBorderSubtle, lCanvas), 'Maximized window border on canvas light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderSubtle, dCanvas), 'Maximized window border on canvas dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lBorderSubtle, lSubtle), 'Title bar border on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderSubtle, dSubtle), 'Title bar border on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // 3. DOM Rendering Verification
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      const mockWindow = {
+        id: 'win-test-1',
+        appId: 'terminal' as const,
+        title: '테스트 터미널',
+        icon: '🖥️',
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: false,
+        zIndex: 10,
+        position: { x: 100, y: 100 },
+        size: { width: 600, height: 400 },
+      };
+
+      await act(async () => {
+        root.render(
+          <DesktopWindowComponent
+            window={mockWindow}
+            isActive={true}
+            onFocus={() => {}}
+            onClose={() => {}}
+            onMinimize={() => {}}
+            onToggleMaximize={() => {}}
+          >
+            <div>Window Content</div>
+          </DesktopWindowComponent>
+        );
+      });
+
+      const dialogEl = container.querySelector('div[role="dialog"]') as HTMLElement;
+      expect(dialogEl, 'Dialog element must render').not.toBeNull();
+      expect(dialogEl.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(dialogEl.style.borderColor || dialogEl.style.border).toContain('var(--color-border-strong)');
+      expect(dialogEl.style.boxShadow).toContain('var(--shadow-lg)');
+      expect(dialogEl.style.boxShadow).toContain('var(--color-brand-primary)');
+      expect(dialogEl.style.outline || 'inherit', 'Dialog must not suppress focus ring').not.toMatch(/(none|0px|\b0\b)/);
+      expect(dialogEl.style.outlineStyle || 'inherit').not.toBe('none');
+
+      const titlebarEl = dialogEl.firstElementChild as HTMLElement;
+      expect(titlebarEl, 'Titlebar must render').not.toBeNull();
+      expect(titlebarEl.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(titlebarEl.style.borderBottom || titlebarEl.style.border).toContain('var(--color-border-subtle)');
+
+      const titleWrapper = container.querySelector('[id^="window-title-"]') as HTMLElement;
+      expect(titleWrapper, 'Title wrapper must render').not.toBeNull();
+      expect(titleWrapper.style.color).toBe('var(--color-text-primary)');
+
+      const appIdWrapper = titlebarEl.lastElementChild as HTMLElement;
+      expect(appIdWrapper, 'AppId wrapper must render').not.toBeNull();
+      expect(appIdWrapper.style.color).toBe('var(--color-text-muted)');
+
+      const closeBtn = container.querySelector('button[title="창 닫기"]') as HTMLButtonElement;
+      expect(closeBtn, 'Close button must render').not.toBeNull();
+      expect(closeBtn.style.backgroundColor).toBe('var(--color-status-offline)');
+      expect(closeBtn.style.boxShadow).toBe('var(--shadow-sm)');
+      expect(closeBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      const minBtn = container.querySelector('button[title="최소화"]') as HTMLButtonElement;
+      expect(minBtn, 'Minimize button must render').not.toBeNull();
+      expect(minBtn.style.backgroundColor).toBe('var(--color-status-degraded)');
+      expect(minBtn.style.boxShadow).toBe('var(--shadow-sm)');
+      expect(minBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      const maxBtn = container.querySelector('button[title="최대화"]') as HTMLButtonElement;
+      expect(maxBtn, 'Maximize button must render').not.toBeNull();
+      expect(maxBtn.style.backgroundColor).toBe('var(--color-status-online)');
+      expect(maxBtn.style.boxShadow).toBe('var(--shadow-sm)');
+      expect(maxBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // Inactive Maximized Render
+      await act(async () => {
+        root.render(
+          <DesktopWindowComponent
+            window={{ ...mockWindow, isMaximized: true }}
+            isActive={false}
+            onFocus={() => {}}
+            onClose={() => {}}
+            onMinimize={() => {}}
+            onToggleMaximize={() => {}}
+          >
+            <div>Window Content</div>
+          </DesktopWindowComponent>
+        );
+      });
+
+      expect(dialogEl.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(dialogEl.style.borderColor || dialogEl.style.border).toContain('var(--color-border-subtle)');
+      expect(dialogEl.style.boxShadow).toBe('var(--shadow-md)');
+      expect(titlebarEl.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(titlebarEl.style.borderBottom || titlebarEl.style.border).toContain('var(--color-border-subtle)');
+      expect(titleWrapper.style.color).toBe('var(--color-text-muted)');
+      expect(appIdWrapper.style.color).toBe('var(--color-text-muted)');
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+
+    // 4. Token Declaration Verification: all tokens used in DesktopWindow.tsx exist in index.css
+    const cssPath = path.resolve(__dirname, '../src/index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf-8');
+    const declaredCssTokens = new Set<string>();
+    const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+    let declMatch;
+    while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+      declaredCssTokens.add(declMatch[1].trim());
+    }
+
+    const dwPath = path.resolve(__dirname, '../src/features/desktop/DesktopWindow.tsx');
+    const dwContent = fs.readFileSync(dwPath, 'utf-8');
+    const varMatches = dwContent.match(/var\((--[a-z0-9-]+)/g) || [];
+    for (const v of varMatches) {
+      const tokenName = v.replace('var(', '');
+      expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in DesktopWindow.tsx must be declared in index.css`).toBe(true);
+    }
+  });
+
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -8965,7 +9197,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -9249,6 +9481,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const releaseEngineStats = analyzeFile('features/release/releaseEngine.ts');
     expect(releaseEngineStats.violations, `releaseEngine violations:\n${releaseEngineStats.violations.join('\n')}`).toEqual([]);
     expect(releaseEngineStats.totalStyleAttrs, 'Total style attributes in releaseEngine must be exactly 0').toBe(0);
+
+    const desktopWindowStats = analyzeFile('features/desktop/DesktopWindow.tsx');
+    expect(desktopWindowStats.violations, `DesktopWindow violations:\n${desktopWindowStats.violations.join('\n')}`).toEqual([]);
+    expect(desktopWindowStats.totalStyleAttrs, 'Total style attributes in DesktopWindow must be exactly 13').toBe(13);
+    expect(desktopWindowStats.checkedObjects, 'Explicit style objects in DesktopWindow must be exactly 3').toBe(3);
+    expect(desktopWindowStats.checkedPairs, 'Evaluated pairs in DesktopWindow must be exactly 9').toBe(9);
+    expect(desktopWindowStats.unboundColorObjects, 'Unbound color objects in DesktopWindow must be exactly 2').toBe(2);
+    expect(desktopWindowStats.coveredColorObjects, 'Total covered color objects in DesktopWindow must be exactly 5').toBe(5);
+    expect(desktopWindowStats.checkedBorderObjects, 'Border objects in DesktopWindow must be exactly 6').toBe(6);
+    expect(desktopWindowStats.checkedBorderPairs, 'Border pairs in DesktopWindow must be exactly 7').toBe(7);
   });
 
 
@@ -10001,6 +10243,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe145Cr = getContrast('#fed7aa', lightTokens['--color-bg-subtle']);
     expect(probe145Cr, 'App former terminal notice text #fed7aa on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe145Cr).toBeCloseTo(1.24, 1);
+
+    // Probe 146 [Card 278]: Former traffic light minimize #f59e0b on light subtle fails 3.0:1 (1.96:1)
+    const probe146Cr = getContrast('#f59e0b', lightTokens['--color-bg-subtle']);
+    expect(probe146Cr, 'DesktopWindow former minimize button #f59e0b on light subtle fails 3.0:1').toBeLessThan(3.0);
+    expect(probe146Cr).toBeCloseTo(1.96, 1);
+
+    // Probe 147 [Card 278]: Former traffic light maximize #10b981 on light subtle fails 3.0:1 (2.32:1)
+    const probe147Cr = getContrast('#10b981', lightTokens['--color-bg-subtle']);
+    expect(probe147Cr, 'DesktopWindow former maximize button #10b981 on light subtle fails 3.0:1').toBeLessThan(3.0);
+    expect(probe147Cr).toBeCloseTo(2.32, 1);
+
+    // Probe 148 [Card 278]: Former traffic light minimize #f59e0b on light surface fails 3.0:1 (2.15:1)
+    const probe148Cr = getContrast('#f59e0b', lightTokens['--color-bg-surface']);
+    expect(probe148Cr, 'DesktopWindow former minimize button #f59e0b on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe148Cr).toBeCloseTo(2.15, 1);
+
+    // Probe 149 [Card 278]: Former inactive title text #94a3b8 on light subtle fails 4.5:1 (2.34:1)
+    const probe149Cr = getContrast('#94a3b8', lightTokens['--color-bg-subtle']);
+    expect(probe149Cr, 'DesktopWindow former inactive title text #94a3b8 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe149Cr).toBeCloseTo(2.34, 1);
+
+    // Probe 150 [Card 278]: Former appId text #64748b on dark title bar #0f172a fails 4.5:1 (3.75:1)
+    const probe150Cr = getContrast('#64748b', '#0f172a');
+    expect(probe150Cr, 'DesktopWindow former appId text #64748b on dark title bar #0f172a fails 4.5:1').toBeLessThan(4.5);
+    expect(probe150Cr).toBeCloseTo(3.75, 1);
 
 
 
