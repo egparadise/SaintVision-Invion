@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EditorFile, GitCommitRecord, FileDiffResult, WorkspaceEditView } from '@/contracts/types';
+import { EditorFile, GitCommitRecord, FileDiffResult, WorkspaceEditView, TerminalSessionState } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { saveWorkspaceEditView } from '@/shared/api/workspaceEditObservation';
@@ -35,6 +35,59 @@ const INITIAL_FILES: EditorFile[] = [
     isDirty: false,
   },
 ];
+
+export type WorkspaceTerminalStatus = TerminalSessionState['status'];
+
+export interface WorkspaceTerminalStatusConfig {
+  label: string;
+  bgVar: string;
+  colorVar: string;
+  borderVar: string;
+}
+
+export const WORKSPACE_TERMINAL_STATUS_CONFIG: Record<WorkspaceTerminalStatus, WorkspaceTerminalStatusConfig> = {
+  connected: {
+    label: 'CONNECTED',
+    bgVar: 'var(--color-diff-added-bg)',
+    colorVar: 'var(--color-status-online)',
+    borderVar: 'var(--color-diff-added-border)',
+  },
+  recovered: {
+    label: 'RECOVERED',
+    bgVar: 'var(--color-brand-subtle)',
+    colorVar: 'var(--color-brand-hover)',
+    borderVar: 'var(--color-brand-primary)',
+  },
+  reconnecting: {
+    label: 'RECONNECTING',
+    bgVar: 'var(--color-bg-subtle)',
+    colorVar: 'var(--color-status-degraded)',
+    borderVar: 'var(--color-status-degraded)',
+  },
+  disconnected: {
+    label: 'DISCONNECTED',
+    bgVar: 'var(--color-risk-l3-bg)',
+    colorVar: 'var(--color-status-offline)',
+    borderVar: 'var(--color-risk-l3-border)',
+  },
+};
+
+export const UNKNOWN_TERMINAL_STATUS_STYLE: WorkspaceTerminalStatusConfig = {
+  label: 'UNKNOWN',
+  bgVar: 'var(--color-bg-subtle)',
+  colorVar: 'var(--color-status-unknown)',
+  borderVar: 'var(--color-border-subtle)',
+};
+
+export function getWorkspaceTerminalStatusStyle(rawStatus: unknown): WorkspaceTerminalStatusConfig {
+  if (typeof rawStatus === 'string' && Object.hasOwn(WORKSPACE_TERMINAL_STATUS_CONFIG, rawStatus)) {
+    return WORKSPACE_TERMINAL_STATUS_CONFIG[rawStatus as WorkspaceTerminalStatus];
+  }
+  return {
+    ...UNKNOWN_TERMINAL_STATUS_STYLE,
+    label: typeof rawStatus === 'string' && rawStatus ? `UNKNOWN (${rawStatus})` : 'UNKNOWN',
+  };
+}
 
 export interface MonacoWorkspaceEditorProps {
   workspaceId?: string;
@@ -307,6 +360,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
   };
 
   const activeDiff = computeDiff(activeFile.path, baseContents[activeFile.path] || '', activeFile.content);
+  const terminalStatusStyle = getWorkspaceTerminalStatusStyle(sessionState.status);
 
   return (
     <div
@@ -314,9 +368,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: 'calc(100vh - 120px)',
-        backgroundColor: '#0d1117',
-        color: '#c9d1d9',
-        border: '1px solid #30363d',
+        backgroundColor: 'var(--color-bg-canvas)',
+        color: 'var(--color-text-primary)',
+        border: '1px solid var(--color-border-subtle)',
         borderRadius: 'var(--radius-lg, 8px)',
         overflow: 'hidden',
       }}
@@ -328,9 +382,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         data-testid="editor-unexposed-notice"
         style={{
           padding: '8px 16px',
-          backgroundColor: projectId && runId && checkoutId ? 'rgba(46, 160, 67, 0.12)' : 'rgba(56, 139, 253, 0.12)',
-          borderBottom: '1px solid #30363d',
-          color: projectId && runId && checkoutId ? '#3fb950' : '#58a6ff',
+          backgroundColor: projectId && runId && checkoutId ? 'var(--color-diff-added-bg)' : 'var(--color-brand-subtle)',
+          borderBottom: projectId && runId && checkoutId ? '1px solid var(--color-diff-added-border)' : '1px solid var(--color-brand-primary)',
+          color: projectId && runId && checkoutId ? 'var(--color-status-online)' : 'var(--color-brand-hover)',
           fontSize: '12px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -358,9 +412,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
           data-testid="editor-save-error-banner"
           style={{
             padding: '8px 16px',
-            backgroundColor: 'rgba(248, 81, 73, 0.15)',
-            borderBottom: '1px solid #f85149',
-            color: '#f85149',
+            backgroundColor: 'var(--color-risk-l3-bg)',
+            borderBottom: '1px solid var(--color-risk-l3-border)',
+            color: 'var(--color-status-offline)',
             fontSize: '12px',
             fontWeight: 500,
           }}
@@ -375,9 +429,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
           data-testid="editor-context-notice"
           style={{
             padding: '8px 16px',
-            backgroundColor: 'rgba(227, 179, 65, 0.15)',
-            borderBottom: '1px solid #e3b341',
-            color: '#e3b341',
+            backgroundColor: 'var(--color-bg-subtle)',
+            borderBottom: '1px solid var(--color-status-degraded)',
+            color: 'var(--color-status-degraded)',
             fontSize: '12px',
             fontWeight: 500,
           }}
@@ -392,9 +446,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
           data-testid="editor-save-success-notice"
           style={{
             padding: '8px 16px',
-            backgroundColor: 'rgba(46, 160, 67, 0.15)',
-            borderBottom: '1px solid #2ea043',
-            color: '#3fb950',
+            backgroundColor: 'var(--color-diff-added-bg)',
+            borderBottom: '1px solid var(--color-diff-added-border)',
+            color: 'var(--color-status-online)',
             fontSize: '12px',
             fontWeight: 500,
           }}
@@ -410,13 +464,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '8px 16px',
-          backgroundColor: '#161b22',
-          borderBottom: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          borderBottom: '1px solid var(--color-border-subtle)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
-            Workspace: <code style={{ color: '#58a6ff' }}>{workspaceId}</code>
+          <span style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '14px' }}>
+            Workspace: <code style={{ color: 'var(--color-brand-hover)' }}>{workspaceId}</code>
           </span>
           <div style={{ display: 'flex', gap: '4px' }}>
             <Button
@@ -444,7 +498,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#8b949e', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={simulateConflictOnSave}
@@ -484,13 +538,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         <div
           style={{
             width: '240px',
-            backgroundColor: '#0d1117',
-            borderRight: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-canvas)',
+            borderRight: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          <div style={{ padding: '10px 14px', borderBottom: '1px solid #21262d', fontSize: '12px', fontWeight: 600, color: '#8b949e' }}>
+          <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--color-border-subtle)', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
             EXPLORER
           </div>
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px' }}>
@@ -506,25 +560,25 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                   borderRadius: '4px',
                   fontSize: '13px',
                   cursor: 'pointer',
-                  backgroundColor: file.path === activeFilePath ? '#1f242c' : 'transparent',
-                  color: file.path === activeFilePath ? '#58a6ff' : '#c9d1d9',
+                  backgroundColor: file.path === activeFilePath ? 'var(--color-brand-subtle)' : 'transparent',
+                  color: file.path === activeFilePath ? 'var(--color-brand-hover)' : 'var(--color-text-primary)',
                 }}
               >
                 <span style={{ fontFamily: 'var(--font-mono, monospace)' }}>{file.name}</span>
                 {file.isDirty && (
-                  <span style={{ color: '#e3b341', fontSize: '16px', lineHeight: 0 }}>●</span>
+                  <span style={{ color: 'var(--color-brand-warning)', fontSize: '16px', lineHeight: 0 }}>●</span>
                 )}
               </div>
             ))}
           </div>
 
           {/* Git Log Summary */}
-          <div style={{ padding: '10px 14px', borderTop: '1px solid #21262d', fontSize: '11px', color: '#8b949e' }}>
+          <div style={{ padding: '10px 14px', borderTop: '1px solid var(--color-border-subtle)', fontSize: '11px', color: 'var(--color-text-muted)' }}>
             <div style={{ fontWeight: 600, marginBottom: '4px' }}>LATEST GIT COMMIT</div>
-            <div style={{ fontFamily: 'var(--font-mono, monospace)', color: '#58a6ff' }}>
+            <div style={{ fontFamily: 'var(--font-mono, monospace)', color: 'var(--color-brand-hover)' }}>
               {commits[0]?.commitId.slice(0, 7)}
             </div>
-            <div style={{ color: '#c9d1d9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {commits[0]?.message}
             </div>
           </div>
@@ -545,8 +599,8 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 <div
                   style={{
                     padding: '8px 16px',
-                    backgroundColor: 'rgba(56, 139, 253, 0.12)',
-                    borderBottom: '1px solid rgba(56, 139, 253, 0.3)',
+                    backgroundColor: 'var(--color-brand-subtle)',
+                    borderBottom: '1px solid var(--color-brand-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -554,14 +608,14 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 600, color: '#58a6ff' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--color-brand-hover)' }}>
                       🔒 불변 Workspace 실행 입력 스냅샷 (ADR-044 Frozen Input)
                     </span>
-                    <span style={{ color: '#8b949e' }}>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>
                       Attempt #{frozenSnapshot.attempt}/{frozenSnapshot.maxAttempts} • Version v{frozenSnapshot.boundRunVersion}
                     </span>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', color: '#79c0ff' }}>
+                  <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', color: 'var(--color-brand-hover)' }}>
                     Digest: {frozenSnapshot.inputHash.slice(0, 24)}...
                   </div>
                 </div>
@@ -573,13 +627,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '6px 16px',
-                    backgroundColor: '#161b22',
-                    borderBottom: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    borderBottom: '1px solid var(--color-border-subtle)',
                     fontSize: '12px',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: '#f0f6fc' }}>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: 'var(--color-text-primary)' }}>
                       {activeFile.path}
                     </span>
                     <span
@@ -588,28 +642,29 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                         borderRadius: '4px',
                         fontSize: '11px',
                         fontWeight: 600,
-                        backgroundColor: 'rgba(210, 153, 34, 0.2)',
-                        color: '#e3b341',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        color: 'var(--color-status-degraded)',
+                        border: '1px solid var(--color-status-degraded)',
                       }}
                     >
                       READ-ONLY (FROZEN)
                     </span>
                   </div>
-                  <span style={{ color: '#8b949e', fontSize: '11px' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px' }}>
                     고정 입력 • 호스트의 후속 편집과 엄격히 분리 보존됨 (ADR-044)
                   </span>
                 </div>
 
                 {/* Frozen Code Area */}
-                <div style={{ flex: 1, display: 'flex', backgroundColor: '#090d13', overflow: 'hidden' }}>
+                <div style={{ flex: 1, display: 'flex', backgroundColor: 'var(--color-bg-canvas)', overflow: 'hidden' }}>
                   {/* Line Numbers Gutter */}
                   <div
                     style={{
                       width: '44px',
                       padding: '12px 6px',
-                      backgroundColor: '#070a0e',
-                      borderRight: '1px solid #21262d',
-                      color: '#484f58',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      borderRight: '1px solid var(--color-border-subtle)',
+                      color: 'var(--color-text-muted)',
                       fontFamily: 'var(--font-mono, monospace)',
                       fontSize: '13px',
                       lineHeight: '20px',
@@ -631,7 +686,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                       flex: 1,
                       padding: '12px',
                       backgroundColor: 'transparent',
-                      color: '#8b949e',
+                      color: 'var(--color-text-secondary)',
                       border: 'none',
                       resize: 'none',
                       fontFamily: 'var(--font-mono, monospace)',
@@ -653,32 +708,32 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '6px 16px',
-                    backgroundColor: '#161b22',
-                    borderBottom: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    borderBottom: '1px solid var(--color-border-subtle)',
                     fontSize: '12px',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: '#f0f6fc' }}>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: 'var(--color-text-primary)' }}>
                       {activeFile.path}
                     </span>
-                    {activeFile.isDirty && <span style={{ color: '#e3b341' }}>(modified)</span>}
+                    {activeFile.isDirty && <span style={{ color: 'var(--color-status-degraded)' }}>(modified)</span>}
                   </div>
-                  <span style={{ color: '#8b949e', fontSize: '11px' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px' }}>
                     ETag: {activeFile.etag.slice(0, 16)}... • {activeFile.language} • UTF-8
                   </span>
                 </div>
 
                 {/* Editor Textarea with Line Numbers */}
-                <div style={{ flex: 1, display: 'flex', backgroundColor: '#0d1117', overflow: 'hidden' }}>
+                <div style={{ flex: 1, display: 'flex', backgroundColor: 'var(--color-bg-canvas)', overflow: 'hidden' }}>
                   {/* Line Numbers Gutter */}
                   <div
                     style={{
                       width: '44px',
                       padding: '12px 6px',
-                      backgroundColor: '#090d13',
-                      borderRight: '1px solid #21262d',
-                      color: '#484f58',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      borderRight: '1px solid var(--color-border-subtle)',
+                      color: 'var(--color-text-muted)',
                       fontFamily: 'var(--font-mono, monospace)',
                       fontSize: '13px',
                       lineHeight: '20px',
@@ -700,7 +755,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                       flex: 1,
                       padding: '12px',
                       backgroundColor: 'transparent',
-                      color: '#c9d1d9',
+                      color: 'var(--color-text-primary)',
                       border: 'none',
                       resize: 'none',
                       fontFamily: 'var(--font-mono, monospace)',
@@ -719,8 +774,8 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
           <div
             style={{
               height: '240px',
-              borderTop: '1px solid #30363d',
-              backgroundColor: '#090d13',
+              borderTop: '1px solid var(--color-border-subtle)',
+              backgroundColor: 'var(--color-bg-canvas)',
               display: 'flex',
               flexDirection: 'column',
             }}
@@ -732,13 +787,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '6px 14px',
-                backgroundColor: '#161b22',
-                borderBottom: '1px solid #21262d',
+                backgroundColor: 'var(--color-bg-surface)',
+                borderBottom: '1px solid var(--color-border-subtle)',
                 fontSize: '12px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 600, color: '#f0f6fc' }}>
+                <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                   Web Terminal PTY ({sessionState.cols}x{sessionState.rows})
                 </span>
                 <span
@@ -747,38 +802,30 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                   aria-live="polite"
                   style={{
                     fontSize: '11px',
-                    color: '#e3b341',
+                    color: 'var(--color-status-degraded)',
                     padding: '1px 6px',
                     borderRadius: '4px',
-                    backgroundColor: 'rgba(227, 179, 65, 0.15)',
-                    border: '1px solid rgba(227, 179, 65, 0.3)',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-status-degraded)',
                   }}
                 >
                   [로컬 에뮬레이션 · 독립 PTY 미연결]
                 </span>
                 <span
+                  data-testid="editor-terminal-status-badge"
                   style={{
                     padding: '1px 6px',
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    backgroundColor:
-                      sessionState.status === 'connected'
-                        ? 'rgba(46, 160, 67, 0.2)'
-                        : sessionState.status === 'recovered'
-                        ? 'rgba(56, 139, 253, 0.2)'
-                        : 'rgba(248, 81, 73, 0.2)',
-                    color:
-                      sessionState.status === 'connected'
-                        ? '#3fb950'
-                        : sessionState.status === 'recovered'
-                        ? '#58a6ff'
-                        : '#f85149',
+                    backgroundColor: terminalStatusStyle.bgVar,
+                    color: terminalStatusStyle.colorVar,
+                    border: `1px solid ${terminalStatusStyle.borderVar}`,
                   }}
                 >
-                  {sessionState.status.toUpperCase()}
+                  {terminalStatusStyle.label}
                 </span>
-                <span style={{ color: '#8b949e', fontSize: '11px' }}>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px' }}>
                   Seq: {sessionState.lastSeq} • Dups: {sessionState.duplicateExecutions}
                 </span>
               </div>
@@ -810,14 +857,14 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '12px',
                 lineHeight: '18px',
-                color: '#8b949e',
+                color: 'var(--color-text-muted)',
               }}
             >
               <div>[Session {sessionState.sessionId} initialized] Checkpoint: {sessionState.checkpointHash.slice(0, 16)}...</div>
               {commandHistory.map((cmd) => (
                 <div key={cmd.seq} style={{ marginTop: '4px' }}>
-                  <span style={{ color: '#58a6ff' }}>saintvision@wsp:~$ {cmd.command}</span>
-                  <div style={{ color: '#c9d1d9' }}>{cmd.output}</div>
+                  <span style={{ color: 'var(--color-brand-primary)' }}>saintvision@wsp:~$ {cmd.command}</span>
+                  <div style={{ color: 'var(--color-text-primary)' }}>{cmd.output}</div>
                 </div>
               ))}
               {resumeReport && (
@@ -825,13 +872,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                   style={{
                     margin: '6px 0',
                     padding: '6px 10px',
-                    backgroundColor: 'rgba(56, 139, 253, 0.1)',
-                    borderLeft: '3px solid #58a6ff',
-                    color: '#f0f6fc',
+                    backgroundColor: 'var(--color-brand-subtle)',
+                    borderLeft: '3px solid var(--color-brand-primary)',
+                    color: 'var(--color-text-primary)',
                   }}
                 >
                   ✔ AC-06 Session Resumed: Checkpoint Hash Verified (
-                  <code style={{ color: '#58a6ff' }}>{resumeReport.checkpointHash.slice(0, 12)}...</code>
+                  <code style={{ color: 'var(--color-brand-hover)' }}>{resumeReport.checkpointHash.slice(0, 12)}...</code>
                   ), Zero Duplicate Executions ({resumeReport.duplicateExecutions}).
                 </div>
               )}
@@ -844,11 +891,11 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
               style={{
                 display: 'flex',
                 padding: '6px 12px',
-                backgroundColor: '#0d1117',
-                borderTop: '1px solid #21262d',
+                backgroundColor: 'var(--color-bg-canvas)',
+                borderTop: '1px solid var(--color-border-subtle)',
               }}
             >
-              <span style={{ color: '#3fb950', fontFamily: 'var(--font-mono, monospace)', fontSize: '13px', marginRight: '6px' }}>
+              <span style={{ color: 'var(--color-status-online)', fontFamily: 'var(--font-mono, monospace)', fontSize: '13px', marginRight: '6px' }}>
                 $
               </span>
               <input
@@ -861,7 +908,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                   flex: 1,
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontFamily: 'var(--font-mono, monospace)',
                   fontSize: '13px',
                 }}

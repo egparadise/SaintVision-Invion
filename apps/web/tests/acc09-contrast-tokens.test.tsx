@@ -140,6 +140,12 @@ import {
   type UiGitFileStatus,
   type UiGitStageState,
 } from '../src/features/editor/GitCommitModal';
+import {
+  MonacoWorkspaceEditor,
+  WORKSPACE_TERMINAL_STATUS_CONFIG,
+  getWorkspaceTerminalStatusStyle,
+  type WorkspaceTerminalStatus,
+} from '../src/features/editor/MonacoWorkspaceEditor';
 import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
 import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
@@ -401,7 +407,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/ConflictResolutionModal.tsx": {},
   "features/editor/DiffViewer.tsx": {},
   "features/editor/GitCommitModal.tsx": {},
-  "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
+  "features/editor/MonacoWorkspaceEditor.tsx": {},
   "features/evidence/EvidenceViewer.tsx": {},
   "features/mlops/ModelLineageView.tsx": {},
   "features/nodes/NodeDetail.tsx": {},
@@ -9479,9 +9485,102 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     container.remove();
   });
 
+  // 9ae. [Card 281 / ACC-09] MonacoWorkspaceEditor Contrast, Configs, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 281: MonacoWorkspaceEditor complies with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. WORKSPACE_TERMINAL_STATUS_CONFIG verification
+    expect(Object.keys(WORKSPACE_TERMINAL_STATUS_CONFIG).sort()).toEqual(['connected', 'disconnected', 'reconnecting', 'recovered']);
+    for (const status of ['connected', 'disconnected', 'reconnecting', 'recovered'] as const) {
+      expect(Object.hasOwn(WORKSPACE_TERMINAL_STATUS_CONFIG, status)).toBe(true);
+      const cfg = getWorkspaceTerminalStatusStyle(status);
+      expect(cfg.label).toBeDefined();
+      expect(cfg.colorVar).toMatch(/^var\(--color-(status-online|status-offline|status-degraded|brand-hover)\)$/);
+      expect(cfg.bgVar).toMatch(/^var\(--color-(diff-added-bg|risk-l3-bg|bg-subtle|brand-subtle)\)$/);
+      expect(cfg.borderVar).toMatch(/^var\(--color-(diff-added-border|risk-l3-border|status-degraded|brand-primary)\)$/);
+    }
+
+    // Dynamic contrast verification for terminal status tokens
+    const connBgL = lightTokens['--color-diff-added-bg'];
+    const connFgL = lightTokens['--color-status-online'];
+    const connBorderL = lightTokens['--color-diff-added-border'];
+    const connBgD = darkTokens['--color-diff-added-bg'];
+    const connFgD = darkTokens['--color-status-online'];
+    const connBorderD = darkTokens['--color-diff-added-border'];
+
+    expect(getContrast(connFgL, connBgL), 'Light connected text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(connFgD, connBgD), 'Dark connected text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(connBorderL, connBgL), 'Light connected border on added bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(connBorderD, connBgD), 'Dark connected border on added bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    const recovBgL = lightTokens['--color-brand-subtle'];
+    const recovFgL = lightTokens['--color-brand-hover'];
+    const recovBorderL = lightTokens['--color-brand-primary'];
+    const recovBgD = darkTokens['--color-brand-subtle'];
+    const recovFgD = darkTokens['--color-brand-hover'];
+    const recovBorderD = darkTokens['--color-brand-primary'];
+
+    expect(getContrast(recovFgL, recovBgL), 'Light recovered text on brand subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(recovFgD, recovBgD), 'Dark recovered text on brand subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(recovBorderL, recovBgL), 'Light recovered border on brand subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(recovBorderD, recovBgD), 'Dark recovered border on brand subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // Fail-closed fallback for unknown and prototype keys
+    const unknownStatus = getWorkspaceTerminalStatusStyle('unknown_terminal_status');
+    expect(unknownStatus.label).toBe('UNKNOWN (unknown_terminal_status)');
+    expect(unknownStatus.colorVar).toBe('var(--color-status-unknown)');
+    expect(unknownStatus.bgVar).toBe('var(--color-bg-subtle)');
+    expect(unknownStatus.borderVar).toBe('var(--color-border-subtle)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      const protoStyle = getWorkspaceTerminalStatusStyle(protoKey);
+      expect(protoStyle.colorVar).toBe('var(--color-status-unknown)');
+      expect(protoStyle.label).toBe(`UNKNOWN (${protoKey})`);
+    }
+
+    // 2. DOM Rendering & Token Binding
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(
+        <MonacoWorkspaceEditor
+          workspaceId="wsp_test_dom"
+          projectId="proj_1"
+          runId="run_1"
+          checkoutId="chk_1"
+        />
+      );
+    });
+
+    const unexposedNotice = container.querySelector('[data-testid="editor-unexposed-notice"]') as HTMLElement;
+    expect(unexposedNotice).toBeDefined();
+    expect(unexposedNotice.style.backgroundColor).toBe('var(--color-diff-added-bg)');
+    expect(unexposedNotice.style.color).toBe('var(--color-status-online)');
+    expect(unexposedNotice.style.borderBottom || unexposedNotice.style.border).toContain('var(--color-diff-added-border)');
+
+    const terminalBadge = container.querySelector('[data-testid="editor-terminal-status-badge"]') as HTMLElement;
+    expect(terminalBadge).toBeDefined();
+    expect(terminalBadge.textContent).toBe('CONNECTED');
+    expect(terminalBadge.style.backgroundColor).toBe('var(--color-diff-added-bg)');
+    expect(terminalBadge.style.color).toBe('var(--color-status-online)');
+    expect(terminalBadge.style.borderColor || terminalBadge.style.border).toContain('var(--color-diff-added-border)');
+
+    const mockNotice = container.querySelector('[data-testid="editor-terminal-mock-notice"]') as HTMLElement;
+    expect(mockNotice).toBeDefined();
+    expect(mockNotice.style.color).toBe('var(--color-status-degraded)');
+    expect(mockNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+    expect(mockNotice.style.borderColor || mockNotice.style.border).toContain('var(--color-status-degraded)');
+
+    await act(async () => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+
+
 
   // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 & Card 280: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 & Card 280 & Card 281: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -9788,7 +9887,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG' || node.name.getText(sf) === 'DIFF_LINE_TYPE_CONFIG' || node.name.getText(sf) === 'CONFLICT_STATUS_CONFIG' || node.name.getText(sf) === 'CONFLICT_RESOLUTION_ACTION_CONFIG' || node.name.getText(sf) === 'GIT_FILE_STATUS_CONFIG' || node.name.getText(sf) === 'GIT_STAGE_STATE_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG' || node.name.getText(sf) === 'DIFF_LINE_TYPE_CONFIG' || node.name.getText(sf) === 'CONFLICT_STATUS_CONFIG' || node.name.getText(sf) === 'CONFLICT_RESOLUTION_ACTION_CONFIG' || node.name.getText(sf) === 'GIT_FILE_STATUS_CONFIG' || node.name.getText(sf) === 'GIT_STAGE_STATE_CONFIG' || node.name.getText(sf) === 'WORKSPACE_TERMINAL_STATUS_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -10128,6 +10227,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(gitCommitStats.coveredColorObjects, 'Total covered color objects in GitCommitModal must be exactly 12').toBe(12);
     expect(gitCommitStats.checkedBorderObjects, 'Border objects in GitCommitModal must be exactly 6').toBe(6);
     expect(gitCommitStats.checkedBorderPairs, 'Border pairs in GitCommitModal must be exactly 6').toBe(6);
+
+    const monacoStats = analyzeFile('features/editor/MonacoWorkspaceEditor.tsx');
+    expect(monacoStats.violations, `MonacoWorkspaceEditor violations:\n${monacoStats.violations.join('\n')}`).toEqual([]);
+    expect(monacoStats.totalStyleAttrs, 'Total style attributes in MonacoWorkspaceEditor must be exactly 69').toBe(69);
+    expect(monacoStats.checkedObjects, 'Explicit style objects in MonacoWorkspaceEditor must be exactly 15').toBe(15);
+    expect(monacoStats.checkedPairs, 'Evaluated pairs in MonacoWorkspaceEditor must be exactly 42').toBe(42);
+    expect(monacoStats.unboundColorObjects, 'Unbound color objects in MonacoWorkspaceEditor must be exactly 26').toBe(26);
+    expect(monacoStats.coveredColorObjects, 'Total covered color objects in MonacoWorkspaceEditor must be exactly 41').toBe(41);
+    expect(monacoStats.checkedBorderObjects, 'Border objects in MonacoWorkspaceEditor must be exactly 21').toBe(21);
+    expect(monacoStats.checkedBorderPairs, 'Border pairs in MonacoWorkspaceEditor must be exactly 22').toBe(22);
   });
 
 
@@ -10958,6 +11067,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe160Cr, 'GitCommitModal former raw #58a6ff on light surface fails 4.5:1').toBeLessThan(4.5);
     expect(probe160Cr).toBeCloseTo(2.53, 1);
 
+    // Probe 161 [Card 281]: MonacoWorkspaceEditor baseline raw #58a6ff on light canvas fails 4.5:1 (2.41:1)
+    const probe161Cr = getContrast('#58a6ff', lightTokens['--color-bg-canvas']);
+    expect(probe161Cr, 'MonacoWorkspaceEditor former raw #58a6ff on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe161Cr).toBeCloseTo(2.41, 1);
+
+    // Probe 162 [Card 281]: MonacoWorkspaceEditor baseline raw #8b949e on light subtle fails 4.5:1 (2.81:1)
+    const probe162Cr = getContrast('#8b949e', lightTokens['--color-bg-subtle']);
+    expect(probe162Cr, 'MonacoWorkspaceEditor former raw #8b949e on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe162Cr).toBeCloseTo(2.81, 1);
+
+    // Probe 163 [Card 281]: MonacoWorkspaceEditor baseline raw #e3b341 on light surface fails 4.5:1 (1.95:1)
+    const probe163Cr = getContrast('#e3b341', lightTokens['--color-bg-surface']);
+    expect(probe163Cr, 'MonacoWorkspaceEditor former raw #e3b341 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe163Cr).toBeCloseTo(1.95, 1);
+
+    // Probe 164 [Card 281]: MonacoWorkspaceEditor baseline raw #3fb950 on light canvas fails 4.5:1 (2.43:1)
+    const probe164Cr = getContrast('#3fb950', lightTokens['--color-bg-canvas']);
+    expect(probe164Cr, 'MonacoWorkspaceEditor former raw #3fb950 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe164Cr).toBeCloseTo(2.43, 1);
+
+    // Probe 165 [Card 281]: MonacoWorkspaceEditor baseline raw #f85149 on light canvas fails 4.5:1 (3.20:1)
+    const probe165Cr = getContrast('#f85149', lightTokens['--color-bg-canvas']);
+    expect(probe165Cr, 'MonacoWorkspaceEditor former raw #f85149 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe165Cr).toBeCloseTo(3.20, 1);
+
 
 
     // Legacy Token Reverts:
@@ -11054,8 +11188,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 471').toBe(471);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 34').toBe(34);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 484').toBe(484);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 35').toBe(35);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;

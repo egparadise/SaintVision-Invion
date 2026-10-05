@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-10-05T22:23:22.236228+00:00",
+  "sourceHeadSha": "e425e4ff121ef701007488d2e3ea194bcef071ce",
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "durationSeconds": 825.29,
+  "killRate": "100.0%",
+  "mutants": [
+    {
+      "id": "M1",
+      "desc": "connected color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M2",
+      "desc": "connected color literal regression: colorVar: '#3fb950'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M3",
+      "desc": "connected bg literal regression: bgVar: 'rgba(46, 160, 67, 0.2)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M4",
+      "desc": "connected border literal regression: borderVar: '#2ea043'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M5",
+      "desc": "recovered color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M6",
+      "desc": "recovered color literal regression: colorVar: '#58a6ff'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M7",
+      "desc": "recovered bg literal regression: bgVar: 'rgba(56, 139, 253, 0.2)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M8",
+      "desc": "reconnecting color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M9",
+      "desc": "reconnecting color literal regression: colorVar: '#e3b341'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M10",
+      "desc": "disconnected color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M11",
+      "desc": "disconnected color literal regression: colorVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M12",
+      "desc": "disconnected bg literal regression: bgVar: 'rgba(248, 81, 73, 0.2)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M13",
+      "desc": "getWorkspaceTerminalStatusStyle prototype key vulnerability",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M14",
+      "desc": "getWorkspaceTerminalStatusStyle fallback changed to normal text",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M15",
+      "desc": "Root container background literal regression: backgroundColor: '#0d1117'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M16",
+      "desc": "Root container border subtle collision: border: '1px solid var(--color-bg-canvas)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M17",
+      "desc": "Unexposed notice connected background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M18",
+      "desc": "Unexposed notice unconnected background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M19",
+      "desc": "Unexposed notice connected text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M20",
+      "desc": "Unexposed notice unconnected text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M21",
+      "desc": "Save error banner background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M22",
+      "desc": "Save warning banner background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M23",
+      "desc": "Save success banner background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M24",
+      "desc": "Explorer sidebar background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M25",
+      "desc": "Explorer active file background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M26",
+      "desc": "Explorer active file text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M27",
+      "desc": "Top toolbar background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M28",
+      "desc": "Top toolbar workspace text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M29",
+      "desc": "Editor tab bar background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M30",
+      "desc": "Normal editor gutter background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M31",
+      "desc": "Normal editor gutter border literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M32",
+      "desc": "Normal editor gutter text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M33",
+      "desc": "Frozen snapshot gutter background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M34",
+      "desc": "Frozen snapshot read-only badge background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M35",
+      "desc": "Terminal container background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M36",
+      "desc": "Terminal title bar background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M37",
+      "desc": "Terminal mock notice background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M38",
+      "desc": "Terminal prompt output text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M39",
+      "desc": "Terminal resume report background literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M40",
+      "desc": "Terminal command form prompt $ text literal regression",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    }
+  ]
+}
