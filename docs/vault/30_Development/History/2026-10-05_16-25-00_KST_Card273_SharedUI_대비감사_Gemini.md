@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261005-CARD273-GEMINI"
 title: "Card 273 공용 및 소형 화면 (Shared & Minor UI) 색상 리터럴 전수 토큰화, 상태 색 정합성 및 접근성 승격"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T16:25:00+09:00"
-updated: "2026-10-05T18:00:00+09:00"
+updated: "2026-10-05T18:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -151,6 +151,15 @@ Overall Result: ALL PASS
    - 탐침 직접 실측:
      - `ExecutionResultView.tsx` 1:1 충돌: `color: var(--color-bg-surface)` 주입 시 `1:1 token collision between background and foreground (--color-bg-surface)` 검출로 즉시 사살.
      - `Button.tsx` `baseStyle` `outline: 'none'` 주입: `analyzeFile`의 변수 스타일 검사에서 `Inline outline: none suppressing focus ring` 검출 및 Test 9w DOM 단언(`btn.style.outline !== 'none'`)으로 자체 사살.
+
+5. **Codex r1 F-R2 AST 도달 가능성 실측 증명**:
+   - `checkConfigTables` 내 `RISK_CONFIG` 분기가 실제로 실행되는지 검증하기 위해 해당 분기 진입점에 `throw new Error('CODEX_F_R2_PROVEN_REACHED')` 예외를 주입하는 탐침 시험을 수행.
+   - `analyzeFile('shared/ui/RiskBadge.tsx')` 호출 시 해당 분기가 즉시 실행되어 예외가 포착됨(exit code 1)으로써 AST 분기의 활성 실행 및 래칫(checkedObjects 4, checkedPairs 4, checkedBorderObjects 4, checkedBorderPairs 4)이 완전히 살아있음을 입증.
+
+6. **Codex r1 F-R3 계약 기반 완전성 및 동조 제거 변이 차단**:
+   - `apps/web/src/shared/ui/RiskBadge.tsx`: `RISK_CONFIG`에 `as const satisfies Record<RiskLevel, RiskConfigItem>`을 부여하여 정본 wire 타입 `RiskLevel`의 4종 키(`L0`, `L1`, `L2`, `L3`)가 하나라도 빠지면 컴파일 에러(`Property '...' is missing in type ... but required in type 'Record<RiskLevel, RiskConfigItem>'`)가 발생하도록 완전성을 강제.
+   - `apps/web/tests/acc09-contrast-tokens.test.tsx`: 기존 하드코딩 배열 `['L0', 'L1', 'L2', 'L3']`을 정본 스키마 `contracts/v1alpha1/core.schema.json`의 `$defs.RiskLevel.enum`으로부터 런타임에 직접 도출하도록 승격.
+   - **동조 제거 변이 실측**: `RISK_CONFIG`에서 `L3` 항목을 제거하는 동조 변이를 주입했을 때, TypeScript 컴파일러 `tsc -b`(exit code 2, missing property L3)와 Vitest `acc09-contrast-tokens.test.tsx`(exit code 1, `RISK_CONFIG keys must exactly match canonical RiskLevel wire enum`) 양쪽 모두에서 100% 사살됨을 실측 확인.
 
 ---
 

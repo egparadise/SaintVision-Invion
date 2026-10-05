@@ -7556,9 +7556,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const root = createRoot(container);
 
     try {
-      // 1. RISK_CONFIG exact key set equality with RiskLevel wire enum
-      const expectedRiskKeys: RiskLevel[] = ['L0', 'L1', 'L2', 'L3'];
-      expect(Object.keys(RISK_CONFIG).sort(), 'RISK_CONFIG keys must exactly match RiskLevel wire enum').toEqual(expectedRiskKeys.sort());
+      // 1. RISK_CONFIG exact key set equality with canonical RiskLevel wire enum (F-R3)
+      const schemaPath = path.resolve(__dirname, '../../../contracts/v1alpha1/core.schema.json');
+      const canonicalCoreSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+      const expectedRiskKeys: RiskLevel[] = canonicalCoreSchema.$defs?.RiskLevel?.enum ?? [];
+      expect(expectedRiskKeys.length, 'Canonical schema must define RiskLevel enum').toBe(4);
+      expect(Object.keys(RISK_CONFIG).sort(), 'RISK_CONFIG keys must exactly match canonical RiskLevel wire enum').toEqual([...expectedRiskKeys].sort());
 
       // 2. RISK_CONFIG entries numerical contrast calculation (text >= 4.5:1, border >= 3.0:1)
       for (const [level, cfg] of Object.entries(RISK_CONFIG)) {
