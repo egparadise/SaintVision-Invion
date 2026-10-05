@@ -3,6 +3,7 @@ import { NodeItem, ProblemDetails } from '@/contracts/types';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
+import { getClusterNodeStatusConfig } from '@/features/dashboard/ClusterOverview';
 
 export interface NodeListProps {
   nodes: NodeItem[];
@@ -117,8 +118,8 @@ export const NodeList: React.FC<NodeListProps> = ({
                 style={{
                   flex: 1,
                   padding: '8px 12px',
-                  backgroundColor: 'var(--color-bg-code, #1e1e1e)',
-                  color: '#4ade80',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  color: 'var(--color-status-online)',
                   borderRadius: '4px',
                   fontSize: '0.875rem',
                   fontFamily: 'monospace',
@@ -138,8 +139,8 @@ export const NodeList: React.FC<NodeListProps> = ({
                 }}
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: 'var(--color-bg-surface-hover, #2d3748)',
-                  color: 'var(--color-text-primary, #fff)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  color: 'var(--color-text-primary)',
                   border: '1px solid var(--color-border-subtle)',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -154,7 +155,7 @@ export const NodeList: React.FC<NodeListProps> = ({
               <span
                 role="status"
                 data-testid="node-agent-copy-feedback"
-                style={{ display: 'block', marginTop: '8px', fontSize: '0.75rem', color: '#4ade80' }}
+                style={{ display: 'block', marginTop: '8px', fontSize: '0.75rem', color: 'var(--color-status-online)' }}
               >
                 설치 명령어가 클립보드에 복사되었습니다.
               </span>
@@ -177,6 +178,7 @@ export const NodeList: React.FC<NodeListProps> = ({
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {nodes.map((node) => {
+          const statusCfg = getClusterNodeStatusConfig(node.status);
           if (node.telemetryUnavailable) return (
             <div
               key={node.id}
@@ -209,18 +211,18 @@ export const NodeList: React.FC<NodeListProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-text-muted)',
+                    color: statusCfg.color,
                     backgroundColor: 'var(--color-bg-subtle)',
-                    border: `1px solid ${node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-border-subtle)'}`,
+                    border: `1px solid ${statusCfg.color}`,
                   }}
                 >
                   <span style={{
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-text-muted)',
+                    backgroundColor: statusCfg.color,
                   }} />
-                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
+                  {statusCfg.label}
                 </span>
               </div>
               <p
@@ -262,19 +264,6 @@ export const NodeList: React.FC<NodeListProps> = ({
             </div>
           );
 
-          const statusColor =
-            node.status === 'online'
-              ? 'var(--color-status-online)'
-              : node.status === 'active'
-              ? 'var(--color-status-active)'
-              : node.status === 'degraded'
-              ? 'var(--color-status-degraded)'
-              : node.status === 'lost'
-              ? 'var(--color-status-lost)'
-              : node.status === 'unknown'
-              ? 'var(--color-status-unknown)'
-              : 'var(--color-status-offline)';
-
           const ramUsedGb = (node.memoryUsedBytes / (1024 ** 3)).toFixed(1);
           const ramTotalGb = (node.memoryTotalBytes / (1024 ** 3)).toFixed(1);
           const storageUsedGb = (node.storageUsedBytes / (1024 ** 3)).toFixed(1);
@@ -314,13 +303,13 @@ export const NodeList: React.FC<NodeListProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: statusColor,
+                    color: statusCfg.color,
                     backgroundColor: 'var(--color-bg-subtle)',
-                    border: `1px solid ${statusColor}`,
+                    border: `1px solid ${statusCfg.color}`,
                   }}
                 >
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: statusColor }} />
-                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: statusCfg.color }} />
+                  {statusCfg.label}
                 </span>
               </div>
 
@@ -370,7 +359,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                     marginTop: '8px',
                     padding: '4px 8px',
                     borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'rgba(210, 153, 34, 0.15)',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     border: '1px solid var(--color-status-unknown)',
                     color: 'var(--color-status-unknown)',
                     fontSize: '0.6875rem',
@@ -389,8 +378,8 @@ export const NodeList: React.FC<NodeListProps> = ({
                     marginTop: '8px',
                     padding: '4px 8px',
                     borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-status-active)',
                     color: 'var(--color-status-active)',
                     fontSize: '0.6875rem',
                     fontWeight: 500,
@@ -461,7 +450,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                         fontWeight: 600,
                         borderRadius: 'var(--radius-sm)',
                         backgroundColor: node.observationOnly ? 'var(--color-border-strong)' : 'var(--color-brand-primary-bg)',
-                        color: node.observationOnly ? 'var(--color-text-inverse)' : '#ffffff',
+                        color: node.observationOnly ? 'var(--color-text-inverse)' : 'var(--color-brand-primary-fg)',
                         border: 'none',
                         cursor: 'pointer',
                       }}

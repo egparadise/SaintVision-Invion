@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+  "observedAt": "2026-10-05T06:15:14.101884+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "telemetry badge: color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:03:13.453085+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "telemetry badge: border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:03:35.788097+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "telemetry badge: synchronized low-contrast mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:03:57.073327+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "telemetry badge: dot background collision with subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:04:25.265712+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "telemetry card: lost border collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:04:49.689847+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "telemetry card: unknown border collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:05:09.653435+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "telemetry notice: lost text collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:05:28.302307+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "telemetry notice: unknown text collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:05:44.869071+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "standard badge: color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:06:01.589508+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "standard badge: border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:06:19.624142+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "standard badge: synchronized low-contrast mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:06:37.897948+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "standard badge: dot collision with subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:06:55.103499+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "standard card: border collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:07:12.609869+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "standard card: CPU usage bar color collision with subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:07:28.915270+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "standard card: GPU box background collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:07:46.412139+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "telemetry detail button: background collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:08:05.378365+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "observation banner: bg==color collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:08:24.481350+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "observation banner: border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:08:40.870545+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "observation banner: revert to raw rgba background",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:08:56.874262+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "observation banner: remove warning emoji icon",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:09:14.338410+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "active notice: bg==color collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:09:31.831360+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "active notice: border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:09:50.060620+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "active notice: revert to raw rgba background",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:10:06.802771+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "active notice: remove info emoji icon",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:10:22.853575+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "schedulable text: observationOnly color collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:10:40.168205+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "schedulable text: allocatable color collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:10:57.267915+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "studio open button: normal color collision (color: var(--color-brand-primary-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:11:14.005244+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "studio open button: normal revert to raw literal #ffffff",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:11:30.893280+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "studio open button: obsOnly color collision with border-strong",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / F1.b & F1.c: Component DOM Rendering Verification: RunDetail, NodeList, and DeveloperStudio bind to var(--color-text-inverse)",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:11:46.546399+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "studio open button: focus ring suppression via outline: none",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:12:03.359795+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "studio open button: focus ring suppression via outline: '0'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:12:19.767816+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "schedulable section: borderTop collision with surface",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:12:38.095056+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "code block: revert background to raw literal #1e1e1e",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:12:54.574891+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "code block: revert text to raw literal #4ade80",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:13:12.037623+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "code block: bg==color collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:13:28.375846+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "copy button: bg==color collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:13:47.177153+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "copy button: focus ring suppression via outline: none",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:14:05.194293+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "copy button: revert background to raw literal #2d3748",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:14:21.865897+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "copy feedback text: revert to raw literal #4ade80",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:14:38.423201+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "node select button: focus ring suppression via outline: none",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations",
+      "sourceHeadSha": "779940b681f6b8bd32745cc8b7a59cc2e17acb49",
+      "observedAt": "2026-10-05T06:14:55.040171+00:00"
+    }
+  ]
+}
