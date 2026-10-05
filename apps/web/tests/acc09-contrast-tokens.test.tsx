@@ -92,7 +92,15 @@ import { ExecutionResultView } from '../src/features/workspaces/ExecutionResultV
 import { WorkspaceCreateModal } from '../src/features/workspaces/WorkspaceCreateModal';
 import { PlacementExplainView } from '../src/features/placement/PlacementExplainView';
 import { ResourceTopologyGraph } from '../src/features/placement/ResourceTopologyGraph';
-import type { RiskLevel, PlacementExplainResult } from '../src/contracts/types';
+import {
+  EvidenceViewer,
+  EVIDENCE_INTEGRITY_CONFIG,
+  getEvidenceIntegrityConfig,
+  UI_INTEGRITY_PROJECTION_STATUSES,
+  deriveIntegrityStatus,
+  type UiIntegrityProjectionStatus,
+} from '../src/features/evidence/EvidenceViewer';
+import type { RiskLevel, PlacementExplainResult, RunResultView } from '../src/contracts/types';
 
 import type {
   ReleaseManifestResponse,
@@ -353,7 +361,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/DiffViewer.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#3fb950": 3, "#484f58": 2, "#8b949e": 1, "#c9d1d9": 2, "#f0f6fc": 1, "#f85149": 3, "rgba(248,81,73,0.15)": 1, "rgba(46,160,67,0.15)": 1},
   "features/editor/GitCommitModal.tsx": {"#0d1117": 3, "#161b22": 1, "#30363d": 6, "#58a6ff": 1, "#8b949e": 5, "#c9d1d9": 3, "#e3b341": 2, "#f0f6fc": 1, "#f85149": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(56,139,253,0.1)": 1},
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
-  "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
+  "features/evidence/EvidenceViewer.tsx": {},
   "features/mlops/ModelLineageView.tsx": {},
   "features/nodes/NodeDetail.tsx": {},
   "features/nodes/NodeList.tsx": {},
@@ -8083,6 +8091,251 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9y. [Card 275 / ACC-09] EvidenceViewer Contrast, Strict Wire Contracts, & Fail-Closed DOM Token Binding
+  it('ACC-09 / Card 275: EvidenceViewer complies with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      // 1. EVIDENCE_INTEGRITY_CONFIG exact key set equality with UI-derived projection statuses
+      const expectedIntegrityKeys = [...UI_INTEGRITY_PROJECTION_STATUSES];
+      expect(expectedIntegrityKeys.length, 'UI integrity projection must define 4 status items').toBe(4);
+      expect(Object.keys(EVIDENCE_INTEGRITY_CONFIG).sort(), 'EVIDENCE_INTEGRITY_CONFIG keys must exactly match UI projection statuses').toEqual([...expectedIntegrityKeys].sort());
+
+      // 1b. Verify derivation projection rules strictly derive all statuses from canonical RunResultView fields:
+      expect(deriveIntegrityStatus({ output: { verified: true } })).toBe('PASS');
+      expect(deriveIntegrityStatus({ output: { verified: false } })).toBe('FAIL');
+      expect(deriveIntegrityStatus({ state: 'failed' })).toBe('RUN_FAILED');
+      expect(deriveIntegrityStatus({})).toBe('UNVERIFIED');
+
+      // 2. Numerical contrast calculations for each status config (text >= 4.5:1, border >= 3.0:1 on subtle & surface)
+      const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+      const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+      const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+      const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+
+      for (const [status, cfg] of Object.entries(EVIDENCE_INTEGRITY_CONFIG)) {
+        const fgTok = cfg.colorVar.replace(/^var\(|\)$/g, '');
+        const bgTok = cfg.bgVar.replace(/^var\(|\)$/g, '');
+        const borderTok = cfg.borderVar.replace(/^var\(|\)$/g, '');
+
+        const lFg = resolveTokenHex(fgTok, lightTokens);
+        const dFg = resolveTokenHex(fgTok, darkTokens);
+        const lBg = resolveTokenHex(bgTok, lightTokens);
+        const dBg = resolveTokenHex(bgTok, darkTokens);
+        const lBorder = resolveTokenHex(borderTok, lightTokens);
+        const dBorder = resolveTokenHex(borderTok, darkTokens);
+
+        // Text contrast on own badge background
+        const lightTextCr = getContrast(lFg, lBg);
+        const darkTextCr = getContrast(dFg, dBg);
+        expect(lightTextCr, `EVIDENCE_INTEGRITY_CONFIG[${status}] text light contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(darkTextCr, `EVIDENCE_INTEGRITY_CONFIG[${status}] text dark contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+
+        // Border contrast on parent card surface
+        const lightBorderCr = getContrast(lBorder, lSurface);
+        const darkBorderCr = getContrast(dBorder, dSurface);
+        expect(lightBorderCr, `EVIDENCE_INTEGRITY_CONFIG[${status}] border light contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(darkBorderCr, `EVIDENCE_INTEGRITY_CONFIG[${status}] border dark contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // 3. Fail-closed UNKNOWN fallback test: Object.hasOwn defense & prototype key rejection
+      const unknownFallback = getEvidenceIntegrityConfig('UNKNOWN_STATUS');
+      expect(unknownFallback.label).toContain('UNKNOWN: UNKNOWN_STATUS');
+      expect(unknownFallback.colorVar).toBe('var(--color-status-unknown)');
+      expect(unknownFallback.bgVar).toBe('var(--color-bg-subtle)');
+      expect(unknownFallback.borderVar).toBe('var(--color-status-unknown)');
+
+      // Prototype property injection attacks must fall back to UNKNOWN
+      for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+        const protoRes = getEvidenceIntegrityConfig(protoKey);
+        expect(protoRes.label, `Prototype key ${protoKey} must trigger UNKNOWN fallback`).toContain('UNKNOWN');
+      }
+
+      // Null and undefined fall back to clean UNKNOWN without raw string
+      expect(getEvidenceIntegrityConfig(null).label).toBe('미확인 무결성 상태 (UNKNOWN)');
+      expect(getEvidenceIntegrityConfig(undefined).label).toBe('미확인 무결성 상태 (UNKNOWN)');
+
+      // UNKNOWN fallback contrast verification
+      const lUnknownFg = resolveTokenHex('--color-status-unknown', lightTokens);
+      const dUnknownFg = resolveTokenHex('--color-status-unknown', darkTokens);
+      expect(getContrast(lUnknownFg, lSubtle), 'UNKNOWN text light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dUnknownFg, dSubtle), 'UNKNOWN text dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lUnknownFg, lSurface), 'UNKNOWN border light contrast on surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(dUnknownFg, dSurface), 'UNKNOWN border dark contrast on surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 4. DOM Rendering tests for all 4 integrity states, UNKNOWN, sealed, and error alert
+      const baseRunResult: RunResultView = {
+        id: 'run-c275-pass',
+        runId: 'run-c275-pass',
+        projectId: 'prj-c275',
+        status: 'succeeded',
+        state: 'succeeded',
+        nodeId: 'node-01',
+        objective: 'Evidence Viewer Contrast Verification',
+        output: { sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', sizeBytes: 2048, verified: true },
+        evidence: { evidenceId: 'ev-c275-01', outputSha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+        stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
+        completedAt: '2026-10-05T12:00:00Z',
+        sealed: true,
+      };
+
+      // 4-1. PASS state DOM verification
+      vi.spyOn(client, 'apiClient').mockResolvedValueOnce(baseRunResult);
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-pass" projectId="prj-c275" onBack={() => {}} />);
+      });
+
+      const passBadge = container.querySelector('[data-testid="evidence-status-pass"]') as HTMLElement;
+      expect(passBadge, 'PASS badge must render').not.toBeNull();
+      expect(passBadge.textContent).toContain('출력 무결성 검증 통과 (PASS)');
+      expect(passBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(passBadge.style.color).toBe('var(--color-brand-success)');
+      expect(passBadge.style.borderColor || passBadge.style.border).toContain('var(--color-brand-success)');
+
+      // Sealed badge verification
+      const sealedBadge = container.querySelector('[data-testid="evidence-status-sealed"]') as HTMLElement;
+      expect(sealedBadge, 'SEALED badge must render').not.toBeNull();
+      expect(sealedBadge.textContent).toContain('불변 봉인 (SEALED)');
+      expect(sealedBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(sealedBadge.style.color).toBe('var(--color-brand-primary)');
+      expect(sealedBadge.style.borderColor || sealedBadge.style.border).toContain('var(--color-brand-primary)');
+
+      // 4-2. FAIL state DOM verification
+      const failRunResult: RunResultView = {
+        ...baseRunResult,
+        id: 'run-c275-fail',
+        runId: 'run-c275-fail',
+        output: { sha256: 'f'.repeat(64), sizeBytes: 1024, verified: false as any },
+      };
+      vi.spyOn(client, 'apiClient').mockResolvedValueOnce(failRunResult);
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-fail" projectId="prj-c275" onBack={() => {}} />);
+      });
+
+      const failBadge = container.querySelector('[data-testid="evidence-status-fail"]') as HTMLElement;
+      expect(failBadge, 'FAIL badge must render').not.toBeNull();
+      expect(failBadge.textContent).toContain('출력 무결성 검증 실패 (FAIL)');
+      expect(failBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(failBadge.style.color).toBe('var(--color-brand-danger)');
+      expect(failBadge.style.borderColor || failBadge.style.border).toContain('var(--color-brand-danger)');
+
+      const failNotice = container.querySelector('[data-testid="evidence-failed-notice"]') as HTMLElement;
+      expect(failNotice, 'FAIL notice banner must render').not.toBeNull();
+      expect(failNotice.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+      expect(failNotice.style.color).toBe('var(--color-risk-l3-text)');
+      expect(failNotice.style.borderColor || failNotice.style.border).toContain('var(--color-risk-l3-border)');
+
+      // 4-3. RUN_FAILED state DOM verification
+      const runFailedResult: RunResultView = {
+        ...baseRunResult,
+        id: 'run-c275-run-failed',
+        runId: 'run-c275-run-failed',
+        state: 'failed',
+        output: undefined,
+        stopReceipt: { exitCode: 1, physicallyStopped: true, resourceReclaimed: true, verified: false },
+      };
+      vi.spyOn(client, 'apiClient').mockResolvedValueOnce(runFailedResult);
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-run-failed" projectId="prj-c275" onBack={() => {}} />);
+      });
+
+      const runFailedBadge = container.querySelector('[data-testid="evidence-status-run-failed"]') as HTMLElement;
+      expect(runFailedBadge, 'RUN_FAILED badge must render').not.toBeNull();
+      expect(runFailedBadge.textContent).toContain('실행 실패 · 출력 부재 (RUN_FAILED)');
+      expect(runFailedBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(runFailedBadge.style.color).toBe('var(--color-brand-danger)');
+      expect(runFailedBadge.style.borderColor || runFailedBadge.style.border).toContain('var(--color-brand-danger)');
+
+      const runFailedNotice = container.querySelector('[data-testid="evidence-run-failed-notice"]') as HTMLElement;
+      expect(runFailedNotice, 'RUN_FAILED notice banner must render').not.toBeNull();
+      expect(runFailedNotice.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+      expect(runFailedNotice.style.color).toBe('var(--color-risk-l3-text)');
+      expect(runFailedNotice.style.borderColor || runFailedNotice.style.border).toContain('var(--color-risk-l3-border)');
+
+      // 4-4. UNVERIFIED state DOM verification
+      const unverifiedResult: RunResultView = {
+        ...baseRunResult,
+        id: 'run-c275-unverified',
+        runId: 'run-c275-unverified',
+        output: { sha256: 'b'.repeat(64), sizeBytes: 1024 },
+      };
+      vi.spyOn(client, 'apiClient').mockResolvedValueOnce(unverifiedResult);
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-unverified" projectId="prj-c275" onBack={() => {}} />);
+      });
+
+      const unverifiedBadge = container.querySelector('[data-testid="evidence-status-unverified"]') as HTMLElement;
+      expect(unverifiedBadge, 'UNVERIFIED badge must render').not.toBeNull();
+      expect(unverifiedBadge.textContent).toContain('출력 무결성 미검증 (UNVERIFIED)');
+      expect(unverifiedBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(unverifiedBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(unverifiedBadge.style.borderColor || unverifiedBadge.style.border).toContain('var(--color-status-unknown)');
+
+      const unverifiedNotice = container.querySelector('[data-testid="evidence-unverified-notice"]') as HTMLElement;
+      expect(unverifiedNotice, 'UNVERIFIED notice banner must render').not.toBeNull();
+      expect(unverifiedNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(unverifiedNotice.style.color).toBe('var(--color-status-unknown)');
+      expect(unverifiedNotice.style.borderColor || unverifiedNotice.style.border).toContain('var(--color-status-unknown)');
+
+      // 4-5. Error alert banner DOM verification (missing projectId)
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-err" projectId="" onBack={() => {}} />);
+      });
+
+      const errorAlert = container.querySelector('[data-testid="evidence-error-alert"]') as HTMLElement;
+      expect(errorAlert, 'Error alert banner must render when projectId missing').not.toBeNull();
+      expect(errorAlert.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+      expect(errorAlert.style.color).toBe('var(--color-risk-l3-text)');
+      expect(errorAlert.style.borderColor || errorAlert.style.border).toContain('var(--color-risk-l3-border)');
+      expect(errorAlert.textContent).toContain('증거 패키지 동기화 오류');
+
+      // 4-6. UNKNOWN fallback state DOM verification
+      const unknownResult: RunResultView = {
+        ...baseRunResult,
+        id: 'run-c275-unknown',
+        runId: 'run-c275-unknown',
+        output: { sha256: 'c'.repeat(64), sizeBytes: 1024, verified: 'CORRUPTED_VALUE' as any },
+      };
+      vi.spyOn(client, 'apiClient').mockResolvedValueOnce(unknownResult);
+      await act(async () => {
+        root.render(<EvidenceViewer runId="run-c275-unknown" projectId="prj-c275" onBack={() => {}} />);
+      });
+
+      const unknownBadge = container.querySelector('[data-testid="evidence-status-unknown"]') as HTMLElement;
+      expect(unknownBadge, 'UNKNOWN badge must render when integrityVerification is unrecognized').not.toBeNull();
+      expect(unknownBadge.textContent).toContain('UNKNOWN');
+      expect(unknownBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(unknownBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(unknownBadge.style.borderColor || unknownBadge.style.border).toContain('var(--color-status-unknown)');
+
+      // 5. Fail-closed undefined token containment check (EvidenceViewer var(--x) ⊆ index.css declared tokens)
+      const cssPath = path.resolve(__dirname, '../src/index.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf-8');
+      const declaredCssTokens = new Set<string>();
+      const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+      let declMatch;
+      while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+        declaredCssTokens.add(declMatch[1].trim());
+      }
+
+      const evPath = path.resolve(__dirname, '../src/features/evidence/EvidenceViewer.tsx');
+      const evContent = fs.readFileSync(evPath, 'utf-8');
+      const varMatches = evContent.match(/var\((--[a-z0-9-]+)/g) || [];
+      for (const v of varMatches) {
+        const tokenName = v.replace('var(', '');
+        expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in EvidenceViewer.tsx must be declared in index.css`).toBe(true);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+
   // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList & RiskBadge
   it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, NodeList, and RiskBadge style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
@@ -8391,7 +8644,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -8412,7 +8665,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                     if (m) {
                       if (pName === 'bg' || pName === 'bgVar') bgToken = m[1];
                       if (pName === 'color' || pName === 'colorVar') fgToken = m[1];
-                      if (pName === 'border') borderToken = m[1];
+                      if (pName === 'border' || pName === 'borderVar') borderToken = m[1];
                     }
                   }
                 }
@@ -8631,7 +8884,18 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(topologyStats.coveredColorObjects, 'Total covered color objects in ResourceTopologyGraph must be exactly 9').toBe(9);
     expect(topologyStats.checkedBorderObjects, 'Border objects in ResourceTopologyGraph must be exactly 4').toBe(4);
     expect(topologyStats.checkedBorderPairs, 'Border pairs in ResourceTopologyGraph must be exactly 6').toBe(6);
+
+    const evidenceStats = analyzeFile('features/evidence/EvidenceViewer.tsx');
+    expect(evidenceStats.violations, `EvidenceViewer violations:\n${evidenceStats.violations.join('\n')}`).toEqual([]);
+    expect(evidenceStats.totalStyleAttrs, 'Total style attributes in EvidenceViewer must be exactly 31').toBe(31);
+    expect(evidenceStats.checkedObjects, 'Explicit style objects in EvidenceViewer must be exactly 11').toBe(11);
+    expect(evidenceStats.checkedPairs, 'Evaluated pairs in EvidenceViewer must be exactly 15').toBe(15);
+    expect(evidenceStats.unboundColorObjects, 'Unbound color objects in EvidenceViewer must be exactly 4').toBe(4);
+    expect(evidenceStats.coveredColorObjects, 'Total covered color objects in EvidenceViewer must be exactly 15').toBe(15);
+    expect(evidenceStats.checkedBorderObjects, 'Border objects in EvidenceViewer must be exactly 12').toBe(12);
+    expect(evidenceStats.checkedBorderPairs, 'Border pairs in EvidenceViewer must be exactly 12').toBe(12);
   });
+
 
 
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
@@ -9297,6 +9561,36 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe130Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
     expect(probe130Cr, 'NodeDetail observation text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe130Cr).toBeCloseTo(1.10, 1);
+
+    // Probe 131 [Card 275]: Former EvidenceViewer unverified badge #d97706 on light surface composite strictly fails 4.5:1
+    const lightAmberComp275 = blendRgba([234, 179, 8], 0.15, lightTokens['--color-bg-surface']);
+    const probe131Cr = getContrast('#d97706', lightAmberComp275);
+    expect(probe131Cr, 'EvidenceViewer former unverified badge text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe131Cr).toBeCloseTo(2.90, 1);
+
+    // Probe 132 [Card 275]: Former EvidenceViewer RUN_FAILED notice text #f87171 on light risk-l3 composite fails 4.5:1
+    const lightRedNoticeComp275 = blendRgba([248, 81, 73], 0.08, lightTokens['--color-bg-surface']);
+    const probe132Cr = getContrast('#f87171', lightRedNoticeComp275);
+    expect(probe132Cr, 'EvidenceViewer former RUN_FAILED notice text on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe132Cr).toBeCloseTo(2.51, 1);
+
+    // Probe 133 [Card 275]: Former EvidenceViewer PASS badge border rgba(16, 185, 129, 0.15) on light surface fails 3.0:1
+    const lightPassBorderComp275 = blendRgba([16, 185, 129], 0.15, lightTokens['--color-bg-surface']);
+    const probe133Cr = getContrast(lightPassBorderComp275, lightTokens['--color-bg-surface']);
+    expect(probe133Cr, 'EvidenceViewer former PASS badge border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe133Cr).toBeCloseTo(1.16, 1);
+
+    // Probe 134 [Card 275]: Former EvidenceViewer UNVERIFIED notice border rgba(234, 179, 8, 0.3) on light surface fails 3.0:1
+    const lightUnverifiedBorderComp275 = blendRgba([234, 179, 8], 0.30, lightTokens['--color-bg-surface']);
+    const probe134Cr = getContrast(lightUnverifiedBorderComp275, lightTokens['--color-bg-surface']);
+    expect(probe134Cr, 'EvidenceViewer former UNVERIFIED notice border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe134Cr).toBeCloseTo(1.22, 1);
+
+    // Probe 135 [Card 275]: Former EvidenceViewer copy feedback #10b981 on light surface fails 4.5:1
+    const probe135Cr = getContrast('#10b981', lightTokens['--color-bg-surface']);
+    expect(probe135Cr, 'EvidenceViewer former copy feedback text #10b981 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe135Cr).toBeCloseTo(2.54, 1);
+
 
 
     // Legacy Token Reverts:

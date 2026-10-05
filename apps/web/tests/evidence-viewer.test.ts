@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EvidenceData } from '../src/features/evidence/EvidenceViewer';
+import { EvidenceData, deriveIntegrityStatus, getEvidenceIntegrityConfig } from '../src/features/evidence/EvidenceViewer';
 
 describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () => {
   it('constructs canonical project-scoped result and evidence resolution endpoints accurately', () => {
@@ -158,10 +158,30 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     // 2. Asserts catch block sets evidenceData to null and populates errorMessage
     expect(sourceContent).toMatch(/catch\s*\([^)]*\)\s*\{[\s\S]*setEvidenceData\(null\);[\s\S]*setErrorMessage\(/);
 
-    // 3. Asserts PASS badge is strictly conditional on evidenceData.integrityVerification === 'PASS'
-    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'PASS' && (");
-    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'FAIL' && (");
-    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'UNVERIFIED' && (");
+    // 3. Asserts integrity verification projection behavior:
+    // Only canonical output.verified === true yields PASS; all others fail closed.
+    expect(deriveIntegrityStatus({ output: { verified: true } })).toBe('PASS');
+    expect(deriveIntegrityStatus({ output: { verified: false } })).toBe('FAIL');
+    expect(deriveIntegrityStatus({ state: 'failed' })).toBe('RUN_FAILED');
+    expect(deriveIntegrityStatus({})).toBe('UNVERIFIED');
+
+    // Asserts config mapping and badge labeling: PASS is strictly distinct and safe
+    const passCfg = getEvidenceIntegrityConfig('PASS');
+    expect(passCfg.label).toContain('PASS');
+    expect(passCfg.colorVar).toBe('var(--color-brand-success)');
+
+    const failCfg = getEvidenceIntegrityConfig('FAIL');
+    expect(failCfg.label).toContain('FAIL');
+    expect(failCfg.colorVar).toBe('var(--color-brand-danger)');
+
+    const unverifiedCfg = getEvidenceIntegrityConfig('UNVERIFIED');
+    expect(unverifiedCfg.label).toContain('UNVERIFIED');
+    expect(unverifiedCfg.colorVar).toBe('var(--color-status-unknown)');
+
+    // Fail-closed fallback for arbitrary / out-of-contract inputs
+    const unknownCfg = getEvidenceIntegrityConfig('MALICIOUS_INPUT');
+    expect(unknownCfg.label).toContain('UNKNOWN');
+    expect(unknownCfg.colorVar).toBe('var(--color-status-unknown)');
 
     // 4. Asserts retention and tamper specs are labeled as static policy specifications
     expect(sourceContent).toContain('[시스템 정책 사양]');
