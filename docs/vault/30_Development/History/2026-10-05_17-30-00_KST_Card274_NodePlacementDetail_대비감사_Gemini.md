@@ -81,7 +81,7 @@ source_of_truth: "Git"
 - 노드 카드의 2px 외곽선 테두리는 `isFenced ? 'var(--color-status-lost)' : isSelected ? 'var(--color-status-online)' : 'var(--color-border-subtle)'` 삼항식 인라인 표현으로 승격하여 `analyzeFile` AST 분석기가 3개 분기 모두를 정적으로 추적 및 검증 가능하게 함.
 
 ### 3.2 NodeDetail 정본 계약 재사용
-- 노드 상태(`online`, `active`, `degraded`, `lost`, `unknown`)를 처리할 때 중복 매핑 객체를 정의하지 않고 Card 248에서 완성된 `getClusterNodeStatusConfig` 및 `NODE_STATUS_CONFIG`(`src/features/dashboard/ClusterOverview`)를 직접 import하여 사용.
+- 노드 상태(`online`, `active`, `degraded`, `lost`, `unknown`)를 처리할 때 중복 매핑 객체를 정의하지 않고 Card 248에서 완성된 `getClusterNodeStatusConfig` 및 `NODE_STATUS_CONFIG`(`apps/web/src/features/dashboard/ClusterOverview.tsx`)를 직접 import하여 사용.
 - `Object.hasOwn` fail-closed prototype 방어 검증을 타임라인 스냅샷(`[data-testid="node-detail-timeline-status"]`) 및 상태 라벨에 일관 적용하여 prototype 오염 키, 비표준 상태 문자열 주입 시 `Heartbeat FAILED (UNKNOWN (<raw>))`로 안전 강등.
 
 ### 3.3 PlacementExplainView 시뮬레이션 배지 및 위너 배너
