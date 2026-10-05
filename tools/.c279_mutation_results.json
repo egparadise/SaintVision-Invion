@@ -1,0 +1,215 @@
+{
+  "card": "CARD-279",
+  "component": "TerminalSessionView",
+  "sourceHeadSha": "6ae979291c6d9072185507055910a914639556d5",
+  "startedAt": "2026-10-05T20:30:28.001458+00:00",
+  "mutants": [
+    {
+      "id": "M1",
+      "desc": "powershell color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M2",
+      "desc": "powershell color literal regression: color: '#38bdf8'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M3",
+      "desc": "bash color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M4",
+      "desc": "bash color literal regression: color: '#4ade80'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M5",
+      "desc": "zsh color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M6",
+      "desc": "zsh color literal regression: color: '#fbbf24'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M7",
+      "desc": "cmd color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M8",
+      "desc": "cmd color literal regression: color: '#94a3b8'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M9",
+      "desc": "getTerminalShellConfig Object.hasOwn own-property guard suppression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M10",
+      "desc": "getTerminalShellConfig fallback label UNKNOWN indicator stripping regression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M11",
+      "desc": "ticket_bound color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M12",
+      "desc": "ticket_bound color literal regression: color: '#f59e0b'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M13",
+      "desc": "awaiting_command color subtle collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M14",
+      "desc": "awaiting_command color literal regression: color: '#64748b'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M15",
+      "desc": "getPtyAuthStatusConfig Object.hasOwn own-property guard suppression",
+      "status": "KILLED"
+    },
+    {
+      "id": "M16",
+      "desc": "derivePtyAuthStatus inversion: return awaiting_command when commandId present",
+      "status": "KILLED"
+    },
+    {
+      "id": "M17",
+      "desc": "Empty nodes container bg collision: backgroundColor: 'var(--color-bg-canvas)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M18",
+      "desc": "Empty nodes banner bg collision: backgroundColor: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M19",
+      "desc": "Empty nodes banner borderBottom collision: borderBottom: '1px solid var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M20",
+      "desc": "Empty nodes banner borderBottom literal: borderBottom: '1px solid #334155'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M21",
+      "desc": "Empty nodes banner degraded text color collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M22",
+      "desc": "Empty nodes banner degraded literal regression: color: '#fed7aa'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M23",
+      "desc": "Empty nodes text color collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M24",
+      "desc": "Active session view container bg collision: backgroundColor: 'var(--color-bg-canvas)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M25",
+      "desc": "Tablist container bg collision: backgroundColor: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M26",
+      "desc": "Tablist borderBottom collision: borderBottom: '1px solid var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M27",
+      "desc": "Active tab bg collision: backgroundColor: isActive ? 'var(--color-bg-subtle)' : 'transparent'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M28",
+      "desc": "Active tab borderTop brand collision: borderTop: isActive ? '2px solid var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M29",
+      "desc": "Active tab text color collision: color: isActive ? 'var(--color-bg-surface)' : 'var(--color-text-muted)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M30",
+      "desc": "Active tab text color literal regression: color: isActive ? '#f8fafc' : 'var(--color-text-muted)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M31",
+      "desc": "Inactive tab text color collision: color: isActive ? 'var(--color-text-primary)' : 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M32",
+      "desc": "Tab close button color collision: color: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M33",
+      "desc": "New session select bg collision: backgroundColor: 'var(--color-bg-canvas)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M34",
+      "desc": "New session select border collision: border: '1px solid var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M35",
+      "desc": "New session select border literal regression: border: '1px solid #334155'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M36",
+      "desc": "Error alert bg collision: backgroundColor: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M37",
+      "desc": "Error alert text color collision: color: 'var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M38",
+      "desc": "Error alert borderBottom collision: borderBottom: '1px solid var(--color-bg-surface)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M39",
+      "desc": "Switch mode button bg collision: backgroundColor: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    },
+    {
+      "id": "M40",
+      "desc": "Switch mode button text color collision: color: 'var(--color-bg-subtle)'",
+      "status": "KILLED"
+    }
+  ],
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "completedAt": "2026-10-05T20:42:40.726908+00:00",
+  "killRate": "100.0%"
+}
