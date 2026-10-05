@@ -116,6 +116,30 @@ import {
   derivePtyAuthStatus,
   UI_PTY_AUTH_PROJECTION_STATUSES,
 } from '../src/features/desktop/TerminalSessionView';
+import {
+  ConflictResolutionModal,
+  CONFLICT_STATUS_CONFIG,
+  getConflictStatusConfig,
+  CONFLICT_RESOLUTION_ACTION_CONFIG,
+  getConflictResolutionActionConfig,
+  type UiConflictStatus,
+  type UiConflictResolutionAction,
+} from '../src/features/editor/ConflictResolutionModal';
+import {
+  DiffViewer,
+  DIFF_LINE_TYPE_CONFIG,
+  getDiffLineTypeConfig,
+  type UiDiffLineType,
+} from '../src/features/editor/DiffViewer';
+import {
+  GitCommitModal,
+  GIT_FILE_STATUS_CONFIG,
+  getGitFileStatusConfig,
+  GIT_STAGE_STATE_CONFIG,
+  getGitStageStateConfig,
+  type UiGitFileStatus,
+  type UiGitStageState,
+} from '../src/features/editor/GitCommitModal';
 import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
 import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
@@ -374,9 +398,9 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/desktop/ModelStudioView.tsx": {},
   "features/desktop/ResourceExplorer.tsx": {},
   "features/desktop/TerminalSessionView.tsx": {},
-  "features/editor/ConflictResolutionModal.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#58a6ff": 1, "#8b949e": 2, "#f85149": 5, "#fff": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(248,81,73,0.1)": 1},
-  "features/editor/DiffViewer.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#3fb950": 3, "#484f58": 2, "#8b949e": 1, "#c9d1d9": 2, "#f0f6fc": 1, "#f85149": 3, "rgba(248,81,73,0.15)": 1, "rgba(46,160,67,0.15)": 1},
-  "features/editor/GitCommitModal.tsx": {"#0d1117": 3, "#161b22": 1, "#30363d": 6, "#58a6ff": 1, "#8b949e": 5, "#c9d1d9": 3, "#e3b341": 2, "#f0f6fc": 1, "#f85149": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(56,139,253,0.1)": 1},
+  "features/editor/ConflictResolutionModal.tsx": {},
+  "features/editor/DiffViewer.tsx": {},
+  "features/editor/GitCommitModal.tsx": {},
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
   "features/evidence/EvidenceViewer.tsx": {},
   "features/mlops/ModelLineageView.tsx": {},
@@ -9229,9 +9253,235 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9ad. [Card 280 / ACC-09] ConflictResolutionModal, DiffViewer, and GitCommitModal Contrast, Configs, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 280: ConflictResolutionModal, DiffViewer, and GitCommitModal comply with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. ConflictResolutionModal configs and fail-closed lookups
+    expect(Object.keys(CONFLICT_STATUS_CONFIG).sort()).toEqual(['concurrency_conflict', 'etag_mismatch']);
+    for (const status of ['etag_mismatch', 'concurrency_conflict'] as const) {
+      expect(Object.hasOwn(CONFLICT_STATUS_CONFIG, status)).toBe(true);
+      const cfg = getConflictStatusConfig(status);
+      expect(cfg.label).toBeDefined();
+      expect(cfg.colorVar).toMatch(/^var\(--color-(status-offline|status-degraded)\)$/);
+      expect(cfg.bgVar).toMatch(/^var\(--color-(risk-l3-bg|bg-subtle)\)$/);
+      expect(cfg.badgeFgVar).toBe('var(--color-brand-primary-fg)');
+    }
+    // Fail-closed fallback for conflict status
+    const unknownConflict = getConflictStatusConfig('unknown_status');
+    expect(unknownConflict.label).toBe('⚠️ UNKNOWN (unknown_status)');
+    expect(unknownConflict.colorVar).toBe('var(--color-status-unknown)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      expect(getConflictStatusConfig(protoKey).colorVar).toBe('var(--color-status-unknown)');
+    }
+
+    // CONFLICT_RESOLUTION_ACTION_CONFIG
+    expect(Object.keys(CONFLICT_RESOLUTION_ACTION_CONFIG).sort()).toEqual(['accept_remote', 'keep_mine', 'merge']);
+    for (const action of ['accept_remote', 'keep_mine', 'merge'] as const) {
+      expect(Object.hasOwn(CONFLICT_RESOLUTION_ACTION_CONFIG, action)).toBe(true);
+      const actCfg = getConflictResolutionActionConfig(action);
+      expect(actCfg.label).toBeDefined();
+    }
+    expect(CONFLICT_RESOLUTION_ACTION_CONFIG.keep_mine.colorVar).toBe('var(--color-status-offline)');
+    expect(CONFLICT_RESOLUTION_ACTION_CONFIG.keep_mine.borderColorVar).toBe('var(--color-status-offline)');
+    expect(getConflictResolutionActionConfig('unknown_action').colorVar).toBe('var(--color-status-unknown)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      expect(getConflictResolutionActionConfig(protoKey).colorVar).toBe('var(--color-status-unknown)');
+    }
+
+    // 2. DiffViewer DIFF_LINE_TYPE_CONFIG verification and contrast calculations
+    expect(Object.keys(DIFF_LINE_TYPE_CONFIG).sort()).toEqual(['added', 'removed', 'unchanged']);
+    for (const lineType of ['added', 'removed', 'unchanged'] as const) {
+      expect(Object.hasOwn(DIFF_LINE_TYPE_CONFIG, lineType)).toBe(true);
+      const cfg = getDiffLineTypeConfig(lineType);
+      expect(cfg.label).toBeDefined();
+    }
+
+    // Dynamic contrast verification for diff line tokens
+    const addedBgL = lightTokens['--color-diff-added-bg'];
+    const addedTextL = lightTokens['--color-diff-added-text'];
+    const addedBorderL = lightTokens['--color-diff-added-border'];
+    const addedBgD = darkTokens['--color-diff-added-bg'];
+    const addedTextD = darkTokens['--color-diff-added-text'];
+    const addedBorderD = darkTokens['--color-diff-added-border'];
+
+    const removedBgL = lightTokens['--color-diff-removed-bg'];
+    const removedTextL = lightTokens['--color-diff-removed-text'];
+    const removedBorderL = lightTokens['--color-diff-removed-border'];
+    const removedBgD = darkTokens['--color-diff-removed-bg'];
+    const removedTextD = darkTokens['--color-diff-removed-text'];
+    const removedBorderD = darkTokens['--color-diff-removed-border'];
+
+    expect(getContrast(addedTextL, addedBgL), 'Light added text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(addedTextD, addedBgD), 'Dark added text on added bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(removedTextL, removedBgL), 'Light removed text on removed bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(removedTextD, removedBgD), 'Dark removed text on removed bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    expect(getContrast(addedBorderL, lightTokens['--color-bg-canvas']), 'Light added border >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(addedBorderD, darkTokens['--color-bg-canvas']), 'Dark added border >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(removedBorderL, lightTokens['--color-bg-canvas']), 'Light removed border >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(removedBorderD, darkTokens['--color-bg-canvas']), 'Dark removed border >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    const unknownLineType = getDiffLineTypeConfig('unknown_diff_line');
+    expect(unknownLineType.label).toBe('UNKNOWN (unknown_diff_line)');
+    expect(unknownLineType.colorVar).toBe('var(--color-status-unknown)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      expect(getDiffLineTypeConfig(protoKey).colorVar).toBe('var(--color-status-unknown)');
+    }
+
+    // 3. GitCommitModal GIT_FILE_STATUS_CONFIG & GIT_STAGE_STATE_CONFIG
+    expect(Object.keys(GIT_FILE_STATUS_CONFIG).sort()).toEqual(['clean', 'modified']);
+    for (const fs of ['modified', 'clean'] as const) {
+      expect(Object.hasOwn(GIT_FILE_STATUS_CONFIG, fs)).toBe(true);
+      const cfg = getGitFileStatusConfig(fs);
+      expect(cfg.badgeText).toBeDefined();
+    }
+    expect(GIT_FILE_STATUS_CONFIG.modified.colorVar).toBe('var(--color-status-degraded)');
+    expect(GIT_FILE_STATUS_CONFIG.modified.badgeColorVar).toBe('var(--color-status-degraded)');
+    expect(getGitFileStatusConfig('unknown_status').colorVar).toBe('var(--color-status-unknown)');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      expect(getGitFileStatusConfig(protoKey).colorVar).toBe('var(--color-status-unknown)');
+    }
+
+    expect(Object.keys(GIT_STAGE_STATE_CONFIG).sort()).toEqual(['staged', 'unstaged']);
+    expect(GIT_STAGE_STATE_CONFIG.staged.bgVar).toBe('var(--color-brand-subtle)');
+    expect(GIT_STAGE_STATE_CONFIG.unstaged.bgVar).toBe('transparent');
+    expect(getGitStageStateConfig('staged').bgVar).toBe('var(--color-brand-subtle)');
+    expect(getGitStageStateConfig('unstaged').bgVar).toBe('transparent');
+    expect(getGitStageStateConfig('unknown').bgVar).toBe('transparent');
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      expect(getGitStageStateConfig(protoKey).bgVar).toBe('transparent');
+    }
+
+    // 4. DOM Rendering and Token Binding
+    const sampleDiff: FileDiffResult = {
+      path: 'src/contracts/virtualFabric.ts',
+      originalEtag: 'etag_base_1234567890abcdef',
+      modifiedEtag: 'etag_mod_9876543210fedcba',
+      additionsCount: 5,
+      deletionsCount: 2,
+      lines: [
+        { type: 'unchanged', originalLineNumber: 1, modifiedLineNumber: 1, content: 'export interface VirtualMachine {' },
+        { type: 'removed', originalLineNumber: 2, content: '  legacyState: string;' },
+        { type: 'added', modifiedLineNumber: 2, content: '  contractState: NodeState;' },
+      ],
+    };
+
+    // 4-a. ConflictResolutionModal DOM test
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(
+        <ConflictResolutionModal
+          filePath="src/contracts/virtualFabric.ts"
+          diff={sampleDiff}
+          onKeepMine={vi.fn()}
+          onAcceptRemote={vi.fn()}
+          onMerge={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      );
+    });
+
+    const conflictDialog = container.querySelector('[data-testid="conflict-resolution-dialog"]') as HTMLElement;
+    expect(conflictDialog, 'Conflict dialog must render').not.toBeNull();
+    expect(conflictDialog.style.backgroundColor).toBe('var(--color-bg-surface)');
+    expect(conflictDialog.style.borderColor || conflictDialog.style.border).toContain('var(--color-status-offline)');
+    expect(conflictDialog.style.boxShadow).toBe('var(--shadow-lg)');
+
+    const conflictBackdrop = container.querySelector('[data-testid="conflict-resolution-backdrop"]') as HTMLElement;
+    expect(conflictBackdrop.style.backgroundColor).toBe('var(--color-bg-backdrop)');
+
+    const warningBanner = container.querySelector('[data-testid="conflict-warning-banner"]') as HTMLElement;
+    expect(warningBanner.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+    expect(warningBanner.style.borderBottom || warningBanner.style.border).toContain('var(--color-border-subtle)');
+
+    const statusBadge = container.querySelector('[data-testid="conflict-status-badge"]') as HTMLElement;
+    expect(statusBadge.style.backgroundColor).toBe('var(--color-status-offline)');
+    expect(statusBadge.style.color).toBe('var(--color-brand-primary-fg)');
+
+    const forceOverwriteBtn = container.querySelector('[data-testid="force-overwrite-btn"]') as HTMLElement;
+    expect(forceOverwriteBtn.style.color).toBe('var(--color-status-offline)');
+    expect(forceOverwriteBtn.style.borderColor || forceOverwriteBtn.style.border).toContain('var(--color-status-offline)');
+
+    // 4-b. DiffViewer direct DOM test
+    await act(async () => {
+      root.render(
+        <DiffViewer
+          diff={sampleDiff}
+          onClose={vi.fn()}
+          onApply={vi.fn()}
+          onRevert={vi.fn()}
+        />
+      );
+    });
+
+    const diffContainer = container.querySelector('[data-testid="diff-viewer-container"]') as HTMLElement;
+    expect(diffContainer.style.backgroundColor).toBe('var(--color-bg-canvas)');
+    expect(diffContainer.style.color).toBe('var(--color-text-secondary)');
+
+    const additionsEl = container.querySelector('[data-testid="diff-additions-count"]') as HTMLElement;
+    expect(additionsEl.style.color).toBe('var(--color-diff-added-text)');
+
+    const deletionsEl = container.querySelector('[data-testid="diff-deletions-count"]') as HTMLElement;
+    expect(deletionsEl.style.color).toBe('var(--color-diff-removed-text)');
+
+    const addedLine = container.querySelector('[data-testid="diff-line-2"]') as HTMLElement;
+    expect(addedLine.style.backgroundColor).toBe('var(--color-diff-added-bg)');
+    expect(addedLine.style.borderLeft).toContain('var(--color-diff-added-border)');
+
+    const removedLine = container.querySelector('[data-testid="diff-line-1"]') as HTMLElement;
+    expect(removedLine.style.backgroundColor).toBe('var(--color-diff-removed-bg)');
+    expect(removedLine.style.borderLeft).toContain('var(--color-diff-removed-border)');
+
+    // 4-c. GitCommitModal DOM test
+    const sampleFiles = [
+      { path: 'src/main.ts', content: 'console.log("hello");', isDirty: true },
+      { path: 'README.md', content: '# Documentation', isDirty: false },
+    ];
+
+    await act(async () => {
+      root.render(
+        <GitCommitModal
+          files={sampleFiles}
+          parentCommit={{ commitId: '0123456789abcdef0123456789abcdef01234567', parentCommitId: null, author: 'Gemini', message: 'init', timestamp: '2026-10-06T00:00:00Z', stagedFiles: ['src/main.ts'], treeHash: 'tree_123' }}
+          onCommit={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      );
+    });
+
+    const gitDialog = container.querySelector('[data-testid="git-commit-dialog"]') as HTMLElement;
+    expect(gitDialog.style.backgroundColor).toBe('var(--color-bg-surface)');
+    expect(gitDialog.style.borderColor || gitDialog.style.border).toContain('var(--color-border-subtle)');
+    expect(gitDialog.style.boxShadow).toBe('var(--shadow-lg)');
+
+    const authorInput = container.querySelector('[data-testid="commit-author-input"]') as HTMLInputElement;
+    expect(authorInput.style.backgroundColor).toBe('var(--color-bg-canvas)');
+    expect(authorInput.style.borderColor || authorInput.style.border).toContain('var(--color-border-subtle)');
+
+    const messageInput = container.querySelector('[data-testid="commit-message-input"]') as HTMLTextAreaElement;
+    expect(messageInput.style.backgroundColor).toBe('var(--color-bg-canvas)');
+    expect(messageInput.style.borderColor || messageInput.style.border).toContain('var(--color-border-subtle)');
+
+    const reqIndicator = container.querySelector('[data-testid="commit-required-indicator"]') as HTMLElement;
+    expect(reqIndicator.style.color).toBe('var(--color-status-offline)');
+
+    const dirtyRow = container.querySelector('[data-testid="file-row-src_main_ts"]') as HTMLElement;
+    expect(dirtyRow.style.backgroundColor).toBe('var(--color-brand-subtle)');
+
+    const dirtyBadge = container.querySelector('[data-testid="file-badge-src_main_ts"]') as HTMLElement;
+    expect(dirtyBadge.style.color).toBe('var(--color-status-degraded)');
+
+    await act(async () => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
 
   // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 & Card 280: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -9538,7 +9788,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG' || node.name.getText(sf) === 'DIFF_LINE_TYPE_CONFIG' || node.name.getText(sf) === 'CONFLICT_STATUS_CONFIG' || node.name.getText(sf) === 'CONFLICT_RESOLUTION_ACTION_CONFIG' || node.name.getText(sf) === 'GIT_FILE_STATUS_CONFIG' || node.name.getText(sf) === 'GIT_STAGE_STATE_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -9559,15 +9809,18 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                     if (m) {
                       if (pName === 'bg' || pName === 'bgVar') bgToken = m[1];
                       if (pName === 'color' || pName === 'colorVar') fgToken = m[1];
-                      if (pName === 'border' || pName === 'borderVar') borderToken = m[1];
+                      if (pName === 'border' || pName === 'borderVar' || pName === 'borderColorVar') borderToken = m[1];
                     }
                   }
                 }
                 if (varName === 'NODE_STATUS_CONFIG' && !bgToken) {
                   bgToken = '--color-bg-canvas';
                 }
-                if ((varName === 'TERMINAL_SHELL_CONFIG' || varName === 'PTY_AUTH_STATUS_CONFIG') && !bgToken) {
+                if ((varName === 'TERMINAL_SHELL_CONFIG' || varName === 'PTY_AUTH_STATUS_CONFIG' || varName === 'GIT_FILE_STATUS_CONFIG' ) && !bgToken) {
                   bgToken = '--color-bg-subtle';
+                }
+                if (varName === 'DIFF_LINE_TYPE_CONFIG' && !bgToken) {
+                  bgToken = '--color-bg-canvas';
                 }
                 if (varName === 'RISK_CONFIG' && !borderToken && fgToken) {
                   borderToken = fgToken;
@@ -9845,6 +10098,36 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(terminalSessionStats.coveredColorObjects, 'Total covered color objects in TerminalSessionView must be exactly 19').toBe(19);
     expect(terminalSessionStats.checkedBorderObjects, 'Border objects in TerminalSessionView must be exactly 9').toBe(9);
     expect(terminalSessionStats.checkedBorderPairs, 'Border pairs in TerminalSessionView must be exactly 9').toBe(9);
+
+    const conflictResolutionStats = analyzeFile('features/editor/ConflictResolutionModal.tsx');
+    expect(conflictResolutionStats.violations, `ConflictResolutionModal violations:\n${conflictResolutionStats.violations.join('\n')}`).toEqual([]);
+    expect(conflictResolutionStats.totalStyleAttrs, 'Total style attributes in ConflictResolutionModal must be exactly 18').toBe(18);
+    expect(conflictResolutionStats.checkedObjects, 'Explicit style objects in ConflictResolutionModal must be exactly 2').toBe(2);
+    expect(conflictResolutionStats.checkedPairs, 'Evaluated pairs in ConflictResolutionModal must be exactly 5').toBe(5);
+    expect(conflictResolutionStats.unboundColorObjects, 'Unbound color objects in ConflictResolutionModal must be exactly 3').toBe(3);
+    expect(conflictResolutionStats.coveredColorObjects, 'Total covered color objects in ConflictResolutionModal must be exactly 5').toBe(5);
+    expect(conflictResolutionStats.checkedBorderObjects, 'Border objects in ConflictResolutionModal must be exactly 4').toBe(4);
+    expect(conflictResolutionStats.checkedBorderPairs, 'Border pairs in ConflictResolutionModal must be exactly 4').toBe(4);
+
+    const diffViewerStats = analyzeFile('features/editor/DiffViewer.tsx');
+    expect(diffViewerStats.violations, `DiffViewer violations:\n${diffViewerStats.violations.join('\n')}`).toEqual([]);
+    expect(diffViewerStats.totalStyleAttrs, 'Total style attributes in DiffViewer must be exactly 17').toBe(17);
+    expect(diffViewerStats.checkedObjects, 'Explicit style objects in DiffViewer must be exactly 4').toBe(4);
+    expect(diffViewerStats.checkedPairs, 'Evaluated pairs in DiffViewer must be exactly 8').toBe(8);
+    expect(diffViewerStats.unboundColorObjects, 'Unbound color objects in DiffViewer must be exactly 4').toBe(4);
+    expect(diffViewerStats.coveredColorObjects, 'Total covered color objects in DiffViewer must be exactly 8').toBe(8);
+    expect(diffViewerStats.checkedBorderObjects, 'Border objects in DiffViewer must be exactly 3').toBe(3);
+    expect(diffViewerStats.checkedBorderPairs, 'Border pairs in DiffViewer must be exactly 3').toBe(3);
+
+    const gitCommitStats = analyzeFile('features/editor/GitCommitModal.tsx');
+    expect(gitCommitStats.violations, `GitCommitModal violations:\n${gitCommitStats.violations.join('\n')}`).toEqual([]);
+    expect(gitCommitStats.totalStyleAttrs, 'Total style attributes in GitCommitModal must be exactly 25').toBe(25);
+    expect(gitCommitStats.checkedObjects, 'Explicit style objects in GitCommitModal must be exactly 4').toBe(4);
+    expect(gitCommitStats.checkedPairs, 'Evaluated pairs in GitCommitModal must be exactly 12').toBe(12);
+    expect(gitCommitStats.unboundColorObjects, 'Unbound color objects in GitCommitModal must be exactly 8').toBe(8);
+    expect(gitCommitStats.coveredColorObjects, 'Total covered color objects in GitCommitModal must be exactly 12').toBe(12);
+    expect(gitCommitStats.checkedBorderObjects, 'Border objects in GitCommitModal must be exactly 6').toBe(6);
+    expect(gitCommitStats.checkedBorderPairs, 'Border pairs in GitCommitModal must be exactly 6').toBe(6);
   });
 
 
@@ -10648,6 +10931,33 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe155Cr, 'TerminalSessionView former switch-mode text #60a5fa on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe155Cr).toBeCloseTo(2.32, 1);
 
+    // Probe 156 [Card 280]: ConflictResolutionModal baseline raw #f85149 on light canvas fails 4.5:1 (3.20:1)
+    const probe156Cr = getContrast('#f85149', lightTokens['--color-bg-canvas']);
+    expect(probe156Cr, 'ConflictResolutionModal former raw #f85149 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe156Cr).toBeCloseTo(3.20, 1);
+
+    // Probe 157 [Card 280]: DiffViewer baseline raw #3fb950 on 15% tint over light surface fails 4.5:1 (2.16:1)
+    const lightSurfaceCompositeDiffGreen = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-surface']);
+    const probe157Cr = getContrast('#3fb950', lightSurfaceCompositeDiffGreen);
+    expect(probe157Cr, 'DiffViewer former raw #3fb950 on 15% tint fails 4.5:1').toBeLessThan(4.5);
+    expect(probe157Cr).toBeCloseTo(2.16, 1);
+
+    // Probe 158 [Card 280]: DiffViewer baseline raw #f85149 on 15% tint over light surface fails 4.5:1 (2.80:1)
+    const lightSurfaceCompositeDiffRed = blendRgba([248, 81, 73], 0.15, lightTokens['--color-bg-surface']);
+    const probe158Cr = getContrast('#f85149', lightSurfaceCompositeDiffRed);
+    expect(probe158Cr, 'DiffViewer former raw #f85149 on 15% tint fails 4.5:1').toBeLessThan(4.5);
+    expect(probe158Cr).toBeCloseTo(2.80, 1);
+
+    // Probe 159 [Card 280]: GitCommitModal baseline raw #e3b341 on light canvas fails 4.5:1 (1.86:1)
+    const probe159Cr = getContrast('#e3b341', lightTokens['--color-bg-canvas']);
+    expect(probe159Cr, 'GitCommitModal former raw #e3b341 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe159Cr).toBeCloseTo(1.86, 1);
+
+    // Probe 160 [Card 280]: GitCommitModal baseline raw #58a6ff on light surface fails 4.5:1 (2.53:1)
+    const probe160Cr = getContrast('#58a6ff', lightTokens['--color-bg-surface']);
+    expect(probe160Cr, 'GitCommitModal former raw #58a6ff on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe160Cr).toBeCloseTo(2.53, 1);
+
 
 
     // Legacy Token Reverts:
@@ -10744,8 +11054,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 471').toBe(471);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 34').toBe(34);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.233"
+version: "1.0.234"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-06T06:03:00+09:00"
+updated: "2026-10-06T06:44:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-06T06:44:00+09:00 (Card 280 에디터 모달 묶음 화면 ConflictResolutionModal(16건), DiffViewer(18건), GitCommitModal(26건) 색상 리터럴 60 occurrences → 0건 전수 토큰화, index.css diff 전용 시맨틱 토큰 6종 양 테마 정의 및 동적 명도 대비(텍스트 6.49~8.60:1>=4.5:1, 경계선 3.15~7.02:1>=3.0:1) 100% 충족, 모달 backdrop overlay 비텍스트 시각 스크림(SC 1.4.11 / SC 1.4.3 N/A) 정합, CONFLICT_STATUS_CONFIG·DIFF_LINE_TYPE_CONFIG·GIT_FILE_STATUS_CONFIG·GIT_STAGE_STATE_CONFIG satisfies Record<..., ...> 엄밀 결속, getConflictStatusConfig/getDiffLineTypeConfig/getGitFileStatusConfig/getGitStageStateConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, COLOR_LITERAL_MULTISET_BASELINE 3개 파일 {} 래칫, var(--color-border-subtle) 정확히 471건/34개 파일 래칫 보존, Test 9ad 및 Test 9j-2 AST 래칫(ConflictResolutionModal 18/2/5/3/5/4/4, DiffViewer 17/4/8/4/8/3/3, GitCommitModal 25/4/12/8/12/6/6, violations 전 파일 0건), Revert-Fail Probes 156~160, 40종 변이 100% 사살 실측(Commit A f1c898ce 위 Receipt B b6ba31fb 봉인), tools/reproduce_c280_contrast.py 32개 지표 전원 통과; Vitest 44 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T06:03:00+09:00 (Card 279 [r2] 터미널 세션 화면 TerminalSessionView 색상 리터럴 전수 토큰화(37 occurrences / 18 distinct → 0건), 셸 및 PTY 상태 스타일 계약 결속 및 접근성 승격 r2 리뷰 조치: PR #376, base 9c850d46, target agent/gemini/c278-desktop-window-contrast, Claude r2 피드백 전수 조치: F-A reproduce_c279_contrast.py 재실행 기반 History §2.2 콘솔 출력 및 §2.1 표 동기화(TS-24 Before 1.17/1.21, TS-25 4.02/4.78, TS-26 1.98/4.78), F-B TS-1 및 TS-4 다크 before_hex를 실제 렌더 토큰(#111827, #1f2937)으로 정합하여 Before = After (TS-1 1.05/1.10, TS-4 1.10/1.21) 위생 행 일치화, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, var(--color-border-subtle) 정확히 458건/31개 파일 래칫 보존, tools/reproduce_c279_contrast.py 32개 지표 전원 통과; Vitest 43 passed, full 77 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T03:50:00+09:00 (Card 278 [r1] 데스크톱 윈도우 창 컴포넌트 DesktopWindow 색상 리터럴 전수 토큰화(17 occurrences / 15 distinct: 14 semantic colors → 0건), 창 제어 액션 스타일 계약 결속 및 접근성 승격: PR #375, base e6488165, target agent/gemini/c277-app-shell-release-contrast, Codex F-R1 및 Claude F1~F3 r1 리뷰 피드백 전수 조치: tools/test_c278_mutations.py read_bytes/write_bytes 바이너리 저장·복원 전환으로 Windows CRLF 줄바꿈 오염 및 tracked modified 잔여 결함 원천 차단, runner 내 clean-tree fail-closed 무결성 검증 내장 및 commit A' (4a629d6a) 위 40/40 전수 사살(Kill Rate 100.0%) receipt B' (b7ca44f8) 재봉인; DesktopWindow.tsx 신호등 버튼을 getWindowControlConfig(action).color에 직접 바인딩하여 계산형 래칫과 실제 렌더 색상 100% 동기화(Claude F2); reproduce_c278_contrast.py 및 History §2/§2.2 내 미사용 fallback 9개 행 Before 실측치 정정(= After) 및 "미사용 fallback 제거(위생)" 재분류, 생 hex 하드코딩 6개 행(DW-10~DW-15) 결손 수리 성격 명확화(Claude F1); DW-7 underlay Titlebar subtle 및 spec 3.18/3.08 정정(Claude F3); COLOR_LITERAL_MULTISET_BASELINE {} 래칫, var(--color-border-subtle) 정확히 457건/31개 파일 래칫 엄밀 보존, Test 9ab 신설 및 Test 9j-2 AST 래칫(DesktopWindow 13/3/9/2/5/6/7, violations 0), Revert-Fail Probes 146~150, tools/reproduce_c278_contrast.py 21개 지표 전원 통과; Vitest 42 passed, full 76 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T01:58:47+09:00 (Card 277 [r2] 앱 셸 및 릴리스 엔진 화면 App & releaseEngine 색상 리터럴 전수 토큰화(17 occurrences / 12 distinct: App.tsx 11 occurrences / 9 distinct, releaseEngine.ts 6 occurrences / 3 distinct → 0건), Claude UI r2 피드백 전수 조치: PR #374, base 89bc257f, target agent/gemini/c276-approval-detail-header-contrast, F-A reproduce_c277_contrast.py resolve_color 내 bg_raw 우선순위 정합 및 History §2/§2.2 실측치 갱신(AP-1 6.80/6.80, AP-4 8.31/8.31, RE-1 12.26/12.26, AP-13 1.60/9.51), F-B RE-1·RE-2 Before 라벨 base hex 쌍(#c9d1d9 on #0d1117, #6e7681 on #0d1117) 정합, F-C 워크스페이스 오류 배너 canvas 부모 통일(AP-11 1.13/1.08, AP-12 3.60/5.16, AP-13 1.60/9.51), F-D 작업판 version 1.0.228 bump 및 stamp date 동기화; COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, var(--color-border-subtle) 정확히 457건/31개 파일 래칫 엄밀 보존, Test 9aa 신설 및 Test 9j-2 AST 래칫(App 19/7/12/4/11/9/10, releaseEngine 0/0/0/0/0/0/0, violations 0), Revert-Fail Probes 141~145, tools/test_c277_mutations.py 40종 M1~M40 100% 사살 실측 및 receipt A'/B' 봉인, tools/reproduce_c277_contrast.py 21개 지표 전원 통과; Vitest 41 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
@@ -60,6 +61,29 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-06 에디터 모달 묶음 화면 (ConflictResolutionModal, DiffViewer, GitCommitModal) 색상 리터럴 전수 토큰화(60 occurrences → 0건), 상태 계약 결속 및 접근성 승격 (Card 280, `agent/gemini/c280-editor-modals-contrast`, PR 대상 `agent/gemini/c279-terminal-session-contrast`)
+- **개요**: ACC-09 에디터 모달 3개 컴포넌트(`ConflictResolutionModal.tsx`, `DiffViewer.tsx`, `GitCommitModal.tsx`)의 색상 리터럴 inventory 전수(60 occurrences → 0건), 대비 표본/DOM 결속 감사 및 상태/diff 스타일 계약 승격:
+  1. **색상 리터럴 전수 해소 (60 occurrences → 0건)**:
+     - `ConflictResolutionModal.tsx`: 16 occurrences / 9 distinct (`#0d1117`, `#161b22`, `#30363d`×2, `#58a6ff`, `#8b949e`×2, `#f85149`×5, `#fff`, `rgba(0,0,0,0.5)`, `rgba(0,0,0,0.75)`, `rgba(248,81,73,0.1)`) 제거 및 디자인 토큰 전면 승격.
+     - `DiffViewer.tsx`: 18 occurrences / 10 distinct (`#0d1117`, `#161b22`, `#30363d`×2, `#3fb950`×3, `#484f58`×2, `#8b949e`, `#c9d1d9`×2, `#f0f6fc`, `#f85149`×3, `rgba(248,81,73,0.15)`, `rgba(46,160,67,0.15)`) 제거 및 디자인 토큰 전면 승격.
+     - `GitCommitModal.tsx`: 26 occurrences / 10 distinct (`#0d1117`×3, `#161b22`, `#30363d`×6, `#58a6ff`, `#8b949e`×5, `#c9d1d9`×3, `#e3b341`×2, `#f0f6fc`, `#f85149`, `rgba(0,0,0,0.5)`, `rgba(0,0,0,0.75)`, `rgba(56,139,253,0.1)`) 제거 및 디자인 토큰 전면 승격.
+  2. **Diff 전용 토큰 양 테마 정의 및 명도 대비 보장**:
+     - `apps/web/src/index.css`에 `--color-diff-added-bg`, `--color-diff-added-text`, `--color-diff-added-border`, `--color-diff-removed-bg`, `--color-diff-removed-text`, `--color-diff-removed-border` 정의 완료.
+     - 추가/삭제 배경 위 텍스트 4.5:1 이상(6.49:1 / 8.55:1 및 6.80:1 / 8.60:1), 좌측 경계선 3.0:1 이상(3.15:1 / 8.53:1 및 6.18:1 / 7.02:1) 전원 충족.
+  3. **모달 백드롭 스크림(Modal Backdrop Scrim) 규격 판정**:
+     - 모달 배후 `backgroundColor: var(--color-bg-backdrop)` (`rgba(0, 0, 0, 0.75)`)는 배경 페이지 콘텐츠를 감광(dimming)하는 비텍스트 시각 스크림으로 WCAG SC 1.4.11 / SC 1.4.3 적용 대상에서 제외(INFO)됨을 명확화.
+  4. **Fail-Closed 상태 계약 체계 및 프로토타입 오염 방어**:
+     - `CONFLICT_STATUS_CONFIG`, `CONFLICT_RESOLUTION_ACTION_CONFIG`, `DIFF_LINE_TYPE_CONFIG`, `GIT_FILE_STATUS_CONFIG`, `GIT_STAGE_STATE_CONFIG` 설정 표 구축.
+     - `Object.hasOwn` 기반 fail-closed 룩업 헬퍼로 `toString`, `constructor`, `__proto__`, `valueOf` 등 프로토타입 키 및 미등록 상태를 `UNKNOWN (<key>)` 및 `var(--color-status-unknown)` 토큰으로 격리 (변이 M7, M25, M33, M36 100% 사살).
+  5. **토큰 인벤토리 및 AST 래칫 고정**:
+     - `COLOR_LITERAL_MULTISET_BASELINE` 3개 파일 전수 `{}` 고정.
+     - `var(--color-border-subtle)` 정확히 471건, 34개 파일 래칫 보존.
+     - Test 9j-2 AST 분석: ConflictResolutionModal 18/2/5/3/5/4/4, DiffViewer 17/4/8/4/8/3/3, GitCommitModal 25/4/12/8/12/6/6, violations 전 파일 0건.
+  6. **DOM 결속 및 Revert-Fail Probes**:
+     - Test 9ad DOM 결속 및 config 테이블/명도 대비/프로토타입 단언, Probes 156~160 베이스 결함 조합 실패 단언.
+  7. **40종 변이 M1~M40 100% 사살 실측 (Receipt A/B)**:
+     - `tools/test_c280_mutations.py` 40종 변이 100% 사살 및 receipt A/B 프로토콜 완수 (Commit A `f1c898ce` 위 Commit B `b6ba31fb` 봉인).
 
 ## 2026-10-06 터미널 세션 화면 (TerminalSessionView) 색상 리터럴 전수 토큰화(37 occurrences / 18 distinct → 0건), 셸 및 PTY 상태 스타일 계약 결속 및 접근성 승격 [r2] (Card 279, `agent/gemini/c279-terminal-session-contrast`, PR #376, PR 대상 `agent/gemini/c278-desktop-window-contrast`)
 - **개요**: ACC-09 터미널 세션 화면 (`TerminalSessionView.tsx`)의 색상 리터럴 inventory 전수(37 occurrences / 18 distinct → 0건), 대비 표본/DOM 결속 감사 및 셸/PTY 상태 계약 승격:

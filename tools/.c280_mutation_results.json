@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-10-05T21:39:19.285974+00:00",
+  "sourceHeadSha": "f1c898ce99580eeee091904899f39bb996b35018",
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "durationSeconds": 823.56,
+  "killRate": "100.0%",
+  "mutants": [
+    {
+      "id": "M1",
+      "desc": "etag_mismatch color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M2",
+      "desc": "etag_mismatch color literal regression: colorVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M3",
+      "desc": "etag_mismatch bg literal regression: bgVar: 'rgba(248, 81, 73, 0.1)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M4",
+      "desc": "etag_mismatch badgeBgVar subtle collision: badgeBgVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M5",
+      "desc": "concurrency_conflict color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M6",
+      "desc": "concurrency_conflict color literal regression: colorVar: '#d29922'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M7",
+      "desc": "getConflictStatusConfig prototype key vulnerability: in instead of Object.hasOwn",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M8",
+      "desc": "getConflictStatusConfig fallback color changed to normal text",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M9",
+      "desc": "keep_mine color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M10",
+      "desc": "keep_mine color literal regression: colorVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M11",
+      "desc": "keep_mine borderColor literal regression: borderColorVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M12",
+      "desc": "accept_remote color literal regression: colorVar: '#c9d1d9'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M13",
+      "desc": "warning banner background literal regression: backgroundColor: 'rgba(248, 81, 73, 0.1)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M14",
+      "desc": "modal backdrop literal regression: backgroundColor: 'rgba(0, 0, 0, 0.75)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M15",
+      "desc": "diff added color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M16",
+      "desc": "diff added color literal regression: colorVar: '#3fb950'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M17",
+      "desc": "diff added bg literal regression: bgVar: 'rgba(46, 160, 67, 0.15)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M18",
+      "desc": "diff added border literal regression: borderVar: '#3fb950'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M19",
+      "desc": "diff removed color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M20",
+      "desc": "diff removed color literal regression: colorVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M21",
+      "desc": "diff removed bg literal regression: bgVar: 'rgba(248, 81, 73, 0.15)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M22",
+      "desc": "diff removed border literal regression: borderVar: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M23",
+      "desc": "diff unchanged color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M24",
+      "desc": "diff unchanged color literal regression: colorVar: '#c9d1d9'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M25",
+      "desc": "getDiffLineTypeConfig prototype key vulnerability: in instead of Object.hasOwn",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M26",
+      "desc": "getDiffLineTypeConfig fallback color changed to normal text",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M27",
+      "desc": "diff header background literal regression: backgroundColor: '#161b22'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M28",
+      "desc": "modified color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M29",
+      "desc": "modified color literal regression: colorVar: '#e3b341'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M30",
+      "desc": "modified badgeColor literal regression: badgeColorVar: '#e3b341'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M31",
+      "desc": "clean color subtle collision: colorVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M32",
+      "desc": "clean color literal regression: colorVar: '#c9d1d9'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M33",
+      "desc": "getGitFileStatusConfig prototype key vulnerability: in instead of Object.hasOwn",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M34",
+      "desc": "getGitFileStatusConfig fallback color changed to normal text",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M35",
+      "desc": "staged row bg literal regression: bgVar: 'rgba(56, 139, 253, 0.1)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M36",
+      "desc": "getGitStageStateConfig prototype key vulnerability: in instead of Object.hasOwn",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M37",
+      "desc": "modal container background literal regression: backgroundColor: '#161b22'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M38",
+      "desc": "author input background literal regression: backgroundColor: '#0d1117'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M39",
+      "desc": "required asterisk literal regression: color: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M40",
+      "desc": "stage all button literal regression: color: '#58a6ff'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    }
+  ]
+}
