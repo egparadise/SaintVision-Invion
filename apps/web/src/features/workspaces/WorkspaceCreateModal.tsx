@@ -67,7 +67,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        backgroundColor: 'var(--color-bg-backdrop)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

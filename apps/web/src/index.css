@@ -21,6 +21,9 @@
     --color-brand-hover: #1d4ed8;
     --color-brand-primary-hover-bg: #1d4ed8;
     --color-brand-subtle: #dbeafe;
+    --color-brand-success: #15803d;
+    --color-brand-danger: #b91c1c;
+    --color-brand-warning: #92400e;
 
     /* Status Colors */
     --color-status-online: #15803d;
@@ -38,6 +41,9 @@
     --color-risk-l1: #1d4ed8; /* 격리 쓰기 */
     --color-risk-l2: #92400e; /* 외부 영향 가능 */
     --color-risk-l3: #b91c1c; /* 인프라·보안 경계 위험 */
+    --color-risk-l3-bg: #fee2e2;
+    --color-risk-l3-border: #b91c1c;
+    --color-risk-l3-text: #991b1b;
 
     /* Spacing & Radius */
     --space-1: 0.25rem;
@@ -73,6 +79,9 @@
     --color-brand-primary-fg: #ffffff;
     --color-brand-hover: #93c5fd;
     --color-brand-subtle: #1e293b;
+    --color-brand-success: #22c55e;
+    --color-brand-danger: #f87171;
+    --color-brand-warning: #f59e0b;
 
     --color-status-online: #22c55e;
     --color-status-degraded: #f59e0b;
@@ -87,6 +96,9 @@
     --color-risk-l1: #60a5fa;
     --color-risk-l2: #f59e0b;
     --color-risk-l3: #f87171;
+    --color-risk-l3-bg: #3b1219;
+    --color-risk-l3-border: #f87171;
+    --color-risk-l3-text: #fecaca;
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);

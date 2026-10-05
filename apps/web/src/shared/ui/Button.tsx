@@ -36,7 +36,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
       backgroundColor: 'var(--color-brand-primary-bg, var(--color-brand-primary))',
-      color: '#ffffff',
+      color: 'var(--color-brand-primary-fg)',
       border: '1px solid transparent',
     },
     secondary: {
@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     },
     danger: {
       backgroundColor: 'var(--color-status-offline-bg, var(--color-status-offline))',
-      color: '#ffffff',
+      color: 'var(--color-brand-primary-fg)',
       border: '1px solid transparent',
     },
     ghost: {

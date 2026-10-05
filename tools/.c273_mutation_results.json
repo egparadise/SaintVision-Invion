@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+  "observedAt": "2026-10-05T09:24:51.663063+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "RiskBadge: L0 colorVar==bgVar collision (colorVar: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:18:33.162670+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "RiskBadge: L0 bgVar==colorVar collision (bgVar: var(--color-risk-l0))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:18:42.423862+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "RiskBadge: L1 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:18:54.786187+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "RiskBadge: L2 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:04.275978+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "RiskBadge: L3 colorVar synchronized low-contrast mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:13.292023+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "RiskBadge: L3 bgVar==colorVar collision (bgVar: var(--color-risk-l3))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:24.581626+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "RiskBadge: fail-closed prototype check bypass (remove Object.hasOwn, use 'in' operator)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:35.333227+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "RiskBadge: UNKNOWN label mutation (change UNKNOWN to UNKNOWN_BAD)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:45.746416+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "RiskBadge: fallback colorVar==bgVar collision (colorVar: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:19:55.670019+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "RiskBadge: fallback bgVar==colorVar collision (bgVar: var(--color-status-unknown))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:05.169721+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "RiskBadge: fallback low-contrast text mutation (colorVar: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:14.540101+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "RiskBadge: container border==bgVar collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:24.464919+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "RiskBadge: rendered label mutated to static HARDCODED string",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:33.726612+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "RiskBadge: accessibility role='status' removed from container",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:42.640478+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "RiskBadge: accessibility aria-label suppressed to empty string",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:20:51.623222+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "RiskBadge: L0 bgVar mutated to var(--color-bg-canvas) breaking uniform subtle styling",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:00.275237+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "Button: primary color==bg collision (color: var(--color-brand-primary-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:09.545764+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "Button: primary low-contrast text mutation (color: var(--color-text-muted))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:18.695826+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "Button: baseStyle outline: 'none' suppressing focus ring (focus ring suppression violation)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:27.590843+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "Button: danger color==bg collision (color: var(--color-status-offline-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:36.217694+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "Button: danger low-contrast text mutation (color: var(--color-text-secondary))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:45.054903+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "Button: secondary color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:21:54.188059+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "Button: secondary bg==color collision (backgroundColor: var(--color-text-primary))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:03.108104+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "Button: secondary border==bg collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:11.997758+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "Button: primary color revert to raw literal #ffffff (multiset ratchet failure)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:20.689747+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "Button: danger color revert to raw literal #ffffff (multiset ratchet failure)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:29.604760+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "ExecutionResultView: success pill bg revert to raw literal rgba(16, 185, 129, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:38.624828+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "ExecutionResultView: success pill bg==color collision (backgroundColor: var(--color-brand-success))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:47.978036+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "ExecutionResultView: success pill color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:22:58.491516+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "ExecutionResultView: exit code card bg mutated to var(--color-bg-canvas)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:12.201335+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "ExecutionResultView: success status text changed from '정상 종료 (SUCCESS)' to 'SUCCESS'",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:21.135594+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "ExecutionResultView: allowed event row bg mutated to var(--color-bg-surface)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:29.990441+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "WorkspaceCreateModal: backdrop bg revert to raw literal rgba(0, 0, 0, 0.65)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:39.326595+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "WorkspaceCreateModal: backdrop bg mutated to var(--color-bg-surface)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:48.149423+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "WorkspaceCreateModal: dialog surface bg mutated to var(--color-bg-subtle)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:23:57.433699+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "WorkspaceCreateModal: dialog accessibility role='dialog' removed",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:24:06.721445+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "RiskBadge: L0 bgVar revert to raw literal rgba(16, 185, 129, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:24:15.554638+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "RiskBadge: L1 bgVar revert to raw literal rgba(59, 130, 246, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:24:24.723753+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "RiskBadge: L2 bgVar revert to raw literal rgba(245, 158, 11, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:24:33.765543+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "RiskBadge: L3 bgVar revert to raw literal rgba(239, 68, 68, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "8ba88a41bbb2313db922269107485901694d4867",
+      "observedAt": "2026-10-05T09:24:42.598068+00:00"
+    }
+  ]
+}
