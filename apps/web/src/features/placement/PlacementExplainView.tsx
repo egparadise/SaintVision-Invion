@@ -32,9 +32,9 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
                 borderRadius: '4px',
                 fontSize: '0.6875rem',
                 fontWeight: 600,
-                backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                color: '#d97706',
-                border: '1px solid rgba(234, 179, 8, 0.3)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: 'var(--color-status-unknown)',
+                border: '1px solid var(--color-status-unknown)',
               }}
             >
               [로컬 시뮬레이션 (UNVERIFIED · 모의)]
@@ -53,11 +53,12 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
 
       {/* Winner Summary Banner */}
       <div
+        data-testid="placement-explain-winner-banner"
         style={{
           padding: '16px 20px',
           borderRadius: 'var(--radius-md)',
-          backgroundColor: selectedNodeId ? 'rgba(16, 185, 129, 0.1)' : 'var(--color-risk-l3-bg)',
-          border: `1px solid ${selectedNodeId ? 'var(--color-brand-success)' : 'var(--color-risk-l3-border)'}`,
+          backgroundColor: 'var(--color-bg-subtle)',
+          border: `1px solid ${selectedNodeId ? 'var(--color-status-online)' : 'var(--color-status-lost)'}`,
           marginBottom: '24px',
           display: 'flex',
           alignItems: 'center',
@@ -92,7 +93,7 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
                 padding: '16px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--color-bg-subtle)',
-                border: `1px solid ${isWinner ? 'var(--color-brand-success)' : 'var(--color-border-subtle)'}`,
+                border: `1px solid ${isWinner ? 'var(--color-status-online)' : 'var(--color-border-subtle)'}`,
                 display: 'grid',
                 gridTemplateColumns: '220px 1fr auto',
                 gap: '16px',
@@ -104,13 +105,15 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{cand.hostname}</span>
                   <span
+                    data-testid="placement-explain-candidate-badge"
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontSize: '0.6875rem',
                       fontWeight: 600,
-                      backgroundColor: passed ? 'rgba(16, 185, 129, 0.15)' : 'var(--color-risk-l3-bg)',
-                      color: passed ? 'var(--color-brand-success)' : 'var(--color-brand-danger)',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: passed ? 'var(--color-status-online)' : 'var(--color-status-lost)',
+                      border: `1px solid ${passed ? 'var(--color-status-online)' : 'var(--color-status-lost)'}`,
                     }}
                   >
                     {passed ? '통과 (PASSED)' : '탈락 (REJECTED)'}
@@ -130,7 +133,7 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
                         key={idx}
                         style={{
                           fontSize: '0.75rem',
-                          color: 'var(--color-brand-danger)',
+                          color: 'var(--color-status-lost)',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
@@ -173,7 +176,7 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
                       style={{
                         fontSize: '1.25rem',
                         fontWeight: 700,
-                        color: isWinner ? 'var(--color-brand-success)' : 'var(--color-text-primary)',
+                        color: isWinner ? 'var(--color-status-online)' : 'var(--color-text-primary)',
                       }}
                     >
                       {cand.scores.totalScore}점
