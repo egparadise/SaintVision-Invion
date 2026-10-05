@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T17:30:00+09:00"
-updated: "2026-10-05T18:50:00+09:00"
+updated: "2026-10-05T19:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -33,27 +33,27 @@ source_of_truth: "Git"
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
 
-아래 Before 값은 베이스 `450e04b1`의 실제 코드 실측값(라이트 캔버스 `#f8fafc` 위 카드 서피스 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#111827`, `#1f2937`)을 기준으로 측정되었습니다. 알파 합성은 채널 반올림 표준 공식(`round(alpha * fg + (1 - alpha) * bg)`)을 적용하였습니다. 베이스 `450e04b1`에 존재하던 3개 파일의 색상 리터럴 11건이 전수 제거되어 0건으로 정착되었습니다. After 값은 `python tools/reproduce_c274_contrast.py` 실행 결과(27개 전 항목)와 100% 일치합니다.
+아래 Before 값은 베이스 `4a26c79a`의 실제 코드 실측값(라이트 캔버스 `#f8fafc` 위 카드 서피스 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#111827`, `#1f2937`)을 기준으로 측정되었습니다. 알파 합성은 저장소 정본 모델인 `blendRgba`(sRGB 채널 반올림 표준 공식 `round(alpha * fg + (1 - alpha) * bg)`) 및 실제 조상 underlay(조상 카드/컨테이너 `var(--color-bg-surface)` 라이트 `#ffffff` / 다크 `#111827`)를 적용하여 산출하였습니다. 베이스 `4a26c79a`에 존재하던 3개 파일의 색상 리터럴 11건이 전수 제거되어 0건으로 정착되었습니다. After 값은 `python tools/reproduce_c274_contrast.py` 실행 결과(27개 전 항목)와 100% 일치합니다.
 
-각 지표의 배경 산출 근거 줄 번호:
-- `NodeDetail.tsx`: 105행 관측 콜아웃(100행 `node-detail-observation-callout` `var(--color-bg-subtle)`), 188행 자원 에러(184행 `node-resource-usage-error` `var(--color-bg-subtle)`), 396행 스케줄 박스(394행 `node-detail-schedulable-box` `var(--color-bg-subtle)`), 200행 타임라인(180행 패널 `var(--color-bg-subtle)`).
-- `PlacementExplainView.tsx`: 35행 시뮬레이션 배지(30행 배지 자체 `var(--color-bg-subtle)`), 59행 위너 배너(53행 `placement-explain-winner-banner` `var(--color-bg-subtle)`), 112행 후보 배지(107행 배지 자체 `var(--color-bg-subtle)`), 136행 탈락 사유(90행 후보 카드 `var(--color-bg-subtle)`), 179행 위너 점수(90행 후보 카드 `var(--color-bg-subtle)`).
+각 지표의 배경 산출 근거 줄 번호 (underlay: 조상 카드/컨테이너 `var(--color-bg-surface)` 라이트 `#ffffff` / 다크 `#111827`):
+- `NodeDetail.tsx`: 103/105행 관측 콜아웃(51행 조상 카드 `var(--color-bg-surface)` 위 100행 `node-detail-observation-callout` `rgba(210,153,34,0.12)`), 188행 자원 에러(51행 조상 카드 `var(--color-bg-surface)` 위 184행 `node-resource-usage-error` `rgba(248,81,73,0.10)`), 396/397행 스케줄 박스(51행 조상 카드 `var(--color-bg-surface)` 위 394행 `node-detail-schedulable-box` `rgba(210,153,34,0.15)`), 200행 타임라인(180행 패널 `var(--color-bg-subtle)`).
+- `PlacementExplainView.tsx`: 35/37행 시뮬레이션 배지(21행 컨테이너 `var(--color-bg-surface)` 위 30행 배지 자체 `rgba(234,179,8,0.15)`), 59/61행 위너 배너(21행 컨테이너 `var(--color-bg-surface)` 위 53행 `placement-explain-winner-banner` `rgba(16,185,129,0.1)`), 112행 후보 배지(21행 컨테이너 `var(--color-bg-surface)` 위 107행 배지 자체 `rgba(16,185,129,0.15)`), 136행 탈락 사유(90행 후보 카드 `var(--color-bg-subtle)`), 179행 위너 점수(90행 후보 카드 `var(--color-bg-subtle)`).
 - `ResourceTopologyGraph.tsx`: 56행 노드 카드(52행 카드 자체 `var(--color-bg-subtle)` over 조상 서피스/캔버스), 75행 선택 배지(73행 배지 자체 `var(--color-bg-subtle)`), 89행 펜스 배지(87행 배지 자체 `var(--color-bg-subtle)`), 69행 호스트명 및 70행 노드 ID(52행 카드 `var(--color-bg-subtle)`).
 
 | ID | UI 요소 | 위치 (코드 줄) | Before 베이스 합성값 (Hex/RGBA on Underlay) | Before 명도비 (Light / Dark) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| IT01 | 관측 콜아웃 제목 | NodeDetail.tsx:103 | var(--color-status-unknown) on rgba(210,153,34,0.12) (#faf7e8 / #292723) | 6.01:1 (PASS) / 4.96:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
-| IT02 | 관측 콜아웃 본문 | NodeDetail.tsx:105 | var(--color-text-primary) on rgba(210,153,34,0.12) (#faf7e8 / #292723) | 15.15:1 (PASS) / 11.97:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
-| IT03 | 자원 에러 알림 | NodeDetail.tsx:188 | var(--color-status-lost) on rgba(248,81,73,0.10) (#feeeec / #271f25) | 5.37:1 (PASS) / 4.67:1 (PASS) | --color-status-lost on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| IT04 | 스케줄 박스 텍스트 | NodeDetail.tsx:396 | var(--color-status-unknown) on rgba(210,153,34,0.15) (#f9f5e4 / #2f2b26) | 5.86:1 (PASS) / 4.71:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
-| IT05 | 스케줄 박스 테두리 | NodeDetail.tsx:397 | var(--color-status-unknown) on rgba(210,153,34,0.15) | 5.86:1 (PASS) / 4.71:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
+| IT01 | 관측 콜아웃 제목 | NodeDetail.tsx:103 | var(--color-status-unknown) on rgba(210,153,34,0.12) (#faf3e4 / #282726 over surface L51) | 6.42:1 (PASS) / 5.91:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
+| IT02 | 관측 콜아웃 본문 | NodeDetail.tsx:105 | var(--color-text-primary) on rgba(210,153,34,0.12) (#faf3e4 / #282726 over surface L51) | 16.16:1 (PASS) / 14.27:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
+| IT03 | 자원 에러 알림 | NodeDetail.tsx:188 | var(--color-status-lost) on rgba(248,81,73,0.10) (#feeeed / #281e2a over surface L51) | 5.75:1 (PASS) / 5.80:1 (PASS) | --color-status-lost on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| IT04 | 스케줄 박스 텍스트 | NodeDetail.tsx:396 | var(--color-status-unknown) on rgba(210,153,34,0.15) (#f8f0de / #2e2b26 over surface L51) | 6.25:1 (PASS) / 5.58:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
+| IT05 | 스케줄 박스 테두리 | NodeDetail.tsx:397 | var(--color-status-unknown) on rgba(210,153,34,0.15) (#f8f0de / #2e2b26 over surface L51) | 6.25:1 (PASS) / 5.58:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
 | IT06 | 타임라인 offline 상태 | NodeDetail.tsx:200 | var(--color-status-offline) on var(--color-bg-subtle) | 6.47:1 (PASS) / 6.41:1 (PASS) | --color-status-offline on --color-bg-subtle | 6.47:1 | 6.41:1 | >= 4.5:1 | PASS |
 | IT07 | 타임라인 unknown 상태 | NodeDetail.tsx:200 | var(--color-status-unknown) on var(--color-bg-subtle) | 7.09:1 (PASS) / 7.03:1 (PASS) | --color-status-unknown on --color-bg-subtle | 7.09:1 | 7.03:1 | >= 4.5:1 | PASS |
-| IT08 | 시뮬레이션 배지 텍스트 | PlacementExplainView.tsx:35 | #d97706 on rgba(234,179,8,0.15) (#fbf4d8 / #312e1f) | 2.90:1 (FAIL) / 2.77:1 (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
-| IT09 | 시뮬레이션 배지 테두리 | PlacementExplainView.tsx:37 | rgba(234,179,8,0.3) on rgba(234,179,8,0.15) | 1.11:1 (FAIL) / 1.17:1 (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
-| IT10 | 위너 배너 테두리 | PlacementExplainView.tsx:61 | var(--color-brand-success) on rgba(16,185,129,0.1) (#e7f8f1 / #13282b) | 3.87:1 (PASS) / 5.21:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
-| IT11 | 위너 배너 본문 | PlacementExplainView.tsx:59 | var(--color-text-primary) on rgba(16,185,129,0.1) | 14.15:1 (PASS) / 11.51:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
-| IT12 | 통과 후보 배지 텍스트 | PlacementExplainView.tsx:112 | var(--color-brand-success) on rgba(16,185,129,0.15) (#dbf5ea / #143335) | 3.56:1 (FAIL) / 4.70:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
+| IT08 | 시뮬레이션 배지 텍스트 | PlacementExplainView.tsx:35 | #d97706 on rgba(234,179,8,0.15) (#fcf4da / #322f22 over surface L21) | 2.90:1 (FAIL) / 4.21:1 (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
+| IT09 | 시뮬레이션 배지 테두리 | PlacementExplainView.tsx:37 | rgba(234,179,8,0.3) on rgba(234,179,8,0.15) (배지배경위 1.11 / 1.44, 서피스위 1.22 / 1.90 L21) | 1.11:1 (FAIL) / 1.44:1 (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
+| IT10 | 위너 배너 테두리 | PlacementExplainView.tsx:61 | var(--color-brand-success) on rgba(16,185,129,0.1) (#e7f8f2 / #112830 over surface L21) | 4.56:1 (PASS) / 6.73:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
+| IT11 | 위너 배너 본문 | PlacementExplainView.tsx:59 | var(--color-text-primary) on rgba(16,185,129,0.1) (#e7f8f2 / #112830 over surface L21) | 16.24:1 (PASS) / 14.67:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
+| IT12 | 통과 후보 배지 텍스트 | PlacementExplainView.tsx:112 | var(--color-brand-success) on rgba(16,185,129,0.15) (#dbf4ec / #113034 over surface L21) | 4.34:1 (FAIL) / 6.16:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
 | IT13 | 통과 후보 배지 테두리 | PlacementExplainView.tsx:114 | (테두리 없음 → 1px 토큰 테두리 신설) | N/A | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
 | IT14 | 탈락 후보 배지 텍스트 | PlacementExplainView.tsx:112 | var(--color-brand-danger) on var(--color-risk-l3-bg) | 4.58:1 (PASS) / 4.58:1 (PASS) | --color-status-lost on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | IT15 | 탈락 후보 배지 테두리 | PlacementExplainView.tsx:114 | (테두리 없음 → 1px 토큰 테두리 신설) | N/A | --color-status-lost on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
@@ -87,6 +87,11 @@ source_of_truth: "Git"
 ### 3.3 PlacementExplainView 시뮬레이션 배지 및 위너 배너
 - 하드코딩 `#d97706` 및 반투명 노랑 틴트 `rgba(234, 179, 8, 0.15)`의 심각한 결손(2.90:1 FAIL)을 `var(--color-bg-subtle)` 및 `var(--color-status-unknown)`(6.47:1 / 5.82:1 PASS)으로 정식 승격.
 - 위너 배너 배경 `rgba(16, 185, 129, 0.1)`를 `var(--color-bg-subtle)`로 정규화하고 테두리에 `var(--color-status-online)`을 바인딩.
+
+### 3.4 F1 회귀 단언 좁힘 판정 (Option a 채택 근거)
+- `apps/web/tests/placement-simulator.test.tsx:258`의 후보 노드 상태 단언이 렌더된 raw HTML `markup`에 `'online'` 문자열이 없을 것을 요구하던 과대범위(over-broad) 검사로 인해, `ResourceTopologyGraph` 및 `PlacementExplainView`의 1순위 선택 노드 강조 스타일에 정식 상태 토큰 `var(--color-status-online)`이 주입되면서 style 속성 문자열 충돌로 실패(FAIL)하는 회귀가 발생함.
+- **판정**: Option (a) — 단언을 보이는 텍스트(`const visibleText = markup.replace(/<[^>]+>/g, ' '); expect(visibleText).not.toContain('online');`)로 좁히는 방식을 채택함.
+- **근거**: 시험의 원래 도메인 의도는 "미검증 후보 노드가 online 상태를 스스로 주장하거나 화면에 online으로 잘못 표시되지 않는다"는 무결성 가드임. 컴포넌트의 테두리 및 배지에 사용된 디자인 토큰 CSS 변수명(`var(--color-status-online)`)은 UI 스타일 구현 세부사항이며 사용자에게 표시되는 텍스트와 무관함. 따라서 태그 및 인라인 스타일을 제외한 실제 렌더 텍스트만 검사하도록 좁힘으로써 원래의 무결성 검증 의도를 온전히 보존하고 CSS 변수명 충돌을 정당하게 해소함.
 
 ---
 
