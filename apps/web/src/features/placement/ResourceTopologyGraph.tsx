@@ -49,25 +49,15 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
           const availableRamGb = ((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1);
           const totalRamGb = (node.memoryTotalBytes / 1024 ** 3).toFixed(0);
 
-          let borderColor = 'var(--color-border-subtle)';
-          let bgColor = 'var(--color-bg-subtle)';
-
-          if (isFenced) {
-            borderColor = 'var(--color-risk-l3-border)';
-            bgColor = 'var(--color-risk-l3-bg)';
-          } else if (isSelected) {
-            borderColor = 'var(--color-brand-success)';
-            bgColor = 'rgba(16, 185, 129, 0.08)';
-          }
-
           return (
             <div
               key={node.id}
+              data-testid={`resource-topology-node-${node.id}`}
               style={{
                 padding: '16px',
                 borderRadius: 'var(--radius-md)',
-                border: `2px solid ${borderColor}`,
-                backgroundColor: bgColor,
+                border: `2px solid ${isFenced ? 'var(--color-status-lost)' : isSelected ? 'var(--color-status-online)' : 'var(--color-border-subtle)'}`,
+                backgroundColor: 'var(--color-bg-subtle)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
@@ -81,13 +71,15 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
                 </div>
                 {isSelected && (
                   <span
+                    data-testid="resource-topology-selected-badge"
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontSize: '0.6875rem',
                       fontWeight: 700,
-                      backgroundColor: 'var(--color-brand-success)',
-                      color: '#ffffff',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-status-online)',
+                      border: '1px solid var(--color-status-online)',
                     }}
                   >
                     1순위 배치
@@ -95,13 +87,15 @@ export const ResourceTopologyGraph: React.FC<ResourceTopologyGraphProps> = ({
                 )}
                 {isFenced && (
                   <span
+                    data-testid="resource-topology-fenced-badge"
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontSize: '0.6875rem',
                       fontWeight: 700,
-                      backgroundColor: 'var(--color-brand-danger)',
-                      color: '#ffffff',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-status-lost)',
+                      border: '1px solid var(--color-status-lost)',
                     }}
                   >
                     FENCED

@@ -2,6 +2,7 @@ import React from 'react';
 import { NodeItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import type { ObservedNodeResourceUsage } from '@/contracts/kernel-observation';
+import { getClusterNodeStatusConfig } from '@/features/dashboard/ClusterOverview';
 
 export interface NodeDetailProps {
   node: NodeItem;
@@ -20,6 +21,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
   onBack,
   onOpenStudio,
 }) => {
+  const nodeStatusConfig = getClusterNodeStatusConfig(node.status);
   const hasTelemetry =
     !node.telemetryUnavailable &&
     typeof node.cpuUsagePercent === 'number' &&
@@ -100,7 +102,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
           style={{
             marginBottom: '20px',
             padding: '16px 20px',
-            backgroundColor: 'rgba(210, 153, 34, 0.12)',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--color-status-unknown)',
             color: 'var(--color-status-unknown)',
@@ -185,7 +187,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
           style={{
             marginBottom: '20px',
             padding: '16px 20px',
-            backgroundColor: 'rgba(248, 81, 73, 0.1)',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--color-status-lost)',
             color: 'var(--color-status-lost)',
@@ -393,7 +395,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
               data-testid="node-detail-schedulable-box"
               style={{
                 padding: '10px',
-                backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.15)' : 'var(--color-bg-subtle)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 border: `1px solid ${node.observationOnly ? 'var(--color-status-unknown)' : 'var(--color-status-online)'}`,
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.75rem',
@@ -444,9 +446,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
               <span
                 data-testid="node-detail-timeline-status"
                 style={{
-                color: node.status === 'online' ? 'var(--color-status-online)' : node.status === 'active' ? 'var(--color-status-active)' : node.status === 'degraded' ? 'var(--color-status-degraded)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-status-lost)',
-                fontWeight: 600
-              }}>
+                  color: nodeStatusConfig.color,
+                  fontWeight: 600,
+                }}
+              >
                 {node.status === 'online'
                   ? 'Heartbeat OK'
                   : node.status === 'active'
@@ -457,14 +460,14 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
                   ? 'Heartbeat LOST (노드 단절)'
                   : node.status === 'unknown'
                   ? 'Heartbeat UNKNOWN (미확인 상태)'
-                  : 'Heartbeat FAILED (Offline)'}
+                  : `Heartbeat FAILED (${nodeStatusConfig.label})`}
               </span>{' '}
               {hasTelemetry
                 ? `- CPU ${node.cpuUsagePercent}% | RAM ${((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%${node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} (${node.status === 'online' ? 'mTLS 텔레메트리 수신' : node.status === 'active' ? '계약 상태 active 수신' : '통신 상태 확인 필요'})`
                 : `- 동적 메트릭 미측정 (${node.status === 'active' ? '계약 상태 active 수신' : '정적 등록 상태'})`}
             </div>
             <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>
-              • 상태: <strong>{node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt || '미기록'} | 모의 지터: 없음
+              • 상태: <strong>{nodeStatusConfig.label}</strong> | 하트비트 원본 시각: {node.heartbeatAt || '미기록'} | 모의 지터: 없음
             </div>
           </div>
         </div>

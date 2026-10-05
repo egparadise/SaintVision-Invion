@@ -255,8 +255,10 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
     expect(markup).toContain('(linux)');
     expect(markup).toContain('신고 스펙 (Claimed · 실측 가용량 아님): 8C / 32 GB · 1 GPU (모델: 미제공)');
     expect(markup).toContain('CANDIDATE (미검증)');
-    expect(markup).not.toContain('online');
-    expect(markup).not.toContain('가용 코어');
+    // F1: Ensure unverified candidate does not synthesize 'online' status in visible text
+    const visibleText = markup.replace(/<[^>]+>/g, ' ');
+    expect(visibleText).not.toContain('online');
+    expect(visibleText).not.toContain('가용 코어');
   });
 });
 
