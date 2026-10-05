@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+  "observedAt": "2026-10-05T14:01:38.338336+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "M1",
+      "desc": "ApprovalDetail: Bound version badge color==bg 1:1 collision (color: var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:49:56.960850+00:00"
+    },
+    {
+      "id": "M2",
+      "desc": "ApprovalDetail: Bound version badge border collision (border: 1px solid var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:50:24.208669+00:00"
+    },
+    {
+      "id": "M3",
+      "desc": "ApprovalDetail: Bound version badge low contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:50:42.509446+00:00"
+    },
+    {
+      "id": "M4",
+      "desc": "ApprovalDetail: Bound version badge inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:50:59.727834+00:00"
+    },
+    {
+      "id": "M5",
+      "desc": "ApprovalDetail: Bound version badge color literal regression (#58a6ff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:51:17.603685+00:00"
+    },
+    {
+      "id": "M6",
+      "desc": "ApprovalDetail: Bound version badge bg literal regression (rgba(56, 139, 253, 0.15))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:51:34.132753+00:00"
+    },
+    {
+      "id": "M7",
+      "desc": "ApprovalDetail: Rollback warning banner color==bg 1:1 collision (color: var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:51:50.591601+00:00"
+    },
+    {
+      "id": "M8",
+      "desc": "ApprovalDetail: Rollback warning banner border collision (border: 1px solid var(--color-risk-l3-bg))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:52:08.814438+00:00"
+    },
+    {
+      "id": "M9",
+      "desc": "ApprovalDetail: Rollback warning banner low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:52:27.144809+00:00"
+    },
+    {
+      "id": "M10",
+      "desc": "ApprovalDetail: Rollback warning banner bg literal regression (rgba(220, 38, 38, 0.1))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:52:46.215221+00:00"
+    },
+    {
+      "id": "M11",
+      "desc": "ApprovalDetail: Rollback warning banner border literal regression (#dc2626)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:53:03.252252+00:00"
+    },
+    {
+      "id": "M12",
+      "desc": "ApprovalDetail: Rollback warning banner inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:53:19.737897+00:00"
+    },
+    {
+      "id": "M13",
+      "desc": "ApprovalDetail: Unified Diff <pre> color==bg 1:1 collision (color: var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:53:37.616042+00:00"
+    },
+    {
+      "id": "M14",
+      "desc": "ApprovalDetail: Unified Diff <pre> border collision (border: 1px solid var(--color-bg-canvas))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:53:54.826599+00:00"
+    },
+    {
+      "id": "M15",
+      "desc": "ApprovalDetail: Unified Diff <pre> low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:54:12.339373+00:00"
+    },
+    {
+      "id": "M16",
+      "desc": "ApprovalDetail: Unified Diff <pre> bg literal regression (#0d1117)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:54:29.921057+00:00"
+    },
+    {
+      "id": "M17",
+      "desc": "ApprovalDetail: Unified Diff <pre> border literal regression (#30363d)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:54:46.409916+00:00"
+    },
+    {
+      "id": "M18",
+      "desc": "ApprovalDetail: Unified Diff <pre> text literal regression (#c9d1d9)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:55:02.139247+00:00"
+    },
+    {
+      "id": "M19",
+      "desc": "ApprovalDetail: Unified Diff <pre> inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:55:18.550299+00:00"
+    },
+    {
+      "id": "M20",
+      "desc": "ApprovalDetail: Reject modal backdrop literal regression (rgba(0, 0, 0, 0.5))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:55:36.680102+00:00"
+    },
+    {
+      "id": "M21",
+      "desc": "Header: Gateway offline indicator dot literal regression (#f85149)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:55:53.860619+00:00"
+    },
+    {
+      "id": "M22",
+      "desc": "Header: Gateway offline text literal regression (#f85149)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:56:11.085102+00:00"
+    },
+    {
+      "id": "M23",
+      "desc": "Header: Gateway offline text low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:56:29.078530+00:00"
+    },
+    {
+      "id": "M24",
+      "desc": "Header: Gateway offline text color==bg collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:56:46.961400+00:00"
+    },
+    {
+      "id": "M25",
+      "desc": "Header: User pill container bg literal regression (rgba(56, 139, 253, 0.12))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:57:04.925171+00:00"
+    },
+    {
+      "id": "M26",
+      "desc": "Header: User pill container border literal regression (rgba(56, 139, 253, 0.3))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:57:22.146690+00:00"
+    },
+    {
+      "id": "M27",
+      "desc": "Header: User pill container border collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:57:39.638590+00:00"
+    },
+    {
+      "id": "M28",
+      "desc": "Header: User pill container inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:57:56.948051+00:00"
+    },
+    {
+      "id": "M29",
+      "desc": "Header: User name text literal regression (#58a6ff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:58:14.829895+00:00"
+    },
+    {
+      "id": "M30",
+      "desc": "Header: User name color==bg 1:1 collision (color: var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:58:32.538811+00:00"
+    },
+    {
+      "id": "M31",
+      "desc": "Header: User name low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:58:50.081522+00:00"
+    },
+    {
+      "id": "M32",
+      "desc": "Header: User role badge bg literal regression (rgba(56, 139, 253, 0.25))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:59:07.441544+00:00"
+    },
+    {
+      "id": "M33",
+      "desc": "Header: User role badge text literal regression (#79c0ff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:59:25.665018+00:00"
+    },
+    {
+      "id": "M34",
+      "desc": "Header: User role badge color==bg 1:1 collision (color: var(--color-bg-surface))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T13:59:44.041245+00:00"
+    },
+    {
+      "id": "M35",
+      "desc": "Header: User role badge low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:00:02.727885+00:00"
+    },
+    {
+      "id": "M36",
+      "desc": "Header: Logout button text literal regression (#f85149)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:00:20.391821+00:00"
+    },
+    {
+      "id": "M37",
+      "desc": "Header: Logout button inline outline:none focus suppression",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:00:37.301605+00:00"
+    },
+    {
+      "id": "M38",
+      "desc": "Header: Web Desktop button bg literal regression (rgba(59, 130, 246, 0.2))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:00:54.928007+00:00"
+    },
+    {
+      "id": "M39",
+      "desc": "Header: Web Desktop button border literal regression (rgba(59, 130, 246, 0.4))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:01:13.058488+00:00"
+    },
+    {
+      "id": "M40",
+      "desc": "Header: Web Desktop button text literal regression (#60a5fa)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "acc09-contrast-tokens.test.tsx",
+      "sourceHeadSha": "16896341a65f50169b6287653cea19afd4c17c61",
+      "observedAt": "2026-10-05T14:01:29.877793+00:00"
+    }
+  ]
+}
