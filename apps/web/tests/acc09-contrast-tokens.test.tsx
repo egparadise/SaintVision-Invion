@@ -344,7 +344,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
   "features/mlops/ModelLineageView.tsx": {},
   "features/nodes/NodeDetail.tsx": {"rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1},
-  "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#4ade80": 2, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
+  "features/nodes/NodeList.tsx": {},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
   "features/placement/PlacementSimulator.tsx": {},
   "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
@@ -7307,8 +7307,223 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview & WorkspaceList
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, and WorkspaceList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+// 9v. [Card 271 / ACC-09] Component DOM Rendering & Binding Verification: NodeList Status Badges, Notices, Code Bootstrap, and Interactive Buttons
+  it('ACC-09 / Card 271: NodeList status badges, notices, code bootstrap, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts', async () => {
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'light');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      // 1. Config contract parity & helper fail-closed guard
+      const sampleStatuses: NodeStatus[] = ['active', 'degraded', 'draining', 'enrolling', 'lost', 'offline', 'online', 'retired', 'unknown'];
+      for (const st of sampleStatuses) {
+        const cfg = getClusterNodeStatusConfig(st);
+        expect(cfg.color, `Status ${st} must resolve to a valid CSS variable`).toMatch(/^var\(--color-status-[a-z]+\)$/);
+        expect(cfg.label, `Status ${st} must have non-empty label`).toBeTruthy();
+      }
+
+      // Fail-closed UNKNOWN fallback handling
+      const unkCustom = getClusterNodeStatusConfig('custom_future_state');
+      expect(unkCustom.color).toBe('var(--color-status-unknown)');
+      expect(unkCustom.label).toBe('UNKNOWN (custom_future_state)');
+
+      const nullCfg = getClusterNodeStatusConfig(null);
+      expect(nullCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCfg.label).toBe('UNKNOWN');
+
+      const undefCfg = getClusterNodeStatusConfig(undefined);
+      expect(undefCfg.color).toBe('var(--color-status-unknown)');
+      expect(undefCfg.label).toBe('UNKNOWN');
+
+      const emptyCfg = getClusterNodeStatusConfig('');
+      expect(emptyCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCfg.label).toBe('UNKNOWN');
+
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getClusterNodeStatusConfig(pk as any);
+        expect(protoCfg.color).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
+      }
+
+      // 2. Render NodeList with nodes spanning canonical statuses & special states
+      const testNodes: NodeItem[] = [
+        {
+          id: 'nod-online',
+          hostname: 'node-online-worker',
+          status: 'online',
+          os: 'linux',
+          cpuCores: 16,
+          cpuUsagePercent: 20,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsedBytes: 16 * 1024 ** 3,
+          storageTotalBytes: 1000 * 1024 ** 3,
+          storageUsedBytes: 200 * 1024 ** 3,
+          allocatableCores: 12,
+          gpuCount: 1,
+          gpuName: 'NVIDIA RTX 4090',
+          gpuVramTotalBytes: 24 * 1024 ** 3,
+          gpuVramUsedBytes: 8 * 1024 ** 3,
+          heartbeatAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'nod-active',
+          hostname: 'node-active-worker',
+          status: 'active',
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 40,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsedBytes: 12 * 1024 ** 3,
+          storageTotalBytes: 500 * 1024 ** 3,
+          storageUsedBytes: 100 * 1024 ** 3,
+          allocatableCores: 4,
+          gpuCount: 0,
+          heartbeatAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'nod-obs',
+          hostname: 'node-obs-worker',
+          status: 'unknown',
+          observationOnly: true,
+          os: 'linux',
+          cpuCores: 4,
+          cpuUsagePercent: 10,
+          memoryTotalBytes: 16 * 1024 ** 3,
+          memoryUsedBytes: 2 * 1024 ** 3,
+          storageTotalBytes: 250 * 1024 ** 3,
+          storageUsedBytes: 20 * 1024 ** 3,
+          gpuCount: 0,
+          heartbeatAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'nod-telem-lost',
+          hostname: 'node-telem-lost-worker',
+          status: 'lost',
+          telemetryUnavailable: true,
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 0,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsedBytes: 0,
+          storageTotalBytes: 500 * 1024 ** 3,
+          storageUsedBytes: 0,
+          gpuCount: 0,
+          heartbeatAt: '2026-10-05T00:00:00Z',
+        },
+      ];
+
+      const onSelect = vi.fn();
+      const onStudio = vi.fn();
+
+      act(() => {
+        root.render(<NodeList nodes={testNodes} isLoading={false} error={null} onSelectNode={onSelect} onOpenStudio={onStudio} />);
+      });
+
+      // 3. Status badges verification
+      for (const node of testNodes) {
+        const badge = container.querySelector(`[data-testid="node-status-badge-${node.id}"]`) as HTMLElement;
+        expect(badge, `Status badge for ${node.id} must render`).not.toBeNull();
+        const cfg = getClusterNodeStatusConfig(node.status);
+        expect(badge.textContent).toContain(cfg.label);
+        expect(badge.style.color).toBe(cfg.color);
+        expect(badge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+        expect(badge.style.borderColor || badge.style.border).toContain(cfg.color.replace(/var\(|\)/g, ''));
+      }
+
+      // 4. Observation banner
+      const obsBanner = container.querySelector('[data-testid="node-observation-banner-nod-obs"]') as HTMLElement;
+      expect(obsBanner, 'Observation banner must render').not.toBeNull();
+      expect(obsBanner.textContent).toContain('⚠️');
+      expect(obsBanner.textContent).toContain('관측 전용');
+      expect(obsBanner.style.color).toBe('var(--color-status-unknown)');
+      expect(obsBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(obsBanner.style.borderColor || obsBanner.style.border).toContain('var(--color-status-unknown)');
+
+      // 5. Active notice
+      const activeNotice = container.querySelector('[data-testid="node-active-status-notice-nod-active"]') as HTMLElement;
+      expect(activeNotice, 'Active notice must render').not.toBeNull();
+      expect(activeNotice.getAttribute('role')).toBe('status');
+      expect(activeNotice.textContent).toContain('ℹ️');
+      expect(activeNotice.textContent).toContain('계약 상태: active');
+      expect(activeNotice.style.color).toBe('var(--color-status-active)');
+      expect(activeNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(activeNotice.style.borderColor || activeNotice.style.border).toContain('var(--color-status-active)');
+
+      // 6. Interactive buttons & focus ring preservation
+      const selectBtns = container.querySelectorAll('button[data-testid^="node-select-btn-"]');
+      expect(selectBtns.length).toBeGreaterThan(0);
+      for (const btn of Array.from(selectBtns)) {
+        const b = btn as HTMLElement;
+        expect(b.style.outline).not.toBe('none');
+        expect(b.style.outline).not.toBe('0');
+      }
+
+      const studioBtns = container.querySelectorAll('button[data-testid^="node-studio-btn-"]');
+      expect(studioBtns.length).toBeGreaterThan(0);
+      for (const btn of Array.from(studioBtns)) {
+        const b = btn as HTMLElement;
+        expect(b.style.outline).not.toBe('none');
+        expect(b.style.outline).not.toBe('0');
+      }
+
+      const obsStudioBtn = container.querySelector('[data-testid="node-studio-btn-nod-obs"]') as HTMLElement;
+      expect(obsStudioBtn.style.backgroundColor).toBe('var(--color-border-strong)');
+      expect(obsStudioBtn.style.color).toBe('var(--color-text-inverse)');
+
+      const regularStudioBtn = container.querySelector('[data-testid="node-studio-btn-nod-online"]') as HTMLElement;
+      expect(regularStudioBtn.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
+      expect(regularStudioBtn.style.color).toBe('var(--color-brand-primary-fg)');
+
+      // 7. Empty state install guide & copy button
+      act(() => {
+        root.render(<NodeList nodes={[]} isLoading={false} error={null} />);
+      });
+
+      const guideToggleBtn = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('Node Agent 설치 안내'));
+      expect(guideToggleBtn).toBeDefined();
+
+      act(() => {
+        guideToggleBtn?.click();
+      });
+
+      const copyBtn = container.querySelector('[data-testid="copy-agent-bootstrap-btn"]') as HTMLElement;
+      expect(copyBtn, 'Copy bootstrap button must render').not.toBeNull();
+      expect(copyBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(copyBtn.style.color).toBe('var(--color-text-primary)');
+      expect(copyBtn.style.borderColor || copyBtn.style.border).toContain('var(--color-border-subtle)');
+      expect(copyBtn.style.outline).not.toBe('none');
+      expect(copyBtn.style.outline).not.toBe('0');
+
+      // 8. Numerical contrast calculations on subtle
+      const unkLightCr = getContrast(resolveTokenHex('--color-status-unknown', lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+      expect(unkLightCr, 'NodeList UNKNOWN fallback on light subtle must pass 4.5:1').toBeCloseTo(6.47, 2);
+      expect(unkLightCr).toBeGreaterThanOrEqual(4.5);
+      const unkDarkCr = getContrast(resolveTokenHex('--color-status-unknown', darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+      expect(unkDarkCr, 'NodeList UNKNOWN fallback on dark subtle must pass 4.5:1').toBeCloseTo(5.82, 2);
+      expect(unkDarkCr).toBeGreaterThanOrEqual(4.5);
+
+      for (const st of sampleStatuses) {
+        const cfg = getClusterNodeStatusConfig(st);
+        const tokenMatch = cfg.color.match(/var\((--color-[a-z0-9-]+)\)/);
+        expect(tokenMatch).not.toBeNull();
+        const tok = tokenMatch![1];
+        const lCr = getContrast(resolveTokenHex(tok, lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+        expect(lCr, `Status ${st} on light subtle must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        const dCr = getContrast(resolveTokenHex(tok, darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+        expect(dCr, `Status ${st} on dark subtle must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList & NodeList
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, WorkspaceList, and NodeList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -7754,6 +7969,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(workspaceListStats.coveredColorObjects, 'Total covered color objects in WorkspaceList must be exactly 20').toBe(20);
     expect(workspaceListStats.checkedBorderObjects, 'Border objects in WorkspaceList must be exactly 11').toBe(11);
     expect(workspaceListStats.checkedBorderPairs, 'Border pairs in WorkspaceList must be exactly 11').toBe(11);
+
+    const nodeListStats = analyzeFile('features/nodes/NodeList.tsx');
+    expect(nodeListStats.violations, `NodeList violations:\n${nodeListStats.violations.join('\n')}`).toEqual([]);
+    expect(nodeListStats.totalStyleAttrs, 'Total style attributes in NodeList must be exactly 53').toBe(53);
+    expect(nodeListStats.checkedObjects, 'Explicit style objects in NodeList must be exactly 7').toBe(7);
+    expect(nodeListStats.checkedPairs, 'Evaluated pairs in NodeList must be exactly 26').toBe(26);
+    expect(nodeListStats.unboundColorObjects, 'Unbound color objects in NodeList must be exactly 14').toBe(14);
+    expect(nodeListStats.coveredColorObjects, 'Total covered color objects in NodeList must be exactly 21').toBe(21);
+    expect(nodeListStats.checkedBorderObjects, 'Border objects in NodeList must be exactly 11').toBe(11);
+    expect(nodeListStats.checkedBorderPairs, 'Border pairs in NodeList must be exactly 13').toBe(13);
   });
 
 
@@ -8339,6 +8564,33 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe115Cr, 'WorkspaceList former deleting border on dark surface fails 3.0:1').toBeLessThan(3.0);
     expect(probe115Cr).toBeCloseTo(1.42, 1);
 
+    // Probe 116 [Card 271]: NodeList former copy feedback text #4ade80 on light surface strictly fails 4.5:1
+    const probe116Cr = getContrast('#4ade80', lightTokens['--color-bg-surface']);
+    expect(probe116Cr, 'NodeList former copy feedback #4ade80 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe116Cr).toBeCloseTo(1.74, 1);
+
+    // Probe 117 [Card 271]: NodeList former active notice border rgba(56,189,248,0.3) on light surface strictly fails 3.0:1
+    const lightActiveBorder = blendRgba([56, 189, 248], 0.3, lightTokens['--color-bg-surface']);
+    const probe117Cr = getContrast(lightActiveBorder, lightTokens['--color-bg-surface']);
+    expect(probe117Cr, 'NodeList former active notice border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe117Cr).toBeCloseTo(1.26, 1);
+
+    // Probe 118 [Card 271]: NodeList former active notice border rgba(56,189,248,0.3) on dark surface strictly fails 3.0:1
+    const darkActiveBorder = blendRgba([56, 189, 248], 0.3, darkTokens['--color-bg-surface']);
+    const probe118Cr = getContrast(darkActiveBorder, darkTokens['--color-bg-surface']);
+    expect(probe118Cr, 'NodeList former active notice border on dark surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe118Cr).toBeCloseTo(1.88, 1);
+
+    // Probe 119 [Card 271]: NodeList online status badge synchronized mutation to var(--color-text-inverse) on light subtle strictly fails 4.5:1
+    const probe119Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
+    expect(probe119Cr, 'Synchronized text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe119Cr).toBeCloseTo(1.10, 1);
+
+    // Probe 120 [Card 271]: NodeList active status badge synchronized mutation to var(--color-text-inverse) on light subtle strictly fails 4.5:1
+    const probe120Cr = getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-bg-subtle']);
+    expect(probe120Cr, 'Synchronized text-inverse mutation on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe120Cr).toBeCloseTo(1.10, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -8351,8 +8603,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 457/31 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 457/31 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -8434,7 +8686,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 457').toBe(457);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
