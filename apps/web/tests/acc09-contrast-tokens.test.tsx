@@ -107,6 +107,15 @@ import {
   WINDOW_CONTROL_CONFIG,
   getWindowControlConfig,
 } from '../src/features/desktop/DesktopWindow';
+import {
+  TerminalSessionView,
+  TERMINAL_SHELL_CONFIG,
+  getTerminalShellConfig,
+  PTY_AUTH_STATUS_CONFIG,
+  getPtyAuthStatusConfig,
+  derivePtyAuthStatus,
+  UI_PTY_AUTH_PROJECTION_STATUSES,
+} from '../src/features/desktop/TerminalSessionView';
 import { APPROVAL_STATUSES, type ApprovalStatus } from '../src/features/approvals/ApprovalCenter';
 import type { RiskLevel, PlacementExplainResult, RunResultView, ApprovalItem } from '../src/contracts/types';
 
@@ -364,7 +373,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/desktop/InvFileExplorer.tsx": {},
   "features/desktop/ModelStudioView.tsx": {},
   "features/desktop/ResourceExplorer.tsx": {},
-  "features/desktop/TerminalSessionView.tsx": {"#0f172a": 6, "#1e293b": 2, "#334155": 6, "#38bdf8": 1, "#3b82f6": 1, "#475569": 1, "#4ade80": 1, "#60a5fa": 1, "#7f1d1d": 1, "#94a3b8": 4, "#ef4444": 1, "#f8fafc": 5, "#fbbf24": 1, "#fecaca": 2, "#fed7aa": 1, "rgba(0,0,0,0.2)": 1, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.3)": 1},
+  "features/desktop/TerminalSessionView.tsx": {},
   "features/editor/ConflictResolutionModal.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#58a6ff": 1, "#8b949e": 2, "#f85149": 5, "#fff": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(248,81,73,0.1)": 1},
   "features/editor/DiffViewer.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#3fb950": 3, "#484f58": 2, "#8b949e": 1, "#c9d1d9": 2, "#f0f6fc": 1, "#f85149": 3, "rgba(248,81,73,0.15)": 1, "rgba(46,160,67,0.15)": 1},
   "features/editor/GitCommitModal.tsx": {"#0d1117": 3, "#161b22": 1, "#30363d": 6, "#58a6ff": 1, "#8b949e": 5, "#c9d1d9": 3, "#e3b341": 2, "#f0f6fc": 1, "#f85149": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(56,139,253,0.1)": 1},
@@ -8888,9 +8897,341 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9ac. [Card 279 / ACC-09] TerminalSessionView Contrast, Shell/PTY Configs, Fail-Closed Contracts, & DOM Token Binding
+  it('ACC-09 / Card 279: TerminalSessionView complies with WCAG 2.2 AA contrast, fail-closed contracts, and DOM token bindings', async () => {
+    // 1. Fail-closed TERMINAL_SHELL_CONFIG verification (powershell, bash, zsh, cmd)
+    expect(Object.keys(TERMINAL_SHELL_CONFIG).sort()).toEqual(['bash', 'cmd', 'powershell', 'zsh']);
+    for (const shell of ['powershell', 'bash', 'zsh', 'cmd'] as const) {
+      expect(Object.hasOwn(TERMINAL_SHELL_CONFIG, shell)).toBe(true);
+      const cfg = getTerminalShellConfig(shell);
+      expect(cfg.label).toBeDefined();
+      expect(cfg.color).toMatch(/^var\(--color-(brand-hover|status-online|text-primary)\)$/);
+    }
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    expect(TERMINAL_SHELL_CONFIG.powershell.color).toBe('var(--color-brand-hover)');
+    expect(TERMINAL_SHELL_CONFIG.bash.color).toBe('var(--color-status-online)');
+    expect(TERMINAL_SHELL_CONFIG.zsh.color).toBe('var(--color-brand-hover)');
+    expect(TERMINAL_SHELL_CONFIG.cmd.color).toBe('var(--color-text-primary)');
+
+    expect(getTerminalShellConfig('powershell').color).toBe('var(--color-brand-hover)');
+    expect(getTerminalShellConfig('bash').color).toBe('var(--color-status-online)');
+    expect(getTerminalShellConfig('zsh').color).toBe('var(--color-brand-hover)');
+    expect(getTerminalShellConfig('cmd').color).toBe('var(--color-text-primary)');
+
+    // Strict case-sensitive and fallback label tests (kills mutation variations)
+    expect(getTerminalShellConfig('POWERSHELL').label).toBe('UNKNOWN (POWERSHELL)');
+    expect(getTerminalShellConfig('Bash').label).toBe('UNKNOWN (Bash)');
+    expect(getTerminalShellConfig('ZSH').label).toBe('UNKNOWN (ZSH)');
+    expect(getTerminalShellConfig('CMD').label).toBe('UNKNOWN (CMD)');
+
+    // Fail-closed fallback verification for shell
+    const unknownShell = getTerminalShellConfig('unknown_shell');
+    expect(unknownShell.label).toBe('UNKNOWN (unknown_shell)');
+    expect(unknownShell.color).toBe('var(--color-status-unknown)');
+
+    // Prototype injection attacks fall back to UNKNOWN (<protoKey>)
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      const protoRes = getTerminalShellConfig(protoKey);
+      expect(protoRes.color).toBe('var(--color-status-unknown)');
+      expect(protoRes.label).toBe(`UNKNOWN (${protoKey})`);
+    }
+    expect(getTerminalShellConfig(null).label).toBe('UNKNOWN');
+    expect(getTerminalShellConfig(undefined).label).toBe('UNKNOWN');
+    expect(getTerminalShellConfig('').label).toBe('UNKNOWN');
+    expect(getTerminalShellConfig('   ').label).toBe('UNKNOWN');
+
+    // 2. Fail-closed PTY_AUTH_STATUS_CONFIG verification (ticket_bound, awaiting_command)
+    expect(UI_PTY_AUTH_PROJECTION_STATUSES).toEqual(['ticket_bound', 'awaiting_command']);
+    expect(Object.keys(PTY_AUTH_STATUS_CONFIG).sort()).toEqual(['awaiting_command', 'ticket_bound']);
+    for (const st of UI_PTY_AUTH_PROJECTION_STATUSES) {
+      expect(Object.hasOwn(PTY_AUTH_STATUS_CONFIG, st)).toBe(true);
+      const cfg = getPtyAuthStatusConfig(st);
+      expect(cfg.label).toBeDefined();
+      expect(cfg.color).toMatch(/^var\(--color-(status-degraded|text-muted)\)$/);
+    }
+
+    expect(derivePtyAuthStatus('cmd-123')).toBe('ticket_bound');
+    expect(derivePtyAuthStatus(undefined)).toBe('awaiting_command');
+    expect(derivePtyAuthStatus('')).toBe('awaiting_command');
+    expect(derivePtyAuthStatus('   ')).toBe('awaiting_command');
+
+    expect(getPtyAuthStatusConfig('ticket_bound').color).toBe('var(--color-status-degraded)');
+    expect(getPtyAuthStatusConfig('awaiting_command').color).toBe('var(--color-text-muted)');
+
+    // Strict case-sensitive and fallback label tests
+    expect(getPtyAuthStatusConfig('TICKET_BOUND').label).toBe('UNKNOWN (TICKET_BOUND)');
+    expect(getPtyAuthStatusConfig('Awaiting_Command').label).toBe('UNKNOWN (Awaiting_Command)');
+
+    // Fail-closed fallback verification for PTY auth
+    const unknownPty = getPtyAuthStatusConfig('unknown_status');
+    expect(unknownPty.label).toBe('UNKNOWN (unknown_status)');
+    expect(unknownPty.color).toBe('var(--color-status-unknown)');
+
+    for (const protoKey of ['toString', 'constructor', '__proto__', 'valueOf']) {
+      const protoRes = getPtyAuthStatusConfig(protoKey);
+      expect(protoRes.color).toBe('var(--color-status-unknown)');
+    }
+    expect(getPtyAuthStatusConfig(null).label).toBe('UNKNOWN');
+    expect(getPtyAuthStatusConfig(undefined).label).toBe('UNKNOWN');
+
+    // 3. Numerical contrast calculations for TerminalSessionView tokens (WCAG 2.2 AA criteria)
+    const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
+    const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
+    const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+    const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+    const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+    const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+    const lBorderStrong = resolveTokenHex('--color-border-strong', lightTokens);
+    const dBorderStrong = resolveTokenHex('--color-border-strong', darkTokens);
+    const lBorderSubtle = resolveTokenHex('--color-border-subtle', lightTokens);
+    const dBorderSubtle = resolveTokenHex('--color-border-subtle', darkTokens);
+    const lTextPrimary = resolveTokenHex('--color-text-primary', lightTokens);
+    const dTextPrimary = resolveTokenHex('--color-text-primary', darkTokens);
+    const lTextMuted = resolveTokenHex('--color-text-muted', lightTokens);
+    const dTextMuted = resolveTokenHex('--color-text-muted', darkTokens);
+    const lBrandHover = resolveTokenHex('--color-brand-hover', lightTokens);
+    const dBrandHover = resolveTokenHex('--color-brand-hover', darkTokens);
+    const lStatusOnline = resolveTokenHex('--color-status-online', lightTokens);
+    const dStatusOnline = resolveTokenHex('--color-status-online', darkTokens);
+    const lStatusDegraded = resolveTokenHex('--color-status-degraded', lightTokens);
+    const dStatusDegraded = resolveTokenHex('--color-status-degraded', darkTokens);
+    const lStatusOffline = resolveTokenHex('--color-status-offline', lightTokens);
+    const dStatusOffline = resolveTokenHex('--color-status-offline', darkTokens);
+    const lStatusUnknown = resolveTokenHex('--color-status-unknown', lightTokens);
+    const dStatusUnknown = resolveTokenHex('--color-status-unknown', darkTokens);
+
+    // Shell badges on subtle header (>= 4.5:1 text)
+    expect(getContrast(lBrandHover, lSubtle), 'Powershell badge on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dBrandHover, dSubtle), 'Powershell badge on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lStatusOnline, lSubtle), 'Bash badge on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusOnline, dSubtle), 'Bash badge on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lTextPrimary, lSubtle), 'Cmd badge on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextPrimary, dSubtle), 'Cmd badge on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // PTY auth badges on subtle header (>= 4.5:1 text)
+    expect(getContrast(lStatusDegraded, lSubtle), 'Ticket bound badge on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusDegraded, dSubtle), 'Ticket bound badge on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(lTextMuted, lSubtle), 'Awaiting command badge on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextMuted, dSubtle), 'Awaiting command badge on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // Unknown fallback on subtle (>= 4.5:1 text)
+    expect(getContrast(lStatusUnknown, lSubtle), 'Unknown fallback on subtle light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusUnknown, dSubtle), 'Unknown fallback on subtle dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // Terminal log text on dark terminal canvas background (--color-bg-canvas in dark theme: #0f172a)
+    // Coordinator directive: "터미널 출력 영역은 실제 배경(어두운 터미널 배경 토큰)과 각 로그 레벨 색의 텍스트 4.5 대비"
+    const terminalDarkBg = dCanvas; // #0f172a
+    expect(getContrast(dTextPrimary, terminalDarkBg), 'Terminal stdout text on dark canvas contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusOffline, terminalDarkBg), 'Terminal stderr text on dark canvas contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusDegraded, terminalDarkBg), 'Terminal warning text on dark canvas contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dStatusOnline, terminalDarkBg), 'Terminal success text on dark canvas contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    expect(getContrast(dTextMuted, terminalDarkBg), 'Terminal timestamp/meta text on dark canvas contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+    // Interactive borders on surface / subtle (>= 3.0:1 non-text)
+    expect(getContrast(lBorderStrong, lSurface), 'Form control border on surface light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderStrong, dSurface), 'Form control border on surface dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lBorderStrong, lSubtle), 'Form control border on subtle light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderStrong, dSubtle), 'Form control border on subtle dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(lBorderSubtle, lSurface), 'Subtle border on surface light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    expect(getContrast(dBorderSubtle, dSurface), 'Subtle border on surface dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+    // 4. DOM Rendering Verification
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      const mockNodes: NodeItem[] = [
+        {
+          id: 'nod_01',
+          hostname: 'Node-01-WinMain',
+          ipAddress: '192.168.45.101',
+          os: 'windows',
+          role: 'worker',
+          status: 'online',
+          schedulable: true,
+          observationOnly: false,
+          cpuCoresTotal: 16,
+          memoryTotalBytes: 64 * 1024 * 1024 * 1024,
+        },
+        {
+          id: 'nod_02',
+          hostname: 'Node-02-LinuxSec',
+          ipAddress: '192.168.45.102',
+          os: 'linux',
+          role: 'worker',
+          status: 'online',
+          schedulable: true,
+          observationOnly: false,
+          cpuCoresTotal: 8,
+          memoryTotalBytes: 32 * 1024 * 1024 * 1024,
+        },
+        {
+          id: 'nod_obs',
+          hostname: 'Node-03-ObsOnly',
+          ipAddress: '192.168.45.103',
+          os: 'linux',
+          role: 'observer',
+          status: 'online',
+          schedulable: false,
+          observationOnly: true,
+          cpuCoresTotal: 4,
+          memoryTotalBytes: 16 * 1024 * 1024 * 1024,
+        },
+      ];
+
+      await act(async () => {
+        root.render(
+          <TerminalSessionView
+            nodes={mockNodes}
+            defaultNodeId="nod_01"
+            commandId=""
+          />
+        );
+      });
+
+      const sectionEl = container.querySelector('div[data-testid="terminal-session-view-container"]') as HTMLElement;
+      expect(sectionEl, 'Terminal section must render').not.toBeNull();
+      expect(sectionEl.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(sectionEl.style.color).toBe('var(--color-text-primary)');
+
+      const tablistEl = container.querySelector('div[role="tablist"]') as HTMLElement;
+      expect(tablistEl, 'Tablist must render').not.toBeNull();
+      expect(tablistEl.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(tablistEl.style.borderBottom || tablistEl.style.border).toContain('var(--color-border-subtle)');
+
+      const activeTab = container.querySelector('div[role="tab"][aria-selected="true"]') as HTMLElement;
+      expect(activeTab, 'Active tab must render').not.toBeNull();
+      expect(activeTab.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(activeTab.style.borderTop || activeTab.style.border).toContain('var(--color-brand-primary)');
+      expect(activeTab.style.color).toBe('var(--color-text-primary)');
+
+      const inactiveTab = container.querySelector('div[role="tab"][aria-selected="false"]') as HTMLElement;
+      expect(inactiveTab, 'Inactive tab must render').not.toBeNull();
+      expect(inactiveTab.style.backgroundColor).toBe('transparent');
+      expect(inactiveTab.style.color).toBe('var(--color-text-muted)');
+
+      const newSessionSelect = container.querySelector('select[data-testid="new-session-select"]') as HTMLSelectElement;
+      expect(newSessionSelect, 'New session select must render').not.toBeNull();
+      expect(newSessionSelect.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(newSessionSelect.style.borderColor || newSessionSelect.style.border).toContain('var(--color-border-strong)');
+      expect(newSessionSelect.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // Trigger observation node error alert
+      await act(async () => {
+        newSessionSelect.value = 'terminal:nod_obs';
+        newSessionSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      const errorAlert = container.querySelector('[data-testid="terminal-session-error-alert"]') as HTMLElement;
+      expect(errorAlert, 'Observation error alert must render').not.toBeNull();
+      expect(errorAlert.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+      expect(errorAlert.style.color).toBe('var(--color-risk-l3-text)');
+      expect(errorAlert.style.borderBottom || errorAlert.style.border).toContain('var(--color-risk-l3-border)');
+
+      const activeNodeEl = container.querySelector('[data-testid="active-node-hostname"]') as HTMLElement;
+      expect(activeNodeEl, 'Active node hostname must render').not.toBeNull();
+      expect(activeNodeEl.style.color).toBe('var(--color-text-primary)');
+
+      const shellBadge = container.querySelector('[data-testid="active-shell-type"]') as HTMLElement;
+      expect(shellBadge, 'Shell badge must render').not.toBeNull();
+      expect(shellBadge.style.color).toBe('var(--color-brand-hover)');
+      expect(shellBadge.textContent).toBe('POWERSHELL');
+
+      // Verify case variants, unknown values, and prototype keys render UNKNOWN (<raw>) with unknown color in DOM
+      for (const fallbackShell of ['POWERSHELL', 'Bash', 'ZSH', 'CMD', 'unknown_custom_shell', 'toString']) {
+        await act(async () => {
+          root.render(
+            <TerminalSessionView
+              key={`term_fb_${fallbackShell}`}
+              nodes={mockNodes}
+              defaultNodeId="nod_01"
+              commandId=""
+              initialSessions={[
+                {
+                  id: `sess_test_${fallbackShell}`,
+                  title: `Test ${fallbackShell}`,
+                  nodeId: 'nod_01',
+                  shellType: fallbackShell,
+                  mode: 'terminal',
+                  workspaceId: 'ws_test',
+                },
+              ]}
+            />
+          );
+        });
+        const fbShellBadge = container.querySelector('[data-testid="active-shell-type"]') as HTMLElement;
+        expect(fbShellBadge.textContent).toBe(`UNKNOWN (${fallbackShell})`);
+        expect(fbShellBadge.style.color).toBe('var(--color-status-unknown)');
+      }
+
+      const authBadge = container.querySelector('[data-testid="pty-ticket-badge"]') as HTMLElement;
+      expect(authBadge, 'PTY auth badge must render').not.toBeNull();
+      expect(authBadge.style.color).toBe('var(--color-text-muted)');
+
+      const cmdInput = container.querySelector('input[data-testid="terminal-command-id-input"]') as HTMLInputElement;
+      expect(cmdInput, 'Command ID input must render').not.toBeNull();
+      expect(cmdInput.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(cmdInput.style.borderColor || cmdInput.style.border).toContain('var(--color-border-strong)');
+      expect(cmdInput.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      const switchBtn = container.querySelector('button[data-testid="switch-mode-btn"]') as HTMLButtonElement;
+      expect(switchBtn, 'Switch mode button must render').not.toBeNull();
+      expect(switchBtn.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(switchBtn.style.borderColor || switchBtn.style.border).toContain('var(--color-brand-primary)');
+      expect(switchBtn.style.color).toBe('var(--color-brand-hover)');
+      expect(switchBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // Empty state test
+      await act(async () => {
+        root.render(
+          <TerminalSessionView
+            nodes={[]}
+          />
+        );
+      });
+
+      const emptyContainer = container.querySelector('[data-testid="terminal-session-view-container"]') as HTMLElement;
+      expect(emptyContainer, 'Empty container must render').not.toBeNull();
+      expect(emptyContainer.style.backgroundColor).toBe('var(--color-bg-surface)');
+
+      const emptyNotice = container.querySelector('[data-testid="terminal-empty-nodes-notice"]') as HTMLElement;
+      expect(emptyNotice, 'Empty status notice must render').not.toBeNull();
+      expect(emptyNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(emptyNotice.style.borderBottom || emptyNotice.style.border).toContain('var(--color-border-subtle)');
+      expect(emptyNotice.style.color).toBe('var(--color-text-muted)');
+
+      const warnSpan = container.querySelector('[data-testid="terminal-no-nodes-notice"] span') as HTMLElement;
+      expect(warnSpan, 'Operator warning span must render').not.toBeNull();
+      expect(warnSpan.style.color).toBe('var(--color-status-degraded)');
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+
+    // 5. Token Declaration Verification: all tokens used in TerminalSessionView.tsx exist in index.css
+    const cssPath = path.resolve(__dirname, '../src/index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf-8');
+    const declaredCssTokens = new Set<string>();
+    const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+    let declMatch;
+    while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+      declaredCssTokens.add(declMatch[1].trim());
+    }
+
+    const tsvPath = path.resolve(__dirname, '../src/features/desktop/TerminalSessionView.tsx');
+    const tsvContent = fs.readFileSync(tsvPath, 'utf-8');
+    const varMatches = tsvContent.match(/var\((--[a-z0-9-]+)/g) || [];
+    for (const v of varMatches) {
+      const tokenName = v.replace('var(', '');
+      expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in TerminalSessionView.tsx must be declared in index.css`).toBe(true);
+    }
+  });
+
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 & Card 271 & Card 273 & Card 274 & Card 275 & Card 276 & Card 277 & Card 278 & Card 279: Style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -9197,7 +9538,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           }
         }
 
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG' || node.name.getText(sf) === 'EVIDENCE_INTEGRITY_CONFIG' || node.name.getText(sf) === 'WINDOW_CONTROL_CONFIG' || node.name.getText(sf) === 'TERMINAL_SHELL_CONFIG' || node.name.getText(sf) === 'PTY_AUTH_STATUS_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -9224,6 +9565,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 }
                 if (varName === 'NODE_STATUS_CONFIG' && !bgToken) {
                   bgToken = '--color-bg-canvas';
+                }
+                if ((varName === 'TERMINAL_SHELL_CONFIG' || varName === 'PTY_AUTH_STATUS_CONFIG') && !bgToken) {
+                  bgToken = '--color-bg-subtle';
                 }
                 if (varName === 'RISK_CONFIG' && !borderToken && fgToken) {
                   borderToken = fgToken;
@@ -9491,6 +9835,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(desktopWindowStats.coveredColorObjects, 'Total covered color objects in DesktopWindow must be exactly 5').toBe(5);
     expect(desktopWindowStats.checkedBorderObjects, 'Border objects in DesktopWindow must be exactly 6').toBe(6);
     expect(desktopWindowStats.checkedBorderPairs, 'Border pairs in DesktopWindow must be exactly 7').toBe(7);
+
+    const terminalSessionStats = analyzeFile('features/desktop/TerminalSessionView.tsx');
+    expect(terminalSessionStats.violations, `TerminalSessionView violations:\n${terminalSessionStats.violations.join('\n')}`).toEqual([]);
+    expect(terminalSessionStats.totalStyleAttrs, 'Total style attributes in TerminalSessionView must be exactly 34').toBe(34);
+    expect(terminalSessionStats.checkedObjects, 'Explicit style objects in TerminalSessionView must be exactly 15').toBe(15);
+    expect(terminalSessionStats.checkedPairs, 'Evaluated pairs in TerminalSessionView must be exactly 19').toBe(19);
+    expect(terminalSessionStats.unboundColorObjects, 'Unbound color objects in TerminalSessionView must be exactly 4').toBe(4);
+    expect(terminalSessionStats.coveredColorObjects, 'Total covered color objects in TerminalSessionView must be exactly 19').toBe(19);
+    expect(terminalSessionStats.checkedBorderObjects, 'Border objects in TerminalSessionView must be exactly 9').toBe(9);
+    expect(terminalSessionStats.checkedBorderPairs, 'Border pairs in TerminalSessionView must be exactly 9').toBe(9);
   });
 
 
@@ -10269,6 +10623,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe150Cr, 'DesktopWindow former appId text #64748b on dark title bar #0f172a fails 4.5:1').toBeLessThan(4.5);
     expect(probe150Cr).toBeCloseTo(3.75, 1);
 
+    // Probe 151 [Card 279]: Former powershell text #38bdf8 on light subtle fails 4.5:1 (1.96:1)
+    const probe151Cr = getContrast('#38bdf8', lightTokens['--color-bg-subtle']);
+    expect(probe151Cr, 'TerminalSessionView former powershell text #38bdf8 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe151Cr).toBeCloseTo(1.96, 1);
+
+    // Probe 152 [Card 279]: Former bash text #4ade80 on light subtle fails 4.5:1 (1.59:1)
+    const probe152Cr = getContrast('#4ade80', lightTokens['--color-bg-subtle']);
+    expect(probe152Cr, 'TerminalSessionView former bash text #4ade80 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe152Cr).toBeCloseTo(1.59, 1);
+
+    // Probe 153 [Card 279]: Former zsh text #fbbf24 on light subtle fails 4.5:1 (1.52:1)
+    const probe153Cr = getContrast('#fbbf24', lightTokens['--color-bg-subtle']);
+    expect(probe153Cr, 'TerminalSessionView former zsh text #fbbf24 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe153Cr).toBeCloseTo(1.52, 1);
+
+    // Probe 154 [Card 279]: Former terminal operator notice text #fed7aa on light subtle fails 4.5:1 (1.24:1)
+    const probe154Cr = getContrast('#fed7aa', lightTokens['--color-bg-subtle']);
+    expect(probe154Cr, 'TerminalSessionView former operator notice #fed7aa on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe154Cr).toBeCloseTo(1.24, 1);
+
+    // Probe 155 [Card 279]: Former switch-mode button text #60a5fa on light subtle fails 4.5:1 (2.32:1)
+    const probe155Cr = getContrast('#60a5fa', lightTokens['--color-bg-subtle']);
+    expect(probe155Cr, 'TerminalSessionView former switch-mode text #60a5fa on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe155Cr).toBeCloseTo(2.32, 1);
+
 
 
     // Legacy Token Reverts:
@@ -10282,8 +10661,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 457/31 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 457/31 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -10365,7 +10744,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 457').toBe(457);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
