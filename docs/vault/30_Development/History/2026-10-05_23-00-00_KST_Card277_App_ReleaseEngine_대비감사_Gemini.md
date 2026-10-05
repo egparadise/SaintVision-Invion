@@ -13,13 +13,13 @@ source_of_truth: "Git"
 
 ## 1. 작업 개요
 - **목표**: ACC-09 앱 셸 (`App.tsx`) 및 릴리스 엔진 (`releaseEngine.ts`)에 잔존하던 13건(11종 고유 리터럴) 색상 리터럴 전수 토큰화(13건→0건) 및 디자인 토큰 체계 승격:
-  1. `apps/web/src/app/App.tsx`: 베이스(`08657e93`)에 잔존하던 11건의 색상 리터럴 (`#991b1b` 2건, `#dc2626`, `#ef4444`, `#f87171`, `#fca5a5`, `#fed7aa`, `#fee2e2`, `#ffffff` 2건, `rgba(239,68,68,0.1)`)을 전수 제거하고 디자인 토큰 체계로 100% 승격:
+  1. `apps/web/src/app/App.tsx`: 베이스(`89bc257f`)에 잔존하던 11건의 색상 리터럴 (`#991b1b` 2건, `#dc2626`, `#ef4444`, `#f87171`, `#fca5a5`, `#fed7aa`, `#fee2e2`, `#ffffff` 2건, `rgba(239,68,68,0.1)`)을 전수 제거하고 디자인 토큰 체계로 100% 승격:
      - Global action error banner: `var(--color-risk-l3-bg)`, `var(--color-risk-l3-text)`, `var(--color-risk-l3-border)`.
      - Global error dismiss button: `var(--color-risk-l3-border)`, `var(--color-bg-surface)`, `var(--color-risk-l3-text)`.
      - Node simulation active button: `border: nodeSimState === key ? '1px solid var(--color-brand-primary-fg)' : '1px solid var(--color-border-strong)'`, `color: nodeSimState === key ? 'var(--color-brand-primary-fg)' : 'var(--color-text-secondary)'`.
      - Workspace error banner: `var(--color-risk-l3-bg)`, `var(--color-risk-l3-border)`, `var(--color-risk-l3-text)`.
      - Terminal missing workspace notice guidance: `var(--color-status-degraded)`.
-  2. `apps/web/src/features/release/releaseEngine.ts`: 베이스(`08657e93`)에 잔존하던 2건의 문자열 리터럴 (`#0d1117`, `#6e7681`) 제거:
+  2. `apps/web/src/features/release/releaseEngine.ts`: 베이스(`89bc257f`)에 잔존하던 2건의 문자열 리터럴 (`#0d1117`, `#6e7681`) 제거:
      - WCAG 1.4.11 접근성 감사 설명 문자열 `(--color-border-subtle on --color-bg-canvas)` 반영 및 관련 trivia 주석 토큰화.
   3. **AST 정적 분석기 래칫 및 검증 테이블 바인딩**:
      - Test 9j-2 `analyzeFile` 스위트에 `App.tsx` 및 `releaseEngine.ts` 등록:
@@ -38,9 +38,9 @@ source_of_truth: "Git"
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
 
-아래 Before 값은 베이스 `08657e93`(Card 276 Commit B)의 실제 코드 실측값(라이트 캔버스 `#f8fafc` 위 카드 서피스 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#111827`, `#1f2937`)을 기준으로 측정되었습니다. 알파 합성은 저장소 정본 모델인 `blendRgba`(sRGB 채널 반올림 표준 공식 `round(alpha * fg + (1 - alpha) * bg)`) 및 실제 조상 underlay를 적용하여 산출하였습니다. 베이스 `08657e93`에 존재하던 13건의 색상 리터럴이 전수 제거되어 0건으로 정착되었습니다. After 값은 `python tools/reproduce_c277_contrast.py` 실행 결과(21개 전 항목)와 100% 일치합니다.
+아래 Before 값은 베이스 `89bc257f`(Card 276 Commit B')의 실제 코드 실측값(라이트 캔버스 `#f8fafc` 위 카드 서피스 `#ffffff`, 서브틀 배경 `#f1f5f9` 및 다크 캔버스 `#090d16` 위 `#111827`, `#1f2937`)을 기준으로 측정되었습니다. 알파 합성은 저장소 정본 모델인 `blendRgba`(sRGB 채널 반올림 표준 공식 `round(alpha * fg + (1 - alpha) * bg)`) 및 실제 조상 underlay를 적용하여 산출하였습니다. 베이스 `89bc257f`에 존재하던 13건의 색상 리터럴이 전수 제거되어 0건으로 정착되었습니다. After 값은 `python tools/reproduce_c277_contrast.py` 실행 결과(21개 전 항목)와 100% 일치합니다.
 
-각 지표의 배경 산출 근거 줄 번호 (베이스 `08657e93` 기준):
+각 지표의 배경 산출 근거 줄 번호 (베이스 `89bc257f` 기준):
 - `App.tsx:478`: 글로벌 액션 오류 배너 배경(베이스 `#fee2e2` → 개정 `var(--color-risk-l3-bg)`).
 - `App.tsx:500`: 글로벌 오류 닫기 버튼 배경(베이스 `#ffffff` → 개정 `var(--color-bg-surface)`).
 - `App.tsx:675`: 노드 시뮬레이션 버튼 배경(활성: `var(--color-brand-primary-bg)`, 비활성: `var(--color-bg-subtle)`).
