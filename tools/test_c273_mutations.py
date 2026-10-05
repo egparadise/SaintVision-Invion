@@ -77,9 +77,9 @@ MUTANTS = [
     {
         "id": "W6",
         "file": "RiskBadge",
-        "desc": "RiskBadge: RISK_CONFIG key mutation (rename L3 to L4, breaking contract key set)",
-        "target": "  L3: {\n    label: 'L3',",
-        "replacement": "  L4: {\n    label: 'L4',",
+        "desc": "RiskBadge: L3 bgVar==colorVar collision (bgVar: var(--color-risk-l3))",
+        "target": "  L3: {\n    label: 'L3',\n    description: '기본 차단 (위험)',\n    icon: '🛑',\n    colorVar: 'var(--color-risk-l3)',\n    bgVar: 'var(--color-bg-subtle)',",
+        "replacement": "  L3: {\n    label: 'L3',\n    description: '기본 차단 (위험)',\n    icon: '🛑',\n    colorVar: 'var(--color-risk-l3)',\n    bgVar: 'var(--color-risk-l3)',",
     },
     {
         "id": "W7",
@@ -172,9 +172,9 @@ MUTANTS = [
     {
         "id": "W19",
         "file": "Button",
-        "desc": "Button: primary bg==color collision (backgroundColor: var(--color-brand-primary-fg))",
-        "target": "      backgroundColor: 'var(--color-brand-primary-bg, var(--color-brand-primary))',\n      color: 'var(--color-brand-primary-fg)',",
-        "replacement": "      backgroundColor: 'var(--color-brand-primary-fg)',\n      color: 'var(--color-brand-primary-fg)',",
+        "desc": "Button: baseStyle outline: 'none' suppressing focus ring (focus ring suppression violation)",
+        "target": "    opacity: disabled || isLoading ? 0.6 : 1,\n    userSelect: 'none',\n  };",
+        "replacement": "    opacity: disabled || isLoading ? 0.6 : 1,\n    userSelect: 'none',\n    outline: 'none',\n  };",
     },
     {
         "id": "W20",
@@ -353,11 +353,15 @@ def restore_file(file_key: str, original_bytes: bytes):
 
 def run_tsc_check():
     """Run npx tsc -b to ensure the mutant compiles."""
-    cmd = [
-        "npx.cmd" if os.name == "nt" else "npx",
-        "tsc",
-        "-b",
-    ]
+    local_tsc = APPS_WEB / "node_modules" / "typescript" / "bin" / "tsc"
+    if local_tsc.exists():
+        cmd = ["node", str(local_tsc), "-b"]
+    else:
+        cmd = [
+            "npx.cmd" if os.name == "nt" else "npx",
+            "tsc",
+            "-b",
+        ]
     try:
         proc = subprocess.run(
             cmd,

@@ -7551,9 +7551,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const root = createRoot(container);
 
     try {
-      // 1. RISK_CONFIG exact key set equality with RiskLevel wire enum
-      const expectedRiskKeys: RiskLevel[] = ['L0', 'L1', 'L2', 'L3'];
-      expect(Object.keys(RISK_CONFIG).sort(), 'RISK_CONFIG keys must exactly match RiskLevel wire enum').toEqual(expectedRiskKeys.sort());
+      // 1. RISK_CONFIG exact key set equality with canonical RiskLevel wire enum (F-R3)
+      const schemaPath = path.resolve(__dirname, '../../../contracts/v1alpha1/core.schema.json');
+      const canonicalCoreSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+      const expectedRiskKeys: RiskLevel[] = canonicalCoreSchema.$defs?.RiskLevel?.enum ?? [];
+      expect(expectedRiskKeys.length, 'Canonical schema must define RiskLevel enum').toBe(4);
+      expect(Object.keys(RISK_CONFIG).sort(), 'RISK_CONFIG keys must exactly match canonical RiskLevel wire enum').toEqual([...expectedRiskKeys].sort());
 
       // 2. RISK_CONFIG entries numerical contrast calculation (text >= 4.5:1, border >= 3.0:1)
       for (const [level, cfg] of Object.entries(RISK_CONFIG)) {
@@ -7671,6 +7674,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       });
       const buttons = container.querySelectorAll('button');
       expect(buttons).toHaveLength(4);
+      for (const btn of buttons) {
+        expect(btn.style.outline, 'Button outline must not be none').not.toBe('none');
+        expect(btn.style.outline, 'Button outline must not be 0').not.toBe('0');
+      }
       expect(buttons[0].style.color).toBe('var(--color-brand-primary-fg)');
       expect(buttons[0].style.backgroundColor).toBe('var(--color-brand-primary-bg, var(--color-brand-primary))');
       expect(buttons[1].style.color).toBe('var(--color-text-primary)');
@@ -7728,6 +7735,78 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect((modalBackdrop as HTMLElement)?.style.backgroundColor).toBe('var(--color-bg-backdrop)');
       const dialogSurface = modalBackdrop?.firstElementChild as HTMLElement;
       expect(dialogSurface?.style.backgroundColor).toBe('var(--color-bg-surface)');
+
+      // 8. Explicit numerical contrast calculations for the 6 Card 273 design tokens
+      const lBrandSuccess = resolveTokenHex('--color-brand-success', lightTokens);
+      const dBrandSuccess = resolveTokenHex('--color-brand-success', darkTokens);
+      const lSurface = resolveTokenHex('--color-bg-surface', lightTokens);
+      const dSurface = resolveTokenHex('--color-bg-surface', darkTokens);
+      const lSubtle = resolveTokenHex('--color-bg-subtle', lightTokens);
+      const dSubtle = resolveTokenHex('--color-bg-subtle', darkTokens);
+      const lCanvas = resolveTokenHex('--color-bg-canvas', lightTokens);
+      const dCanvas = resolveTokenHex('--color-bg-canvas', darkTokens);
+
+      expect(getContrast(lBrandSuccess, lSurface), 'brand-success on light surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandSuccess, dSurface), 'brand-success on dark surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lBrandSuccess, lSubtle), 'brand-success on light subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandSuccess, dSubtle), 'brand-success on dark subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const lBrandDanger = resolveTokenHex('--color-brand-danger', lightTokens);
+      const dBrandDanger = resolveTokenHex('--color-brand-danger', darkTokens);
+      expect(getContrast(lBrandDanger, lSurface), 'brand-danger on light surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandDanger, dSurface), 'brand-danger on dark surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lBrandDanger, lSubtle), 'brand-danger on light subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandDanger, dSubtle), 'brand-danger on dark subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const lBrandWarning = resolveTokenHex('--color-brand-warning', lightTokens);
+      const dBrandWarning = resolveTokenHex('--color-brand-warning', darkTokens);
+      expect(getContrast(lBrandWarning, lSurface), 'brand-warning on light surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandWarning, dSurface), 'brand-warning on dark surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lBrandWarning, lSubtle), 'brand-warning on light subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dBrandWarning, dSubtle), 'brand-warning on dark subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const lRiskL3Border = resolveTokenHex('--color-risk-l3-border', lightTokens);
+      const dRiskL3Border = resolveTokenHex('--color-risk-l3-border', darkTokens);
+      const lRiskL3Bg = resolveTokenHex('--color-risk-l3-bg', lightTokens);
+      const dRiskL3Bg = resolveTokenHex('--color-risk-l3-bg', darkTokens);
+      expect(getContrast(lRiskL3Border, lSurface), 'risk-l3-border on light surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(dRiskL3Border, dSurface), 'risk-l3-border on dark surface >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lRiskL3Border, lCanvas), 'risk-l3-border on light canvas >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(dRiskL3Border, dCanvas), 'risk-l3-border on dark canvas >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lRiskL3Border, lRiskL3Bg), 'risk-l3-border on light risk-l3-bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(dRiskL3Border, dRiskL3Bg), 'risk-l3-border on dark risk-l3-bg >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const lRiskL3Text = resolveTokenHex('--color-risk-l3-text', lightTokens);
+      const dRiskL3Text = resolveTokenHex('--color-risk-l3-text', darkTokens);
+      expect(getContrast(lRiskL3Text, lRiskL3Bg), 'risk-l3-text on light risk-l3-bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dRiskL3Text, dRiskL3Bg), 'risk-l3-text on dark risk-l3-bg >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lRiskL3Text, lSurface), 'risk-l3-text on light surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(dRiskL3Text, dSurface), 'risk-l3-text on dark surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 9. Fail-closed undefined token containment check (Card 273 target files var(--x) ⊆ index.css declared tokens)
+      const card273Files = [
+        'shared/ui/Button.tsx',
+        'shared/ui/RiskBadge.tsx',
+        'features/workspaces/ExecutionResultView.tsx',
+        'features/workspaces/WorkspaceCreateModal.tsx',
+      ];
+      const cssPath = path.resolve(__dirname, '../src/index.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf-8');
+      const declaredCssTokens = new Set<string>();
+      const tokenDeclRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/g;
+      let declMatch;
+      while ((declMatch = tokenDeclRegex.exec(cssContent)) !== null) {
+        declaredCssTokens.add(declMatch[1].trim());
+      }
+      for (const rel of card273Files) {
+        const fPath = path.resolve(__dirname, '../src', rel);
+        const fContent = fs.readFileSync(fPath, 'utf-8');
+        const varMatches = fContent.match(/var\((--[a-z0-9-]+)/g) || [];
+        for (const v of varMatches) {
+          const tokenName = v.replace('var(', '');
+          expect(declaredCssTokens.has(tokenName), `Token ${tokenName} used in ${rel} must be declared in index.css`).toBe(true);
+        }
+      }
     } finally {
       act(() => {
         root.unmount();
@@ -8111,6 +8190,44 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         }
       }
 
+      function checkOutlineProp(p: ts.ObjectLiteralElementLike) {
+        if (!ts.isPropertyAssignment(p)) return;
+        const name = p.name.getText(sf);
+        if (name === 'outline') {
+          let initExpr: ts.Expression = p.initializer;
+          while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+            initExpr = initExpr.expression;
+          }
+          const outlineVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+          if (outlineVal === 'none' || outlineVal === '0' || outlineVal === '0px') {
+            const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+            violations.push(`L${line + 1}: Inline outline: ${outlineVal} suppressing focus ring`);
+          }
+        }
+        if (name === 'outlineWidth') {
+          let initExpr: ts.Expression = p.initializer;
+          while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+            initExpr = initExpr.expression;
+          }
+          const widthVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+          if (widthVal === '0' || widthVal === '0px') {
+            const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+            violations.push(`L${line + 1}: Inline outlineWidth: 0 suppressing focus ring`);
+          }
+        }
+        if (name === 'outlineStyle') {
+          let initExpr: ts.Expression = p.initializer;
+          while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+            initExpr = initExpr.expression;
+          }
+          const styleVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+          if (styleVal === 'none') {
+            const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+            violations.push(`L${line + 1}: Inline outlineStyle: none suppressing focus ring`);
+          }
+        }
+      }
+
       function checkBorderPair(bgToken: string, borderToken: string, pos: number, opacity: number = 1.0) {
         checkedBorderPairs++;
         const { line } = sf.getLineAndCharacterOfPosition(pos);
@@ -8198,39 +8315,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 if (name === 'color') fgNode = p.initializer;
                 if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft' || name === 'borderTop') borderNode = p.initializer;
                 if (name === 'opacity') opacityNode = p.initializer;
-                if (name === 'outline') {
-                  let initExpr = p.initializer;
-                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
-                    initExpr = initExpr.expression;
-                  }
-                  const outlineVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
-                  if (outlineVal === 'none' || outlineVal === '0' || outlineVal === '0px') {
-                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
-                    violations.push(`L${line + 1}: Inline outline: ${outlineVal} suppressing focus ring`);
-                  }
-                }
-                if (name === 'outlineWidth') {
-                  let initExpr = p.initializer;
-                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
-                    initExpr = initExpr.expression;
-                  }
-                  const widthVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
-                  if (widthVal === '0' || widthVal === '0px') {
-                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
-                    violations.push(`L${line + 1}: Inline outlineWidth: 0 suppressing focus ring`);
-                  }
-                }
-                if (name === 'outlineStyle') {
-                  let initExpr = p.initializer;
-                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
-                    initExpr = initExpr.expression;
-                  }
-                  const styleVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
-                  if (styleVal === 'none') {
-                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
-                    violations.push(`L${line + 1}: Inline outlineStyle: none suppressing focus ring`);
-                  }
-                }
+                checkOutlineProp(p);
               }
             }
 
@@ -8294,6 +8379,18 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
+        if (ts.isVariableDeclaration(node)) {
+          let varInit = node.initializer;
+          while (varInit && (ts.isAsExpression(varInit) || ts.isSatisfiesExpression(varInit) || ts.isParenthesizedExpression(varInit))) {
+            varInit = varInit.expression;
+          }
+          if (varInit && ts.isObjectLiteralExpression(varInit)) {
+            for (const p of varInit.properties) {
+              checkOutlineProp(p);
+            }
+          }
+        }
+
         if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG' || node.name.getText(sf) === 'RISK_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
@@ -8313,8 +8410,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                     const text = subProp.initializer.getText(sf);
                     const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
                     if (m) {
-                      if (pName === 'bg') bgToken = m[1];
-                      if (pName === 'color') fgToken = m[1];
+                      if (pName === 'bg' || pName === 'bgVar') bgToken = m[1];
+                      if (pName === 'color' || pName === 'colorVar') fgToken = m[1];
                       if (pName === 'border') borderToken = m[1];
                     }
                   }
@@ -8464,6 +8561,46 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(nodeListStats.coveredColorObjects, 'Total covered color objects in NodeList must be exactly 21').toBe(21);
     expect(nodeListStats.checkedBorderObjects, 'Border objects in NodeList must be exactly 11').toBe(11);
     expect(nodeListStats.checkedBorderPairs, 'Border pairs in NodeList must be exactly 13').toBe(13);
+
+    const buttonStats = analyzeFile('shared/ui/Button.tsx');
+    expect(buttonStats.violations, `Button violations:\n${buttonStats.violations.join('\n')}`).toEqual([]);
+    expect(buttonStats.totalStyleAttrs, 'Total style attributes in Button must be exactly 3').toBe(3);
+    expect(buttonStats.checkedObjects, 'Explicit style objects in Button must be exactly 0').toBe(0);
+    expect(buttonStats.checkedPairs, 'Evaluated pairs in Button must be exactly 0').toBe(0);
+    expect(buttonStats.unboundColorObjects, 'Unbound color objects in Button must be exactly 0').toBe(0);
+    expect(buttonStats.coveredColorObjects, 'Total covered color objects in Button must be exactly 0').toBe(0);
+    expect(buttonStats.checkedBorderObjects, 'Border objects in Button must be exactly 0').toBe(0);
+    expect(buttonStats.checkedBorderPairs, 'Border pairs in Button must be exactly 0').toBe(0);
+
+    const riskBadgeStats = analyzeFile('shared/ui/RiskBadge.tsx');
+    expect(riskBadgeStats.violations, `RiskBadge violations:\n${riskBadgeStats.violations.join('\n')}`).toEqual([]);
+    expect(riskBadgeStats.totalStyleAttrs, 'Total style attributes in RiskBadge must be exactly 6').toBe(6);
+    expect(riskBadgeStats.checkedObjects, 'Explicit style objects in RiskBadge must be exactly 4').toBe(4);
+    expect(riskBadgeStats.checkedPairs, 'Evaluated pairs in RiskBadge must be exactly 4').toBe(4);
+    expect(riskBadgeStats.unboundColorObjects, 'Unbound color objects in RiskBadge must be exactly 0').toBe(0);
+    expect(riskBadgeStats.coveredColorObjects, 'Total covered color objects in RiskBadge must be exactly 4').toBe(4);
+    expect(riskBadgeStats.checkedBorderObjects, 'Border objects in RiskBadge must be exactly 4').toBe(4);
+    expect(riskBadgeStats.checkedBorderPairs, 'Border pairs in RiskBadge must be exactly 4').toBe(4);
+
+    const executionStats = analyzeFile('features/workspaces/ExecutionResultView.tsx');
+    expect(executionStats.violations, `ExecutionResultView violations:\n${executionStats.violations.join('\n')}`).toEqual([]);
+    expect(executionStats.totalStyleAttrs, 'Total style attributes in ExecutionResultView must be exactly 44').toBe(44);
+    expect(executionStats.checkedObjects, 'Explicit style objects in ExecutionResultView must be exactly 2').toBe(2);
+    expect(executionStats.checkedPairs, 'Evaluated pairs in ExecutionResultView must be exactly 20').toBe(20);
+    expect(executionStats.unboundColorObjects, 'Unbound color objects in ExecutionResultView must be exactly 15').toBe(15);
+    expect(executionStats.coveredColorObjects, 'Total covered color objects in ExecutionResultView must be exactly 17').toBe(17);
+    expect(executionStats.checkedBorderObjects, 'Border objects in ExecutionResultView must be exactly 7').toBe(7);
+    expect(executionStats.checkedBorderPairs, 'Border pairs in ExecutionResultView must be exactly 8').toBe(8);
+
+    const modalStats = analyzeFile('features/workspaces/WorkspaceCreateModal.tsx');
+    expect(modalStats.violations, `WorkspaceCreateModal violations:\n${modalStats.violations.join('\n')}`).toEqual([]);
+    expect(modalStats.totalStyleAttrs, 'Total style attributes in WorkspaceCreateModal must be exactly 15').toBe(15);
+    expect(modalStats.checkedObjects, 'Explicit style objects in WorkspaceCreateModal must be exactly 3').toBe(3);
+    expect(modalStats.checkedPairs, 'Evaluated pairs in WorkspaceCreateModal must be exactly 8').toBe(8);
+    expect(modalStats.unboundColorObjects, 'Unbound color objects in WorkspaceCreateModal must be exactly 5').toBe(5);
+    expect(modalStats.coveredColorObjects, 'Total covered color objects in WorkspaceCreateModal must be exactly 8').toBe(8);
+    expect(modalStats.checkedBorderObjects, 'Border objects in WorkspaceCreateModal must be exactly 4').toBe(4);
+    expect(modalStats.checkedBorderPairs, 'Border pairs in WorkspaceCreateModal must be exactly 4').toBe(4);
   });
 
 
