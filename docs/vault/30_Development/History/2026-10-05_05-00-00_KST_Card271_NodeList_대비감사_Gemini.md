@@ -13,7 +13,7 @@ source_of_truth: "Git"
 
 ## 1. 작업 개요
 - **목표**: 노드 목록 뷰(`apps/web/src/features/nodes/NodeList.tsx`)의 색상 리터럴 전수(9건→0건) 토큰화 및 디자인 토큰 체계 승격:
-  1. 상태 설정 객체 정합성 및 중복 배제: Card 248에서 완성된 `NODE_STATUS_CONFIG` 및 `getClusterNodeStatusConfig` (`apps/web/src/features/cluster/ClusterOverview.tsx`) 계약을 직접 임포트하여 재사용. 정본 wire 계약 enum `NodeStatus` 9종(`online`, `active`, `syncing`, `degraded`, `draining`, `offline`, `rebalancing`, `maintenance`, `lost`)과 엄밀 일치.
+  1. 상태 설정 객체 정합성 및 중복 배제: Card 248에서 완성된 `NODE_STATUS_CONFIG` 및 `getClusterNodeStatusConfig` (`apps/web/src/features/dashboard/ClusterOverview.tsx`) 계약을 직접 임포트하여 재사용. 정본 wire 계약 enum `NodeStatus` 9종(`online`, `active`, `syncing`, `degraded`, `draining`, `offline`, `rebalancing`, `maintenance`, `lost`)과 엄밀 일치.
   2. `getClusterNodeStatusConfig` fail-closed own-key 방어: `Object.hasOwn` 기반 검사로 prototype key(`toString`, `constructor`, `__proto__`, `valueOf`, `hasOwnProperty`, `isPrototypeOf`), 대소문자 변형(`ONLINE`), 계약 밖 값(`admitted`, `unknown_status`)의 fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식으로 안전 강등 매핑 (WCAG 1.4.1 준수).
   3. 코드 블록 및 부트스트랩 복사 UI: 다크 고정 리터럴 `#1e1e1e`, `#2d3748`, `#4ade80`, `#fff` 제거 및 `var(--color-bg-subtle)`, `var(--color-status-online)`, `var(--color-text-primary)` 토큰 승격. 복사 성공 피드백 텍스트를 `var(--color-status-online)`으로 승격하여 라이트 테마 명도비 1.74:1 결손(FAIL)을 5.02:1(PASS)로 교정.
   4. 관측 전용 배너 및 활성 노드 안내 시맨틱 보존: 관측 전용 배너(`role="region"`, `aria-label="관측 전용 모드 안내"`, `var(--color-status-unknown)` 테두리/텍스트), 활성 노드 알림(`role="region"`, `aria-label="활성 노드 실행 안내"`, `var(--color-status-active)` 테두리/텍스트). 반투명 리터럴 `rgba(210,153,34,0.15)`, `rgba(56,189,248,0.12)`, `rgba(56,189,248,0.3)` 전수 제거 및 라이트/다크 양방향 테두리 대비비 1.26:1/1.88:1 결손(FAIL)을 5.42:1/6.85:1(PASS)로 승격.
