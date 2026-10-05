@@ -57,22 +57,22 @@ source_of_truth: "Git"
 | DW-1 | 최대화 창 컨테이너 배경 (fill on canvas) | DesktopWindow:67 | Canvas | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | INFO | INFO |
 | DW-2 | 최대화 창 컨테이너 테두리 | DesktopWindow:71 | Canvas | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | >= 3.0:1 | PASS |
 | DW-3 | 플로팅 창 컨테이너 배경 (fill on canvas) | DesktopWindow:87 | Canvas | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | INFO | INFO |
-| DW-4 | 플로팅 창 컨테이너 테두리 (focused) | DesktopWindow:92 | Canvas | #333333 on canvas | 12.08:1 / 1.54:1 (FAIL) | var(--color-border-strong) on canvas | 7.24:1 / 7.65:1 | >= 3.0:1 | PASS |
+| DW-4 | 플로팅 창 컨테이너 테두리 (focused) | DesktopWindow:92 | Canvas | var(--color-border-strong) on canvas | 7.24:1 / 7.65:1 | var(--color-border-strong) on canvas | 7.24:1 / 7.65:1 | >= 3.0:1 | PASS (위생) |
 | DW-5 | 플로팅 창 포커스 링 외곽선 (brand-primary) | DesktopWindow:90 | Canvas | var(--color-brand-primary) on canvas | 4.94:1 / 7.64:1 | var(--color-brand-primary) on canvas | 4.94:1 / 7.64:1 | >= 3.0:1 | PASS |
-| DW-6 | 활성 타이틀바 배경 (fill on surface) | DesktopWindow:112 | Surface | #1e293b on surface | 14.63:1 / 1.21:1 | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | INFO | INFO |
-| DW-7 | 활성 타이틀바 borderBottom | DesktopWindow:113 | Subtle | #334155 on subtle | 10.35:1 / 1.71:1 (FAIL) | var(--color-border-subtle) on subtle | 3.48:1 / 3.73:1 | >= 3.0:1 | PASS |
-| DW-8 | 비활성 타이틀바 배경 (fill on surface) | DesktopWindow:112 | Surface | #0f172a on surface | 17.85:1 / 1.01:1 | var(--color-bg-surface) on surface | 1.00:1 / 1.00:1 | INFO | INFO |
-| DW-9 | 비활성 타이틀바 borderBottom | DesktopWindow:113 | Surface | #334155 on surface | 10.35:1 / 1.71:1 (FAIL) | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | >= 3.0:1 | PASS |
+| DW-6 | 활성 타이틀바 배경 (fill on surface) | DesktopWindow:112 | Surface | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | INFO | INFO (위생) |
+| DW-7 | 활성 타이틀바 borderBottom | DesktopWindow:113 | Subtle | var(--color-border-subtle) on subtle | 3.18:1 / 3.08:1 | var(--color-border-subtle) on subtle | 3.18:1 / 3.08:1 | >= 3.0:1 | PASS (위생) |
+| DW-8 | 비활성 타이틀바 배경 (fill on surface) | DesktopWindow:112 | Surface | var(--color-bg-surface) on surface | 1.00:1 / 1.00:1 | var(--color-bg-surface) on surface | 1.00:1 / 1.00:1 | INFO | INFO (위생) |
+| DW-9 | 비활성 타이틀바 borderBottom | DesktopWindow:113 | Surface | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | >= 3.0:1 | PASS (위생) |
 | DW-10 | 신호등 닫기 버튼 (on active subtle) | DesktopWindow:134 | Subtle | #ef4444 on subtle | 3.44:1 / 3.90:1 | var(--color-status-offline) on subtle | 5.91:1 / 5.31:1 | >= 3.0:1 | PASS |
 | DW-11 | 신호등 닫기 버튼 (on inactive surface) | DesktopWindow:134 | Surface | #ef4444 on surface | 3.76:1 / 4.71:1 | var(--color-status-offline) on surface | 6.47:1 / 6.41:1 | >= 3.0:1 | PASS |
-| DW-12 | 신호등 최소화 버튼 (on active subtle) | DesktopWindow:153 | Subtle | #f59e0b on subtle | 1.96:1 / 6.83:1 (FAIL) | var(--color-status-degraded) on subtle | 4.58:1 / 6.83:1 | >= 3.0:1 | PASS |
-| DW-13 | 신호등 최소화 버튼 (on inactive surface) | DesktopWindow:153 | Surface | #f59e0b on surface | 2.15:1 / 8.26:1 (FAIL) | var(--color-status-degraded) on surface | 5.02:1 / 8.26:1 | >= 3.0:1 | PASS |
-| DW-14 | 신호등 최대화 버튼 (on active subtle) | DesktopWindow:172 | Subtle | #10b981 on subtle | 2.32:1 / 5.79:1 (FAIL) | var(--color-status-online) on subtle | 4.58:1 / 6.44:1 | >= 3.0:1 | PASS |
-| DW-15 | 신호등 최대화 버튼 (on inactive surface) | DesktopWindow:172 | Surface | #10b981 on surface | 2.54:1 / 6.99:1 (FAIL) | var(--color-status-online) on surface | 5.02:1 / 7.79:1 | >= 3.0:1 | PASS |
-| DW-16 | 창 제목 텍스트 (active) | DesktopWindow:191 | Subtle | #f8fafc on subtle | 1.05:1 / 14.03:1 (FAIL) | var(--color-text-primary) on subtle | 16.30:1 / 14.05:1 | >= 4.5:1 | PASS |
-| DW-17 | 창 제목 텍스트 (inactive) | DesktopWindow:191 | Surface | #94a3b8 on surface | 2.56:1 / 6.92:1 (FAIL) | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | >= 4.5:1 | PASS |
-| DW-18 | 창 appId 상태 레이블 (active) | DesktopWindow:200 | Subtle | #64748b on subtle | 4.34:1 / 3.08:1 (FAIL) | var(--color-text-muted) on subtle | 5.25:1 / 5.78:1 | >= 4.5:1 | PASS |
-| DW-19 | 창 appId 상태 레이블 (inactive) | DesktopWindow:200 | Surface | #64748b on surface | 4.76:1 / 3.73:1 (FAIL) | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | >= 4.5:1 | PASS |
+| DW-12 | 신호등 최소화 버튼 (on active subtle) | DesktopWindow:153 | Subtle | #f59e0b on subtle | 1.96:1 / 6.83:1 (FAIL) | var(--color-status-degraded) on subtle | 4.58:1 / 6.83:1 | >= 3.0:1 | PASS (결손수리) |
+| DW-13 | 신호등 최소화 버튼 (on inactive surface) | DesktopWindow:153 | Surface | #f59e0b on surface | 2.15:1 / 8.26:1 (FAIL) | var(--color-status-degraded) on surface | 5.02:1 / 8.26:1 | >= 3.0:1 | PASS (결손수리) |
+| DW-14 | 신호등 최대화 버튼 (on active subtle) | DesktopWindow:172 | Subtle | #10b981 on subtle | 2.32:1 / 5.79:1 (FAIL) | var(--color-status-online) on subtle | 4.58:1 / 6.44:1 | >= 3.0:1 | PASS (결손수리) |
+| DW-15 | 신호등 최대화 버튼 (on inactive surface) | DesktopWindow:172 | Surface | #10b981 on surface | 2.54:1 / 6.99:1 (FAIL) | var(--color-status-online) on surface | 5.02:1 / 7.79:1 | >= 3.0:1 | PASS (결손수리) |
+| DW-16 | 창 제목 텍스트 (active) | DesktopWindow:191 | Subtle | var(--color-text-primary) on subtle | 16.30:1 / 14.05:1 | var(--color-text-primary) on subtle | 16.30:1 / 14.05:1 | >= 4.5:1 | PASS (위생) |
+| DW-17 | 창 제목 텍스트 (inactive) | DesktopWindow:191 | Surface | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | >= 4.5:1 | PASS (위생) |
+| DW-18 | 창 appId 상태 레이블 (active) | DesktopWindow:200 | Subtle | var(--color-text-muted) on subtle | 5.25:1 / 5.78:1 | var(--color-text-muted) on subtle | 5.25:1 / 5.78:1 | >= 4.5:1 | PASS (위생) |
+| DW-19 | 창 appId 상태 레이블 (inactive) | DesktopWindow:200 | Surface | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | >= 4.5:1 | PASS (위생) |
 | DW-20 | 창 컨트롤 폴백 UNKNOWN 배지 텍스트 | getWindowControlConfig | Subtle | var(--color-status-unknown) on subtle | 6.47:1 / 5.82:1 | var(--color-status-unknown) on subtle | 6.47:1 / 5.82:1 | >= 4.5:1 | PASS |
 | DW-21 | 창 컨트롤 폴백 UNKNOWN 배지 테두리 | getWindowControlConfig | Subtle | var(--color-status-unknown) on subtle | 6.47:1 / 5.82:1 | var(--color-status-unknown) on subtle | 6.47:1 / 5.82:1 | >= 3.0:1 | PASS |
 
@@ -89,22 +89,22 @@ ID     | Target     | Before (L/D)   | After (L/D)    | Status | Item Name
 DW-1   | INFO       | 1.05 / 1.10    | 1.05 / 1.10    | INFO   | Window container surface (maximized)
 DW-2   | >= 3.0:1   | 3.33 / 4.08    | 3.33 / 4.08    | PASS   | Window container border (maximized)
 DW-3   | INFO       | 1.05 / 1.10    | 1.05 / 1.10    | INFO   | Window container surface (floating)
-DW-4   | >= 3.0:1   | 12.08 / 1.54   | 7.24 / 7.65    | PASS   | Window container border (floating focused)
+DW-4   | >= 3.0:1   | 7.24 / 7.65    | 7.24 / 7.65    | PASS   | Window container border (floating focused)
 DW-5   | >= 3.0:1   | 4.94 / 7.64    | 4.94 / 7.64    | PASS   | Window focus ring outline (floating focused)
-DW-6   | INFO       | 14.63 / 1.21   | 1.10 / 1.21    | INFO   | Titlebar background (active)
-DW-7   | >= 3.0:1   | 10.35 / 1.71   | 3.48 / 3.73    | PASS   | Titlebar borderBottom (active)
-DW-8   | INFO       | 17.85 / 1.01   | 1.00 / 1.00    | INFO   | Titlebar background (inactive)
-DW-9   | >= 3.0:1   | 10.35 / 1.71   | 3.48 / 3.73    | PASS   | Titlebar borderBottom (inactive)
+DW-6   | INFO       | 1.10 / 1.21    | 1.10 / 1.21    | INFO   | Titlebar background (active)
+DW-7   | >= 3.0:1   | 3.18 / 3.08    | 3.18 / 3.08    | PASS   | Titlebar borderBottom (active)
+DW-8   | INFO       | 1.00 / 1.00    | 1.00 / 1.00    | INFO   | Titlebar background (inactive)
+DW-9   | >= 3.0:1   | 3.48 / 3.73    | 3.48 / 3.73    | PASS   | Titlebar borderBottom (inactive)
 DW-10  | >= 3.0:1   | 3.44 / 3.90    | 5.91 / 5.31    | PASS   | Traffic light close button (on active subtle)
 DW-11  | >= 3.0:1   | 3.76 / 4.71    | 6.47 / 6.41    | PASS   | Traffic light close button (on inactive surface)
 DW-12  | >= 3.0:1   | 1.96 / 6.83    | 4.58 / 6.83    | PASS   | Traffic light minimize button (on active subtle)
 DW-13  | >= 3.0:1   | 2.15 / 8.26    | 5.02 / 8.26    | PASS   | Traffic light minimize button (on inactive surface)
 DW-14  | >= 3.0:1   | 2.32 / 5.79    | 4.58 / 6.44    | PASS   | Traffic light maximize button (on active subtle)
 DW-15  | >= 3.0:1   | 2.54 / 6.99    | 5.02 / 7.79    | PASS   | Traffic light maximize button (on inactive surface)
-DW-16  | >= 4.5:1   | 1.05 / 14.03   | 16.30 / 14.05  | PASS   | Title text (active)
-DW-17  | >= 4.5:1   | 2.56 / 6.92    | 5.75 / 6.99    | PASS   | Title text (inactive)
-DW-18  | >= 4.5:1   | 4.34 / 3.08    | 5.25 / 5.78    | PASS   | Window appId status indicator (active)
-DW-19  | >= 4.5:1   | 4.76 / 3.73    | 5.75 / 6.99    | PASS   | Window appId status indicator (inactive)
+DW-16  | >= 4.5:1   | 16.30 / 14.05  | 16.30 / 14.05  | PASS   | Title text (active)
+DW-17  | >= 4.5:1   | 5.75 / 6.99    | 5.75 / 6.99    | PASS   | Title text (inactive)
+DW-18  | >= 4.5:1   | 5.25 / 5.78    | 5.25 / 5.78    | PASS   | Window appId status indicator (active)
+DW-19  | >= 4.5:1   | 5.75 / 6.99    | 5.75 / 6.99    | PASS   | Window appId status indicator (inactive)
 DW-20  | >= 4.5:1   | 6.47 / 5.82    | 6.47 / 5.82    | PASS   | Window control fallback UNKNOWN badge text
 DW-21  | >= 3.0:1   | 6.47 / 5.82    | 6.47 / 5.82    | PASS   | Window control fallback UNKNOWN badge border
 ----------------------------------------------------------------------------------------
@@ -132,10 +132,24 @@ ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.
 - 신호등 조절 동작('close', 'minimize', 'maximize')을 관리하는 `WINDOW_CONTROL_CONFIG` 테이블을 정의하고 `satisfies Record<WindowControlAction, WindowControlStyle>`로 계약 무결성을 강제하였습니다.
 - `getWindowControlConfig(action?: string | null)` 헬퍼는 `Object.hasOwn(WINDOW_CONTROL_CONFIG, action)`을 사용하여 `toString`, `constructor`, `__proto__` 등 프로토타입 주입을 원천 차단하고, 알 수 없는 값이 전달되면 `UNKNOWN (<raw>)` 레이블 및 `var(--color-status-unknown)` 토큰으로 fail-closed 안전 강등하여 WCAG 2.2 SC 1.4.1(색상에만 의존하지 않는 식별)을 엄격히 준수합니다.
 
+### 3.4 Review r1 보완 사항 (Codex F-R1, Claude F1~F3)
+- **Codex F-R1 (Receipt Provenance & Byte-Clean Restore)**:
+  - `tools/test_c278_mutations.py`에서 `Path.read_text()`/`Path.write_text()` 사용 시 Windows 환경에서 LF 줄바꿈이 CRLF로 변환되어 tracked 파일이 modified로 남는 결함을 `Path.read_bytes()` 및 `Path.write_bytes()` 바이너리 저장/복원으로 전면 전환하여 해결하였습니다.
+  - 변이 전/후 및 각 변이 복원 직후 `git status --porcelain --untracked-files=no`가 비어있음을 확인하는 fail-closed 무결성 검증을 runner에 내장하였습니다.
+  - 수정된 runner를 commit A' (`4a629d6a`)에 반영 후 clean checkout 상태에서 40/40 전수 사살(Kill Rate 100.0%)을 재검증하고 결과를 commit B' (`b7ca44f8`)에 밀봉하였습니다.
+- **Claude F1 (Fallback 기반 행 Before 정정 및 결손 수리 성격 명확화)**:
+  - base `e6488165`에서 `var(--token, #fallback)` 형태로 사용되던 9개 행(DW-4, DW-6, DW-7, DW-8, DW-9, DW-16, DW-17, DW-18, DW-19)은 이미 토큰이 선언되어 있어 실제 base 렌더 값이 After와 동일했습니다.
+  - 따라서 9개 행의 Before 값을 실제 렌더 값(= After)으로 정정하고 `(FAIL)` 표기를 제거하였으며, 작업 성격을 "미사용 fallback 제거(위생)"로 재분류하였습니다.
+  - base에 생 hex가 하드코딩되어 있던 신호등 6개 행(DW-10~DW-15, 특히 라이트 모드 1.96~2.54:1 결함)이 실제 대비 결손 수리 대상임을 명확히 강조하였습니다.
+- **Claude F2 (신호등 조절 버튼 렌더 색상 바인딩 강제)**:
+  - `DesktopWindow.tsx`의 신호등 버튼 JSX가 하드코딩된 색상 대신 `getWindowControlConfig(action).color`를 직접 참조하도록 바인딩하여, 계산형 래칫 테이블과 실제 DOM 렌더 색상이 완벽히 동기화되도록 보강하였습니다.
+- **Claude F3 (DW-7 활성 타이틀바 borderBottom underlay 및 spec 정정)**:
+  - DW-7의 언더레이를 Titlebar subtle로 정확히 반영하고, 기준 규격을 `3.18 / 3.08`로 정정하였습니다.
+
 ---
 
 ## 4. 증거 및 검증 결과 (Evidence & Verification)
-- `python tools/reproduce_c278_contrast.py` -> 21/21 PASS/INFO (0 failures).
+- `python tools/reproduce_c278_contrast.py` -> 21/21 PASS/INFO (0 failures, r1 정정 반영).
 - `cd apps/web && npx tsc -b` -> exit code 0, 0 errors.
 - `npm run build` -> exit code 0, production bundle generated.
 - `npx vitest run tests/acc09-contrast-tokens.test.tsx` -> 42/42 PASS.
@@ -144,6 +158,6 @@ ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.
 - `python tools/check_frontend_integrity.py` -> PASS (9대 무결성 규칙 위반 0건).
 - `python tools/check_contract_bindings.py` -> PASS.
 - `python tools/check_docs.py` -> PASS.
-- `python tools/check_doc_path_citations.py --ratchet --base-ref e6488165` -> PASS.
+- `python tools/check_doc_path_citations.py --ratchet --base-ref 3abd58d2` -> PASS.
 - `python tools/sync_obsidian.py --check` -> PASS (0 conflicts).
-- `tools/test_c278_mutations.py` -> 40/40 KILLED on clean commit A (`637c21f4`), sealed in Commit B (`4ad183be`).
+- `tools/test_c278_mutations.py` -> 40/40 KILLED on clean commit A' (`4a629d6a`), sealed in Commit B' (`b7ca44f8`) with byte-clean restore verification.
