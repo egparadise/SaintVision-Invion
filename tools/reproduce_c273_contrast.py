@@ -1,7 +1,7 @@
 """
 Dynamic contrast reproduction script for Card 273: Shared & Minor UI Components
 Validates WCAG 2.2 AA contrast compliance against apps/web/src/index.css tokens.
-Audit Items: 22 (Button, RiskBadge, ExecutionResultView, WorkspaceCreateModal)
+Audit Items: 32 (Button, RiskBadge, ExecutionResultView, WorkspaceCreateModal)
 """
 import re
 from pathlib import Path
@@ -57,6 +57,8 @@ def main():
     d_surface = parse_hex(dark['--color-bg-surface'])
     l_subtle = parse_hex(light['--color-bg-subtle'])
     d_subtle = parse_hex(dark['--color-bg-subtle'])
+    l_l3_bg = parse_hex(light['--color-risk-l3-bg'])
+    d_l3_bg = parse_hex(dark['--color-risk-l3-bg'])
 
     items = [
         # 1. Button.tsx (Button.tsx:38, 43, 48, 53)
@@ -151,6 +153,47 @@ def main():
         ("IT22", "modal-notice border (on bg-subtle, WorkspaceCreateModal.tsx:118)", 3.0,
          light['--color-border-subtle'], dark['--color-border-subtle'],
          l_subtle, d_subtle),
+
+        # 5. F1 Newly Defined Status & Risk Tokens (ExecutionResultView.tsx & WorkspaceCreateModal.tsx)
+        ("IT23", "exec-success text (on bg-subtle, ExecutionResultView.tsx:67)", 4.5,
+         light['--color-brand-success'], dark['--color-brand-success'],
+         l_subtle, d_subtle),
+
+        ("IT24", "exec-danger text (on bg-subtle, ExecutionResultView.tsx:67)", 4.5,
+         light['--color-brand-danger'], dark['--color-brand-danger'],
+         l_subtle, d_subtle),
+
+        ("IT25", "exec-reclaimed-warning text (on surface, ExecutionResultView.tsx:130)", 4.5,
+         light['--color-brand-warning'], dark['--color-brand-warning'],
+         l_surface, d_surface),
+
+        ("IT26", "exec-exitcode-success text (on surface, ExecutionResultView.tsx:55)", 4.5,
+         light['--color-brand-success'], dark['--color-brand-success'],
+         l_surface, d_surface),
+
+        ("IT27", "exec-exitcode-danger text (on surface, ExecutionResultView.tsx:55)", 4.5,
+         light['--color-brand-danger'], dark['--color-brand-danger'],
+         l_surface, d_surface),
+
+        ("IT28", "exec-risk-l3-border border (on surface, ExecutionResultView.tsx:44)", 3.0,
+         light['--color-risk-l3-border'], dark['--color-risk-l3-border'],
+         l_surface, d_surface),
+
+        ("IT29", "exec-risk-l3-card-border border (on risk-l3-bg, ExecutionResultView.tsx:215)", 3.0,
+         light['--color-risk-l3-border'], dark['--color-risk-l3-border'],
+         l_l3_bg, d_l3_bg),
+
+        ("IT30", "exec-risk-l3 text (on risk-l3-bg, ExecutionResultView.tsx:219)", 4.5,
+         light['--color-risk-l3-text'], dark['--color-risk-l3-text'],
+         l_l3_bg, d_l3_bg),
+
+        ("IT31", "modal-warning border (on risk-l3-bg, WorkspaceCreateModal.tsx:144)", 3.0,
+         light['--color-risk-l3-border'], dark['--color-risk-l3-border'],
+         l_l3_bg, d_l3_bg),
+
+        ("IT32", "modal-warning text (on risk-l3-bg, WorkspaceCreateModal.tsx:143)", 4.5,
+         light['--color-risk-l3-text'], dark['--color-risk-l3-text'],
+         l_l3_bg, d_l3_bg),
     ]
 
     print("=" * 115)

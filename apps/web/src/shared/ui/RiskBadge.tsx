@@ -14,7 +14,7 @@ export interface RiskConfigItem {
   bgVar: string;
 }
 
-export const RISK_CONFIG: Record<string, RiskConfigItem> = {
+export const RISK_CONFIG = {
   L0: {
     label: 'L0',
     description: '읽기 전용 (안전)',
@@ -43,7 +43,7 @@ export const RISK_CONFIG: Record<string, RiskConfigItem> = {
     colorVar: 'var(--color-risk-l3)',
     bgVar: 'var(--color-bg-subtle)',
   },
-};
+} as const satisfies Record<RiskLevel, RiskConfigItem>;
 
 export function getRiskLevelConfig(level: unknown): RiskConfigItem {
   if (typeof level === 'string' && Object.hasOwn(RISK_CONFIG, level)) {
