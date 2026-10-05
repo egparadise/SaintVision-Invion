@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-10-05T23:26:44.306795+00:00",
+  "sourceHeadSha": "bdee2e6098a73606267e1be13d0b35467b389043",
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "durationSeconds": 829.53,
+  "killRate": "100.0%",
+  "mutants": [
+    {
+      "id": "M1",
+      "desc": "connected dotColor literal regression: dotColor: '#238636'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M2",
+      "desc": "connected promptColor literal regression: promptColor: '#58a6ff'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M3",
+      "desc": "connected borderVar literal regression: borderVar: '#238636'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M4",
+      "desc": "connected bgVar subtle collision: bgVar: 'var(--color-bg-subtle)'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M5",
+      "desc": "connecting dotColor literal regression: dotColor: '#d29922'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M6",
+      "desc": "connecting promptColor literal regression: promptColor: '#d29922'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M7",
+      "desc": "connecting bgVar literal regression: bgVar: '#1c1917'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M8",
+      "desc": "connecting borderVar literal regression: borderVar: '#ea580c'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M9",
+      "desc": "disconnected dotColor literal regression: dotColor: '#8b949e'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M10",
+      "desc": "disconnected promptColor literal regression: promptColor: '#8b949e'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M11",
+      "desc": "disconnected borderVar literal regression: borderVar: '#30363d'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M12",
+      "desc": "error dotColor literal regression: dotColor: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M13",
+      "desc": "error promptColor literal regression: promptColor: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M14",
+      "desc": "error borderVar literal regression: borderVar: '#ef4444'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M15",
+      "desc": "error bgVar literal regression: bgVar: '#7f1d1d'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M16",
+      "desc": "prototype pollution breach: status in WEB_TERMINAL_CONNECTION_STATUS_CONFIG",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M17",
+      "desc": "fail-closed UNKNOWN label dropped: raw instead of UNKNOWN (raw)",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M18",
+      "desc": "fallback dotColor elevates to online: var(--color-status-online)",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M19",
+      "desc": "root container backgroundColor literal regression: '#0d1117'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M20",
+      "desc": "root container color literal regression: '#c9d1d9'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M21",
+      "desc": "root container border literal regression: '1px solid #30363d'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M22",
+      "desc": "title bar backgroundColor literal regression: '#161b22'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M23",
+      "desc": "title bar borderBottom literal regression: '1px solid #30363d'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M24",
+      "desc": "session ID color literal regression: '#8b949e'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M25",
+      "desc": "connection status color literal regression: '#8b949e'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M26",
+      "desc": "toggle a11y button color literal regression: '#c9d1d9'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M27",
+      "desc": "close button color literal regression: '#f85149'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M28",
+      "desc": "missing command notice backgroundColor literal regression: '#1c1917'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M29",
+      "desc": "missing command notice color literal regression: '#fb923c'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M30",
+      "desc": "missing command notice borderBottom literal regression: '1px solid #ea580c'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M31",
+      "desc": "missing command notice hint color literal regression: '#fed7aa'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M32",
+      "desc": "error banner backgroundColor literal regression: '#7f1d1d'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M33",
+      "desc": "error banner color literal regression: '#fecaca'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M34",
+      "desc": "error banner borderBottom literal regression: '1px solid #ef4444'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M35",
+      "desc": "retry button backgroundColor literal regression: '#ef4444'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M36",
+      "desc": "retry button color literal regression: '#fff'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M37",
+      "desc": "disconnected alert banner backgroundColor literal regression: '#451a03'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M38",
+      "desc": "disconnected alert banner color literal regression: '#fde68a'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M39",
+      "desc": "retry button focus ring suppression: outline: 'none'",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    },
+    {
+      "id": "M40",
+      "desc": "root container 1:1 color collision: bg and fg both text-primary",
+      "status": "killed",
+      "tsc_ok": true,
+      "detail": "Killed successfully (exit 1)"
+    }
+  ]
+}
