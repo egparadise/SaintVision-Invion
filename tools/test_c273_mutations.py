@@ -77,9 +77,9 @@ MUTANTS = [
     {
         "id": "W6",
         "file": "RiskBadge",
-        "desc": "RiskBadge: RISK_CONFIG key mutation (rename L3 to L4, breaking contract key set)",
-        "target": "  L3: {\n    label: 'L3',",
-        "replacement": "  L4: {\n    label: 'L4',",
+        "desc": "RiskBadge: L3 bgVar==colorVar collision (bgVar: var(--color-risk-l3))",
+        "target": "  L3: {\n    label: 'L3',\n    description: '기본 차단 (위험)',\n    icon: '🛑',\n    colorVar: 'var(--color-risk-l3)',\n    bgVar: 'var(--color-bg-subtle)',",
+        "replacement": "  L3: {\n    label: 'L3',\n    description: '기본 차단 (위험)',\n    icon: '🛑',\n    colorVar: 'var(--color-risk-l3)',\n    bgVar: 'var(--color-risk-l3)',",
     },
     {
         "id": "W7",
