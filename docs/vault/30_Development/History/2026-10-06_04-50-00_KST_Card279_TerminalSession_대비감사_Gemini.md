@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-06T04:50:00+09:00"
-updated: "2026-10-06T05:46:00+09:00"
+updated: "2026-10-06T06:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -58,10 +58,10 @@ source_of_truth: "Git"
 
 | ID | 항목 명칭 | 코드 위치 | 언더레이 | Before 규격 | Before 실측 (L/D) | After 토큰 규격 | After 실측 (L/D) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TS-1 | 세션 컨테이너 배경 (fill on canvas) | TerminalSessionView:255 | Canvas | var(--color-bg-surface) on canvas | 1.05:1 / 1.09:1 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | INFO | INFO (위생) |
+| TS-1 | 세션 컨테이너 배경 (fill on canvas) | TerminalSessionView:255 | Canvas | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | INFO | INFO (위생) |
 | TS-2 | 탭 목록 컨테이너 배경 (fill on surface) | TerminalSessionView:267 | Surface | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | INFO | INFO (위생) |
 | TS-3 | 탭 목록 borderBottom | TerminalSessionView:268 | Subtle | var(--color-border-subtle) on subtle | 3.18:1 / 3.08:1 | var(--color-border-subtle) on subtle | 3.18:1 / 3.08:1 | >= 3.0:1 | PASS (위생) |
-| TS-4 | 활성 탭 배경 (fill on subtle) | TerminalSessionView:289 | Subtle | var(--color-bg-surface) on subtle | 1.10:1 / 1.22:1 | var(--color-bg-surface) on subtle | 1.10:1 / 1.21:1 | INFO | INFO (위생) |
+| TS-4 | 활성 탭 배경 (fill on subtle) | TerminalSessionView:289 | Subtle | var(--color-bg-surface) on subtle | 1.10:1 / 1.21:1 | var(--color-bg-surface) on subtle | 1.10:1 / 1.21:1 | INFO | INFO (위생) |
 | TS-5 | 활성 탭 상단 브랜드 인디케이터 borderTop | TerminalSessionView:290 | Surface | var(--color-brand-primary) on surface | 5.17:1 / 6.98:1 | var(--color-brand-primary) on surface | 5.17:1 / 6.98:1 | >= 3.0:1 | PASS (위생) |
 | TS-6 | 활성 탭 우측 구분선 borderRight | TerminalSessionView:291 | Surface | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | >= 3.0:1 | PASS (위생) |
 | TS-7 | 활성 탭 제목 텍스트 | TerminalSessionView:292 | Surface | var(--color-text-primary) on surface | 17.85:1 / 16.98:1 | var(--color-text-primary) on surface | 17.85:1 / 16.98:1 | >= 4.5:1 | PASS (위생) |
@@ -81,9 +81,9 @@ source_of_truth: "Git"
 | TS-21 | PTY 인증: awaiting_command 텍스트 | TerminalSessionView:55 | Subtle | #94a3b8 on subtle | 2.34:1 / 5.72:1 (FAIL) | var(--color-text-muted) on subtle | 5.25:1 / 5.78:1 | >= 4.5:1 | PASS (결손수리) |
 | TS-22 | 승인 Run 및 명령 ID 입력창 테두리 | TerminalSessionView:459 | Subtle | #334155 on subtle | 9.45:1 / 1.42:1 (FAIL) | var(--color-border-strong) on subtle | 6.92:1 / 5.78:1 | >= 3.0:1 | PASS (결손수리) |
 | TS-23 | 승인 Run 및 명령 ID 텍스트 | TerminalSessionView:461 | Surface | #f8fafc on #0f172a | 17.06:1 / 17.06:1 | var(--color-text-primary) on surface | 17.85:1 / 16.98:1 | >= 4.5:1 | PASS |
-| TS-24 | 모드 전환 버튼 배경 (fill on subtle) | TerminalSessionView:501 | Subtle | #dbeafe on subtle | 1.11:1 / 1.42:1 | var(--color-brand-subtle) on subtle | 1.11:1 / 1.00:1 | INFO | INFO (위생) |
-| TS-25 | 모드 전환 버튼 테두리 | TerminalSessionView:502 | brand-subtle | #2563eb on #dbeafe | 4.24:1 / 4.07:1 | var(--color-brand-primary) on brand-subtle | 4.24:1 / 5.75:1 | >= 3.0:1 | PASS |
-| TS-26 | 모드 전환 버튼 텍스트 | TerminalSessionView:503 | brand-subtle | #60a5fa on subtle | 2.32:1 / 5.75:1 (FAIL) | var(--color-brand-hover) on brand-subtle | 5.49:1 / 8.11:1 | >= 4.5:1 | PASS (결손수리) |
+| TS-24 | 모드 전환 버튼 배경 (fill on subtle) | TerminalSessionView:501 | Subtle | rgba(59, 130, 246, 0.15) on subtle | 1.17:1 / 1.21:1 | var(--color-brand-subtle) on subtle | 1.11:1 / 1.00:1 | INFO | INFO (시맨틱 토큰화) |
+| TS-25 | 모드 전환 버튼 테두리 | TerminalSessionView:502 | brand-subtle | #2563eb on rgba(59, 130, 246, 0.15) | 4.02:1 / 4.78:1 | var(--color-brand-primary) on brand-subtle | 4.24:1 / 5.75:1 | >= 3.0:1 | PASS |
+| TS-26 | 모드 전환 버튼 텍스트 | TerminalSessionView:503 | brand-subtle | #60a5fa on rgba(59, 130, 246, 0.15) | 1.98:1 / 4.78:1 (FAIL) | var(--color-brand-hover) on brand-subtle | 5.49:1 / 8.11:1 | >= 4.5:1 | PASS (결손수리) |
 | TS-27 | 빈 노드 알림 배너 배경 | TerminalSessionView:176 | Surface | #1e293b on surface | 14.63:1 / 1.21:1 | var(--color-bg-subtle) on surface | 1.10:1 / 1.21:1 | INFO | INFO |
 | TS-28 | 빈 노드 알림 배너 borderBottom | TerminalSessionView:179 | Subtle | #334155 on #1e293b | 1.41:1 / 1.41:1 (FAIL) | var(--color-border-subtle) on subtle | 3.18:1 / 3.08:1 | >= 3.0:1 | PASS (결손수리) |
 | TS-29 | 빈 노드 알림 안내 텍스트 | TerminalSessionView:177 | Subtle | #94a3b8 on #1e293b | 5.71:1 / 5.71:1 | var(--color-text-muted) on subtle | 5.25:1 / 5.78:1 | >= 4.5:1 | PASS |
@@ -101,10 +101,10 @@ CARD 279 (TerminalSessionView) WCAG 2.2 AA DYNAMIC CONTRAST AUDIT REPORT
 ========================================================================================
 ID     | Target     | Before (L/D)   | After (L/D)    | Status | Item Name
 ----------------------------------------------------------------------------------------
-TS-1   | INFO       | 1.05 / 1.09    | 1.05 / 1.10    | INFO   | Session view container (surface on canvas)
+TS-1   | INFO       | 1.05 / 1.10    | 1.05 / 1.10    | INFO   | Session view container (surface on canvas)
 TS-2   | INFO       | 1.10 / 1.21    | 1.10 / 1.21    | INFO   | Tablist container (subtle on surface)
 TS-3   | >= 3.0:1   | 3.18 / 3.08    | 3.18 / 3.08    | PASS   | Tablist borderBottom (boundary on subtle)
-TS-4   | INFO       | 1.10 / 1.22    | 1.10 / 1.21    | INFO   | Active tab background (surface on subtle)
+TS-4   | INFO       | 1.10 / 1.21    | 1.10 / 1.21    | INFO   | Active tab background (surface on subtle)
 TS-5   | >= 3.0:1   | 5.17 / 6.98    | 5.17 / 6.98    | PASS   | Active tab indicator borderTop (brand on surface)
 TS-6   | >= 3.0:1   | 3.48 / 3.73    | 3.48 / 3.73    | PASS   | Active tab right border (subtle on surface)
 TS-7   | >= 4.5:1   | 17.85 / 16.98  | 17.85 / 16.98  | PASS   | Active tab text (text on surface)
@@ -124,9 +124,9 @@ TS-20  | >= 4.5:1   | 1.52 / 8.79    | 4.58 / 6.83    | PASS   | PTY auth badge:
 TS-21  | >= 4.5:1   | 2.34 / 5.72    | 5.25 / 5.78    | PASS   | PTY auth badge: awaiting_command text (on subtle)
 TS-22  | >= 3.0:1   | 9.45 / 1.42    | 6.92 / 5.78    | PASS   | Run select & Command ID border (on subtle)
 TS-23  | >= 4.5:1   | 17.06 / 17.06  | 17.85 / 16.98  | PASS   | Run select & Command ID text (on surface)
-TS-24  | INFO       | 1.11 / 1.42    | 1.11 / 1.00    | INFO   | Switch mode button background (brand-subtle on subtle)
-TS-25  | >= 3.0:1   | 4.24 / 4.07    | 4.24 / 5.75    | PASS   | Switch mode button border (brand-primary on brand-subtle)
-TS-26  | >= 4.5:1   | 2.32 / 5.75    | 5.49 / 8.11    | PASS   | Switch mode button text (brand-hover on brand-subtle)
+TS-24  | INFO       | 1.17 / 1.21    | 1.11 / 1.00    | INFO   | Switch mode button background (brand-subtle on subtle)
+TS-25  | >= 3.0:1   | 4.02 / 4.78    | 4.24 / 5.75    | PASS   | Switch mode button border (brand-primary on brand-subtle)
+TS-26  | >= 4.5:1   | 1.98 / 4.78    | 5.49 / 8.11    | PASS   | Switch mode button text (brand-hover on brand-subtle)
 TS-27  | INFO       | 14.63 / 1.21   | 1.10 / 1.21    | INFO   | Empty nodes notice container background (subtle on surface)
 TS-28  | >= 3.0:1   | 1.41 / 1.41    | 3.18 / 3.08    | PASS   | Empty nodes notice borderBottom (subtle on subtle)
 TS-29  | >= 4.5:1   | 5.71 / 5.71    | 5.25 / 5.78    | PASS   | Empty nodes notice text (text-muted on subtle)
@@ -176,3 +176,6 @@ ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.
 - **Claude F2 (Low)**: `tools/reproduce_c279_contrast.py` TS-24(모드 전환 버튼 배경) nature를 "생 rgba 투명도 리터럴을 테마 시맨틱 토큰으로 승격 (시맨틱 토큰화)"로 재분류하고, 베이스 다크 underlay는 `blend_rgba(rgba(59, 130, 246, 0.15) over --color-bg-subtle)`로 정본 재계산.
 - **Claude F3 (Low)**: `tools/reproduce_c279_contrast.py`의 `nature` 항목에서 계산값과 상이할 수 있는 정적 수치 주석을 제거하고 순수 정성적 분류로 일원화.
 - **Receipt A'/B'**: Commit A' (`6ae97929`)에 코드/테스트/러너 갱신, Commit B' (`16635e1e`)에 40/40 전수 사살 재봉인.
+
+- **Claude F-A (Medium)**: History §2.2 콘솔 출력 및 §2.1 표 실측치 동기화(TS-24 Before 1.17/1.21, TS-25 4.02/4.78, TS-26 1.98/4.78).
+- **Claude F-B (Low)**: TS-1 및 TS-4 다크 before_hex를 실제 렌더 토큰(#111827, #1f2937)으로 정합하여 Before = After (TS-1 1.05/1.10, TS-4 1.10/1.21) 위생 행 일치화.
