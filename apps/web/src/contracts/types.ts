@@ -585,3 +585,5 @@ export type {
 
 export type RunArtifactItem = RunArtifactFile;
 export type RunAttemptItem = RunAttemptObservation;
+export const INTEGRITY_VERIFICATION_STATUSES = ['PASS', 'FAIL', 'UNVERIFIED', 'RUN_FAILED'] as const;
+export type IntegrityVerificationStatus = (typeof INTEGRITY_VERIFICATION_STATUSES)[number];

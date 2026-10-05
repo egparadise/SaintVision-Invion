@@ -1,12 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
-import type { RunResultView } from '@/contracts/types';
+import type { RunResultView, IntegrityVerificationStatus } from '@/contracts/types';
 
 export interface EvidenceViewerProps {
   runId: string;
   projectId?: string;
   onBack: () => void;
+}
+
+export interface EvidenceIntegrityConfigItem {
+  label: string;
+  icon: string;
+  colorVar: string;
+  bgVar: string;
+  borderVar: string;
+  description: string;
+}
+
+export const EVIDENCE_INTEGRITY_CONFIG = {
+  PASS: {
+    label: '출력 무결성 검증 통과 (PASS)',
+    icon: '✓',
+    colorVar: 'var(--color-brand-success)',
+    bgVar: 'var(--color-bg-subtle)',
+    borderVar: 'var(--color-brand-success)',
+    description: '출력 산출물의 암호학적 영수증 및 체크섬 검증 통과',
+  },
+  FAIL: {
+    label: '출력 무결성 검증 실패 (FAIL)',
+    icon: '✗',
+    colorVar: 'var(--color-brand-danger)',
+    bgVar: 'var(--color-bg-subtle)',
+    borderVar: 'var(--color-brand-danger)',
+    description: '산출물 메타데이터가 존재하나 암호학적 영수증/체크섬 검증 실패',
+  },
+  RUN_FAILED: {
+    label: '실행 실패 · 출력 부재 (RUN_FAILED)',
+    icon: '✗',
+    colorVar: 'var(--color-brand-danger)',
+    bgVar: 'var(--color-bg-subtle)',
+    borderVar: 'var(--color-brand-danger)',
+    description: '프로세스 비정상 종료로 인해 검증 대상 산출물 미생성',
+  },
+  UNVERIFIED: {
+    label: '출력 무결성 미검증 (UNVERIFIED)',
+    icon: '⚠️',
+    colorVar: 'var(--color-status-unknown)',
+    bgVar: 'var(--color-bg-subtle)',
+    borderVar: 'var(--color-status-unknown)',
+    description: '독립적 암호학적 대조가 수행되지 않았거나 검증 정보 부재',
+  },
+} as const satisfies Record<IntegrityVerificationStatus, EvidenceIntegrityConfigItem>;
+
+export function getEvidenceIntegrityConfig(status: unknown): EvidenceIntegrityConfigItem {
+  if (typeof status === 'string' && Object.hasOwn(EVIDENCE_INTEGRITY_CONFIG, status)) {
+    return EVIDENCE_INTEGRITY_CONFIG[status as IntegrityVerificationStatus];
+  }
+  const raw = status === null || status === undefined ? '' : String(status).trim();
+  return {
+    label: raw ? `미확인 무결성 상태 (UNKNOWN: ${raw})` : '미확인 무결성 상태 (UNKNOWN)',
+    icon: '❓',
+    colorVar: 'var(--color-status-unknown)',
+    bgVar: 'var(--color-bg-subtle)',
+    borderVar: 'var(--color-status-unknown)',
+    description: '정의되지 않은 무결성 판정 상태 (Fail-closed)',
+  };
 }
 
 export interface EvidenceData {
@@ -18,7 +77,7 @@ export interface EvidenceData {
   manifestDigest?: string;
   specDigest?: string;
   policyVersion?: string;
-  integrityVerification: 'PASS' | 'FAIL' | 'UNVERIFIED' | 'RUN_FAILED';
+  integrityVerification: IntegrityVerificationStatus | string;
   policySpecifications?: {
     retention: string;
     tamperProtection: string;
@@ -49,8 +108,10 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     try {
       const prjId = projectId.trim();
       const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${runId}/result`);
-      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' | 'RUN_FAILED' = 'UNVERIFIED';
-      if (res.output?.verified === true) {
+      let integrityStatus: IntegrityVerificationStatus | string = 'UNVERIFIED';
+      if ((res as any).integrityVerification) {
+        integrityStatus = (res as any).integrityVerification;
+      } else if (res.output?.verified === true) {
         integrityStatus = 'PASS';
       } else if (res.output && (res.output.verified as unknown) === false) {
         // [계약 방어]: core.schema.json에서 ResultOutputMetadata.verified는 현재 "const": true 이므로
@@ -124,13 +185,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
       {errorMessage && (
         <div
           role="alert"
+          data-testid="evidence-error-alert"
           style={{
             padding: '16px 20px',
             marginBottom: '20px',
-            backgroundColor: 'rgba(248, 81, 73, 0.1)',
-            border: '1px solid var(--color-status-error)',
+            backgroundColor: 'var(--color-risk-l3-bg)',
+            border: '1px solid var(--color-risk-l3-border)',
             borderRadius: 'var(--radius-md)',
-            color: 'var(--color-status-error)',
+            color: 'var(--color-risk-l3-text)',
             fontSize: '0.875rem',
             display: 'flex',
             justifyContent: 'space-between',
@@ -163,77 +225,43 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
                 동적 무결성 판정:
               </span>
               {/* Dynamic Per-Run Verification Result */}
-              {evidenceData.integrityVerification === 'PASS' && (
-                <span
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                    color: 'var(--color-status-online)',
-                    border: '1px solid var(--color-status-online)',
-                  }}
-                >
-                  ✓ 출력 무결성 검증 통과 (PASS)
-                </span>
-              )}
-              {evidenceData.integrityVerification === 'FAIL' && (
-                <span
-                  data-testid="evidence-status-fail"
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                    color: 'var(--color-status-error)',
-                    border: '1px solid var(--color-status-error)',
-                  }}
-                >
-                  ✗ 출력 무결성 검증 실패 (FAIL)
-                </span>
-              )}
-              {evidenceData.integrityVerification === 'RUN_FAILED' && (
-                <span
-                  data-testid="evidence-status-run-failed"
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                    color: 'var(--color-status-error)',
-                    border: '1px solid var(--color-status-error)',
-                  }}
-                >
-                  ✗ 실행 실패 · 출력 부재 (RUN_FAILED)
-                </span>
-              )}
-              {evidenceData.integrityVerification === 'UNVERIFIED' && (
-                <span
-                  data-testid="evidence-status-unverified"
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                    color: '#d97706',
-                    border: '1px solid #d97706',
-                  }}
-                >
-                  ⚠️ 출력 무결성 미검증 (UNVERIFIED)
-                </span>
-              )}
+              {(() => {
+                const config = getEvidenceIntegrityConfig(evidenceData.integrityVerification);
+                const testIdMap: Record<IntegrityVerificationStatus, string> = {
+                  PASS: 'evidence-status-pass',
+                  FAIL: 'evidence-status-fail',
+                  RUN_FAILED: 'evidence-status-run-failed',
+                  UNVERIFIED: 'evidence-status-unverified',
+                };
+                const testId = (typeof evidenceData.integrityVerification === 'string' && Object.hasOwn(testIdMap, evidenceData.integrityVerification))
+                  ? testIdMap[evidenceData.integrityVerification as IntegrityVerificationStatus]
+                  : 'evidence-status-unknown';
+                return (
+                  <span
+                    data-testid={testId}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      backgroundColor: config.bgVar,
+                      color: config.colorVar,
+                      border: `1px solid ${config.borderVar}`,
+                    }}
+                  >
+                    {config.icon} {config.label}
+                  </span>
+                );
+              })()}
               {evidenceData.immutable && (
                 <span
+                  data-testid="evidence-status-sealed"
                   style={{
                     padding: '4px 10px',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     color: 'var(--color-brand-primary)',
                     border: '1px solid var(--color-brand-primary)',
                   }}
@@ -245,7 +273,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {copySuccess && (
-                <span role="status" data-testid="copy-evidence-success" style={{ fontSize: '0.75rem', color: '#10b981' }}>
+                <span role="status" data-testid="copy-evidence-success" style={{ fontSize: '0.75rem', color: 'var(--color-brand-success)' }}>
                   ✓ 클립보드에 복사되었습니다
                 </span>
               )}
@@ -272,11 +300,11 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               style={{
                 marginBottom: '16px',
                 padding: '10px 14px',
-                backgroundColor: 'rgba(248, 81, 73, 0.08)',
+                backgroundColor: 'var(--color-risk-l3-bg)',
                 borderRadius: 'var(--radius-sm)',
-                border: '1px solid rgba(248, 81, 73, 0.3)',
+                border: '1px solid var(--color-risk-l3-border)',
                 fontSize: '0.8125rem',
-                color: '#f87171',
+                color: 'var(--color-risk-l3-text)',
               }}
             >
               <div>
@@ -298,11 +326,11 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               style={{
                 marginBottom: '16px',
                 padding: '10px 14px',
-                backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                backgroundColor: 'var(--color-risk-l3-bg)',
                 borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--color-status-error)',
+                border: '1px solid var(--color-risk-l3-border)',
                 fontSize: '0.8125rem',
-                color: 'var(--color-status-error)',
+                color: 'var(--color-risk-l3-text)',
               }}
             >
               <div>
@@ -323,11 +351,11 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               style={{
                 marginBottom: '16px',
                 padding: '10px 14px',
-                backgroundColor: 'rgba(234, 179, 8, 0.08)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 borderRadius: 'var(--radius-sm)',
-                border: '1px solid rgba(234, 179, 8, 0.3)',
+                border: '1px solid var(--color-status-unknown)',
                 fontSize: '0.8125rem',
-                color: '#d97706',
+                color: 'var(--color-status-unknown)',
               }}
             >
               {evidenceData.manifestDigest && evidenceData.immutable ? (
@@ -351,6 +379,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               )}
             </div>
           )}
+
 
           {/* Static System Architecture Policy Specifications (Design Requirements, Not Per-Run Dynamic Tests) */}
           <div
