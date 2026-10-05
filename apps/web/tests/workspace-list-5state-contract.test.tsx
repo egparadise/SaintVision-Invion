@@ -136,7 +136,7 @@ describe('WorkspaceList Canonical 5-State Contract & Unknown Handling', () => {
       />
     );
 
-    expect(html).toContain('미확인 상태 (migrating_cluster)');
+    expect(html).toContain('UNKNOWN (migrating_cluster)');
     // Must never silently convert to ready or deleted
     expect(html).not.toContain('준비 완료 (Ready)');
     expect(html).not.toContain('삭제됨 (Deleted)');
