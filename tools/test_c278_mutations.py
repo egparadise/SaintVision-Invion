@@ -164,31 +164,31 @@ MUTANTS = [
     {
         "id": "M23",
         "desc": "Traffic light close button literal regression: backgroundColor: '#ef4444'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-offline)',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: closeControl.color,",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: '#ef4444',",
     },
     {
         "id": "M24",
         "desc": "Traffic light close button shadow literal regression: 0 1px 3px rgba(0,0,0,0.3)",
-        "target": "              padding: 0,\n              boxShadow: 'var(--shadow-sm)',\n            }}\n          />\n          <button\n            type=\"button\"\n            title={WINDOW_CONTROL_CONFIG.minimize.label}",
-        "replacement": "              padding: 0,\n              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',\n            }}\n          />\n          <button\n            type=\"button\"\n            title={WINDOW_CONTROL_CONFIG.minimize.label}",
+        "target": "              padding: 0,\n              boxShadow: 'var(--shadow-sm)',\n            }}\n          />\n          <button\n            type=\"button\"\n            title={minControl.label}",
+        "replacement": "              padding: 0,\n              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',\n            }}\n          />\n          <button\n            type=\"button\"\n            title={minControl.label}",
     },
     {
         "id": "M25",
         "desc": "Traffic light close button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-offline)',\n              border: 'none',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: closeControl.color,\n              border: 'none',",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-bg-subtle)',\n              border: 'none',",
     },
     {
         "id": "M26",
         "desc": "Traffic light close button inline outline: none focus suppression",
-        "target": "              backgroundColor: 'var(--color-status-offline)',\n              border: 'none',\n              cursor: 'pointer',",
-        "replacement": "              backgroundColor: 'var(--color-status-offline)',\n              border: 'none',\n              outline: 'none',\n              cursor: 'pointer',",
+        "target": "              backgroundColor: closeControl.color,\n              border: 'none',\n              cursor: 'pointer',",
+        "replacement": "              backgroundColor: closeControl.color,\n              border: 'none',\n              outline: 'none',\n              cursor: 'pointer',",
     },
     {
         "id": "M27",
         "desc": "Traffic light minimize button literal regression: backgroundColor: '#f59e0b'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-degraded)',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: minControl.color,",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: '#f59e0b',",
     },
     {
@@ -200,19 +200,19 @@ MUTANTS = [
     {
         "id": "M29",
         "desc": "Traffic light minimize button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-degraded)',\n              border: 'none',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: minControl.color,\n              border: 'none',",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-bg-subtle)',\n              border: 'none',",
     },
     {
         "id": "M30",
         "desc": "Traffic light minimize button inline outline: none focus suppression",
-        "target": "              backgroundColor: 'var(--color-status-degraded)',\n              border: 'none',\n              cursor: 'pointer',",
-        "replacement": "              backgroundColor: 'var(--color-status-degraded)',\n              border: 'none',\n              outline: 'none',\n              cursor: 'pointer',",
+        "target": "              backgroundColor: minControl.color,\n              border: 'none',\n              cursor: 'pointer',",
+        "replacement": "              backgroundColor: minControl.color,\n              border: 'none',\n              outline: 'none',\n              cursor: 'pointer',",
     },
     {
         "id": "M31",
         "desc": "Traffic light maximize button literal regression: backgroundColor: '#10b981'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-online)',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: maxControl.color,",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: '#10b981',",
     },
     {
@@ -224,7 +224,7 @@ MUTANTS = [
     {
         "id": "M33",
         "desc": "Traffic light maximize button collision on active subtle: backgroundColor: 'var(--color-bg-subtle)'",
-        "target": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-status-online)',\n              border: 'none',",
+        "target": "              borderRadius: '50%',\n              backgroundColor: maxControl.color,\n              border: 'none',",
         "replacement": "              borderRadius: '50%',\n              backgroundColor: 'var(--color-bg-subtle)',\n              border: 'none',",
     },
     {
@@ -272,8 +272,14 @@ MUTANTS = [
 ]
 
 def check_clean_tree():
-    status = subprocess.check_output(["git", "status", "--porcelain"], cwd=WORKTREE_ROOT, text=True, encoding="utf-8", errors="replace")
-    tracked_changes = [line for line in status.splitlines() if not line.startswith("??")]
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=no"],
+        cwd=WORKTREE_ROOT,
+        text=True,
+        encoding="utf-8",
+        errors="replace"
+    )
+    tracked_changes = [line for line in status.splitlines() if line.strip() and not line.startswith("??")]
     if tracked_changes:
         raise RuntimeError(f"Worktree has uncommitted tracked changes:\n{chr(10).join(tracked_changes)}")
 
@@ -281,7 +287,8 @@ def get_head_sha():
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=WORKTREE_ROOT, text=True, encoding="utf-8", errors="replace").strip()
 
 def run_test(mutant):
-    orig_content = TARGET_FILE.read_text(encoding='utf-8')
+    orig_bytes = TARGET_FILE.read_bytes()
+    orig_content = orig_bytes.decode('utf-8')
     target = mutant["target"]
     replacement = mutant["replacement"]
 
@@ -291,7 +298,7 @@ def run_test(mutant):
         return {"status": "ERROR", "reason": "Target snippet matched multiple times"}
 
     mutated_content = orig_content.replace(target, replacement)
-    TARGET_FILE.write_text(mutated_content, encoding='utf-8')
+    TARGET_FILE.write_bytes(mutated_content.encode('utf-8'))
 
     try:
         # 1. Compile check (tsc -b)
@@ -320,11 +327,21 @@ def run_test(mutant):
     except subprocess.TimeoutExpired:
         return {"status": "TIMEOUT"}
     finally:
-        TARGET_FILE.write_text(orig_content, encoding='utf-8')
-        # Double check restoration
-        restored_content = TARGET_FILE.read_text(encoding='utf-8')
-        if restored_content != orig_content:
-            raise RuntimeError(f"Failed to restore original content of {TARGET_FILE}")
+        TARGET_FILE.write_bytes(orig_bytes)
+        # Double check restoration byte equality
+        restored_bytes = TARGET_FILE.read_bytes()
+        if restored_bytes != orig_bytes:
+            raise RuntimeError(f"Failed to restore original bytes of {TARGET_FILE}")
+        # Fail-closed check: verify tracked tree is byte-clean
+        git_st = subprocess.check_output(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=WORKTREE_ROOT,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        ).strip()
+        if git_st:
+            raise RuntimeError(f"Tracked tree is not clean after mutant restoration:\n{git_st}")
 
 def main():
     parser = argparse.ArgumentParser(description="Run Card 278 mutation tests")
@@ -340,7 +357,7 @@ def main():
         return
 
     if args.verify_targets:
-        content = TARGET_FILE.read_text(encoding='utf-8')
+        content = TARGET_FILE.read_bytes().decode('utf-8')
         errors = 0
         for m in MUTANTS:
             cnt = content.count(m["target"])

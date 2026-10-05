@@ -10,7 +10,8 @@ export interface WindowControlStyle {
   label: string;
 }
 
-export const WINDOW_CONTROL_CONFIG: Record<WindowControlAction, WindowControlStyle> = {
+// UI-derived projection for desktop window frame controls (WCAG 2.2 AA non-text contrast >= 3.0:1)
+export const WINDOW_CONTROL_CONFIG = {
   close: {
     color: 'var(--color-status-offline)',
     bg: 'var(--color-bg-subtle)',
@@ -91,6 +92,9 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
   }
 
   const { isMaximized, position, size, zIndex, title, icon } = window;
+  const closeControl = getWindowControlConfig('close');
+  const minControl = getWindowControlConfig('minimize');
+  const maxControl = getWindowControlConfig('maximize');
 
   return (
     <div
@@ -161,7 +165,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             type="button"
-            title={WINDOW_CONTROL_CONFIG.close.label}
+            title={closeControl.label}
             aria-label={`창 닫기: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -171,7 +175,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-status-offline)',
+              backgroundColor: closeControl.color,
               border: 'none',
               cursor: 'pointer',
               padding: 0,
@@ -180,7 +184,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
           />
           <button
             type="button"
-            title={WINDOW_CONTROL_CONFIG.minimize.label}
+            title={minControl.label}
             aria-label={`창 최소화: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -190,7 +194,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-status-degraded)',
+              backgroundColor: minControl.color,
               border: 'none',
               cursor: 'pointer',
               padding: 0,
@@ -199,7 +203,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
           />
           <button
             type="button"
-            title={isMaximized ? '원래 크기로 복원' : WINDOW_CONTROL_CONFIG.maximize.label}
+            title={isMaximized ? '원래 크기로 복원' : maxControl.label}
             aria-label={isMaximized ? `원래 크기로 복원: ${title}` : `최대화: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
@@ -209,7 +213,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-status-online)',
+              backgroundColor: maxControl.color,
               border: 'none',
               cursor: 'pointer',
               padding: 0,
