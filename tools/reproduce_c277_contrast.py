@@ -229,7 +229,7 @@ AUDIT_ITEMS = [
         'name': 'Workspace error banner border',
         'type': 'border',
         'target': '3.0:1 non-text',
-        'before': {'border_raw': '#ef4444', 'parent_token': '--color-bg-surface'},
+        'before': {'border_raw': '#ef4444', 'parent_token': '--color-bg-canvas'},
         'after': {'border_token': '--color-risk-l3-border', 'parent_token': '--color-bg-canvas'},
     },
     {
@@ -238,7 +238,7 @@ AUDIT_ITEMS = [
         'name': 'Workspace error banner text',
         'type': 'text',
         'target': '4.5:1 text',
-        'before': {'fg_raw': '#fca5a5', 'bg_raw': 'rgba(239, 68, 68, 0.1)', 'parent_token': '--color-bg-surface'},
+        'before': {'fg_raw': '#fca5a5', 'bg_raw': 'rgba(239, 68, 68, 0.1)', 'parent_token': '--color-bg-canvas'},
         'after': {'fg_token': '--color-risk-l3-text', 'bg_token': '--color-risk-l3-bg'},
     },
     {
@@ -324,10 +324,6 @@ def resolve_color(spec: Dict[str, str], theme: str) -> str:
         return tokens[spec['bg_token']]
     if 'border_token' in spec:
         return tokens[spec['border_token']]
-    if 'parent_token' in spec:
-        return tokens[spec['parent_token']]
-    if 'parent_raw' in spec:
-        return spec['parent_raw']
     if 'fg_raw' in spec:
         raw = spec['fg_raw']
         if raw.startswith('rgba'):
@@ -340,7 +336,7 @@ def resolve_color(spec: Dict[str, str], theme: str) -> str:
     if 'bg_raw' in spec:
         raw = spec['bg_raw']
         if raw.startswith('rgba'):
-            underlay = tokens[spec.get('parent_token', '--color-bg-surface')]
+            underlay = tokens[spec.get('parent_token', '--color-bg-canvas')]
             return blend_rgba(parse_rgba(raw), underlay)
         if raw.startswith('var('):
             tok = raw.replace('var(', '').replace(')', '')
@@ -354,6 +350,10 @@ def resolve_color(spec: Dict[str, str], theme: str) -> str:
             tok = raw.replace('var(', '').replace(')', '')
             return tokens[tok]
         return raw
+    if 'parent_token' in spec:
+        return tokens[spec['parent_token']]
+    if 'parent_raw' in spec:
+        return spec['parent_raw']
     raise ValueError(f"Unknown color spec: {spec}")
 
 def compute_contrast(item: Dict[str, Any], state: 'before' or 'after') -> (float, float):
@@ -363,10 +363,14 @@ def compute_contrast(item: Dict[str, Any], state: 'before' or 'after') -> (float
     if item_type == 'text':
         # fg vs bg
         fg_spec = {'fg_token': spec['fg_token']} if 'fg_token' in spec else {'fg_raw': spec['fg_raw']}
+        if 'parent_token' in spec:
+            fg_spec['parent_token'] = spec['parent_token']
         if 'bg_token' in spec:
             bg_spec = {'bg_token': spec['bg_token']}
         elif 'bg_raw' in spec:
-            bg_spec = {'bg_raw': spec['bg_raw'], 'parent_token': spec.get('parent_token', '--color-bg-surface')}
+            bg_spec = {'bg_raw': spec['bg_raw']}
+            if 'parent_token' in spec:
+                bg_spec['parent_token'] = spec['parent_token']
         else:
             raise ValueError(f"No bg in {spec}")
         l_fg = resolve_color(fg_spec, 'light')
@@ -384,6 +388,8 @@ def compute_contrast(item: Dict[str, Any], state: 'before' or 'after') -> (float
             p_spec = {'parent_raw': spec['parent_raw']}
         else:
             raise ValueError(f"No parent in {spec}")
+        if b_spec.get('border_raw') == 'none' and 'parent_token' in spec:
+            b_spec['parent_token'] = spec['parent_token']
         l_b = resolve_color(b_spec, 'light')
         l_p = resolve_color(p_spec, 'light')
         d_b = resolve_color(b_spec, 'dark')
@@ -394,6 +400,7 @@ def compute_contrast(item: Dict[str, Any], state: 'before' or 'after') -> (float
         # bg vs parent
         bg_spec = {'bg_token': spec['bg_token']} if 'bg_token' in spec else {'bg_raw': spec['bg_raw']}
         if 'parent_token' in spec:
+            bg_spec['parent_token'] = spec['parent_token']
             p_spec = {'parent_token': spec['parent_token']}
         elif 'parent_raw' in spec:
             p_spec = {'parent_raw': spec['parent_raw']}

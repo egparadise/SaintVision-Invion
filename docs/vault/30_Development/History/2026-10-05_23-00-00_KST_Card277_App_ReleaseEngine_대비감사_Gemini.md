@@ -1,18 +1,18 @@
 ---
 doc_id: "HIST-20261005-CARD277-GEMINI"
-title: "Card 277 App Shell 및 Release Engine 화면 색상 리터럴 전수 토큰화 및 접근성 승격 [r1]"
-version: "1.1.0"
+title: "Card 277 App Shell 및 Release Engine 화면 색상 리터럴 전수 토큰화 및 접근성 승격 [r2]"
+version: "1.2.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T23:00:00+09:00"
-updated: "2026-10-06T01:18:00+09:00"
+updated: "2026-10-06T01:58:47+09:00"
 source_of_truth: "Git"
 ---
 
-# Card 277 App Shell 및 Release Engine 화면 색상 리터럴 전수 토큰화 및 접근성 승격 [r1]
+# Card 277 App Shell 및 Release Engine 화면 색상 리터럴 전수 토큰화 및 접근성 승격 [r2]
 
 ## 1. 작업 개요
-- **목표**: ACC-09 앱 셸 (`App.tsx`) 및 릴리스 엔진 (`releaseEngine.ts`)에 잔존하던 17 occurrences / 12 distinct 색상 리터럴 전수 토큰화(17건→0건), 상태 계약 무결성 및 디자인 토큰 체계 승격 (Claude UI r1 피드백 F1~F6 전수 조치):
+- **목표**: ACC-09 앱 셸 (`App.tsx`) 및 릴리스 엔진 (`releaseEngine.ts`)에 잔존하던 17 occurrences / 12 distinct 색상 리터럴 전수 토큰화(17건→0건), 상태 계약 무결성 및 디자인 토큰 체계 승격 (Claude UI r1/r2 피드백 전수 조치):
   1. `apps/web/src/app/App.tsx`: 베이스(`89bc257f`)에 잔존하던 11 occurrences / 9 distinct 색상 리터럴 (`#991b1b` 2건, `#dc2626`, `#ef4444`, `#f87171`, `#fca5a5`, `#fed7aa`, `#fee2e2`, `#ffffff` 2건, `rgba(239,68,68,0.1)`)을 전수 제거하고 디자인 토큰 체계로 100% 승격:
      - Global action error banner: `var(--color-risk-l3-bg)`, `var(--color-risk-l3-text)`, `var(--color-risk-l3-border)`.
      - Global error dismiss button: `var(--color-risk-l3-border)`, `var(--color-bg-surface)`, `var(--color-risk-l3-text)`.
@@ -50,28 +50,28 @@ source_of_truth: "Git"
 - `releaseEngine.ts:81`: WCAG 1.4.11 비텍스트 경계선 대비 감사 규격 (3.33:1 / 4.08:1 실측).
 
 | ID | UI 요소 | 위치 (코드 줄) | 조상 Underlay | Before 베이스 합성값 (Hex/RGBA on Underlay) | Before 명도비 (Light / Dark) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light / Dark) | WCAG 기준 | 판정 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| AP-1 | 글로벌 액션 오류 배너 텍스트 | App:480 | Banner bg L478 | #991b1b on #fee2e2 | 8.31:1 / 2.13:1 | var(--color-risk-l3-text) on risk-l3-bg | 6.80:1 / 11.28:1 | >= 4.5:1 | PASS |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| AP-1 | 글로벌 액션 오류 배너 텍스트 | App:480 | Banner bg L478 | #991b1b on #fee2e2 | 6.80:1 / 6.80:1 | var(--color-risk-l3-text) on risk-l3-bg | 6.80:1 / 11.28:1 | >= 4.5:1 | PASS |
 | AP-2 | 글로벌 액션 오류 배너 borderBottom | App:481 | Canvas L470 | #f87171 on canvas | 2.64:1 / 7.02:1 | var(--color-risk-l3-border) on canvas | 6.18:1 / 7.02:1 | >= 3.0:1 | PASS |
-| AP-3 | 글로벌 오류 닫기 버튼 배경 (fill on banner) | App:500 | Banner bg L478 | #dc2626 on risk-l3-bg | 3.95:1 / 3.38:1 | var(--color-bg-surface) on risk-l3-bg | 1.22:1 / 1.09:1 | INFO | INFO |
-| AP-4 | 글로벌 오류 닫기 버튼 텍스트 | App:501 | Button bg L500 | #991b1b on #ffffff | 8.31:1 / 2.13:1 | var(--color-risk-l3-text) on bg-surface | 8.31:1 / 12.26:1 | >= 4.5:1 | PASS |
+| AP-3 | 글로벌 오류 닫기 버튼 배경 (fill on banner) | App:500 | Banner bg L478 | #dc2626 on risk-l3-bg | 1.22:1 / 1.22:1 | var(--color-bg-surface) on risk-l3-bg | 1.22:1 / 1.09:1 | INFO | INFO |
+| AP-4 | 글로벌 오류 닫기 버튼 텍스트 | App:501 | Button bg L500 | #991b1b on #ffffff | 8.31:1 / 8.31:1 | var(--color-risk-l3-text) on bg-surface | 8.31:1 / 12.26:1 | >= 4.5:1 | PASS |
 | AP-5 | 글로벌 오류 닫기 버튼 테두리 | App:498 | Button bg L500 | #dc2626 on #ffffff | 4.83:1 / 4.83:1 | var(--color-risk-l3-border) on bg-surface | 6.47:1 / 6.41:1 | >= 3.0:1 | PASS |
 | AP-6 | 노드 시뮬레이션 활성 버튼 배경 (fill on surface) | App:675 | Surface L650 | var(--color-brand-primary-bg) on surface | 5.17:1 / 2.65:1 | var(--color-brand-primary-bg) on surface | 5.17:1 / 2.65:1 | INFO | INFO |
 | AP-7 | 노드 시뮬레이션 활성 버튼 텍스트 | App:676 | Button bg L675 | #ffffff on brand-primary-bg | 5.17:1 / 6.70:1 | var(--color-brand-primary-fg) on brand-primary-bg | 5.17:1 / 6.70:1 | >= 4.5:1 | PASS |
 | AP-8 | 노드 시뮬레이션 활성 버튼 테두리 | App:674 | Button bg L675 | var(--color-border-strong) on brand-primary-bg | 1.47:1 / 2.64:1 (FAIL) | var(--color-brand-primary-fg) on brand-primary-bg | 5.17:1 / 6.70:1 | >= 3.0:1 | PASS |
 | AP-9 | 노드 시뮬레이션 비활성 버튼 텍스트 | App:676 | Subtle bg L675 | var(--color-text-secondary) on subtle | 6.92:1 / 11.86:1 | var(--color-text-secondary) on subtle | 6.92:1 / 11.86:1 | >= 4.5:1 | PASS |
 | AP-10 | 노드 시뮬레이션 비활성 버튼 테두리 | App:674 | Surface L650 | var(--color-border-strong) on surface | 7.58:1 / 6.99:1 | var(--color-border-strong) on surface | 7.58:1 / 6.99:1 | >= 3.0:1 | PASS |
-| AP-11 | 워크스페이스 오류 배너 배경 (fill on canvas) | App:756 | Canvas L750 | rgba(239, 68, 68, 0.1) on canvas | 1.09:1 / 1.19:1 | var(--color-risk-l3-bg) on canvas | 1.17:1 / 1.19:1 | INFO | INFO |
-| AP-12 | 워크스페이스 오류 배너 테두리 | App:757 | Surface L750 | #ef4444 on surface | 3.76:1 / 4.71:1 | var(--color-risk-l3-border) on surface | 6.18:1 / 7.02:1 | >= 3.0:1 | PASS |
-| AP-13 | 워크스페이스 오류 배너 텍스트 | App:760 | Banner bg L756 | #fca5a5 on rgba(239,68,68,0.1) | 1.90:1 / 8.61:1 (FAIL) | var(--color-risk-l3-text) on risk-l3-bg | 6.80:1 / 11.28:1 | >= 4.5:1 | PASS |
+| AP-11 | 워크스페이스 오류 배너 배경 (fill on canvas) | App:756 | Canvas L750 | rgba(239, 68, 68, 0.1) on canvas | 1.13:1 / 1.08:1 | var(--color-risk-l3-bg) on canvas | 1.17:1 / 1.19:1 | INFO | INFO |
+| AP-12 | 워크스페이스 오류 배너 테두리 | App:757 | Canvas L750 | #ef4444 on canvas | 3.60:1 / 5.16:1 | var(--color-risk-l3-border) on canvas | 6.18:1 / 7.02:1 | >= 3.0:1 | PASS |
+| AP-13 | 워크스페이스 오류 배너 텍스트 | App:760 | Banner bg L756 | #fca5a5 on rgba(239, 68, 68, 0.1) | 1.60:1 / 9.51:1 (FAIL) | var(--color-risk-l3-text) on risk-l3-bg | 6.80:1 / 11.28:1 | >= 4.5:1 | PASS |
 | AP-14 | 터미널 안내 카드 컨테이너 배경 (fill on canvas) | App:924 | Canvas L915 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | var(--color-bg-surface) on canvas | 1.05:1 / 1.10:1 | INFO | INFO |
 | AP-15 | 터미널 안내 카드 테두리 | App:925 | Canvas L915 | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | >= 3.0:1 | PASS |
 | AP-16 | 터미널 안내 본문 뮤트 텍스트 | App:927 | Surface L924 | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | var(--color-text-muted) on surface | 5.75:1 / 6.99:1 | >= 4.5:1 | PASS |
 | AP-17 | 터미널 조치 안내 경고 텍스트 | App:932 | Surface L924 | #fed7aa on surface | 1.35:1 / 13.11:1 (FAIL) | var(--color-status-degraded) on surface | 5.02:1 / 8.26:1 | >= 4.5:1 | PASS |
 | AP-18 | 터미널 실행 선택 레이블 텍스트 | App:939 | Surface L935 | var(--color-text-primary) on surface | 17.85:1 / 16.98:1 | var(--color-text-primary) on surface | 17.85:1 / 16.98:1 | >= 4.5:1 | PASS |
 | AP-19 | 터미널 실행 선택 입력창 테두리 | App:945 | Surface L935 | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | var(--color-border-subtle) on surface | 3.48:1 / 3.73:1 | >= 3.0:1 | PASS |
-| RE-1 | WCAG 1.4.3 본문 텍스트 명도 대비 감사 | releaseEngine:74 | Canvas | var(--color-text-secondary) on canvas | 1.54:1 / 11.49:1 | var(--color-text-secondary) on canvas | 7.24:1 / 15.69:1 | >= 4.5:1 | PASS |
-| RE-2 | WCAG 1.4.11 UI 비텍스트 경계선 명도 대비 감사 | releaseEngine:81 | Canvas | var(--color-border-subtle) on canvas | 4.12:1 / 4.12:1 | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | >= 3.0:1 | PASS |
+| RE-1 | WCAG 1.4.3 본문 텍스트 명도 대비 감사 | releaseEngine:74 | Canvas | #c9d1d9 on #0d1117 | 12.26:1 / 12.26:1 | var(--color-text-secondary) on canvas | 7.24:1 / 15.69:1 | >= 4.5:1 | PASS |
+| RE-2 | WCAG 1.4.11 UI 비텍스트 경계선 명도 대비 감사 | releaseEngine:81 | Canvas | #6e7681 on #0d1117 | 4.12:1 / 4.12:1 | var(--color-border-subtle) on canvas | 3.33:1 / 4.08:1 | >= 3.0:1 | PASS |
 
 ### 2.2 독립 재현 스크립트 실행 콘솔 (`tools/reproduce_c277_contrast.py`)
 
@@ -83,26 +83,26 @@ Card 277: ACC-09 App Shell & Release Engine WCAG 2.2 AA Contrast Reproduction
 
 ID     | Target     | Before (L/D)   | After (L/D)    | Status | Item Name
 ----------------------------------------------------------------------------------------
-AP-1   | >= 4.5:1   | 8.31 / 2.13    | 6.80 / 11.28   | PASS   | Global action error banner text
+AP-1   | >= 4.5:1   | 6.80 / 6.80    | 6.80 / 11.28   | PASS   | Global action error banner text
 AP-2   | >= 3.0:1   | 2.64 / 7.02    | 6.18 / 7.02    | PASS   | Global action error banner borderBottom
 AP-3   | INFO       | 1.22 / 1.22    | 1.22 / 1.09    | INFO   | Global error dismiss button background (fill on banner)
-AP-4   | >= 4.5:1   | 8.31 / 2.13    | 8.31 / 12.26   | PASS   | Global error dismiss button text
+AP-4   | >= 4.5:1   | 8.31 / 8.31    | 8.31 / 12.26   | PASS   | Global error dismiss button text
 AP-5   | >= 3.0:1   | 4.83 / 4.83    | 6.47 / 6.41    | PASS   | Global error dismiss button border
 AP-6   | INFO       | 5.17 / 2.65    | 5.17 / 2.65    | INFO   | Node simulation active button background (fill on surface)
 AP-7   | >= 4.5:1   | 5.17 / 6.70    | 5.17 / 6.70    | PASS   | Node simulation active button text
 AP-8   | >= 3.0:1   | 1.47 / 2.64    | 5.17 / 6.70    | PASS   | Node simulation active button border
 AP-9   | >= 4.5:1   | 6.92 / 11.86   | 6.92 / 11.86   | PASS   | Node simulation inactive button text
 AP-10  | >= 3.0:1   | 7.58 / 6.99    | 7.58 / 6.99    | PASS   | Node simulation inactive button border
-AP-11  | INFO       | 1.09 / 1.19    | 1.17 / 1.19    | INFO   | Workspace error banner background (fill on canvas)
-AP-12  | >= 3.0:1   | 3.76 / 4.71    | 6.18 / 7.02    | PASS   | Workspace error banner border
-AP-13  | >= 4.5:1   | 1.90 / 9.35    | 6.80 / 11.28   | PASS   | Workspace error banner text
+AP-11  | INFO       | 1.13 / 1.08    | 1.17 / 1.19    | INFO   | Workspace error banner background (fill on canvas)
+AP-12  | >= 3.0:1   | 3.60 / 5.16    | 6.18 / 7.02    | PASS   | Workspace error banner border
+AP-13  | >= 4.5:1   | 1.60 / 9.51    | 6.80 / 11.28   | PASS   | Workspace error banner text
 AP-14  | INFO       | 1.05 / 1.10    | 1.05 / 1.10    | INFO   | Terminal notice container background (fill on canvas)
 AP-15  | >= 3.0:1   | 3.33 / 4.08    | 3.33 / 4.08    | PASS   | Terminal notice container border
 AP-16  | >= 4.5:1   | 5.75 / 6.99    | 5.75 / 6.99    | PASS   | Terminal notice muted text
 AP-17  | >= 4.5:1   | 1.35 / 13.11   | 5.02 / 8.26    | PASS   | Terminal notice action guidance text
 AP-18  | >= 4.5:1   | 17.85 / 16.98  | 17.85 / 16.98  | PASS   | Terminal run select input text
 AP-19  | >= 3.0:1   | 3.48 / 3.73    | 3.48 / 3.73    | PASS   | Terminal run select input border
-RE-1   | >= 4.5:1   | 1.54 / 11.49   | 7.24 / 15.69   | PASS   | WCAG 1.4.3 minimum body text contrast audit
+RE-1   | >= 4.5:1   | 12.26 / 12.26  | 7.24 / 15.69   | PASS   | WCAG 1.4.3 minimum body text contrast audit
 RE-2   | >= 3.0:1   | 4.12 / 4.12    | 3.33 / 4.08    | PASS   | WCAG 1.4.11 non-text interactive boundary contrast audit
 ----------------------------------------------------------------------------------------
 Total Audit Items: 21, Passed / Info: 21/21
@@ -132,6 +132,12 @@ ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.
 - **F4 (Medium)**: 배경 행 AP-3, AP-11, AP-14의 테두리 대치값을 실제 배경 대 underlay 쌍(AP-3 1.22/1.09, AP-11 1.17/1.19, AP-14 1.05/1.10)으로 정합하고 INFO로 분류.
 - **F5 (Medium)**: Before 6개 항목(AP-2 2.64/7.02, AP-3 3.95/3.38, AP-5 4.83/4.83, AP-12 3.76/4.71, AP-13 다크 8.61, AP-17 다크 13.11)을 정확한 sRGB 공식으로 재계산 정합.
 - **F6 (Low)**: 베이스 `89bc257f` 기준 리터럴 수량을 17 occurrences / 12 distinct (App.tsx 11 occurrences / 9 distinct, releaseEngine.ts 6 occurrences / 3 distinct: `#c9d1d9`, `#0d1117`, `#6e7681`) 표기로 Index, 작업판, History 전면 통일.
+
+### 3.4 Claude UI r2 피드백(F-A~F-D) 조치 요약
+- **F-A (Medium)**: `tools/reproduce_c277_contrast.py`의 `resolve_color`에서 `bg_raw`/`fg_raw`/`border_raw` 분기를 `parent_token` 위로 승격하여 `bg_raw`가 무시되던 결함을 해소. AP-1 Before(6.80/6.80), AP-4 Before(8.31/8.31), RE-1 Before(12.26/12.26), AP-13 Before 실측치 정합 완료.
+- **F-B (Low)**: History §2.1 표본의 RE-1 및 RE-2 Before 라벨을 베이스 원문 hex 쌍(`#c9d1d9 on #0d1117`, `#6e7681 on #0d1117`)으로 정합.
+- **F-C (Low)**: 워크스페이스 오류 배너(`App.tsx:754`)의 조상 부모가 canvas임을 정밀 반영하여 AP-11, AP-12, AP-13의 조상 배경을 canvas(`--color-bg-canvas`)로 전면 통일 및 재계산(AP-11: 1.13/1.08, AP-12: 3.60/5.16, AP-13: 1.60/9.51).
+- **F-D (Low)**: Gemini 작업판 frontmatter `version: "1.0.228"`로 1 올리고 timestamp를 commit 시각 이하로 동기화.
 
 ---
 
