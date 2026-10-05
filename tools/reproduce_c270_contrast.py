@@ -88,7 +88,7 @@ def main():
         ("IT19", "card-border", 3.0, light['--color-border-subtle'], dark['--color-border-subtle'], l_canvas, d_canvas),
         ("IT20", "card-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
         ("IT21", "card-meta text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
-        ("IT22", "card-studio-btn text", 4.5, light['--color-brand-hover'], dark['--color-brand-hover'], l_surface, d_surface),
+        ("IT22", "card-studio-btn text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_subtle, d_subtle),
 
         # 5. Empty State
         ("IT23", "empty-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),

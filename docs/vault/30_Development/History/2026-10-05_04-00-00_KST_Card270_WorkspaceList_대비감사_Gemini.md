@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T04:00:00+09:00"
-updated: "2026-10-05T14:31:00+09:00"
+updated: "2026-10-05T15:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -49,7 +49,7 @@ source_of_truth: "Git"
 | 작업공간 카드 테두리 | card-border | base에서 이미 토큰화됨 (var(--color-border-subtle) on canvas) | 3.33:1 (PASS) / 4.08:1 (PASS) | --color-border-subtle on --color-bg-canvas | 3.33:1 | 4.08:1 | >= 3.0:1 | PASS |
 | 작업공간 카드 제목 | card-title text | base에서 이미 토큰화됨 (상속 텍스트 on #ffffff / #111827) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
 | 작업공간 카드 메타 | card-meta text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| Studio 바로가기 버튼 | card-studio-btn text | base에서 이미 토큰화됨 (var(--color-brand-hover) on surface) | 6.70:1 (PASS) / 9.84:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
+| Studio 바로가기 버튼 | card-studio-btn text | base에서 이미 토큰화됨 (var(--color-text-primary) on subtle) | 16.30:1 (PASS) / 14.05:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 빈 화면 제목 | empty-title text | base에서 이미 토큰화됨 (var(--color-text-primary) on surface) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
 | 빈 화면 설명 | empty-description text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
 
@@ -90,7 +90,7 @@ IT18  | btn-create-workspace text    | 4.5   | 5.17       | 6.70       | PASS
 IT19  | card-border                  | 3.0   | 3.33       | 4.08       | PASS
 IT20  | card-title text              | 4.5   | 17.85      | 16.98      | PASS
 IT21  | card-meta text               | 4.5   | 5.75       | 6.99       | PASS
-IT22  | card-studio-btn text         | 4.5   | 6.70       | 9.84       | PASS
+IT22  | card-studio-btn text         | 4.5   | 16.30      | 14.05      | PASS
 IT23  | empty-title text             | 4.5   | 17.85      | 16.98      | PASS
 IT24  | empty-description text       | 4.5   | 5.75       | 6.99       | PASS
 ----------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ Total Audit Items: 24 | Passed: 24 | Failed: 0
 
 > [!IMPORTANT]
 > **증거 배치 및 Head 무결성 보증 (Card 245/248 합의 프로토콜 준수)**:
-> `tools/.c270_mutation_results.json` receipt는 commit A `59146c32` tree의 mutation 증거이며, commit B(`e93f629d`)는 이 JSON 결과 파일만 추가했습니다. 후속 commit C는 mutation 러너·시험·제품 코드를 바꾸지 않고 reproduce 스크립트와 문서만 변경(tools/reproduce_c270_contrast.py 및 History 정합)하였으므로 mutation 러너 및 receipt 재생성이 불필요합니다. 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree `59146c32`)의 clean HEAD입니다.
+> `tools/.c270_mutation_results.json` receipt는 commit A `59146c32` tree의 mutation 증거이며, commit B(`e93f629d`)는 이 JSON 결과 파일만 추가했습니다. 후속 commit C/D는 mutation 러너·시험·제품 코드를 바꾸지 않고 reproduce 스크립트와 문서만 변경(tools/reproduce_c270_contrast.py 및 History 정합)하였으므로 mutation 러너 및 receipt 재생성이 불필요합니다. 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree `59146c32`)의 clean HEAD입니다.
 
 `tools/test_c270_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
 결과 메타데이터는 `tools/.c270_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존되었습니다.
