@@ -4,6 +4,73 @@ import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
 import { NodeItem, RunItem } from '@/contracts/types';
 import { TerminalShellType } from '@/contracts/virtualFabric';
 
+export interface TerminalShellStyle {
+  color: string;
+  label: string;
+}
+
+export const TERMINAL_SHELL_CONFIG: Record<TerminalShellType, TerminalShellStyle> = {
+  powershell: {
+    color: 'var(--color-brand-hover)',
+    label: 'POWERSHELL',
+  },
+  bash: {
+    color: 'var(--color-status-online)',
+    label: 'BASH',
+  },
+  zsh: {
+    color: 'var(--color-brand-hover)',
+    label: 'ZSH',
+  },
+  cmd: {
+    color: 'var(--color-text-primary)',
+    label: 'CMD',
+  },
+};
+
+export function getTerminalShellConfig(shellType: unknown): TerminalShellStyle {
+  if (typeof shellType === 'string' && Object.hasOwn(TERMINAL_SHELL_CONFIG, shellType)) {
+    return TERMINAL_SHELL_CONFIG[shellType as TerminalShellType];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    label: typeof shellType === 'string' && shellType.trim() ? shellType.toUpperCase() : 'UNKNOWN',
+  };
+}
+
+export const UI_PTY_AUTH_PROJECTION_STATUSES = ['ticket_bound', 'awaiting_command'] as const;
+export type UiPtyAuthProjectionStatus = typeof UI_PTY_AUTH_PROJECTION_STATUSES[number];
+
+export interface PtyAuthStatusStyle {
+  color: string;
+  label: string;
+}
+
+export const PTY_AUTH_STATUS_CONFIG: Record<UiPtyAuthProjectionStatus, PtyAuthStatusStyle> = {
+  ticket_bound: {
+    color: 'var(--color-status-degraded)',
+    label: '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)',
+  },
+  awaiting_command: {
+    color: 'var(--color-text-muted)',
+    label: '승인 명령 ID 대기 중 (인증 대기 · mTLS)',
+  },
+};
+
+export function derivePtyAuthStatus(commandId?: string | null): UiPtyAuthProjectionStatus {
+  return commandId && commandId.trim() ? 'ticket_bound' : 'awaiting_command';
+}
+
+export function getPtyAuthStatusConfig(status: unknown): PtyAuthStatusStyle {
+  if (typeof status === 'string' && Object.hasOwn(PTY_AUTH_STATUS_CONFIG, status)) {
+    return PTY_AUTH_STATUS_CONFIG[status as UiPtyAuthProjectionStatus];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    label: typeof status === 'string' && status.trim() ? `UNKNOWN (${status})` : 'UNKNOWN',
+  };
+}
+
 export interface TerminalSessionViewProps {
   nodes?: NodeItem[];
   runs?: RunItem[];
@@ -41,52 +108,18 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
       setActiveCommandId(commandId ?? '');
     }
   }, [commandId]);
-  if (!nodes || nodes.length === 0) {
-    return (
-      <div
-        data-testid="terminal-session-view-container"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          backgroundColor: 'var(--color-bg-surface, #0f172a)',
-          color: 'var(--color-text-primary, #f8fafc)',
-        }}
-      >
-        <div
-          id="terminal-empty-nodes-notice"
-          data-testid="terminal-empty-nodes-notice"
-          role="alert"
-          style={{
-            padding: '16px',
-            backgroundColor: '#1e293b',
-            color: '#94a3b8',
-            fontSize: '0.875rem',
-            borderBottom: '1px solid #334155',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <span data-testid="terminal-no-nodes-notice">
-            ℹ️ 등록된 클러스터 노드가 없습니다. PTY 터미널 세션을 생성할 수 없습니다.
-            <span style={{ marginLeft: '8px', color: '#fed7aa', fontSize: '0.8125rem' }}>
-              🛠️ <strong>[운영자 조치 필요]</strong>: 클러스터에 등록된 온라인 노드가 없습니다. 인프라 운영자에게 노드 편입(Node 온보딩)을 요청하십시오.
-            </span>
-          </span>
-        </div>
-      </div>
-    );
-  }
 
-  // Filter eligible (schedulable & non-observation) nodes for initial sessions
-  const eligibleNodes = nodes.filter((n) => !n.observationOnly && n.schedulable !== false);
-  const primaryNode =
-    (defaultNodeId ? nodes.find((n) => n.id === defaultNodeId) : null) ||
-    eligibleNodes[0] ||
-    nodes[0];
+  const eligibleNodes = useMemo(() => {
+    return (nodes || []).filter((n) => !n.observationOnly && n.schedulable !== false);
+  }, [nodes]);
+
+  const primaryNode = useMemo(() => {
+    if (!nodes || nodes.length === 0) return null;
+    return (defaultNodeId ? nodes.find((n) => n.id === defaultNodeId) : null) || eligibleNodes[0] || nodes[0];
+  }, [nodes, defaultNodeId, eligibleNodes]);
 
   const initialSessions: ActiveSessionTab[] = useMemo(() => {
+    if (!primaryNode) return [];
     const list: ActiveSessionTab[] = [];
     const isWin = primaryNode.os === 'windows';
     const shell: TerminalShellType = isWin ? 'powershell' : 'bash';
@@ -100,7 +133,6 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
       workspaceId: defaultWorkspaceId,
     });
 
-    // Add secondary linux session if another eligible node exists
     const secondaryNode = eligibleNodes.find((n) => n.id !== primaryNode.id);
     if (secondaryNode) {
       const secIsWin = secondaryNode.os === 'windows';
@@ -122,6 +154,44 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
     initialSessions[0]?.id || 'sess_init_01'
   );
   const [sessionError, setSessionError] = useState<string | null>(null);
+
+  if (!nodes || nodes.length === 0 || !primaryNode) {
+    return (
+      <div
+        data-testid="terminal-session-view-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          backgroundColor: 'var(--color-bg-surface)',
+          color: 'var(--color-text-primary)',
+        }}
+      >
+        <div
+          id="terminal-empty-nodes-notice"
+          data-testid="terminal-empty-nodes-notice"
+          role="alert"
+          style={{
+            padding: '16px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: 'var(--color-text-muted)',
+            fontSize: '0.875rem',
+            borderBottom: '1px solid var(--color-border-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span data-testid="terminal-no-nodes-notice">
+            ℹ️ 등록된 클러스터 노드가 없습니다. PTY 터미널 세션을 생성할 수 없습니다.
+            <span style={{ marginLeft: '8px', color: 'var(--color-status-degraded)', fontSize: '0.8125rem' }}>
+              🛠️ <strong>[운영자 조치 필요]</strong>: 클러스터에 등록된 온라인 노드가 없습니다. 인프라 운영자에게 노드 편입(Node 온보딩)을 요청하십시오.
+            </span>
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) || sessions[0] || initialSessions[0];
@@ -172,6 +242,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
     );
   };
 
+  const currentShellConfig = getTerminalShellConfig(activeSession.shellType);
+  const currentPtyStatusConfig = getPtyAuthStatusConfig(derivePtyAuthStatus(activeCommandId));
+
   return (
     <div
       data-testid="terminal-session-view-container"
@@ -179,8 +252,8 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: 'var(--color-bg-surface, #0f172a)',
-        color: 'var(--color-text-primary, #f8fafc)',
+        backgroundColor: 'var(--color-bg-surface)',
+        color: 'var(--color-text-primary)',
       }}
     >
       {/* Session Top Bar / Tabs */}
@@ -191,8 +264,8 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backgroundColor: 'var(--color-bg-subtle, #1e293b)',
-          borderBottom: '1px solid var(--color-border-subtle, #334155)',
+          backgroundColor: 'var(--color-bg-subtle)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           padding: '0 12px',
           height: '42px',
         }}
@@ -213,9 +286,10 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
                   alignItems: 'center',
                   gap: '8px',
                   padding: '6px 12px',
-                  backgroundColor: isActive ? 'var(--color-bg-surface, #0f172a)' : 'transparent',
-                  borderTop: isActive ? '2px solid var(--color-brand-primary, #3b82f6)' : '2px solid transparent',
-                  borderRight: '1px solid var(--color-border-subtle, #334155)',
+                  backgroundColor: isActive ? 'var(--color-bg-surface)' : 'transparent',
+                  borderTop: isActive ? '2px solid var(--color-brand-primary)' : '2px solid transparent',
+                  borderRight: '1px solid var(--color-border-subtle)',
+                  color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                   fontSize: '0.8125rem',
                   fontWeight: isActive ? 600 : 500,
                   cursor: 'pointer',
@@ -236,7 +310,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: 'var(--color-text-muted, #94a3b8)',
+                      color: 'var(--color-text-muted)',
                       cursor: 'pointer',
                       padding: '0 2px',
                       fontSize: '0.75rem',
@@ -266,9 +340,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
               padding: '4px 8px',
               fontSize: '0.75rem',
               borderRadius: '4px',
-              backgroundColor: 'var(--color-bg-surface, #0f172a)',
+              backgroundColor: 'var(--color-bg-surface)',
               color: 'inherit',
-              border: '1px solid var(--color-border-strong, #475569)',
+              border: '1px solid var(--color-border-strong)',
             }}
           >
             <option value="" disabled>
@@ -295,8 +369,6 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         </div>
       </div>
 
-
-
       {/* Observation node error alert */}
       {sessionError && (
         <div
@@ -304,10 +376,10 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
           data-testid="terminal-session-error-alert"
           style={{
             padding: '8px 16px',
-            backgroundColor: '#7f1d1d',
-            color: '#fecaca',
+            backgroundColor: 'var(--color-risk-l3-bg)',
+            color: 'var(--color-risk-l3-text)',
             fontSize: '0.8125rem',
-            borderBottom: '1px solid #ef4444',
+            borderBottom: '1px solid var(--color-risk-l3-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -320,7 +392,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#fecaca',
+              color: 'var(--color-risk-l3-text)',
               cursor: 'pointer',
               fontSize: '0.875rem',
             }}
@@ -337,10 +409,10 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '8px 16px',
-          backgroundColor: 'rgba(0,0,0,0.2)',
-          borderBottom: '1px solid var(--color-border-subtle, #334155)',
+          backgroundColor: 'var(--color-bg-subtle)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           fontSize: '0.75rem',
-          color: 'var(--color-text-muted, #94a3b8)',
+          color: 'var(--color-text-muted)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -348,7 +420,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             대상 노드:{' '}
             <strong
               data-testid="active-node-hostname"
-              style={{ color: 'var(--color-text-primary, #f8fafc)' }}
+              style={{ color: 'var(--color-text-primary)' }}
             >
               {activeNode.hostname}
             </strong>{' '}
@@ -358,20 +430,18 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             쉘 유형:{' '}
             <strong
               data-testid="active-shell-type"
-              style={{ color: activeSession.shellType === 'powershell' ? '#38bdf8' : '#4ade80' }}
+              style={{ color: currentShellConfig.color }}
             >
-              {activeSession.shellType.toUpperCase()}
+              {currentShellConfig.label}
             </strong>
           </span>
           <span>
             인증 방식:{' '}
             <strong
               data-testid="pty-ticket-badge"
-              style={{ color: activeCommandId.trim() ? '#fbbf24' : '#94a3b8' }}
+              style={{ color: currentPtyStatusConfig.color }}
             >
-              {activeCommandId.trim()
-                ? '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)'
-                : '승인 명령 ID 대기 중 (인증 대기 · mTLS)'}
+              {currentPtyStatusConfig.label}
             </strong>
           </span>
         </div>
@@ -385,10 +455,10 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
                 value={activeCommandId}
                 onChange={(e) => setActiveCommandId(e.target.value)}
                 style={{
-                  backgroundColor: '#0f172a',
-                  border: '1px solid #334155',
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border-strong)',
                   borderRadius: '4px',
-                  color: '#f8fafc',
+                  color: 'var(--color-text-primary)',
                   fontSize: '0.6875rem',
                   padding: '2px 6px',
                 }}
@@ -411,10 +481,10 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
               onChange={(e) => setActiveCommandId(e.target.value)}
               placeholder="승인 commandId..."
               style={{
-                backgroundColor: '#0f172a',
-                border: '1px solid #334155',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-strong)',
                 borderRadius: '4px',
-                color: '#f8fafc',
+                color: 'var(--color-text-primary)',
                 fontSize: '0.6875rem',
                 padding: '2px 6px',
                 width: '130px',
@@ -428,9 +498,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             style={{
               padding: '2px 8px',
               borderRadius: '4px',
-              backgroundColor: 'rgba(59, 130, 246, 0.15)',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              color: '#60a5fa',
+              backgroundColor: 'var(--color-brand-subtle)',
+              border: '1px solid var(--color-brand-primary)',
+              color: 'var(--color-brand-hover)',
               fontSize: '0.6875rem',
               cursor: 'pointer',
             }}
@@ -445,7 +515,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         {activeSession.mode === 'terminal' ? (
           <div
             data-testid="active-terminal-container"
-            style={{ flex: 1, padding: '16px', overflow: 'auto' }}
+            style={{ flex: 1, padding: '16px', overflow: 'auto', backgroundColor: 'var(--color-bg-surface)' }}
           >
             <WebTerminal
               workspaceId={activeSession.workspaceId}
@@ -453,7 +523,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             />
           </div>
         ) : (
-          <div data-testid="active-ide-container" style={{ flex: 1, overflow: 'hidden' }}>
+          <div data-testid="active-ide-container" style={{ flex: 1, overflow: 'hidden', backgroundColor: 'var(--color-bg-surface)' }}>
             <MonacoWorkspaceEditor
               workspaceId={activeSession.workspaceId}
               projectId={projectId}
@@ -464,4 +534,3 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
     </div>
   );
 };
-
