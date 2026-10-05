@@ -1,8 +1,8 @@
 {
   "card": "CARD-279",
   "component": "TerminalSessionView",
-  "sourceHeadSha": "f327bc615f240e1b3e1fff33a3b0d0e17b751c4e",
-  "startedAt": "2026-10-05T19:37:13.711028+00:00",
+  "sourceHeadSha": "6ae979291c6d9072185507055910a914639556d5",
+  "startedAt": "2026-10-05T20:30:28.001458+00:00",
   "mutants": [
     {
       "id": "M1",
@@ -51,7 +51,7 @@
     },
     {
       "id": "M10",
-      "desc": "getTerminalShellConfig fallback color regression: var(--color-brand-hover)",
+      "desc": "getTerminalShellConfig fallback label UNKNOWN indicator stripping regression",
       "status": "KILLED"
     },
     {
@@ -210,6 +210,6 @@
   "survived": 0,
   "timeouts": 0,
   "tsc_fails": 0,
-  "completedAt": "2026-10-05T19:49:22.406575+00:00",
+  "completedAt": "2026-10-05T20:42:40.726908+00:00",
   "killRate": "100.0%"
 }
