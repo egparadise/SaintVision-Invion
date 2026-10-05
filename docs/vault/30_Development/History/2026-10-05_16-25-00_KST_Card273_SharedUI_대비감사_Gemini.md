@@ -99,7 +99,7 @@ Overall Result: ALL PASS
 ## 3. 계약 정합성 및 접근성 불변식 검증
 
 1. **RiskLevel Wire 계약 일치**:
-   - `RISK_CONFIG`는 `RiskLevel` (`contracts/types.ts`)의 엄밀 집합인 `['L0', 'L1', 'L2', 'L3']` 4종 키만을 정의하며, `satisfies Record<RiskLevel, RiskConfigItem>` 정적 가드로 여분/누락 프로퍼티를 원천 차단함.
+   - `RISK_CONFIG`는 `RiskLevel` (`apps/web/src/contracts/types.ts`)의 엄밀 집합인 `['L0', 'L1', 'L2', 'L3']` 4종 키만을 정의하며, wire enum과의 키 세트 일치성을 보증함.
    - Test 9w에서 `Object.keys(RISK_CONFIG).sort()`와 wire enum의 동등성을 런타임에 단언함.
 
 2. **Fail-Closed UNKNOWN 격하 방어**:
