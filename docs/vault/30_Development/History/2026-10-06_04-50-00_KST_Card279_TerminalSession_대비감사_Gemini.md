@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-06T04:50:00+09:00"
-updated: "2026-10-06T04:50:00+09:00"
+updated: "2026-10-06T05:46:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -168,3 +168,11 @@ ALL AUDIT ITEMS COMPLIANT WITH WCAG 2.2 AA SPECIFICATIONS.
 - `python tools/check_doc_path_citations.py --ratchet --base-ref 9c850d46` -> PASS.
 - `python tools/sync_obsidian.py --check` -> PASS (0 conflicts).
 - `tools/test_c279_mutations.py` -> 40/40 KILLED on clean commit A (`f327bc61`), sealed in Commit B (`b59395c7`) with byte-clean restore verification.
+
+---
+
+## 5. Review r1 반영 내역 (PR #376 r1)
+- **Codex F-R1 / Claude F1 (Medium)**: `TerminalSessionView.tsx` `getTerminalShellConfig` fallback label을 형제 접근자 `getPtyAuthStatusConfig`와 동일하게 `UNKNOWN (${shellType})`로 승격하여 계약 밖 대소문자 변형(`POWERSHELL`, `Bash`, `ZSH`, `CMD`), 임의 미등록 값, prototype key가 DOM에서도 canonical label과 구별되도록 개선. `acc09-contrast-tokens.test.tsx` 유닛 및 DOM 테스트에 단언 추가 및 `UNKNOWN` 표지 박탈 변이(M10) 사살 검증.
+- **Claude F2 (Low)**: `tools/reproduce_c279_contrast.py` TS-24(모드 전환 버튼 배경) nature를 "생 rgba 투명도 리터럴을 테마 시맨틱 토큰으로 승격 (시맨틱 토큰화)"로 재분류하고, 베이스 다크 underlay는 `blend_rgba(rgba(59, 130, 246, 0.15) over --color-bg-subtle)`로 정본 재계산.
+- **Claude F3 (Low)**: `tools/reproduce_c279_contrast.py`의 `nature` 항목에서 계산값과 상이할 수 있는 정적 수치 주석을 제거하고 순수 정성적 분류로 일원화.
+- **Receipt A'/B'**: Commit A' (`6ae97929`)에 코드/테스트/러너 갱신, Commit B' (`16635e1e`)에 40/40 전수 사살 재봉인.

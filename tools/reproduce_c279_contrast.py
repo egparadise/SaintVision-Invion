@@ -140,6 +140,10 @@ def verify_tokens_against_index_css():
             if not actual or actual.lower() != hex_val.lower():
                 raise AssertionError(f"Token mismatch in {theme}: {tok} expected {hex_val}, got {actual}")
 
+# Helper for switch mode button base background (rgba(59, 130, 246, 0.15) over --color-bg-subtle)
+b_switch_bg_l = blend_rgba(parse_rgba("rgba(59, 130, 246, 0.15)"), TOKENS['light']['--color-bg-subtle'])
+b_switch_bg_d = blend_rgba(parse_rgba("rgba(59, 130, 246, 0.15)"), TOKENS['dark']['--color-bg-subtle'])
+
 # Audit items for TerminalSessionView
 AUDIT_ITEMS = [
     {
@@ -283,7 +287,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-risk-l3-bg",
         "before_hex": {"light": ("#ef4444", "#7f1d1d"), "dark": ("#ef4444", "#7f1d1d")},
         "after_token": ("--color-risk-l3-border", "--color-risk-l3-bg"),
-        "nature": "대비 결손 수리 (2.87:1 -> 5.75:1 / 4.41:1)",
+        "nature": "대비 결손 수리 (경계선 비텍스트 대비 보장)",
     },
     {
         "id": "TS-14",
@@ -294,7 +298,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-risk-l3-bg",
         "before_hex": {"light": ("#fecaca", "#7f1d1d"), "dark": ("#fecaca", "#7f1d1d")},
         "after_token": ("--color-risk-l3-text", "--color-risk-l3-bg"),
-        "nature": "테마 시맨틱 토큰화 (7.65:1 / 8.21:1)",
+        "nature": "테마 시맨틱 토큰화",
     },
     {
         "id": "TS-15",
@@ -316,7 +320,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#38bdf8", "#f1f5f9"), "dark": ("#38bdf8", "#1f2937")},
         "after_token": ("--color-brand-hover", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 1.76:1 (FAIL) -> 7.39:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-17",
@@ -327,7 +331,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#4ade80", "#f1f5f9"), "dark": ("#4ade80", "#1f2937")},
         "after_token": ("--color-status-online", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 1.48:1 (FAIL) -> 5.91:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-18",
@@ -338,7 +342,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#fbbf24", "#f1f5f9"), "dark": ("#fbbf24", "#1f2937")},
         "after_token": ("--color-brand-hover", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 1.62:1 (FAIL) -> 7.39:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-19",
@@ -349,7 +353,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#0f172a", "#f1f5f9"), "dark": ("#f9fafb", "#1f2937")},
         "after_token": ("--color-text-primary", "--color-bg-subtle"),
-        "nature": "테마 시맨틱 토큰화 (15.54:1 / 11.86:1)",
+        "nature": "테마 시맨틱 토큰화",
     },
     {
         "id": "TS-20",
@@ -360,7 +364,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#fbbf24", "#f1f5f9"), "dark": ("#fbbf24", "#1f2937")},
         "after_token": ("--color-status-degraded", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 1.62:1 (FAIL) -> 4.58:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-21",
@@ -371,7 +375,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#94a3b8", "#f1f5f9"), "dark": ("#94a3b8", "#1f2937")},
         "after_token": ("--color-text-muted", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 2.56:1 (FAIL) -> 5.25:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-22",
@@ -382,7 +386,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#334155", "#f1f5f9"), "dark": ("#334155", "#1f2937")},
         "after_token": ("--color-border-strong", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (다크 1.71:1 (FAIL) -> 4.41:1)",
+        "nature": "대비 결손 수리 (다크 비텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-23",
@@ -393,7 +397,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-surface",
         "before_hex": {"light": ("#f8fafc", "#0f172a"), "dark": ("#f8fafc", "#0f172a")},
         "after_token": ("--color-text-primary", "--color-bg-surface"),
-        "nature": "테마 시맨틱 토큰화 (17.85:1 / 16.30:1)",
+        "nature": "테마 시맨틱 토큰화",
     },
     {
         "id": "TS-24",
@@ -402,9 +406,9 @@ AUDIT_ITEMS = [
         "target": "INFO",
         "kind": "bg",
         "underlay": "--color-bg-subtle",
-        "before_hex": {"light": ("#dbeafe", "#f1f5f9"), "dark": ("#1e3a8a", "#1f2937")},
+        "before_hex": {"light": (b_switch_bg_l, TOKENS['light']['--color-bg-subtle']), "dark": (b_switch_bg_d, TOKENS['dark']['--color-bg-subtle'])},
         "after_token": ("--color-brand-subtle", "--color-bg-subtle"),
-        "nature": "미사용 fallback 제거(위생)",
+        "nature": "생 rgba 투명도 리터럴을 테마 시맨틱 토큰으로 승격 (시맨틱 토큰화)",
     },
     {
         "id": "TS-25",
@@ -413,9 +417,9 @@ AUDIT_ITEMS = [
         "target": ">= 3.0:1",
         "kind": "border",
         "underlay": "--color-brand-subtle",
-        "before_hex": {"light": ("#2563eb", "#dbeafe"), "dark": ("#60a5fa", "#1e3a8a")},
+        "before_hex": {"light": ("#2563eb", b_switch_bg_l), "dark": ("#60a5fa", b_switch_bg_d)},
         "after_token": ("--color-brand-primary", "--color-brand-subtle"),
-        "nature": "비텍스트 대비 보장 (3.53:1 / 3.73:1)",
+        "nature": "비텍스트 대비 보장",
     },
     {
         "id": "TS-26",
@@ -424,9 +428,9 @@ AUDIT_ITEMS = [
         "target": ">= 4.5:1",
         "kind": "text",
         "underlay": "--color-brand-subtle",
-        "before_hex": {"light": ("#60a5fa", "#f1f5f9"), "dark": ("#60a5fa", "#1e293b")},
+        "before_hex": {"light": ("#60a5fa", b_switch_bg_l), "dark": ("#60a5fa", b_switch_bg_d)},
         "after_token": ("--color-brand-hover", "--color-brand-subtle"),
-        "nature": "대비 결손 수리 (라이트 2.50:1 (FAIL) -> 6.80:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-27",
@@ -448,7 +452,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#334155", "#1e293b"), "dark": ("#334155", "#1e293b")},
         "after_token": ("--color-border-subtle", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (1.54:1 (FAIL) -> 3.18:1 / 3.08:1)",
+        "nature": "대비 결손 수리 (경계선 비텍스트 대비 보장)",
     },
     {
         "id": "TS-29",
@@ -459,7 +463,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#94a3b8", "#1e293b"), "dark": ("#94a3b8", "#1e293b")},
         "after_token": ("--color-text-muted", "--color-bg-subtle"),
-        "nature": "테마 시맨틱 토큰화 (5.25:1 / 5.78:1)",
+        "nature": "테마 시맨틱 토큰화",
     },
     {
         "id": "TS-30",
@@ -470,7 +474,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#fed7aa", "#f1f5f9"), "dark": ("#fed7aa", "#1e293b")},
         "after_token": ("--color-status-degraded", "--color-bg-subtle"),
-        "nature": "대비 결손 수리 (라이트 1.34:1 (FAIL) -> 4.58:1)",
+        "nature": "대비 결손 수리 (라이트 텍스트 대비 미달 해소)",
     },
     {
         "id": "TS-31",
@@ -481,7 +485,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#92400e", "#f1f5f9"), "dark": ("#d29922", "#1f2937")},
         "after_token": ("--color-status-unknown", "--color-bg-subtle"),
-        "nature": "fail-closed UNKNOWN 토큰화 (6.47:1 / 5.82:1)",
+        "nature": "fail-closed UNKNOWN 토큰화",
     },
     {
         "id": "TS-32",
@@ -492,7 +496,7 @@ AUDIT_ITEMS = [
         "underlay": "--color-bg-subtle",
         "before_hex": {"light": ("#92400e", "#f1f5f9"), "dark": ("#d29922", "#1f2937")},
         "after_token": ("--color-status-unknown", "--color-bg-subtle"),
-        "nature": "fail-closed UNKNOWN 토큰화 (6.47:1 / 5.82:1)",
+        "nature": "fail-closed UNKNOWN 토큰화",
     },
 ]
 
