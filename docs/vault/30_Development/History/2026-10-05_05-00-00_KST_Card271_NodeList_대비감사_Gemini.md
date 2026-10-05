@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-05T04:55:00+09:00"
-updated: "2026-10-05T14:43:00+09:00"
+updated: "2026-10-05T15:49:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -29,13 +29,13 @@ source_of_truth: "Git"
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface/Subtle) | Before 명도비 (Light/Dark 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 코드 블록 텍스트 | code-block text | #4ade80 on #1e1e1e | 9.07:1 (PASS) / 9.07:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
-| 복사 버튼 텍스트 | btn-copy text | #ffffff on #2d3748 | 8.78:1 (PASS) / 8.78:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
-| 복사 완료 피드백 | copy-feedback text | #4ade80 on #ffffff / #111827 | 1.74:1 (FAIL) / 9.25:1 (PASS) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
-| 관측전용 배너 텍스트 | obs-banner text | var(--color-status-unknown) on rgba(210,153,34,0.15) | 6.46:1 (PASS) / 5.86:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
+| 코드 블록 텍스트 | code-block text | #4ade80 on #1e1e1e | 9.57:1 (PASS) / 9.57:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
+| 복사 버튼 텍스트 | btn-copy text | #ffffff on #2d3748 | 11.99:1 (PASS) / 11.99:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
+| 복사 완료 피드백 | copy-feedback text | #4ade80 on #ffffff / #111827 | 1.74:1 (FAIL) / 10.18:1 (PASS) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
+| 관측전용 배너 텍스트 | obs-banner text | var(--color-status-unknown) on rgba(210,153,34,0.15) (합성 #f8f0de / #2e2b26) | 6.25:1 (PASS) / 5.58:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
 | 관측전용 배너 테두리 | obs-banner border | base에서 이미 토큰화됨 (var(--color-status-unknown) on surface) | 6.47:1 (PASS) / 5.82:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
-| 활성노드 안내 텍스트 | active-notice text | var(--color-status-active) on rgba(56,189,248,0.12) | 5.42:1 (PASS) / 6.85:1 (PASS) | --color-status-active on --color-bg-subtle | 5.42:1 | 6.85:1 | >= 4.5:1 | PASS |
-| 활성노드 안내 테두리 | active-notice border | rgba(56,189,248,0.3) on #ffffff / #111827 | 1.21:1 (FAIL) / 1.74:1 (FAIL) | --color-status-active on --color-bg-subtle | 5.42:1 | 6.85:1 | >= 3.0:1 | PASS |
+| 활성노드 안내 텍스트 | active-notice text | var(--color-status-active) on rgba(56,189,248,0.12) | 5.41:1 (PASS) / 6.68:1 (PASS) | --color-status-active on --color-bg-subtle | 5.42:1 | 6.85:1 | >= 4.5:1 | PASS |
+| 활성노드 안내 테두리 | active-notice border | rgba(56,189,248,0.3) on #ffffff / #111827 | 1.26:1 (FAIL) / 1.88:1 (FAIL) | --color-status-active on --color-bg-subtle | 5.42:1 | 6.85:1 | >= 3.0:1 | PASS |
 | Studio 열기 버튼 | btn-studio-open text | #ffffff on var(--color-brand-primary-bg) | 5.17:1 (PASS) / 6.70:1 (PASS) | --color-brand-primary-fg on --color-brand-primary-bg | 5.17:1 | 6.70:1 | >= 4.5:1 | PASS |
 | Studio 열기 (관측전용) | btn-studio-obsonly text | base에서 이미 토큰화됨 (--color-text-inverse on --color-border-strong) | 7.58:1 (PASS) / 7.03:1 (PASS) | --color-text-inverse on --color-border-strong | 7.58:1 | 7.03:1 | >= 4.5:1 | PASS |
 | 새로고침 버튼 | btn-refresh text | base에서 이미 토큰화됨 (var(--color-text-primary) on subtle) | 16.30:1 (PASS) / 14.05:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
@@ -50,8 +50,8 @@ source_of_truth: "Git"
 | 상태 배지 Lost/Offline 테두리| badge-lost border | base에서 이미 토큰화됨 (var(--color-status-lost) on subtle) | 5.91:1 (PASS) / 5.31:1 (PASS) | --color-status-lost on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 상태 배지 Unknown 텍스트 | badge-unknown text | base에서 이미 토큰화됨 (var(--color-status-unknown) on subtle) | 6.47:1 (PASS) / 5.82:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
 | 상태 배지 Unknown 테두리 | badge-unknown border | base에서 이미 토큰화됨 (var(--color-status-unknown) on subtle) | 6.47:1 (PASS) / 5.82:1 (PASS) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 3.0:1 | PASS |
-| 헤더 제목 | header-title text | base에서 이미 토큰화됨 (#0f172a on #ffffff / #f9fafb on #111827) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 헤더 부제목 | header-subtitle text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 헤더 제목 | header-title text | base에서 이미 토큰화됨 (var(--color-text-primary) on canvas) | 17.06:1 (PASS) / 18.59:1 (PASS) | --color-text-primary on --color-bg-canvas | 17.06:1 | 18.59:1 | >= 4.5:1 | PASS |
+| 헤더 부제목 | header-subtitle text | base에서 이미 토큰화됨 (var(--color-text-muted) on canvas) | 5.50:1 (PASS) / 7.65:1 (PASS) | --color-text-muted on --color-bg-canvas | 5.50:1 | 7.65:1 | >= 4.5:1 | PASS |
 | 빈 화면 제목 | empty-title text | base에서 이미 토큰화됨 (var(--color-text-primary) on surface) | 17.85:1 (PASS) / 16.98:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
 | 빈 화면 설명 | empty-desc text | base에서 이미 토큰화됨 (var(--color-text-muted) on surface) | 5.75:1 (PASS) / 6.99:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
 
@@ -92,8 +92,8 @@ IT18  | badge-active border          | 3.0   | 5.42       | 6.85       | PASS
 IT19  | badge-degraded border        | 3.0   | 4.58       | 6.83       | PASS
 IT20  | badge-lost border            | 3.0   | 5.91       | 5.31       | PASS
 IT21  | badge-unknown border         | 3.0   | 6.47       | 5.82       | PASS
-IT22  | header-title text            | 4.5   | 17.85      | 16.98      | PASS
-IT23  | header-subtitle text         | 4.5   | 5.75       | 6.99       | PASS
+IT22  | header-title text            | 4.5   | 17.06      | 18.59      | PASS
+IT23  | header-subtitle text         | 4.5   | 5.50       | 7.65       | PASS
 IT24  | empty-title text             | 4.5   | 17.85      | 16.98      | PASS
 IT25  | empty-desc text              | 4.5   | 5.75       | 6.99       | PASS
 ----------------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ Total Audit Items: 25 | Passed: 25 | Failed: 0
 
 > [!IMPORTANT]
 > **증거 배치 및 Head 무결성 보증 (Card 245/248 합의 프로토콜 준수)**:
-> `tools/.c271_mutation_results.json`은 러너 및 제품 코드가 포함된 commit A의 clean checkout 상태에서 `python tools/test_c271_mutations.py --all`을 단일 연속 실행하여 생성되며, commit B는 이 JSON 결과 파일만 추가합니다. commit A와 B 사이 제품 및 시험 코드 변경은 0건이며, 봉인된 `sourceHeadSha`는 commit A(코드·시험 tree)의 clean HEAD입니다.
+> `tools/.c271_mutation_results.json` receipt는 A2 `779940b6`의 mutation 증거이며, commit B(`274486cd`)는 이 JSON 결과 파일만 추가했습니다. 이후 commit은 재현 스크립트·문서만 변경하였으므로 mutation 러너 및 receipt 재생성이 불필요합니다. 봉인된 `sourceHeadSha`는 commit A2(코드·시험 tree `779940b6`)의 clean HEAD입니다.
 
 `tools/test_c271_mutations.py`를 통해 모든 변이가 TypeScript 컴파일을 통과(`tsc -b` exit 0)함을 검증한 뒤, Vitest 계약 테스트 및 DOM 단언으로 사살됨을 확인했습니다.
 결과 메타데이터는 `tools/.c271_mutation_results.json`에 `sourceHeadSha` 및 `observedAt`과 함께 영구 보존됩니다.

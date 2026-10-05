@@ -51,6 +51,8 @@ def main():
     light, dark = parse_tokens(css_text)
 
     # Base backgrounds
+    l_canvas = parse_hex(light['--color-bg-canvas'])
+    d_canvas = parse_hex(dark['--color-bg-canvas'])
     l_surface = parse_hex(light['--color-bg-surface'])
     d_surface = parse_hex(dark['--color-bg-surface'])
     l_subtle = parse_hex(light['--color-bg-subtle'])
@@ -89,8 +91,8 @@ def main():
         ("IT21", "badge-unknown border", 3.0, light['--color-status-unknown'], dark['--color-status-unknown'], l_subtle, d_subtle),
 
         # 6. Header & Empty States
-        ("IT22", "header-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
-        ("IT23", "header-subtitle text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
+        ("IT22", "header-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_canvas, d_canvas),
+        ("IT23", "header-subtitle text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_canvas, d_canvas),
         ("IT24", "empty-title text", 4.5, light['--color-text-primary'], dark['--color-text-primary'], l_surface, d_surface),
         ("IT25", "empty-desc text", 4.5, light['--color-text-muted'], dark['--color-text-muted'], l_surface, d_surface),
     ]
