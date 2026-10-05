@@ -1,0 +1,372 @@
+{
+  "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+  "observedAt": "2026-10-05T10:07:02.755165+00:00",
+  "totalTested": 40,
+  "totalMutants": 40,
+  "killed": 40,
+  "survived": 0,
+  "timeouts": 0,
+  "tsc_fails": 0,
+  "mutations": [
+    {
+      "id": "W1",
+      "desc": "NodeDetail: observation callout bgVar==colorVar collision (backgroundColor: var(--color-status-unknown))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:55:53.125923+00:00"
+    },
+    {
+      "id": "W2",
+      "desc": "NodeDetail: observation callout low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:56:21.329728+00:00"
+    },
+    {
+      "id": "W3",
+      "desc": "NodeDetail: observation callout border==bgVar collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:56:41.350903+00:00"
+    },
+    {
+      "id": "W4",
+      "desc": "NodeDetail: resource alert bgVar==colorVar collision (backgroundColor: var(--color-status-lost))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:56:58.125631+00:00"
+    },
+    {
+      "id": "W5",
+      "desc": "NodeDetail: resource alert low-contrast text mutation (color: var(--color-text-inverse))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:57:15.163002+00:00"
+    },
+    {
+      "id": "W6",
+      "desc": "NodeDetail: resource alert border==bgVar collision (border: 1px solid var(--color-bg-subtle))",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:57:31.317770+00:00"
+    },
+    {
+      "id": "W7",
+      "desc": "NodeDetail: schedulable box observationOnly border mutated to subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:57:48.053463+00:00"
+    },
+    {
+      "id": "W8",
+      "desc": "NodeDetail: schedulable box normal border mutated to subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:58:05.353852+00:00"
+    },
+    {
+      "id": "W9",
+      "desc": "NodeDetail: schedulable box label color mutated to subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:58:23.847345+00:00"
+    },
+    {
+      "id": "W10",
+      "desc": "NodeDetail: timeline status color mutated to text-secondary",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:58:39.321736+00:00"
+    },
+    {
+      "id": "W11",
+      "desc": "NodeDetail: timeline corrupt status label fallback bypassed",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:58:55.791866+00:00"
+    },
+    {
+      "id": "W12",
+      "desc": "NodeDetail: observation callout raw literal regression rgba(210, 153, 34, 0.12)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:59:12.162563+00:00"
+    },
+    {
+      "id": "W13",
+      "desc": "NodeDetail: resource alert raw literal regression rgba(248, 81, 73, 0.1)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:59:28.051581+00:00"
+    },
+    {
+      "id": "W14",
+      "desc": "NodeDetail: schedulable box raw literal regression rgba(210, 153, 34, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 189: NodeDetail component DOM rendering binds observation callout, error alert, and schedulable cards to design tokens with dynamic contrast verification",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T09:59:43.405321+00:00"
+    },
+    {
+      "id": "W15",
+      "desc": "PlacementExplainView: simulation badge bgVar==colorVar collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:00:00.078399+00:00"
+    },
+    {
+      "id": "W16",
+      "desc": "PlacementExplainView: simulation badge low-contrast text mutation",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:00:16.225150+00:00"
+    },
+    {
+      "id": "W17",
+      "desc": "PlacementExplainView: simulation badge border==bg collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:00:32.847978+00:00"
+    },
+    {
+      "id": "W18",
+      "desc": "PlacementExplainView: winner banner bgVar==borderColor collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:00:48.566330+00:00"
+    },
+    {
+      "id": "W19",
+      "desc": "PlacementExplainView: winner banner border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:01:05.052554+00:00"
+    },
+    {
+      "id": "W20",
+      "desc": "PlacementExplainView: winner banner no-winner border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:01:20.897213+00:00"
+    },
+    {
+      "id": "W21",
+      "desc": "PlacementExplainView: passed candidate badge bgVar==colorVar collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:01:37.094602+00:00"
+    },
+    {
+      "id": "W22",
+      "desc": "PlacementExplainView: rejected candidate badge bgVar==colorVar collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:01:53.134292+00:00"
+    },
+    {
+      "id": "W23",
+      "desc": "PlacementExplainView: candidate badge text mutated to text-inverse",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:02:09.152058+00:00"
+    },
+    {
+      "id": "W24",
+      "desc": "PlacementExplainView: candidate badge border mutated to subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:02:25.953256+00:00"
+    },
+    {
+      "id": "W25",
+      "desc": "PlacementExplainView: winner score text mutated to text-secondary",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:02:42.323725+00:00"
+    },
+    {
+      "id": "W26",
+      "desc": "PlacementExplainView: simulation badge raw literal regression (#d97706)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:02:57.941432+00:00"
+    },
+    {
+      "id": "W27",
+      "desc": "PlacementExplainView: candidate badge raw literal regression rgba(16, 185, 129, 0.15)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:03:13.520452+00:00"
+    },
+    {
+      "id": "W28",
+      "desc": "PlacementExplainView: winner banner raw literal regression rgba(16, 185, 129, 0.1)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:03:29.765706+00:00"
+    },
+    {
+      "id": "W29",
+      "desc": "ResourceTopologyGraph: node card background mutated to status-online",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:03:45.880497+00:00"
+    },
+    {
+      "id": "W30",
+      "desc": "ResourceTopologyGraph: selected node card border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:04:02.466571+00:00"
+    },
+    {
+      "id": "W31",
+      "desc": "ResourceTopologyGraph: fenced node card border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:04:19.318171+00:00"
+    },
+    {
+      "id": "W32",
+      "desc": "ResourceTopologyGraph: selected badge bgVar==colorVar collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:04:35.108861+00:00"
+    },
+    {
+      "id": "W33",
+      "desc": "ResourceTopologyGraph: selected badge text mutated to text-inverse",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:04:51.371424+00:00"
+    },
+    {
+      "id": "W34",
+      "desc": "ResourceTopologyGraph: selected badge border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:05:07.294685+00:00"
+    },
+    {
+      "id": "W35",
+      "desc": "ResourceTopologyGraph: fenced badge bgVar==colorVar collision",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:05:23.547846+00:00"
+    },
+    {
+      "id": "W36",
+      "desc": "ResourceTopologyGraph: fenced badge text mutated to text-inverse",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:05:40.994671+00:00"
+    },
+    {
+      "id": "W37",
+      "desc": "ResourceTopologyGraph: fenced badge border mutated to border-subtle",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:05:58.202924+00:00"
+    },
+    {
+      "id": "W38",
+      "desc": "ResourceTopologyGraph: selected badge raw literal regression (#ffffff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:06:15.092801+00:00"
+    },
+    {
+      "id": "W39",
+      "desc": "ResourceTopologyGraph: fenced badge raw literal regression (#ffffff)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:06:30.948839+00:00"
+    },
+    {
+      "id": "W40",
+      "desc": "ResourceTopologyGraph: node card raw literal regression rgba(16, 185, 129, 0.08)",
+      "status": "KILLED",
+      "killed": true,
+      "killer": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 274: NodeDetail, PlacementExplainView, and ResourceTopologyGraph comply with WCAG 2.2 AA contrast and fail-closed contracts",
+      "sourceHeadSha": "8e9db6fb9ebfc142b5253231fd134c1b1ecdb7c9",
+      "observedAt": "2026-10-05T10:06:46.327923+00:00"
+    }
+  ]
+}
