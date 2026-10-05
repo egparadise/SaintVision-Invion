@@ -47,6 +47,11 @@ import {
   getClusterNodeStatusConfig,
 } from '../src/features/dashboard/ClusterOverview';
 import {
+  WorkspaceList,
+  WORKSPACE_STATUS_CONFIG,
+  getWorkspaceStatusConfig,
+} from '../src/features/workspaces/WorkspaceList';
+import {
   PlacementSimulator,
   DISCOVERY_CANDIDATE_STATE_CONFIG,
   getDiscoveryCandidateStateConfig,
@@ -84,7 +89,7 @@ import type {
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
 import { fabricObservation } from '../src/shared/api/fabricObservation';
-import type { ProjectItem, NodeItem, RunItem } from '../src/contracts/types';
+import type { ProjectItem, NodeItem, RunItem, WorkspaceItem, WorkspaceStatusName } from '../src/contracts/types';
 
 vi.mock('@/shared/api/client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/shared/api/client')>();
@@ -353,7 +358,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/terminal/WebTerminal.tsx": {"#090d16": 1, "#0d1117": 1, "#161b22": 1, "#1c1917": 1, "#238636": 1, "#30363d": 2, "#451a03": 1, "#58a6ff": 1, "#6b7280": 1, "#7f1d1d": 1, "#8b949e": 5, "#c9d1d9": 2, "#d29922": 1, "#d97706": 1, "#ea580c": 1, "#ef4444": 2, "#f0f6fc": 2, "#f85149": 1, "#fb923c": 1, "#fde68a": 2, "#fecaca": 1, "#fed7aa": 1, "#fff": 1},
   "features/workspaces/ExecutionResultView.tsx": {"rgba(16,185,129,0.15)": 1},
   "features/workspaces/WorkspaceCreateModal.tsx": {"rgba(0,0,0,0.65)": 1},
-  "features/workspaces/WorkspaceList.tsx": {"#34d399": 1, "#f59e0b": 1, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(16,185,129,0.3)": 1, "rgba(239,68,68,0.15)": 1, "rgba(239,68,68,0.3)": 1, "rgba(245,158,11,0.15)": 1, "rgba(245,158,11,0.3)": 1},
+  "features/workspaces/WorkspaceList.tsx": {},
   "shared/ui/Button.tsx": {"#ffffff": 2},
   "shared/ui/Header.tsx": {"#58a6ff": 1, "#60a5fa": 1, "#79c0ff": 1, "#f85149": 3, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.25)": 1, "rgba(56,139,253,0.3)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.4)": 1},
   "shared/ui/RiskBadge.tsx": {"rgba(16,185,129,0.15)": 1, "rgba(239,68,68,0.15)": 1, "rgba(245,158,11,0.15)": 1, "rgba(59,130,246,0.15)": 1},
@@ -7085,8 +7090,225 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter & ClusterOverview
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, and ClusterOverview style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9r. [Card 270 / ACC-09] WorkspaceList Contrast & DOM Token Binding: 5 canonical states, fail-closed UNKNOWN (<raw>), error banner, and focus rings
+  it('ACC-09 / Card 270: WorkspaceList status badges, error banner, and interactive buttons comply with WCAG 2.2 AA contrast and fail-closed contracts', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      // 1. Config key set exact equality with wire enum
+      const expectedKeys: WorkspaceStatusName[] = ['deleted', 'deleting', 'provisioning', 'ready', 'suspended'];
+      expect(Object.keys(WORKSPACE_STATUS_CONFIG).sort(), 'WORKSPACE_STATUS_CONFIG keys must exactly match WorkspaceStatusName wire enum').toEqual(expectedKeys.sort());
+
+      // 2. Render all 5 canonical statuses in DOM and verify styling & tokens
+      const sampleNodes: NodeItem[] = [
+        {
+          id: 'nod_01JABCDEF01',
+          hostname: 'pacs-worker-01',
+          ip: '192.168.1.10',
+          status: 'active',
+          cpuCores: 16,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsedBytes: 16 * 1024 ** 3,
+          gpuCount: 2,
+          gpuModels: ['NVIDIA RTX 4090'],
+          storagePools: [],
+          telemetryUnavailable: false,
+          schedulable: true,
+          labels: {},
+          annotations: {},
+        },
+      ];
+
+      const sampleWorkspaces: WorkspaceItem[] = [
+        {
+          id: 'wsp-ready',
+          projectId: 'prj-1',
+          name: 'Ready Workspace',
+          targetNodeId: 'nod_01JABCDEF01',
+          isolationMode: 'process_sandbox',
+          allowedPaths: [],
+          prohibitedPaths: [],
+          cpuLimitCores: 2,
+          memoryLimitBytes: 1024,
+          status: 'ready',
+          createdAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'wsp-prov',
+          projectId: 'prj-1',
+          name: 'Provisioning Workspace',
+          targetNodeId: 'nod_01JABCDEF01',
+          isolationMode: 'process_sandbox',
+          allowedPaths: [],
+          prohibitedPaths: [],
+          cpuLimitCores: 2,
+          memoryLimitBytes: 1024,
+          status: 'provisioning',
+          createdAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'wsp-susp',
+          projectId: 'prj-1',
+          name: 'Suspended Workspace',
+          targetNodeId: 'nod_01JABCDEF01',
+          isolationMode: 'process_sandbox',
+          allowedPaths: [],
+          prohibitedPaths: [],
+          cpuLimitCores: 2,
+          memoryLimitBytes: 1024,
+          status: 'suspended',
+          createdAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'wsp-del',
+          projectId: 'prj-1',
+          name: 'Deleting Workspace',
+          targetNodeId: 'nod_01JABCDEF01',
+          isolationMode: 'process_sandbox',
+          allowedPaths: [],
+          prohibitedPaths: [],
+          cpuLimitCores: 2,
+          memoryLimitBytes: 1024,
+          status: 'deleting',
+          createdAt: '2026-10-05T00:00:00Z',
+        },
+        {
+          id: 'wsp-deleted',
+          projectId: 'prj-1',
+          name: 'Deleted Workspace',
+          targetNodeId: null,
+          isolationMode: 'process_sandbox',
+          allowedPaths: [],
+          prohibitedPaths: [],
+          cpuLimitCores: 2,
+          memoryLimitBytes: 1024,
+          status: 'deleted',
+          createdAt: '2026-10-05T00:00:00Z',
+        },
+      ];
+
+      act(() => {
+        root.render(
+          <WorkspaceList
+            workspaces={sampleWorkspaces}
+            nodes={sampleNodes}
+            errorMessage="클러스터 동기화 오류가 발생했습니다"
+            onCreateWorkspace={vi.fn()}
+            onSelectWorkspace={vi.fn()}
+            onOpenStudio={vi.fn()}
+          />
+        );
+      });
+
+      // Verify status badges
+      for (const wsp of sampleWorkspaces) {
+        const badge = container.querySelector(`[data-testid="wsp-status-${wsp.id}"]`) as HTMLElement;
+        expect(badge, `Status badge for ${wsp.id} must be rendered`).not.toBeNull();
+        const cfg = WORKSPACE_STATUS_CONFIG[wsp.status];
+        expect(badge.textContent).toBe(cfg.label);
+        expect(badge.style.backgroundColor).toContain(cfg.bg.replace(/var\(|\)/g, ''));
+        expect(badge.style.color).toContain(cfg.color.replace(/var\(|\)/g, ''));
+        expect(badge.style.borderColor || badge.style.border).toContain(cfg.border.replace(/var\(|\)/g, ''));
+      }
+
+      // 3. Error banner DOM assertions
+      const errorBanner = container.querySelector('[data-testid="workspace-error-banner"]') as HTMLElement;
+      expect(errorBanner, 'Workspace error banner must be rendered when errorMessage is passed').not.toBeNull();
+      expect(errorBanner.getAttribute('role')).toBe('alert');
+      expect(errorBanner.textContent).toContain('⚠️');
+      expect(errorBanner.textContent).toContain('작업공간 오류');
+      expect(errorBanner.textContent).toContain('클러스터 동기화 오류가 발생했습니다');
+      expect(errorBanner.style.backgroundColor).toContain('var(--color-bg-subtle)');
+      expect(errorBanner.style.borderColor || errorBanner.style.border).toContain('var(--color-status-offline)');
+      expect(errorBanner.style.color).toContain('var(--color-status-offline)');
+
+      // 4. Focus ring preservation
+      const createBtn = container.querySelector('button');
+      expect(createBtn).not.toBeNull();
+      expect(createBtn?.style.outline).not.toBe('none');
+      expect(createBtn?.style.outline).not.toBe('0');
+
+      const studioBtns = container.querySelectorAll('button');
+      const studioBtn = Array.from(studioBtns).find((b) => b.textContent?.includes('Studio에서 열기'));
+      expect(studioBtn).toBeDefined();
+      expect(studioBtn?.style.outline).not.toBe('none');
+      expect(studioBtn?.style.outline).not.toBe('0');
+
+      const cards = container.querySelectorAll('div[role="button"]');
+      expect(cards.length).toBeGreaterThan(0);
+      for (const card of Array.from(cards)) {
+        const cardEl = card as HTMLElement;
+        expect(cardEl.style.outline).not.toBe('none');
+        expect(cardEl.style.outline).not.toBe('0');
+      }
+
+      // 5. Fail-closed UNKNOWN (<raw>) contract handling
+      const unk1 = getWorkspaceStatusConfig('migrating_cluster');
+      expect(unk1.color).toBe('var(--color-status-unknown)');
+      expect(unk1.bg).toBe('var(--color-bg-subtle)');
+      expect(unk1.border).toBe('var(--color-status-unknown)');
+      expect(unk1.label).toBe('UNKNOWN (migrating_cluster)');
+
+      const unkCase = getWorkspaceStatusConfig('READY');
+      expect(unkCase.color).toBe('var(--color-status-unknown)');
+      expect(unkCase.label).toBe('UNKNOWN (READY)');
+
+      const unkAdmitted = getWorkspaceStatusConfig('admitted');
+      expect(unkAdmitted.color).toBe('var(--color-status-unknown)');
+      expect(unkAdmitted.label).toBe('UNKNOWN (admitted)');
+
+      const nullCfg = getWorkspaceStatusConfig(null);
+      expect(nullCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCfg.label).toBe('UNKNOWN');
+
+      const emptyCfg = getWorkspaceStatusConfig('');
+      expect(emptyCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCfg.label).toBe('UNKNOWN');
+
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getWorkspaceStatusConfig(pk as any);
+        expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
+      }
+
+      // 6. Explicit numerical contrast calculations
+      const unkLightCr = getContrast(resolveTokenHex('--color-status-unknown', lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+      expect(unkLightCr, 'WorkspaceList UNKNOWN fallback on light subtle must pass 4.5:1').toBeCloseTo(6.47, 2);
+      expect(unkLightCr).toBeGreaterThanOrEqual(4.5);
+      const unkDarkCr = getContrast(resolveTokenHex('--color-status-unknown', darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+      expect(unkDarkCr, 'WorkspaceList UNKNOWN fallback on dark subtle must pass 4.5:1').toBeCloseTo(5.82, 2);
+      expect(unkDarkCr).toBeGreaterThanOrEqual(4.5);
+
+      for (const [stKey, cfg] of Object.entries(WORKSPACE_STATUS_CONFIG)) {
+        const tokenMatch = cfg.color.match(/var\((--color-[a-z0-9-]+)\)/);
+        expect(tokenMatch, `Status ${stKey} color must be a CSS variable`).not.toBeNull();
+        const token = tokenMatch![1];
+        const lCr = getContrast(resolveTokenHex(token, lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+        expect(lCr, `WORKSPACE_STATUS_CONFIG.${stKey} color contrast on light subtle must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        const dCr = getContrast(resolveTokenHex(token, darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+        expect(dCr, `WORKSPACE_STATUS_CONFIG.${stKey} color contrast on dark subtle must pass 4.5:1`).toBeGreaterThanOrEqual(4.5);
+
+        const borderTokenMatch = cfg.border.match(/var\((--color-[a-z0-9-]+)\)/);
+        expect(borderTokenMatch, `Status ${stKey} border must be a CSS variable`).not.toBeNull();
+        const borderToken = borderTokenMatch![1];
+        const lBorderCr = getContrast(resolveTokenHex(borderToken, lightTokens), resolveTokenHex('--color-bg-subtle', lightTokens));
+        expect(lBorderCr, `WORKSPACE_STATUS_CONFIG.${stKey} border contrast on light subtle must pass 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        const dBorderCr = getContrast(resolveTokenHex(borderToken, darkTokens), resolveTokenHex('--color-bg-subtle', darkTokens));
+        expect(dBorderCr, `WORKSPACE_STATUS_CONFIG.${stKey} border contrast on dark subtle must pass 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview & WorkspaceList
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 & Card 248 & Card 270: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, ApprovalCenter, ClusterOverview, and WorkspaceList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -7375,7 +7597,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG' || node.name.getText(sf) === 'APPROVAL_STATUS_CONFIG' || node.name.getText(sf) === 'NODE_STATUS_CONFIG' || node.name.getText(sf) === 'WORKSPACE_STATUS_CONFIG') && node.initializer) {
           const varName = node.name.getText(sf);
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
@@ -7522,6 +7744,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(clusterStats.coveredColorObjects, 'Total covered color objects in ClusterOverview must be exactly 38').toBe(38);
     expect(clusterStats.checkedBorderObjects, 'Border objects in ClusterOverview must be exactly 16').toBe(16);
     expect(clusterStats.checkedBorderPairs, 'Border pairs in ClusterOverview must be exactly 16').toBe(16);
+
+    const workspaceListStats = analyzeFile('features/workspaces/WorkspaceList.tsx');
+    expect(workspaceListStats.violations, `WorkspaceList violations:\n${workspaceListStats.violations.join('\n')}`).toEqual([]);
+    expect(workspaceListStats.totalStyleAttrs, 'Total style attributes in WorkspaceList must be exactly 37').toBe(37);
+    expect(workspaceListStats.checkedObjects, 'Explicit style objects in WorkspaceList must be exactly 8').toBe(8);
+    expect(workspaceListStats.checkedPairs, 'Evaluated pairs in WorkspaceList must be exactly 20').toBe(20);
+    expect(workspaceListStats.unboundColorObjects, 'Unbound color objects in WorkspaceList must be exactly 12').toBe(12);
+    expect(workspaceListStats.coveredColorObjects, 'Total covered color objects in WorkspaceList must be exactly 20').toBe(20);
+    expect(workspaceListStats.checkedBorderObjects, 'Border objects in WorkspaceList must be exactly 11').toBe(11);
+    expect(workspaceListStats.checkedBorderPairs, 'Border pairs in WorkspaceList must be exactly 11').toBe(11);
   });
 
 
@@ -8077,6 +8309,36 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe110Cr, 'ClusterOverview former #d29922 on light canvas fails 4.5:1').toBeLessThan(4.5);
     expect(probe110Cr).toBeCloseTo(2.41, 1);
 
+    // Probe 111 [Card 270]: WorkspaceList former ready text #34d399 on light composite #dbf4ec strictly fails 4.5:1
+    const lightReadyComposite = blendRgba([16, 185, 129], 0.15, lightTokens['--color-bg-surface']);
+    const probe111Cr = getContrast('#34d399', lightReadyComposite);
+    expect(probe111Cr, 'WorkspaceList former #34d399 on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe111Cr).toBeCloseTo(1.66, 1);
+
+    // Probe 112 [Card 270]: WorkspaceList former provisioning text #f59e0b on light composite #fef4e7 strictly fails 4.5:1
+    const lightProvComposite = blendRgba([245, 158, 11], 0.15, lightTokens['--color-bg-surface']);
+    const probe112Cr = getContrast('#f59e0b', lightProvComposite);
+    expect(probe112Cr, 'WorkspaceList former #f59e0b on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe112Cr).toBeCloseTo(1.91, 1);
+
+    // Probe 113 [Card 270]: WorkspaceList former deleting text #f87171 on light composite #fde9e9 strictly fails 4.5:1
+    const lightDelComposite = blendRgba([239, 68, 68], 0.15, lightTokens['--color-bg-surface']);
+    const probe113Cr = getContrast('#f87171', lightDelComposite);
+    expect(probe113Cr, 'WorkspaceList former #f87171 on light composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe113Cr).toBeCloseTo(2.28, 1);
+
+    // Probe 114 [Card 270]: WorkspaceList former ready border rgba(16,185,129,0.3) on light surface strictly fails 3.0:1
+    const lightReadyBorder = blendRgba([16, 185, 129], 0.3, lightTokens['--color-bg-surface']);
+    const probe114Cr = getContrast(lightReadyBorder, lightTokens['--color-bg-surface']);
+    expect(probe114Cr, 'WorkspaceList former ready border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe114Cr).toBeCloseTo(1.33, 1);
+
+    // Probe 115 [Card 270]: WorkspaceList former deleting border rgba(239,68,68,0.3) on dark surface strictly fails 3.0:1
+    const darkDelBorder = blendRgba([239, 68, 68], 0.3, darkTokens['--color-bg-surface']);
+    const probe115Cr = getContrast(darkDelBorder, darkTokens['--color-bg-surface']);
+    expect(probe115Cr, 'WorkspaceList former deleting border on dark surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe115Cr).toBeCloseTo(1.42, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -8089,8 +8351,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 459/31 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 459/31 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 458/31 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -8172,7 +8434,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 459').toBe(459);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
