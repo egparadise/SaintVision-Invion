@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-10-05T23:26:44.306795+00:00",
-  "sourceHeadSha": "bdee2e6098a73606267e1be13d0b35467b389043",
+  "timestamp": "2026-10-06T00:15:29.298659+00:00",
+  "sourceHeadSha": "df554a14f98f1dc5d7630d1e942b72903ea38d10",
   "totalMutants": 40,
   "killed": 40,
   "survived": 0,
   "timeouts": 0,
   "tsc_fails": 0,
-  "durationSeconds": 829.53,
+  "durationSeconds": 818.09,
   "killRate": "100.0%",
   "mutants": [
     {
@@ -53,7 +53,7 @@
     },
     {
       "id": "M7",
-      "desc": "connecting bgVar literal regression: bgVar: '#1c1917'",
+      "desc": "connecting colorVar 1:1 collision with bgVar: colorVar: 'var(--color-bg-subtle)'",
       "status": "killed",
       "tsc_ok": true,
       "detail": "Killed successfully (exit 1)"
