@@ -61,8 +61,46 @@
      "text": "@router.get(\"/storage/replica-status\")"
     }
    ],
-   "closedBlockers": {},
-   "forbiddenBlockers": []
+   "closedBlockers": {
+    "uri-trailing-and-version-slash-fix-re-review-not-recorded": [
+     {
+      "kind": "references",
+      "path": "src/saintvision/storage/pathsafe.py",
+      "text": "if \"/\" in version:"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/storage/pathsafe.py",
+      "text": "if slash and not relative:"
+     },
+     {
+      "kind": "references",
+      "path": "tests/test_vf_service_review.py",
+      "text": "test_parser_never_accepts_a_non_roundtripping_uri"
+     }
+    ],
+    "c75201af-model-shard-resolution-not-independently-reviewed": [
+     {
+      "kind": "references",
+      "path": "services/control-plane/src/inv/model_uri_resolver.py",
+      "text": "validate_contract(\"ModelExecutionManifestObservation\", result)"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/services/resolver.py",
+      "text": "execution observation identity mismatch"
+     },
+     {
+      "kind": "references",
+      "path": "tests/integration/test_model_uri_resolver_http.py",
+      "text": "test_model_uri_resolution_rechecks_both_roles_and_never_replays_authority"
+     }
+    ]
+   },
+   "forbiddenBlockers": [
+    "uri-trailing-and-version-slash-fix-re-review-not-recorded",
+    "c75201af-model-shard-resolution-not-independently-reviewed"
+   ]
   },
   "VF-CL-03": {
    "impliesImplemented": true,
@@ -104,10 +142,28 @@
       "kind": "path-exists",
       "path": "src/saintvision/api/problem.py"
      }
+    ],
+    "34791448-license-exact-match-adapter-not-independently-reviewed": [
+     {
+      "kind": "references",
+      "path": "src/saintvision/adapters/model_import.py",
+      "text": "value != manifest[field]"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/adapters/model_import.py",
+      "text": "if field not in DECLARED_FIELDS:"
+     },
+     {
+      "kind": "references",
+      "path": "tests/core/test_registry_policy_exact_match.py",
+      "text": "test_every_deviation_from_the_declaration_is_named_and_refused"
+     }
     ]
    },
    "forbiddenBlockers": [
-    "import-adapter-has-no-request-path-contract"
+    "import-adapter-has-no-request-path-contract",
+    "34791448-license-exact-match-adapter-not-independently-reviewed"
    ]
   },
   "VF-CL-04": {
@@ -251,13 +307,49 @@
       "path": ".github/workflows/core.yml",
       "text": "assert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'"
      }
+    ],
+    "0043-retained-replicas-pin-fix-re-review-not-recorded": [
+     {
+      "kind": "references",
+      "path": "migrations/versions/0043_replica_retention.py",
+      "text": "CHECK (pinned_until IS NULL OR state IN ('ready', 'stale'))"
+     },
+     {
+      "kind": "references",
+      "path": "tests/test_vf_replica_migration.py",
+      "text": "test_forward_upgrade_preserves_existing_pin_and_bytes"
+     },
+     {
+      "kind": "references",
+      "path": "tests/test_vf_service_review.py",
+      "text": "test_departure_preserves_retention_and_marks_pinned_replica_stale"
+     }
+    ],
+    "3e267b05-archive-retention-tool-not-independently-reviewed": [
+     {
+      "kind": "references",
+      "path": "tools/pitr_archive_retention.py",
+      "text": "return m.group(1), UnknownAge()"
+     },
+     {
+      "kind": "references",
+      "path": "tools/pitr_archive_retention.py",
+      "text": "boundary = min(b.start_segment for b in retained)"
+     },
+     {
+      "kind": "references",
+      "path": "tests/test_pitr_archive_retention.py",
+      "text": "test_revival_f01_filesystem_seam_missing_start_time_never_reads_directory_mtime"
+     }
     ]
    },
    "forbiddenBlockers": [
     "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
     "restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2",
     "restore-drill-setup-skips-are-an-external-precondition",
-    "retention-and-readiness-tools-not-wired-to-any-operational-gate"
+    "retention-and-readiness-tools-not-wired-to-any-operational-gate",
+    "0043-retained-replicas-pin-fix-re-review-not-recorded",
+    "3e267b05-archive-retention-tool-not-independently-reviewed"
    ]
   },
   "VF-CL-05": {
