@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-10-06T00:15:29.298659+00:00",
-  "sourceHeadSha": "df554a14f98f1dc5d7630d1e942b72903ea38d10",
+  "timestamp": "2026-10-06T00:54:28.224614+00:00",
+  "sourceHeadSha": "407a8e8203d368ecea39942a1786bc00eb7160c1",
   "totalMutants": 40,
   "killed": 40,
   "survived": 0,
   "timeouts": 0,
   "tsc_fails": 0,
-  "durationSeconds": 818.09,
+  "durationSeconds": 795.95,
   "killRate": "100.0%",
   "mutants": [
     {
