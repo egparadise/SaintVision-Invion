@@ -28,7 +28,6 @@ export interface WebTerminalConnectionStatusConfigItem {
   label: string;
   dotColor: string;
   colorVar: string;
-  textColor: string;
   promptColor: string;
   borderVar: string;
   bgVar: string;
@@ -39,7 +38,6 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
     label: 'connected',
     dotColor: 'var(--color-status-online)',
     colorVar: 'var(--color-status-online)',
-    textColor: 'var(--color-status-online)',
     promptColor: 'var(--color-brand-primary)',
     borderVar: 'var(--color-status-online)',
     bgVar: 'var(--color-diff-added-bg)',
@@ -48,7 +46,6 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
     label: 'connecting',
     dotColor: 'var(--color-status-degraded)',
     colorVar: 'var(--color-status-degraded)',
-    textColor: 'var(--color-status-degraded)',
     promptColor: 'var(--color-status-degraded)',
     borderVar: 'var(--color-status-degraded)',
     bgVar: 'var(--color-bg-subtle)',
@@ -57,7 +54,6 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
     label: 'disconnected',
     dotColor: 'var(--color-text-muted)',
     colorVar: 'var(--color-text-muted)',
-    textColor: 'var(--color-text-muted)',
     promptColor: 'var(--color-text-muted)',
     borderVar: 'var(--color-border-subtle)',
     bgVar: 'var(--color-bg-subtle)',
@@ -66,7 +62,6 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
     label: 'error',
     dotColor: 'var(--color-status-offline)',
     colorVar: 'var(--color-status-offline)',
-    textColor: 'var(--color-status-offline)',
     promptColor: 'var(--color-status-offline)',
     borderVar: 'var(--color-status-offline)',
     bgVar: 'var(--color-risk-l3-bg)',
@@ -77,7 +72,6 @@ export const WEB_TERMINAL_CONNECTION_STATUS_FALLBACK: WebTerminalConnectionStatu
   label: 'UNKNOWN',
   dotColor: 'var(--color-status-unknown)',
   colorVar: 'var(--color-status-unknown)',
-  textColor: 'var(--color-status-unknown)',
   promptColor: 'var(--color-status-unknown)',
   borderVar: 'var(--color-status-unknown)',
   bgVar: 'var(--color-bg-subtle)',

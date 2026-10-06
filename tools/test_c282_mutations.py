@@ -41,8 +41,8 @@ MUTANTS = [
         "id": "M2",
         "file": "web_terminal",
         "desc": "connected promptColor literal regression: promptColor: '#58a6ff'",
-        "target": "    textColor: 'var(--color-status-online)',\n    promptColor: 'var(--color-brand-primary)',",
-        "replacement": "    textColor: 'var(--color-status-online)',\n    promptColor: '#58a6ff',"
+        "target": "    colorVar: 'var(--color-status-online)',\n    promptColor: 'var(--color-brand-primary)',",
+        "replacement": "    colorVar: 'var(--color-status-online)',\n    promptColor: '#58a6ff',"
     },
     {
         "id": "M3",
@@ -69,15 +69,15 @@ MUTANTS = [
         "id": "M6",
         "file": "web_terminal",
         "desc": "connecting promptColor literal regression: promptColor: '#d29922'",
-        "target": "    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',",
-        "replacement": "    textColor: 'var(--color-status-degraded)',\n    promptColor: '#d29922',\n    borderVar: 'var(--color-status-degraded)',"
+        "target": "    colorVar: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',",
+        "replacement": "    colorVar: 'var(--color-status-degraded)',\n    promptColor: '#d29922',\n    borderVar: 'var(--color-status-degraded)',"
     },
     {
         "id": "M7",
         "file": "web_terminal",
         "desc": "connecting colorVar 1:1 collision with bgVar: colorVar: 'var(--color-bg-subtle)'",
-        "target": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',",
-        "replacement": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-bg-subtle)',\n    textColor: 'var(--color-bg-subtle)',"
+        "target": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',",
+        "replacement": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-bg-subtle)',\n    promptColor: 'var(--color-status-degraded)',"
     },
     {
         "id": "M8",
@@ -97,8 +97,8 @@ MUTANTS = [
         "id": "M10",
         "file": "web_terminal",
         "desc": "disconnected promptColor literal regression: promptColor: '#8b949e'",
-        "target": "    textColor: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',\n    borderVar: 'var(--color-border-subtle)',",
-        "replacement": "    textColor: 'var(--color-text-muted)',\n    promptColor: '#8b949e',\n    borderVar: 'var(--color-border-subtle)',"
+        "target": "    colorVar: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',\n    borderVar: 'var(--color-border-subtle)',",
+        "replacement": "    colorVar: 'var(--color-text-muted)',\n    promptColor: '#8b949e',\n    borderVar: 'var(--color-border-subtle)',"
     },
     {
         "id": "M11",
@@ -118,8 +118,8 @@ MUTANTS = [
         "id": "M13",
         "file": "web_terminal",
         "desc": "error promptColor literal regression: promptColor: '#f85149'",
-        "target": "    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',",
-        "replacement": "    textColor: 'var(--color-status-offline)',\n    promptColor: '#f85149',\n    borderVar: 'var(--color-status-offline)',"
+        "target": "    colorVar: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',",
+        "replacement": "    colorVar: 'var(--color-status-offline)',\n    promptColor: '#f85149',\n    borderVar: 'var(--color-status-offline)',"
     },
     {
         "id": "M14",

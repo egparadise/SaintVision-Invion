@@ -9632,6 +9632,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const cfg = getWebTerminalConnectionStatusConfig(status);
       expect(cfg.label).toBeDefined();
       expect(cfg.dotColor).toMatch(/^var\(--color-(status-online|status-degraded|text-muted|status-offline)\)$/);
+      expect(cfg.colorVar).toMatch(/^var\(--color-(status-online|status-degraded|text-muted|status-offline)\)$/);
       expect(cfg.promptColor).toMatch(/^var\(--color-(brand-primary|status-degraded|text-muted|status-offline)\)$/);
       expect(cfg.borderVar).toMatch(/^var\(--color-(status-online|status-degraded|border-subtle|status-offline)\)$/);
       expect(cfg.bgVar).toMatch(/^var\(--color-(diff-added-bg|bg-subtle|risk-l3-bg)\)$/);
@@ -9641,7 +9642,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const connCfg = getWebTerminalConnectionStatusConfig('connected');
     expect(connCfg.bgVar, 'Connected bgVar must strictly bind to diff-added-bg').toBe('var(--color-diff-added-bg)');
     expect(connCfg.dotColor, 'Connected dotColor must strictly bind to status-online').toBe('var(--color-status-online)');
-    expect(connCfg.textColor, 'Connected textColor must strictly bind to status-online').toBe('var(--color-status-online)');
+    expect(connCfg.colorVar, 'Connected colorVar must strictly bind to status-online').toBe('var(--color-status-online)');
     expect(connCfg.promptColor, 'Connected promptColor must strictly bind to brand-primary').toBe('var(--color-brand-primary)');
     expect(connCfg.borderVar, 'Connected borderVar must strictly bind to status-online').toBe('var(--color-status-online)');
 
