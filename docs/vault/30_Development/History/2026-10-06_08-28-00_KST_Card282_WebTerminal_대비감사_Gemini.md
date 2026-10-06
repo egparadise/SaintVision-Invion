@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261006-CARD282-GEMINI"
 title: "Card 282 웹 터미널 화면 색상 리터럴 전수 토큰화 및 ACC-09 그랜드 마일스톤 달성"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-06T08:28:00+09:00"
-updated: "2026-10-06T09:16:00+09:00"
+updated: "2026-10-06T09:54:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -37,8 +37,8 @@ source_of_truth: "Git"
   8. **DOM 결속 및 Revert-Fail Probes**:
      - Test 9af 신설: `WebTerminal` 컴포넌트 렌더링, 색상 토큰 바인딩, 동적 명도 대비 계산, 프로토타입 오염 격리 전수 단언.
      - Revert-Fail Probes 166~170 신설: 베이스라인 결함 색상(`#fb923c`, `#fecaca`, `#fde68a`, `#ef4444`, `#238636`)이 라이트 캔버스 위에서 4.5:1을 탈락함을 증명.
-  9. **40종 전수 변이 실측 사살 (Receipt A/B & Receipt A'/B')**:
-     - `tools/test_c282_mutations.py` M1~M40 40/40 100% 사살 실측 (clean commit A `bdee2e60` 기반 Commit B `51b93831` 봉인, r1 후 Commit A' `df554a14` 기반 Commit B' `d25e47d7` 재봉인, 바이너리 read_bytes/write_bytes 복원 및 fail-closed clean-tree 무결성 검증 통과).
+  9. **40종 전수 변이 실측 사살 (Receipt A/B & Receipt A'/B' & Receipt A''/B'')**:
+     - `tools/test_c282_mutations.py` M1~M40 40/40 100% 사살 실측 (clean commit A `bdee2e60` 기반 Commit B `51b93831` 봉인, r1 후 Commit A' `df554a14` 기반 Commit B' `d25e47d7` 봉인, r2 후 Commit A'' `407a8e82` 기반 Commit B'' `4ccc39a0` 재봉인, 바이너리 read_bytes/write_bytes 복원 및 fail-closed clean-tree 무결성 검증 통과).
 
 ---
 
@@ -63,6 +63,18 @@ source_of_truth: "Git"
 
 4. **AST 커버리지 지표 갱신**:
    - Test 9j-2 AST 분석 지표 갱신: totalStyleAttrs: 28, checkedObjects: 10, checkedPairs: 18, unboundColorObjects: 7, coveredColorObjects: 17, checkedBorderObjects: 9, checkedBorderPairs: 9, violations: 0.
+
+---
+
+## 1.2 PR #379 r2 리뷰 피드백 조치 (F1)
+
+1. **F1 (죽은 textColor 제거로 colorVar 직접 감사 보장 및 1:1 충돌 사살 실측)**:
+   - `checkConfigTables` AST 분석기는 객체 내 일치하는 전경 키(`color`, `colorVar`, `textColor`)를 순회하며 `fgToken`을 갱신하므로, 객체의 마지막 전경 키인 `textColor`(실제 화면에 렌더링되지 않는 죽은 필드)가 실제로 텍스트를 렌더링하는 `colorVar`를 덮어써 검사 공백을 유발하던 문제를 해소.
+   - `WebTerminal.tsx`의 `WebTerminalConnectionStatusConfigItem`, `WEB_TERMINAL_CONNECTION_STATUS_CONFIG`(4개 상태 전수), `WEB_TERMINAL_CONNECTION_STATUS_FALLBACK`에서 죽은 `textColor` 필드를 전면 삭제.
+   - 화면에 실제로 글자를 칠하는 `colorVar`(`terminal-connection-status` 배지의 `color: statusConfig.colorVar`)가 유일한 전경 토큰으로 남아 `checkConfigTables`에 의해 `bgVar`와 직접 대비 감사되도록 결속.
+   - `connecting.colorVar := var(--color-bg-subtle)` (bgVar와의 1:1 충돌) 변이가 AST 분석기 수치 규칙(`1:1 token collision between background and foreground (--color-bg-subtle)`)에 의해 즉각 100% 사살됨을 검증.
+   - `tools/test_c282_mutations.py` 내 M2, M6, M7, M10, M13 변이 대상을 `textColor`에서 `colorVar`로 동기화.
+   - Clean Commit A'' `407a8e82` 기반 `tools/test_c282_mutations.py --all` 재실행: 40/40 killed (100.0%, 796.0s) Receipt B'' `4ccc39a0` 재봉인.
 
 ---
 
@@ -122,6 +134,6 @@ source_of_truth: "Git"
    - `python tools/check_docs.py`: exit code 0.
    - `python tools/check_doc_path_citations.py --ratchet --base-ref a17b0e7d`: PASS.
    - `python tools/sync_obsidian.py --check`: 0 conflicts.
-5. **돌연변이 검증 (Receipt A/B & Receipt A'/B')**:
-   - `python tools/test_c282_mutations.py --all`: 40/40 killed (100.0%, duration 818.1s).
-   - Clean Commit A `bdee2e60` 위 Receipt B `51b93831` 봉인, r1 피드백 반영 Commit A' `df554a14` 위 Receipt B' `d25e47d7` 봉인.
+5. **돌연변이 검증 (Receipt A/B & Receipt A'/B' & Receipt A''/B'')**:
+   - `tools/test_c282_mutations.py --all`: 40/40 killed (100.0%, duration 796.0s).
+   - Clean Commit A `bdee2e60` 위 Receipt B `51b93831` 봉인, r1 피드백 반영 Commit A' `df554a14` 위 Receipt B' `d25e47d7` 봉인, r2 피드백 반영 Commit A'' `407a8e82` 위 Receipt B'' `4ccc39a0` 재봉인.
