@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.320"
+version: "1.0.321"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T22:55:21+09:00"
+updated: "2026-10-07T08:07:44+09:00"
 source_of_truth: "Git"
-active_card: "No hosted-only Codex card remains (measured row by row); independent review of incoming Claude PRs"
-active_card_status: "Card 266 #362 is approved by Codex r3 at 3286817d (exact-head Backend 3.12/3.14, Core, security and docs green) and is in this train; Card 268 #363 removed the last accepted-with-expiry disposition with migration 0067"
-active_card_next: "Review Card 269 #364 (48-task rescore v1.17) and later Claude PRs; remaining Codex-owned rows wait on physical nodes, long soak or user decisions; product dispatch stays off by default"
+active_card: "CARD-284 VF-CL reviewer blocker independent re-review"
+active_card_status: "Five stale reviewer blockers in VF-CL-02/03/04 are independently re-reviewed at train 62 candidate 59050d2a and closed with mutation and exact-head hosted evidence; implementation-side fields remain unchanged"
+active_card_next: "Open the Card 284 PR, obtain exact-head Docs/Core green, and request Claude review"
 ---
+
+## 2026-10-07 Card 284 — VF-CL reviewer blockers
+
+- At train 62 candidate `59050d2a`, independently re-reviewed the two VF-CL-02, one VF-CL-03,
+  and two VF-CL-04 reviewer blockers. All five fail-closed boundaries remain effective; focused
+  mutants were killed and exact-head Core/Backend evidence was inspected.
+- Moved only those reviewer blockers to mechanically checked closure records and set the three
+  reviewer booleans true. Product code and implementation/CI/acceptance claims are unchanged.
+- History: [[2026-10-07_08-07-44_KST_Card284_VF-CL_reviewer_blockers_Codex]].
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
 
