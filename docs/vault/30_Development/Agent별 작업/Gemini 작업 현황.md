@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.236"
+version: "1.0.237"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-06T08:28:00+09:00"
+updated: "2026-10-06T09:16:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-06T08:28:00+09:00 (Card 282 웹 터미널 화면 WebTerminal 색상 리터럴 32 occurrences / 23 distinct → 0건 전수 토큰화 및 ACC-09 그랜드 마일스톤 달성: 저장소 전체 대상 apps/web/src 색상 리터럴 잔여 파일 0개({} 래칫 완결), WebTerminal.tsx 인라인 스타일 CSS 변수 직접 결속 체계 정합 및 테마 종속성 규명, WEB_TERMINAL_CONNECTION_STATUS_CONFIG satisfies Record<WebTerminalConnectionStatus, WebTerminalConnectionStatusConfigItem> 엄밀 결속, getWebTerminalConnectionStatusConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, offline-bg 배경 위 primary-fg 텍스트(5.86:1 / 7.46:1 >= 4.5:1) 및 risk-l3-border 경계선(5.72:1 / 6.18:1 >= 3.0:1) 채택으로 WCAG 2.2 AA 100% 충족, COLOR_LITERAL_MULTISET_BASELINE 전 파일 {} 완결 래칫, var(--color-border-subtle) 정확히 487건/36개 파일 래칫 보존, Test 9af 및 Test 9j-2 AST 래칫(WebTerminal 28/6/15/8/14/9/9, violations 0건), Revert-Fail Probes 166~170, 40종 변이 100% 사살 실측(Commit A bdee2e60 위 Receipt B 51b93831 봉인), tools/reproduce_c282_contrast.py 32개 지표 전원 통과; Vitest 46 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
+- 확인 기준: 2026-10-06T09:16:00+09:00 (Card 282 [r1] 웹 터미널 화면 WebTerminal 색상 리터럴 32 occurrences / 23 distinct → 0건 전수 토큰화 및 ACC-09 그랜드 마일스톤 달성 r1 리뷰 조치: PR #379, target agent/gemini/c281-monaco-editor-contrast, Claude UI r1 피드백(F1~F3) 전수 조치: F1 checkConfigTables 전경 키에 textColor 추가 및 WEB_TERMINAL_CONNECTION_STATUS_CONFIG colorVar 명시 결속, connecting.colorVar 1:1 충돌 사살 실측(M7); F2 statusConfig label·colorVar·bgVar·borderVar의 WebTerminal 타이틀바 상태 배지 실제 렌더링 결속 및 Test 9af 계약 밖 상태 fail-closed UNKNOWN (<raw>) DOM 렌더링 단언; F3 scanColorLiterals W3C 148종 명명 색상 래칫 확장, transparent 구조적 리셋 키워드 허용 및 white/black 금지 규칙 명시, apps/web/src 144개 전 파일 0건 실측 검증; Test 9j-2 AST 래칫(WebTerminal 28/10/18/7/17/9/9, violations 0), COLOR_LITERAL_MULTISET_BASELINE 전 파일 {} 완결 래칫, var(--color-border-subtle) 487건/36개 파일 래칫 보존, tools/reproduce_c282_contrast.py 32개 지표 전원 통과, tools/test_c282_mutations.py 40종 M1~M40 100% 사살 실측(Commit A' df554a14 위 Receipt B' d25e47d7 봉인); Vitest 46 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T07:25:00+09:00 (Card 281 Monaco 에디터 화면 MonacoWorkspaceEditor 색상 리터럴 86 occurrences / 29 distinct → 0건 전수 토큰화, React JSX 인메모리 에디터 인라인 스타일 CSS 변수 직접 결속 체계 정합 및 테마 종속성 규명, WORKSPACE_TERMINAL_STATUS_CONFIG satisfies Record<WorkspaceTerminalStatus, WorkspaceTerminalStatusConfigItem> 엄밀 결속, getWorkspaceTerminalStatusConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, brand-subtle 배경 위 brand-hover 텍스트(5.49:1 / 8.11:1 >= 4.5:1) 및 brand-primary 경계선(4.24:1 / 5.75:1 >= 3.0:1) 채택으로 WCAG 2.2 AA 100% 충족, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, var(--color-border-subtle) 정확히 484건/35개 파일 래칫 보존, Test 9ae 및 Test 9j-2 AST 래칫(MonacoWorkspaceEditor 69/15/42/26/41/21/22, violations 0건), Revert-Fail Probes 161~165, 40종 변이 100% 사살 실측(Commit A e425e4ff 위 Receipt B e5e01958 봉인), tools/reproduce_c281_contrast.py 69개 지표 전원 통과; Vitest 45 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T06:44:00+09:00 (Card 280 에디터 모달 묶음 화면 ConflictResolutionModal(16건), DiffViewer(18건), GitCommitModal(26건) 색상 리터럴 60 occurrences → 0건 전수 토큰화, index.css diff 전용 시맨틱 토큰 6종 양 테마 정의 및 동적 명도 대비(텍스트 6.49~8.60:1>=4.5:1, 경계선 3.15~7.02:1>=3.0:1) 100% 충족, 모달 backdrop overlay 비텍스트 시각 스크림(SC 1.4.11 / SC 1.4.3 N/A) 정합, CONFLICT_STATUS_CONFIG·DIFF_LINE_TYPE_CONFIG·GIT_FILE_STATUS_CONFIG·GIT_STAGE_STATE_CONFIG satisfies Record<..., ...> 엄밀 결속, getConflictStatusConfig/getDiffLineTypeConfig/getGitFileStatusConfig/getGitStageStateConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, COLOR_LITERAL_MULTISET_BASELINE 3개 파일 {} 래칫, var(--color-border-subtle) 정확히 471건/34개 파일 래칫 보존, Test 9ad 및 Test 9j-2 AST 래칫(ConflictResolutionModal 18/2/5/3/5/4/4, DiffViewer 17/4/8/4/8/3/3, GitCommitModal 25/4/12/8/12/6/6, violations 전 파일 0건), Revert-Fail Probes 156~160, 40종 변이 100% 사살 실측(Commit A f1c898ce 위 Receipt B b6ba31fb 봉인), tools/reproduce_c280_contrast.py 32개 지표 전원 통과; Vitest 44 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T06:03:00+09:00 (Card 279 [r2] 터미널 세션 화면 TerminalSessionView 색상 리터럴 전수 토큰화(37 occurrences / 18 distinct → 0건), 셸 및 PTY 상태 스타일 계약 결속 및 접근성 승격 r2 리뷰 조치: PR #376, base 9c850d46, target agent/gemini/c278-desktop-window-contrast, Claude r2 피드백 전수 조치: F-A reproduce_c279_contrast.py 재실행 기반 History §2.2 콘솔 출력 및 §2.1 표 동기화(TS-24 Before 1.17/1.21, TS-25 4.02/4.78, TS-26 1.98/4.78), F-B TS-1 및 TS-4 다크 before_hex를 실제 렌더 토큰(#111827, #1f2937)으로 정합하여 Before = After (TS-1 1.05/1.10, TS-4 1.10/1.21) 위생 행 일치화, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, var(--color-border-subtle) 정확히 458건/31개 파일 래칫 보존, tools/reproduce_c279_contrast.py 32개 지표 전원 통과; Vitest 43 passed, full 77 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
@@ -82,11 +82,12 @@ source_of_truth: "Git"
   5. **토큰 인벤토리 및 AST 래칫 보존**:
      - `COLOR_LITERAL_MULTISET_BASELINE` 내 `features/terminal/WebTerminal.tsx: {}` 등록.
      - `var(--color-border-subtle)` 정확히 487건(+3건), 36개 파일(+1개 파일) 래칫 갱신.
-     - Test 9j-2 AST 분석: WebTerminal 28/6/15/8/14/9/9, violations 0.
-  6. **DOM 렌더 결속 및 Revert-Fail Probes**:
-     - Test 9af DOM 렌더 및 상태 config 테이블/토큰 결속 단언, Probes 166~170 베이스라인 결함 색상(raw `#fb923c`, `#fecaca`, `#fde68a`, `#ef4444`, `#238636` fails 4.5:1) 탈락 검증.
-  7. **40종 변이 M1~M40 100% 사살 실측 (Receipt A/B)**:
-     - `tools/test_c282_mutations.py` 40종 변이 100% 사살 receipt A/B 검증 완료 (Commit A `bdee2e60` 위 Commit B `51b93831` 봉인).
+     - Test 9j-2 AST 분석: WebTerminal 28/10/18/7/17/9/9, violations 0.
+  6. **DOM 렌더 결속 및 Revert-Fail Probes (F2 & F3)**:
+     - Test 9af DOM 렌더 및 상태 배지 실체 렌더링(label, colorVar, bgVar, borderVar), 계약 밖 상태 `UNKNOWN (<raw>)` fail-closed DOM 렌더링 단언, Probes 166~170 베이스라인 결함 색상 탈락 검증.
+     - Test 11 W3C 명명 색상 래칫(white/black/red 탐지, transparent 구조적 키워드 무시) 단언.
+  7. **40종 변이 M1~M40 100% 사살 실측 (Receipt A/B & Receipt A'/B')**:
+     - `tools/test_c282_mutations.py` 40종 변이 100% 사살 receipt A/B 검증 완료 (Commit A `bdee2e60` 위 Commit B `51b93831` 봉인, r1 후 Commit A' `df554a14` 위 Commit B' `d25e47d7` 재봉인).
 
 ## 2026-10-06 Monaco 에디터 화면 (MonacoWorkspaceEditor) 색상 리터럴 전수 토큰화(86 occurrences / 29 distinct → 0건), 상태 계약 결속 및 접근성 승격 (Card 281, `agent/gemini/c281-monaco-editor-contrast`, PR 대상 `agent/gemini/c280-editor-modals-contrast`)
 - **개요**: ACC-09 에디터 핵심 컴포넌트(`MonacoWorkspaceEditor.tsx`)의 색상 리터럴 inventory 전수(86 occurrences / 29 distinct → 0건), 대비 표본/DOM 결속 감사 및 터미널 상태 계약 승격:

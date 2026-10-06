@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261006-CARD282-GEMINI"
 title: "Card 282 웹 터미널 화면 색상 리터럴 전수 토큰화 및 ACC-09 그랜드 마일스톤 달성"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-06T08:28:00+09:00"
-updated: "2026-10-06T08:28:00+09:00"
+updated: "2026-10-06T09:16:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -37,8 +37,32 @@ source_of_truth: "Git"
   8. **DOM 결속 및 Revert-Fail Probes**:
      - Test 9af 신설: `WebTerminal` 컴포넌트 렌더링, 색상 토큰 바인딩, 동적 명도 대비 계산, 프로토타입 오염 격리 전수 단언.
      - Revert-Fail Probes 166~170 신설: 베이스라인 결함 색상(`#fb923c`, `#fecaca`, `#fde68a`, `#ef4444`, `#238636`)이 라이트 캔버스 위에서 4.5:1을 탈락함을 증명.
-  9. **40종 전수 변이 실측 사살 (Receipt A/B)**:
-     - `tools/test_c282_mutations.py` M1~M40 40/40 100% 사살 실측 (clean commit A `bdee2e60` 기반, Commit B `51b93831` 봉인, 바이너리 read_bytes/write_bytes 복원 및 fail-closed clean-tree 무결성 검증 통과).
+  9. **40종 전수 변이 실측 사살 (Receipt A/B & Receipt A'/B')**:
+     - `tools/test_c282_mutations.py` M1~M40 40/40 100% 사살 실측 (clean commit A `bdee2e60` 기반 Commit B `51b93831` 봉인, r1 후 Commit A' `df554a14` 기반 Commit B' `d25e47d7` 재봉인, 바이너리 read_bytes/write_bytes 복원 및 fail-closed clean-tree 무결성 검증 통과).
+
+---
+
+## 1.1 PR #379 r1 리뷰 피드백 조치 (F1, F2, F3)
+
+1. **F1 (checkConfigTables 전경 키 지원 및 1:1 충돌 사살 검증)**:
+   - `WEB_TERMINAL_CONNECTION_STATUS_CONFIG` 및 `WEB_TERMINAL_CONNECTION_STATUS_FALLBACK`에 표준 `colorVar: string;` 명시 결속.
+   - `checkConfigTables` AST 분석기에서 `colorVar`뿐만 아니라 `textColor`도 전경 토큰으로 인식하도록 검사 키를 확장 (`pName === 'color' || pName === 'colorVar' || pName === 'textColor'`).
+   - `connecting.colorVar := var(--color-bg-subtle)` (bgVar와 1:1 충돌) 변이가 AST 분석기 수치 규칙(`1:1 token collision between background and foreground`)에 의해 즉각 사살됨을 검증하고, 러너 M7 변이로 등록하여 100% 사살 실측.
+
+2. **F2 (설정 표 필드의 WebTerminal UI 실제 렌더링 및 계약 밖 상태 fail-closed UNKNOWN (<raw>) DOM 단언)**:
+   - `WebTerminal.tsx` 상단 타이틀바 `terminal-connection-status` 상태 배지에 `statusConfig.bgVar`, `statusConfig.colorVar`, `1px solid ${statusConfig.borderVar}`, `(${statusConfig.label})`을 실체 렌더링 결속.
+   - `initialConnectionStatus` prop 변경 시 `connectionStatus` 상태 동기화 지원.
+   - Test 9af에 계약 밖 상태(`out_of_contract_state`) 주입 시 DOM 상에서 `UNKNOWN (out_of_contract_state)` 텍스트, `var(--color-bg-subtle)` 배경, `var(--color-status-unknown)` 전경/테두리가 렌더링됨을 엄밀 단언.
+
+3. **F3 (scanColorLiterals W3C 명명 색상 래칫 확장 및 규칙 명시)**:
+   - `apps/web/tests/acc09-contrast-tokens.test.tsx`의 `scanColorLiterals`에 W3C 표준 CSS 148종 명명 색상 정규식 래칫을 확장.
+   - `'transparent'`는 CSS 구조적 리셋 키워드(`border: '1px solid transparent'`, `background: 'transparent'`)로 명시적 허용목록(allowlist) 규칙 처리.
+   - `'white'` 및 `'black'`은 각각 `#fff`, `#000`과 동등한 미가공 색상 리터럴로 간주하여 엄격 금지 규칙 명시.
+   - 래칫 확장 후 `apps/web/src` 내 144개 전체 소스 파일(93개 프로덕션 파일 포함)에 대해 명명 색상 위반 0건 유지 실측 확인.
+   - Test 11에 `red`, `white`, `black`, `1px solid red`는 탐지(1건)되고 `transparent`는 무시(0건)되는 규칙 단언 추가.
+
+4. **AST 커버리지 지표 갱신**:
+   - Test 9j-2 AST 분석 지표 갱신: totalStyleAttrs: 28, checkedObjects: 10, checkedPairs: 18, unboundColorObjects: 7, coveredColorObjects: 17, checkedBorderObjects: 9, checkedBorderPairs: 9, violations: 0.
 
 ---
 
@@ -86,7 +110,7 @@ source_of_truth: "Git"
 ## 3. 검증 결과 및 증거 요약
 
 1. **단위 및 계약 검증**:
-   - `npx vitest run tests/acc09-contrast-tokens.test.tsx`: 46 tests 전수 통과 (Test 9af, Test 9j-2 WebTerminal 래칫, Probes 166~170, Test 10 ACC-09 그랜드 마일스톤 불변식 포함).
+   - `npx vitest run tests/acc09-contrast-tokens.test.tsx`: 46 tests 전수 통과 (Test 9af DOM 렌더 및 fail-closed UNKNOWN (<raw>) 단언, Test 9j-2 WebTerminal 래칫 28/10/18/7/17/9/9, Probes 166~170, Test 10 ACC-09 그랜드 마일스톤 불변식, Test 11 W3C 명명 색상 래칫 포함).
 2. **TypeScript 컴파일 및 빌드**:
    - `npx tsc -b`: 0 errors.
    - `npm run build`: 프로덕션 번들 정상 빌드 완료.
@@ -98,6 +122,6 @@ source_of_truth: "Git"
    - `python tools/check_docs.py`: exit code 0.
    - `python tools/check_doc_path_citations.py --ratchet --base-ref a17b0e7d`: PASS.
    - `python tools/sync_obsidian.py --check`: 0 conflicts.
-5. **돌연변이 검증 (Receipt A/B)**:
-   - `python tools/test_c282_mutations.py --all`: 40/40 killed (100.0%, duration 829.5s).
-   - Clean Commit A `bdee2e60` 위 Receipt B `51b93831` 봉인.
+5. **돌연변이 검증 (Receipt A/B & Receipt A'/B')**:
+   - `python tools/test_c282_mutations.py --all`: 40/40 killed (100.0%, duration 818.1s).
+   - Clean Commit A `bdee2e60` 위 Receipt B `51b93831` 봉인, r1 피드백 반영 Commit A' `df554a14` 위 Receipt B' `d25e47d7` 봉인.

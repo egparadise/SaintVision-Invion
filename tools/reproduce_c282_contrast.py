@@ -176,8 +176,8 @@ AUDIT_ITEMS = [
         'element': 'Connection Status Label Text',
         'role': 'text',
         'token': '--color-text-muted',
-        'underlay': '--color-bg-surface',
-        'desc': 'Connection status text description (formerly #8b949e)',
+        'underlay': '--color-bg-subtle',
+        'desc': 'Connection status badge text foreground (statusConfig.colorVar, formerly #8b949e)',
     },
     {
         'id': 'WT-09',
