@@ -17,6 +17,8 @@ export interface WebTerminalProps {
   sessionId?: string | null;
   commandId?: string | null;
   onClose?: () => void;
+  initialConnectionStatus?: WebTerminalConnectionStatus;
+  disableAutoConnect?: boolean;
 }
 
 
@@ -25,6 +27,7 @@ export type WebTerminalConnectionStatus = 'connecting' | 'connected' | 'disconne
 export interface WebTerminalConnectionStatusConfigItem {
   label: string;
   dotColor: string;
+  colorVar: string;
   textColor: string;
   promptColor: string;
   borderVar: string;
@@ -35,6 +38,7 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
   connected: {
     label: 'connected',
     dotColor: 'var(--color-status-online)',
+    colorVar: 'var(--color-status-online)',
     textColor: 'var(--color-status-online)',
     promptColor: 'var(--color-brand-primary)',
     borderVar: 'var(--color-status-online)',
@@ -43,6 +47,7 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
   connecting: {
     label: 'connecting',
     dotColor: 'var(--color-status-degraded)',
+    colorVar: 'var(--color-status-degraded)',
     textColor: 'var(--color-status-degraded)',
     promptColor: 'var(--color-status-degraded)',
     borderVar: 'var(--color-status-degraded)',
@@ -51,6 +56,7 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
   disconnected: {
     label: 'disconnected',
     dotColor: 'var(--color-text-muted)',
+    colorVar: 'var(--color-text-muted)',
     textColor: 'var(--color-text-muted)',
     promptColor: 'var(--color-text-muted)',
     borderVar: 'var(--color-border-subtle)',
@@ -59,6 +65,7 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
   error: {
     label: 'error',
     dotColor: 'var(--color-status-offline)',
+    colorVar: 'var(--color-status-offline)',
     textColor: 'var(--color-status-offline)',
     promptColor: 'var(--color-status-offline)',
     borderVar: 'var(--color-status-offline)',
@@ -69,6 +76,7 @@ export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
 export const WEB_TERMINAL_CONNECTION_STATUS_FALLBACK: WebTerminalConnectionStatusConfigItem = {
   label: 'UNKNOWN',
   dotColor: 'var(--color-status-unknown)',
+  colorVar: 'var(--color-status-unknown)',
   textColor: 'var(--color-status-unknown)',
   promptColor: 'var(--color-status-unknown)',
   borderVar: 'var(--color-status-unknown)',
@@ -96,6 +104,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   sessionId,
   commandId,
   onClose,
+  initialConnectionStatus,
+  disableAutoConnect,
 }) => {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(sessionId || null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
@@ -105,13 +115,20 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [isAccessibleView, setIsAccessibleView] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<WebTerminalConnectionStatus>(initialConnectionStatus || 'disconnected');
+
+  useEffect(() => {
+    if (initialConnectionStatus !== undefined) {
+      setConnectionStatus(initialConnectionStatus);
+    }
+  }, [initialConnectionStatus]);
   const [lastError, setLastError] = useState<string | null>(null);
   const [disconnectedCmdAlert, setDisconnectedCmdAlert] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<WsTerminalClient | null>(null);
 
   useEffect(() => {
+    if (disableAutoConnect) return;
     let active = true;
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
@@ -325,33 +342,49 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span
-            data-testid="connection-status-dot"
-            aria-hidden="true"
-            style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: getWebTerminalConnectionStatusConfig(connectionStatus).dotColor,
-            }}
-          />
-          <span>
-            PTY Web Terminal: <code>{workspaceId}</code>{' '}
-            <span
-              data-testid="terminal-session-id"
-              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-            >
-              (세션: {activeSessionId || '미발급'})
-            </span>{' '}
-            <span
-              data-testid="terminal-connection-status"
-              role="status"
-              aria-live="polite"
-              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-            >
-              ({connectionStatus})
-            </span>
-          </span>
+          {(() => {
+            const statusConfig = getWebTerminalConnectionStatusConfig(connectionStatus);
+            return (
+              <>
+                <span
+                  data-testid="connection-status-dot"
+                  aria-hidden="true"
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: statusConfig.dotColor,
+                  }}
+                />
+                <span>
+                  PTY Web Terminal: <code>{workspaceId}</code>{' '}
+                  <span
+                    data-testid="terminal-session-id"
+                    style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
+                  >
+                    (세션: {activeSessionId || '미발급'})
+                  </span>{' '}
+                  <span
+                    data-testid="terminal-connection-status"
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                      fontSize: '0.75rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '1px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: statusConfig.bgVar,
+                      color: statusConfig.colorVar,
+                      border: `1px solid ${statusConfig.borderVar}`,
+                    }}
+                  >
+                    ({statusConfig.label})
+                  </span>
+                </span>
+              </>
+            );
+          })()}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -379,7 +379,36 @@ const HEX_COLOR_REGEX = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g
 const RGB_COLOR_REGEX = /rgba?\s*\([^)]+\)/gi;
 const HSL_COLOR_REGEX = /hsla?\s*\([^)]+\)/gi;
 
-// Exact multiset of hex/rgb(a)/hsl(a) literals in already comment-stripped text
+// W3C CSS named colors list (excluding 'transparent' which is explicitly allowlisted as a structural reset keyword)
+// Rule:
+// - 'white' and 'black' are treated as raw color literals (equivalent to #fff / #000) and strictly forbidden
+// - 'transparent' is an allowlisted CSS structural reset keyword and ignored
+const CSS_NAMED_COLORS_LIST = [
+  'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
+  'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse',
+  'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue',
+  'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgreen', 'darkgrey', 'darkkhaki', 'darkmagenta',
+  'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon', 'darkseagreen',
+  'darkslateblue', 'darkslategray', 'darkslategrey', 'darkturquoise', 'darkviolet', 'deeppink',
+  'deepskyblue', 'dimgray', 'dimgrey', 'dodgerblue', 'firebrick', 'floralwhite', 'forestgreen',
+  'fuchsia', 'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'greenyellow',
+  'grey', 'honeydew', 'hotpink', 'indianred', 'indigo', 'ivory', 'khaki', 'lavender',
+  'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue', 'lightcoral', 'lightcyan',
+  'lightgoldenrodyellow', 'lightgray', 'lightgreen', 'lightgrey', 'lightpink', 'lightsalmon',
+  'lightseagreen', 'lightskyblue', 'lightslategray', 'lightslategrey', 'lightsteelblue',
+  'lightyellow', 'lime', 'limegreen', 'linen', 'magenta', 'maroon', 'mediumaquamarine',
+  'mediumblue', 'mediumorchid', 'mediumpurple', 'mediumseagreen', 'mediumslateblue',
+  'mediumspringgreen', 'mediumturquoise', 'mediumvioletred', 'midnightblue', 'mintcream',
+  'mistyrose', 'moccasin', 'navajowhite', 'navy', 'oldlace', 'olive', 'olivedrab', 'orange',
+  'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise', 'palevioletred',
+  'papayawhip', 'peachpuff', 'peru', 'pink', 'plum', 'powderblue', 'purple', 'rebeccapurple',
+  'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen',
+  'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow',
+  'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet',
+  'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen'
+];
+
+// Exact multiset of hex/rgb(a)/hsl(a) and CSS named color literals in already comment-stripped text
 function scanColorLiterals(text: string): Record<string, number> {
   const multiset: Record<string, number> = {};
   for (const m of text.match(HEX_COLOR_REGEX) || []) {
@@ -389,6 +418,18 @@ function scanColorLiterals(text: string): Record<string, number> {
   for (const re of [RGB_COLOR_REGEX, HSL_COLOR_REGEX]) {
     for (const m of text.match(re) || []) {
       const lit = m.toLowerCase().replace(/\s+/g, '');
+      multiset[lit] = (multiset[lit] || 0) + 1;
+    }
+  }
+  // Named CSS colors regex matching color literals in string quotes or border shorthands
+  const namedRegex = new RegExp(
+    `['"\`](?:(?:\\d+(?:px|em|rem)?\\s+(?:solid|dashed|dotted)\\s+)?)\\b(${CSS_NAMED_COLORS_LIST.join('|')})\\b['"\`]`,
+    'gi'
+  );
+  let match: RegExpExecArray | null;
+  while ((match = namedRegex.exec(text)) !== null) {
+    const lit = match[1].toLowerCase();
+    if (lit !== 'transparent') {
       multiset[lit] = (multiset[lit] || 0) + 1;
     }
   }
@@ -9678,12 +9719,42 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(dot).toBeDefined();
     expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
 
+    // Status badge DOM rendering actively binds label, colorVar, bgVar, borderVar (F2)
+    const connBadge = container.querySelector('[data-testid="terminal-connection-status"]') as HTMLElement;
+    expect(connBadge, 'Connection status badge must render').not.toBeNull();
+    expect(connBadge.textContent).toContain('error');
+    expect(connBadge.style.backgroundColor).toBe('var(--color-risk-l3-bg)');
+    expect(connBadge.style.color).toBe('var(--color-status-offline)');
+    expect(connBadge.style.borderColor || connBadge.style.border).toContain('var(--color-status-offline)');
+
     const reconnectBtn = container.querySelector('[data-testid="terminal-reconnect-btn"]') as HTMLElement;
     expect(reconnectBtn).toBeDefined();
 
     const a11yBtn = container.querySelector('[data-testid="terminal-toggle-a11y-btn"]') as HTMLElement;
     expect(a11yBtn).toBeDefined();
     expect(a11yBtn.style.color).toBe('var(--color-text-primary)');
+
+    // 3. Out-of-contract status fail-closed DOM rendering & token binding (F2)
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_test_term"
+          sessionId="sess_1"
+          commandId="cmd_authorized_1"
+          disableAutoConnect={true}
+          // @ts-expect-error testing out-of-contract state fail-closed DOM fallback
+          initialConnectionStatus="out_of_contract_state"
+        />
+      );
+    });
+
+    const unkStatusBadge = container.querySelector('[data-testid="terminal-connection-status"]') as HTMLElement;
+    expect(unkStatusBadge, 'Out-of-contract connection status badge must render').not.toBeNull();
+    expect(unkStatusBadge.textContent).toContain('UNKNOWN (out_of_contract_state)');
+    expect(unkStatusBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+    expect(unkStatusBadge.style.color).toBe('var(--color-status-unknown)');
+    expect(unkStatusBadge.style.borderColor || unkStatusBadge.style.border).toContain('var(--color-status-unknown)');
+    expect(unkStatusBadge.style.color).not.toBe(unkStatusBadge.style.backgroundColor);
 
     // Render with missing command to verify warning notice banner
     await act(async () => {
@@ -10040,7 +10111,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                     const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
                     if (m) {
                       if (pName === 'bg' || pName === 'bgVar') bgToken = m[1];
-                      if (pName === 'color' || pName === 'colorVar') fgToken = m[1];
+                      if (pName === 'color' || pName === 'colorVar' || pName === 'textColor') fgToken = m[1];
                       if (pName === 'border' || pName === 'borderVar' || pName === 'borderColorVar') borderToken = m[1];
                     }
                   }
@@ -10374,10 +10445,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const webTerminalStats = analyzeFile('features/terminal/WebTerminal.tsx');
     expect(webTerminalStats.violations, `WebTerminal violations:\n${webTerminalStats.violations.join('\n')}`).toEqual([]);
     expect(webTerminalStats.totalStyleAttrs, 'Total style attributes in WebTerminal must be exactly 28').toBe(28);
-    expect(webTerminalStats.checkedObjects, 'Explicit style objects in WebTerminal must be exactly 6').toBe(6);
-    expect(webTerminalStats.checkedPairs, 'Evaluated pairs in WebTerminal must be exactly 15').toBe(15);
-    expect(webTerminalStats.unboundColorObjects, 'Unbound color objects in WebTerminal must be exactly 8').toBe(8);
-    expect(webTerminalStats.coveredColorObjects, 'Total covered color objects in WebTerminal must be exactly 14').toBe(14);
+    expect(webTerminalStats.checkedObjects, 'Explicit style objects in WebTerminal must be exactly 10').toBe(10);
+    expect(webTerminalStats.checkedPairs, 'Evaluated pairs in WebTerminal must be exactly 18').toBe(18);
+    expect(webTerminalStats.unboundColorObjects, 'Unbound color objects in WebTerminal must be exactly 7').toBe(7);
+    expect(webTerminalStats.coveredColorObjects, 'Total covered color objects in WebTerminal must be exactly 17').toBe(17);
     expect(webTerminalStats.checkedBorderObjects, 'Border objects in WebTerminal must be exactly 9').toBe(9);
     expect(webTerminalStats.checkedBorderPairs, 'Border pairs in WebTerminal must be exactly 9').toBe(9);
   });
@@ -11416,5 +11487,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(scan("const s = '/* not a comment'; const c = '#abc'; const t = '*/';\n")).toEqual({ '#abc': 1 });
     expect(scan("const re = /https?:\\/\\//; const c = '#abc';\n", 'probe.ts')).toEqual({ '#abc': 1 });
     expect(scan('const el = <p>see // #abc</p>;\n')).toEqual({ '#abc': 1 });
+
+    // CSS named colors detection & transparent keyword rule (F3)
+    expect(scan("const color = 'red';\n")).toEqual({ 'red': 1 });
+    expect(scan("const color = 'white';\n")).toEqual({ 'white': 1 });
+    expect(scan("const color = 'black';\n")).toEqual({ 'black': 1 });
+    expect(scan("const border = '1px solid red';\n")).toEqual({ 'red': 1 });
+    expect(scan("const bg = 'transparent';\n")).toEqual({});
+    expect(scan("const border = '1px solid transparent';\n")).toEqual({});
   });
 });

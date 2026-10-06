@@ -69,22 +69,22 @@ MUTANTS = [
         "id": "M6",
         "file": "web_terminal",
         "desc": "connecting promptColor literal regression: promptColor: '#d29922'",
-        "target": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',",
-        "replacement": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: '#d29922',"
+        "target": "    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',",
+        "replacement": "    textColor: 'var(--color-status-degraded)',\n    promptColor: '#d29922',\n    borderVar: 'var(--color-status-degraded)',"
     },
     {
         "id": "M7",
         "file": "web_terminal",
-        "desc": "connecting bgVar literal regression: bgVar: '#1c1917'",
-        "target": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',\n    bgVar: 'var(--color-bg-subtle)',",
-        "replacement": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',\n    bgVar: '#1c1917',"
+        "desc": "connecting colorVar 1:1 collision with bgVar: colorVar: 'var(--color-bg-subtle)'",
+        "target": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',",
+        "replacement": "    dotColor: 'var(--color-status-degraded)',\n    colorVar: 'var(--color-bg-subtle)',\n    textColor: 'var(--color-bg-subtle)',"
     },
     {
         "id": "M8",
         "file": "web_terminal",
         "desc": "connecting borderVar literal regression: borderVar: '#ea580c'",
-        "target": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',",
-        "replacement": "  connecting: {\n    label: 'connecting',\n    dotColor: 'var(--color-status-degraded)',\n    textColor: 'var(--color-status-degraded)',\n    promptColor: 'var(--color-status-degraded)',\n    borderVar: '#ea580c',"
+        "target": "    promptColor: 'var(--color-status-degraded)',\n    borderVar: 'var(--color-status-degraded)',\n    bgVar: 'var(--color-bg-subtle)',",
+        "replacement": "    promptColor: 'var(--color-status-degraded)',\n    borderVar: '#ea580c',\n    bgVar: 'var(--color-bg-subtle)',"
     },
     {
         "id": "M9",
@@ -97,15 +97,15 @@ MUTANTS = [
         "id": "M10",
         "file": "web_terminal",
         "desc": "disconnected promptColor literal regression: promptColor: '#8b949e'",
-        "target": "  disconnected: {\n    label: 'disconnected',\n    dotColor: 'var(--color-text-muted)',\n    textColor: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',",
-        "replacement": "  disconnected: {\n    label: 'disconnected',\n    dotColor: 'var(--color-text-muted)',\n    textColor: 'var(--color-text-muted)',\n    promptColor: '#8b949e',"
+        "target": "    textColor: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',\n    borderVar: 'var(--color-border-subtle)',",
+        "replacement": "    textColor: 'var(--color-text-muted)',\n    promptColor: '#8b949e',\n    borderVar: 'var(--color-border-subtle)',"
     },
     {
         "id": "M11",
         "file": "web_terminal",
         "desc": "disconnected borderVar literal regression: borderVar: '#30363d'",
-        "target": "  disconnected: {\n    label: 'disconnected',\n    dotColor: 'var(--color-text-muted)',\n    textColor: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',\n    borderVar: 'var(--color-border-subtle)',",
-        "replacement": "  disconnected: {\n    label: 'disconnected',\n    dotColor: 'var(--color-text-muted)',\n    textColor: 'var(--color-text-muted)',\n    promptColor: 'var(--color-text-muted)',\n    borderVar: '#30363d',"
+        "target": "    promptColor: 'var(--color-text-muted)',\n    borderVar: 'var(--color-border-subtle)',\n    bgVar: 'var(--color-bg-subtle)',",
+        "replacement": "    promptColor: 'var(--color-text-muted)',\n    borderVar: '#30363d',\n    bgVar: 'var(--color-bg-subtle)',"
     },
     {
         "id": "M12",
@@ -118,22 +118,22 @@ MUTANTS = [
         "id": "M13",
         "file": "web_terminal",
         "desc": "error promptColor literal regression: promptColor: '#f85149'",
-        "target": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',",
-        "replacement": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: '#f85149',"
+        "target": "    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',",
+        "replacement": "    textColor: 'var(--color-status-offline)',\n    promptColor: '#f85149',\n    borderVar: 'var(--color-status-offline)',"
     },
     {
         "id": "M14",
         "file": "web_terminal",
         "desc": "error borderVar literal regression: borderVar: '#ef4444'",
-        "target": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',",
-        "replacement": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: '#ef4444',"
+        "target": "    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',\n    bgVar: 'var(--color-risk-l3-bg)',",
+        "replacement": "    promptColor: 'var(--color-status-offline)',\n    borderVar: '#ef4444',\n    bgVar: 'var(--color-risk-l3-bg)',"
     },
     {
         "id": "M15",
         "file": "web_terminal",
         "desc": "error bgVar literal regression: bgVar: '#7f1d1d'",
-        "target": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',\n    bgVar: 'var(--color-risk-l3-bg)',",
-        "replacement": "  error: {\n    label: 'error',\n    dotColor: 'var(--color-status-offline)',\n    textColor: 'var(--color-status-offline)',\n    promptColor: 'var(--color-status-offline)',\n    borderVar: 'var(--color-status-offline)',\n    bgVar: '#7f1d1d',"
+        "target": "    borderVar: 'var(--color-status-offline)',\n    bgVar: 'var(--color-risk-l3-bg)',\n  },",
+        "replacement": "    borderVar: 'var(--color-status-offline)',\n    bgVar: '#7f1d1d',\n  },"
     },
     {
         "id": "M16",
@@ -195,15 +195,15 @@ MUTANTS = [
         "id": "M24",
         "file": "web_terminal",
         "desc": "session ID color literal regression: '#8b949e'",
-        "target": "data-testid=\"terminal-session-id\"\n              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}",
-        "replacement": "data-testid=\"terminal-session-id\"\n              style={{ fontSize: '0.75rem', color: '#8b949e' }}"
+        "target": "data-testid=\"terminal-session-id\"\n                    style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}",
+        "replacement": "data-testid=\"terminal-session-id\"\n                    style={{ fontSize: '0.75rem', color: '#8b949e' }}"
     },
     {
         "id": "M25",
         "file": "web_terminal",
         "desc": "connection status color literal regression: '#8b949e'",
-        "target": "data-testid=\"terminal-connection-status\"\n              role=\"status\"\n              aria-live=\"polite\"\n              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}",
-        "replacement": "data-testid=\"terminal-connection-status\"\n              role=\"status\"\n              aria-live=\"polite\"\n              style={{ fontSize: '0.75rem', color: '#8b949e' }}"
+        "target": "data-testid=\"terminal-connection-status\"\n                    role=\"status\"\n                    aria-live=\"polite\"\n                    style={{\n                      fontSize: '0.75rem',\n                      display: 'inline-flex',\n                      alignItems: 'center',\n                      padding: '1px 6px',\n                      borderRadius: '4px',\n                      backgroundColor: statusConfig.bgVar,\n                      color: statusConfig.colorVar,",
+        "replacement": "data-testid=\"terminal-connection-status\"\n                    role=\"status\"\n                    aria-live=\"polite\"\n                    style={{\n                      fontSize: '0.75rem',\n                      display: 'inline-flex',\n                      alignItems: 'center',\n                      padding: '1px 6px',\n                      borderRadius: '4px',\n                      backgroundColor: statusConfig.bgVar,\n                      color: '#8b949e',"
     },
     {
         "id": "M26",
