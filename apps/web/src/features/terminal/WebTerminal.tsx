@@ -17,6 +17,80 @@ export interface WebTerminalProps {
   sessionId?: string | null;
   commandId?: string | null;
   onClose?: () => void;
+  initialConnectionStatus?: WebTerminalConnectionStatus;
+  disableAutoConnect?: boolean;
+}
+
+
+export type WebTerminalConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+
+export interface WebTerminalConnectionStatusConfigItem {
+  label: string;
+  dotColor: string;
+  colorVar: string;
+  promptColor: string;
+  borderVar: string;
+  bgVar: string;
+}
+
+export const WEB_TERMINAL_CONNECTION_STATUS_CONFIG = {
+  connected: {
+    label: 'connected',
+    dotColor: 'var(--color-status-online)',
+    colorVar: 'var(--color-status-online)',
+    promptColor: 'var(--color-brand-primary)',
+    borderVar: 'var(--color-status-online)',
+    bgVar: 'var(--color-diff-added-bg)',
+  },
+  connecting: {
+    label: 'connecting',
+    dotColor: 'var(--color-status-degraded)',
+    colorVar: 'var(--color-status-degraded)',
+    promptColor: 'var(--color-status-degraded)',
+    borderVar: 'var(--color-status-degraded)',
+    bgVar: 'var(--color-bg-subtle)',
+  },
+  disconnected: {
+    label: 'disconnected',
+    dotColor: 'var(--color-text-muted)',
+    colorVar: 'var(--color-text-muted)',
+    promptColor: 'var(--color-text-muted)',
+    borderVar: 'var(--color-border-subtle)',
+    bgVar: 'var(--color-bg-subtle)',
+  },
+  error: {
+    label: 'error',
+    dotColor: 'var(--color-status-offline)',
+    colorVar: 'var(--color-status-offline)',
+    promptColor: 'var(--color-status-offline)',
+    borderVar: 'var(--color-status-offline)',
+    bgVar: 'var(--color-risk-l3-bg)',
+  },
+} as const satisfies Record<WebTerminalConnectionStatus, WebTerminalConnectionStatusConfigItem>;
+
+export const WEB_TERMINAL_CONNECTION_STATUS_FALLBACK: WebTerminalConnectionStatusConfigItem = {
+  label: 'UNKNOWN',
+  dotColor: 'var(--color-status-unknown)',
+  colorVar: 'var(--color-status-unknown)',
+  promptColor: 'var(--color-status-unknown)',
+  borderVar: 'var(--color-status-unknown)',
+  bgVar: 'var(--color-bg-subtle)',
+};
+
+export function getWebTerminalConnectionStatusConfig(
+  status?: string | null
+): WebTerminalConnectionStatusConfigItem {
+  if (
+    typeof status === 'string' &&
+    Object.hasOwn(WEB_TERMINAL_CONNECTION_STATUS_CONFIG, status)
+  ) {
+    return WEB_TERMINAL_CONNECTION_STATUS_CONFIG[status as WebTerminalConnectionStatus];
+  }
+  const raw = status !== undefined && status !== null ? String(status).trim() : '';
+  return {
+    ...WEB_TERMINAL_CONNECTION_STATUS_FALLBACK,
+    label: raw ? `UNKNOWN (${raw})` : 'UNKNOWN',
+  };
 }
 
 export const WebTerminal: React.FC<WebTerminalProps> = ({
@@ -24,6 +98,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   sessionId,
   commandId,
   onClose,
+  initialConnectionStatus,
+  disableAutoConnect,
 }) => {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(sessionId || null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
@@ -33,13 +109,20 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [isAccessibleView, setIsAccessibleView] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<WebTerminalConnectionStatus>(initialConnectionStatus || 'disconnected');
+
+  useEffect(() => {
+    if (initialConnectionStatus !== undefined) {
+      setConnectionStatus(initialConnectionStatus);
+    }
+  }, [initialConnectionStatus]);
   const [lastError, setLastError] = useState<string | null>(null);
   const [disconnectedCmdAlert, setDisconnectedCmdAlert] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<WsTerminalClient | null>(null);
 
   useEffect(() => {
+    if (disableAutoConnect) return;
     let active = true;
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
@@ -232,10 +315,10 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: '520px',
-        backgroundColor: '#0d1117',
-        color: '#c9d1d9',
+        backgroundColor: 'var(--color-bg-canvas)',
+        color: 'var(--color-text-primary)',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid #30363d',
+        border: '1px solid var(--color-border-subtle)',
         overflow: 'hidden',
         boxShadow: 'var(--shadow-lg)',
       }}
@@ -247,44 +330,55 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          backgroundColor: '#161b22',
-          borderBottom: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           fontSize: '0.8125rem',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span
-            data-testid="connection-status-dot"
-            aria-hidden="true"
-            style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor:
-                connectionStatus === 'connected'
-                  ? '#238636'
-                  : connectionStatus === 'connecting'
-                  ? '#d29922'
-                  : '#8b949e',
-            }}
-          />
-          <span>
-            PTY Web Terminal: <code>{workspaceId}</code>{' '}
-            <span
-              data-testid="terminal-session-id"
-              style={{ fontSize: '0.75rem', color: '#8b949e' }}
-            >
-              (세션: {activeSessionId || '미발급'})
-            </span>{' '}
-            <span
-              data-testid="terminal-connection-status"
-              role="status"
-              aria-live="polite"
-              style={{ fontSize: '0.75rem', color: '#8b949e' }}
-            >
-              ({connectionStatus})
-            </span>
-          </span>
+          {(() => {
+            const statusConfig = getWebTerminalConnectionStatusConfig(connectionStatus);
+            return (
+              <>
+                <span
+                  data-testid="connection-status-dot"
+                  aria-hidden="true"
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: statusConfig.dotColor,
+                  }}
+                />
+                <span>
+                  PTY Web Terminal: <code>{workspaceId}</code>{' '}
+                  <span
+                    data-testid="terminal-session-id"
+                    style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
+                  >
+                    (세션: {activeSessionId || '미발급'})
+                  </span>{' '}
+                  <span
+                    data-testid="terminal-connection-status"
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                      fontSize: '0.75rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '1px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: statusConfig.bgVar,
+                      color: statusConfig.colorVar,
+                      border: `1px solid ${statusConfig.borderVar}`,
+                    }}
+                  >
+                    ({statusConfig.label})
+                  </span>
+                </span>
+              </>
+            );
+          })()}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -304,7 +398,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             data-testid="terminal-toggle-a11y-btn"
             variant="ghost"
             size="sm"
-            style={{ color: '#c9d1d9', fontSize: '0.75rem', padding: '2px 8px' }}
+            style={{ color: 'var(--color-text-primary)', fontSize: '0.75rem', padding: '2px 8px' }}
             onClick={() => setIsAccessibleView((prev) => !prev)}
           >
             {isAccessibleView ? '💻 xterm 터미널 보기' : '♿ 스크린리더 텍스트 뷰'}
@@ -314,7 +408,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
               data-testid="terminal-close-btn"
               variant="ghost"
               size="sm"
-              style={{ color: '#f85149', fontSize: '0.75rem', padding: '2px 8px' }}
+              style={{ color: 'var(--color-status-offline)', fontSize: '0.75rem', padding: '2px 8px' }}
               onClick={onClose}
             >
               닫기
@@ -331,10 +425,10 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           data-testid="terminal-command-required-notice"
           style={{
             padding: '8px 16px',
-            backgroundColor: '#1c1917',
-            color: '#fb923c',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: 'var(--color-status-degraded)',
             fontSize: '0.8125rem',
-            borderBottom: '1px solid #ea580c',
+            borderBottom: '1px solid var(--color-status-degraded)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -344,7 +438,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           <span>
             ⚠️ <strong>[승인 명령 부재]</strong> 유효한 승인 명령 신원(commandId)이 없어 30초 일회용 PTY 티켓을 발급하지 않았습니다. (위조 식별자 합성 방지)
             <br />
-            <span style={{ fontSize: '0.75rem', color: '#fed7aa' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
               👉 <strong>[사용자 조치 필요]</strong>: 상단 '승인 실행(Run)' 드롭다운에서 실행을 선택하거나 '승인 명령 ID' 입력창에 유효한 commandId(예: cmd_...)를 입력하십시오.
             </span>
           </span>
@@ -358,10 +452,10 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           data-testid="terminal-error-alert"
           style={{
             padding: '8px 16px',
-            backgroundColor: '#7f1d1d',
-            color: '#fecaca',
+            backgroundColor: 'var(--color-risk-l3-bg)',
+            color: 'var(--color-status-offline)',
             fontSize: '0.8125rem',
-            borderBottom: '1px solid #ef4444',
+            borderBottom: '1px solid var(--color-risk-l3-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -384,8 +478,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             title={!isAuthorizedCommandId(commandId) ? '승인된 실행(commandId)을 선택해야 재시도할 수 있습니다 (사용자 조치 필요).' : '새 티켓으로 재시도'}
             style={{
               padding: '2px 8px',
-              backgroundColor: isAuthorizedCommandId(commandId) ? '#ef4444' : '#6b7280',
-              color: '#fff',
+              backgroundColor: isAuthorizedCommandId(commandId) ? 'var(--color-status-offline-bg)' : 'var(--color-bg-subtle)',
+              color: isAuthorizedCommandId(commandId) ? 'var(--color-brand-primary-fg)' : 'var(--color-text-muted)',
               border: 'none',
               borderRadius: '4px',
               cursor: isAuthorizedCommandId(commandId) ? 'pointer' : 'not-allowed',
@@ -405,10 +499,10 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           data-testid="terminal-disconnected-cmd-alert"
           style={{
             padding: '6px 16px',
-            backgroundColor: '#451a03',
-            color: '#fde68a',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: 'var(--color-status-degraded)',
             fontSize: '0.75rem',
-            borderBottom: '1px solid #d97706',
+            borderBottom: '1px solid var(--color-status-degraded)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -421,7 +515,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#fde68a',
+              color: 'var(--color-status-degraded)',
               cursor: 'pointer',
               fontSize: '0.75rem',
             }}
@@ -442,8 +536,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             flex: 1,
             padding: '16px',
             overflowY: 'auto',
-            backgroundColor: '#090d16',
-            color: '#f0f6fc',
+            backgroundColor: 'var(--color-bg-canvas)',
+            color: 'var(--color-text-primary)',
             fontFamily: 'sans-serif',
             fontSize: '0.875rem',
             lineHeight: 1.6,
@@ -452,7 +546,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px' }}>
             접근성 텍스트 로그 대체 뷰 (WCAG AA 대응)
           </h4>
-          <p style={{ color: '#8b949e', marginBottom: '16px' }}>
+          <p style={{ color: 'var(--color-text-muted)', marginBottom: '16px' }}>
             스크린리더 및 텍스트 브라우저를 위한 순수 텍스트 로그 출력 모드입니다.
           </p>
           <pre
@@ -482,7 +576,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             onSubmit={handleCommandSubmit}
             style={{ display: 'flex', marginTop: '4px' }}
           >
-            <span style={{ color: connectionStatus === 'connected' ? '#58a6ff' : '#8b949e' }}>
+            <span style={{ color: getWebTerminalConnectionStatusConfig(connectionStatus).promptColor }}>
               {connectionStatus === 'connected'
                 ? `saintvision@${workspaceId || 'terminal'}:~$ `
                 : `[${connectionStatus}] $ `}
@@ -498,7 +592,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
                 flex: 1,
                 backgroundColor: 'transparent',
                 border: 'none',
-                color: '#f0f6fc',
+                color: 'var(--color-text-primary)',
                 fontFamily: 'inherit',
                 fontSize: 'inherit',
               }}
