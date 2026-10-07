@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261007-CARD290-CLAUDE"
 title: "Card 290 48 task rescore v1.20"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-10-07T12:52:00+09:00"
-updated: "2026-10-07T13:59:31+09:00"
+updated: "2026-10-07T14:29:46+09:00"
 source_of_truth: "Git"
 ---
 
@@ -28,7 +28,6 @@ source_of_truth: "Git"
     66c tip (run `37572321090`) and its `payload.observations` are byte-identical to the 66a
     run `37566028638`, with the same v1.18 digest `348491efbc4c447f` and a different
     `payloadSha256` - two separate real runs, not one artifact read twice.
-  (`coord/train66a-ci-1216`).
 - Chain machine-checked in both directions: `6fc0428b ⊂ V ⊂ W ⊂ X ⊂ train62 ⊂ train63 ⊂
   train65 ⊂ Y`, and Y is **not** an ancestor of the landed tree.
 - `#380`–`#385` are all in Y and all OPEN. **`#386` (card 289, my own) is not in Y and is not
@@ -72,12 +71,17 @@ recorded but were not run."* No row lists certificate rotation as its remaining 
 rotation **preserves** the inputs that `G-19`/`G-24` need rather than **producing** an acceptance.
 
 **And the accessibility axis is identical for the fourth time.** The envelope from Y's own head
-(run `37566028638`, success) has five observations byte-identical to what v1.18 and v1.19 recorded
+(66c, run `37572321090`: `workflow_dispatch`, attempt 1, success, `sourceHeadSha=5d0c9e62`,
+`cleanCheckout: true`) has five observations byte-identical to what v1.18 and v1.19 recorded,
+and byte-identical to the 66a comparison run `37566028638`
 — sorted canonical JSON sha256 `348491efbc4c447f` — with the same `targetRef` blob
 `737853bbde0b`, `MEASURED_FAIL`, and the single failing box `manualAcceptanceMissingCount` 1.
 
-**The AC-11 axis aggregation did not run here.** That lane is `skipped` at Y's tip and at all eight
-recent heads, so `S11-BE`'s "all eight axes" condition could not have moved. That is a lane state,
+**The AC-11 axis aggregation did not run here.** At Y's exact SHA that lane has **no run at all** -
+the branch push does not start it, and the API listing of that head's eight runs does not contain
+it. On PR heads it appears as `skipped`. Both mean it did not execute, but the run provenance is
+not the same and the two are kept apart. So `S11-BE`'s "all eight axes" condition could not have
+moved. That is a run state,
 not an inference.
 
 ## Rows considered
