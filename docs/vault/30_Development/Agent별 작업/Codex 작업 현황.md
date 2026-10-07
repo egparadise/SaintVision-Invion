@@ -1,15 +1,33 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.321"
+version: "1.0.323"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T08:07:44+09:00"
+updated: "2026-10-07T10:12:00+09:00"
 source_of_truth: "Git"
-active_card: "CARD-284 VF-CL reviewer blocker independent re-review"
-active_card_status: "Five stale reviewer blockers in VF-CL-02/03/04 are independently re-reviewed at train 62 candidate 59050d2a and closed with mutation and exact-head hosted evidence; implementation-side fields remain unchanged"
-active_card_next: "Open the Card 284 PR, obtain exact-head Docs/Core green, and request Claude review"
+active_card: "CARD-286 cancel bridge real-PG flake determinization"
+active_card_status: "PR #382 implements execute-once plus observation-only reconciliation; code head 39204885 passed Backend 3.12/3.14 and Core 37553014490 with 8628 passed, while the original cancel-bridge case and the new real-Node lost-ack regression both passed"
+active_card_next: "Obtain final docs-only-head CI and Claude independent review for PR #382"
 ---
+
+## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
+
+- Base `517880099743cf2d62131012191b7ba54650c44d`, branch
+  `agent/codex/c286-cancel-bridge-flake`; owner/reviewer Codex/Claude.
+- Recent hosted JUnit sample: nine consecutive successful executions plus train 63 attempt 1,
+  yielding **9 passed / 1 setup error**. The error occurs in `build_resume()` before audit
+  partition detach or same-key retry: the first Node execution returned `NODE-0030` after
+  6.479 s and the fixture did not perform the protocol-required observation.
+- The fixture now sends the execution exactly once and, only for `NODE-0030`, performs bounded
+  observation-only receipt reads. Exhaustion and every other error remain fail-closed. Pure
+  regressions assert no re-execution, and a real-Node regression injects a lost acknowledgement
+  after acceptance so reverting the fixture call fails deterministically.
+- Pre-fix run `37548456022` attempt 2 passed the same case in 1.011 s; with that rerun the observed
+  sample is **10 passed / 1 setup error**. Code head `39204885` then passed Core run `37553014490`:
+  8,628 passed, 23 skipped, 2 deselected, zero failures/errors. The original case passed in 0.909 s
+  and the injected lost-ack case passed both the early Workspace lane and the full suite.
+- History: [[2026-10-07_09-34-33_KST_Card286_cancel_bridge_flake_Codex]].
 
 ## 2026-10-07 Card 284 — VF-CL reviewer blockers
 
