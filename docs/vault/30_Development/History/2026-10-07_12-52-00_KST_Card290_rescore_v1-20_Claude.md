@@ -6,7 +6,7 @@ status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-10-07T12:52:00+09:00"
-updated: "2026-10-07T12:52:00+09:00"
+updated: "2026-10-07T13:59:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,7 +16,18 @@ source_of_truth: "Git"
 
 - Landed: `git ls-remote` read the integration tip again at 12:42 KST and it is still
   `6fc0428b49f28379cb4da17830d92256b55c2eb2` — the **eighteenth** identical reading.
-- Candidate **Y** = train 66 `2146a70b0e588654a99030dfc9cee815147d37ba`
+- Candidate **Y** = train 66 `5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6` (`coord/train66c-ci-1336`)
+  - The train was re-cut twice while this card was open: 66a `2146a70b0e588654a99030dfc9cee815147d37ba` -> 66b
+    `dd07f01cfcb70e29dba6c8212bc8df297a20b89e` -> 66c. Y moved to the 66c tip and the score is
+    unchanged, but that was measured rather than assumed: `2146a70b0e588654a99030dfc9cee815147d37ba` is an ancestor of `5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6`, the
+    landed tree is an ancestor of it, it is **not** an ancestor of the landed tree, and the
+    delta is two commits touching two documents on six frontmatter lines - the two `updated`
+    stamps, the Index `latest_codex_card`, and the Codex board's `active_card_status` and
+    `active_card_next`. No 48-task row, no `outcome` field, no product code, no test. The
+    inventory count is 145 at both tips. The accessibility envelope was re-downloaded at the
+    66c tip (run `37572321090`) and its `payload.observations` are byte-identical to the 66a
+    run `37566028638`, with the same v1.18 digest `348491efbc4c447f` and a different
+    `payloadSha256` - two separate real runs, not one artifact read twice.
   (`coord/train66a-ci-1216`).
 - Chain machine-checked in both directions: `6fc0428b ⊂ V ⊂ W ⊂ X ⊂ train62 ⊂ train63 ⊂
   train65 ⊂ Y`, and Y is **not** an ancestor of the landed tree.
