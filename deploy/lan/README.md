@@ -345,8 +345,9 @@ pinned issuing chain, and the issuer's revocation registry. It refuses an early,
 revoked, disabled, wrong-key, wrong-node, expired, or stale-version rotation and
 emits public material only. The Node runs `worker_leaf_rotation.py install`; that
 tool verifies every public byte, writes the Node leaf and a bounded two-Control-
-Plane overlap policy with fsync/rename, copies and verifies them before restart,
-and records an exact retry journal. A CP commit requires that Node receipt and
+Plane overlap policy with fsync/rename, records a durable install-intent before
+changing either public file, copies and verifies them before restart, and keeps
+an exact retry journal. A CP commit requires that Node receipt and
 uses the existing channel-version CAS before atomically publishing the matching
 Control Plane and Node public leaves. The Node then runs `finalize` with the CP
 commit receipt, reducing the policy to the new Control Plane fingerprint. An

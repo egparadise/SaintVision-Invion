@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261007-CARD288-CODEX"
 title: "Card 288 Node and Control Plane leaf rotation"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 created: "2026-10-07T11:29:12+09:00"
-updated: "2026-10-07T11:45:53+09:00"
+updated: "2026-10-07T12:00:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -37,9 +37,10 @@ source_of_truth: "Git"
    leaf, revoked current leaf, stale version, or second writer is rejected.
 3. `worker_leaf_rotation.py install` validates the proposal against Node-local
    pinned material and the private-key public half. It backs up only public
-   material, writes each replacement through flush/fsync/rename, journals the
-   exact proposal, copies/verifies the material, and only then restarts. Exact
-   retries resume; a different proposal cannot take over the journal.
+   material, durably journals the exact install intent before changing either
+   public file, writes each replacement through flush/fsync/rename, and only
+   then restarts. Exact retries resume from either side of publication; a
+   different proposal cannot take over the journal.
 4. The CP accepts only the exact Node-key-signed restart receipt and performs the
    existing channel-version CAS before durably replacing its public control leaf
    and the public Node/policy copies. The Node accepts only the exact
@@ -47,8 +48,9 @@ source_of_truth: "Git"
    two-control-leaf overlap to the new control fingerprint.
 5. Before CP commit, rollback can restore the exact prior public leaf/policy only
    while both remain valid. Expired public material is never restored. Kill
-   points before install, after install, and before restart all recover by exact
-   idempotent retry without changing the Node private key.
+   points before install, after durable intent, after public-file publication,
+   after install, and before restart all recover by exact idempotent retry
+   without changing the Node private key. Intent-phase rollback is also covered.
 
 No migration, public HTTP route, product workload flag, or contract schema was
 added. The existing operator-only channel authority remains the only DB mutation
@@ -57,10 +59,10 @@ boundary.
 ## Focused evidence
 
 - `tests/test_lan_leaf_rotation.py`: short-lived leaf issue/install/finalize,
-  exact key preservation, all three kill points, retry replay, fresh-only
+  exact key preservation, all five kill points, retry replay, intent-phase and fresh-only
   rollback, wrong Node, wrong chain, wrong key, stale version, expiry, concurrent
   writer, revoked registry, CSR-only prepare, and channel-CAS commit.
-- Local focused result before commit: **17 passed** using the repository Python
+- Local focused result before commit: **21 passed** using the repository Python
   3.14 environment. No local Docker command was executed.
 - The test suite uses synthetic keys and short-lived certificates in temporary
   directories. No private or live pilot value is recorded.

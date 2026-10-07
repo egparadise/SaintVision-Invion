@@ -308,7 +308,16 @@ def test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority(tmp_path)
         )
 
 
-@pytest.mark.parametrize("point", ["before-install", "after-install", "before-restart"])
+@pytest.mark.parametrize(
+    "point",
+    [
+        "before-install",
+        "after-intent",
+        "after-public-install",
+        "after-install",
+        "before-restart",
+    ],
+)
 def test_rotation_kill_points_recover_idempotently_without_replacing_key(tmp_path, point):
     fixture = _fixture(tmp_path)
     old_key = (fixture.worker / "node-key.pem").read_bytes()
@@ -334,6 +343,38 @@ def test_rotation_kill_points_recover_idempotently_without_replacing_key(tmp_pat
     assert first == replay
     assert restarts == [fixture.worker.resolve()]
     assert (fixture.worker / "node-key.pem").read_bytes() == old_key
+
+
+@pytest.mark.parametrize("point", ["after-intent", "after-public-install"])
+def test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe(tmp_path, point):
+    fixture = _fixture(tmp_path)
+
+    def kill(current):
+        if current == point:
+            raise RuntimeError("synthetic publication kill")
+
+    with pytest.raises(RuntimeError, match="synthetic publication kill"):
+        rotation.install(
+            fixture.bundle,
+            fixture.worker,
+            now=fixture.now,
+            restart=lambda _root: None,
+            kill=kill,
+        )
+
+    journal = json.loads((fixture.worker / "leaf-rotation.json").read_text("utf-8"))
+    assert journal["phase"] == "installing"
+    restarts = []
+    assert rotation.rollback(
+        fixture.bundle,
+        fixture.worker,
+        now=fixture.now + timedelta(seconds=30),
+        restart=lambda root: restarts.append(root),
+    ) == {"rotationId": "a" * 32, "rolledBack": True, "channelVersion": 7}
+    assert restarts == [fixture.worker.resolve()]
+    assert fingerprint(
+        x509.load_pem_x509_certificate((fixture.worker / "node-cert.pem").read_bytes())
+    ) == fingerprint(fixture.current_node)
 
 
 @pytest.mark.parametrize(

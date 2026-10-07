@@ -145,7 +145,7 @@ def validate_bundle(
     worker_root: Path,
     *,
     now: datetime | None = None,
-    installed: bool = False,
+    installed: bool | None = False,
 ) -> dict:
     """Validate exact chain, Node/key binding, time window, and monotonic version."""
     now = now or datetime.now(timezone.utc)
@@ -219,12 +219,16 @@ def validate_bundle(
 
     old_node_raw = _regular(worker_root / "node-cert.pem")
     old_node = x509.load_pem_x509_certificate(old_node_raw)
-    expected_current = (
-        manifest["nextNodeCertificateSHA256"]
-        if installed
-        else manifest["currentNodeCertificateSHA256"]
-    )
-    if old_node.fingerprint(hashes.SHA256()).hex() != expected_current:
+    expected_current = {
+        (
+            manifest["nextNodeCertificateSHA256"]
+            if installed
+            else manifest["currentNodeCertificateSHA256"]
+        )
+    }
+    if installed is None:
+        expected_current.add(manifest["nextNodeCertificateSHA256"])
+    if old_node.fingerprint(hashes.SHA256()).hex() not in expected_current:
         raise ValueError("Current Node leaf does not match the rotation base")
     next_node = _leaf(
         files["node-cert.pem"],
@@ -325,8 +329,12 @@ def install(
             bundle,
             worker_root,
             now=now,
-            installed=bool(
-                journal and journal.get("phase") in {"installed", "restarted", "finalized"}
+            installed=(
+                None
+                if journal and journal.get("phase") == "installing"
+                else bool(
+                    journal and journal.get("phase") in {"installed", "restarted", "finalized"}
+                )
             ),
         )
         manifest, files = validated["manifest"], validated["files"]
@@ -349,8 +357,12 @@ def install(
             target = backup / name
             if not target.exists():
                 _atomic(target, _regular(source))
+        journal = {**expected_identity, "phase": "installing", "restartRequired": True}
+        _atomic(journal_path, _canonical(journal))
+        kill("after-intent")
         _atomic(worker_root / "node-cert.pem", files["node-cert.pem"])
         _atomic(worker_root / "peer-policy.json", files["peer-policy-overlap.json"])
+        kill("after-public-install")
         journal = {**expected_identity, "phase": "installed", "restartRequired": True}
         _atomic(journal_path, _canonical(journal))
         kill("after-install")
@@ -459,7 +471,7 @@ def rollback(
         if (
             journal.get("rotationId") != manifest["rotationId"]
             or journal.get("proposalDigest") != _digest(manifest_raw)
-            or journal.get("phase") not in {"installed", "restarted", "rolled-back"}
+            or journal.get("phase") not in {"installing", "installed", "restarted", "rolled-back"}
         ):
             raise ValueError("Only the exact unfinalized rotation can roll back")
         backup = worker_root / "leaf-rotation-backup" / manifest["rotationId"]
