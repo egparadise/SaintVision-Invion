@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 created: "2026-10-07T11:29:12+09:00"
-updated: "2026-10-07T11:29:12+09:00"
+updated: "2026-10-07T11:45:53+09:00"
 source_of_truth: "Git"
 ---
 
@@ -60,7 +60,7 @@ boundary.
   exact key preservation, all three kill points, retry replay, fresh-only
   rollback, wrong Node, wrong chain, wrong key, stale version, expiry, concurrent
   writer, revoked registry, CSR-only prepare, and channel-CAS commit.
-- Local focused result before commit: **16 passed** using the repository Python
+- Local focused result before commit: **17 passed** using the repository Python
   3.14 environment. No local Docker command was executed.
 - The test suite uses synthetic keys and short-lived certificates in temporary
   directories. No private or live pilot value is recorded.

@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.323"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T11:32:33+09:00"
+updated: "2026-10-07T11:45:53+09:00"
 source_of_truth: "Git"
 active_card: "CARD-288 Node and Control Plane leaf rotation"
 active_card_status: "Implementation complete for CSR-only issuance, exact chain and channel binding, atomic Node installation, CP channel CAS, bounded overlap/finalization, fresh-only rollback, and kill-point recovery; live r2 state remains untouched pending Claude review"
@@ -19,7 +19,7 @@ active_card_next: "Open the stacked Card 288 PR, obtain exact-head Backend/Core/
 - The Node installer verifies every bound identity and digest, journals exact retries, writes public
   files with fsync/rename before restart, and records a restart receipt. CP commit uses the existing
   channel CAS; finalization ends a bounded old/new control overlap. Fresh-only rollback and three
-  crash kill points are covered. Focused local result: 16 passed, with no local Docker use.
+  crash kill points are covered. Focused local result: 17 passed, with no local Docker use.
 - The accepted r2 pilot state is intentionally unchanged. History records the separate post-review
   commands and requires a current mTLS heartbeat on the new channel before operational acceptance.
 - History: [[2026-10-07_11-29-12_KST_Card288_Node_leaf_rotation_Codex]].

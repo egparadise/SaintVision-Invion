@@ -71,7 +71,7 @@ def _write(path, name, raw):
 
 def _fixture(tmp_path, *, now=None, second_node_key=False):
     now = now or datetime(2026, 10, 7, 1, 0, tzinfo=timezone.utc)
-    _, root, issuer_key, issuer = _ca(now)
+    root_key, root, issuer_key, issuer = _ca(now)
     chain = pem(issuer) + pem(root)
     node_key = Ed25519PrivateKey.generate()
     next_key = Ed25519PrivateKey.generate() if second_node_key else node_key
@@ -180,6 +180,8 @@ def _fixture(tmp_path, *, now=None, second_node_key=False):
         next_control=next_control,
         node_key=node_key,
         control_key=control_key,
+        root_key=root_key,
+        root=root,
         chain=chain,
         issuer_key=issuer_key,
         issuer=issuer,
@@ -339,6 +341,7 @@ def test_rotation_kill_points_recover_idempotently_without_replacing_key(tmp_pat
     [
         ("wrong-node", "identity"),
         ("wrong-chain", "pinned chain"),
+        ("expired-root", "issuing chain"),
         ("wrong-key", "private key"),
         ("stale-version", "version"),
         ("expired", "validity window"),
@@ -353,6 +356,27 @@ def test_rotation_rejects_wrong_identity_chain_key_version_and_expiry(tmp_path, 
         other = _fixture(tmp_path / "other")
         (fixture.bundle / "ca.pem").write_bytes(other.chain)
         manifest["files"]["ca.pem"] = hashlib.sha256(other.chain).hexdigest()
+        manifest["caBundleSHA256"] = manifest["files"]["ca.pem"]
+    elif fault == "expired-root":
+        root = (
+            x509.CertificateBuilder()
+            .subject_name(fixture.root.subject)
+            .issuer_name(fixture.root.subject)
+            .public_key(fixture.root_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(fixture.now - timedelta(days=3))
+            .not_valid_after(fixture.now - timedelta(days=1))
+            .add_extension(x509.BasicConstraints(ca=True, path_length=1), critical=True)
+            .add_extension(
+                x509.KeyUsage(False, False, False, False, False, True, True, None, None),
+                critical=True,
+            )
+            .sign(fixture.root_key, None)
+        )
+        chain = pem(fixture.issuer) + pem(root)
+        (fixture.worker / "ca.pem").write_bytes(chain)
+        (fixture.bundle / "ca.pem").write_bytes(chain)
+        manifest["files"]["ca.pem"] = hashlib.sha256(chain).hexdigest()
         manifest["caBundleSHA256"] = manifest["files"]["ca.pem"]
     elif fault == "stale-version":
         manifest["targetChannelVersion"] = manifest["currentChannelVersion"]

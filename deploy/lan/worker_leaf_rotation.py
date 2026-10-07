@@ -199,9 +199,23 @@ def validate_bundle(
     if len(chain) != 2:
         raise ValueError("Pinned chain must contain one intermediate and one root")
     intermediate, root = chain
+    intermediate_constraints = intermediate.extensions.get_extension_for_class(
+        x509.BasicConstraints
+    ).value
+    root_constraints = root.extensions.get_extension_for_class(x509.BasicConstraints).value
     _verify_signature(root, intermediate)
-    if not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc:
-        raise ValueError("Issuing intermediate is not currently valid")
+    _verify_signature(root, root)
+    if (
+        intermediate.issuer != root.subject
+        or root.issuer != root.subject
+        or not intermediate_constraints.ca
+        or intermediate_constraints.path_length != 0
+        or not root_constraints.ca
+        or root_constraints.path_length != 1
+        or not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc
+        or not root.not_valid_before_utc <= now < root.not_valid_after_utc
+    ):
+        raise ValueError("Pinned issuing chain constraints or validity differ")
 
     old_node_raw = _regular(worker_root / "node-cert.pem")
     old_node = x509.load_pem_x509_certificate(old_node_raw)
