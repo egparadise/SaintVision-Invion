@@ -4,6 +4,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -611,6 +612,37 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert "NOCREATEDB NOCREATEROLE NOREPLICATION" in script
     assert "rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication" in verifier
     assert "'f|f|f|f|f'" in verifier
+
+
+@pytest.mark.skipif(shutil.which("bash") is None, reason="bash is unavailable")
+def test_remote_database_scripts_are_valid_bash():
+    root = Path(__file__).resolve().parents[1]
+    for name in ("prepare-pilot-database.sh", "verify-pilot-database.sh"):
+        completed = subprocess.run(
+            ["bash", "-n", f"deploy/lan/{name}"],
+            capture_output=True,
+            check=False,
+            cwd=root,
+            text=True,
+        )
+        assert completed.returncode == 0, completed.stderr
+
+
+def test_remote_node_dockerfile_sources_are_in_the_root_build_context():
+    root = Path(__file__).resolve().parents[1]
+    dockerfile = (root / "deploy/lan/Dockerfile.node.remote").read_text(encoding="utf-8")
+    dockerignore = (root / ".dockerignore").read_text(encoding="utf-8").splitlines()
+
+    assert "COPY services/node-agent ./services/node-agent" in dockerfile
+    assert "COPY packages/contracts-go ./packages/contracts-go" in dockerfile
+    for required in (
+        "!services/node-agent/",
+        "!services/node-agent/**",
+        "!packages/",
+        "!packages/contracts-go/",
+        "!packages/contracts-go/**",
+    ):
+        assert required in dockerignore
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX shell verifier runs in hosted Linux")
