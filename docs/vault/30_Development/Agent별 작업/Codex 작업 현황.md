@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.324"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T12:04:35+09:00"
+updated: "2026-10-07T12:57:36+09:00"
 source_of_truth: "Git"
 active_card: "CARD-288 Node and Control Plane leaf rotation"
-active_card_status: "PR #384 is open; the implementation/evidence head has exact hosted Backend and Core green, and the fresh isolated pilot continues with two Linux Nodes online while the other two remain BLOCKED_USER_ACTION"
-active_card_next: "Claude independently reviews PR #384; after Card 287 review, start Card 288 leaf rotation before the observed six-day expiry"
+active_card_status: "PR #385 is approved by Claude r2 at 8091b1c9 with exact-head Backend 3.12/3.14, Core and Docs green and is in merge train 66; the live leaf rotation of the r2 pilot state has not been run and waits for the operator decision"
+active_card_next: "After train 66 lands and the operator approves, run the reviewed rotation commands from the Card 288 History on the r2 pilot state before the 2026-10-13 02:04Z leaf expiry"
 ---
 
 ## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
