@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261007-CARD289-CLAUDE"
 title: "Card 289 desktop launcher formalization"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-10-07T12:28:28+09:00"
-updated: "2026-10-07T12:28:28+09:00"
+updated: "2026-10-07T13:45:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -113,3 +113,107 @@ A static test parses every `deploy/**/*.ps1` with the PowerShell parser; all eig
   it or touch the private state.
 - Windows login auto-start remains `deploy/studio/Register-EnvironmentStartup.ps1`; this card
   adds a desktop icon, not a startup change.
+
+
+## Reviewer r1 remediation (Codex F1-F6)
+
+Codex asked for six changes on PR #386. Every boundary below is now driven by a test, and each
+test was proved to be a witness by reintroducing the defect and watching exactly that test fail.
+
+`deploy/lan/SvLauncherInput.ps1` is new: it holds the input grammar and command-line parsing
+that both the launcher and the registrar share, so the two entry points cannot drift and so a
+regression test can drive each rule directly instead of only reading the source.
+
+**F1 - operator inputs reach `ssh.exe` as data, not as options.** The previous version only
+refused quotes and newlines. A native argument list is flattened by the Windows runtime, so a
+single string such as `operator.example.test -o ProxyCommand=calc.exe` could arrive as several
+arguments. Both inputs are now held to an anchored grammar rather than filtered: the tunnel
+target must match `user@host` exactly, with IPv4 octet range and leading-zero rejection or
+per-label hostname validation, and the key path must not begin with `-`, must contain no quote
+or control character, and must resolve to an existing file. The ssh invocation fixes every
+option before `--`, so a validated target can only ever be read as the destination. The
+registrar applies the identical assertions, so a value the launcher would refuse cannot be
+baked into an unattended shortcut. Rejected values are never echoed: they carry an account and
+a host.
+
+**F2 - ownership is decided by tokens, not by `Contains`.** `C:/pilot/r2` is a substring of
+`C:/pilot/r2-x`, so the substring test could accept a console serving a neighbouring state -
+the same class of defect this card set out to fix. `Get-SvArgv` implements the documented Win32
+CRT tokenizer (whitespace outside quotes separates, a backslash run escapes a following quote,
+doubled quotes inside a quoted argument produce one literal quote), and ownership now requires
+the normalized path after an exact `--state` token to equal the target state.
+
+**F3 - the external forward is identified, not assumed.** Treating *any* listener on `dbPort`
+as the tunnel would point the console at whatever happened to be listening. Reuse now requires
+every listener on that port to be bound to a loopback address *and* an owning process that is
+`ssh.exe` whose command line carries exactly `-L 127.0.0.1:<dbPort>:127.0.0.1:<dbPort>` and,
+when a target was supplied, exactly that target. Anything else fails closed before a listener
+starts. The port is parsed with `[int]::TryParse` and range-checked, so a non-numeric `dbPort`
+cannot cast to `0` and be forwarded.
+
+**F4 - only a genuinely absent `databaseMode` means legacy local.** `tools/lan_pilot.py` uses
+`setdefault`, which substitutes the default only when the key is missing; a present but wrong
+value is refused there. The launcher matched that by truthiness, so `null`, an empty string and
+`0` all became "legacy local" and then demanded a container an external state does not have.
+The mode is now decided by a property-existence check, and a declared value outside the two
+contract strings fails closed before any Docker call.
+
+**F5 - each boundary has a witness.** The suite was 1 test before this card and is **21 now**
+(21 passed, 0 skipped on this host). Eight mutations, each reverting one boundary:
+
+| Mutation | Test that failed |
+|---|---|
+| tunnel target grammar always accepts | `test_tunnel_target_grammar_refuses_option_and_whitespace_injection` |
+| key path no longer refuses a leading dash | `test_ssh_key_path_refuses_option_syntax_before_resolving_it` |
+| state compared as a substring again | `test_argv_tokenizer_refuses_a_prefix_state_path` |
+| non-loopback bind accepted as the tunnel | `test_external_state_refuses_a_non_loopback_listener_on_the_database_port` |
+| any loopback listener counts as the tunnel | `test_external_state_refuses_a_loopback_listener_it_cannot_identify` |
+| falsey `databaseMode` treated as legacy | `test_a_declared_but_invalid_database_mode_fails_closed` `[None]` `[]` `[0]` |
+| shortcut ownership rule disabled | `test_desktop_registrar_preserves_a_shortcut_owned_by_another_setup` |
+| vite bound to `0.0.0.0` again | `test_live_console_binds_the_web_listener_to_loopback_only` |
+
+Both files were restored from file backups and byte-compared against the pristine copies after
+the run, and the suite returned to 21 passed. An earlier mutation run used `git checkout --` to
+revert and **destroyed work**: the new helper was untracked so the restore silently failed and
+mutations accumulated, and the launcher's index copy was the pre-card original so the checkout
+reverted the whole remediation to 152 lines. Mutation harnesses here back up to files.
+
+Two of those tests exist because the first remediation pass was wrong and measurement said so:
+
+- **The key-path rule had no witness.** The first mutation run caught seven of eight; removing
+  the leading-dash rule failed nothing, because only the tunnel target had a grammar test. The
+  dash case is now driven against a file that really exists under the name
+  `-oProxyCommand=calc.exe`, so with the rule removed the value resolves and is **accepted**.
+  The quote and control-character rule cannot be witnessed the same way - Windows filenames
+  cannot contain those bytes at all - and that limit is written in the test rather than implied.
+- **`Get-SvListeners` returning an `@(...)` array silently reintroduced F3.** PowerShell unrolls
+  an array on return, so a single listener arrived as a scalar whose `.Count` is null, making
+  `Count -gt 0` false and skipping the loopback and ownership loops entirely. The first fix,
+  returning a comma-wrapped array, broke the opposite case: the empty result arrived as one
+  element holding an empty array, whose `LocalAddress` is null and therefore read as a
+  non-loopback bind. The function now emits the objects and **every one of its six call sites
+  wraps with `@()`**. A test caught this, not a reading of the source.
+
+The shortcut ownership rule moved out of the registrar into `Assert-SvOwnedShortcut` for the
+same reason: the invariant was described in source but never executed. The test writes a link
+owned by another setup and asserts it is preserved, then writes one carrying this setup's marker
+and asserts it is accepted. An earlier attempt to test this by redirecting the home directory
+does not work, because `[Environment]::GetFolderPath('Desktop')` does not read it.
+
+**F6 - the skip map is measured, not guessed.** Collecting the suite and joining each item to
+its own `skipif` reason gives `PowerShell and csc.exe shim require Windows` = 9,
+`PowerShell parser requires Windows` = 1, `PowerShell required` = 4, and 7 items that always
+run. Both `backend.yml` and `core.yml` carry those exact counts.
+
+A self-check test forbids control bytes in this test file and in the three PowerShell files: an
+earlier shell-escaping slip wrote four literal U+0008 bytes where an escape was meant, which had
+made two IPv4 assertions vacuous.
+
+### Remediation residual
+
+- The live r2 pilot was still not touched: no private state file was opened, and no rotation or
+  forward was run against it.
+- The character-loop half of the key-path rule is asserted but not mutation-proved, for the
+  filesystem reason stated above.
+- PR base moved to `coord/train66c-ci-1336` (`5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6`); the branch point is
+  unchanged, so this is a merge-target change rather than a rebase.

@@ -362,8 +362,12 @@ worker and database use `unless-stopped`.
 already provisioned. It never resets a database, never dispatches work, and never
 prints or logs a secret.
 
-It reads the database shape from the state's own `databaseMode`, defaulting an
-older state to the local mode exactly as `tools/lan_pilot.py` does:
+It reads the database shape from the state's own `databaseMode`, defaulting to the
+local mode only when that key is genuinely **absent**, exactly as
+`tools/lan_pilot.py` does with `setdefault`. A declared mode that is null, empty,
+numeric, or simply unknown is refused before any Docker call or listener, because a
+falsey value silently becoming "legacy local" would make an external state demand a
+container that cannot exist:
 
 * `managed-local-docker` — the owned pilot container is inspected by label and
   started if stopped, and a failed `docker start` stops before any listener.
@@ -373,6 +377,13 @@ older state to the local mode exactly as `tools/lan_pilot.py` does:
   state**; the target host and key are arguments (`-DatabaseTunnelTarget`,
   `-SshKeyPath`) and no pilot address, account, or port is written in this
   repository. Without an open tunnel and without a target it fails closed.
+
+An already-open forward is only reused when it can be identified as the owned one:
+*every* listener on that port must be bound to a loopback address, and the owning
+process must be `ssh.exe` whose command line carries exactly
+`-L 127.0.0.1:<dbPort>:127.0.0.1:<dbPort>` and, when a target was supplied, exactly
+that target. Any other holder of the port fails closed. Treating an arbitrary
+listener as the tunnel would have pointed the console at whatever was listening.
 
 Both owned listeners must belong to the state being started. A console on 18082 or
 a web server on 3000 that serves a *different* state, or that is bound to a
@@ -389,6 +400,25 @@ that script, carrying the same arguments. It follows the ownership rule
 `Register-EnvironmentStartup.ps1` uses: a shortcut whose description is not this
 setup's marker is preserved rather than overwritten, and `-Remove` withdraws only
 the owned one.
+
+`deploy/lan/SvLauncherInput.ps1` holds the input grammar and command-line parsing
+both scripts share, so the icon can never be registered with a value the launcher
+would refuse:
+
+* `-DatabaseTunnelTarget` must match one anchored `user@host` grammar (IPv4 with
+  valid octets, or a hostname with valid labels). Whitespace, quotes, control
+  characters, `=` and option syntax all fall outside it, and the ssh invocation
+  fixes every option before `--` so a validated target can only be read as the
+  destination. A single string must never be able to arrive at `ssh.exe` as several
+  arguments.
+* `-SshKeyPath` must not begin with `-`, must contain no quote or control
+  character, and must resolve to an existing file.
+* Ownership is decided by tokenizing the owning process's command line with the
+  documented Win32 CRT rules and comparing the normalized path after an exact
+  `--state` token. A substring test matched `C:/pilot/r2` against a process serving
+  `C:/pilot/r2-x`.
+
+Rejected values are never echoed: they can carry an operator account or host.
 
 Default paths are derived from the checkout that contains the script, so no
 deployment script assumes a drive letter.

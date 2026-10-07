@@ -176,7 +176,14 @@ jobs:
           # agent CLIs.  Pin the exact reason/count map so skip remains visible
           # evidence rather than being counted as success or allowed to grow.
           expected_skips = Counter({
-              'PowerShell and csc.exe shim require Windows': 1,
+              # Card 289 r2: the original Docker-start case plus five behavioural
+              # launcher cases (external-mode, non-loopback and unidentified listener,
+              # invalid declared mode x4, invalid tunnel target) need the Windows shim.
+              'PowerShell and csc.exe shim require Windows': 9,
+              'PowerShell parser requires Windows': 1,
+              # Four helper-grammar cases: tunnel target, argv tokenizer,
+              # shortcut ownership marker, SSH key path.
+              'PowerShell required': 4,
               # Card 262: two volume copy/cleanup cases plus the API namespace
               # isolation case run with INV_TEST_CONFIG_IMAGE in hosted Core.
               'Explicit pinned local candidate image required': 3,
