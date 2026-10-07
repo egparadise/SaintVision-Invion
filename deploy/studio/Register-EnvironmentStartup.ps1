@@ -1,4 +1,9 @@
-param([string]$StudioRoot='C:/Project/SaintVision-Workspaces',[string]$StatePath='C:/Project/SaintVision-Invion/.work/lan-pilot')
+# Defaults are derived from this checkout so the registered shortcut never embeds a
+# drive letter or a repository directory that does not exist on this machine.
+param(
+    [string]$StudioRoot = (Join-Path (Split-Path (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path -Parent) 'SaintVision-Workspaces'),
+    [string]$StatePath = (Join-Path $PSScriptRoot '../../.work/lan-pilot')
+)
 $ErrorActionPreference = 'Stop'
 $svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-Environment.ps1')).Path
 $StudioRoot = (Resolve-Path -LiteralPath $StudioRoot).Path
