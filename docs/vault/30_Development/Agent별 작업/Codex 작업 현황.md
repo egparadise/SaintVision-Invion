@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.321"
+version: "1.0.322"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T08:07:44+09:00"
+updated: "2026-10-07T09:34:33+09:00"
 source_of_truth: "Git"
-active_card: "CARD-284 VF-CL reviewer blocker independent re-review"
-active_card_status: "Five stale reviewer blockers in VF-CL-02/03/04 are independently re-reviewed at train 62 candidate 59050d2a and closed with mutation and exact-head hosted evidence; implementation-side fields remain unchanged"
-active_card_next: "Open the Card 284 PR, obtain exact-head Docs/Core green, and request Claude review"
+active_card: "CARD-286 cancel bridge real-PG flake determinization"
+active_card_status: "Train 63 Core attempt 1 failed before the audit-partition test body because workspace setup treated an uncertain Node acknowledgement as final; the fix executes once and reconciles only through the observation endpoint"
+active_card_next: "Run exact-head hosted Core, record the repeated target result and full totals, then route the PR to Claude for independent review"
 ---
+
+## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
+
+- Base `517880099743cf2d62131012191b7ba54650c44d`, branch
+  `agent/codex/c286-cancel-bridge-flake`; owner/reviewer Codex/Claude.
+- Recent hosted JUnit sample: nine consecutive successful executions plus train 63 attempt 1,
+  yielding **9 passed / 1 setup error**. The error occurs in `build_resume()` before audit
+  partition detach or same-key retry: the first Node execution returned `NODE-0030` after
+  6.479 s and the fixture did not perform the protocol-required observation.
+- The fixture now sends the execution exactly once and, only for `NODE-0030`, performs bounded
+  observation-only receipt reads. Exhaustion and every other error remain fail-closed. Pure
+  regressions assert no re-execution, and a real-Node regression injects a lost acknowledgement
+  after acceptance so reverting the fixture call fails deterministically.
+- History: [[2026-10-07_09-34-33_KST_Card286_cancel_bridge_flake_Codex]].
 
 ## 2026-10-07 Card 284 — VF-CL reviewer blockers
 

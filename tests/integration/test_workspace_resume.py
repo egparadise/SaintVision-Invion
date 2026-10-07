@@ -17,6 +17,7 @@ from inv.policy import action_digest
 from inv.workspace_files import PrivateTree, RestoreGenerations, WorkingGenerations, decode_snapshot
 from inv.workspace_recovery import WorkspaceRecovery
 from inv.workspace_resume import WorkspaceResume
+from node_delivery_support import deliver_once_then_observe
 from test_approvals import approval, request, challenge, decide, dispatch, count
 from test_node_runtime import node_runtime, active, container
 from test_node_delivery import remote
@@ -106,7 +107,7 @@ def build_resume(remote, storage, tmp_path, attack=None, *, freeze_input=True):
         PrivateTree(source),
         proofs=a.proofs,
     )
-    a.delivery.deliver(a.node, first.envelope)
+    deliver_once_then_observe(a.delivery, a.node, first.envelope)
     assert a.queue.finish(first) == "stopped" and active(a) == 0
     a.run = a.e.runs.transition(
         a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"]
@@ -142,6 +143,26 @@ def build_resume(remote, storage, tmp_path, attack=None, *, freeze_input=True):
         a.workload = freeze(a)["workload"]
     a.storage = storage
     return a
+
+
+def test_build_resume_observes_lost_acknowledgement_without_reexecution(
+    remote, storage, tmp_path, monkeypatch
+):
+    original = remote.delivery.deliver
+    modes = []
+
+    def lose_first_acknowledgement(node, envelope, *, observation_only=False):
+        modes.append(observation_only)
+        result = original(node, envelope, observation_only=observation_only)
+        if not observation_only:
+            raise DomainError("NODE-0030", "synthetic lost acknowledgement", 503)
+        return result
+
+    monkeypatch.setattr(remote.delivery, "deliver", lose_first_acknowledgement)
+
+    build_resume(remote, storage, tmp_path)
+
+    assert modes == [False, True]
 
 
 def test_fresh_approved_step_executes_real_git_and_commits_restorable_files(resumed):
