@@ -882,6 +882,84 @@ def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
         lan_pilot.load_prebuilt_image(archive_path, inspect_path, tag, tmp_path / "rejected.tar")
 
 
+def test_prebuilt_oci_archive_binds_manifest_id_to_config_and_tag(tmp_path):
+    tag = "saintvision-lan-node:epoch-te"
+    archive_path = tmp_path / "node-agent.tar"
+    inspect_path = tmp_path / "image-inspect.json"
+    config_value = {
+        "config": {"Entrypoint": ["/inv-node"]},
+        "rootfs": {"diff_ids": []},
+    }
+    config = json.dumps(config_value, separators=(",", ":")).encode()
+    config_hex = __import__("hashlib").sha256(config).hexdigest()
+    config_name = "blobs/sha256/" + config_hex
+    legacy = [{"Config": config_name, "RepoTags": [tag], "Layers": []}]
+    oci_manifest = {
+        "schemaVersion": 2,
+        "config": {"digest": "sha256:" + config_hex},
+        "layers": [],
+    }
+    manifest_raw = json.dumps(oci_manifest, separators=(",", ":")).encode()
+    manifest_hex = __import__("hashlib").sha256(manifest_raw).hexdigest()
+    index = {
+        "schemaVersion": 2,
+        "manifests": [
+            {
+                "digest": "sha256:" + manifest_hex,
+                "size": len(manifest_raw),
+                "annotations": {
+                    "io.containerd.image.name": "docker.io/library/" + tag,
+                    "org.opencontainers.image.ref.name": "epoch-te",
+                },
+            }
+        ],
+    }
+    members = {
+        "manifest.json": json.dumps(legacy).encode(),
+        config_name: config,
+        "index.json": json.dumps(index).encode(),
+        "oci-layout": b'{"imageLayoutVersion":"1.0.0"}',
+        "blobs/sha256/" + manifest_hex: manifest_raw,
+    }
+    with tarfile.open(archive_path, "w") as archive:
+        for name, data in members.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    inspected = [
+        {
+            "Id": "sha256:" + manifest_hex,
+            "RepoTags": [tag],
+            "RootFS": {"Layers": []},
+            "Config": config_value["config"],
+        }
+    ]
+    inspect_path.write_text(json.dumps(inspected), encoding="utf-8")
+
+    image_id, _ = lan_pilot.load_prebuilt_image(
+        archive_path, inspect_path, tag, tmp_path / "copied.tar"
+    )
+    assert image_id == "sha256:" + manifest_hex
+
+    inspected[0]["Id"] = "sha256:" + ("f" * 64)
+    inspect_path.write_text(json.dumps(inspected), encoding="utf-8")
+    with pytest.raises(ValueError, match="OCI manifest identity differs"):
+        lan_pilot.load_prebuilt_image(archive_path, inspect_path, tag, tmp_path / "rejected.tar")
+
+    inspected[0]["Id"] = "sha256:" + manifest_hex
+    inspect_path.write_text(json.dumps(inspected), encoding="utf-8")
+    oci_manifest["config"]["digest"] = "sha256:" + ("e" * 64)
+    changed = json.dumps(oci_manifest, separators=(",", ":")).encode()
+    members["blobs/sha256/" + manifest_hex] = changed
+    with tarfile.open(archive_path, "w") as archive:
+        for name, data in members.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    with pytest.raises(ValueError, match="OCI manifest digest differs"):
+        lan_pilot.load_prebuilt_image(archive_path, inspect_path, tag, tmp_path / "rejected.tar")
+
+
 def test_status_rows_keep_partial_nodes_visible(monkeypatch):
     nodes = [
         node("nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "192.168.45.81"),
