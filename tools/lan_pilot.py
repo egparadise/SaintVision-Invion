@@ -423,8 +423,7 @@ def load_prebuilt_image(archive_path, inspect_path, tag, target):
         )
         if not config_match or tag not in entry.get("RepoTags", []):
             raise ValueError("Prebuilt archive and inspection identity differ")
-        if image_id != "sha256:" + config_match.group(1):
-            raise ValueError("Prebuilt image ID differs from archive config digest")
+        config_digest = "sha256:" + config_match.group(1)
         config_member = archive.getmember(config_name)
         if not config_member.isfile() or config_member.size > 2 * 1024 * 1024:
             raise ValueError("Prebuilt image config is missing")
@@ -432,6 +431,8 @@ def load_prebuilt_image(archive_path, inspect_path, tag, target):
         config_raw = config_stream.read()
         if hashlib.sha256(config_raw).hexdigest() != config_match.group(1):
             raise ValueError("Prebuilt image config digest differs")
+        if image_id != config_digest and "index.json" not in archive.getnames():
+            raise ValueError("Prebuilt image ID differs from archive config digest")
         archive_config = json.loads(config_raw)
         archive_runtime = archive_config.get("config")
         archive_layers = archive_config.get("rootfs", {}).get("diff_ids")
@@ -441,6 +442,70 @@ def load_prebuilt_image(archive_path, inspect_path, tag, target):
         for key in ("Entrypoint", "Cmd", "WorkingDir", "Env", "User"):
             if archive_runtime.get(key) != inspect_runtime.get(key):
                 raise ValueError("Prebuilt archive and inspection runtime differ")
+        if image_id != config_digest:
+            # Docker's containerd image store exposes the OCI manifest digest as
+            # inspect.Id. Classic stores expose the config digest instead. Bind
+            # either representation to the same docker-save archive rather than
+            # accepting an arbitrary inspect ID from the build host.
+            try:
+                index_member = archive.getmember("index.json")
+                layout_member = archive.getmember("oci-layout")
+            except KeyError:
+                raise ValueError("Prebuilt image ID differs from archive config digest") from None
+            if (
+                not index_member.isfile()
+                or index_member.size > 1024 * 1024
+                or not layout_member.isfile()
+                or layout_member.size > 1024
+            ):
+                raise ValueError("Prebuilt OCI image index is invalid")
+            index = json.load(archive.extractfile(index_member))
+            layout = json.load(archive.extractfile(layout_member))
+            descriptors = index.get("manifests") if isinstance(index, dict) else None
+            if (
+                layout != {"imageLayoutVersion": "1.0.0"}
+                or index.get("schemaVersion") != 2
+                or not isinstance(descriptors, list)
+                or len(descriptors) != 1
+            ):
+                raise ValueError("Prebuilt OCI image index is invalid")
+            descriptor = descriptors[0]
+            digest = descriptor.get("digest") if isinstance(descriptor, dict) else None
+            digest_match = re.fullmatch(r"sha256:([a-f0-9]{64})", digest or "")
+            annotations = descriptor.get("annotations") if isinstance(descriptor, dict) else None
+            if (
+                not digest_match
+                or image_id != digest
+                or not isinstance(annotations, dict)
+                or annotations.get("org.opencontainers.image.ref.name") != tag.rsplit(":", 1)[-1]
+                or not annotations.get("io.containerd.image.name", "").endswith("/" + tag)
+            ):
+                raise ValueError("Prebuilt OCI manifest identity differs from inspection")
+            manifest_member = archive.getmember("blobs/sha256/" + digest_match.group(1))
+            if (
+                not manifest_member.isfile()
+                or manifest_member.size != descriptor.get("size")
+                or manifest_member.size > 2 * 1024 * 1024
+            ):
+                raise ValueError("Prebuilt OCI manifest is invalid")
+            manifest_raw = archive.extractfile(manifest_member).read()
+            if hashlib.sha256(manifest_raw).hexdigest() != digest_match.group(1):
+                raise ValueError("Prebuilt OCI manifest digest differs")
+            oci_manifest = json.loads(manifest_raw)
+            legacy_layers = []
+            for layer_name in entry.get("Layers", []):
+                layer_match = re.fullmatch(r"(?:blobs/sha256/)?([a-f0-9]{64})(?:/layer\.tar)?", layer_name)
+                if not layer_match:
+                    raise ValueError("Prebuilt archive layer identity is invalid")
+                legacy_layers.append("sha256:" + layer_match.group(1))
+            oci_layers = oci_manifest.get("layers")
+            if (
+                oci_manifest.get("schemaVersion") != 2
+                or oci_manifest.get("config", {}).get("digest") != config_digest
+                or not isinstance(oci_layers, list)
+                or [layer.get("digest") for layer in oci_layers] != legacy_layers
+            ):
+                raise ValueError("Prebuilt OCI manifest and archive content differ")
     shutil.copyfile(archive_path, target)
     return image_id, inspected
 

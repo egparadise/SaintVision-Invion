@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.321"
+version: "1.0.324"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T08:07:44+09:00"
+updated: "2026-10-07T12:04:35+09:00"
 source_of_truth: "Git"
-active_card: "CARD-284 VF-CL reviewer blocker independent re-review"
-active_card_status: "Five stale reviewer blockers in VF-CL-02/03/04 are independently re-reviewed at train 62 candidate 59050d2a and closed with mutation and exact-head hosted evidence; implementation-side fields remain unchanged"
-active_card_next: "Open the Card 284 PR, obtain exact-head Docs/Core green, and request Claude review"
+active_card: "CARD-287 LAN pilot reconnect"
+active_card_status: "PR #384 is open; the implementation/evidence head has exact hosted Backend and Core green, and the fresh isolated pilot continues with two Linux Nodes online while the other two remain BLOCKED_USER_ACTION"
+active_card_next: "Claude independently reviews PR #384; after Card 287 review, start Card 288 leaf rotation before the observed six-day expiry"
 ---
+
+## 2026-10-07 Card 287 — LAN pilot reconnect
+
+- Preserved the expired pilot state, CA, containers, and volumes. A fresh isolated state at
+  `.work/lan-5node/r2-7057dcd0` uses a remote hardened PostgreSQL instance, an SSH tunnel,
+  and an exact Linux-built prebuilt image; local Docker Desktop was not used.
+- Fixed three bootstrap defects found by the real path: the remote database heredoc failure,
+  the clean archive's missing Go contract package, and strict binding for Docker's OCI image-store
+  identity. Focused coverage is 25 passed and one Windows-only POSIX skip.
+- Two accessible Nodes now run on the new non-conflicting port and report current `online`
+  heartbeats through mTLS. The remaining two are not claimed: one needs Docker group activation,
+  and one needs the operator to enroll the SSH public key and identify the non-root account.
+- Node leaves expire on 2026-10-13 UTC. Card 288 is proposed for atomic, fail-closed automatic
+  leaf rotation before that boundary.
+- History: [[2026-10-07_11-07-11_KST_Card287_LAN_pilot_reconnect_Codex]].
 
 ## 2026-10-07 Card 284 — VF-CL reviewer blockers
 
