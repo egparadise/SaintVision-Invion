@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.323"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T10:12:00+09:00"
+updated: "2026-10-07T11:32:33+09:00"
 source_of_truth: "Git"
-active_card: "CARD-286 cancel bridge real-PG flake determinization"
-active_card_status: "PR #382 implements execute-once plus observation-only reconciliation; code head 39204885 passed Backend 3.12/3.14 and Core 37553014490 with 8628 passed, while the original cancel-bridge case and the new real-Node lost-ack regression both passed"
-active_card_next: "Obtain final docs-only-head CI and Claude independent review for PR #382"
+active_card: "CARD-287 LAN pilot reconnect"
+active_card_status: "Fresh isolated pilot state is running against the remote hardened database: two independently addressed Linux Nodes are online with current mTLS heartbeats; the other two Nodes are BLOCKED_USER_ACTION on Docker socket membership and SSH key enrollment"
+active_card_next: "Open the Card 287 PR, obtain exact-head Backend/Core/Docs green, and request Claude review; schedule Card 288 before the six-day Node leaf expires"
 ---
 
 ## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
@@ -28,6 +28,20 @@ active_card_next: "Obtain final docs-only-head CI and Claude independent review 
   8,628 passed, 23 skipped, 2 deselected, zero failures/errors. The original case passed in 0.909 s
   and the injected lost-ack case passed both the early Workspace lane and the full suite.
 - History: [[2026-10-07_09-34-33_KST_Card286_cancel_bridge_flake_Codex]].
+## 2026-10-07 Card 287 — LAN pilot reconnect
+
+- Preserved the expired pilot state, CA, containers, and volumes. A fresh isolated state at
+  `.work/lan-5node/r2-7057dcd0` uses a remote hardened PostgreSQL instance, an SSH tunnel,
+  and an exact Linux-built prebuilt image; local Docker Desktop was not used.
+- Fixed three bootstrap defects found by the real path: the remote database heredoc failure,
+  the clean archive's missing Go contract package, and strict binding for Docker's OCI image-store
+  identity. Focused coverage is 25 passed and one Windows-only POSIX skip.
+- Two accessible Nodes now run on the new non-conflicting port and report current `online`
+  heartbeats through mTLS. The remaining two are not claimed: one needs Docker group activation,
+  and one needs the operator to enroll the SSH public key and identify the non-root account.
+- Node leaves expire on 2026-10-13 UTC. Card 288 is proposed for atomic, fail-closed automatic
+  leaf rotation before that boundary.
+- History: [[2026-10-07_11-07-11_KST_Card287_LAN_pilot_reconnect_Codex]].
 
 ## 2026-10-07 Card 284 — VF-CL reviewer blockers
 

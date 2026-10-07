@@ -109,13 +109,10 @@ done
     echo 'Pilot database readiness timed out.' >&2
     exit 1
 }
-docker exec -i "$container" sh -s <<'CONTAINER' >/dev/null
+if ! docker exec -i "$container" sh -s <<'CONTAINER' >/dev/null
 set -eu
 export PGPASSWORD="$(cat /run/secrets/postgres-password)"
-psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 2>/dev/null <<'SQL' || {
-    echo 'Pilot runtime role hardening failed; diagnostics suppressed.' >&2
-    exit 1
-}
+psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 2>/dev/null <<'SQL'
 \set runtime_password `cat /run/secrets/runtime-password`
 SET log_statement = 'none';
 SET log_min_error_statement = 'panic';
@@ -132,4 +129,8 @@ SELECT format(
 ) \gexec
 SQL
 CONTAINER
+then
+    echo 'Pilot runtime role hardening failed; diagnostics suppressed.' >&2
+    exit 1
+fi
 printf '{"database":"ready","listen":"127.0.0.1:%s","authenticationBoundary":"scram-plus-ssh-tunnel","credentialStorage":"operator-private-files","network":"dedicated-user-defined"}\n' "$host_port"

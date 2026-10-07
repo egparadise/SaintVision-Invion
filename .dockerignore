@@ -5,9 +5,14 @@
 !src/
 !src/**
 !services/
+!services/node-agent/
+!services/node-agent/**
 !services/control-plane/
 !services/control-plane/src/
 !services/control-plane/src/**
+!packages/
+!packages/contracts-go/
+!packages/contracts-go/**
 !migrations/
 !migrations/**
 !tools/
