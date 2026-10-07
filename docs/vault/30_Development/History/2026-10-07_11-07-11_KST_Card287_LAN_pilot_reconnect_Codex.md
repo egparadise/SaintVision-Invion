@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261007-CARD287-CODEX"
 title: "Card 287 LAN pilot reconnect"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 created: "2026-10-07T11:07:11+09:00"
-updated: "2026-10-07T11:32:33+09:00"
+updated: "2026-10-07T12:04:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -52,6 +52,13 @@ The first exact-head Backend run correctly rejected the stale public tooling has
 SHA-256 and Git-blob bindings were regenerated from the committed files; the focused evidence
 binding test and the LAN pilot suite then passed before the replacement hosted run.
 
+At implementation/evidence head `298a33e1a6317f5f0bfd468476b3cb2be6e6e0fb`, replacement Backend
+run `37562512551` passed on Python 3.12 and 3.14 (each 8,270 passed, 52 skipped, 0 failed), Docs
+run `37562512502` passed, and Core run `37562512509` passed. Its downloaded JUnit records 8,650
+tests, 8,627 passed, 23 skipped, 0 failures, and 0 errors; the subsequent package build, Go tests,
+and strict TypeScript compile also passed. These are hosted implementation/evidence results, not
+claims about the two user-blocked Nodes.
+
 ## Measured deployment
 
 - Remote database prepare and verification both passed: missing and wrong credentials were
@@ -65,8 +72,8 @@ binding test and the LAN pilot suite then passed before the replacement hosted r
 - Both accessible Nodes loaded the same verified archive into new, distinctly named containers on
   a non-conflicting Node port. The first foreground observation returned `observed=2` and
   `unavailable=0`; both records were `online` with heartbeats at 2026-10-07 02:06 UTC. A persistent
-  observer then advanced both heartbeats again. Workload execution remains disabled and the state
-  is observation-only.
+  observer advanced both heartbeats through 2026-10-07 03:04 UTC. Workload execution remains
+  disabled and the state is observation-only.
 - The two newly issued leaves expire on 2026-10-13 at 02:04 UTC. This is an observed operational
   expiry, not a claim that automatic rotation exists.
 

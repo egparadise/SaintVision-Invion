@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.323"
+version: "1.0.324"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T11:32:33+09:00"
+updated: "2026-10-07T12:04:35+09:00"
 source_of_truth: "Git"
 active_card: "CARD-287 LAN pilot reconnect"
-active_card_status: "Fresh isolated pilot state is running against the remote hardened database: two independently addressed Linux Nodes are online with current mTLS heartbeats; the other two Nodes are BLOCKED_USER_ACTION on Docker socket membership and SSH key enrollment"
-active_card_next: "Open the Card 287 PR, obtain exact-head Backend/Core/Docs green, and request Claude review; schedule Card 288 before the six-day Node leaf expires"
+active_card_status: "PR #384 is open; the implementation/evidence head has exact hosted Backend and Core green, and the fresh isolated pilot continues with two Linux Nodes online while the other two remain BLOCKED_USER_ACTION"
+active_card_next: "Claude independently reviews PR #384; after Card 287 review, start Card 288 leaf rotation before the observed six-day expiry"
 ---
 
 ## 2026-10-07 Card 287 — LAN pilot reconnect
