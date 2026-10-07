@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261007-CARD289-CLAUDE"
 title: "Card 289 desktop launcher formalization"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-10-07T12:28:28+09:00"
-updated: "2026-10-07T13:45:31+09:00"
+updated: "2026-10-07T16:07:14+09:00"
 source_of_truth: "Git"
 ---
 
@@ -217,3 +217,108 @@ made two IPv4 assertions vacuous.
   filesystem reason stated above.
 - PR base moved to `coord/train66c-ci-1336` (`5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6`); the branch point is
   unchanged, so this is a merge-target change rather than a rebase.
+
+
+## Reviewer r2 remediation (Codex High-1, High-2)
+
+Both findings were real, and I reproduced each against the shipped source before changing it.
+
+**High-1: whitespace in the key path broke the native argument boundary.** The rule refused a
+leading dash, quotes and control characters, but not a space. Windows PowerShell joins an
+`-ArgumentList` array with spaces and does not quote, so a real file named `key with space`
+reached the child as three arguments. Measured with a compiled argv recorder against the
+product's exact argument shape: the nine-element list arrived as eleven, with `ARG=with` and
+`ARG=space` split off the key. A fragment after a space can therefore be read as an ssh
+option, before `--` closes option parsing. Both entry points shared the defect, because the
+launcher and the registrar share the helper.
+
+The rule is now one function, `Assert-SvNativeArgument`, refusing whitespace, quotes and
+control characters, and it is applied to every value this launcher hands a native child:
+the key path, the state directory, the checkout, the interpreter and the vite entry. That
+fails closed; a quoting serializer would be the alternative and is a larger change than this
+boundary needs.
+
+**Two things I assumed while fixing this and then measured to be false.** I first checked both
+the raw and the resolved key path, writing that the resolved check was needed because a short
+name such as `C:/PROGRA~1` resolves to a path with spaces. `Resolve-Path` does **not** expand
+8.3 short names, and it preserves a trailing space rather than trimming it, so that reason was
+wrong and the mutation run proved the second guard had no witness. The real reason is a
+**relative** path under a working directory containing a space: raw `id_ed25519` has no
+whitespace and resolves to `...\dir with space\id_ed25519`, which does. So the check is applied
+once, to the resolved value, and the raw check was removed rather than kept and described.
+
+**High-2: the owned-forward check was neither positional nor total.** Reuse asked only whether
+the expected forward and target appeared as tokens *anywhere* in the owner's command line, and
+skipped the target comparison entirely when no target had been supplied. Reproduced: a command
+line whose real `-L` was `127.0.0.1:49237:evil.example:49237` passed, because the expected
+forward also appeared as a trailing remote-command token. Separately, after starting ssh the
+launcher checked only the bind address, so a process that won a race to the loopback port could
+be inherited.
+
+`Test-SvOwnedSshForward` is now positional and total: argv[0] must be the exact system ssh
+executable; there must be exactly one `-L` and one `--`; the token **immediately after** `-L`
+must equal the expected forward; the token **immediately after** `--` must equal the expected
+target and be the last token, so no remote command is carried; and an empty expected target can
+never pass. `Assert-SvOwnedTunnelListeners` is the single gate both paths call -- reuse, and
+again after this launcher starts ssh, where it also binds the listener's owning process to the
+`PassThru` process id. A target is required even to reuse a forward. The loopback check is also
+named separately in each path, so the operator learns which boundary failed; the gate re-checks
+it, so that pre-check is a better message rather than the only guard.
+
+**A defect of mine that the strict gate exposed.** `Get-SvArgv` returned `, $svArguments.ToArray()`,
+so a caller writing `@(Get-SvArgv ...)` received **one element holding the whole `string[]`**.
+`argv[0]` was an array, every token comparison failed against it, and the new gate rejected
+genuine command lines as well as hostile ones. That is the `Get-SvListeners` unrolling trap from
+r1, in the opposite direction. One rule now covers both: the function returns the plain array and
+every call site wraps with `@()`, pinned by a test that checks the arity behaviour and scans the
+call sites in both scripts.
+
+### Mutations
+
+The suite is **21 -> 31** tests, and all **21** boundary mutations below are caught with **zero survivors**. The first r2 mutation pass left **six survivors**, and five of
+them were redundant guards masking each other: two character loops both refused the same spaced
+path, and the trailing-token rule covered for the positional-forward rule. Collapsing the
+duplicated rules and adding inputs that only one guard rejects closed them -- a positionally
+perfect line whose sole defect is the `-L` value, an empty destination token, a relative key path
+under a spaced working directory, and a state directory containing a space.
+
+| Mutation | Test that failed |
+|---|---|
+| native-argument rule accepts whitespace | key-path recorder, launcher, registrar and state-path tests |
+| resolved key value no longer checked | `test_a_relative_key_path_is_checked_after_resolution` |
+| forward no longer positional | `test_owned_ssh_forward_is_positional_and_total` |
+| target no longer positional | same |
+| empty expected target no longer refused | same |
+| remote command after destination allowed | same |
+| exact system ssh executable not required | same |
+| duplicate `-L` / separator allowed | same |
+| listener owner pid not bound | `test_owned_tunnel_listeners_binds_every_listener_and_the_expected_pid` |
+| gate loopback re-check removed | same |
+| reuse no longer requires a target | `test_external_state_requires_a_target_even_to_reuse_a_listener` |
+| post-start gate disabled | `test_both_tunnel_paths_go_through_the_one_strict_gate` |
+| argv return comma-wrapped again | four tests, including the tokenizer and both gate tests |
+| native argument guard removed from the launcher | `test_a_state_path_with_whitespace_fails_closed` |
+
+The r1 boundaries were re-run in the same pass and all still fail their own tests.
+
+**One witness is a source assertion rather than a behaviour, and that is stated rather than
+implied**: the post-start gate cannot be driven end to end here, because it deliberately accepts
+only the exact system ssh executable and so cannot be satisfied by a shim. The test asserts that
+both call sites are refusals (`if (-not (Assert-SvOwnedTunnelListeners`), which is what the
+surviving mutation defeated.
+
+### Skip map
+
+Re-measured by joining each collected item to its own `skipif` reason: `PowerShell and csc.exe
+shim require Windows` 13, `PowerShell parser requires Windows` 2, `PowerShell required` 9, and 7
+that always run -- 31 collected. Both `backend.yml` and `core.yml` carry those counts.
+
+### Remediation residual
+
+- The live r2 pilot was still not touched: no private state file was opened, and no rotation or
+  forward was run against it.
+- A path containing whitespace is now refused rather than supported. If a spaced checkout or
+  state directory is ever required, the fix is a quoting serializer for `-ArgumentList`, not
+  relaxing this rule.
+- `-OpenBrowser` readiness polling and a real SSH forward remain unexercised against the live
+  pilot, so the post-start branch has never run against a real tunnel.

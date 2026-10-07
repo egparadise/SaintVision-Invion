@@ -306,11 +306,11 @@ jobs:
               # Card 289 r2: the original Docker-start case plus five behavioural
               # launcher cases (external-mode, non-loopback and unidentified listener,
               # invalid declared mode x4, invalid tunnel target) need the Windows shim.
-              'PowerShell and csc.exe shim require Windows': 9,
-              'PowerShell parser requires Windows': 1,
-              # Four helper-grammar cases: tunnel target, argv tokenizer,
-              # shortcut ownership marker, SSH key path.
-              'PowerShell required': 4,
+              # Card 289 reviewer r2: measured by joining each collected item to its own
+              # skipif reason, not by counting decorators (31 collected, 7 always run).
+              'PowerShell and csc.exe shim require Windows': 13,
+              'PowerShell parser requires Windows': 2,
+              'PowerShell required': 9,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'run only through tools/placement_lock_wait_diagnostic.py': 1,

@@ -324,6 +324,16 @@ def _run_powershell(body: str, timeout: int = 120) -> subprocess.CompletedProces
     )
 
 
+def _squashed(text: str) -> str:
+    """Output with all whitespace removed.
+
+    PowerShell wraps a thrown message at the console width and can break it mid-word
+    ("owned databa\nse tunnel"), so asserting a phrase against the raw text is flaky for
+    reasons that have nothing to do with the behaviour under test.
+    """
+    return "".join(text.split())
+
+
 def test_no_test_source_line_carries_a_control_byte():
     """A shell-escaping slip once wrote U+0008 where \\b was meant, voiding two regexes."""
     for path in (
@@ -446,10 +456,12 @@ def test_external_state_refuses_a_non_loopback_listener_on_the_database_port(tmp
     port = listener.getsockname()[1]
     try:
         _external_state(state_dir, port)
-        result = _launch(state_dir, shim_dir, marker)
+        # Reuse now requires a target, so supply one: this test is about the bind address.
+        result = _launch(state_dir, shim_dir, marker,
+                         "-DatabaseTunnelTarget", "operator@192.168.45.143")
         combined = result.stdout + result.stderr
         assert result.returncode != 0, combined
-        assert "non-loopback" in combined, combined
+        assert "non-loopback" in _squashed(combined), combined
         assert not (state_dir / "live-console-processes.json").exists()
         calls = marker.read_text(encoding="utf-8").splitlines() if marker.exists() else []
         assert calls == [], calls
@@ -473,7 +485,10 @@ def test_external_state_refuses_a_loopback_listener_it_cannot_identify(tmp_path:
     port = listener.getsockname()[1]
     try:
         _external_state(state_dir, port)
-        result = _launch(state_dir, shim_dir, marker)
+        # A target is now required even to reuse a forward, so supply one: this test is
+        # about the identity of the holder, not about the missing-target guard below.
+        result = _launch(state_dir, shim_dir, marker,
+                         "-DatabaseTunnelTarget", "operator@192.168.45.143")
         combined = result.stdout + result.stderr
         assert result.returncode != 0, combined
         assert "cannot identify" in combined, combined
@@ -588,3 +603,375 @@ def test_ssh_key_path_refuses_option_syntax_before_resolving_it(tmp_path: Path):
     # Both entry points must route through that one rule, not carry their own copy.
     for name in ("Start-LiveConsole.ps1", "Register-DesktopShortcut.ps1"):
         assert "Assert-SvKeyPath" in (ROOT / "deploy/lan" / name).read_text(encoding="utf-8")
+def _argv_recorder(tmp_path: Path) -> tuple[Path, Path]:
+    """An exe that records each argument it receives, so argv splitting is observable."""
+    csc = shutil.which("csc.exe") or r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+    if not Path(csc).exists():
+        pytest.skip("csc.exe is required")
+    recorder_dir = tmp_path / "recorder"
+    recorder_dir.mkdir(exist_ok=True)
+    log = tmp_path / "argv.log"
+    source = recorder_dir / "argv-recorder.cs"
+    source.write_text(
+        "using System;\nusing System.IO;\nclass R {\n"
+        "  static int Main(string[] a) {\n"
+        "    string o = Environment.GetEnvironmentVariable(\"SV_ARGV_LOG\");\n"
+        "    foreach (string s in a) File.AppendAllText(o, \"ARG=\" + s + \"\\n\");\n"
+        "    File.AppendAllText(o, \"COUNT=\" + a.Length + \"\\n\");\n"
+        "    return 0;\n  }\n}\n",
+        encoding="utf-8",
+    )
+    built = subprocess.run(
+        [csc, "/nologo", "/target:exe", f"/out:{recorder_dir / 'argv-recorder.exe'}", str(source)],
+        capture_output=True, text=True, errors="replace", timeout=60,
+    )
+    assert built.returncode == 0, built.stdout + built.stderr
+    return recorder_dir / "argv-recorder.exe", log
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell and csc.exe shim require Windows")
+def test_a_key_path_with_whitespace_would_split_the_native_argument_list(tmp_path: Path):
+    """Codex r2 High-1, measured rather than argued.
+
+    Windows PowerShell joins an ``-ArgumentList`` array with spaces and does not quote, so a
+    real file whose name contains a space reaches the child as several arguments. The
+    recorder below proves both halves: the spaced path splits, the rejected-by-grammar path
+    never gets that far, and a whitespace-free path survives as exactly one argument.
+    """
+    recorder, log = _argv_recorder(tmp_path)
+    spaced = tmp_path / "key with space"
+    spaced.write_text("not-a-key", encoding="utf-8")
+    plain = tmp_path / "id_ed25519"
+    plain.write_text("not-a-key", encoding="utf-8")
+
+    def record(value: Path) -> list[str]:
+        if log.exists():
+            log.unlink()
+        body = "\n".join([
+            "$env:SV_ARGV_LOG = '" + log.as_posix() + "'",
+            "$a = @('-N','-L','127.0.0.1:1:127.0.0.1:1','-o','IdentitiesOnly=yes','-i','"
+            + value.as_posix() + "','--','operator@host.example')",
+            "$p = Start-Process -FilePath '" + recorder.as_posix()
+            + "' -ArgumentList $a -WindowStyle Hidden -PassThru",
+            "$p.WaitForExit()",
+        ])
+        result = _run_powershell(body)
+        assert log.exists(), result.stdout + result.stderr
+        return log.read_text(encoding="utf-8").splitlines()
+
+    spaced_argv = record(spaced)
+    # The product's array has nine elements; the spaced path turns it into eleven.
+    assert "COUNT=11" in spaced_argv, spaced_argv
+    assert "ARG=with" in spaced_argv and "ARG=space" in spaced_argv, spaced_argv
+
+    plain_argv = record(plain)
+    assert "COUNT=9" in plain_argv, plain_argv
+    # Exactly one argument carries the key, with no fragment split off it.
+    assert "ARG=" + plain.as_posix() in plain_argv, plain_argv
+    assert len([line for line in plain_argv if line.startswith("ARG=")]) == 9, plain_argv
+
+    # Therefore the grammar must refuse the spaced path outright, at both entry points.
+    probe = "\n".join([
+        "function Invoke-SvProbe($label, $value) {",
+        "  try { $null = Assert-SvKeyPath $value; Write-Output ('ACCEPTED ' + $label) }",
+        "  catch { Write-Output ('REFUSED ' + $label + ': ' + $_.Exception.Message) }",
+        "}",
+        "Invoke-SvProbe 'spaced' '" + spaced.as_posix() + "'",
+        "Invoke-SvProbe 'tab' (\"" + plain.as_posix() + "\" + [char]9)",
+        "Invoke-SvProbe 'plain' '" + plain.as_posix() + "'",
+    ])
+    out = _run_powershell(probe)
+    combined = out.stdout + out.stderr
+    assert "ACCEPTED spaced" not in combined, combined
+    assert "REFUSED spaced" in combined and "whitespace" in combined, combined
+    assert "ACCEPTED tab" not in combined, combined
+    assert "ACCEPTED plain" in combined, combined
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell and csc.exe shim require Windows")
+def test_the_launcher_refuses_a_key_path_with_whitespace_before_anything_starts(tmp_path: Path):
+    """The same boundary at the launcher entry point, not only in the helper."""
+    if _launcher_prerequisites():
+        pytest.skip("launcher prerequisites absent: " + ", ".join(_launcher_prerequisites()))
+    shim_dir, marker = _docker_shim(tmp_path)
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    _external_state(state_dir, 59373)
+    spaced = tmp_path / "key with space"
+    spaced.write_text("not-a-key", encoding="utf-8")
+    result = _launch(
+        state_dir, shim_dir, marker,
+        "-DatabaseTunnelTarget", "operator@192.168.45.143",
+        "-SshKeyPath", str(spaced),
+    )
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0, combined
+    assert "whitespace" in combined, combined
+    assert not (state_dir / "live-console-processes.json").exists()
+    assert (marker.read_text(encoding="utf-8").splitlines() if marker.exists() else []) == []
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell required")
+def test_the_registrar_refuses_a_key_path_with_whitespace(tmp_path: Path):
+    """A value the launcher refuses must not be bakeable into an unattended shortcut."""
+    spaced = tmp_path / "key with space"
+    spaced.write_text("not-a-key", encoding="utf-8")
+    result = subprocess.run(
+        [_powershell(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+         str(ROOT / "deploy/lan/Register-DesktopShortcut.ps1"),
+         "-StatePath", str(tmp_path),
+         "-DatabaseTunnelTarget", "operator@192.168.45.143",
+         "-SshKeyPath", str(spaced),
+         "-ShortcutName", "SaintVision Invion Test"],
+        cwd=ROOT, capture_output=True, text=True, errors="replace", timeout=120,
+    )
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0, combined
+    assert "whitespace" in combined, combined
+    assert "Registered" not in combined, combined
+    # Both entry points must reach that rule through the one helper.
+    for name in ("Start-LiveConsole.ps1", "Register-DesktopShortcut.ps1"):
+        assert "Assert-SvKeyPath" in (ROOT / "deploy/lan" / name).read_text(encoding="utf-8")
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell required")
+def test_owned_ssh_forward_is_positional_and_total():
+    """Codex r2 High-2: the previous check accepted the forward as a token anywhere.
+
+    The hostile line below really forwards to ``evil.example`` and only carries the expected
+    forward as a trailing remote-command token. It was accepted before this change; it is
+    refused now because the comparison is against the token immediately after ``-L``.
+    """
+    ssh = "C:/Windows/System32/OpenSSH/ssh.exe"
+    port = 49237
+    forward = f"127.0.0.1:{port}:127.0.0.1:{port}"
+    target = "operator@192.168.45.143"
+    genuine = f"{ssh} -N -L {forward} -o BatchMode=yes -- {target}"
+    cases = {
+        "genuine": (genuine, True),
+        # Real -L points elsewhere; expected forward only appears as a trailing token.
+        "forward-elsewhere": (f"{ssh} -N -L 127.0.0.1:{port}:evil.example:{port} -- {target} {forward}", False),
+        # Positionally perfect in every respect EXCEPT the forward value, so only the
+        # comparison against the token after -L can reject it. Without this case the
+        # trailing-token rule masked that comparison and its mutation survived.
+        "forward-value-only": (f"{ssh} -N -L 127.0.0.1:{port}:evil.example:{port} -o BatchMode=yes -- {target}", False),
+        # Target present but not immediately after the separator.
+        "target-elsewhere": (f"{ssh} -N -L {forward} -o User={target} -- operator@other.example", False),
+        # A remote command after the destination.
+        "trailing-command": (f"{genuine} /bin/sh", False),
+        # Two forwards: not the shape this launcher builds.
+        "second-forward": (f"{ssh} -N -L {forward} -L 127.0.0.1:1:evil.example:1 -- {target}", False),
+        # No separator at all.
+        "no-separator": (f"{ssh} -N -L {forward} {target}", False),
+        # A different executable that merely ends in ssh.exe.
+        "other-exe": (f"C:/tools/ssh.exe -N -L {forward} -- {target}", False),
+        "empty": ("", False),
+    }
+    lines = []
+    for label, (command_line, _) in cases.items():
+        lines.append(
+            "if (Test-SvOwnedSshForward -CommandLine '" + command_line.replace("'", "''")
+            + "' -ExpectedForward '" + forward + "' -ExpectedTarget '" + target + "')"
+            + " { Write-Output 'TRUE " + label + "' } else { Write-Output 'FALSE " + label + "' }"
+        )
+    # An empty expected target must never pass, which is what "required" means.
+    lines.append(
+        "if (Test-SvOwnedSshForward -CommandLine '" + genuine + "' -ExpectedForward '" + forward
+        + "' -ExpectedTarget '') { Write-Output 'TRUE no-target' } else { Write-Output 'FALSE no-target' }"
+    )
+    # Get-SvArgv yields an empty token from '""', so an empty expected target would compare
+    # equal to it. Only the empty-target guard rejects this; the positional comparison does
+    # not, which is why that guard's mutation survived without this case.
+    empty_destination = f'{ssh} -N -L {forward} -- ""'
+    lines.append(
+        "if (Test-SvOwnedSshForward -CommandLine '" + empty_destination.replace("'", "''")
+        + "' -ExpectedForward '" + forward
+        + "' -ExpectedTarget '') { Write-Output 'TRUE empty-destination' } else { Write-Output 'FALSE empty-destination' }"
+    )
+    result = _run_powershell("\n".join(lines))
+    combined = result.stdout + result.stderr
+    for label, (_, expected) in cases.items():
+        want = ("TRUE " if expected else "FALSE ") + label
+        assert want in combined, (want, combined)
+    assert "FALSE no-target" in combined, combined
+    assert "FALSE empty-destination" in combined, combined
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell required")
+def test_owned_tunnel_listeners_binds_every_listener_and_the_expected_pid():
+    """The one gate both paths use: loopback, strict command line, and pid when supplied."""
+    ssh = "C:/Windows/System32/OpenSSH/ssh.exe"
+    forward = "127.0.0.1:55448:127.0.0.1:55448"
+    target = "operator@192.168.45.143"
+    good = f"{ssh} -N -L {forward} -- {target}"
+    body = "\n".join([
+        "$provider = { param($svPid) if ($svPid -eq 4242) { '" + good + "' } else { 'C:/other.exe' } }",
+        "function New-Listener($address, $owner) {",
+        "  return [pscustomobject]@{ LocalAddress = $address; OwningProcess = $owner }",
+        "}",
+        "function Probe($label, $listeners, $expectedPid) {",
+        "  if (Assert-SvOwnedTunnelListeners -Listeners $listeners -ExpectedForward '" + forward + "'"
+        + " -ExpectedTarget '" + target + "' -CommandLineProvider $provider -ExpectedProcessId $expectedPid)"
+        + " { Write-Output ('TRUE ' + $label) } else { Write-Output ('FALSE ' + $label) }",
+        "}",
+        "Probe 'single-owned' @((New-Listener '127.0.0.1' 4242)) 0",
+        "Probe 'pid-bound' @((New-Listener '127.0.0.1' 4242)) 4242",
+        "Probe 'pid-mismatch' @((New-Listener '127.0.0.1' 4242)) 9999",
+        "Probe 'ipv6-loopback' @((New-Listener '::1' 4242)) 0",
+        "Probe 'non-loopback' @((New-Listener '0.0.0.0' 4242)) 0",
+        "Probe 'foreign-owner' @((New-Listener '127.0.0.1' 77)) 0",
+        # A second listener on the port that is NOT ours must sink the whole decision.
+        "Probe 'second-foreign' @((New-Listener '127.0.0.1' 4242),(New-Listener '127.0.0.1' 77)) 0",
+        "Probe 'second-non-loopback' @((New-Listener '127.0.0.1' 4242),(New-Listener '0.0.0.0' 4242)) 0",
+        "Probe 'empty' @() 0",
+    ])
+    result = _run_powershell(body)
+    combined = result.stdout + result.stderr
+    for label in ("single-owned", "pid-bound", "ipv6-loopback"):
+        assert "TRUE " + label in combined, (label, combined)
+    for label in ("pid-mismatch", "non-loopback", "foreign-owner", "second-foreign",
+                  "second-non-loopback", "empty"):
+        assert "FALSE " + label in combined, (label, combined)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell and csc.exe shim require Windows")
+def test_external_state_requires_a_target_even_to_reuse_a_listener(tmp_path: Path):
+    """Codex r2 High-2: skipping the target comparison was how an unrelated listener passed."""
+    if _launcher_prerequisites():
+        pytest.skip("launcher prerequisites absent: " + ", ".join(_launcher_prerequisites()))
+    import socket
+
+    shim_dir, marker = _docker_shim(tmp_path)
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)
+    port = listener.getsockname()[1]
+    try:
+        _external_state(state_dir, port)
+        result = _launch(state_dir, shim_dir, marker)
+        combined = result.stdout + result.stderr
+        assert result.returncode != 0, combined
+        assert "cannotverifyitistheowneddatabasetunnel" in _squashed(combined), combined
+        assert not (state_dir / "live-console-processes.json").exists()
+        assert (marker.read_text(encoding="utf-8").splitlines() if marker.exists() else []) == []
+    finally:
+        listener.close()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell parser requires Windows")
+def test_both_tunnel_paths_go_through_the_one_strict_gate():
+    """Reuse and post-start must not drift apart again."""
+    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+    assert text.count("Assert-SvOwnedTunnelListeners") == 2, text.count("Assert-SvOwnedTunnelListeners")
+    # Both call sites must be refusals, not merely present: changing `if (-not (Assert-...`
+    # to `if ($false -and (Assert-...` keeps the count at two while disabling the gate, and
+    # that mutation survived until this assertion existed. The post-start path cannot be
+    # driven behaviourally here, because the gate deliberately accepts only the exact system
+    # ssh executable and so cannot be satisfied by a shim; this is the available witness and
+    # it is a source assertion, which is stated rather than implied.
+    assert text.count("if (-not (Assert-SvOwnedTunnelListeners") == 2, text
+    # The post-start call must bind the PassThru pid.
+    assert "-ExpectedProcessId $svSshProcessId" in text
+    assert "-PassThru" in text.split("Start-Process -FilePath $svSsh", 1)[1].split(chr(10), 1)[0]
+    # The loose any-token comparison must not come back.
+    assert "svSeenForward" not in text
+    assert "svSeenTarget" not in text
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell required")
+def test_get_sv_argv_returns_a_plain_array_at_every_arity():
+    """Pin the return contract that a comma-wrapped return silently broke.
+
+    With ``return , $array`` a caller writing ``@(Get-SvArgv ...)`` received ONE element
+    holding the whole ``string[]``, so ``argv[0]`` was an array and every token comparison
+    failed against it -- the strict forward gate returned false for genuine command lines.
+    That is the Get-SvListeners unrolling trap in the opposite direction, so both now follow
+    the same rule: the function returns the plain array and call sites wrap with ``@()``.
+    """
+    body = "\n".join([
+        "function Report($label, $line, $expected) {",
+        "  $argv = @(Get-SvArgv $line)",
+        "  $first = if ($argv.Count -gt 0) { $argv[0] } else { '' }",
+        "  $isString = $first -is [string]",
+        "  Write-Output ($label + ' count=' + $argv.Count + ' expected=' + $expected + ' firstIsString=' + $isString)",
+        "}",
+        "Report 'empty' '' 0",
+        "Report 'single' 'C:/a/ssh.exe' 1",
+        "Report 'three' 'C:/a/ssh.exe -N -L' 3",
+        "Report 'quoted' '\"C:/a b/ssh.exe\" -N' 2",
+    ])
+    result = _run_powershell(body)
+    combined = result.stdout + result.stderr
+    assert "empty count=0 expected=0" in combined, combined
+    assert "single count=1 expected=1 firstIsString=True" in combined, combined
+    assert "three count=3 expected=3 firstIsString=True" in combined, combined
+    assert "quoted count=2 expected=2 firstIsString=True" in combined, combined
+    # And the source rule itself, so a future edit cannot reintroduce the comma.
+    helper_source = (ROOT / "deploy/lan/SvLauncherInput.ps1").read_text(encoding="utf-8")
+    assert "return , $svArguments.ToArray()" not in helper_source
+    for path in (ROOT / "deploy/lan/SvLauncherInput.ps1", ROOT / "deploy/lan/Start-LiveConsole.ps1"):
+        text = path.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('#') or stripped.startswith('<#'):
+                continue  # prose about the rule is not a call site
+            if "Get-SvArgv" in line and "function Get-SvArgv" not in line:
+                assert "@(Get-SvArgv" in line, (path.name, line)
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell and csc.exe shim require Windows")
+def test_a_state_path_with_whitespace_fails_closed(tmp_path: Path):
+    """The native-argument boundary is not only about the key path.
+
+    Every value this launcher hands a child through ``-ArgumentList`` is joined with spaces
+    and not quoted, so a state directory containing a space would reach ``lan_console.py``
+    as several arguments and the ``--state`` comparison would silently be against a
+    fragment. Refusing it names the reason; the previous code mis-serialized it in silence.
+    """
+    if _launcher_prerequisites():
+        pytest.skip("launcher prerequisites absent: " + ", ".join(_launcher_prerequisites()))
+    shim_dir, marker = _docker_shim(tmp_path)
+    state_dir = tmp_path / "state dir"
+    state_dir.mkdir()
+    _external_state(state_dir, 59374)
+    result = _launch(state_dir, shim_dir, marker,
+                     "-DatabaseTunnelTarget", "operator@192.168.45.143")
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0, combined
+    assert "mustnotcontainwhitespace" in _squashed(combined), combined
+    assert not (state_dir / "live-console-processes.json").exists()
+    assert (marker.read_text(encoding="utf-8").splitlines() if marker.exists() else []) == []
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell required")
+def test_a_relative_key_path_is_checked_after_resolution(tmp_path: Path):
+    """The whitespace rule is applied to the resolved value, which is what reaches ssh.
+
+    A relative ``id_ed25519`` carries no whitespace, so a check on the raw value alone would
+    accept it; under a working directory containing a space it resolves to a path that does.
+    This is the input that witnesses the resolved check on its own.
+
+    Two things I had assumed and measured to be false, recorded so they are not re-assumed:
+    ``Resolve-Path`` does not expand 8.3 short names (``C:/PROGRA~1`` stays short), and it
+    preserves a trailing space rather than trimming it.
+    """
+    spaced_dir = tmp_path / "dir with space"
+    spaced_dir.mkdir()
+    (spaced_dir / "id_ed25519").write_text("not-a-key", encoding="utf-8")
+    plain_dir = tmp_path / "plain"
+    plain_dir.mkdir()
+    (plain_dir / "id_ed25519").write_text("not-a-key", encoding="utf-8")
+    body = "\n".join([
+        "function Invoke-SvProbe($label, $location, $value) {",
+        "  Push-Location -LiteralPath $location",
+        "  try { $null = Assert-SvKeyPath $value; Write-Output ('ACCEPTED ' + $label) }",
+        "  catch { Write-Output ('REFUSED ' + $label + ': ' + $_.Exception.Message) }",
+        "  finally { Pop-Location }",
+        "}",
+        "Invoke-SvProbe 'relative-under-space' '" + spaced_dir.as_posix() + "' 'id_ed25519'",
+        "Invoke-SvProbe 'relative-plain' '" + plain_dir.as_posix() + "' 'id_ed25519'",
+    ])
+    result = _run_powershell(body)
+    combined = result.stdout + result.stderr
+    assert "ACCEPTED relative-under-space" not in combined, combined
+    assert "REFUSED relative-under-space" in combined, combined
+    assert "whitespace" in _squashed(combined), combined
+    # The same shape with no space in the working directory must still be accepted, so the
+    # rule is about whitespace and not about relative paths.
+    assert "ACCEPTED relative-plain" in combined, combined

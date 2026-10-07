@@ -29,6 +29,13 @@ if (-not [IO.Path]::IsPathRooted($svCommon)) { $svCommon = Join-Path $svCheckout
 $svRepository = Split-Path (Resolve-Path -LiteralPath $svCommon).Path -Parent
 $svPython = Join-Path $svRepository '.venv/Scripts/python.exe'
 $svVite = "$svCheckout/apps/web/node_modules/vite/bin/vite.js"
+# Reviewer r2 (High): Windows PowerShell joins an -ArgumentList array with spaces and does
+# not quote, so any of these carrying whitespace would reach the child as several arguments.
+# Refuse with the reason named instead of mis-serializing it silently.
+$null = Assert-SvNativeArgument -Value $svCheckout -What 'The checkout path'
+$null = Assert-SvNativeArgument -Value $StatePath -What 'The pilot state path'
+$null = Assert-SvNativeArgument -Value $svPython -What 'The interpreter path'
+$null = Assert-SvNativeArgument -Value $svVite -What 'The vite entry path'
 if (-not (Test-Path -LiteralPath $svPython) -or -not (Test-Path -LiteralPath $svVite)) {
     throw 'Install this checkout Python and web dependencies first.'
 }
@@ -84,36 +91,27 @@ if ($svDatabaseMode -eq 'managed-local-docker') {
         throw 'External pilot state does not declare a usable database port.'
     }
     $svForward = "127.0.0.1:${svTunnelPort}:127.0.0.1:${svTunnelPort}"
+    # One provider for both paths, so the command line compared always belongs to the
+    # process that actually holds the port.
+    $svCommandLineProvider = { param($svPid) Get-SvOwnerCommandLine $svPid }
     $svExisting = @(Get-SvListeners $svTunnelPort)
     if ($svExisting.Count -gt 0) {
-        # Any listener is not a tunnel. Every bind must be loopback, and the owner must be an
-        # ssh client carrying this exact forward and target; otherwise fail closed.
+        # The target is required even to REUSE a forward. Skipping the comparison when no
+        # target was supplied is what let an unrelated loopback listener be adopted.
+        if (-not $DatabaseTunnelTarget) {
+            throw "Port $svTunnelPort already has a listener, and without -DatabaseTunnelTarget this launcher cannot verify it is the owned database tunnel. Re-run with the target. No listeners were started."
+        }
+        # Named separately so the operator learns which boundary failed. The gate below
+        # re-checks this, so removing it weakens the message, not the refusal.
         foreach ($svListener in $svExisting) {
             if ($svListener.LocalAddress -notin $svLoopback) {
                 throw "Port $svTunnelPort is bound on a non-loopback address; refusing to treat it as the database tunnel. No listeners were started."
             }
         }
-        $svOwned = $false
-        foreach ($svListener in $svExisting) {
-            $svArgv = Get-SvArgv (Get-SvOwnerCommandLine $svListener.OwningProcess)
-            if ($svArgv.Count -eq 0) { continue }
-            if (-not (Test-SvSamePath $svArgv[0] (Join-Path $env:SystemRoot 'System32/OpenSSH/ssh.exe'))) { continue }
-            $svSeenForward = $false
-            foreach ($svToken in $svArgv) {
-                if ([string]::Equals($svToken, $svForward, [StringComparison]::Ordinal)) { $svSeenForward = $true }
-            }
-            if (-not $svSeenForward) { continue }
-            if ($DatabaseTunnelTarget) {
-                $svSeenTarget = $false
-                foreach ($svToken in $svArgv) {
-                    if ([string]::Equals($svToken, $DatabaseTunnelTarget, [StringComparison]::Ordinal)) { $svSeenTarget = $true }
-                }
-                if (-not $svSeenTarget) { continue }
-            }
-            $svOwned = $true
-            break
-        }
-        if (-not $svOwned) {
+        if (-not (Assert-SvOwnedTunnelListeners -Listeners $svExisting `
+                                                -ExpectedForward $svForward `
+                                                -ExpectedTarget $DatabaseTunnelTarget `
+                                                -CommandLineProvider $svCommandLineProvider)) {
             throw "Port $svTunnelPort is held by a process this launcher cannot identify as the owned database tunnel. No listeners were started."
         }
     } else {
@@ -132,7 +130,8 @@ if ($svDatabaseMode -eq 'managed-local-docker') {
         if ($SshKeyPath) { $svSshArguments += @('-o','IdentitiesOnly=yes','-i',$SshKeyPath) }
         $svSshArguments += @('--',$DatabaseTunnelTarget)
         # No stream redirection: ssh diagnostics can name hosts and accounts.
-        Start-Process -FilePath $svSsh -ArgumentList $svSshArguments -WindowStyle Hidden | Out-Null
+        $svSshProcess = Start-Process -FilePath $svSsh -ArgumentList $svSshArguments -WindowStyle Hidden -PassThru
+        $svSshProcessId = $svSshProcess.Id
         for ($svWait = 0; $svWait -lt 20; $svWait++) {
             if (@(Get-SvListeners $svTunnelPort).Count -gt 0) { break }
             Start-Sleep -Milliseconds 500
@@ -141,10 +140,21 @@ if ($svDatabaseMode -eq 'managed-local-docker') {
         if ($svOpened.Count -eq 0) {
             throw "The database tunnel did not open within 10 seconds. Check that the database host is reachable. No listeners were started."
         }
+        # Reviewer r2 (High): checking only the bind address here let a process that won the
+        # race to the loopback port pass. The port must be held by exactly the ssh this
+        # launcher just started, and that process must satisfy the same strict gate the
+        # reuse path uses -- otherwise no listener of ours is started at all.
         foreach ($svListener in $svOpened) {
             if ($svListener.LocalAddress -notin $svLoopback) {
                 throw "The database tunnel opened on a non-loopback address; refusing to continue. No listeners were started."
             }
+        }
+        if (-not (Assert-SvOwnedTunnelListeners -Listeners $svOpened `
+                                                -ExpectedForward $svForward `
+                                                -ExpectedTarget $DatabaseTunnelTarget `
+                                                -CommandLineProvider $svCommandLineProvider `
+                                                -ExpectedProcessId $svSshProcessId)) {
+            throw "The database tunnel on 127.0.0.1:$svTunnelPort is not held by the ssh process this launcher started with the expected forward and target. No listeners were started."
         }
     }
 } else {
@@ -162,7 +172,7 @@ function Start-SvListener([int]$Port,[string]$ScriptPath,[bool]$RequireState,[st
                 continue
             }
             $svCommandLine = Get-SvOwnerCommandLine $svListener.OwningProcess
-            $svArgv = Get-SvArgv $svCommandLine
+            $svArgv = @(Get-SvArgv $svCommandLine)
             $svScriptSeen = $false
             foreach ($svToken in $svArgv) {
                 if (Test-SvSamePath $svToken $ScriptPath) { $svScriptSeen = $true; break }

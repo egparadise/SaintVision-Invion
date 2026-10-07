@@ -378,12 +378,32 @@ container that cannot exist:
   `-SshKeyPath`) and no pilot address, account, or port is written in this
   repository. Without an open tunnel and without a target it fails closed.
 
-An already-open forward is only reused when it can be identified as the owned one:
-*every* listener on that port must be bound to a loopback address, and the owning
-process must be `ssh.exe` whose command line carries exactly
-`-L 127.0.0.1:<dbPort>:127.0.0.1:<dbPort>` and, when a target was supplied, exactly
-that target. Any other holder of the port fails closed. Treating an arbitrary
-listener as the tunnel would have pointed the console at whatever was listening.
+An already-open forward is only reused when it can be identified as the owned one, and
+the same check runs again after this launcher starts `ssh` itself, so the two paths
+cannot drift. One helper, `Assert-SvOwnedTunnelListeners`, decides both:
+
+* *every* listener on the port must be bound to a loopback address;
+* the owning process must be the **exact** system `ssh.exe`, not merely a file of that
+  name;
+* the token **immediately after** `-L` must equal
+  `127.0.0.1:<dbPort>:127.0.0.1:<dbPort>`, and the token **immediately after** `--` must
+  equal the supplied target, with nothing following it, so no remote command is carried;
+* a target is **required** even to reuse a forward -- skipping that comparison when none
+  was supplied is how an unrelated loopback listener could be adopted;
+* after this launcher starts `ssh`, the port must be held by exactly the process id it
+  started, so a process that won a race to the loopback port cannot be inherited.
+
+Checking only that the expected forward appeared *somewhere* in the command line was not
+enough: a command line whose real `-L` pointed at another host passed, because the
+expected string also appeared as a trailing remote-command token.
+
+Every value handed to a native child through `-ArgumentList` must be free of whitespace,
+quotes and control characters. Windows PowerShell joins that array with spaces and does
+not quote, so `-i "C:/keys/key with space"` reaches `ssh` as three arguments and a
+fragment after a space can be read as an option. The key path, the state directory, the
+checkout, the interpreter and the vite entry are all refused with the reason named rather
+than silently mis-serialized. If a path with spaces is ever required, the fix is a quoting
+serializer, not relaxing this rule.
 
 Both owned listeners must belong to the state being started. A console on 18082 or
 a web server on 3000 that serves a *different* state, or that is bound to a
@@ -411,8 +431,11 @@ would refuse:
   fixes every option before `--` so a validated target can only be read as the
   destination. A single string must never be able to arrive at `ssh.exe` as several
   arguments.
-* `-SshKeyPath` must not begin with `-`, must contain no quote or control
-  character, and must resolve to an existing file.
+* `-SshKeyPath` must not begin with `-` and must resolve to an existing file whose
+  resolved path contains no whitespace, quote or control character. The check is on the
+  resolved value because that is what reaches `ssh`, and because resolution can introduce
+  whitespace the caller never typed: a relative `id_ed25519` under a working directory
+  containing a space resolves to `.../dir with space/id_ed25519`.
 * Ownership is decided by tokenizing the owning process's command line with the
   documented Win32 CRT rules and comparing the normalized path after an exact
   `--state` token. A substring test matched `C:/pilot/r2` against a process serving
