@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.322"
+version: "1.0.323"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T09:34:33+09:00"
+updated: "2026-10-07T10:12:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-286 cancel bridge real-PG flake determinization"
-active_card_status: "Train 63 Core attempt 1 failed before the audit-partition test body because workspace setup treated an uncertain Node acknowledgement as final; the fix executes once and reconciles only through the observation endpoint"
-active_card_next: "Run exact-head hosted Core, record the repeated target result and full totals, then route the PR to Claude for independent review"
+active_card_status: "PR #382 implements execute-once plus observation-only reconciliation; code head 39204885 passed Backend 3.12/3.14 and Core 37553014490 with 8628 passed, while the original cancel-bridge case and the new real-Node lost-ack regression both passed"
+active_card_next: "Obtain final docs-only-head CI and Claude independent review for PR #382"
 ---
 
 ## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
@@ -23,6 +23,10 @@ active_card_next: "Run exact-head hosted Core, record the repeated target result
   observation-only receipt reads. Exhaustion and every other error remain fail-closed. Pure
   regressions assert no re-execution, and a real-Node regression injects a lost acknowledgement
   after acceptance so reverting the fixture call fails deterministically.
+- Pre-fix run `37548456022` attempt 2 passed the same case in 1.011 s; with that rerun the observed
+  sample is **10 passed / 1 setup error**. Code head `39204885` then passed Core run `37553014490`:
+  8,628 passed, 23 skipped, 2 deselected, zero failures/errors. The original case passed in 0.909 s
+  and the injected lost-ack case passed both the early Workspace lane and the full suite.
 - History: [[2026-10-07_09-34-33_KST_Card286_cancel_bridge_flake_Codex]].
 
 ## 2026-10-07 Card 284 — VF-CL reviewer blockers

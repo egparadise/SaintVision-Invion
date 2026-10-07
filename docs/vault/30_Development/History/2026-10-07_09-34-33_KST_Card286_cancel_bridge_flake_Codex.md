@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CODEX-CARD286-20261007"
 title: "Card 286 cancel bridge real-PG flake determinization"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T09:34:33+09:00"
+updated: "2026-10-07T10:12:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -38,10 +38,13 @@ observed sample, not a population-rate claim.
 | `37401903045` | `59050d2a` | passed | 0.973 |
 | `37545644638` | `b9ea9992` | passed | 1.034 |
 | `37548456022`, attempt 1 | `51788009` | setup error | 6.479 |
+| `37548456022`, attempt 2 | `51788009` | passed | 1.011 |
 
-Observed frequency: **1 setup error / 10 executions (10%)**, with nine immediate predecessor
-executions passing. Run `37548456022` attempt 1 completed the full suite as 8,623 passed and one
-error. The coordinator-started failed-job rerun is recorded separately when it finishes.
+The initial sample was **1 setup error / 10 executions (10%)**, with nine immediate predecessor
+executions passing. Including the coordinator-started rerun, the observed sample is **1 setup error
+/ 11 executions (9.1%)**. This is a measured sample, not a population-rate estimate. Run
+`37548456022` attempt 1 completed as 8,623 passed and one error; attempt 2 completed as 8,624
+passed, 23 skipped, 2 deselected and zero failures/errors. Its Core artifact is `11454093615`.
 
 ## Root cause boundary
 
@@ -75,6 +78,10 @@ protocol-defined convergence action.
 | 09:24 | `python -m compileall -q` for the helper, unit test and integration test | exit 0 |
 | 09:35 | docs, citation ratchet with base, single-source ratchet, contract binding, ontology | all exit 0 |
 | 09:36 | `python tools/sync_obsidian.py --check` | exit 0; 11 pre-existing unmanaged destination conflicts, no files written |
+| 09:42 | repository Python 3.14: focused pure regressions and Workspace test collection | 3 passed; 12 collected |
+| 10:10 | Core run `37553014490`, code head `39204885d9be0a2d8b59c159a2f4d75675087ee5` | success; 8,628 passed, 23 skipped, 2 deselected, zero failures/errors |
+| 10:10 | Same Core artifact `11454546580` | original cancel-bridge case passed in 0.909 s; lost-ack regression passed in 0.738 s; early Workspace lane also passed it in 2.841 s |
+| 10:11 | Backend run `37552996243`, same code head | Python 3.12 and 3.14 jobs both success |
 
-Hosted exact-head Core, the repeated real-Node target, complete JUnit totals, commit SHA, PR, and
-Claude review status are pending and must not be inferred from the local pure tests.
+PR `#382` is based on `coord/train63a-ci-0847`. The final documentation-only head CI and Claude
+independent review remain pending; neither is inferred from the successful code-head runs.
