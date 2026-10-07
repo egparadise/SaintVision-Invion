@@ -6,7 +6,7 @@ status: "review"
 author: "Codex"
 updated: "2026-10-07T12:04:35+09:00"
 source_of_truth: "Git"
-active_card: "CARD-287 LAN pilot reconnect"
+active_card: "CARD-288 Node and Control Plane leaf rotation"
 active_card_status: "PR #384 is open; the implementation/evidence head has exact hosted Backend and Core green, and the fresh isolated pilot continues with two Linux Nodes online while the other two remain BLOCKED_USER_ACTION"
 active_card_next: "Claude independently reviews PR #384; after Card 287 review, start Card 288 leaf rotation before the observed six-day expiry"
 ---
@@ -28,6 +28,19 @@ active_card_next: "Claude independently reviews PR #384; after Card 287 review, 
   8,628 passed, 23 skipped, 2 deselected, zero failures/errors. The original case passed in 0.909 s
   and the injected lost-ack case passed both the early Workspace lane and the full suite.
 - History: [[2026-10-07_09-34-33_KST_Card286_cancel_bridge_flake_Codex]].
+## 2026-10-07 Card 288 — Node and Control Plane leaf rotation
+
+- Stacked on Card 287 because both cards own the LAN pilot channel. The CP now prepares public
+  rotation material from the existing Node-owned key's CSR, exact issuing chain/revocation registry,
+  exact current pin, and monotonic `version + 1`; it never receives or packages the private key.
+- The Node installer verifies every bound identity and digest, journals exact retries, writes public
+  files with fsync/rename before restart, and records a restart receipt. CP commit uses the existing
+  channel CAS; finalization ends a bounded old/new control overlap. Fresh-only rollback and five
+  crash kill points are covered. Focused local result: 21 passed, with no local Docker use.
+- The accepted r2 pilot state is intentionally unchanged. History records the separate post-review
+  commands and requires a current mTLS heartbeat on the new channel before operational acceptance.
+- History: [[2026-10-07_11-29-12_KST_Card288_Node_leaf_rotation_Codex]].
+
 ## 2026-10-07 Card 287 — LAN pilot reconnect
 
 - Preserved the expired pilot state, CA, containers, and volumes. A fresh isolated state at

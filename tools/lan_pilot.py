@@ -20,6 +20,7 @@ import sys
 import tarfile
 import time
 import zipfile
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -28,18 +29,22 @@ from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "services/control-plane/src"))
+sys.path.insert(0, str(ROOT / "deploy/lan"))
 import psycopg
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 from inv.db import Database
 from inv.ids import new_id
-from inv.node_channels import node_uri, provision_channel, revoke_channel
+from inv.node_channels import certificate_identity, node_uri, provision_channel, revoke_channel
 from inv.node_transport import NodeTLSClient
 from inv.observer_worker import ObservationWorker
 from inv.tooling import NodePrincipal
 from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pem
+from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
+from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
+from worker_leaf_rotation import SCHEMA as ROTATION_SCHEMA
 from psycopg import sql
 from psycopg.conninfo import make_conninfo
 
@@ -72,6 +77,46 @@ def write(path, data):
     with path.open("xb") as stream:
         stream.write(data.encode() if isinstance(data, str) else data)
     path.chmod(0o600)
+
+
+def atomic_write(path, data):
+    """Durably replace one public/operator record without following a symlink."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.is_symlink():
+        raise ValueError(f"Refusing unsafe destination {path.name}")
+    raw = data.encode() if isinstance(data, str) else data
+    temporary = path.with_name(path.name + ".next")
+    if temporary.exists() or temporary.is_symlink():
+        temporary.unlink()
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        if os.name != "nt":
+            directory = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+@contextmanager
+def exclusive_file(path):
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        raise ValueError("Another leaf rotation writer owns the state lock") from None
+    try:
+        os.close(descriptor)
+        yield
+    finally:
+        path.unlink(missing_ok=True)
 
 
 def private_directory(path):
@@ -494,7 +539,9 @@ def load_prebuilt_image(archive_path, inspect_path, tag, target):
             oci_manifest = json.loads(manifest_raw)
             legacy_layers = []
             for layer_name in entry.get("Layers", []):
-                layer_match = re.fullmatch(r"(?:blobs/sha256/)?([a-f0-9]{64})(?:/layer\.tar)?", layer_name)
+                layer_match = re.fullmatch(
+                    r"(?:blobs/sha256/)?([a-f0-9]{64})(?:/layer\.tar)?", layer_name
+                )
                 if not layer_match:
                     raise ValueError("Prebuilt archive layer identity is invalid")
                 legacy_layers.append("sha256:" + layer_match.group(1))
@@ -1105,6 +1152,7 @@ def bundle(args):
                 "Prepare-Worker.ps1",
                 "Start-Worker.ps1",
                 "worker_config.py",
+                "worker_leaf_rotation.py",
                 "worker_storage.py",
                 "worker_replacement.py",
                 "worker_replace.py",
@@ -1207,6 +1255,404 @@ def enroll(args):
                 fileSHA256=hashlib.sha256(target.read_bytes()).hexdigest(),
                 node="awaiting-mTLS-observation",
             )
+        )
+    )
+
+
+def _canonical_json(value):
+    return (
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    ).encode()
+
+
+def _rotation_digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def _utc_z(value):
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _load_revocations(path):
+    if path is None or path.is_symlink() or not path.is_file() or path.stat().st_size > 1024 * 1024:
+        raise ValueError("An exact regular revocation registry is required")
+    rows = json.loads(path.read_text("utf-8"))
+    if not isinstance(rows, list):
+        raise ValueError("Revocation registry must be a list")
+    fingerprints = set()
+    for row in rows:
+        if (
+            not isinstance(row, dict)
+            or not re.fullmatch(r"[a-f0-9]{64}", str(row.get("certificateSHA256", "")))
+            or not isinstance(row.get("serialNumber"), str)
+            or not isinstance(row.get("reason"), str)
+            or not isinstance(row.get("revokedAt"), str)
+        ):
+            raise ValueError("Revocation registry entry is incomplete")
+        fingerprints.add(row["certificateSHA256"])
+    return fingerprints
+
+
+def _validate_current_control_leaf(certificate, intermediate, *, state, now):
+    intermediate.public_key().verify(certificate.signature, certificate.tbs_certificate_bytes)
+    constraints = certificate.extensions.get_extension_for_class(x509.BasicConstraints).value
+    usages = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+    names = certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
+    expected_uri = (
+        f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}'
+    )
+    if (
+        certificate.issuer != intermediate.subject
+        or constraints.ca
+        or list(usages) != [ExtendedKeyUsageOID.CLIENT_AUTH]
+        or names.get_values_for_type(x509.UniformResourceIdentifier) != [expected_uri]
+        or names.get_values_for_type(x509.IPAddress)
+        or not certificate.not_valid_before_utc <= now < certificate.not_valid_after_utc
+    ):
+        raise ValueError("Current Control Plane leaf is not bound to the exact issuing chain")
+
+
+def _rotation_material(path):
+    manifest_raw = (path / "rotation.json").read_bytes()
+    manifest = json.loads(manifest_raw)
+    if not isinstance(manifest, dict) or set(manifest) != ROTATION_MANIFEST_KEYS:
+        raise ValueError("Rotation manifest shape differs")
+    files = {}
+    for name in ROTATION_FILE_NAMES:
+        target = path / name
+        if target.is_symlink() or not target.is_file() or not 0 < target.stat().st_size <= 65536:
+            raise ValueError("Rotation public material is missing or unsafe")
+        files[name] = target.read_bytes()
+    if manifest.get("schemaVersion") != ROTATION_SCHEMA or set(manifest.get("files", {})) != set(
+        ROTATION_FILE_NAMES
+    ):
+        raise ValueError("Rotation schema or file set differs")
+    if any(
+        _rotation_digest(files[name]) != manifest["files"].get(name) for name in ROTATION_FILE_NAMES
+    ):
+        raise ValueError("Rotation public material digest differs")
+    return manifest_raw, manifest, files
+
+
+def _channel_row(conn, state, node, *, lock=False):
+    suffix = " FOR UPDATE" if lock else ""
+    row = conn.execute(
+        "SELECT version,certificate_sha256,certificate_not_after,enabled,endpoint "
+        "FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s" + suffix,
+        (state["tenantId"], node["nodeId"]),
+    ).fetchone()
+    if not row:
+        raise ValueError("Node channel is not enrolled")
+    return row
+
+
+def prepare_leaf_rotation(args):
+    """Issue public rotation material from a Node-owned CSR without installing it."""
+    path, state = args.state, load(args.state)
+    node = node_from_csr(state, args.csr.read_bytes())
+    if node.get("credentialRevoked"):
+        raise ValueError("Revoked Node credentials cannot be rotated")
+    output = args.output.resolve()
+    with exclusive_file(path / "leaf-rotation.lock"):
+        public = csr_public_key(args.csr.read_bytes(), node["nodeId"])
+        current_node_path = node_certificate_path(path, state, node)
+        current_node_raw = current_node_path.read_bytes()
+        current_node = x509.load_pem_x509_certificate(current_node_raw)
+        if current_node.public_key().public_bytes_raw() != public.public_bytes_raw():
+            raise ValueError("Rotation CSR does not preserve the pinned Node key")
+        current_control_raw = (path / "control-cert.pem").read_bytes()
+        current_control = x509.load_pem_x509_certificate(current_control_raw)
+        control_key = serialization.load_pem_private_key(
+            (path / "control-key.pem").read_bytes(), password=None
+        )
+        if (
+            control_key.public_key().public_bytes_raw()
+            != current_control.public_key().public_bytes_raw()
+        ):
+            raise ValueError("Pinned Control Plane key and leaf differ")
+        now = datetime.now(timezone.utc)
+        safety = timedelta(hours=args.safety_window_hours)
+        if (
+            min(current_node.not_valid_after_utc, current_control.not_valid_after_utc)
+            > now + safety
+        ):
+            raise ValueError("Leaf rotation requested before the configured safety window")
+        revocations = _load_revocations(args.revocations)
+        if fingerprint(current_node) in revocations or fingerprint(current_control) in revocations:
+            raise ValueError("A current rotation identity is revoked")
+        _, _, chain_raw, ca_key, intermediate = _load_external_ca(
+            args.ca_key, args.ca_key_password_file, args.ca_chain
+        )
+        if _rotation_digest(chain_raw) != state.get("caBundleSHA256"):
+            raise ValueError("External issuing chain differs from the pilot pin")
+        principal = NodePrincipal(state["tenantId"], node["nodeId"])
+        current_identity = certificate_identity(
+            current_node.public_bytes(serialization.Encoding.DER),
+            principal,
+            state["epoch"],
+            now=now,
+        )
+        current_names = current_node.extensions.get_extension_for_class(
+            x509.SubjectAlternativeName
+        ).value
+        if current_identity != (
+            fingerprint(current_node),
+            current_node.not_valid_after_utc,
+        ) or current_names.get_values_for_type(x509.IPAddress) != [
+            ipaddress.ip_address(node["nodeIP"])
+        ]:
+            raise ValueError("Current Node leaf is not bound to the exact issuing chain")
+        intermediate.public_key().verify(current_node.signature, current_node.tbs_certificate_bytes)
+        if current_node.issuer != intermediate.subject:
+            raise ValueError("Current Node leaf is not bound to the exact issuing chain")
+        _validate_current_control_leaf(current_control, intermediate, state=state, now=now)
+        policy = json.loads(node_policy_path(path, state, node).read_text("utf-8"))
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            channel = _channel_row(conn, state, node)
+        version, channel_fingerprint, channel_not_after, enabled, endpoint = channel
+        if (
+            not enabled
+            or channel_fingerprint != fingerprint(current_node)
+            or channel_not_after <= now
+            or endpoint != f'https://{node["nodeIP"]}:{node["nodePort"]}'
+            or policy
+            != {
+                "version": version,
+                "tenantId": state["tenantId"],
+                "nodeId": node["nodeId"],
+                "recoveryEpoch": state["epoch"],
+                "expiresAt": policy.get("expiresAt"),
+                "clientFingerprints": [fingerprint(current_control)],
+            }
+        ):
+            raise ValueError(
+                "Pinned Node channel or peer policy differs from current public material"
+            )
+        if output.exists():
+            raw, manifest, files = _rotation_material(output)
+            next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+            if (
+                manifest.get("nodeId") != node["nodeId"]
+                or manifest.get("currentChannelVersion") != version
+                or manifest.get("targetChannelVersion") != version + 1
+                or manifest.get("currentNodeCertificateSHA256") != fingerprint(current_node)
+                or manifest.get("caBundleSHA256") != _rotation_digest(chain_raw)
+                or next_node.public_key().public_bytes_raw() != public.public_bytes_raw()
+                or fingerprint(current_node) in revocations
+                or fingerprint(next_node) in revocations
+            ):
+                raise ValueError("Existing rotation output is not an exact safe retry")
+            print(
+                json.dumps(
+                    dict(
+                        prepared=True,
+                        idempotentReplay=True,
+                        nodeId=node["nodeId"],
+                        rotationId=manifest["rotationId"],
+                        targetChannelVersion=manifest["targetChannelVersion"],
+                        proposalDigest=_rotation_digest(raw),
+                    )
+                )
+            )
+            return
+        lifetime = timedelta(seconds=args.leaf_valid_seconds)
+        next_node = issue(
+            ca_key,
+            intermediate,
+            public,
+            node_uri(principal, state["epoch"]),
+            address=node["nodeIP"],
+            now=now,
+            valid_for=lifetime,
+        )
+        next_control = issue(
+            ca_key,
+            intermediate,
+            control_key.public_key(),
+            f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
+            now=now,
+            valid_for=lifetime,
+        )
+        not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
+        overlap_expires = min(now + timedelta(seconds=args.overlap_seconds), not_after)
+        if overlap_expires <= now + timedelta(seconds=30):
+            raise ValueError("Rotation overlap is too short to complete safely")
+        target_version = version + 1
+        next_node_raw, next_control_raw = pem(next_node), pem(next_control)
+        overlap_policy = {
+            "version": target_version,
+            "tenantId": state["tenantId"],
+            "nodeId": node["nodeId"],
+            "recoveryEpoch": state["epoch"],
+            "expiresAt": _utc_z(overlap_expires),
+            "clientFingerprints": [fingerprint(current_control), fingerprint(next_control)],
+        }
+        final_policy = {
+            **overlap_policy,
+            "expiresAt": _utc_z(not_after),
+            "clientFingerprints": [fingerprint(next_control)],
+        }
+        material = {
+            "ca.pem": chain_raw,
+            "node-cert.pem": next_node_raw,
+            "control-cert.pem": next_control_raw,
+            "peer-policy-overlap.json": json.dumps(overlap_policy, indent=2).encode(),
+            "peer-policy-final.json": json.dumps(final_policy, indent=2).encode(),
+        }
+        manifest = {
+            "schemaVersion": ROTATION_SCHEMA,
+            "rotationId": uuid4().hex,
+            "tenantId": state["tenantId"],
+            "nodeId": node["nodeId"],
+            "recoveryEpoch": state["epoch"],
+            "nodeIP": node["nodeIP"],
+            "currentChannelVersion": version,
+            "targetChannelVersion": target_version,
+            "currentNodeCertificateSHA256": fingerprint(current_node),
+            "nextNodeCertificateSHA256": fingerprint(next_node),
+            "currentControlCertificateSHA256": fingerprint(current_control),
+            "nextControlCertificateSHA256": fingerprint(next_control),
+            "caBundleSHA256": _rotation_digest(chain_raw),
+            "createdAt": _utc_z(now),
+            "overlapExpiresAt": _utc_z(overlap_expires),
+            "certificateNotAfter": _utc_z(not_after),
+            "files": {name: _rotation_digest(raw) for name, raw in material.items()},
+        }
+        temporary = output.with_name(output.name + ".next")
+        temporary.mkdir(parents=True, exist_ok=False)
+        try:
+            for name, raw in material.items():
+                atomic_write(temporary / name, raw)
+            manifest_raw = _canonical_json(manifest)
+            atomic_write(temporary / "rotation.json", manifest_raw)
+            os.replace(temporary, output)
+            if os.name != "nt":
+                directory = os.open(output.parent, os.O_RDONLY)
+                try:
+                    os.fsync(directory)
+                finally:
+                    os.close(directory)
+        finally:
+            if temporary.exists():
+                shutil.rmtree(temporary)
+        print(
+            json.dumps(
+                dict(
+                    prepared=True,
+                    idempotentReplay=False,
+                    nodeId=node["nodeId"],
+                    rotationId=manifest["rotationId"],
+                    targetChannelVersion=target_version,
+                    proposalDigest=_rotation_digest(manifest_raw),
+                    privateKeyTransferred=False,
+                )
+            )
+        )
+
+
+def commit_leaf_rotation(args):
+    """CAS the DB channel, then durably publish matching CP/Node public material."""
+    path, state = args.state, load(args.state)
+    manifest_raw, manifest, files = _rotation_material(args.bundle.resolve())
+    node = node_by_id(state, manifest["nodeId"])
+    if node.get("credentialRevoked"):
+        raise ValueError("Revoked Node credentials cannot be committed")
+    proposal_digest = _rotation_digest(manifest_raw)
+    receipt = json.loads(args.node_receipt.read_text("utf-8"))
+    expected_receipt_body = {
+        "schemaVersion": ROTATION_SCHEMA,
+        "rotationId": manifest["rotationId"],
+        "proposalDigest": proposal_digest,
+        "targetChannelVersion": manifest["targetChannelVersion"],
+        "nodeId": manifest["nodeId"],
+        "installedNodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
+        "installedAt": receipt.get("installedAt"),
+        "restartObserved": True,
+    }
+    if set(receipt) != {*expected_receipt_body, "nodeSignature"} or any(
+        receipt.get(key) != value for key, value in expected_receipt_body.items()
+    ):
+        raise ValueError("Node installation receipt differs from the rotation proposal")
+    signature = receipt.get("nodeSignature")
+    if not isinstance(signature, str) or not re.fullmatch(r"[a-f0-9]{128}", signature):
+        raise ValueError("Node installation receipt signature is invalid")
+    next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+    installed_at = datetime.fromisoformat(receipt["installedAt"].replace("Z", "+00:00"))
+    current_time = datetime.now(timezone.utc)
+    overlap_expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
+    certificate_not_after = datetime.fromisoformat(
+        manifest["certificateNotAfter"].replace("Z", "+00:00")
+    )
+    if (
+        installed_at.tzinfo != timezone.utc
+        or installed_at > current_time + timedelta(seconds=30)
+        or not current_time < overlap_expires < certificate_not_after
+        or installed_at >= overlap_expires
+    ):
+        raise ValueError("Node installation receipt is outside the overlap window")
+    control_key = serialization.load_pem_private_key(
+        (path / "control-key.pem").read_bytes(), password=None
+    )
+    if not isinstance(control_key, Ed25519PrivateKey):
+        raise ValueError("Control Plane receipt signing key type differs")
+    next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
+    if control_key.public_key().public_bytes_raw() != next_control.public_key().public_bytes_raw():
+        raise ValueError("Control Plane key differs from the proposed control certificate")
+    with exclusive_file(path / "leaf-rotation.lock"):
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            row = _channel_row(conn, state, node, lock=True)
+            version, certificate_sha256, _not_after, enabled, endpoint = row
+            if (version, certificate_sha256, enabled) == (
+                manifest["currentChannelVersion"],
+                manifest["currentNodeCertificateSHA256"],
+                True,
+            ):
+                committed_version = provision_channel(
+                    conn,
+                    NodePrincipal(state["tenantId"], node["nodeId"]),
+                    epoch=state["epoch"],
+                    endpoint=endpoint,
+                    certificate_der=x509.load_pem_x509_certificate(
+                        files["node-cert.pem"]
+                    ).public_bytes(serialization.Encoding.DER),
+                    expected_version=manifest["currentChannelVersion"],
+                )
+            elif (version, certificate_sha256, enabled) == (
+                manifest["targetChannelVersion"],
+                manifest["nextNodeCertificateSHA256"],
+                True,
+            ):
+                committed_version = version
+            else:
+                raise ValueError("Channel changed; concurrent or stale rotation refused")
+        atomic_write(path / "control-cert.pem", files["control-cert.pem"])
+        atomic_write(node_certificate_path(path, state, node), files["node-cert.pem"])
+        atomic_write(node_policy_path(path, state, node), files["peer-policy-final.json"])
+        commit_receipt_body = {
+            "schemaVersion": ROTATION_SCHEMA,
+            "rotationId": manifest["rotationId"],
+            "proposalDigest": proposal_digest,
+            "nodeId": manifest["nodeId"],
+            "channelVersion": committed_version,
+            "certificateSHA256": manifest["nextNodeCertificateSHA256"],
+            "committed": True,
+        }
+        commit_receipt = {
+            **commit_receipt_body,
+            "controlSignature": control_key.sign(_canonical_json(commit_receipt_body)).hex(),
+        }
+        atomic_write(args.output.resolve(), _canonical_json(commit_receipt))
+    print(
+        json.dumps(
+            {
+                **commit_receipt,
+                "idempotentReplay": committed_version == version,
+                "restartObserverRequired": True,
+                "nodeOverlapFinalizationRequired": True,
+            }
         )
     )
 
@@ -1565,6 +2011,26 @@ def main():
     p.add_argument("--ca-key", type=Path, help="Encrypted external issuing key")
     p.add_argument("--ca-key-password-file", type=Path, help="Password file for --ca-key")
     p.add_argument("--ca-chain", type=Path, help="External issuing chain already pinned by init")
+    p = commands.add_parser(
+        "prepare-leaf-rotation",
+        help="Issue a public Node/control rotation from a Node-owned CSR without installing it",
+    )
+    p.add_argument("--csr", type=Path, required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--ca-key", type=Path, required=True)
+    p.add_argument("--ca-key-password-file", type=Path, required=True)
+    p.add_argument("--ca-chain", type=Path, required=True)
+    p.add_argument("--revocations", type=Path, required=True)
+    p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
+    p.add_argument("--overlap-seconds", type=int, choices=range(60, 3601), default=900)
+    p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "commit-leaf-rotation",
+        help="Commit an installed Node rotation with channel CAS and durable public material",
+    )
+    p.add_argument("--bundle", type=Path, required=True)
+    p.add_argument("--node-receipt", type=Path, required=True)
+    p.add_argument("--output", type=Path, required=True)
     commands.add_parser("status")
     p = commands.add_parser("observe")
     p.add_argument("--once", action="store_true")
