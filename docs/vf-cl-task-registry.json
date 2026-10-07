@@ -1,5 +1,5 @@
 {
- "version": "1.5.0",
+ "version": "1.6.0",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -19,7 +19,8 @@
    "locallyVerified": true,
    "ciVerified": true,
    "independentlyReviewed": true,
-   "operationallyAccepted": false
+   "operationallyAccepted": false,
+   "blockers": []
   },
   {
    "id": "VF-CL-02",
@@ -85,18 +86,18 @@
       "src/saintvision/api/problem.py exists, which design v1.2 required for MODEL-0009"
      ],
      "checksIn": "docs/vf-cl-registry-manifest.json"
-     },
-     {
-      "blocker": "34791448-license-exact-match-adapter-not-independently-reviewed",
-      "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
-      "evidence": [
-       "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: src/saintvision/adapters/model_import.py is unchanged since 34791448 and compares exactly the two declared strings, rejects missing/non-string/different values and rejects every extra proposal key",
-       "tests/core/test_registry_policy_exact_match.py passed 37 cases under Python 3.14; replacing exact equality with case-folded equality made the licensePolicy-case and classification-case cases fail (2 failed), so the regression suite kills the reviewed relaxation",
-       "the adapter returns only field-name mismatch reasons and the canonical 409 code; a match is explicitly not execution or legal authority"
-      ],
-      "checksIn": "docs/vf-cl-registry-manifest.json"
-     }
-    ]
+    },
+    {
+     "blocker": "34791448-license-exact-match-adapter-not-independently-reviewed",
+     "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
+     "evidence": [
+      "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: src/saintvision/adapters/model_import.py is unchanged since 34791448 and compares exactly the two declared strings, rejects missing/non-string/different values and rejects every extra proposal key",
+      "tests/core/test_registry_policy_exact_match.py passed 37 cases under Python 3.14; replacing exact equality with case-folded equality made the licensePolicy-case and classification-case cases fail (2 failed), so the regression suite kills the reviewed relaxation",
+      "the adapter returns only field-name mismatch reasons and the canonical 409 code; a match is explicitly not execution or legal authority"
+     ],
+     "checksIn": "docs/vf-cl-registry-manifest.json"
+    }
+   ]
   },
   {
    "id": "VF-CL-04",
@@ -133,28 +134,28 @@
       "the ratchet also asserts the setup skip 'CX01_CONTAINER is unset; container identity/ownership cannot be verified' is absent, so a regression to skipping fails the build rather than passing quietly"
      ],
      "checksIn": "docs/vf-cl-registry-manifest.json"
-     },
-     {
-      "blocker": "0043-retained-replicas-pin-fix-re-review-not-recorded",
-      "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
-      "evidence": [
-       "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: migrations/versions/0043_replica_retention.py is unchanged since 08ece3bc and permits a retained pin only for ready or stale replicas; downgrade remains an explicit reviewed-forward-fix refusal",
-       "a captured-upgrade predicate probe admits pinned+stale while the ready-only mutant refuses it; exact-head Core run 37401903045 JUnit records both tests/test_vf_replica_migration.py PostgreSQL cases and the pinned-departure service case as executed",
-       "the forward-upgrade test preserves the whole pre-existing row, then changes it to stale and requires the pin to remain; the concurrent corruption test requires departure not to overwrite corrupt state"
-      ],
-      "checksIn": "docs/vf-cl-registry-manifest.json"
-     },
-     {
-      "blocker": "3e267b05-archive-retention-tool-not-independently-reviewed",
-      "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
-      "evidence": [
-       "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: the original 3e267b05 plan is still present but later fixes make malformed or ambiguous START TIME fail closed, retain missing-time backups as UnknownAge without filesystem mtime, and keep WAL from the minimum retained start segment",
-       "tests/test_pitr_archive_retention.py passed 37 cases locally; changing the WAL boundary from min to max made four safety/property cases fail, including the unknown-age filesystem-seam case",
-       "exact-head Backend run 37401900619 completed successfully on Python 3.12 and 3.14; no local Docker was used"
-      ],
-      "checksIn": "docs/vf-cl-registry-manifest.json"
-     }
-    ],
+    },
+    {
+     "blocker": "0043-retained-replicas-pin-fix-re-review-not-recorded",
+     "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
+     "evidence": [
+      "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: migrations/versions/0043_replica_retention.py is unchanged since 08ece3bc and permits a retained pin only for ready or stale replicas; downgrade remains an explicit reviewed-forward-fix refusal",
+      "a captured-upgrade predicate probe admits pinned+stale while the ready-only mutant refuses it; exact-head Core run 37401903045 JUnit records both tests/test_vf_replica_migration.py PostgreSQL cases and the pinned-departure service case as executed",
+      "the forward-upgrade test preserves the whole pre-existing row, then changes it to stale and requires the pin to remain; the concurrent corruption test requires departure not to overwrite corrupt state"
+     ],
+     "checksIn": "docs/vf-cl-registry-manifest.json"
+    },
+    {
+     "blocker": "3e267b05-archive-retention-tool-not-independently-reviewed",
+     "closedAt": "59050d2aa125fad67a4734f271fea5c294296a1a",
+     "evidence": [
+      "reviewed at train 62 candidate 59050d2aa125fad67a4734f271fea5c294296a1a: the original 3e267b05 plan is still present but later fixes make malformed or ambiguous START TIME fail closed, retain missing-time backups as UnknownAge without filesystem mtime, and keep WAL from the minimum retained start segment",
+      "tests/test_pitr_archive_retention.py passed 37 cases locally; changing the WAL boundary from min to max made four safety/property cases fail, including the unknown-age filesystem-seam case",
+      "exact-head Backend run 37401900619 completed successfully on Python 3.12 and 3.14; no local Docker was used"
+     ],
+     "checksIn": "docs/vf-cl-registry-manifest.json"
+    }
+   ],
    "restatedBlockers": [
     {
      "was": "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
@@ -168,7 +169,7 @@
     {
      "what": "tests/integration/test_recovery_drill.py",
      "condition": "19 of 20 cases need a CX01 container on this host -- 17 for CX01_CONTAINER and 2 for the archiver image, which is that container's image. This workstation has no CX01 container and local docker is off by memory constraint.",
-     "measuredIn": "hosted Core run 36886647197 at 25f43a25 (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed. Re-measured at this registry's tree; the first measurement was run 36521298082 at 6fc0428b and a claim about a tree has to be shown at that tree.",
+     "measuredIn": "hosted Core run 37548456022 at 517880099743cf2d62131012191b7ba54650c44d (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed, asserted by core.yml rather than read from prose. Re-measured at this registry's tree; the previous measurement was run 36886647197 at 25f43a25 and the first was run 36521298082 at 6fc0428b, because a claim about a tree has to be shown at that tree.",
      "note": "Filed as a blocker in registry 1.2.0 and in the restatedBlockers note. That was wrong twice over: first it waited for merged PR #126, then it waited for inputs hosted CI already supplies. A gap in my own measurement is not a gap in the work.",
      "blockerIdsThisReplaces": [
       "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
@@ -211,28 +212,101 @@
    "operationallyAccepted": false,
    "notApplicable": [
     "ciVerified: a review card ships documents, not code CI executes",
-    "independentlyReviewed: this card IS the review function; its own outputs are reviewed per-document by the owner of the reviewed change"
-   ]
+    "independentlyReviewed: this card IS the review function, so an independent review of it is the reviewer's act and not the owner's. Card 285 left the field false deliberately: the owner may not raise it, and Codex raising it is the only way it becomes true. Card 284 closed the other four cards' review blockers and did not reach this one, so it is now the only card without an independent review."
+   ],
+   "blockers": []
   }
  ],
  "verifiedAgainst": {
-  "tree": "25f43a25",
-  "ref": "coord/train11-ci-0047",
+  "tree": "517880099743cf2d62131012191b7ba54650c44d",
+  "ref": "coord/train63a-ci-0847",
   "candidate": true,
   "reverifyAt": "integration/all-agents-unified",
-  "candidateNote": "coord/train11-ci-0047 is the train 11 landing CANDIDATE, not integration. Every claim re-derived here is about that candidate tree. When it reaches integration/all-agents-unified the claims must be re-verified and re-recorded at the landed SHA -- rule 8 reports until they are, because an ancestry relation is not a licence to carry a candidate's evidence forward.",
-  "note": "Implementation-side claims re-verified by reading the landed tree; review-side booleans and their blockers are the reviewer's and were not touched. The tree moved from 6fc0428b to the train 11 candidate 25f43a25, and the hosted run moved with it: a claim about a tree has to be shown at that tree.",
+  "candidateNote": "coord/train63a-ci-0847 is the train 63 landing CANDIDATE, not integration. Every claim re-derived here is about that candidate tree. When it reaches integration/all-agents-unified the claims must be re-verified and re-recorded at the landed SHA -- rule 8 reports until they are, because an ancestry relation is not a licence to carry a candidate's evidence forward.",
+  "note": "Card 285 re-recorded this block at the train 63 candidate (train 62 plus the single merge of #381). The previous entry named the train 11 candidate 25f43a25, which is an ancestor of this tree and still passed rule 8 only because it had never reached integration -- a claim that is technically admissible and 52 trains stale. All 56 manifest checks were re-applied here independently of the checker and all 56 hold, which is what re-derives implemented. locallyVerified was re-measured per card at this tree (see reverification). ciVerified is unchanged: the manifest still asserts nothing for VF-CL-01/02/03/05 and the hosted lane cannot attribute a directory run to one card, so the per-card attribution below records what the run does and does not show rather than upgrading the claim.",
   "hostedRun": {
-   "runId": "36886647197",
+   "runId": "37548456022",
    "workflow": "Core Build",
-   "headSha": "25f43a25a999568c70ecccbf5881dbc2d11f3b5e",
+   "headSha": "517880099743cf2d62131012191b7ba54650c44d",
    "conclusion": "success",
    "steps": [
     "Create disposable CX01 PostgreSQL: success",
     "Run owned CX01 recovery drill evidence: success",
-    "Require executed CX01 recovery evidence: success"
+    "Require executed CX01 recovery evidence: success",
+    "Cleanup disposable CX01 PostgreSQL: success"
    ],
-   "why": "core.yml asserts skips == Counter() and passed == 20 for that drill, so a successful run is proof it executed with no skips at this exact tree."
+   "attempt": 2,
+   "why": "core.yml asserts skips == Counter() and passed == 20 for the owned CX01 recovery drill, so a successful run is proof it executed with no skips at this exact tree. Attempt 1 of this run id concluded failure on one unrelated real-PG setup error (test_kernel_cancel_bridge_real_pg, NODE-0030 uncertain delivery; 8,623 passed, 0 failures, 1 error) and the failed job was re-run. The three owned CX01 steps succeeded in attempt 1 as well, so the drill measurement did not depend on the re-run; the attempt is recorded because a reader checking this run id sees both."
+  },
+  "otherHostedRuns": [
+   {
+    "runId": "37548452805",
+    "workflow": "Backend Build",
+    "headSha": "517880099743cf2d62131012191b7ba54650c44d",
+    "conclusion": "success"
+   },
+   {
+    "runId": "37548464717",
+    "workflow": "Documentation Build",
+    "headSha": "517880099743cf2d62131012191b7ba54650c44d",
+    "conclusion": "success"
+   }
+  ],
+  "reverification": {
+   "environment": "Python 3.14.7, docker hidden from PATH, real PostgreSQL only via a disposable database c285_reverify created and dropped on 127.0.0.1:55432 (the shared invdev database was not used)",
+   "attributionRule": "A test counts for a card when it imports one of that card's DISTINCTIVE owned modules (an owned module that is not shared API infrastructure, counting a bare import of a tool's basename because tools are imported after a sys.path insert), or when the card's own manifest checks name that test file. A first attempt matched module basenames as substrings and pulled in 128-153 files per card, which is the failure whyCiVerified names: it would have read as coverage while asserting nothing. Recorded so the next reader can judge the rule, not just the result.",
+   "perCard": {
+    "VF-CL-01": {
+     "attributedTests": [
+      "tests/core/test_model_verify_route.py"
+     ],
+     "localResult": "90 passed",
+     "notAttributable": "the import graph cannot reach saintvision.api.v1.storage: a route module has no direct importer because it is exercised through the ASGI app, so no test file can be tied to it this way"
+    },
+    "VF-CL-02": {
+     "attributedTests": [
+      "tests/core/test_model_execution_manifest_contract.py",
+      "tests/core/test_model_version_register_route.py",
+      "tests/integration/test_model_uri_resolver_http.py",
+      "tests/test_model_registry.py",
+      "tests/test_model_uri_resolver.py",
+      "tests/test_pathsafe.py",
+      "tests/test_uri_resolver.py",
+      "tests/test_vf_service_review.py"
+     ],
+     "localResult": "212 passed, 1 skipped (a Windows symlink-privilege case)",
+     "notAttributable": "the import graph cannot reach saintvision.api.v1.storage: a route module has no direct importer because it is exercised through the ASGI app, so no test file can be tied to it this way"
+    },
+    "VF-CL-03": {
+     "attributedTests": [
+      "tests/core/test_model_release_route.py",
+      "tests/core/test_registry_policy_exact_match.py",
+      "tests/integration/test_model_retention_pin_real_pg.py"
+     ],
+     "localResult": "124 passed",
+     "notAttributable": "the import graph cannot reach saintvision.api.v1.projects: a route module has no direct importer because it is exercised through the ASGI app, so no test file can be tied to it this way",
+     "excludedAsShared": "saintvision.api.problem is imported by 31 test files across unrelated cards, so it attributes nothing and was excluded by measurement"
+    },
+    "VF-CL-04": {
+     "attributedTests": [
+      "tests/core/test_check_s12_acceptance_shape.py",
+      "tests/integration/test_recovery_drill.py",
+      "tests/test_pitr_archive_retention.py",
+      "tests/test_pitr_boundary.py",
+      "tests/test_pitr_opt_in_dry_run.py",
+      "tests/test_pitr_readiness.py",
+      "tests/test_s11_local_retention_faults.py",
+      "tests/test_vf_replica_migration.py",
+      "tests/test_vf_service_review.py"
+     ],
+     "localResult": "195 passed, 31 skipped (Linux-boundary and CX01-container cases)"
+    },
+    "VF-CL-05": {
+     "attributedTests": [],
+     "localResult": "no code to run; this card ships review documents"
+    }
+   },
+   "whatThisDoesNotShow": "The hosted Core lane runs whole directories (pytest tests/core, pytest tests/), so a green lane shows the lane passed, not that a named card was exercised. The attributed tests above are the honest intersection; VF-CL-01's is a single file, which is the thinnest of the four and is stated rather than padded."
   }
  },
  "verifiedBy": "tools/check_vf_cl_registry.py"
