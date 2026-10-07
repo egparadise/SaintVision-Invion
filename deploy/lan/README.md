@@ -356,6 +356,96 @@ policy are both still valid; expired material is never restored. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
+## Desktop launcher
+
+`deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has
+already provisioned. It never resets a database, never dispatches work, and never
+prints or logs a secret.
+
+It reads the database shape from the state's own `databaseMode`, defaulting to the
+local mode only when that key is genuinely **absent**, exactly as
+`tools/lan_pilot.py` does with `setdefault`. A declared mode that is null, empty,
+numeric, or simply unknown is refused before any Docker call or listener, because a
+falsey value silently becoming "legacy local" would make an external state demand a
+container that cannot exist:
+
+* `managed-local-docker` — the owned pilot container is inspected by label and
+  started if stopped, and a failed `docker start` stops before any listener.
+* `ssh-tunnel-external` — a hardened remote database has no local container, so
+  Docker is not consulted at all. The script assures a loopback SSH forward on the
+  port the state itself records in `dbPort`. The **port always comes from the
+  state**; the target host and key are arguments (`-DatabaseTunnelTarget`,
+  `-SshKeyPath`) and no pilot address, account, or port is written in this
+  repository. Without an open tunnel and without a target it fails closed.
+
+An already-open forward is only reused when it can be identified as the owned one, and
+the same check runs again after this launcher starts `ssh` itself, so the two paths
+cannot drift. One helper, `Assert-SvOwnedTunnelListeners`, decides both:
+
+* *every* listener on the port must be bound to a loopback address;
+* the owning process must be the **exact** system `ssh.exe`, not merely a file of that
+  name;
+* the token **immediately after** `-L` must equal
+  `127.0.0.1:<dbPort>:127.0.0.1:<dbPort>`, and the token **immediately after** `--` must
+  equal the supplied target, with nothing following it, so no remote command is carried;
+* a target is **required** even to reuse a forward -- skipping that comparison when none
+  was supplied is how an unrelated loopback listener could be adopted;
+* after this launcher starts `ssh`, the port must be held by exactly the process id it
+  started, so a process that won a race to the loopback port cannot be inherited.
+
+Checking only that the expected forward appeared *somewhere* in the command line was not
+enough: a command line whose real `-L` pointed at another host passed, because the
+expected string also appeared as a trailing remote-command token.
+
+Every value handed to a native child through `-ArgumentList` must be free of whitespace,
+quotes and control characters. Windows PowerShell joins that array with spaces and does
+not quote, so `-i "C:/keys/key with space"` reaches `ssh` as three arguments and a
+fragment after a space can be read as an option. The key path, the state directory, the
+checkout, the interpreter and the vite entry are all refused with the reason named rather
+than silently mis-serialized. If a path with spaces is ever required, the fix is a quoting
+serializer, not relaxing this rule.
+
+Both owned listeners must belong to the state being started. A console on 18082 or
+a web server on 3000 that serves a *different* state, or that is bound to a
+non-loopback address, is refused rather than reused — reusing one showed another
+state's data as if it were this one. Replacing such a listener stops a process, so
+it stays an explicit decision behind `-ReplaceForeignStateListener`. The web server
+is bound to `127.0.0.1` only.
+
+`-OpenBrowser` waits for the console's `live-postgresql-mtls` source and a 200 from
+the page before opening it, and reports a timeout instead of an exception body.
+
+`deploy/lan/Register-DesktopShortcut.ps1` registers a current-user desktop icon for
+that script, carrying the same arguments. It follows the ownership rule
+`Register-EnvironmentStartup.ps1` uses: a shortcut whose description is not this
+setup's marker is preserved rather than overwritten, and `-Remove` withdraws only
+the owned one.
+
+`deploy/lan/SvLauncherInput.ps1` holds the input grammar and command-line parsing
+both scripts share, so the icon can never be registered with a value the launcher
+would refuse:
+
+* `-DatabaseTunnelTarget` must match one anchored `user@host` grammar (IPv4 with
+  valid octets, or a hostname with valid labels). Whitespace, quotes, control
+  characters, `=` and option syntax all fall outside it, and the ssh invocation
+  fixes every option before `--` so a validated target can only be read as the
+  destination. A single string must never be able to arrive at `ssh.exe` as several
+  arguments.
+* `-SshKeyPath` must not begin with `-` and must resolve to an existing file whose
+  resolved path contains no whitespace, quote or control character. The check is on the
+  resolved value because that is what reaches `ssh`, and because resolution can introduce
+  whitespace the caller never typed: a relative `id_ed25519` under a working directory
+  containing a space resolves to `.../dir with space/id_ed25519`.
+* Ownership is decided by tokenizing the owning process's command line with the
+  documented Win32 CRT rules and comparing the normalized path after an exact
+  `--state` token. A substring test matched `C:/pilot/r2` against a process serving
+  `C:/pilot/r2-x`.
+
+Rejected values are never echoed: they can carry an operator account or host.
+
+Default paths are derived from the checkout that contains the script, so no
+deployment script assumes a drive letter.
+
 Stop the bootstrap and observer processes by their recorded PIDs after validating
 their command lines. Remove only the named `SaintVision-LAN-Bootstrap-<workerIP>`
 or `SaintVision-LAN-Node-<nodeId>` firewall rules to withdraw access. Stop the named

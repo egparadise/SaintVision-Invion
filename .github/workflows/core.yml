@@ -303,7 +303,14 @@ jobs:
               # S10-BE stage 2: the live MLflow conformance file runs only in the run-mlflow
               # lane (INV_MLFLOW_LIVE_URI); in this job it skips, visibly, 3 cases.
               'Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)': 3,
-              'PowerShell and csc.exe shim require Windows': 1,
+              # Card 289 r2: the original Docker-start case plus five behavioural
+              # launcher cases (external-mode, non-loopback and unidentified listener,
+              # invalid declared mode x4, invalid tunnel target) need the Windows shim.
+              # Card 289 reviewer r2: measured by joining each collected item to its own
+              # skipif reason, not by counting decorators (31 collected, 7 always run).
+              'PowerShell and csc.exe shim require Windows': 13,
+              'PowerShell parser requires Windows': 2,
+              'PowerShell required': 9,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'run only through tools/placement_lock_wait_diagnostic.py': 1,

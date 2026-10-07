@@ -1,6 +1,8 @@
 param(
-    [string]$StudioRoot = 'C:/Project/SaintVision-Workspaces',
-    [string]$StatePath = 'C:/Project/SaintVision-Invion/.work/lan-pilot'
+    # Derived from this checkout: the old default named a drive and a repository
+    # directory that do not exist on every operator machine.
+    [string]$StudioRoot = (Join-Path (Split-Path (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path -Parent) 'SaintVision-Workspaces'),
+    [string]$StatePath = (Join-Path $PSScriptRoot '../../.work/lan-pilot')
 )
 $ErrorActionPreference = 'Stop'
 $svCheckout = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path.Replace('\','/')
