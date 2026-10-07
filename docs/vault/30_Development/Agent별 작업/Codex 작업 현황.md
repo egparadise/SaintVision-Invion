@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.322"
+version: "1.0.323"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T11:07:11+09:00"
+updated: "2026-10-07T11:32:33+09:00"
 source_of_truth: "Git"
 active_card: "CARD-287 LAN pilot reconnect"
 active_card_status: "Fresh isolated pilot state is running against the remote hardened database: two independently addressed Linux Nodes are online with current mTLS heartbeats; the other two Nodes are BLOCKED_USER_ACTION on Docker socket membership and SSH key enrollment"

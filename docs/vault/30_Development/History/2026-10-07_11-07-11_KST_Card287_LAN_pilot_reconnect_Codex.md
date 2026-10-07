@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261007-CARD287-CODEX"
 title: "Card 287 LAN pilot reconnect"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 created: "2026-10-07T11:07:11+09:00"
-updated: "2026-10-07T11:07:11+09:00"
+updated: "2026-10-07T11:32:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -46,6 +46,11 @@ Local gates also passed `tools/check_docs.py`, `tools/check_ontology.py`,
 `tools/sync_obsidian.py --check` made no writes and reported 11 pre-existing unmanaged destination
 collisions (8 without a baseline and 3 where both copies diverged); those unrelated files were not
 adopted or overwritten.
+
+The first exact-head Backend run correctly rejected the stale public tooling hashes in
+`card150-intranet-pki-lan-pilot.json` for the two changed bootstrap files. Those public, secret-free
+SHA-256 and Git-blob bindings were regenerated from the committed files; the focused evidence
+binding test and the LAN pilot suite then passed before the replacement hosted run.
 
 ## Measured deployment
 
