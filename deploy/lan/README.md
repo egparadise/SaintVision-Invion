@@ -356,6 +356,43 @@ policy are both still valid; expired material is never restored. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
+## Desktop launcher
+
+`deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has
+already provisioned. It never resets a database, never dispatches work, and never
+prints or logs a secret.
+
+It reads the database shape from the state's own `databaseMode`, defaulting an
+older state to the local mode exactly as `tools/lan_pilot.py` does:
+
+* `managed-local-docker` — the owned pilot container is inspected by label and
+  started if stopped, and a failed `docker start` stops before any listener.
+* `ssh-tunnel-external` — a hardened remote database has no local container, so
+  Docker is not consulted at all. The script assures a loopback SSH forward on the
+  port the state itself records in `dbPort`. The **port always comes from the
+  state**; the target host and key are arguments (`-DatabaseTunnelTarget`,
+  `-SshKeyPath`) and no pilot address, account, or port is written in this
+  repository. Without an open tunnel and without a target it fails closed.
+
+Both owned listeners must belong to the state being started. A console on 18082 or
+a web server on 3000 that serves a *different* state, or that is bound to a
+non-loopback address, is refused rather than reused — reusing one showed another
+state's data as if it were this one. Replacing such a listener stops a process, so
+it stays an explicit decision behind `-ReplaceForeignStateListener`. The web server
+is bound to `127.0.0.1` only.
+
+`-OpenBrowser` waits for the console's `live-postgresql-mtls` source and a 200 from
+the page before opening it, and reports a timeout instead of an exception body.
+
+`deploy/lan/Register-DesktopShortcut.ps1` registers a current-user desktop icon for
+that script, carrying the same arguments. It follows the ownership rule
+`Register-EnvironmentStartup.ps1` uses: a shortcut whose description is not this
+setup's marker is preserved rather than overwritten, and `-Remove` withdraws only
+the owned one.
+
+Default paths are derived from the checkout that contains the script, so no
+deployment script assumes a drive letter.
+
 Stop the bootstrap and observer processes by their recorded PIDs after validating
 their command lines. Remove only the named `SaintVision-LAN-Bootstrap-<workerIP>`
 or `SaintVision-LAN-Node-<nodeId>` firewall rules to withdraw access. Stop the named

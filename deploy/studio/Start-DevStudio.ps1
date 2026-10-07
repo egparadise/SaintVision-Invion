@@ -1,4 +1,4 @@
-param([string]$StudioRoot='C:/Project/SaintVision-Workspaces',[switch]$NoBrowser)
+param([string]$StudioRoot = (Join-Path (Split-Path (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path -Parent) 'SaintVision-Workspaces'),[switch]$NoBrowser)
 $ErrorActionPreference = 'Stop'
 $svCheckout = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 $svCommon = & git -C $svCheckout rev-parse --git-common-dir
