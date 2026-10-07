@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.323"
+version: "1.0.324"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T11:32:33+09:00"
+updated: "2026-10-07T12:00:51+09:00"
 source_of_truth: "Git"
-active_card: "CARD-287 LAN pilot reconnect"
-active_card_status: "Fresh isolated pilot state is running against the remote hardened database: two independently addressed Linux Nodes are online with current mTLS heartbeats; the other two Nodes are BLOCKED_USER_ACTION on Docker socket membership and SSH key enrollment"
-active_card_next: "Open the Card 287 PR, obtain exact-head Backend/Core/Docs green, and request Claude review; schedule Card 288 before the six-day Node leaf expires"
+active_card: "CARD-288 Node and Control Plane leaf rotation"
+active_card_status: "Implementation complete for CSR-only issuance, exact chain and channel binding, atomic Node installation, CP channel CAS, bounded overlap/finalization, fresh-only rollback, and kill-point recovery; live r2 state remains untouched pending Claude review"
+active_card_next: "Open the stacked Card 288 PR, obtain exact-head Backend/Core/Docs green, and request Claude review before any operational rotation of .work/lan-5node/r2-7057dcd0"
 ---
+
+## 2026-10-07 Card 288 — Node and Control Plane leaf rotation
+
+- Stacked on Card 287 because both cards own the LAN pilot channel. The CP now prepares public
+  rotation material from the existing Node-owned key's CSR, exact issuing chain/revocation registry,
+  exact current pin, and monotonic `version + 1`; it never receives or packages the private key.
+- The Node installer verifies every bound identity and digest, journals exact retries, writes public
+  files with fsync/rename before restart, and records a restart receipt. CP commit uses the existing
+  channel CAS; finalization ends a bounded old/new control overlap. Fresh-only rollback and five
+  crash kill points are covered. Focused local result: 21 passed, with no local Docker use.
+- The accepted r2 pilot state is intentionally unchanged. History records the separate post-review
+  commands and requires a current mTLS heartbeat on the new channel before operational acceptance.
+- History: [[2026-10-07_11-29-12_KST_Card288_Node_leaf_rotation_Codex]].
 
 ## 2026-10-07 Card 287 — LAN pilot reconnect
 

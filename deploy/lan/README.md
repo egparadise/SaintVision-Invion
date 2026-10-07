@@ -339,12 +339,22 @@ It starts the existing container and checks process stability. The operator must
 still confirm an actual mTLS observation from the server before calling it connected.
 
 CA lifetime is seven days; peer certificates and the initial allowlist last at
-most six days. Expiry fails closed. This first bootstrap intentionally does not
-implement renewal: preserve keys, advance the peer-policy version, and reconcile
-the certificate channel through the existing operator contracts before extending
-the pilot. Automated Node leaf rotation is therefore still a readiness blocker,
-not an implied capability. Windows reboot does not automatically relaunch the server's observer
-or download process. The worker and database use `unless-stopped`.
+most six days. Expiry fails closed. `lan_pilot.py prepare-leaf-rotation` now
+accepts only a signed CSR for the already pinned Node key, the exact externally
+pinned issuing chain, and the issuer's revocation registry. It refuses an early,
+revoked, disabled, wrong-key, wrong-node, expired, or stale-version rotation and
+emits public material only. The Node runs `worker_leaf_rotation.py install`; that
+tool verifies every public byte, writes the Node leaf and a bounded two-Control-
+Plane overlap policy with fsync/rename, records a durable install-intent before
+changing either public file, copies and verifies them before restart, and keeps
+an exact retry journal. A CP commit requires that Node receipt and
+uses the existing channel-version CAS before atomically publishing the matching
+Control Plane and Node public leaves. The Node then runs `finalize` with the CP
+commit receipt, reducing the policy to the new Control Plane fingerprint. An
+uncommitted rotation can use `rollback` only while the exact prior leaf and peer
+policy are both still valid; expired material is never restored. Windows reboot
+does not automatically relaunch the server's observer or download process. The
+worker and database use `unless-stopped`.
 
 Stop the bootstrap and observer processes by their recorded PIDs after validating
 their command lines. Remove only the named `SaintVision-LAN-Bootstrap-<workerIP>`
