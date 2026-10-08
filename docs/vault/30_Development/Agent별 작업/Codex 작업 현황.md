@@ -4,10 +4,10 @@ title: "Codex 작업 현황"
 version: "1.0.325"
 status: "review"
 author: "Codex"
-updated: "2026-10-08T15:54:21+09:00"
+updated: "2026-10-08T16:38:43+09:00"
 source_of_truth: "Git"
 active_card: "CARD-291 multi-Node leaf rotation batch"
-active_card_status: "Implementation and synthetic two-Node crash regressions complete on train 68; live r2 state remains unchanged pending Claude review and landing"
+active_card_status: "PR #388 is approved by Claude at 3f7792f3 with exact-head Core green and is in merge train 69; the live r2 state remains unchanged until the operator-authorized batch rotation runs"
 active_card_next: "After independent approval and landing, run the shared batch procedure on the already authorized r2 pilot before the 2026-10-13 02:04Z leaf expiry"
 ---
 
