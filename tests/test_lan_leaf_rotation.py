@@ -1077,6 +1077,17 @@ def test_expired_partial_batch_is_superseded_by_fresh_all_node_batch(tmp_path, m
     replay = json.loads(capsys.readouterr().out)
     assert replay["idempotentReplay"] is True
     assert lan_pilot._load_batch_journal(args.state)["batchId"] == new_batch["batchId"]
+    original_csr = args.csr[0].read_bytes()
+    wrong_key = Ed25519PrivateKey.generate()
+    args.csr[0].write_bytes(
+        x509.CertificateSigningRequestBuilder()
+        .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, NODE_ID)]))
+        .sign(wrong_key, None)
+        .public_bytes(serialization.Encoding.PEM)
+    )
+    with pytest.raises(ValueError, match="CSR binding differs"):
+        lan_pilot.prepare_leaf_rotation_recovery_batch(recovery)
+    args.csr[0].write_bytes(original_csr)
 
     # A crash after archiving the old journal but before writing the new intent is replayable:
     # the current public files still match the fresh bundle's declared recovery base.

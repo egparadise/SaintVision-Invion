@@ -1640,6 +1640,12 @@ def prepare_leaf_rotation_recovery_batch(args):
     revocations = _load_revocations(args.revocations)
     if output.exists():
         replacement_raw, replacement, replacement_bundles = _batch_material(output)
+        replacement_overlap = datetime.fromisoformat(
+            replacement["overlapExpiresAt"].replace("Z", "+00:00")
+        )
+        replacement_not_after = datetime.fromisoformat(
+            replacement["certificateNotAfter"].replace("Z", "+00:00")
+        )
         if (
             replacement["tenantId"] != expired["tenantId"]
             or replacement["recoveryEpoch"] != expired["recoveryEpoch"]
@@ -1647,8 +1653,14 @@ def prepare_leaf_rotation_recovery_batch(args):
             != expired["currentControlCertificateSHA256"]
             or replacement["caBundleSHA256"] != expired["caBundleSHA256"]
             or set(replacement_bundles) != set(expired_bundles)
+            or not now < replacement_overlap < replacement_not_after
         ):
             raise ValueError("Existing recovery batch differs from the expired batch authority")
+        for node_id, (_raw, _manifest, files) in replacement_bundles.items():
+            next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+            public = csr_public_key(csrs[node_id].read_bytes(), node_id)
+            if next_node.public_key().public_bytes_raw() != public.public_bytes_raw():
+                raise ValueError("Existing recovery batch CSR binding differs")
         with exclusive_file(path / "leaf-rotation.lock"):
             journal = _load_batch_journal(path)
             try:
