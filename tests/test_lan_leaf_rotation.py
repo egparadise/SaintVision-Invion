@@ -706,3 +706,278 @@ def test_cp_commit_requires_exact_node_receipt_and_channel_cas(tmp_path, monkeyp
     )
     with pytest.raises(ValueError, match="concurrent or stale"):
         lan_pilot.commit_leaf_rotation(commit_args)
+
+
+NODE_ID_2 = "nod_01HYYYYYYYYYYYYYYYYYYYYYYY"
+NODE_IP_2 = "192.168.45.82"
+
+
+class _BatchConnection:
+    def __init__(self, rows):
+        self.rows = rows
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def execute(self, query, params=None):
+        if "FROM inv.node_channels" in query:
+            return _Result(self.rows[params[1]])
+        return _Result()
+
+
+def _batch_inputs(tmp_path, monkeypatch):
+    fixture, state, row, single = _prepare_inputs(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc)
+    second_key = Ed25519PrivateKey.generate()
+    second_node = issue(
+        fixture.issuer_key,
+        fixture.issuer,
+        second_key.public_key(),
+        f"spiffe://saintvision.ai/tenant/{TENANT_ID}/node/{NODE_ID_2}/epoch/{EPOCH}",
+        address=NODE_IP_2,
+        now=now - timedelta(minutes=1),
+        valid_for=timedelta(minutes=5),
+    )
+    state["nodes"].append(
+        {
+            "nodeId": NODE_ID_2,
+            "nodeIP": NODE_IP_2,
+            "nodePort": 18443,
+            "provisioned": True,
+            "coLocatedWithControlPlane": False,
+        }
+    )
+    (single.state / "private-state.json").write_text(json.dumps(state), encoding="utf-8")
+    second_public = single.state / "public" / "nodes" / NODE_ID_2
+    second_public.mkdir(parents=True)
+    (second_public / "node-cert.pem").write_bytes(pem(second_node))
+    second_policy_dir = single.state / "nodes" / NODE_ID_2
+    second_policy_dir.mkdir(parents=True)
+    second_policy = {
+        "version": 11,
+        "tenantId": TENANT_ID,
+        "nodeId": NODE_ID_2,
+        "recoveryEpoch": EPOCH,
+        "expiresAt": fixture.current_control.not_valid_after_utc.isoformat().replace("+00:00", "Z"),
+        "clientFingerprints": [fingerprint(fixture.current_control)],
+    }
+    (second_policy_dir / "peer-policy.json").write_text(json.dumps(second_policy), encoding="utf-8")
+    csr2 = tmp_path / "node-2.csr"
+    csr2.write_bytes(
+        x509.CertificateSigningRequestBuilder()
+        .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, NODE_ID_2)]))
+        .sign(second_key, None)
+        .public_bytes(serialization.Encoding.PEM)
+    )
+    rows = {
+        NODE_ID: row,
+        NODE_ID_2: (
+            11,
+            fingerprint(second_node),
+            second_node.not_valid_after_utc,
+            True,
+            f"https://{NODE_IP_2}:18443",
+        ),
+    }
+    monkeypatch.setattr(lan_pilot.psycopg, "connect", lambda _dsn: _BatchConnection(rows))
+
+    def provision(_conn, principal, *, epoch, endpoint, certificate_der, expected_version):
+        certificate = x509.load_der_x509_certificate(certificate_der)
+        rows[principal.node_id] = (
+            expected_version + 1,
+            fingerprint(certificate),
+            certificate.not_valid_after_utc,
+            True,
+            endpoint,
+        )
+        return expected_version + 1
+
+    monkeypatch.setattr(lan_pilot, "provision_channel", provision)
+    batch = Namespace(
+        state=single.state,
+        csr=[single.csr, csr2],
+        output=tmp_path / "batch",
+        ca_key=single.ca_key,
+        ca_key_password_file=single.ca_key_password_file,
+        ca_chain=single.ca_chain,
+        revocations=single.revocations,
+        safety_window_hours=1,
+        overlap_seconds=120,
+        leaf_valid_seconds=240,
+    )
+    return fixture, second_key, second_node, rows, batch
+
+
+def _batch_worker(tmp_path, name, *, chain, key, certificate, policy, node_id):
+    worker = tmp_path / name
+    worker.mkdir()
+    (worker / "ca.pem").write_bytes(chain)
+    (worker / "node-key.pem").write_bytes(private_pem(key))
+    (worker / "node-cert.pem").write_bytes(pem(certificate))
+    (worker / "peer-policy.json").write_text(json.dumps(policy), encoding="utf-8")
+    (worker / "manifest.json").write_text(json.dumps({"nodeId": node_id}), encoding="utf-8")
+    return worker
+
+
+def test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes(
+    tmp_path, monkeypatch
+):
+    fixture, second_key, second_node, _rows, args = _batch_inputs(tmp_path, monkeypatch)
+    old_control_raw = (args.state / "control-cert.pem").read_bytes()
+    old_control_fingerprint = fingerprint(fixture.current_control)
+
+    with pytest.raises(ValueError, match="shared leaf rotation batch"):
+        single = Namespace(
+            **{**vars(args), "csr": args.csr[0], "output": tmp_path / "unsafe-single"}
+        )
+        lan_pilot.prepare_leaf_rotation(single)
+    with pytest.raises(ValueError, match="shared leaf rotation batch"):
+        lan_pilot.commit_leaf_rotation(
+            Namespace(
+                state=args.state,
+                bundle=tmp_path / "unused-bundle",
+                node_receipt=tmp_path / "unused-receipt",
+                output=tmp_path / "unused-output",
+            )
+        )
+
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    batch_raw, batch, bundles = lan_pilot._batch_material(args.output)
+    assert batch["batchId"]
+    assert len(bundles) == 2
+    assert len({files["control-cert.pem"] for _raw, _manifest, files in bundles.values()}) == 1
+    assert not any("key" in item.name for item in args.output.rglob("*"))
+    assert all(
+        manifest["nextControlCertificateSHA256"] == batch["nextControlCertificateSHA256"]
+        for _raw, manifest, _files in bundles.values()
+    )
+
+    first_policy = json.loads((args.state / "peer-policy.json").read_text("utf-8"))
+    second_policy = json.loads(
+        (args.state / "nodes" / NODE_ID_2 / "peer-policy.json").read_text("utf-8")
+    )
+    worker1 = _batch_worker(
+        tmp_path,
+        "batch-worker-1",
+        chain=fixture.chain,
+        key=fixture.node_key,
+        certificate=fixture.current_node,
+        policy=first_policy,
+        node_id=NODE_ID,
+    )
+    worker2 = _batch_worker(
+        tmp_path,
+        "batch-worker-2",
+        chain=fixture.chain,
+        key=second_key,
+        certificate=second_node,
+        policy=second_policy,
+        node_id=NODE_ID_2,
+    )
+    receipt1 = rotation.install(
+        args.output / f"nodes/{NODE_ID}", worker1, restart=lambda _root: None
+    )
+    receipt2 = rotation.install(
+        args.output / f"nodes/{NODE_ID_2}", worker2, restart=lambda _root: None
+    )
+    receipt1_path = tmp_path / "receipt-1.json"
+    receipt2_path = tmp_path / "receipt-2.json"
+    receipt1_path.write_text(json.dumps(receipt1), encoding="utf-8")
+    receipt2_path.write_text(json.dumps(receipt2), encoding="utf-8")
+
+    lan_pilot.stage_leaf_rotation_batch(
+        Namespace(state=args.state, bundle=args.output, node_receipt=receipt1_path)
+    )
+    assert (args.state / "control-cert.pem").read_bytes() == old_control_raw
+    assert (
+        old_control_fingerprint
+        in json.loads((worker1 / "peer-policy.json").read_text("utf-8"))["clientFingerprints"]
+    )
+    with pytest.raises(ValueError, match="Every Node"):
+        lan_pilot.commit_leaf_rotation_batch(
+            Namespace(state=args.state, bundle=args.output, output=tmp_path / "commits-early")
+        )
+    assert (args.state / "control-cert.pem").read_bytes() == old_control_raw
+
+    lan_pilot.stage_leaf_rotation_batch(
+        Namespace(state=args.state, bundle=args.output, node_receipt=receipt2_path)
+    )
+
+    def stop_before_switch(point):
+        if point == "before-control-switch":
+            raise RuntimeError("simulated batch crash")
+
+    with pytest.raises(RuntimeError, match="simulated batch crash"):
+        lan_pilot.commit_leaf_rotation_batch(
+            Namespace(
+                state=args.state,
+                bundle=args.output,
+                output=tmp_path / "commits",
+                _kill=stop_before_switch,
+            )
+        )
+    assert (args.state / "control-cert.pem").read_bytes() == old_control_raw
+    for worker in (worker1, worker2):
+        assert (
+            old_control_fingerprint
+            in json.loads((worker / "peer-policy.json").read_text("utf-8"))["clientFingerprints"]
+        )
+
+    def stop_after_switch(point):
+        if point == "after-control-switch":
+            raise RuntimeError("simulated post-switch crash")
+
+    with pytest.raises(RuntimeError, match="simulated post-switch crash"):
+        lan_pilot.commit_leaf_rotation_batch(
+            Namespace(
+                state=args.state,
+                bundle=args.output,
+                output=tmp_path / "commits",
+                _kill=stop_after_switch,
+            )
+        )
+    assert (
+        fingerprint(x509.load_pem_x509_certificate((args.state / "control-cert.pem").read_bytes()))
+        == batch["nextControlCertificateSHA256"]
+    )
+    for worker in (worker1, worker2):
+        assert (
+            batch["nextControlCertificateSHA256"]
+            in json.loads((worker / "peer-policy.json").read_text("utf-8"))["clientFingerprints"]
+        )
+
+    commit_args = Namespace(state=args.state, bundle=args.output, output=tmp_path / "commits")
+    lan_pilot.commit_leaf_rotation_batch(commit_args)
+    assert (
+        fingerprint(x509.load_pem_x509_certificate((args.state / "control-cert.pem").read_bytes()))
+        == batch["nextControlCertificateSHA256"]
+    )
+    for node_id, worker in ((NODE_ID, worker1), (NODE_ID_2, worker2)):
+        rotation.finalize(
+            args.output / f"nodes/{node_id}",
+            worker,
+            commit_args.output / f"{node_id}.json",
+            restart=lambda _root: None,
+        )
+        assert json.loads((worker / "peer-policy.json").read_text("utf-8"))[
+            "clientFingerprints"
+        ] == [batch["nextControlCertificateSHA256"]]
+
+    before = (args.output / f"nodes/{NODE_ID}/control-cert.pem").read_bytes()
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    assert (args.output / f"nodes/{NODE_ID}/control-cert.pem").read_bytes() == before
+    other = Namespace(**{**vars(args), "output": tmp_path / "different-batch"})
+    with pytest.raises(ValueError, match="Another leaf rotation batch"):
+        lan_pilot.prepare_leaf_rotation_batch(other)
+
+
+def test_batch_manifest_rejects_per_node_cp_leaf_mutation(tmp_path, monkeypatch):
+    _fixture_value, _key, _node, _rows, args = _batch_inputs(tmp_path, monkeypatch)
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    second_control = args.output / f"nodes/{NODE_ID_2}/control-cert.pem"
+    second_control.write_bytes((args.state / "control-cert.pem").read_bytes())
+    with pytest.raises(ValueError, match="digest differs"):
+        lan_pilot._batch_material(args.output)

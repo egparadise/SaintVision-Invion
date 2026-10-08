@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.324"
+version: "1.0.325"
 status: "review"
 author: "Codex"
-updated: "2026-10-07T12:57:36+09:00"
+updated: "2026-10-08T15:54:21+09:00"
 source_of_truth: "Git"
-active_card: "CARD-288 Node and Control Plane leaf rotation"
-active_card_status: "PR #385 is approved by Claude r2 at 8091b1c9 with exact-head Backend 3.12/3.14, Core and Docs green and is in merge train 66; the live leaf rotation of the r2 pilot state has not been run and waits for the operator decision"
-active_card_next: "After train 66 lands and the operator approves, run the reviewed rotation commands from the Card 288 History on the r2 pilot state before the 2026-10-13 02:04Z leaf expiry"
+active_card: "CARD-291 multi-Node leaf rotation batch"
+active_card_status: "Implementation and synthetic two-Node crash regressions complete on train 68; live r2 state remains unchanged pending Claude review and landing"
+active_card_next: "After independent approval and landing, run the shared batch procedure on the already authorized r2 pilot before the 2026-10-13 02:04Z leaf expiry"
 ---
+
+## 2026-10-08 Card 291 — multi-Node leaf rotation batch
+
+- The Card 288 live preflight stopped before mutation after proving that separate per-Node
+  proposals would overwrite the one global Control Plane leaf with different fingerprints. No
+  live CSR, certificate, channel CAS, restart, or rollback occurred.
+- One batch now binds the complete active Node set to one next Control Plane leaf. Nodes install
+  old+next overlap and stage restart receipts/channel CAS independently; only the complete staged
+  set can atomically switch the global leaf, after which per-Node signed receipts permit next-only
+  finalization.
+- Two-Node regressions cover first-stage interruption, incomplete second Node, the immediate
+  pre-switch kill point, exact retry, concurrent batch refusal, and one shared fingerprint. Local
+  focused result: 54 passed and one declared POSIX-only skip; no local Docker use.
+- History: [[2026-10-08_15-54-21_KST_Card291_batch_leaf_rotation_Codex]].
 
 ## 2026-10-07 Card 286 — cancel bridge real-PG flake determinization
 
