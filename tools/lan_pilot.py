@@ -44,6 +44,7 @@ from inv.tooling import NodePrincipal
 from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pem
 from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
 from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
+from worker_leaf_rotation import MAXIMUM_OVERLAP_SECONDS
 from worker_leaf_rotation import SCHEMA as ROTATION_SCHEMA
 from psycopg import sql
 from psycopg.conninfo import make_conninfo
@@ -80,6 +81,8 @@ BATCH_JOURNAL_KEYS = {
     "phase",
     "stagedNodeIds",
 }
+DEFAULT_ROTATION_OVERLAP_SECONDS = 14400
+RECOVERY_RECORD_SCHEMA = "saintvision-lan-leaf-rotation-recovery:1"
 
 
 def run(args, **kwargs):
@@ -1478,6 +1481,406 @@ def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):
         raise ValueError("Another leaf rotation batch owns the pilot state")
 
 
+def _write_rotation_public_material(
+    output,
+    *,
+    state,
+    node,
+    current_node,
+    current_control,
+    control_key,
+    public_key,
+    ca_key,
+    intermediate,
+    chain_raw,
+    revocations,
+    now,
+    current_version,
+    overlap_seconds,
+    leaf_valid_seconds,
+    rotation_id,
+    shared_control_raw=None,
+):
+    principal = NodePrincipal(state["tenantId"], node["nodeId"])
+    if current_node.public_key().public_bytes_raw() != public_key.public_bytes_raw():
+        raise ValueError("Recovery CSR does not preserve the pinned Node key")
+    current_identity = certificate_identity(
+        current_node.public_bytes(serialization.Encoding.DER), principal, state["epoch"], now=now
+    )
+    current_names = current_node.extensions.get_extension_for_class(
+        x509.SubjectAlternativeName
+    ).value
+    if (
+        current_identity != (fingerprint(current_node), current_node.not_valid_after_utc)
+        or current_names.get_values_for_type(x509.IPAddress)
+        != [ipaddress.ip_address(node["nodeIP"])]
+        or current_node.issuer != intermediate.subject
+        or fingerprint(current_node) in revocations
+        or fingerprint(current_control) in revocations
+    ):
+        raise ValueError("Recovery Node or Control Plane identity is invalid or revoked")
+    intermediate.public_key().verify(current_node.signature, current_node.tbs_certificate_bytes)
+    lifetime = timedelta(seconds=leaf_valid_seconds)
+    next_node = issue(
+        ca_key,
+        intermediate,
+        public_key,
+        node_uri(principal, state["epoch"]),
+        address=node["nodeIP"],
+        now=now,
+        valid_for=lifetime,
+    )
+    if shared_control_raw is None:
+        next_control = issue(
+            ca_key,
+            intermediate,
+            control_key.public_key(),
+            f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
+            now=now,
+            valid_for=lifetime,
+        )
+    else:
+        next_control = x509.load_pem_x509_certificate(shared_control_raw)
+        _validate_current_control_leaf(next_control, intermediate, state=state, now=now)
+    not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
+    overlap_expires = min(now + timedelta(seconds=overlap_seconds), not_after)
+    if overlap_expires <= now + timedelta(minutes=10):
+        raise ValueError("Recovery overlap is too short to complete safely")
+    target_version = current_version + 1
+    overlap_policy = {
+        "version": target_version,
+        "tenantId": state["tenantId"],
+        "nodeId": node["nodeId"],
+        "recoveryEpoch": state["epoch"],
+        "expiresAt": _utc_z(overlap_expires),
+        "clientFingerprints": [fingerprint(current_control), fingerprint(next_control)],
+    }
+    final_policy = {
+        **overlap_policy,
+        "expiresAt": _utc_z(not_after),
+        "clientFingerprints": [fingerprint(next_control)],
+    }
+    material = {
+        "ca.pem": chain_raw,
+        "node-cert.pem": pem(next_node),
+        "control-cert.pem": pem(next_control),
+        "peer-policy-overlap.json": json.dumps(overlap_policy, indent=2).encode(),
+        "peer-policy-final.json": json.dumps(final_policy, indent=2).encode(),
+    }
+    manifest = {
+        "schemaVersion": ROTATION_SCHEMA,
+        "rotationId": rotation_id,
+        "tenantId": state["tenantId"],
+        "nodeId": node["nodeId"],
+        "recoveryEpoch": state["epoch"],
+        "nodeIP": node["nodeIP"],
+        "currentChannelVersion": current_version,
+        "targetChannelVersion": target_version,
+        "currentNodeCertificateSHA256": fingerprint(current_node),
+        "nextNodeCertificateSHA256": fingerprint(next_node),
+        "currentControlCertificateSHA256": fingerprint(current_control),
+        "nextControlCertificateSHA256": fingerprint(next_control),
+        "caBundleSHA256": _rotation_digest(chain_raw),
+        "createdAt": _utc_z(now),
+        "overlapExpiresAt": _utc_z(overlap_expires),
+        "certificateNotAfter": _utc_z(not_after),
+        "files": {name: _rotation_digest(raw) for name, raw in material.items()},
+    }
+    output.mkdir(parents=True, exist_ok=False)
+    for name, raw in material.items():
+        atomic_write(output / name, raw)
+    raw = _canonical_json(manifest)
+    atomic_write(output / "rotation.json", raw)
+    return raw, manifest, material
+
+
+def prepare_leaf_rotation_recovery_batch(args):
+    """Supersede one expired, partially staged batch with a fresh all-Node batch."""
+    path, state = args.state, load(args.state)
+    output = args.output.resolve()
+    active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+    csrs = {}
+    for csr_path in args.csr:
+        node = node_from_csr(state, csr_path.read_bytes())
+        if node["nodeId"] in csrs:
+            raise ValueError("Each active Node CSR must be supplied exactly once")
+        csrs[node["nodeId"]] = csr_path
+    if set(csrs) != {node["nodeId"] for node in active}:
+        raise ValueError("Recovery must include every active Node")
+    expired_path = args.expired_batch.resolve()
+    expired_raw, expired, expired_bundles = _batch_material(expired_path)
+    now = getattr(args, "_now", None) or datetime.now(timezone.utc)
+    overlap_expires = datetime.fromisoformat(expired["overlapExpiresAt"].replace("Z", "+00:00"))
+    certificate_not_after = datetime.fromisoformat(
+        expired["certificateNotAfter"].replace("Z", "+00:00")
+    )
+    if not overlap_expires <= now < certificate_not_after:
+        raise ValueError("Recovery requires an expired overlap and still-valid batch leaves")
+    if set(expired_bundles) != set(csrs):
+        raise ValueError("Expired batch no longer matches the active Node set")
+    current_control_raw = (path / "control-cert.pem").read_bytes()
+    current_control = x509.load_pem_x509_certificate(current_control_raw)
+    if fingerprint(current_control) != expired["currentControlCertificateSHA256"]:
+        raise ValueError("Expired partial batch is no longer on the old global Control Plane leaf")
+    control_key = serialization.load_pem_private_key(
+        (path / "control-key.pem").read_bytes(), password=None
+    )
+    if (
+        not isinstance(control_key, Ed25519PrivateKey)
+        or control_key.public_key().public_bytes_raw()
+        != current_control.public_key().public_bytes_raw()
+    ):
+        raise ValueError("Pinned Control Plane key and recovery leaf differ")
+    _root, _root_key, chain_raw, ca_key, intermediate = _load_external_ca(
+        args.ca_key, args.ca_key_password_file, args.ca_chain
+    )
+    if _rotation_digest(chain_raw) != state.get("caBundleSHA256"):
+        raise ValueError("Recovery issuing chain differs from the pilot pin")
+    _validate_current_control_leaf(current_control, intermediate, state=state, now=now)
+    revocations = _load_revocations(args.revocations)
+    if output.exists():
+        replacement_raw, replacement, replacement_bundles = _batch_material(output)
+        if (
+            replacement["tenantId"] != expired["tenantId"]
+            or replacement["recoveryEpoch"] != expired["recoveryEpoch"]
+            or replacement["currentControlCertificateSHA256"]
+            != expired["currentControlCertificateSHA256"]
+            or replacement["caBundleSHA256"] != expired["caBundleSHA256"]
+            or set(replacement_bundles) != set(expired_bundles)
+        ):
+            raise ValueError("Existing recovery batch differs from the expired batch authority")
+        with exclusive_file(path / "leaf-rotation.lock"):
+            journal = _load_batch_journal(path)
+            try:
+                _assert_batch_journal(
+                    journal,
+                    manifest_raw=replacement_raw,
+                    manifest=replacement,
+                    bundle=output,
+                )
+            except ValueError:
+                _assert_batch_journal(
+                    journal,
+                    manifest_raw=expired_raw,
+                    manifest=expired,
+                    bundle=expired_path,
+                )
+                staged = set(journal["stagedNodeIds"])
+                if (
+                    journal["phase"] not in {"staging", "staged"}
+                    or not staged
+                    or staged == set(csrs)
+                ):
+                    raise ValueError("Recovery requires a non-empty, incomplete staged batch")
+                with psycopg.connect(state["adminDSN"]) as conn:
+                    conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+                    for node in active:
+                        node_id = node["nodeId"]
+                        old_manifest = expired_bundles[node_id][1]
+                        new_manifest = replacement_bundles[node_id][1]
+                        row = _channel_row(conn, state, node, lock=True)
+                        expected_version = (
+                            old_manifest["targetChannelVersion"]
+                            if node_id in staged
+                            else old_manifest["currentChannelVersion"]
+                        )
+                        expected_certificate = (
+                            old_manifest["nextNodeCertificateSHA256"]
+                            if node_id in staged
+                            else old_manifest["currentNodeCertificateSHA256"]
+                        )
+                        next_node = x509.load_pem_x509_certificate(
+                            replacement_bundles[node_id][2]["node-cert.pem"]
+                        )
+                        public = csr_public_key(csrs[node_id].read_bytes(), node_id)
+                        if (
+                            (row[0], row[1], row[3])
+                            != (expected_version, expected_certificate, True)
+                            or new_manifest["currentChannelVersion"] != expected_version
+                            or new_manifest["currentNodeCertificateSHA256"] != expected_certificate
+                            or next_node.public_key().public_bytes_raw()
+                            != public.public_bytes_raw()
+                        ):
+                            raise ValueError("Existing recovery batch or channel baseline differs")
+                recovery_record = {
+                    "schemaVersion": RECOVERY_RECORD_SCHEMA,
+                    "expiredBatchId": expired["batchId"],
+                    "expiredBatchDigest": _rotation_digest(expired_raw),
+                    "replacementBatchId": replacement["batchId"],
+                    "replacementBatchDigest": _rotation_digest(replacement_raw),
+                    "supersededAt": replacement["createdAt"],
+                    "stagedNodeIds": sorted(staged),
+                }
+                recovery_path = path / f'leaf-rotation-recovery-{expired["batchId"]}.json'
+                if recovery_path.exists() and recovery_path.read_bytes() != _canonical_json(
+                    recovery_record
+                ):
+                    raise ValueError("Expired batch recovery record differs")
+                if not recovery_path.exists():
+                    atomic_write(recovery_path, _canonical_json(recovery_record))
+                _write_batch_journal(
+                    path,
+                    manifest_raw=replacement_raw,
+                    manifest=replacement,
+                    bundle=output,
+                    phase="prepared",
+                    staged=[],
+                )
+        print(
+            json.dumps(
+                {
+                    "prepared": True,
+                    "recovery": True,
+                    "idempotentReplay": True,
+                    "expiredBatchSuperseded": True,
+                    "batchId": replacement["batchId"],
+                    "nodeCount": len(replacement_bundles),
+                    "batchDigest": _rotation_digest(replacement_raw),
+                    "privateKeyTransferred": False,
+                }
+            )
+        )
+        return
+    batch_id = uuid4().hex
+    temporary = output.with_name(output.name + ".next")
+    rows = []
+    shared_control_raw = None
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        _assert_batch_journal(
+            journal, manifest_raw=expired_raw, manifest=expired, bundle=expired_path
+        )
+        staged = set(journal["stagedNodeIds"])
+        if journal["phase"] not in {"staging", "staged"} or not staged or staged == set(csrs):
+            raise ValueError("Recovery requires a non-empty, incomplete staged batch")
+        temporary.mkdir(parents=True, exist_ok=False)
+        try:
+            with psycopg.connect(state["adminDSN"]) as conn:
+                conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+                for node in active:
+                    node_id = node["nodeId"]
+                    old_manifest = expired_bundles[node_id][1]
+                    row = _channel_row(conn, state, node, lock=True)
+                    if node_id in staged:
+                        expected = (
+                            old_manifest["targetChannelVersion"],
+                            old_manifest["nextNodeCertificateSHA256"],
+                            True,
+                        )
+                        current_node_raw = expired_bundles[node_id][2]["node-cert.pem"]
+                    else:
+                        expected = (
+                            old_manifest["currentChannelVersion"],
+                            old_manifest["currentNodeCertificateSHA256"],
+                            True,
+                        )
+                        current_node_raw = node_certificate_path(path, state, node).read_bytes()
+                    if (row[0], row[1], row[3]) != expected:
+                        raise ValueError(
+                            "Expired batch channel state differs from its durable journal"
+                        )
+                    current_node = x509.load_pem_x509_certificate(current_node_raw)
+                    public_key = csr_public_key(csrs[node_id].read_bytes(), node_id)
+                    node_output = temporary / "nodes" / node_id
+                    proposal_raw, proposal, files = _write_rotation_public_material(
+                        node_output,
+                        state=state,
+                        node=node,
+                        current_node=current_node,
+                        current_control=current_control,
+                        control_key=control_key,
+                        public_key=public_key,
+                        ca_key=ca_key,
+                        intermediate=intermediate,
+                        chain_raw=chain_raw,
+                        revocations=revocations,
+                        now=now,
+                        current_version=row[0],
+                        overlap_seconds=args.overlap_seconds,
+                        leaf_valid_seconds=args.leaf_valid_seconds,
+                        rotation_id=batch_id,
+                        shared_control_raw=shared_control_raw,
+                    )
+                    if shared_control_raw is None:
+                        shared_control_raw = files["control-cert.pem"]
+                    rows.append(
+                        {
+                            "nodeId": node_id,
+                            "bundlePath": f"nodes/{node_id}",
+                            "proposalDigest": _rotation_digest(proposal_raw),
+                            "currentChannelVersion": proposal["currentChannelVersion"],
+                            "targetChannelVersion": proposal["targetChannelVersion"],
+                            "nextNodeCertificateSHA256": proposal["nextNodeCertificateSHA256"],
+                        }
+                    )
+            proposals = [_rotation_material(temporary / row["bundlePath"])[1] for row in rows]
+            common = {
+                key: {proposal[key] for proposal in proposals}
+                for key in (
+                    "overlapExpiresAt",
+                    "certificateNotAfter",
+                    "currentControlCertificateSHA256",
+                    "nextControlCertificateSHA256",
+                    "caBundleSHA256",
+                )
+            }
+            if any(len(values) != 1 for values in common.values()):
+                raise ValueError("Recovery batch shared authority differs across Nodes")
+            manifest = {
+                "schemaVersion": BATCH_ROTATION_SCHEMA,
+                "batchId": batch_id,
+                "tenantId": state["tenantId"],
+                "recoveryEpoch": state["epoch"],
+                "createdAt": min(item["createdAt"] for item in proposals),
+                **{key: next(iter(values)) for key, values in common.items()},
+                "nodes": rows,
+            }
+            manifest_raw = _canonical_json(manifest)
+            atomic_write(temporary / "batch.json", manifest_raw)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(temporary, output)
+            recovery_record = {
+                "schemaVersion": RECOVERY_RECORD_SCHEMA,
+                "expiredBatchId": expired["batchId"],
+                "expiredBatchDigest": _rotation_digest(expired_raw),
+                "replacementBatchId": batch_id,
+                "replacementBatchDigest": _rotation_digest(manifest_raw),
+                "supersededAt": _utc_z(now),
+                "stagedNodeIds": sorted(staged),
+            }
+            recovery_path = path / f'leaf-rotation-recovery-{expired["batchId"]}.json'
+            if recovery_path.exists() and recovery_path.read_bytes() != _canonical_json(
+                recovery_record
+            ):
+                raise ValueError("Expired batch recovery record differs")
+            if not recovery_path.exists():
+                atomic_write(recovery_path, _canonical_json(recovery_record))
+            replacement = _write_batch_journal(
+                path,
+                manifest_raw=manifest_raw,
+                manifest=manifest,
+                bundle=output,
+                phase="prepared",
+                staged=[],
+            )
+        finally:
+            if temporary.exists():
+                shutil.rmtree(temporary)
+    print(
+        json.dumps(
+            {
+                "prepared": True,
+                "recovery": True,
+                "expiredBatchSuperseded": True,
+                "batchId": batch_id,
+                "nodeCount": len(rows),
+                "batchDigest": replacement["batchDigest"],
+                "privateKeyTransferred": False,
+            }
+        )
+    )
+
+
 def prepare_leaf_rotation_batch(args):
     """Issue one shared next CP leaf and exact per-Node public bundles."""
     path, state = args.state, load(args.state)
@@ -2537,7 +2940,12 @@ def main():
     p.add_argument("--ca-chain", type=Path, required=True)
     p.add_argument("--revocations", type=Path, required=True)
     p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
-    p.add_argument("--overlap-seconds", type=int, choices=range(60, 3601), default=900)
+    p.add_argument(
+        "--overlap-seconds",
+        type=int,
+        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),
+        default=DEFAULT_ROTATION_OVERLAP_SECONDS,
+    )
     p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
     p = commands.add_parser(
         "prepare-leaf-rotation-batch",
@@ -2550,7 +2958,31 @@ def main():
     p.add_argument("--ca-chain", type=Path, required=True)
     p.add_argument("--revocations", type=Path, required=True)
     p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
-    p.add_argument("--overlap-seconds", type=int, choices=range(60, 3601), default=900)
+    p.add_argument(
+        "--overlap-seconds",
+        type=int,
+        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),
+        default=DEFAULT_ROTATION_OVERLAP_SECONDS,
+    )
+    p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "prepare-leaf-rotation-recovery-batch",
+        help="Supersede one expired partial batch with a fresh exact all-Node batch",
+    )
+    p.add_argument("--expired-batch", type=Path, required=True)
+    p.add_argument("--csr", type=Path, action="append", required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--ca-key", type=Path, required=True)
+    p.add_argument("--ca-key-password-file", type=Path, required=True)
+    p.add_argument("--ca-chain", type=Path, required=True)
+    p.add_argument("--revocations", type=Path, required=True)
+    p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
+    p.add_argument(
+        "--overlap-seconds",
+        type=int,
+        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),
+        default=DEFAULT_ROTATION_OVERLAP_SECONDS,
+    )
     p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
     p = commands.add_parser(
         "stage-leaf-rotation-batch",

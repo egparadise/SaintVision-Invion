@@ -18,8 +18,10 @@ from pathlib import Path
 import re
 import stat
 import subprocess
+import sys
 from typing import Callable
 
+import cryptography
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
@@ -54,6 +56,37 @@ FILE_NAMES = (
 )
 HEX = re.compile(r"[a-f0-9]{64}\Z")
 NODE_ID = re.compile(r"nod_[0-9A-HJKMNP-TV-Z]{26}\Z")
+MINIMUM_PYTHON = (3, 11)
+REQUIRED_CRYPTOGRAPHY = (50, 0, 1)
+MAXIMUM_OVERLAP_SECONDS = 21600
+
+
+def _version_tuple(value: str) -> tuple[int, int, int]:
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:[.+-].*)?", value)
+    if not match:
+        raise RuntimeError("cryptography version is not a supported semantic version")
+    return tuple(int(part) for part in match.groups())
+
+
+def runtime_preflight() -> dict:
+    """Fail before any state write when the isolated worker runtime is incompatible."""
+    crypto_version = _version_tuple(cryptography.__version__)
+    api_available = all(
+        hasattr(x509.Certificate, attribute)
+        for attribute in ("not_valid_before_utc", "not_valid_after_utc")
+    )
+    if sys.version_info[:2] < MINIMUM_PYTHON:
+        raise RuntimeError("Node leaf rotation requires Python 3.11 or newer")
+    if crypto_version < REQUIRED_CRYPTOGRAPHY or not api_available:
+        raise RuntimeError("Node leaf rotation requires cryptography 50.0.1 or newer with UTC APIs")
+    return {
+        "compatible": True,
+        "pythonVersion": ".".join(str(value) for value in sys.version_info[:3]),
+        "cryptographyVersion": cryptography.__version__,
+        "minimumPython": ".".join(str(value) for value in MINIMUM_PYTHON),
+        "minimumCryptography": ".".join(str(value) for value in REQUIRED_CRYPTOGRAPHY),
+        "utcCertificateAPI": True,
+    }
 
 
 def _utc(value: object) -> datetime:
@@ -184,7 +217,10 @@ def validate_bundle(
     created = _utc(manifest["createdAt"])
     overlap = _utc(manifest["overlapExpiresAt"])
     not_after = _utc(manifest["certificateNotAfter"])
-    if not created <= now < overlap < not_after or (overlap - now).total_seconds() > 3600:
+    if (
+        not created <= now < overlap < not_after
+        or (overlap - now).total_seconds() > MAXIMUM_OVERLAP_SECONDS
+    ):
         raise ValueError("Rotation overlap or certificate validity window is invalid")
 
     files = {name: _regular(bundle / name) for name in FILE_NAMES}
@@ -311,6 +347,62 @@ def _exclusive(path: Path):
         path.unlink(missing_ok=True)
 
 
+def _supersede_expired_journal(
+    old_bundle: Path,
+    new_bundle: Path,
+    worker_root: Path,
+    journal: dict,
+    *,
+    now: datetime,
+) -> None:
+    """Archive exactly one expired partial-batch journal before a fresh recovery install."""
+    old_raw = _regular(old_bundle / "rotation.json")
+    old_manifest = json.loads(old_raw)
+    if not isinstance(old_manifest, dict) or set(old_manifest) != MANIFEST_KEYS:
+        raise ValueError("Superseded rotation manifest shape differs")
+    old_files = {name: _regular(old_bundle / name) for name in FILE_NAMES}
+    if any(_digest(old_files[name]) != old_manifest["files"].get(name) for name in FILE_NAMES):
+        raise ValueError("Superseded rotation public material digest differs")
+    new_manifest = json.loads(_regular(new_bundle / "rotation.json"))
+    old_overlap = _utc(old_manifest["overlapExpiresAt"])
+    old_not_after = _utc(old_manifest["certificateNotAfter"])
+    current_leaf = x509.load_pem_x509_certificate(_regular(worker_root / "node-cert.pem"))
+    current_policy = _regular(worker_root / "peer-policy.json")
+    expected_journal = {
+        "rotationId": old_manifest["rotationId"],
+        "proposalDigest": _digest(old_raw),
+        "targetChannelVersion": old_manifest["targetChannelVersion"],
+    }
+    if (
+        journal.get("phase") != "restarted"
+        or any(journal.get(key) != value for key, value in expected_journal.items())
+        or not old_overlap <= now < old_not_after
+        or current_leaf.fingerprint(hashes.SHA256()).hex()
+        != old_manifest["nextNodeCertificateSHA256"]
+        or current_policy != old_files["peer-policy-overlap.json"]
+        or new_manifest.get("tenantId") != old_manifest["tenantId"]
+        or new_manifest.get("nodeId") != old_manifest["nodeId"]
+        or new_manifest.get("recoveryEpoch") != old_manifest["recoveryEpoch"]
+        or new_manifest.get("currentChannelVersion") != old_manifest["targetChannelVersion"]
+        or new_manifest.get("currentNodeCertificateSHA256")
+        != old_manifest["nextNodeCertificateSHA256"]
+        or new_manifest.get("currentControlCertificateSHA256")
+        != old_manifest["currentControlCertificateSHA256"]
+        or new_manifest.get("caBundleSHA256") != old_manifest["caBundleSHA256"]
+    ):
+        raise ValueError("Expired rotation is not an exact safe supersession base")
+    archive_dir = worker_root / "leaf-rotation-superseded"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    archive = archive_dir / f'{old_manifest["rotationId"]}.json'
+    journal_raw = _canonical(journal)
+    if archive.exists():
+        if _regular(archive) != journal_raw:
+            raise ValueError("Superseded rotation journal archive differs")
+    else:
+        _atomic(archive, journal_raw)
+    (worker_root / "leaf-rotation.json").unlink()
+
+
 def install(
     bundle: Path,
     worker_root: Path,
@@ -318,6 +410,7 @@ def install(
     restart: Callable[[Path], None],
     now: datetime | None = None,
     kill: Callable[[str], None] = lambda _point: None,
+    superseded_bundle: Path | None = None,
 ) -> dict:
     """Install public material atomically, then restart; exact retries are idempotent."""
     worker_root = worker_root.resolve()
@@ -325,10 +418,22 @@ def install(
     with _exclusive(worker_root / "leaf-rotation.lock"):
         journal_path = worker_root / "leaf-rotation.json"
         journal = json.loads(journal_path.read_text("utf-8")) if journal_path.exists() else None
+        current_time = now or datetime.now(timezone.utc)
+        if journal and superseded_bundle is not None:
+            # Validate the fresh bundle before archiving the exact expired journal.
+            validate_bundle(bundle, worker_root, now=current_time, installed=False)
+            _supersede_expired_journal(
+                superseded_bundle,
+                bundle,
+                worker_root,
+                journal,
+                now=current_time,
+            )
+            journal = None
         validated = validate_bundle(
             bundle,
             worker_root,
-            now=now,
+            now=current_time,
             installed=(
                 None
                 if journal and journal.get("phase") == "installing"
@@ -534,9 +639,15 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("runtime-preflight")
     install_parser = commands.add_parser("install")
     install_parser.add_argument("--bundle", type=Path, required=True)
     install_parser.add_argument("--worker-root", type=Path, required=True)
+    install_parser.add_argument(
+        "--supersede-expired-bundle",
+        type=Path,
+        help="Exact expired partial-batch bundle whose restarted journal may be superseded",
+    )
     finalize_parser = commands.add_parser("finalize")
     finalize_parser.add_argument("--bundle", type=Path, required=True)
     finalize_parser.add_argument("--worker-root", type=Path, required=True)
@@ -546,8 +657,16 @@ def main() -> None:
     rollback_parser.add_argument("--worker-root", type=Path, required=True)
     args = parser.parse_args()
     try:
-        if args.command == "install":
-            result = install(args.bundle, args.worker_root, restart=docker_restart)
+        runtime = runtime_preflight()
+        if args.command == "runtime-preflight":
+            result = runtime
+        elif args.command == "install":
+            result = install(
+                args.bundle,
+                args.worker_root,
+                restart=docker_restart,
+                superseded_bundle=args.supersede_expired_bundle,
+            )
         elif args.command == "finalize":
             result = finalize(
                 args.bundle, args.worker_root, args.commit_receipt, restart=docker_restart
