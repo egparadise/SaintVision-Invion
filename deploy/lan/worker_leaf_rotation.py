@@ -413,6 +413,7 @@ def install(
     superseded_bundle: Path | None = None,
 ) -> dict:
     """Install public material atomically, then restart; exact retries are idempotent."""
+    runtime_preflight()
     worker_root = worker_root.resolve()
     worker_root.mkdir(parents=True, exist_ok=True)
     with _exclusive(worker_root / "leaf-rotation.lock"):
@@ -510,6 +511,7 @@ def finalize(
     now: datetime | None = None,
 ) -> dict:
     """End bounded overlap only after the CP proves the same channel CAS committed."""
+    runtime_preflight()
     with _exclusive(worker_root / "leaf-rotation.lock"):
         validated = validate_bundle(bundle, worker_root, now=now, installed=True)
         manifest = validated["manifest"]
@@ -565,6 +567,7 @@ def rollback(
     now: datetime | None = None,
 ) -> dict:
     """Restore the prior public material only while both prior authorities are fresh."""
+    runtime_preflight()
     now = now or datetime.now(timezone.utc)
     with _exclusive(worker_root / "leaf-rotation.lock"):
         manifest_raw = _regular(bundle / "rotation.json")
@@ -657,9 +660,8 @@ def main() -> None:
     rollback_parser.add_argument("--worker-root", type=Path, required=True)
     args = parser.parse_args()
     try:
-        runtime = runtime_preflight()
         if args.command == "runtime-preflight":
-            result = runtime
+            result = runtime_preflight()
         elif args.command == "install":
             result = install(
                 args.bundle,

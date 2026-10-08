@@ -984,7 +984,7 @@ def test_batch_manifest_rejects_per_node_cp_leaf_mutation(tmp_path, monkeypatch)
 
 
 def test_runtime_preflight_rejects_the_observed_old_cryptography_before_state_write(
-    monkeypatch,
+    tmp_path, monkeypatch
 ):
     result = rotation.runtime_preflight()
     assert result["compatible"] is True
@@ -992,6 +992,14 @@ def test_runtime_preflight_rejects_the_observed_old_cryptography_before_state_wr
     monkeypatch.setattr(rotation.cryptography, "__version__", "41.0.7")
     with pytest.raises(RuntimeError, match="cryptography 50.0.1"):
         rotation.runtime_preflight()
+    worker = tmp_path / "must-not-be-created"
+    with pytest.raises(RuntimeError, match="cryptography 50.0.1"):
+        rotation.install(
+            tmp_path / "missing-bundle",
+            worker,
+            restart=lambda _root: pytest.fail("restart must not run"),
+        )
+    assert not worker.exists()
 
 
 def test_isolated_rotation_runtime_is_exactly_pinned_and_preflighted():
