@@ -20,7 +20,7 @@ import sys
 import tarfile
 import time
 import zipfile
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -58,6 +58,28 @@ CERTIFICATE_REVOCATION_REASONS = {
 }
 EXTERNAL_DATABASE_MODE = "ssh-tunnel-external"
 LOCAL_DATABASE_MODE = "managed-local-docker"
+BATCH_ROTATION_SCHEMA = "saintvision-lan-leaf-rotation-batch:1"
+BATCH_MANIFEST_KEYS = {
+    "schemaVersion",
+    "batchId",
+    "tenantId",
+    "recoveryEpoch",
+    "createdAt",
+    "overlapExpiresAt",
+    "certificateNotAfter",
+    "currentControlCertificateSHA256",
+    "nextControlCertificateSHA256",
+    "caBundleSHA256",
+    "nodes",
+}
+BATCH_JOURNAL_KEYS = {
+    "schemaVersion",
+    "batchId",
+    "batchDigest",
+    "bundlePath",
+    "phase",
+    "stagedNodeIds",
+}
 
 
 def run(args, **kwargs):
@@ -1346,14 +1368,277 @@ def _channel_row(conn, state, node, *, lock=False):
     return row
 
 
+def _batch_journal_path(path):
+    return path / "leaf-rotation-batch.json"
+
+
+def _load_batch_journal(path):
+    target = _batch_journal_path(path)
+    if not target.exists():
+        return None
+    value = json.loads(target.read_text("utf-8"))
+    if (
+        not isinstance(value, dict)
+        or set(value) != BATCH_JOURNAL_KEYS
+        or value.get("schemaVersion") != BATCH_ROTATION_SCHEMA
+        or value.get("phase") not in {"prepared", "staging", "staged", "switched"}
+        or not isinstance(value.get("stagedNodeIds"), list)
+        or len(value["stagedNodeIds"]) != len(set(value["stagedNodeIds"]))
+    ):
+        raise ValueError("Leaf rotation batch journal differs")
+    return value
+
+
+def _batch_material(path):
+    manifest_raw = (path / "batch.json").read_bytes()
+    manifest = json.loads(manifest_raw)
+    if (
+        not isinstance(manifest, dict)
+        or set(manifest) != BATCH_MANIFEST_KEYS
+        or manifest.get("schemaVersion") != BATCH_ROTATION_SCHEMA
+        or not re.fullmatch(r"[a-f0-9]{32}", str(manifest.get("batchId", "")))
+        or not isinstance(manifest.get("nodes"), list)
+        or len(manifest["nodes"]) < 2
+    ):
+        raise ValueError("Leaf rotation batch manifest differs")
+    expected_node_keys = {
+        "nodeId",
+        "bundlePath",
+        "proposalDigest",
+        "currentChannelVersion",
+        "targetChannelVersion",
+        "nextNodeCertificateSHA256",
+    }
+    bundles = {}
+    node_ids = []
+    for row in manifest["nodes"]:
+        if not isinstance(row, dict) or set(row) != expected_node_keys:
+            raise ValueError("Leaf rotation batch node entry differs")
+        node_id = row["nodeId"]
+        if (
+            not re.fullmatch(r"nod_[0-9A-HJKMNP-TV-Z]{26}", str(node_id))
+            or row["bundlePath"] != f"nodes/{node_id}"
+            or row["targetChannelVersion"] != row["currentChannelVersion"] + 1
+        ):
+            raise ValueError("Leaf rotation batch Node identity or version differs")
+        node_ids.append(node_id)
+        raw, proposal, files = _rotation_material(path / row["bundlePath"])
+        next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+        next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
+        if (
+            _rotation_digest(raw) != row["proposalDigest"]
+            or proposal["rotationId"] != manifest["batchId"]
+            or proposal["nodeId"] != node_id
+            or proposal["tenantId"] != manifest["tenantId"]
+            or proposal["recoveryEpoch"] != manifest["recoveryEpoch"]
+            or proposal["currentChannelVersion"] != row["currentChannelVersion"]
+            or proposal["targetChannelVersion"] != row["targetChannelVersion"]
+            or proposal["nextNodeCertificateSHA256"] != row["nextNodeCertificateSHA256"]
+            or proposal["currentControlCertificateSHA256"]
+            != manifest["currentControlCertificateSHA256"]
+            or proposal["nextControlCertificateSHA256"] != manifest["nextControlCertificateSHA256"]
+            or proposal["caBundleSHA256"] != manifest["caBundleSHA256"]
+            or proposal["overlapExpiresAt"] != manifest["overlapExpiresAt"]
+            or proposal["certificateNotAfter"] != manifest["certificateNotAfter"]
+            or fingerprint(next_node) != proposal["nextNodeCertificateSHA256"]
+            or fingerprint(next_control) != proposal["nextControlCertificateSHA256"]
+            or _rotation_digest(files["ca.pem"]) != proposal["caBundleSHA256"]
+        ):
+            raise ValueError("Leaf rotation batch and Node proposal differ")
+        bundles[node_id] = (raw, proposal, files)
+    if node_ids != sorted(node_ids) or len(node_ids) != len(set(node_ids)):
+        raise ValueError("Leaf rotation batch Nodes must be unique and sorted")
+    control_values = {files["control-cert.pem"] for _raw, _proposal, files in bundles.values()}
+    if len(control_values) != 1:
+        raise ValueError("Leaf rotation batch must bind one shared Control Plane leaf")
+    return manifest_raw, manifest, bundles
+
+
+def _write_batch_journal(path, *, manifest_raw, manifest, bundle, phase, staged):
+    value = {
+        "schemaVersion": BATCH_ROTATION_SCHEMA,
+        "batchId": manifest["batchId"],
+        "batchDigest": _rotation_digest(manifest_raw),
+        "bundlePath": str(bundle.resolve()),
+        "phase": phase,
+        "stagedNodeIds": sorted(staged),
+    }
+    atomic_write(_batch_journal_path(path), _canonical_json(value))
+    return value
+
+
+def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):
+    if not journal or any(
+        (
+            journal["batchId"] != manifest["batchId"],
+            journal["batchDigest"] != _rotation_digest(manifest_raw),
+            journal["bundlePath"] != str(bundle.resolve()),
+        )
+    ):
+        raise ValueError("Another leaf rotation batch owns the pilot state")
+
+
+def prepare_leaf_rotation_batch(args):
+    """Issue one shared next CP leaf and exact per-Node public bundles."""
+    path, state = args.state, load(args.state)
+    active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+    if len(active) < 2:
+        raise ValueError("A leaf rotation batch requires at least two active Nodes")
+    csrs = {}
+    for csr_path in args.csr:
+        raw = csr_path.read_bytes()
+        node = node_from_csr(state, raw)
+        if node["nodeId"] in csrs:
+            raise ValueError("Each active Node CSR must be supplied exactly once")
+        csrs[node["nodeId"]] = csr_path
+    if set(csrs) != {node["nodeId"] for node in active}:
+        raise ValueError("The rotation batch must include every active Node")
+    output = args.output.resolve()
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        if output.exists():
+            raw, manifest, bundles = _batch_material(output)
+            if set(bundles) != set(csrs):
+                raise ValueError("Existing rotation batch is not an exact active-Node retry")
+            for node_id, csr_path in csrs.items():
+                public = csr_public_key(csr_path.read_bytes(), node_id)
+                next_node = x509.load_pem_x509_certificate(bundles[node_id][2]["node-cert.pem"])
+                if public.public_bytes_raw() != next_node.public_key().public_bytes_raw():
+                    raise ValueError("Existing rotation batch CSR binding differs")
+            if journal:
+                _assert_batch_journal(journal, manifest_raw=raw, manifest=manifest, bundle=output)
+            else:
+                journal = _write_batch_journal(
+                    path,
+                    manifest_raw=raw,
+                    manifest=manifest,
+                    bundle=output,
+                    phase="prepared",
+                    staged=[],
+                )
+            print(
+                json.dumps(
+                    {
+                        "prepared": True,
+                        "idempotentReplay": True,
+                        "batchId": manifest["batchId"],
+                        "nodeCount": len(bundles),
+                        "batchDigest": journal["batchDigest"],
+                        "privateKeyTransferred": False,
+                    }
+                )
+            )
+            return
+        if journal:
+            raise ValueError("Another leaf rotation batch owns the pilot state")
+        batch_id = uuid4().hex
+        batch_now = datetime.now(timezone.utc)
+        temporary = output.with_name(output.name + ".next")
+        temporary.mkdir(parents=True, exist_ok=False)
+        shared_control_raw = None
+        rows = []
+        try:
+            for node in active:
+                node_output = temporary / "nodes" / node["nodeId"]
+                child = argparse.Namespace(
+                    state=path,
+                    csr=csrs[node["nodeId"]],
+                    output=node_output,
+                    ca_key=args.ca_key,
+                    ca_key_password_file=args.ca_key_password_file,
+                    ca_chain=args.ca_chain,
+                    revocations=args.revocations,
+                    safety_window_hours=args.safety_window_hours,
+                    overlap_seconds=args.overlap_seconds,
+                    leaf_valid_seconds=args.leaf_valid_seconds,
+                    _batch_mode=True,
+                    _batch_lock_held=True,
+                    _batch_rotation_id=batch_id,
+                    _batch_next_control_raw=shared_control_raw,
+                    _batch_now=batch_now,
+                    _quiet=True,
+                )
+                prepare_leaf_rotation(child)
+                proposal_raw, proposal, files = _rotation_material(node_output)
+                if shared_control_raw is None:
+                    shared_control_raw = files["control-cert.pem"]
+                rows.append(
+                    {
+                        "nodeId": node["nodeId"],
+                        "bundlePath": f"nodes/{node['nodeId']}",
+                        "proposalDigest": _rotation_digest(proposal_raw),
+                        "currentChannelVersion": proposal["currentChannelVersion"],
+                        "targetChannelVersion": proposal["targetChannelVersion"],
+                        "nextNodeCertificateSHA256": proposal["nextNodeCertificateSHA256"],
+                    }
+                )
+            proposals = [_rotation_material(temporary / row["bundlePath"])[1] for row in rows]
+            common = {
+                "overlapExpiresAt": {item["overlapExpiresAt"] for item in proposals},
+                "certificateNotAfter": {item["certificateNotAfter"] for item in proposals},
+                "currentControlCertificateSHA256": {
+                    item["currentControlCertificateSHA256"] for item in proposals
+                },
+                "nextControlCertificateSHA256": {
+                    item["nextControlCertificateSHA256"] for item in proposals
+                },
+                "caBundleSHA256": {item["caBundleSHA256"] for item in proposals},
+            }
+            if any(len(values) != 1 for values in common.values()):
+                raise ValueError("Leaf rotation batch shared authority differs across Nodes")
+            manifest = {
+                "schemaVersion": BATCH_ROTATION_SCHEMA,
+                "batchId": batch_id,
+                "tenantId": state["tenantId"],
+                "recoveryEpoch": state["epoch"],
+                "createdAt": min(item["createdAt"] for item in proposals),
+                **{key: next(iter(values)) for key, values in common.items()},
+                "nodes": rows,
+            }
+            manifest_raw = _canonical_json(manifest)
+            atomic_write(temporary / "batch.json", manifest_raw)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(temporary, output)
+            journal = _write_batch_journal(
+                path,
+                manifest_raw=manifest_raw,
+                manifest=manifest,
+                bundle=output,
+                phase="prepared",
+                staged=[],
+            )
+        finally:
+            if temporary.exists():
+                shutil.rmtree(temporary)
+    print(
+        json.dumps(
+            {
+                "prepared": True,
+                "idempotentReplay": False,
+                "batchId": batch_id,
+                "nodeCount": len(rows),
+                "batchDigest": journal["batchDigest"],
+                "privateKeyTransferred": False,
+            }
+        )
+    )
+
+
 def prepare_leaf_rotation(args):
     """Issue public rotation material from a Node-owned CSR without installing it."""
     path, state = args.state, load(args.state)
+    if len(active_configured_nodes(state)) != 1 and not getattr(args, "_batch_mode", False):
+        raise ValueError("Multiple active Nodes require one shared leaf rotation batch")
     node = node_from_csr(state, args.csr.read_bytes())
     if node.get("credentialRevoked"):
         raise ValueError("Revoked Node credentials cannot be rotated")
     output = args.output.resolve()
-    with exclusive_file(path / "leaf-rotation.lock"):
+    lock = (
+        nullcontext()
+        if getattr(args, "_batch_lock_held", False)
+        else exclusive_file(path / "leaf-rotation.lock")
+    )
+    with lock:
         public = csr_public_key(args.csr.read_bytes(), node["nodeId"])
         current_node_path = node_certificate_path(path, state, node)
         current_node_raw = current_node_path.read_bytes()
@@ -1370,7 +1655,7 @@ def prepare_leaf_rotation(args):
             != current_control.public_key().public_bytes_raw()
         ):
             raise ValueError("Pinned Control Plane key and leaf differ")
-        now = datetime.now(timezone.utc)
+        now = getattr(args, "_batch_now", None) or datetime.now(timezone.utc)
         safety = timedelta(hours=args.safety_window_hours)
         if (
             min(current_node.not_valid_after_utc, current_control.not_valid_after_utc)
@@ -1443,18 +1728,19 @@ def prepare_leaf_rotation(args):
                 or fingerprint(next_node) in revocations
             ):
                 raise ValueError("Existing rotation output is not an exact safe retry")
-            print(
-                json.dumps(
-                    dict(
-                        prepared=True,
-                        idempotentReplay=True,
-                        nodeId=node["nodeId"],
-                        rotationId=manifest["rotationId"],
-                        targetChannelVersion=manifest["targetChannelVersion"],
-                        proposalDigest=_rotation_digest(raw),
+            if not getattr(args, "_quiet", False):
+                print(
+                    json.dumps(
+                        dict(
+                            prepared=True,
+                            idempotentReplay=True,
+                            nodeId=node["nodeId"],
+                            rotationId=manifest["rotationId"],
+                            targetChannelVersion=manifest["targetChannelVersion"],
+                            proposalDigest=_rotation_digest(raw),
+                        )
                     )
                 )
-            )
             return
         lifetime = timedelta(seconds=args.leaf_valid_seconds)
         next_node = issue(
@@ -1466,14 +1752,25 @@ def prepare_leaf_rotation(args):
             now=now,
             valid_for=lifetime,
         )
-        next_control = issue(
-            ca_key,
-            intermediate,
-            control_key.public_key(),
-            f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
-            now=now,
-            valid_for=lifetime,
-        )
+        shared_control_raw = getattr(args, "_batch_next_control_raw", None)
+        if shared_control_raw is None:
+            next_control = issue(
+                ca_key,
+                intermediate,
+                control_key.public_key(),
+                f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
+                now=now,
+                valid_for=lifetime,
+            )
+        else:
+            next_control = x509.load_pem_x509_certificate(shared_control_raw)
+            _validate_current_control_leaf(next_control, intermediate, state=state, now=now)
+            if (
+                control_key.public_key().public_bytes_raw()
+                != next_control.public_key().public_bytes_raw()
+                or fingerprint(next_control) in revocations
+            ):
+                raise ValueError("Shared batch Control Plane leaf differs from pinned authority")
         not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
         overlap_expires = min(now + timedelta(seconds=args.overlap_seconds), not_after)
         if overlap_expires <= now + timedelta(seconds=30):
@@ -1502,7 +1799,7 @@ def prepare_leaf_rotation(args):
         }
         manifest = {
             "schemaVersion": ROTATION_SCHEMA,
-            "rotationId": uuid4().hex,
+            "rotationId": getattr(args, "_batch_rotation_id", None) or uuid4().hex,
             "tenantId": state["tenantId"],
             "nodeId": node["nodeId"],
             "recoveryEpoch": state["epoch"],
@@ -1536,24 +1833,242 @@ def prepare_leaf_rotation(args):
         finally:
             if temporary.exists():
                 shutil.rmtree(temporary)
-        print(
-            json.dumps(
-                dict(
-                    prepared=True,
-                    idempotentReplay=False,
-                    nodeId=node["nodeId"],
-                    rotationId=manifest["rotationId"],
-                    targetChannelVersion=target_version,
-                    proposalDigest=_rotation_digest(manifest_raw),
-                    privateKeyTransferred=False,
+        if not getattr(args, "_quiet", False):
+            print(
+                json.dumps(
+                    dict(
+                        prepared=True,
+                        idempotentReplay=False,
+                        nodeId=node["nodeId"],
+                        rotationId=manifest["rotationId"],
+                        targetChannelVersion=target_version,
+                        proposalDigest=_rotation_digest(manifest_raw),
+                        privateKeyTransferred=False,
+                    )
                 )
             )
+
+
+def _validate_rotation_receipt(path, state, bundle, receipt_path):
+    manifest_raw, manifest, files = _rotation_material(bundle.resolve())
+    node = node_by_id(state, manifest["nodeId"])
+    if node.get("credentialRevoked"):
+        raise ValueError("Revoked Node credentials cannot be committed")
+    proposal_digest = _rotation_digest(manifest_raw)
+    receipt = json.loads(receipt_path.read_text("utf-8"))
+    expected_receipt_body = {
+        "schemaVersion": ROTATION_SCHEMA,
+        "rotationId": manifest["rotationId"],
+        "proposalDigest": proposal_digest,
+        "targetChannelVersion": manifest["targetChannelVersion"],
+        "nodeId": manifest["nodeId"],
+        "installedNodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
+        "installedAt": receipt.get("installedAt"),
+        "restartObserved": True,
+    }
+    if set(receipt) != {*expected_receipt_body, "nodeSignature"} or any(
+        receipt.get(key) != value for key, value in expected_receipt_body.items()
+    ):
+        raise ValueError("Node installation receipt differs from the rotation proposal")
+    signature = receipt.get("nodeSignature")
+    if not isinstance(signature, str) or not re.fullmatch(r"[a-f0-9]{128}", signature):
+        raise ValueError("Node installation receipt signature is invalid")
+    next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+    installed_at = datetime.fromisoformat(receipt["installedAt"].replace("Z", "+00:00"))
+    current_time = datetime.now(timezone.utc)
+    overlap_expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
+    certificate_not_after = datetime.fromisoformat(
+        manifest["certificateNotAfter"].replace("Z", "+00:00")
+    )
+    if (
+        installed_at.tzinfo != timezone.utc
+        or installed_at > current_time + timedelta(seconds=30)
+        or not current_time < overlap_expires < certificate_not_after
+        or installed_at >= overlap_expires
+    ):
+        raise ValueError("Node installation receipt is outside the overlap window")
+    control_key = serialization.load_pem_private_key(
+        (path / "control-key.pem").read_bytes(), password=None
+    )
+    if not isinstance(control_key, Ed25519PrivateKey):
+        raise ValueError("Control Plane receipt signing key type differs")
+    next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
+    if control_key.public_key().public_bytes_raw() != next_control.public_key().public_bytes_raw():
+        raise ValueError("Control Plane key differs from the proposed control certificate")
+    return manifest_raw, manifest, files, node, control_key
+
+
+def stage_leaf_rotation_batch(args):
+    """CAS one restarted Node while keeping the global CP leaf unchanged."""
+    path, state = args.state, load(args.state)
+    batch_raw, batch, bundles = _batch_material(args.bundle.resolve())
+    if set(bundles) != {node["nodeId"] for node in active_configured_nodes(state)}:
+        raise ValueError("Leaf rotation batch no longer matches the complete active Node set")
+    receipt_value = json.loads(args.node_receipt.read_text("utf-8"))
+    node_id = receipt_value.get("nodeId")
+    if node_id not in bundles:
+        raise ValueError("Node receipt is not part of this leaf rotation batch")
+    bundle = args.bundle.resolve() / f"nodes/{node_id}"
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+        path, state, bundle, args.node_receipt
+    )
+    if manifest["rotationId"] != batch["batchId"]:
+        raise ValueError("Node proposal differs from the leaf rotation batch")
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        _assert_batch_journal(
+            journal, manifest_raw=batch_raw, manifest=batch, bundle=args.bundle.resolve()
         )
+        if journal["phase"] == "switched":
+            raise ValueError("A switched leaf rotation batch cannot stage another Node")
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            row = _channel_row(conn, state, node, lock=True)
+            version, certificate_sha256, _not_after, enabled, endpoint = row
+            if (version, certificate_sha256, enabled) == (
+                manifest["currentChannelVersion"],
+                manifest["currentNodeCertificateSHA256"],
+                True,
+            ):
+                committed_version = provision_channel(
+                    conn,
+                    NodePrincipal(state["tenantId"], node_id),
+                    epoch=state["epoch"],
+                    endpoint=endpoint,
+                    certificate_der=x509.load_pem_x509_certificate(
+                        files["node-cert.pem"]
+                    ).public_bytes(serialization.Encoding.DER),
+                    expected_version=manifest["currentChannelVersion"],
+                )
+                replay = False
+            elif (version, certificate_sha256, enabled) == (
+                manifest["targetChannelVersion"],
+                manifest["nextNodeCertificateSHA256"],
+                True,
+            ):
+                committed_version = version
+                replay = True
+            else:
+                raise ValueError("Channel changed; concurrent or stale rotation refused")
+        staged = set(journal["stagedNodeIds"])
+        staged.add(node_id)
+        phase = "staged" if staged == set(bundles) else "staging"
+        _write_batch_journal(
+            path,
+            manifest_raw=batch_raw,
+            manifest=batch,
+            bundle=args.bundle.resolve(),
+            phase=phase,
+            staged=staged,
+        )
+    print(
+        json.dumps(
+            {
+                "staged": True,
+                "idempotentReplay": replay,
+                "batchId": batch["batchId"],
+                "nodeId": node_id,
+                "channelVersion": committed_version,
+                "globalControlLeafSwitched": False,
+            }
+        )
+    )
+
+
+def commit_leaf_rotation_batch(args):
+    """Switch the shared CP leaf only after every restarted Node channel is staged."""
+    path, state = args.state, load(args.state)
+    batch_path = args.bundle.resolve()
+    batch_raw, batch, bundles = _batch_material(batch_path)
+    if set(bundles) != {node["nodeId"] for node in active_configured_nodes(state)}:
+        raise ValueError("Leaf rotation batch no longer matches the complete active Node set")
+    output = args.output.resolve()
+    kill = getattr(args, "_kill", lambda _point: None)
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        _assert_batch_journal(journal, manifest_raw=batch_raw, manifest=batch, bundle=batch_path)
+        if set(journal["stagedNodeIds"]) != set(bundles):
+            raise ValueError("Every Node must restart and stage before the shared CP leaf switches")
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            for node_id, (_raw, manifest, _files) in bundles.items():
+                node = node_by_id(state, node_id)
+                row = _channel_row(conn, state, node, lock=True)
+                if (row[0], row[1], row[3]) != (
+                    manifest["targetChannelVersion"],
+                    manifest["nextNodeCertificateSHA256"],
+                    True,
+                ):
+                    raise ValueError("A staged Node channel changed before batch commit")
+        shared_control = next(iter(bundles.values()))[2]["control-cert.pem"]
+        current_control = (path / "control-cert.pem").read_bytes()
+        current_fingerprint = fingerprint(x509.load_pem_x509_certificate(current_control))
+        if current_fingerprint == batch["currentControlCertificateSHA256"]:
+            kill("before-control-switch")
+            atomic_write(path / "control-cert.pem", shared_control)
+            switched_replay = False
+            kill("after-control-switch")
+        elif current_fingerprint == batch["nextControlCertificateSHA256"]:
+            switched_replay = True
+        else:
+            raise ValueError("Global Control Plane leaf changed outside this rotation batch")
+        for node_id, (_raw, manifest, files) in bundles.items():
+            node = node_by_id(state, node_id)
+            atomic_write(node_certificate_path(path, state, node), files["node-cert.pem"])
+            atomic_write(node_policy_path(path, state, node), files["peer-policy-final.json"])
+        _write_batch_journal(
+            path,
+            manifest_raw=batch_raw,
+            manifest=batch,
+            bundle=batch_path,
+            phase="switched",
+            staged=bundles,
+        )
+        output.mkdir(parents=True, exist_ok=True)
+        if output.is_symlink():
+            raise ValueError("Batch commit receipt directory must not be a symlink")
+        control_key = serialization.load_pem_private_key(
+            (path / "control-key.pem").read_bytes(), password=None
+        )
+        if not isinstance(control_key, Ed25519PrivateKey):
+            raise ValueError("Control Plane receipt signing key type differs")
+        for node_id, (proposal_raw, manifest, _files) in bundles.items():
+            body = {
+                "schemaVersion": ROTATION_SCHEMA,
+                "rotationId": manifest["rotationId"],
+                "proposalDigest": _rotation_digest(proposal_raw),
+                "nodeId": node_id,
+                "channelVersion": manifest["targetChannelVersion"],
+                "certificateSHA256": manifest["nextNodeCertificateSHA256"],
+                "committed": True,
+            }
+            receipt_raw = _canonical_json(
+                {**body, "controlSignature": control_key.sign(_canonical_json(body)).hex()}
+            )
+            target = output / f"{node_id}.json"
+            if target.exists() and target.read_bytes() != receipt_raw:
+                raise ValueError("Existing batch commit receipt differs")
+            atomic_write(target, receipt_raw)
+    print(
+        json.dumps(
+            {
+                "committed": True,
+                "idempotentReplay": switched_replay,
+                "batchId": batch["batchId"],
+                "nodeCount": len(bundles),
+                "globalControlLeafSwitched": True,
+                "nodeOverlapFinalizationRequired": True,
+            }
+        )
+    )
 
 
 def commit_leaf_rotation(args):
     """CAS the DB channel, then durably publish matching CP/Node public material."""
     path, state = args.state, load(args.state)
+    if len(active_configured_nodes(state)) != 1:
+        raise ValueError("Multiple active Nodes require one shared leaf rotation batch")
     manifest_raw, manifest, files = _rotation_material(args.bundle.resolve())
     node = node_by_id(state, manifest["nodeId"])
     if node.get("credentialRevoked"):
@@ -2024,6 +2539,31 @@ def main():
     p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
     p.add_argument("--overlap-seconds", type=int, choices=range(60, 3601), default=900)
     p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "prepare-leaf-rotation-batch",
+        help="Issue one shared Control Plane leaf and exact bundles for every active Node",
+    )
+    p.add_argument("--csr", type=Path, action="append", required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--ca-key", type=Path, required=True)
+    p.add_argument("--ca-key-password-file", type=Path, required=True)
+    p.add_argument("--ca-chain", type=Path, required=True)
+    p.add_argument("--revocations", type=Path, required=True)
+    p.add_argument("--safety-window-hours", type=int, choices=range(1, 169), default=48)
+    p.add_argument("--overlap-seconds", type=int, choices=range(60, 3601), default=900)
+    p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "stage-leaf-rotation-batch",
+        help="CAS one restarted Node channel without switching the shared Control Plane leaf",
+    )
+    p.add_argument("--bundle", type=Path, required=True)
+    p.add_argument("--node-receipt", type=Path, required=True)
+    p = commands.add_parser(
+        "commit-leaf-rotation-batch",
+        help="Switch one shared Control Plane leaf after every Node is restarted and staged",
+    )
+    p.add_argument("--bundle", type=Path, required=True)
+    p.add_argument("--output", type=Path, required=True)
     p = commands.add_parser(
         "commit-leaf-rotation",
         help="Commit an installed Node rotation with channel CAS and durable public material",
