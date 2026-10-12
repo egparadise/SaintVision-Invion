@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.326"
 status: "review"
 author: "Codex"
-updated: "2026-10-08T18:06:35+09:00"
+updated: "2026-10-12T10:06:13+09:00"
 source_of_truth: "Git"
 active_card: "CARD-293 expired partial leaf rotation recovery"
-active_card_status: "Card 292 stopped after one of two Nodes staged and before the global CP switch; Card 293 implements an expired-batch supersession path and runtime preflight without live mutation"
-active_card_next: "Obtain Claude review and landing before any operator-approved recovery of the r2 pilot"
+active_card_status: "PR #389 is approved by Claude at 6c1d7562 with exact-head Backend, Core and Docs green and is in merge train 70; no live recovery has run yet, and the r2 pilot still has one Node offline from the expired Card 292 batch"
+active_card_next: "After train 70 is verified, run the operator-authorized Card 293 recovery on the r2 pilot before the 2026-10-13 02:04Z old-leaf expiry of the untouched Node"
 ---
 
 ## 2026-10-08 Card 293 — expired partial leaf rotation recovery
