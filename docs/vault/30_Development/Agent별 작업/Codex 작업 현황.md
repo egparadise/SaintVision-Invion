@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.325"
+version: "1.0.326"
 status: "review"
 author: "Codex"
-updated: "2026-10-08T16:38:43+09:00"
+updated: "2026-10-08T18:06:35+09:00"
 source_of_truth: "Git"
-active_card: "CARD-291 multi-Node leaf rotation batch"
-active_card_status: "PR #388 is approved by Claude at 3f7792f3 with exact-head Core green and is in merge train 69; the live r2 state remains unchanged until the operator-authorized batch rotation runs"
-active_card_next: "After independent approval and landing, run the shared batch procedure on the already authorized r2 pilot before the 2026-10-13 02:04Z leaf expiry"
+active_card: "CARD-293 expired partial leaf rotation recovery"
+active_card_status: "Card 292 stopped after one of two Nodes staged and before the global CP switch; Card 293 implements an expired-batch supersession path and runtime preflight without live mutation"
+active_card_next: "Obtain Claude review and landing before any operator-approved recovery of the r2 pilot"
 ---
+
+## 2026-10-08 Card 293 — expired partial leaf rotation recovery
+
+- The selected recovery formally supersedes the expired incomplete batch and creates a fresh
+  complete-Node batch. The already staged Node's installed leaf/channel becomes its new baseline;
+  the untouched Node keeps its old baseline. Exact channel state, old/new bundles, journal,
+  issuing chain, Node key, tenant/epoch, and old global CP authority are all fail-closed inputs.
+- A Node runtime preflight now rejects the measured cryptography 41.0.7 environment before any
+  state write. An isolated venv script pins cryptography 50.0.1 without changing system packages.
+  The default overlap is four hours with a six-hour maximum; deadlines remain immutable.
+- No live recovery was executed. History records the reviewed post-approval commands and rejects
+  same-state one-Node re-enrollment, in-place policy extension, and file-only rollback.
+- History: [[2026-10-08_18-06-35_KST_Card293_rotation_recovery_Codex]].
 
 ## 2026-10-08 Card 291 — multi-Node leaf rotation batch
 
