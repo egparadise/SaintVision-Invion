@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.328"
 status: "review"
 author: "Codex"
-updated: "2026-10-14T07:54:03+09:00"
+updated: "2026-10-14T08:19:22+09:00"
 source_of_truth: "Git"
 active_card: "CARD-295 fully expired offline LAN pilot recovery"
-active_card_status: "PR #391 is open on train 70; Option B preserves the r2 identities but treats every expired leaf only as signed history, and local 2-Node/PKI verification is green; hosted exact-head CI and Claude review are pending; no live recovery has run"
-active_card_next: "Finish exact-head Backend/Core/Docs, obtain Claude security review, and then wait for landing plus a separate explicit live-recovery instruction"
+active_card_status: "PR #391 is approved by Claude at c7b1973f and is in merge train 71; Option B preserves the r2 identities and treats every expired leaf only as signed history; no live recovery has run"
+active_card_next: "After train 71 is verified, the operator installs python3-venv on both Nodes and explicitly approves the live recovery with the private OOB authorization record"
 ---
 
 ## 2026-10-14 Card 295 — fully expired offline LAN pilot recovery
