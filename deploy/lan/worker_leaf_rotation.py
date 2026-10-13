@@ -28,6 +28,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from cryptography.x509.oid import ExtendedKeyUsageOID
 
 SCHEMA = "saintvision-lan-leaf-rotation:1"
+OFFLINE_SCHEMA = "saintvision-lan-leaf-rotation:2"
+OFFLINE_RECOVERY_MODE = "fully-expired-offline"
 MANIFEST_KEYS = {
     "schemaVersion",
     "rotationId",
@@ -46,6 +48,13 @@ MANIFEST_KEYS = {
     "overlapExpiresAt",
     "certificateNotAfter",
     "files",
+}
+OFFLINE_MANIFEST_KEYS = MANIFEST_KEYS | {
+    "recoveryMode",
+    "offlineAuthorizationSHA256",
+    "currentPeerPolicySHA256",
+    "supersededRotationId",
+    "supersededProposalDigest",
 }
 FILE_NAMES = (
     "ca.pem",
@@ -158,6 +167,35 @@ def _leaf(
     return certificate
 
 
+def _historical_expired_leaf(
+    raw: bytes,
+    *,
+    intermediate: x509.Certificate,
+    uri: str,
+    usage: x509.ObjectIdentifier,
+    now: datetime,
+    address: str | None = None,
+) -> x509.Certificate:
+    """Validate an expired leaf as signed history, never as live authority."""
+    certificate = x509.load_pem_x509_certificate(raw)
+    _verify_signature(intermediate, certificate)
+    constraints = certificate.extensions.get_extension_for_class(x509.BasicConstraints).value
+    usages = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+    names = certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
+    expected_addresses = [] if address is None else [ipaddress.ip_address(address)]
+    if (
+        certificate.issuer != intermediate.subject
+        or constraints.ca
+        or list(usages) != [usage]
+        or names.get_values_for_type(x509.UniformResourceIdentifier) != [uri]
+        or names.get_values_for_type(x509.IPAddress) != expected_addresses
+        or certificate.not_valid_before_utc >= certificate.not_valid_after_utc
+        or certificate.not_valid_after_utc > now
+    ):
+        raise ValueError("Expired historical leaf identity, chain, or expiry differs")
+    return certificate
+
+
 def _policy(raw: bytes, *, manifest: dict, fingerprints: list[str], expires: str) -> dict:
     value = json.loads(raw)
     expected = {
@@ -184,10 +222,15 @@ def validate_bundle(
     now = now or datetime.now(timezone.utc)
     manifest_raw = _regular(bundle / "rotation.json")
     manifest = json.loads(manifest_raw)
-    if not isinstance(manifest, dict) or set(manifest) != MANIFEST_KEYS:
+    if not isinstance(manifest, dict):
         raise ValueError("Rotation manifest shape differs")
+    schema = manifest.get("schemaVersion")
+    expected_keys = OFFLINE_MANIFEST_KEYS if schema == OFFLINE_SCHEMA else MANIFEST_KEYS
+    if set(manifest) != expected_keys:
+        raise ValueError("Rotation manifest shape differs")
+    offline = schema == OFFLINE_SCHEMA
     if (
-        manifest["schemaVersion"] != SCHEMA
+        schema not in {SCHEMA, OFFLINE_SCHEMA}
         or not isinstance(manifest["rotationId"], str)
         or not re.fullmatch(r"[0-9a-f]{32}", manifest["rotationId"])
         or not isinstance(manifest["tenantId"], str)
@@ -214,6 +257,26 @@ def validate_bundle(
         )
     ):
         raise ValueError("Rotation manifest identity, version, or digest is invalid")
+    if offline and (
+        manifest["recoveryMode"] != OFFLINE_RECOVERY_MODE
+        or not isinstance(manifest["offlineAuthorizationSHA256"], str)
+        or not HEX.fullmatch(manifest["offlineAuthorizationSHA256"])
+        or not isinstance(manifest["currentPeerPolicySHA256"], str)
+        or not HEX.fullmatch(manifest["currentPeerPolicySHA256"])
+        or not (
+            (
+                manifest["supersededRotationId"] is None
+                and manifest["supersededProposalDigest"] is None
+            )
+            or (
+                isinstance(manifest["supersededRotationId"], str)
+                and re.fullmatch(r"[0-9a-f]{32}", manifest["supersededRotationId"])
+                and isinstance(manifest["supersededProposalDigest"], str)
+                and HEX.fullmatch(manifest["supersededProposalDigest"])
+            )
+        )
+    ):
+        raise ValueError("Offline recovery authority binding is invalid")
     created = _utc(manifest["createdAt"])
     overlap = _utc(manifest["overlapExpiresAt"])
     not_after = _utc(manifest["certificateNotAfter"])
@@ -266,6 +329,24 @@ def validate_bundle(
         expected_current.add(manifest["nextNodeCertificateSHA256"])
     if old_node.fingerprint(hashes.SHA256()).hex() not in expected_current:
         raise ValueError("Current Node leaf does not match the rotation base")
+    using_historical_base = (
+        offline
+        and old_node.fingerprint(hashes.SHA256()).hex() == manifest["currentNodeCertificateSHA256"]
+    )
+    if using_historical_base:
+        _historical_expired_leaf(
+            old_node_raw,
+            intermediate=intermediate,
+            uri=f'spiffe://saintvision.ai/tenant/{manifest["tenantId"]}/node/{manifest["nodeId"]}/epoch/{manifest["recoveryEpoch"]}',
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,
+            now=now,
+            address=manifest["nodeIP"],
+        )
+        if (
+            _digest(_regular(worker_root / "peer-policy.json"))
+            != manifest["currentPeerPolicySHA256"]
+        ):
+            raise ValueError("Expired historical peer policy differs")
     next_node = _leaf(
         files["node-cert.pem"],
         intermediate=intermediate,
@@ -285,6 +366,12 @@ def validate_bundle(
         serialization.Encoding.Raw, serialization.PublicFormat.Raw
     ):
         raise ValueError("Rotated Node leaf does not preserve the Node private key")
+    if using_historical_base and private.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw
+    ) != old_node.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw
+    ):
+        raise ValueError("Expired historical Node leaf does not match the Node private key")
     next_control = _leaf(
         files["control-cert.pem"],
         intermediate=intermediate,
@@ -294,13 +381,18 @@ def validate_bundle(
     )
     if next_control.fingerprint(hashes.SHA256()).hex() != manifest["nextControlCertificateSHA256"]:
         raise ValueError("Next Control Plane leaf fingerprint differs")
+    overlap_fingerprints = (
+        [manifest["nextControlCertificateSHA256"]]
+        if offline
+        else [
+            manifest["currentControlCertificateSHA256"],
+            manifest["nextControlCertificateSHA256"],
+        ]
+    )
     _policy(
         files["peer-policy-overlap.json"],
         manifest=manifest,
-        fingerprints=[
-            manifest["currentControlCertificateSHA256"],
-            manifest["nextControlCertificateSHA256"],
-        ],
+        fingerprints=overlap_fingerprints,
         expires=manifest["overlapExpiresAt"],
     )
     _policy(
@@ -373,10 +465,12 @@ def _supersede_expired_journal(
         "proposalDigest": _digest(old_raw),
         "targetChannelVersion": old_manifest["targetChannelVersion"],
     }
+    fully_expired = new_manifest.get("recoveryMode") == OFFLINE_RECOVERY_MODE
+    time_is_safe = old_not_after <= now if fully_expired else old_overlap <= now < old_not_after
     if (
         journal.get("phase") != "restarted"
         or any(journal.get(key) != value for key, value in expected_journal.items())
-        or not old_overlap <= now < old_not_after
+        or not time_is_safe
         or current_leaf.fingerprint(hashes.SHA256()).hex()
         != old_manifest["nextNodeCertificateSHA256"]
         or current_policy != old_files["peer-policy-overlap.json"]
@@ -389,6 +483,14 @@ def _supersede_expired_journal(
         or new_manifest.get("currentControlCertificateSHA256")
         != old_manifest["currentControlCertificateSHA256"]
         or new_manifest.get("caBundleSHA256") != old_manifest["caBundleSHA256"]
+        or (
+            fully_expired
+            and (
+                new_manifest.get("supersededRotationId") != old_manifest["rotationId"]
+                or new_manifest.get("supersededProposalDigest") != _digest(old_raw)
+                or new_manifest.get("currentPeerPolicySHA256") != _digest(current_policy)
+            )
+        )
     ):
         raise ValueError("Expired rotation is not an exact safe supersession base")
     archive_dir = worker_root / "leaf-rotation-superseded"
@@ -431,6 +533,20 @@ def install(
                 now=current_time,
             )
             journal = None
+        elif journal and superseded_bundle is None:
+            candidate_raw = _regular(bundle / "rotation.json")
+            candidate = json.loads(candidate_raw)
+            candidate_identity = {
+                "rotationId": candidate.get("rotationId"),
+                "proposalDigest": _digest(candidate_raw),
+                "targetChannelVersion": candidate.get("targetChannelVersion"),
+            }
+            if candidate.get("recoveryMode") == OFFLINE_RECOVERY_MODE and any(
+                journal.get(key) != value for key, value in candidate_identity.items()
+            ):
+                raise ValueError(
+                    "Fully expired staged recovery requires the exact superseded bundle"
+                )
         validated = validate_bundle(
             bundle,
             worker_root,
@@ -476,7 +592,7 @@ def install(
         restart(worker_root)
         installed_at = (now or datetime.now(timezone.utc)).isoformat().replace("+00:00", "Z")
         receipt_body = {
-            "schemaVersion": SCHEMA,
+            "schemaVersion": manifest["schemaVersion"],
             **expected_identity,
             "nodeId": manifest["nodeId"],
             "installedNodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
@@ -517,7 +633,7 @@ def finalize(
         manifest = validated["manifest"]
         receipt = json.loads(_regular(commit_receipt))
         expected_body = {
-            "schemaVersion": SCHEMA,
+            "schemaVersion": manifest["schemaVersion"],
             "rotationId": manifest["rotationId"],
             "proposalDigest": validated["proposalDigest"],
             "nodeId": manifest["nodeId"],
