@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.326"
+version: "1.0.328"
 status: "review"
 author: "Codex"
-updated: "2026-10-12T10:06:13+09:00"
+updated: "2026-10-14T07:54:03+09:00"
 source_of_truth: "Git"
-active_card: "CARD-293 expired partial leaf rotation recovery"
-active_card_status: "PR #389 is approved by Claude at 6c1d7562 with exact-head Backend, Core and Docs green and is in merge train 70; no live recovery has run yet, and the r2 pilot still has one Node offline from the expired Card 292 batch"
-active_card_next: "After train 70 is verified, run the operator-authorized Card 293 recovery on the r2 pilot before the 2026-10-13 02:04Z old-leaf expiry of the untouched Node"
+active_card: "CARD-295 fully expired offline LAN pilot recovery"
+active_card_status: "PR #391 is open on train 70; Option B preserves the r2 identities but treats every expired leaf only as signed history, and local 2-Node/PKI verification is green; hosted exact-head CI and Claude review are pending; no live recovery has run"
+active_card_next: "Finish exact-head Backend/Core/Docs, obtain Claude security review, and then wait for landing plus a separate explicit live-recovery instruction"
 ---
+
+## 2026-10-14 Card 295 — fully expired offline LAN pilot recovery
+
+- A separate v2 command handles the state in which the global CP leaf and every active Node leaf
+  have expired. Ordinary Card 293 behavior remains strict and unchanged.
+- Expired leaves are only chain-signed history. New authority requires the exact external chain and
+  revocation registry, existing Node-key CSRs, preserved CP key, private OOB authorization, exact
+  Card 292/293 journal, and locked DB channel rows. New Node policy trusts only the fresh CP leaf.
+- A 2-Node fixture and boundary mutations cover mixed validity, chain/identity/CSR/channel drift,
+  revocation, duplicate authorization keys, journal/concurrent writer rejection, kill-point replay,
+  one global switch, and next-only finalize. Focused local result: 40 passed; no local Docker use.
+- History: [[2026-10-14_07-42-37_KST_Card295_fully_expired_recovery_Codex]].
 
 ## 2026-10-08 Card 293 — expired partial leaf rotation recovery
 

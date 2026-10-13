@@ -45,6 +45,9 @@ from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pe
 from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
 from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
 from worker_leaf_rotation import MAXIMUM_OVERLAP_SECONDS
+from worker_leaf_rotation import OFFLINE_MANIFEST_KEYS as OFFLINE_ROTATION_MANIFEST_KEYS
+from worker_leaf_rotation import OFFLINE_RECOVERY_MODE
+from worker_leaf_rotation import OFFLINE_SCHEMA as OFFLINE_ROTATION_SCHEMA
 from worker_leaf_rotation import SCHEMA as ROTATION_SCHEMA
 from psycopg import sql
 from psycopg.conninfo import make_conninfo
@@ -60,6 +63,7 @@ CERTIFICATE_REVOCATION_REASONS = {
 EXTERNAL_DATABASE_MODE = "ssh-tunnel-external"
 LOCAL_DATABASE_MODE = "managed-local-docker"
 BATCH_ROTATION_SCHEMA = "saintvision-lan-leaf-rotation-batch:1"
+OFFLINE_BATCH_ROTATION_SCHEMA = "saintvision-lan-leaf-rotation-batch:2"
 BATCH_MANIFEST_KEYS = {
     "schemaVersion",
     "batchId",
@@ -73,6 +77,10 @@ BATCH_MANIFEST_KEYS = {
     "caBundleSHA256",
     "nodes",
 }
+OFFLINE_BATCH_MANIFEST_KEYS = BATCH_MANIFEST_KEYS | {
+    "recoveryMode",
+    "offlineAuthorizationSHA256",
+}
 BATCH_JOURNAL_KEYS = {
     "schemaVersion",
     "batchId",
@@ -83,6 +91,9 @@ BATCH_JOURNAL_KEYS = {
 }
 DEFAULT_ROTATION_OVERLAP_SECONDS = 14400
 RECOVERY_RECORD_SCHEMA = "saintvision-lan-leaf-rotation-recovery:1"
+OFFLINE_RECOVERY_RECORD_SCHEMA = "saintvision-lan-fully-expired-recovery:1"
+OFFLINE_AUTHORIZATION_SCHEMA = "saintvision-lan-fully-expired-authorization:1"
+OFFLINE_AUTHORIZATION_CONFIRMATION = "fully-expired-offline-recovery-approved"
 
 
 def run(args, **kwargs):
@@ -1337,10 +1348,105 @@ def _validate_current_control_leaf(certificate, intermediate, *, state, now):
         raise ValueError("Current Control Plane leaf is not bound to the exact issuing chain")
 
 
+def _validate_expired_historical_leaf(
+    certificate,
+    intermediate,
+    *,
+    uri,
+    usage,
+    now,
+    address=None,
+):
+    """Validate signed identity history while requiring it to be unusable as live TLS."""
+    intermediate.public_key().verify(certificate.signature, certificate.tbs_certificate_bytes)
+    constraints = certificate.extensions.get_extension_for_class(x509.BasicConstraints).value
+    usages = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+    names = certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
+    expected_addresses = [] if address is None else [ipaddress.ip_address(address)]
+    if (
+        certificate.issuer != intermediate.subject
+        or constraints.ca
+        or list(usages) != [usage]
+        or names.get_values_for_type(x509.UniformResourceIdentifier) != [uri]
+        or names.get_values_for_type(x509.IPAddress) != expected_addresses
+        or certificate.not_valid_before_utc >= certificate.not_valid_after_utc
+        or certificate.not_valid_after_utc > now
+    ):
+        raise ValueError("Expired historical leaf identity, chain, or expiry differs")
+
+
+def _load_offline_authorization(path):
+    if path is None or path.is_symlink() or not path.is_file() or path.stat().st_size > 1024 * 1024:
+        raise ValueError("An exact regular offline recovery authorization is required")
+    raw = path.read_bytes()
+
+    def strict_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("Offline recovery authorization contains a duplicate key")
+            result[key] = value
+        return result
+
+    value = json.loads(raw, object_pairs_hook=strict_object)
+    keys = {
+        "schemaVersion",
+        "confirmation",
+        "tenantId",
+        "recoveryEpoch",
+        "expiredBatchId",
+        "expiredBatchDigest",
+        "controlCertificateSHA256",
+        "nodes",
+    }
+    node_keys = {"nodeId", "nodeIP", "channelVersion", "certificateSHA256"}
+    if (
+        not isinstance(value, dict)
+        or set(value) != keys
+        or value.get("schemaVersion") != OFFLINE_AUTHORIZATION_SCHEMA
+        or value.get("confirmation") != OFFLINE_AUTHORIZATION_CONFIRMATION
+        or not re.fullmatch(r"[a-f0-9]{32}", str(value.get("expiredBatchId", "")))
+        or not re.fullmatch(r"[a-f0-9]{64}", str(value.get("expiredBatchDigest", "")))
+        or not re.fullmatch(r"[a-f0-9]{64}", str(value.get("controlCertificateSHA256", "")))
+        or not isinstance(value.get("nodes"), list)
+        or len(value["nodes"]) < 2
+    ):
+        raise ValueError("Offline recovery authorization shape differs")
+    node_ids = []
+    for row in value["nodes"]:
+        if (
+            not isinstance(row, dict)
+            or set(row) != node_keys
+            or not re.fullmatch(r"nod_[0-9A-HJKMNP-TV-Z]{26}", str(row.get("nodeId", "")))
+            or type(row.get("channelVersion")) is not int
+            or row["channelVersion"] < 0
+            or not re.fullmatch(r"[a-f0-9]{64}", str(row.get("certificateSHA256", "")))
+        ):
+            raise ValueError("Offline recovery authorization Node binding differs")
+        try:
+            address = ipaddress.ip_address(row.get("nodeIP"))
+        except (TypeError, ValueError) as error:
+            raise ValueError("Offline recovery authorization Node address differs") from error
+        if address.version != 4 or not address.is_private or address.is_loopback:
+            raise ValueError("Offline recovery authorization Node address differs")
+        node_ids.append(row["nodeId"])
+    if node_ids != sorted(node_ids) or len(node_ids) != len(set(node_ids)):
+        raise ValueError("Offline recovery authorization Nodes must be unique and sorted")
+    return raw, value
+
+
 def _rotation_material(path):
     manifest_raw = (path / "rotation.json").read_bytes()
     manifest = json.loads(manifest_raw)
-    if not isinstance(manifest, dict) or set(manifest) != ROTATION_MANIFEST_KEYS:
+    if not isinstance(manifest, dict):
+        raise ValueError("Rotation manifest shape differs")
+    schema = manifest.get("schemaVersion")
+    expected_keys = (
+        OFFLINE_ROTATION_MANIFEST_KEYS
+        if schema == OFFLINE_ROTATION_SCHEMA
+        else ROTATION_MANIFEST_KEYS
+    )
+    if set(manifest) != expected_keys:
         raise ValueError("Rotation manifest shape differs")
     files = {}
     for name in ROTATION_FILE_NAMES:
@@ -1348,9 +1454,9 @@ def _rotation_material(path):
         if target.is_symlink() or not target.is_file() or not 0 < target.stat().st_size <= 65536:
             raise ValueError("Rotation public material is missing or unsafe")
         files[name] = target.read_bytes()
-    if manifest.get("schemaVersion") != ROTATION_SCHEMA or set(manifest.get("files", {})) != set(
-        ROTATION_FILE_NAMES
-    ):
+    if schema not in {ROTATION_SCHEMA, OFFLINE_ROTATION_SCHEMA} or set(
+        manifest.get("files", {})
+    ) != set(ROTATION_FILE_NAMES):
         raise ValueError("Rotation schema or file set differs")
     if any(
         _rotation_digest(files[name]) != manifest["files"].get(name) for name in ROTATION_FILE_NAMES
@@ -1383,7 +1489,7 @@ def _load_batch_journal(path):
     if (
         not isinstance(value, dict)
         or set(value) != BATCH_JOURNAL_KEYS
-        or value.get("schemaVersion") != BATCH_ROTATION_SCHEMA
+        or value.get("schemaVersion") not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA}
         or value.get("phase") not in {"prepared", "staging", "staged", "switched"}
         or not isinstance(value.get("stagedNodeIds"), list)
         or len(value["stagedNodeIds"]) != len(set(value["stagedNodeIds"]))
@@ -1397,8 +1503,14 @@ def _batch_material(path):
     manifest = json.loads(manifest_raw)
     if (
         not isinstance(manifest, dict)
-        or set(manifest) != BATCH_MANIFEST_KEYS
-        or manifest.get("schemaVersion") != BATCH_ROTATION_SCHEMA
+        or set(manifest)
+        != (
+            OFFLINE_BATCH_MANIFEST_KEYS
+            if manifest.get("schemaVersion") == OFFLINE_BATCH_ROTATION_SCHEMA
+            else BATCH_MANIFEST_KEYS
+        )
+        or manifest.get("schemaVersion")
+        not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA}
         or not re.fullmatch(r"[a-f0-9]{32}", str(manifest.get("batchId", "")))
         or not isinstance(manifest.get("nodes"), list)
         or len(manifest["nodes"]) < 2
@@ -1448,6 +1560,14 @@ def _batch_material(path):
             or _rotation_digest(files["ca.pem"]) != proposal["caBundleSHA256"]
         ):
             raise ValueError("Leaf rotation batch and Node proposal differ")
+        if manifest["schemaVersion"] == OFFLINE_BATCH_ROTATION_SCHEMA and (
+            proposal.get("schemaVersion") != OFFLINE_ROTATION_SCHEMA
+            or proposal.get("recoveryMode") != OFFLINE_RECOVERY_MODE
+            or manifest.get("recoveryMode") != OFFLINE_RECOVERY_MODE
+            or proposal.get("offlineAuthorizationSHA256")
+            != manifest.get("offlineAuthorizationSHA256")
+        ):
+            raise ValueError("Offline recovery batch authority differs")
         bundles[node_id] = (raw, proposal, files)
     if node_ids != sorted(node_ids) or len(node_ids) != len(set(node_ids)):
         raise ValueError("Leaf rotation batch Nodes must be unique and sorted")
@@ -1459,7 +1579,7 @@ def _batch_material(path):
 
 def _write_batch_journal(path, *, manifest_raw, manifest, bundle, phase, staged):
     value = {
-        "schemaVersion": BATCH_ROTATION_SCHEMA,
+        "schemaVersion": manifest["schemaVersion"],
         "batchId": manifest["batchId"],
         "batchDigest": _rotation_digest(manifest_raw),
         "bundlePath": str(bundle.resolve()),
@@ -1584,6 +1704,126 @@ def _write_rotation_public_material(
         "createdAt": _utc_z(now),
         "overlapExpiresAt": _utc_z(overlap_expires),
         "certificateNotAfter": _utc_z(not_after),
+        "files": {name: _rotation_digest(raw) for name, raw in material.items()},
+    }
+    output.mkdir(parents=True, exist_ok=False)
+    for name, raw in material.items():
+        atomic_write(output / name, raw)
+    raw = _canonical_json(manifest)
+    atomic_write(output / "rotation.json", raw)
+    return raw, manifest, material
+
+
+def _write_fully_expired_rotation_public_material(
+    output,
+    *,
+    state,
+    node,
+    current_node,
+    current_control,
+    current_policy_raw,
+    control_key,
+    public_key,
+    ca_key,
+    intermediate,
+    chain_raw,
+    revocations,
+    now,
+    current_version,
+    execution_window_seconds,
+    leaf_valid_seconds,
+    rotation_id,
+    authorization_digest,
+    superseded_rotation_id,
+    superseded_proposal_digest,
+    shared_control_raw=None,
+):
+    """Issue fresh public authority from expired, signed identity history."""
+    principal = NodePrincipal(state["tenantId"], node["nodeId"])
+    if current_node.public_key().public_bytes_raw() != public_key.public_bytes_raw():
+        raise ValueError("Offline recovery CSR does not prove the pinned Node key")
+    _validate_expired_historical_leaf(
+        current_node,
+        intermediate,
+        uri=node_uri(principal, state["epoch"]),
+        usage=ExtendedKeyUsageOID.SERVER_AUTH,
+        now=now,
+        address=node["nodeIP"],
+    )
+    if fingerprint(current_node) in revocations or fingerprint(current_control) in revocations:
+        raise ValueError("Expired historical recovery identity is revoked")
+    lifetime = timedelta(seconds=leaf_valid_seconds)
+    next_node = issue(
+        ca_key,
+        intermediate,
+        public_key,
+        node_uri(principal, state["epoch"]),
+        address=node["nodeIP"],
+        now=now,
+        valid_for=lifetime,
+    )
+    if shared_control_raw is None:
+        next_control = issue(
+            ca_key,
+            intermediate,
+            control_key.public_key(),
+            f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
+            now=now,
+            valid_for=lifetime,
+        )
+    else:
+        next_control = x509.load_pem_x509_certificate(shared_control_raw)
+        _validate_current_control_leaf(next_control, intermediate, state=state, now=now)
+        if (
+            control_key.public_key().public_bytes_raw()
+            != next_control.public_key().public_bytes_raw()
+        ):
+            raise ValueError("Fresh offline recovery Control Plane leaf differs from its key")
+    if fingerprint(next_node) in revocations or fingerprint(next_control) in revocations:
+        raise ValueError("Fresh offline recovery identity is revoked")
+    not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
+    execution_expires = min(now + timedelta(seconds=execution_window_seconds), not_after)
+    if execution_expires <= now + timedelta(minutes=10):
+        raise ValueError("Offline recovery execution window is too short to complete safely")
+    target_version = current_version + 1
+    execution_policy = {
+        "version": target_version,
+        "tenantId": state["tenantId"],
+        "nodeId": node["nodeId"],
+        "recoveryEpoch": state["epoch"],
+        "expiresAt": _utc_z(execution_expires),
+        "clientFingerprints": [fingerprint(next_control)],
+    }
+    final_policy = {**execution_policy, "expiresAt": _utc_z(not_after)}
+    material = {
+        "ca.pem": chain_raw,
+        "node-cert.pem": pem(next_node),
+        "control-cert.pem": pem(next_control),
+        "peer-policy-overlap.json": json.dumps(execution_policy, indent=2).encode(),
+        "peer-policy-final.json": json.dumps(final_policy, indent=2).encode(),
+    }
+    manifest = {
+        "schemaVersion": OFFLINE_ROTATION_SCHEMA,
+        "rotationId": rotation_id,
+        "tenantId": state["tenantId"],
+        "nodeId": node["nodeId"],
+        "recoveryEpoch": state["epoch"],
+        "nodeIP": node["nodeIP"],
+        "currentChannelVersion": current_version,
+        "targetChannelVersion": target_version,
+        "currentNodeCertificateSHA256": fingerprint(current_node),
+        "nextNodeCertificateSHA256": fingerprint(next_node),
+        "currentControlCertificateSHA256": fingerprint(current_control),
+        "nextControlCertificateSHA256": fingerprint(next_control),
+        "caBundleSHA256": _rotation_digest(chain_raw),
+        "createdAt": _utc_z(now),
+        "overlapExpiresAt": _utc_z(execution_expires),
+        "certificateNotAfter": _utc_z(not_after),
+        "recoveryMode": OFFLINE_RECOVERY_MODE,
+        "offlineAuthorizationSHA256": authorization_digest,
+        "currentPeerPolicySHA256": _rotation_digest(current_policy_raw),
+        "supersededRotationId": superseded_rotation_id,
+        "supersededProposalDigest": superseded_proposal_digest,
         "files": {name: _rotation_digest(raw) for name, raw in material.items()},
     }
     output.mkdir(parents=True, exist_ok=False)
@@ -1888,6 +2128,399 @@ def prepare_leaf_rotation_recovery_batch(args):
                 "nodeCount": len(rows),
                 "batchDigest": replacement["batchDigest"],
                 "privateKeyTransferred": False,
+            }
+        )
+    )
+
+
+def prepare_fully_expired_leaf_rotation_recovery_batch(args):
+    """Recover an all-expired pilot without accepting an expired leaf as authority."""
+    path, state = args.state, load(args.state)
+    output = args.output.resolve()
+    active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+    csrs = {}
+    for csr_path in args.csr:
+        node = node_from_csr(state, csr_path.read_bytes())
+        if node["nodeId"] in csrs:
+            raise ValueError("Each active Node CSR must be supplied exactly once")
+        csrs[node["nodeId"]] = csr_path
+    if set(csrs) != {node["nodeId"] for node in active}:
+        raise ValueError("Fully expired recovery must include every active Node")
+
+    expired_path = args.expired_batch.resolve()
+    expired_raw, expired, expired_bundles = _batch_material(expired_path)
+    if expired["schemaVersion"] != BATCH_ROTATION_SCHEMA or set(expired_bundles) != set(csrs):
+        raise ValueError("Fully expired recovery requires the exact original partial batch")
+    now = getattr(args, "_now", None) or datetime.now(timezone.utc)
+    expired_not_after = datetime.fromisoformat(
+        expired["certificateNotAfter"].replace("Z", "+00:00")
+    )
+    if expired_not_after > now:
+        raise ValueError("Fully expired recovery requires every partial-batch leaf to be expired")
+
+    authorization_raw, authorization = _load_offline_authorization(args.offline_authorization)
+    authorization_digest = _rotation_digest(authorization_raw)
+    expired_digest = _rotation_digest(expired_raw)
+    if (
+        authorization["tenantId"] != state["tenantId"]
+        or authorization["recoveryEpoch"] != state["epoch"]
+        or authorization["expiredBatchId"] != expired["batchId"]
+        or authorization["expiredBatchDigest"] != expired_digest
+        or authorization["controlCertificateSHA256"] != expired["currentControlCertificateSHA256"]
+    ):
+        raise ValueError("Offline recovery authorization does not bind the pilot and expired batch")
+
+    recovery_path = path / f'leaf-rotation-fully-expired-{expired["batchId"]}.json'
+    # An exact replacement batch remains replayable after the global Control Plane
+    # leaf has switched.  Validate only immutable recovery authority here; live
+    # channel state belongs to stage/commit/finalize after preparation.
+    if output.exists():
+        with exclusive_file(path / "leaf-rotation.lock"):
+            journal = _load_batch_journal(path)
+            replacement_raw, replacement, replacement_bundles = _batch_material(output)
+            try:
+                _assert_batch_journal(
+                    journal,
+                    manifest_raw=replacement_raw,
+                    manifest=replacement,
+                    bundle=output,
+                )
+            except ValueError:
+                pass
+            else:
+                if (
+                    replacement["schemaVersion"] != OFFLINE_BATCH_ROTATION_SCHEMA
+                    or replacement.get("recoveryMode") != OFFLINE_RECOVERY_MODE
+                    or replacement.get("offlineAuthorizationSHA256") != authorization_digest
+                    or set(replacement_bundles) != set(csrs)
+                    or not recovery_path.is_file()
+                ):
+                    raise ValueError("Existing fully expired recovery batch differs")
+                record = json.loads(recovery_path.read_text("utf-8"))
+                expected_record = {
+                    "schemaVersion": OFFLINE_RECOVERY_RECORD_SCHEMA,
+                    "recoveryMode": OFFLINE_RECOVERY_MODE,
+                    "expiredBatchId": expired["batchId"],
+                    "expiredBatchDigest": expired_digest,
+                    "replacementBatchId": replacement["batchId"],
+                    "replacementBatchDigest": _rotation_digest(replacement_raw),
+                    "offlineAuthorizationSHA256": authorization_digest,
+                    "supersededAt": replacement["createdAt"],
+                    "stagedNodeIds": record.get("stagedNodeIds"),
+                }
+                if (
+                    record != expected_record
+                    or not isinstance(record["stagedNodeIds"], list)
+                    or not record["stagedNodeIds"]
+                    or set(record["stagedNodeIds"]) == set(csrs)
+                ):
+                    raise ValueError("Existing fully expired recovery record differs")
+                for node_id, (_raw, _manifest, files) in replacement_bundles.items():
+                    public = csr_public_key(csrs[node_id].read_bytes(), node_id)
+                    next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+                    if public.public_bytes_raw() != next_node.public_key().public_bytes_raw():
+                        raise ValueError("Existing fully expired recovery CSR binding differs")
+                print(
+                    json.dumps(
+                        {
+                            "prepared": True,
+                            "fullyExpiredOfflineRecovery": True,
+                            "idempotentReplay": True,
+                            "batchId": replacement["batchId"],
+                            "nodeCount": len(replacement_bundles),
+                            "privateKeyTransferred": False,
+                            "expiredLeafAcceptedAsAuthority": False,
+                        }
+                    )
+                )
+                return
+
+    current_control_raw = (path / "control-cert.pem").read_bytes()
+    current_control = x509.load_pem_x509_certificate(current_control_raw)
+    if fingerprint(current_control) != expired["currentControlCertificateSHA256"]:
+        raise ValueError("Fully expired recovery is not on the exact old Control Plane leaf")
+    control_key = serialization.load_pem_private_key(
+        (path / "control-key.pem").read_bytes(), password=None
+    )
+    if (
+        not isinstance(control_key, Ed25519PrivateKey)
+        or control_key.public_key().public_bytes_raw()
+        != current_control.public_key().public_bytes_raw()
+    ):
+        raise ValueError("Pinned Control Plane key and expired historical leaf differ")
+    _root, _root_key, chain_raw, ca_key, intermediate = _load_external_ca(
+        args.ca_key, args.ca_key_password_file, args.ca_chain
+    )
+    if _rotation_digest(chain_raw) != state.get("caBundleSHA256"):
+        raise ValueError("Offline recovery issuing chain differs from the pilot pin")
+    _validate_expired_historical_leaf(
+        current_control,
+        intermediate,
+        uri=f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
+        usage=ExtendedKeyUsageOID.CLIENT_AUTH,
+        now=now,
+    )
+    revocations = _load_revocations(args.revocations)
+    if fingerprint(current_control) in revocations:
+        raise ValueError("Expired historical Control Plane identity is revoked")
+
+    def baseline(node, staged):
+        node_id = node["nodeId"]
+        old_raw, old_manifest, old_files = expired_bundles[node_id]
+        if node_id in staged:
+            current_raw = old_files["node-cert.pem"]
+            policy_raw = old_files["peer-policy-overlap.json"]
+            version = old_manifest["targetChannelVersion"]
+            certificate_sha256 = old_manifest["nextNodeCertificateSHA256"]
+            superseded_id = old_manifest["rotationId"]
+            superseded_digest = _rotation_digest(old_raw)
+        else:
+            current_raw = node_certificate_path(path, state, node).read_bytes()
+            policy_raw = node_policy_path(path, state, node).read_bytes()
+            version = old_manifest["currentChannelVersion"]
+            certificate_sha256 = old_manifest["currentNodeCertificateSHA256"]
+            superseded_id = None
+            superseded_digest = None
+        return (
+            x509.load_pem_x509_certificate(current_raw),
+            policy_raw,
+            version,
+            certificate_sha256,
+            superseded_id,
+            superseded_digest,
+        )
+
+    def validate_baselines(staged):
+        observed = []
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            for node in active:
+                (
+                    current_node,
+                    _policy_raw,
+                    version,
+                    certificate_sha256,
+                    _superseded_id,
+                    _superseded_digest,
+                ) = baseline(node, staged)
+                row = _channel_row(conn, state, node, lock=True)
+                endpoint = f'https://{node["nodeIP"]}:{node["nodePort"]}'
+                if (row[0], row[1], row[3], row[4]) != (
+                    version,
+                    certificate_sha256,
+                    True,
+                    endpoint,
+                ) or row[2] > now:
+                    raise ValueError("Fully expired channel baseline differs or remains live")
+                _validate_expired_historical_leaf(
+                    current_node,
+                    intermediate,
+                    uri=node_uri(NodePrincipal(state["tenantId"], node["nodeId"]), state["epoch"]),
+                    usage=ExtendedKeyUsageOID.SERVER_AUTH,
+                    now=now,
+                    address=node["nodeIP"],
+                )
+                if fingerprint(current_node) != certificate_sha256:
+                    raise ValueError("Expired historical Node certificate differs from its channel")
+                public = csr_public_key(csrs[node["nodeId"]].read_bytes(), node["nodeId"])
+                if public.public_bytes_raw() != current_node.public_key().public_bytes_raw():
+                    raise ValueError("Offline recovery CSR does not prove the pinned Node key")
+                if fingerprint(current_node) in revocations:
+                    raise ValueError("Expired historical Node identity is revoked")
+                observed.append(
+                    {
+                        "nodeId": node["nodeId"],
+                        "nodeIP": node["nodeIP"],
+                        "channelVersion": version,
+                        "certificateSHA256": certificate_sha256,
+                    }
+                )
+        if authorization["nodes"] != observed:
+            raise ValueError("Offline recovery authorization differs from locked channel baselines")
+
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        _assert_batch_journal(
+            journal, manifest_raw=expired_raw, manifest=expired, bundle=expired_path
+        )
+        staged = set(journal["stagedNodeIds"])
+        if journal["phase"] not in {"staging", "staged"} or not staged or staged == set(csrs):
+            raise ValueError("Fully expired recovery requires a non-empty incomplete partial batch")
+        validate_baselines(staged)
+
+        if output.exists():
+            replacement_raw, replacement, replacement_bundles = _batch_material(output)
+            if (
+                replacement["schemaVersion"] != OFFLINE_BATCH_ROTATION_SCHEMA
+                or replacement.get("recoveryMode") != OFFLINE_RECOVERY_MODE
+                or replacement.get("offlineAuthorizationSHA256") != authorization_digest
+                or replacement["tenantId"] != state["tenantId"]
+                or replacement["recoveryEpoch"] != state["epoch"]
+                or replacement["currentControlCertificateSHA256"] != fingerprint(current_control)
+                or set(replacement_bundles) != set(csrs)
+            ):
+                raise ValueError("Existing fully expired recovery batch differs")
+            for node_id, (_raw, manifest, files) in replacement_bundles.items():
+                public = csr_public_key(csrs[node_id].read_bytes(), node_id)
+                next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+                if public.public_bytes_raw() != next_node.public_key().public_bytes_raw():
+                    raise ValueError("Existing fully expired recovery CSR binding differs")
+            record = {
+                "schemaVersion": OFFLINE_RECOVERY_RECORD_SCHEMA,
+                "recoveryMode": OFFLINE_RECOVERY_MODE,
+                "expiredBatchId": expired["batchId"],
+                "expiredBatchDigest": expired_digest,
+                "replacementBatchId": replacement["batchId"],
+                "replacementBatchDigest": _rotation_digest(replacement_raw),
+                "offlineAuthorizationSHA256": authorization_digest,
+                "supersededAt": replacement["createdAt"],
+                "stagedNodeIds": sorted(staged),
+            }
+            record_raw = _canonical_json(record)
+            if recovery_path.exists() and recovery_path.read_bytes() != record_raw:
+                raise ValueError("Existing fully expired recovery record differs")
+            if not recovery_path.exists():
+                atomic_write(recovery_path, record_raw)
+            _write_batch_journal(
+                path,
+                manifest_raw=replacement_raw,
+                manifest=replacement,
+                bundle=output,
+                phase="prepared",
+                staged=[],
+            )
+            print(
+                json.dumps(
+                    {
+                        "prepared": True,
+                        "fullyExpiredOfflineRecovery": True,
+                        "idempotentReplay": True,
+                        "batchId": replacement["batchId"],
+                        "nodeCount": len(replacement_bundles),
+                        "privateKeyTransferred": False,
+                        "expiredLeafAcceptedAsAuthority": False,
+                    }
+                )
+            )
+            return
+
+        batch_id = uuid4().hex
+        temporary = output.with_name(output.name + ".next")
+        temporary.mkdir(parents=True, exist_ok=False)
+        rows = []
+        shared_control_raw = None
+        try:
+            for node in active:
+                (
+                    current_node,
+                    policy_raw,
+                    version,
+                    _certificate_sha256,
+                    superseded_id,
+                    superseded_digest,
+                ) = baseline(node, staged)
+                node_output = temporary / "nodes" / node["nodeId"]
+                proposal_raw, proposal, files = _write_fully_expired_rotation_public_material(
+                    node_output,
+                    state=state,
+                    node=node,
+                    current_node=current_node,
+                    current_control=current_control,
+                    current_policy_raw=policy_raw,
+                    control_key=control_key,
+                    public_key=csr_public_key(csrs[node["nodeId"]].read_bytes(), node["nodeId"]),
+                    ca_key=ca_key,
+                    intermediate=intermediate,
+                    chain_raw=chain_raw,
+                    revocations=revocations,
+                    now=now,
+                    current_version=version,
+                    execution_window_seconds=args.overlap_seconds,
+                    leaf_valid_seconds=args.leaf_valid_seconds,
+                    rotation_id=batch_id,
+                    authorization_digest=authorization_digest,
+                    superseded_rotation_id=superseded_id,
+                    superseded_proposal_digest=superseded_digest,
+                    shared_control_raw=shared_control_raw,
+                )
+                if shared_control_raw is None:
+                    shared_control_raw = files["control-cert.pem"]
+                rows.append(
+                    {
+                        "nodeId": node["nodeId"],
+                        "bundlePath": f'nodes/{node["nodeId"]}',
+                        "proposalDigest": _rotation_digest(proposal_raw),
+                        "currentChannelVersion": proposal["currentChannelVersion"],
+                        "targetChannelVersion": proposal["targetChannelVersion"],
+                        "nextNodeCertificateSHA256": proposal["nextNodeCertificateSHA256"],
+                    }
+                )
+            proposals = [_rotation_material(temporary / row["bundlePath"])[1] for row in rows]
+            common = {
+                key: {proposal[key] for proposal in proposals}
+                for key in (
+                    "overlapExpiresAt",
+                    "certificateNotAfter",
+                    "currentControlCertificateSHA256",
+                    "nextControlCertificateSHA256",
+                    "caBundleSHA256",
+                    "offlineAuthorizationSHA256",
+                )
+            }
+            if any(len(values) != 1 for values in common.values()):
+                raise ValueError("Fully expired recovery batch shared authority differs")
+            replacement = {
+                "schemaVersion": OFFLINE_BATCH_ROTATION_SCHEMA,
+                "batchId": batch_id,
+                "tenantId": state["tenantId"],
+                "recoveryEpoch": state["epoch"],
+                "createdAt": min(item["createdAt"] for item in proposals),
+                "recoveryMode": OFFLINE_RECOVERY_MODE,
+                **{key: next(iter(values)) for key, values in common.items()},
+                "nodes": rows,
+            }
+            replacement_raw = _canonical_json(replacement)
+            atomic_write(temporary / "batch.json", replacement_raw)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(temporary, output)
+            record = {
+                "schemaVersion": OFFLINE_RECOVERY_RECORD_SCHEMA,
+                "recoveryMode": OFFLINE_RECOVERY_MODE,
+                "expiredBatchId": expired["batchId"],
+                "expiredBatchDigest": expired_digest,
+                "replacementBatchId": batch_id,
+                "replacementBatchDigest": _rotation_digest(replacement_raw),
+                "offlineAuthorizationSHA256": authorization_digest,
+                "supersededAt": replacement["createdAt"],
+                "stagedNodeIds": sorted(staged),
+            }
+            record_raw = _canonical_json(record)
+            if recovery_path.exists() and recovery_path.read_bytes() != record_raw:
+                raise ValueError("Existing fully expired recovery record differs")
+            if not recovery_path.exists():
+                atomic_write(recovery_path, record_raw)
+            journal = _write_batch_journal(
+                path,
+                manifest_raw=replacement_raw,
+                manifest=replacement,
+                bundle=output,
+                phase="prepared",
+                staged=[],
+            )
+        finally:
+            if temporary.exists():
+                shutil.rmtree(temporary)
+    print(
+        json.dumps(
+            {
+                "prepared": True,
+                "fullyExpiredOfflineRecovery": True,
+                "idempotentReplay": False,
+                "batchId": batch_id,
+                "nodeCount": len(rows),
+                "batchDigest": journal["batchDigest"],
+                "privateKeyTransferred": False,
+                "expiredLeafAcceptedAsAuthority": False,
             }
         )
     )
@@ -2272,7 +2905,7 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
     proposal_digest = _rotation_digest(manifest_raw)
     receipt = json.loads(receipt_path.read_text("utf-8"))
     expected_receipt_body = {
-        "schemaVersion": ROTATION_SCHEMA,
+        "schemaVersion": manifest["schemaVersion"],
         "rotationId": manifest["rotationId"],
         "proposalDigest": proposal_digest,
         "targetChannelVersion": manifest["targetChannelVersion"],
@@ -2450,7 +3083,7 @@ def commit_leaf_rotation_batch(args):
             raise ValueError("Control Plane receipt signing key type differs")
         for node_id, (proposal_raw, manifest, _files) in bundles.items():
             body = {
-                "schemaVersion": ROTATION_SCHEMA,
+                "schemaVersion": manifest["schemaVersion"],
                 "rotationId": manifest["rotationId"],
                 "proposalDigest": _rotation_digest(proposal_raw),
                 "nodeId": node_id,
@@ -2491,7 +3124,7 @@ def commit_leaf_rotation(args):
     proposal_digest = _rotation_digest(manifest_raw)
     receipt = json.loads(args.node_receipt.read_text("utf-8"))
     expected_receipt_body = {
-        "schemaVersion": ROTATION_SCHEMA,
+        "schemaVersion": manifest["schemaVersion"],
         "rotationId": manifest["rotationId"],
         "proposalDigest": proposal_digest,
         "targetChannelVersion": manifest["targetChannelVersion"],
@@ -2562,7 +3195,7 @@ def commit_leaf_rotation(args):
         atomic_write(node_certificate_path(path, state, node), files["node-cert.pem"])
         atomic_write(node_policy_path(path, state, node), files["peer-policy-final.json"])
         commit_receipt_body = {
-            "schemaVersion": ROTATION_SCHEMA,
+            "schemaVersion": manifest["schemaVersion"],
             "rotationId": manifest["rotationId"],
             "proposalDigest": proposal_digest,
             "nodeId": manifest["nodeId"],
@@ -2994,6 +3627,29 @@ def main():
         type=int,
         choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),
         default=DEFAULT_ROTATION_OVERLAP_SECONDS,
+    )
+    p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "prepare-fully-expired-leaf-rotation-recovery-batch",
+        help=(
+            "Create one fresh all-Node authority from expired signed identity history and an "
+            "exact private offline authorization"
+        ),
+    )
+    p.add_argument("--expired-batch", type=Path, required=True)
+    p.add_argument("--offline-authorization", type=Path, required=True)
+    p.add_argument("--csr", type=Path, action="append", required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--ca-key", type=Path, required=True)
+    p.add_argument("--ca-key-password-file", type=Path, required=True)
+    p.add_argument("--ca-chain", type=Path, required=True)
+    p.add_argument("--revocations", type=Path, required=True)
+    p.add_argument(
+        "--overlap-seconds",
+        type=int,
+        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),
+        default=DEFAULT_ROTATION_OVERLAP_SECONDS,
+        help="Bounded offline execution deadline; expired CP authority is never included",
     )
     p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
     p = commands.add_parser(
