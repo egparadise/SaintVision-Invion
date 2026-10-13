@@ -111,4 +111,3 @@ the exact PR head. It does not claim that the r2 pilot has recovered. Operationa
 later measurement requiring both Nodes online/fresh after the new global switch, post-switch
 heartbeats, exact incremented channel versions, fresh leaf expiries, and redacted evidence. No
 secret, DSN, private key, or certificate identity belongs in Git, console output, or PR comments.
-
