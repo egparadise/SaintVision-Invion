@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.327"
+version: "1.0.328"
 status: "review"
 author: "Codex"
-updated: "2026-10-14T07:42:37+09:00"
+updated: "2026-10-14T07:54:03+09:00"
 source_of_truth: "Git"
 active_card: "CARD-295 fully expired offline LAN pilot recovery"
-active_card_status: "Option B implementation preserves the r2 identities but treats every expired leaf only as signed history; the separate v2 path requires external re-issuance, Node-local key proof, private OOB authorization, locked channel baselines, and monotonic CAS; no live recovery has run"
-active_card_next: "Open the Card 295 PR on train 70, obtain Claude security review and exact-head hosted CI, then wait for a separate post-landing live-recovery instruction"
+active_card_status: "PR #391 is open on train 70; Option B preserves the r2 identities but treats every expired leaf only as signed history, and local 2-Node/PKI verification is green; hosted exact-head CI and Claude review are pending; no live recovery has run"
+active_card_next: "Finish exact-head Backend/Core/Docs, obtain Claude security review, and then wait for landing plus a separate explicit live-recovery instruction"
 ---
 
 ## 2026-10-14 Card 295 — fully expired offline LAN pilot recovery
