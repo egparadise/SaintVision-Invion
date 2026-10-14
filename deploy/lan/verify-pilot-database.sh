@@ -1,12 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-container=${1:?usage: verify-pilot-database.sh <container> <network>}
-network=${2:?usage: verify-pilot-database.sh <container> <network>}
+container=${1:?usage: verify-pilot-database.sh <container> <network> [database] [operator-private-dir]}
+network=${2:?usage: verify-pilot-database.sh <container> <network> [database] [operator-private-dir]}
+database=${3:-saintvision_lan}
+private_dir=${4:-}
 [[ "$container" =~ ^saintvision-[a-z0-9-]+$ && "$network" =~ ^saintvision-[a-z0-9-]+$ ]] || {
     echo 'Container or network is outside the SaintVision ownership namespace.' >&2
     exit 2
 }
+[[ ${#database} -le 63 && "$database" =~ ^saintvision_lan(_[a-z0-9]+)*$ ]] || {
+    echo 'The database name is outside the SaintVision pilot namespace.' >&2
+    exit 2
+}
+runtime_role=${database/saintvision_lan/inv_lan_runtime}
+if [[ "$database" != saintvision_lan && -z "$private_dir" ]]; then
+    echo 'A private credential directory is required for a namespaced pilot database.' >&2
+    exit 2
+fi
+if [[ -n "$private_dir" ]]; then
+    [[ "$private_dir" == /* && ! -L "$private_dir" ]] || {
+        echo 'The credential directory must be an absolute non-symlink path.' >&2
+        exit 2
+    }
+    runtime_password=$private_dir/${runtime_role}.password
+    [[ -f "$runtime_password" && ! -L "$runtime_password" ]] || {
+        echo 'The runtime credential file is missing or unsafe.' >&2
+        exit 2
+    }
+    [[ "$(stat -c '%a' "$runtime_password")" == 600 ]] || {
+        echo 'The runtime credential file must be owner-only.' >&2
+        exit 2
+    }
+fi
 
 internal=$(docker network inspect --format '{{.Internal}}' "$network")
 owner=$(docker network inspect --format '{{index .Labels "ai.saintvision.lan-pilot"}}' "$network")
@@ -25,30 +51,44 @@ loopback=$(docker container inspect \
 }
 
 if docker exec "$container" sh -ec \
-    'PGPASSFILE=/dev/null exec psql -h 127.0.0.1 -U postgres -d saintvision_lan -Atqc "SELECT 1"' \
+    'PGPASSFILE=/dev/null exec psql -h 127.0.0.1 -U postgres -d "$1" -Atqc "SELECT 1"' \
+    _ "$database" \
     >/dev/null 2>&1; then
     echo 'Pilot database accepted a missing credential.' >&2
     exit 1
 fi
 if docker exec "$container" sh -ec \
-    'PGPASSWORD=wrong; export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d saintvision_lan -Atqc "SELECT 1"' \
+    'PGPASSWORD=wrong; export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d "$1" -Atqc "SELECT 1"' \
+    _ "$database" \
     >/dev/null 2>&1; then
     echo 'Pilot database accepted an incorrect credential.' >&2
     exit 1
 fi
 admin=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d saintvision_lan -Atqc "SELECT current_user"')
-runtime=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/runtime-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U inv_lan_runtime -d saintvision_lan -Atqc "SELECT current_user"')
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d "$1" -Atqc "SELECT current_user"' \
+    _ "$database")
+if [[ -n "$private_dir" ]]; then
+    runtime=$(docker exec -i "$container" sh -ec \
+        'IFS= read -r PGPASSWORD; export PGPASSWORD; exec psql -h 127.0.0.1 -U "$1" -d "$2" -Atqc "SELECT current_user"' \
+        _ "$runtime_role" "$database" <"$runtime_password")
+else
+    runtime=$(docker exec "$container" sh -ec \
+        'PGPASSWORD=$(cat /run/secrets/runtime-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U "$1" -d "$2" -Atqc "SELECT current_user"' \
+        _ "$runtime_role" "$database")
+fi
 runtime_privileges=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication FROM pg_roles WHERE rolname = '\''inv_lan_runtime'\''"')
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -v runtime_role="$2" -Atqc "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication FROM pg_roles WHERE rolname = :'\''runtime_role'\''"' \
+    _ "$database" "$runtime_role")
 methods=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT string_agg(DISTINCT auth_method, '"'"','"'"' ORDER BY auth_method) FROM pg_hba_file_rules WHERE type='"'"'host'"'"' AND error IS NULL"')
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -Atqc "SELECT string_agg(DISTINCT auth_method, '"'"','"'"' ORDER BY auth_method) FROM pg_hba_file_rules WHERE type='"'"'host'"'"' AND error IS NULL"' \
+    _ "$database")
 encryption=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SHOW password_encryption"')
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -Atqc "SHOW password_encryption"' \
+    _ "$database")
 unexpected_memberships=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT count(*) FROM pg_auth_members m JOIN pg_roles child ON child.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE child.rolname='\''inv_lan_runtime'\'' AND parent.rolname<>'\''inv_kernel'\''"')
-[[ "$admin" == postgres && "$runtime" == inv_lan_runtime ]] || {
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -v runtime_role="$2" -Atqc "SELECT count(*) FROM pg_auth_members m JOIN pg_roles child ON child.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE child.rolname=:'\''runtime_role'\'' AND parent.rolname<>'\''inv_kernel'\''"' \
+    _ "$database" "$runtime_role")
+[[ "$admin" == postgres && "$runtime" == "$runtime_role" ]] || {
     echo 'Pilot database credentials are not role-bound.' >&2
     exit 1
 }
@@ -65,4 +105,5 @@ unexpected_memberships=$(docker exec "$container" sh -ec \
     exit 1
 }
 
-printf '{"missingCredentialRejected":true,"wrongCredentialRejected":true,"adminCredentialAccepted":true,"runtimeCredentialAccepted":true,"hostAuthentication":"scram-sha-256","networkDedicated":true,"networkInternal":false,"networkCount":1,"publishAddress":"loopback"}\n'
+printf '{"databaseName":"%s","runtimeRole":"%s","missingCredentialRejected":true,"wrongCredentialRejected":true,"adminCredentialAccepted":true,"runtimeCredentialAccepted":true,"hostAuthentication":"scram-sha-256","networkDedicated":true,"networkInternal":false,"networkCount":1,"publishAddress":"loopback"}\n' \
+    "$database" "$runtime_role"

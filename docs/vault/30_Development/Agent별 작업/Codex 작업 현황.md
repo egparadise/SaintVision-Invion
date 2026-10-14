@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.328"
+version: "1.0.329"
 status: "review"
 author: "Codex"
-updated: "2026-10-14T08:19:22+09:00"
+updated: "2026-10-14T12:36:01+09:00"
 source_of_truth: "Git"
-active_card: "CARD-295 fully expired offline LAN pilot recovery"
-active_card_status: "PR #391 is approved by Claude at c7b1973f and is in merge train 71; Option B preserves the r2 identities and treats every expired leaf only as signed history; no live recovery has run"
-active_card_next: "After train 71 is verified, the operator installs python3-venv on both Nodes and explicitly approves the live recovery with the private OOB authorization record"
+active_card: "CARD-296 fresh isolated r3 bootstrap database namespace"
+active_card_status: "Implementation and negative tests are in progress on the train 71 candidate; no database, state, tunnel, Node, container, or volume has been changed"
+active_card_next: "Open the docs-and-tools PR, obtain Claude review and train 72 verification, then wait for a separate final operator instruction before any r3 bootstrap"
 ---
+
+## 2026-10-14 Card 296 — fresh isolated r3 bootstrap database namespace
+
+- Option A creates new r3 tenant/epoch/Node identities and a new database while preserving every
+  r2 state, journal, database, container, and volume.
+- Strict names derive a unique least-privilege runtime role. Existing database/role collisions,
+  mismatched passfile DSNs, elevated roles, non-SCRAM authentication, and unexpected memberships
+  fail closed. Default `saintvision_lan` behavior remains compatible.
+- The reviewed-but-not-run procedure reuses only the hardened PostgreSQL transport and
+  desktop-owned tunnel, uses a Linux-built exact-SHA image, keeps Node keys local, selects
+  non-conflicting bootstrap/Node ports, and switches the desktop shortcut only after two fresh
+  online observations.
+- History: [[2026-10-14_12-36-01_KST_Card296_r3_bootstrap_database_name_Codex]].
 
 ## 2026-10-14 Card 295 — fully expired offline LAN pilot recovery
 
