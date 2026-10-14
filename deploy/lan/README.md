@@ -39,15 +39,21 @@ Keep the state directory: it contains the independently generated recovery epoch
 and CA. A partial failure is preserved for inspection, never reset automatically.
 
 When Docker Desktop must not be used on the Control Plane host, `init` also
-accepts `--admin-dsn-file` and `--runtime-dsn-file`. Both files must describe a
-SCRAM-authenticated loopback connection to `saintvision_lan` and must not embed
-a password in the URI. The supported boundary is an operator-owned SSH tunnel
-plus one-entry PostgreSQL passfiles stored outside the pilot state. The remote
-database publishes only on `127.0.0.1`, belongs to one dedicated user-defined
-Docker network, and has distinct admin and `inv_lan_runtime` credentials.
-`deploy/lan/prepare-pilot-database.sh` creates that digest-pinned, separately
-named database; `deploy/lan/verify-pilot-database.sh` proves missing and wrong
-credentials are rejected before the files may be used. `bind-db-auth` rebinds a
+accepts `--admin-dsn-file` and `--runtime-dsn-file`. Both files must describe the
+same SCRAM-authenticated loopback database and must not embed a password in the
+URI. The database name is either the backwards-compatible `saintvision_lan` or
+an isolated name in the strict `saintvision_lan_<lowercase-component>` namespace.
+Each isolated database receives its own derived `inv_lan_runtime_<suffix>` role,
+so creating an r3 pilot cannot rotate the preserved r2 runtime credential. The
+supported boundary is an operator-owned SSH tunnel plus one-entry PostgreSQL
+passfiles stored outside the pilot state. The remote database publishes only on
+`127.0.0.1`, belongs to one dedicated user-defined Docker network, and has
+distinct admin and least-privilege runtime credentials.
+`deploy/lan/prepare-pilot-database.sh` creates the requested database only when
+neither it nor its derived role exists; it never overwrites or deletes a prior
+pilot. `deploy/lan/verify-pilot-database.sh` proves missing and wrong credentials,
+role privilege drift, membership drift, and non-SCRAM host authentication are
+rejected before the files may be used. `bind-db-auth` rebinds a
 preserved state only after those checks pass. It does not delete or silently
 reuse another pilot. `--download-port` and `--node-port` let a fresh state avoid
 ports owned by an older preserved pilot. A Node port is part of the immutable

@@ -589,6 +589,76 @@ def test_external_database_dsn_requires_exact_private_passfile_and_loopback(tmp_
         lan_pilot.read_external_dsn(dsn, "postgres")
 
 
+@pytest.mark.parametrize(
+    ("database", "role"),
+    [
+        ("saintvision_lan", "inv_lan_runtime"),
+        ("saintvision_lan_r3_871e74dc", "inv_lan_runtime_r3_871e74dc"),
+        ("saintvision_lan_r3_1", "inv_lan_runtime_r3_1"),
+    ],
+)
+def test_pilot_database_namespace_derives_one_least_privilege_role(database, role):
+    assert lan_pilot.validate_pilot_database_name(database) == database
+    assert lan_pilot.pilot_runtime_role(database) == role
+    assert len(role) <= 63
+
+
+@pytest.mark.parametrize(
+    "database",
+    [
+        "postgres",
+        "saintvision_lan_",
+        "saintvision_lan-R3",
+        "saintvision_lan_R3",
+        "saintvision_lan_r3;drop",
+        "saintvision_lan_r3/other",
+        "saintvision_lan_" + "a" * 49,
+        "",
+        None,
+    ],
+)
+def test_pilot_database_namespace_rejects_ambiguous_or_injection_names(database):
+    with pytest.raises(ValueError, match="outside the SaintVision namespace"):
+        lan_pilot.validate_pilot_database_name(database)
+
+
+def test_external_database_dsn_accepts_namespaced_database_and_requires_matching_pair(tmp_path):
+    database = "saintvision_lan_r3_871e74dc"
+    role = "inv_lan_runtime_r3_871e74dc"
+    admin_passfile = tmp_path / "admin.pgpass"
+    runtime_passfile = tmp_path / "runtime.pgpass"
+    admin_dsn_file = tmp_path / "admin.dsn"
+    runtime_dsn_file = tmp_path / "runtime.dsn"
+    admin_passfile.write_text(
+        f"127.0.0.1:55448:{database}:postgres:" + ("a" * 64) + "\n",
+        encoding="utf-8",
+    )
+    runtime_passfile.write_text(
+        f"127.0.0.1:55448:{database}:{role}:" + ("b" * 64) + "\n",
+        encoding="utf-8",
+    )
+    admin_passfile.chmod(0o600)
+    runtime_passfile.chmod(0o600)
+    admin_dsn_file.write_text(
+        f"host=127.0.0.1 port=55448 dbname={database} user=postgres "
+        f"passfile='{admin_passfile.as_posix()}'",
+        encoding="utf-8",
+    )
+    runtime_dsn_file.write_text(
+        f"host=127.0.0.1 port=55448 dbname={database} user={role} "
+        f"passfile='{runtime_passfile.as_posix()}'",
+        encoding="utf-8",
+    )
+
+    admin_dsn = lan_pilot.read_external_dsn(admin_dsn_file, "postgres")
+    runtime_dsn = lan_pilot.read_external_dsn(runtime_dsn_file, role)
+    assert lan_pilot._require_same_external_database(admin_dsn, runtime_dsn) == database
+
+    mismatched = runtime_dsn.replace(database, "saintvision_lan_r3_other")
+    with pytest.raises(ValueError, match="select different databases"):
+        lan_pilot._require_same_external_database(admin_dsn, mismatched)
+
+
 def test_remote_database_script_uses_scram_dedicated_network_and_private_files():
     root = Path(__file__).resolve().parents[1]
     script = (root / "deploy/lan/prepare-pilot-database.sh").read_text(encoding="utf-8")
@@ -605,11 +675,21 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert not re.search(
         r"(?m)^psql\b[^\n]*(?:runtime_password|\$\([^\n]*runtime-password)", script
     )
-    assert "\\set runtime_password `cat /run/secrets/runtime-password`" in script
+    assert "\\set runtime_password '%s'" in script
     assert "SET log_statement = 'none'" in script
     assert "SET log_min_error_statement = 'panic'" in script
-    assert "ALTER ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS" in script
+    assert "ALTER ROLE %I LOGIN NOSUPERUSER NOBYPASSRLS" in script
     assert "NOCREATEDB NOCREATEROLE NOREPLICATION" in script
+    assert "Requested pilot database or runtime role already exists; preserving it." in script
+    assert "database=${6-saintvision_lan}" in script
+    assert "database=${6:-saintvision_lan}" not in script
+    assert "database=${3-saintvision_lan}" in verifier
+    assert "database=${3:-saintvision_lan}" not in verifier
+    assert "^saintvision_lan(_[a-z0-9]+)*$" in script
+    assert "^saintvision_lan(_[a-z0-9]+)*$" in verifier
+    assert "runtime_role=${database/saintvision_lan/inv_lan_runtime}" in script
+    assert "runtime_role=${database/saintvision_lan/inv_lan_runtime}" in verifier
+    assert "POSTGRES_HOST_AUTH_METHOD=trust" not in verifier
     assert "rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication" in verifier
     assert "'f|f|f|f|f'" in verifier
 
@@ -626,6 +706,164 @@ def test_remote_database_scripts_are_valid_bash():
             text=True,
         )
         assert completed.returncode == 0, completed.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX fake-driver test runs in hosted Linux")
+def test_remote_database_prepare_rejects_invalid_name_before_docker(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    marker = tmp_path / "docker-called"
+    fake_docker = fake_bin / "docker"
+    fake_docker.write_text(f"#!/usr/bin/env bash\ntouch '{marker}'\nexit 99\n", encoding="utf-8")
+    fake_docker.chmod(0o700)
+
+    result = subprocess.run(
+        [
+            "bash",
+            str(root / "deploy/lan/prepare-pilot-database.sh"),
+            "postgres@sha256:" + "a" * 64,
+            "saintvision-test-db",
+            "55440",
+            str(tmp_path / "private"),
+            "saintvision-test-network",
+            "saintvision_lan_r3;drop",
+        ],
+        env={**os.environ, "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}"},
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    assert result.returncode == 2
+    assert "outside the SaintVision pilot namespace" in result.stderr
+    assert not marker.exists()
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX fake-driver test runs in hosted Linux")
+def test_remote_database_prepare_refuses_collision_and_creates_only_absent_name(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    command_log = tmp_path / "docker-commands"
+    fake_docker = fake_bin / "docker"
+    fake_docker.write_text(
+        """#!/usr/bin/env bash
+set -eu
+printf '%s\n' "$*" >>"$FAKE_COMMAND_LOG"
+command_line="$*"
+case "$command_line" in
+  "image inspect --format {{.Id}} "*) echo sha256:image ;;
+  "network inspect saintvision-test-network") exit 0 ;;
+  "network inspect --format {{.Internal}} saintvision-test-network") echo false ;;
+  *"ai.saintvision.lan-pilot"*) echo card150 ;;
+  "container inspect saintvision-test-db") exit 0 ;;
+  *"container inspect --format {{.Image}}"*) echo sha256:image ;;
+  *"container inspect --format {{.State.Running}}"*) echo true ;;
+  *"container inspect --format {{if index .NetworkSettings.Networks"*) echo yes ;;
+  *"SELECT 1"*) echo 1 ;;
+  *"sh -s -- saintvision_lan_r3_871e74dc")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_database"*) echo "${FAKE_DATABASE_COUNT:-0}" ;;
+      *"CREATE DATABASE"*) exit 0 ;;
+      *) echo unexpected-database-stdin >&2; exit 91 ;;
+    esac
+    ;;
+  *"sh -s -- saintvision_lan")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_database"*) echo "${FAKE_DATABASE_COUNT:-0}" ;;
+      *"CREATE DATABASE"*) exit 0 ;;
+      *) echo unexpected-default-database-stdin >&2; exit 94 ;;
+    esac
+    ;;
+  *"sh -s -- inv_lan_runtime_r3_871e74dc")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_roles"*) echo 0 ;;
+      *) echo unexpected-role-stdin >&2; exit 92 ;;
+    esac
+    ;;
+  *"sh -s -- inv_lan_runtime")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_roles"*) echo 0 ;;
+      *) echo unexpected-default-role-stdin >&2; exit 95 ;;
+    esac
+    ;;
+  *"_ saintvision_lan_r3_871e74dc inv_lan_runtime_r3_871e74dc") cat >/dev/null ;;
+  *"_ saintvision_lan inv_lan_runtime") cat >/dev/null ;;
+  *) echo "unexpected docker invocation: $command_line" >&2; exit 93 ;;
+esac
+""",
+        encoding="utf-8",
+    )
+    fake_docker.chmod(0o700)
+    fake_openssl = fake_bin / "openssl"
+    fake_openssl.write_text(
+        "#!/usr/bin/env bash\n[[ \"$*\" == 'rand -hex 32' ]]\nprintf '%064d\\n' 0\n",
+        encoding="utf-8",
+    )
+    fake_openssl.chmod(0o700)
+    private_dir = tmp_path / "private"
+    command = [
+        "bash",
+        str(root / "deploy/lan/prepare-pilot-database.sh"),
+        "postgres@sha256:" + "a" * 64,
+        "saintvision-test-db",
+        "55440",
+        str(private_dir),
+        "saintvision-test-network",
+        "saintvision_lan_r3_871e74dc",
+    ]
+    environment = {
+        **os.environ,
+        "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}",
+        "FAKE_COMMAND_LOG": str(command_log),
+    }
+
+    empty_name = subprocess.run(
+        [*command[:-1], ""],
+        env=environment,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    assert empty_name.returncode == 2
+    assert "outside the SaintVision pilot namespace" in empty_name.stderr
+    assert not command_log.exists()
+
+    defaulted = subprocess.run(
+        command[:-1], env=environment, capture_output=True, check=False, text=True
+    )
+    assert defaulted.returncode == 0, defaulted.stderr
+    default_receipt = json.loads(defaulted.stdout)
+    assert default_receipt["databaseName"] == "saintvision_lan"
+    assert default_receipt["runtimeRole"] == "inv_lan_runtime"
+
+    command_log.write_text("", encoding="utf-8")
+    collision = subprocess.run(
+        command,
+        env={**environment, "FAKE_DATABASE_COUNT": "1"},
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    assert collision.returncode == 1
+    assert "already exists; preserving it" in collision.stderr
+    collision_log = command_log.read_text(encoding="utf-8")
+    assert "saintvision_lan_r3_871e74dc inv_lan_runtime_r3_871e74dc" not in collision_log
+
+    command_log.write_text("", encoding="utf-8")
+    created = subprocess.run(command, env=environment, capture_output=True, check=False, text=True)
+    assert created.returncode == 0, created.stderr
+    receipt = json.loads(created.stdout)
+    assert receipt["databaseName"] == "saintvision_lan_r3_871e74dc"
+    assert receipt["runtimeRole"] == "inv_lan_runtime_r3_871e74dc"
+    safe_log = command_log.read_text(encoding="utf-8")
+    assert "saintvision_lan_r3_871e74dc" in safe_log
+    assert "inv_lan_runtime_r3_871e74dc" in safe_log
+    assert "0" * 64 not in safe_log
 
 
 def test_remote_node_dockerfile_sources_are_in_the_root_build_context():
@@ -665,7 +903,8 @@ case "$command_line" in
   *'pg_auth_members'*) echo "${FAKE_UNEXPECTED_MEMBERSHIPS:-0}" ;;
   *'pg_hba_file_rules'*) echo "${FAKE_AUTH_METHODS:-scram-sha-256}" ;;
   *'SHOW password_encryption'*) echo scram-sha-256 ;;
-  *'-U inv_lan_runtime'*'SELECT current_user'*) echo inv_lan_runtime ;;
+  *'SELECT current_user'*'inv_lan_runtime_r3_871e74dc'*) echo inv_lan_runtime_r3_871e74dc ;;
+  *'SELECT current_user'*'inv_lan_runtime'*) echo inv_lan_runtime ;;
   *'SELECT current_user'*) echo postgres ;;
   *) echo "unexpected docker invocation" >&2; exit 3 ;;
 esac
@@ -681,7 +920,31 @@ esac
     ]
     environment = {**os.environ, "PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}"}
 
-    assert subprocess.run(command, env=environment, check=False).returncode == 0
+    defaulted = subprocess.run(command, env=environment, capture_output=True, check=False, text=True)
+    assert defaulted.returncode == 0, defaulted.stderr
+    default_receipt = json.loads(defaulted.stdout)
+    assert default_receipt["databaseName"] == "saintvision_lan"
+    assert default_receipt["runtimeRole"] == "inv_lan_runtime"
+    empty_name = subprocess.run(
+        [*command, ""], env=environment, capture_output=True, check=False, text=True
+    )
+    assert empty_name.returncode == 2
+    assert "outside the SaintVision pilot namespace" in empty_name.stderr
+    private_dir = tmp_path / "private"
+    private_dir.mkdir()
+    runtime_password = private_dir / "inv_lan_runtime_r3_871e74dc.password"
+    runtime_password.write_text("b" * 64 + "\n", encoding="utf-8")
+    runtime_password.chmod(0o600)
+    namespaced = [
+        *command,
+        "saintvision_lan_r3_871e74dc",
+        str(private_dir),
+    ]
+    accepted = subprocess.run(
+        namespaced, env=environment, capture_output=True, check=False, text=True
+    )
+    assert accepted.returncode == 0, accepted.stderr
+    assert json.loads(accepted.stdout)["runtimeRole"] == "inv_lan_runtime_r3_871e74dc"
     for variable, value in (
         ("FAKE_RUNTIME_PRIVILEGES", "f|f|f|f|t"),
         ("FAKE_UNEXPECTED_MEMBERSHIPS", "1"),
@@ -691,24 +954,31 @@ esac
         assert subprocess.run(command, env=drifted, check=False).returncode == 1
 
 
+@pytest.mark.parametrize(
+    ("database", "runtime_role"),
+    [
+        ("saintvision_lan", "inv_lan_runtime"),
+        ("saintvision_lan_r3_871e74dc", "inv_lan_runtime_r3_871e74dc"),
+    ],
+)
 def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
-    tmp_path, monkeypatch, capsys
+    tmp_path, monkeypatch, capsys, database, runtime_role
 ):
     configured = state([node("nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "192.168.45.81")])
     configured.update(
         databaseMode=lan_pilot.EXTERNAL_DATABASE_MODE,
-        adminDSN="host=127.0.0.1 port=55442 dbname=saintvision_lan user=postgres",
-        runtimeDSN=("host=127.0.0.1 port=55442 dbname=saintvision_lan user=inv_lan_runtime"),
+        adminDSN=f"host=127.0.0.1 port=55442 dbname={database} user=postgres",
+        runtimeDSN=f"host=127.0.0.1 port=55442 dbname={database} user={runtime_role}",
     )
     (tmp_path / "private-state.json").write_text(json.dumps(configured), encoding="utf-8")
     admin_passfile = tmp_path / "admin.pgpass"
     runtime_passfile = tmp_path / "runtime.pgpass"
     admin_passfile.write_text(
-        "127.0.0.1:55442:saintvision_lan:postgres:" + ("a" * 64) + "\n",
+        f"127.0.0.1:55442:{database}:postgres:" + ("a" * 64) + "\n",
         encoding="utf-8",
     )
     runtime_passfile.write_text(
-        "127.0.0.1:55442:saintvision_lan:inv_lan_runtime:" + ("b" * 64) + "\n",
+        f"127.0.0.1:55442:{database}:{runtime_role}:" + ("b" * 64) + "\n",
         encoding="utf-8",
     )
     admin_passfile.chmod(0o600)
@@ -739,14 +1009,16 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
         def __exit__(self, *_):
             return False
 
-        def execute(self, query):
+        def execute(self, query, params=None):
             if query == "SHOW password_encryption":
                 return Result(one=("scram-sha-256",))
             if "pg_hba_file_rules" in query:
                 return Result(rows=[(method,) for method in auth_methods])
             if "FROM pg_auth_members" in query:
+                assert params == (runtime_role,)
                 return Result(rows=[(role,) for role in runtime_memberships])
             if "FROM pg_roles" in query:
+                assert params == (runtime_role,)
                 return Result(one=tuple(runtime_privileges))
             if query == "SELECT current_user":
                 return Result(one=(self.info["user"],))
