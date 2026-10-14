@@ -750,10 +750,12 @@ command_line="$*"
 case "$command_line" in
   "image inspect --format {{.Id}} "*) echo sha256:image ;;
   "network inspect saintvision-test-network") exit 0 ;;
+  "network inspect --format {{.Internal}} saintvision-test-network") echo false ;;
   *"ai.saintvision.lan-pilot"*) echo card150 ;;
   "container inspect saintvision-test-db") exit 0 ;;
   *"container inspect --format {{.Image}}"*) echo sha256:image ;;
   *"container inspect --format {{.State.Running}}"*) echo true ;;
+  *"container inspect --format {{if index .NetworkSettings.Networks"*) echo yes ;;
   *"SELECT 1"*) cat >/dev/null; echo 1 ;;
   *"sh -s -- saintvision_lan_r3_871e74dc")
     payload=$(cat)
