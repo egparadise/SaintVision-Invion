@@ -62,6 +62,7 @@ CERTIFICATE_REVOCATION_REASONS = {
 }
 EXTERNAL_DATABASE_MODE = "ssh-tunnel-external"
 LOCAL_DATABASE_MODE = "managed-local-docker"
+PILOT_DATABASE_PATTERN = re.compile(r"saintvision_lan(?:_[a-z0-9]+)*")
 BATCH_ROTATION_SCHEMA = "saintvision-lan-leaf-rotation-batch:1"
 OFFLINE_BATCH_ROTATION_SCHEMA = "saintvision-lan-leaf-rotation-batch:2"
 BATCH_MANIFEST_KEYS = {
@@ -197,6 +198,36 @@ def _read_pgpass(path, *, host, port, dbname, user):
     return fields[4]
 
 
+def validate_pilot_database_name(value):
+    """Keep pilot databases inside one explicit, injection-safe namespace."""
+    if (
+        not isinstance(value, str)
+        or len(value) > 63
+        or PILOT_DATABASE_PATTERN.fullmatch(value) is None
+    ):
+        raise ValueError("External pilot database name is outside the SaintVision namespace")
+    return value
+
+
+def pilot_runtime_role(database):
+    database = validate_pilot_database_name(database)
+    return "inv_lan_runtime" + database[len("saintvision_lan") :]
+
+
+def _require_same_external_database(admin_dsn, runtime_dsn):
+    admin = psycopg.conninfo.conninfo_to_dict(admin_dsn)
+    runtime_info = psycopg.conninfo.conninfo_to_dict(runtime_dsn)
+    identity = (admin.get("host"), admin.get("port", "5432"), admin.get("dbname"))
+    runtime_identity = (
+        runtime_info.get("host"),
+        runtime_info.get("port", "5432"),
+        runtime_info.get("dbname"),
+    )
+    if identity != runtime_identity:
+        raise ValueError("External admin and runtime DSNs select different databases")
+    return validate_pilot_database_name(admin["dbname"])
+
+
 def read_external_dsn(path, expected_user):
     """Accept a loopback SSH-tunnel DSN backed by one owner-private pgpass entry."""
     if path is None or path.is_symlink() or not path.is_file():
@@ -206,12 +237,12 @@ def read_external_dsn(path, expected_user):
         raise ValueError("External database DSN file is invalid")
     value = raw.decode("utf-8").strip()
     info = psycopg.conninfo.conninfo_to_dict(value)
+    database = validate_pilot_database_name(info.get("dbname"))
     if (
         info.get("host") not in ("127.0.0.1", "localhost")
         or info.get("user") != expected_user
         or info.get("password")
         or not info.get("passfile")
-        or info.get("dbname") != "saintvision_lan"
     ):
         raise ValueError("External database DSN must use a passfile-backed loopback tunnel")
     port = int(info.get("port", 5432))
@@ -221,7 +252,7 @@ def read_external_dsn(path, expected_user):
         info["passfile"],
         host=info["host"],
         port=port,
-        dbname=info["dbname"],
+        dbname=database,
         user=expected_user,
     )
     return make_conninfo(value, connect_timeout=5)
@@ -242,10 +273,10 @@ def _dsn_with_passfile(value, expected_user, passfile):
     info = psycopg.conninfo.conninfo_to_dict(value)
     host = info.get("host")
     port = int(info.get("port", 5432))
+    database = validate_pilot_database_name(info.get("dbname"))
     if (
         host not in ("127.0.0.1", "localhost")
         or info.get("user") != expected_user
-        or info.get("dbname") != "saintvision_lan"
         or info.get("password")
     ):
         raise ValueError("Existing external database identity differs")
@@ -254,13 +285,13 @@ def _dsn_with_passfile(value, expected_user, passfile):
         passfile,
         host=host,
         port=port,
-        dbname=info["dbname"],
+        dbname=database,
         user=expected_user,
     )
     return make_conninfo(
         host=host,
         port=port,
-        dbname=info["dbname"],
+        dbname=database,
         user=expected_user,
         passfile=str(passfile),
         connect_timeout=5,
@@ -273,7 +304,12 @@ def bind_db_auth(args):
     if state.get("databaseMode") != EXTERNAL_DATABASE_MODE:
         raise ValueError("Only an external pilot database can bind external credentials")
     admin_dsn = _dsn_with_passfile(state["adminDSN"], "postgres", args.admin_passfile)
-    runtime_dsn = _dsn_with_passfile(state["runtimeDSN"], "inv_lan_runtime", args.runtime_passfile)
+    database = validate_pilot_database_name(
+        psycopg.conninfo.conninfo_to_dict(admin_dsn).get("dbname")
+    )
+    runtime_role = pilot_runtime_role(database)
+    runtime_dsn = _dsn_with_passfile(state["runtimeDSN"], runtime_role, args.runtime_passfile)
+    _require_same_external_database(admin_dsn, runtime_dsn)
     admin_info = psycopg.conninfo.conninfo_to_dict(admin_dsn)
     no_credential = make_conninfo(
         host=admin_info["host"],
@@ -310,7 +346,8 @@ def bind_db_auth(args):
             raise ValueError("Pilot database host authentication is not exclusively SCRAM")
         role_privileges = conn.execute(
             "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication "
-            "FROM pg_roles WHERE rolname = 'inv_lan_runtime'"
+            "FROM pg_roles WHERE rolname = %s",
+            (runtime_role,),
         ).fetchone()
         if role_privileges != (False, False, False, False, False):
             raise ValueError("Pilot runtime role has elevated privileges")
@@ -320,13 +357,14 @@ def bind_db_auth(args):
                 "SELECT parent.rolname FROM pg_auth_members m "
                 "JOIN pg_roles child ON child.oid=m.member "
                 "JOIN pg_roles parent ON parent.oid=m.roleid "
-                "WHERE child.rolname='inv_lan_runtime' ORDER BY parent.rolname"
+                "WHERE child.rolname=%s ORDER BY parent.rolname",
+                (runtime_role,),
             ).fetchall()
         ]
         if memberships != ["inv_kernel"]:
             raise ValueError("Pilot runtime role membership differs from inv_kernel only")
     with psycopg.connect(runtime_dsn) as conn:
-        if conn.execute("SELECT current_user").fetchone()[0] != "inv_lan_runtime":
+        if conn.execute("SELECT current_user").fetchone()[0] != runtime_role:
             raise ValueError("Pilot runtime credential is not role-bound")
     state["adminDSN"] = admin_dsn
     state["runtimeDSN"] = runtime_dsn
@@ -924,11 +962,17 @@ def init(args):
         ):
             if state.get("databaseMode") == EXTERNAL_DATABASE_MODE:
                 if getattr(args, "admin_dsn_file", None) is not None:
-                    if state["adminDSN"] != read_external_dsn(args.admin_dsn_file, "postgres"):
+                    admin_dsn = read_external_dsn(args.admin_dsn_file, "postgres")
+                    database = validate_pilot_database_name(
+                        psycopg.conninfo.conninfo_to_dict(admin_dsn).get("dbname")
+                    )
+                    runtime_dsn = read_external_dsn(
+                        args.runtime_dsn_file, pilot_runtime_role(database)
+                    )
+                    _require_same_external_database(admin_dsn, runtime_dsn)
+                    if state["adminDSN"] != admin_dsn:
                         raise ValueError("Existing external admin DSN differs")
-                    if state["runtimeDSN"] != read_external_dsn(
-                        args.runtime_dsn_file, "inv_lan_runtime"
-                    ):
+                    if state["runtimeDSN"] != runtime_dsn:
                         raise ValueError("Existing external runtime DSN differs")
             state = ensure_pilot_pki(path, state, args)
             save(path, state)
@@ -961,15 +1005,17 @@ def init(args):
         if external_dsn != (getattr(args, "runtime_dsn_file", None) is not None):
             raise ValueError("Both external database DSN files are required")
         if external_dsn:
+            admin_dsn = read_external_dsn(args.admin_dsn_file, "postgres")
+            database = validate_pilot_database_name(
+                psycopg.conninfo.conninfo_to_dict(admin_dsn).get("dbname")
+            )
+            runtime_dsn = read_external_dsn(args.runtime_dsn_file, pilot_runtime_role(database))
+            _require_same_external_database(admin_dsn, runtime_dsn)
             state["databaseMode"] = EXTERNAL_DATABASE_MODE
             state["container"] = None
-            state["dbPort"] = int(
-                psycopg.conninfo.conninfo_to_dict(
-                    read_external_dsn(args.admin_dsn_file, "postgres")
-                )["port"]
-            )
-            state["adminDSN"] = read_external_dsn(args.admin_dsn_file, "postgres")
-            state["runtimeDSN"] = read_external_dsn(args.runtime_dsn_file, "inv_lan_runtime")
+            state["dbPort"] = int(psycopg.conninfo.conninfo_to_dict(admin_dsn)["port"])
+            state["adminDSN"] = admin_dsn
+            state["runtimeDSN"] = runtime_dsn
         else:
             state["databaseMode"] = LOCAL_DATABASE_MODE
             state["container"] = "saintvision-lan-db-" + epoch[:8]
@@ -994,9 +1040,15 @@ def init(args):
     state.setdefault("databaseMode", LOCAL_DATABASE_MODE)
     if state["databaseMode"] == EXTERNAL_DATABASE_MODE:
         if getattr(args, "admin_dsn_file", None) is not None:
-            if state["adminDSN"] != read_external_dsn(args.admin_dsn_file, "postgres"):
+            admin_dsn = read_external_dsn(args.admin_dsn_file, "postgres")
+            database = validate_pilot_database_name(
+                psycopg.conninfo.conninfo_to_dict(admin_dsn).get("dbname")
+            )
+            runtime_dsn = read_external_dsn(args.runtime_dsn_file, pilot_runtime_role(database))
+            _require_same_external_database(admin_dsn, runtime_dsn)
+            if state["adminDSN"] != admin_dsn:
                 raise ValueError("Existing external admin DSN differs")
-            if state["runtimeDSN"] != read_external_dsn(args.runtime_dsn_file, "inv_lan_runtime"):
+            if state["runtimeDSN"] != runtime_dsn:
                 raise ValueError("Existing external runtime DSN differs")
     elif state["databaseMode"] == LOCAL_DATABASE_MODE:
         exists = subprocess.run(
@@ -1066,20 +1118,28 @@ def init(args):
     run([sys.executable, "-m", "alembic", "upgrade", "head"], env=env, cwd=ROOT, timeout=120)
     with psycopg.connect(state["adminDSN"]) as conn:
         runtime_info = psycopg.conninfo.conninfo_to_dict(state["runtimeDSN"])
+        database = validate_pilot_database_name(
+            psycopg.conninfo.conninfo_to_dict(state["adminDSN"]).get("dbname")
+        )
+        runtime_role = pilot_runtime_role(database)
+        if runtime_info.get("user") != runtime_role:
+            raise ValueError("External runtime role does not match the pilot database")
         runtime_password = runtime_info.get("password")
         if state["databaseMode"] == EXTERNAL_DATABASE_MODE:
-            runtime_password = external_dsn_password(state["runtimeDSN"], "inv_lan_runtime")
-        if not conn.execute("SELECT 1 FROM pg_roles WHERE rolname='inv_lan_runtime'").fetchone():
+            runtime_password = external_dsn_password(state["runtimeDSN"], runtime_role)
+        if not conn.execute("SELECT 1 FROM pg_roles WHERE rolname=%s", (runtime_role,)).fetchone():
             conn.execute(
-                "CREATE ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE"
+                sql.SQL(
+                    "CREATE ROLE {} LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE"
+                ).format(sql.Identifier(runtime_role))
             )
         if runtime_password:
             conn.execute(
-                sql.SQL("ALTER ROLE inv_lan_runtime PASSWORD {}").format(
-                    sql.Literal(runtime_password)
+                sql.SQL("ALTER ROLE {} PASSWORD {}").format(
+                    sql.Identifier(runtime_role), sql.Literal(runtime_password)
                 )
             )
-        conn.execute("GRANT inv_kernel TO inv_lan_runtime")
+        conn.execute(sql.SQL("GRANT inv_kernel TO {}").format(sql.Identifier(runtime_role)))
         prior = conn.execute("SELECT epoch FROM inv.control_epoch").fetchone()
         if prior and str(prior[0]) != state["epoch"]:
             raise ValueError("Recovery epoch differs; refusing reset")
