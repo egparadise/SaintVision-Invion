@@ -3,7 +3,7 @@ set -euo pipefail
 
 container=${1:?usage: verify-pilot-database.sh <container> <network> [database] [operator-private-dir]}
 network=${2:?usage: verify-pilot-database.sh <container> <network> [database] [operator-private-dir]}
-database=${3:-saintvision_lan}
+database=${3-saintvision_lan}
 private_dir=${4:-}
 [[ "$container" =~ ^saintvision-[a-z0-9-]+$ && "$network" =~ ^saintvision-[a-z0-9-]+$ ]] || {
     echo 'Container or network is outside the SaintVision ownership namespace.' >&2

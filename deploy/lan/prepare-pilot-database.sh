@@ -7,7 +7,7 @@ container=${2:-saintvision-card150-pilot-db}
 host_port=${3:-55440}
 private_dir=${4:?an absolute operator-private credential directory is required}
 network=${5:-${container}-internal}
-database=${6:-saintvision_lan}
+database=${6-saintvision_lan}
 volume=${container}-data
 
 [[ "$image" =~ ^postgres@sha256:[a-f0-9]{64}$ ]] || {

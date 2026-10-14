@@ -681,6 +681,10 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert "ALTER ROLE %I LOGIN NOSUPERUSER NOBYPASSRLS" in script
     assert "NOCREATEDB NOCREATEROLE NOREPLICATION" in script
     assert "Requested pilot database or runtime role already exists; preserving it." in script
+    assert "database=${6-saintvision_lan}" in script
+    assert "database=${6:-saintvision_lan}" not in script
+    assert "database=${3-saintvision_lan}" in verifier
+    assert "database=${3:-saintvision_lan}" not in verifier
     assert "^saintvision_lan(_[a-z0-9]+)*$" in script
     assert "^saintvision_lan(_[a-z0-9]+)*$" in verifier
     assert "runtime_role=${database/saintvision_lan/inv_lan_runtime}" in script
@@ -765,6 +769,14 @@ case "$command_line" in
       *) echo unexpected-database-stdin >&2; exit 91 ;;
     esac
     ;;
+  *"sh -s -- saintvision_lan")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_database"*) echo "${FAKE_DATABASE_COUNT:-0}" ;;
+      *"CREATE DATABASE"*) exit 0 ;;
+      *) echo unexpected-default-database-stdin >&2; exit 94 ;;
+    esac
+    ;;
   *"sh -s -- inv_lan_runtime_r3_871e74dc")
     payload=$(cat)
     case "$payload" in
@@ -772,7 +784,15 @@ case "$command_line" in
       *) echo unexpected-role-stdin >&2; exit 92 ;;
     esac
     ;;
+  *"sh -s -- inv_lan_runtime")
+    payload=$(cat)
+    case "$payload" in
+      *"FROM pg_roles"*) echo 0 ;;
+      *) echo unexpected-default-role-stdin >&2; exit 95 ;;
+    esac
+    ;;
   *"_ saintvision_lan_r3_871e74dc inv_lan_runtime_r3_871e74dc") cat >/dev/null ;;
+  *"_ saintvision_lan inv_lan_runtime") cat >/dev/null ;;
   *) echo "unexpected docker invocation: $command_line" >&2; exit 93 ;;
 esac
 """,
@@ -802,6 +822,26 @@ esac
         "FAKE_COMMAND_LOG": str(command_log),
     }
 
+    empty_name = subprocess.run(
+        [*command[:-1], ""],
+        env=environment,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    assert empty_name.returncode == 2
+    assert "outside the SaintVision pilot namespace" in empty_name.stderr
+    assert not command_log.exists()
+
+    defaulted = subprocess.run(
+        command[:-1], env=environment, capture_output=True, check=False, text=True
+    )
+    assert defaulted.returncode == 0, defaulted.stderr
+    default_receipt = json.loads(defaulted.stdout)
+    assert default_receipt["databaseName"] == "saintvision_lan"
+    assert default_receipt["runtimeRole"] == "inv_lan_runtime"
+
+    command_log.write_text("", encoding="utf-8")
     collision = subprocess.run(
         command,
         env={**environment, "FAKE_DATABASE_COUNT": "1"},
@@ -880,7 +920,16 @@ esac
     ]
     environment = {**os.environ, "PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}"}
 
-    assert subprocess.run(command, env=environment, check=False).returncode == 0
+    defaulted = subprocess.run(command, env=environment, capture_output=True, check=False, text=True)
+    assert defaulted.returncode == 0, defaulted.stderr
+    default_receipt = json.loads(defaulted.stdout)
+    assert default_receipt["databaseName"] == "saintvision_lan"
+    assert default_receipt["runtimeRole"] == "inv_lan_runtime"
+    empty_name = subprocess.run(
+        [*command, ""], env=environment, capture_output=True, check=False, text=True
+    )
+    assert empty_name.returncode == 2
+    assert "outside the SaintVision pilot namespace" in empty_name.stderr
     private_dir = tmp_path / "private"
     private_dir.mkdir()
     runtime_password = private_dir / "inv_lan_runtime_r3_871e74dc.password"
