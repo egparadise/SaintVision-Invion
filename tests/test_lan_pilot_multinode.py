@@ -756,7 +756,7 @@ case "$command_line" in
   *"container inspect --format {{.Image}}"*) echo sha256:image ;;
   *"container inspect --format {{.State.Running}}"*) echo true ;;
   *"container inspect --format {{if index .NetworkSettings.Networks"*) echo yes ;;
-  *"SELECT 1"*) cat >/dev/null; echo 1 ;;
+  *"SELECT 1"*) echo 1 ;;
   *"sh -s -- saintvision_lan_r3_871e74dc")
     payload=$(cat)
     case "$payload" in
