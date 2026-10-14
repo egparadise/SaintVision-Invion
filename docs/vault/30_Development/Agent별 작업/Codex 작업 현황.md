@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.329"
 status: "review"
 author: "Codex"
-updated: "2026-10-14T12:36:01+09:00"
+updated: "2026-10-14T14:13:17+09:00"
 source_of_truth: "Git"
 active_card: "CARD-296 fresh isolated r3 bootstrap database namespace"
-active_card_status: "Implementation and negative tests are in progress on the train 71 candidate; no database, state, tunnel, Node, container, or volume has been changed"
-active_card_next: "Open the docs-and-tools PR, obtain Claude review and train 72 verification, then wait for a separate final operator instruction before any r3 bootstrap"
+active_card_status: "PR #392 is approved by Claude at 149ceff5 with exact-head Backend, Core and Docs green and is in merge train 72; no database, state, tunnel, Node, container, or volume has been changed"
+active_card_next: "After train 72 is verified, wait for the operator's final instruction, then run the Card 296 r3 bootstrap procedure"
 ---
 
 ## 2026-10-14 Card 296 — fresh isolated r3 bootstrap database namespace
