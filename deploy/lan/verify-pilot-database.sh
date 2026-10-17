@@ -76,18 +76,35 @@ else
         'PGPASSWORD=$(cat /run/secrets/runtime-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U "$1" -d "$2" -Atqc "SELECT current_user"' \
         _ "$runtime_role" "$database")
 fi
-runtime_privileges=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -v runtime_role="$2" -Atqc "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication FROM pg_roles WHERE rolname = :'\''runtime_role'\''"' \
-    _ "$database" "$runtime_role")
+runtime_privileges=$(docker exec -i "$container" sh -s -- "$database" "$runtime_role" <<'CONTAINER'
+set -eu
+export PGPASSWORD="$(cat /run/secrets/postgres-password)"
+exec psql -U postgres -d "$1" -v ON_ERROR_STOP=1 -v runtime_role="$2" -At <<'SQL'
+SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication
+FROM pg_roles
+WHERE rolname = :'runtime_role';
+SQL
+CONTAINER
+)
 methods=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -Atqc "SELECT string_agg(DISTINCT auth_method, '"'"','"'"' ORDER BY auth_method) FROM pg_hba_file_rules WHERE type='"'"'host'"'"' AND error IS NULL"' \
     _ "$database")
 encryption=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -Atqc "SHOW password_encryption"' \
     _ "$database")
-unexpected_memberships=$(docker exec "$container" sh -ec \
-    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d "$1" -v runtime_role="$2" -Atqc "SELECT count(*) FROM pg_auth_members m JOIN pg_roles child ON child.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE child.rolname=:'\''runtime_role'\'' AND parent.rolname<>'\''inv_kernel'\''"' \
-    _ "$database" "$runtime_role")
+unexpected_memberships=$(docker exec -i "$container" sh -s -- "$database" "$runtime_role" <<'CONTAINER'
+set -eu
+export PGPASSWORD="$(cat /run/secrets/postgres-password)"
+exec psql -U postgres -d "$1" -v ON_ERROR_STOP=1 -v runtime_role="$2" -At <<'SQL'
+SELECT count(*)
+FROM pg_auth_members m
+JOIN pg_roles child ON child.oid = m.member
+JOIN pg_roles parent ON parent.oid = m.roleid
+WHERE child.rolname = :'runtime_role'
+  AND parent.rolname <> 'inv_kernel';
+SQL
+CONTAINER
+)
 [[ "$admin" == postgres && "$runtime" == "$runtime_role" ]] || {
     echo 'Pilot database credentials are not role-bound.' >&2
     exit 1

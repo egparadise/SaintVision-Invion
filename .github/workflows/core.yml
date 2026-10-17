@@ -280,7 +280,28 @@ jobs:
           assert not root.findall('.//skipped'), 'Build admission real-PG cases must execute'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error'))
           PY
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py
+      - name: Verify LAN pilot database scripts with real PostgreSQL
+        run: |
+          repo_digest="$(docker image inspect postgres:16 --format '{{index .RepoDigests 0}}')"
+          image="${repo_digest##*/}"
+          [[ "$image" =~ ^postgres@sha256:[a-f0-9]{64}$ ]] || {
+            echo 'The disposable PostgreSQL image is not digest-pinned.' >&2
+            exit 1
+          }
+          INV_TEST_LAN_DATABASE_IMAGE="$image" python -m pytest -q \
+            tests/integration/test_lan_pilot_database_real_pg.py \
+            --junitxml=dist/lan-pilot-database-real-pg.xml
+      - name: Require executed LAN pilot database evidence
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/lan-pilot-database-real-pg.xml').getroot()
+          cases = root.findall('.//testcase')
+          assert len(cases) == 1, f'Expected 1 LAN database case, got {len(cases)}'
+          assert not root.findall('.//skipped'), 'LAN database real-PG case must execute'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error'))
+          PY
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py
       - name: Stop disposable product ObjectStore service
         if: always()
         run: docker rm --force saintvision-product-object-store 2>/dev/null || true

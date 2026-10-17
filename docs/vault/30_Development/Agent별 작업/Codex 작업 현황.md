@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.329"
+version: "1.0.330"
 status: "review"
 author: "Codex"
-updated: "2026-10-14T14:13:17+09:00"
+updated: "2026-10-17T18:31:18+09:00"
 source_of_truth: "Git"
-active_card: "CARD-296 fresh isolated r3 bootstrap database namespace"
-active_card_status: "PR #392 is approved by Claude at 149ceff5 with exact-head Backend, Core and Docs green and is in merge train 72; no database, state, tunnel, Node, container, or volume has been changed"
-active_card_next: "After train 72 is verified, wait for the operator's final instruction, then run the Card 296 r3 bootstrap procedure"
+active_card: "CARD-297 real-psql variable verification"
+active_card_status: "Product fix and hosted real-PostgreSQL regression are implemented; the live r3 database, role and credentials remain preserved and untouched while independent review is pending"
+active_card_next: "Obtain exact-head Backend/Core evidence and Claude review, land the fix, then resume Card 296 by running the fixed verifier against the preserved r3 database without prepare or recreation"
 ---
+
+## 2026-10-17 Card 297 — real-psql variable verification
+
+- The live r3 bootstrap stopped after isolated database creation: real `psql` does not interpolate
+  `-v` variables inside a `-c` string. Both affected verifier queries now use stdin SQL and
+  `ON_ERROR_STOP`; secrets remain outside argv.
+- The prepare script audit found all variable-bearing SQL already on stdin. A dedicated Core case
+  uses real PostgreSQL to exercise an existing hardened container, a new namespaced database,
+  derived SCRAM role, missing/wrong credentials, elevated-role rejection, and the exact `-c`
+  mutant. Backend and the normal Core suite explicitly leave this case to that one measured step.
+- The already-created live database and credentials must not be deleted or recreated. After this
+  change lands, resume with the fixed verifier directly; rerunning prepare correctly fails closed
+  on the existing database/role collision and is not the recovery command.
+- History: [[2026-10-17_18-31-18_KST_Card297_real_psql_variable_verification_Codex]].
 
 ## 2026-10-14 Card 296 — fresh isolated r3 bootstrap database namespace
 
