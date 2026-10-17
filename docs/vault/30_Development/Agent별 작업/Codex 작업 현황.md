@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.331"
 status: "review"
 author: "Codex"
-updated: "2026-10-17T20:34:55+09:00"
+updated: "2026-10-17T20:46:57+09:00"
 source_of_truth: "Git"
 active_card: "CARD-296 fresh isolated r3 bootstrap live acceptance"
 active_card_status: "The train 73 r3 bootstrap is complete: two Nodes are online and fresh, the loopback live-mTLS console and owned shortcut use the r3 state, and every r2 artifact remains preserved"
-active_card_next: "Claude independently reviews the redacted live record; before the next leaf rotation, install the matching python3-venv package on both Nodes and pass the pinned cryptography runtime gate"
+active_card_next: "PR #394 is approved by Claude at 2fe44acf and is in merge train 74; before the 2026-10-23 leaf expiry the operator installs the matching python3-venv package on both Nodes, then the reviewed batch rotation runs after the pinned cryptography runtime gate passes"
 ---
 
 ## 2026-10-17 Card 296 — fresh isolated r3 bootstrap live acceptance
