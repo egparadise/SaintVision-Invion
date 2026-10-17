@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.330"
 status: "review"
 author: "Codex"
-updated: "2026-10-17T18:31:18+09:00"
+updated: "2026-10-17T19:15:41+09:00"
 source_of_truth: "Git"
 active_card: "CARD-297 real-psql variable verification"
-active_card_status: "Product fix and hosted real-PostgreSQL regression are implemented; the live r3 database, role and credentials remain preserved and untouched while independent review is pending"
-active_card_next: "Obtain exact-head Backend/Core evidence and Claude review, land the fix, then resume Card 296 by running the fixed verifier against the preserved r3 database without prepare or recreation"
+active_card_status: "PR #393 is approved by Claude at 18dbea2e with exact-head Backend, Core real-PostgreSQL and Docs green and is in merge train 73; the live r3 database, role and credentials remain preserved and untouched"
+active_card_next: "After train 73 is verified, resume Card 296 by running the fixed verifier against the preserved r3 database without prepare or recreation"
 ---
 
 ## 2026-10-17 Card 297 — real-psql variable verification
