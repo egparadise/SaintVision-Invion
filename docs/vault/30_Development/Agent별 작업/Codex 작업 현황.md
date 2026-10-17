@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.330"
+version: "1.0.331"
 status: "review"
 author: "Codex"
-updated: "2026-10-17T19:15:41+09:00"
+updated: "2026-10-17T20:34:55+09:00"
 source_of_truth: "Git"
-active_card: "CARD-297 real-psql variable verification"
-active_card_status: "PR #393 is approved by Claude at 18dbea2e with exact-head Backend, Core real-PostgreSQL and Docs green and is in merge train 73; the live r3 database, role and credentials remain preserved and untouched"
-active_card_next: "After train 73 is verified, resume Card 296 by running the fixed verifier against the preserved r3 database without prepare or recreation"
+active_card: "CARD-296 fresh isolated r3 bootstrap live acceptance"
+active_card_status: "The train 73 r3 bootstrap is complete: two Nodes are online and fresh, the loopback live-mTLS console and owned shortcut use the r3 state, and every r2 artifact remains preserved"
+active_card_next: "Claude independently reviews the redacted live record; before the next leaf rotation, install the matching python3-venv package on both Nodes and pass the pinned cryptography runtime gate"
 ---
+
+## 2026-10-17 Card 296 — fresh isolated r3 bootstrap live acceptance
+
+- The approved train 73 procedure completed a new r3 state without reusing or deleting r2 trust,
+  identities, state, database, journals, containers, volumes, or Node keys.
+- Two Node-specific archives and public certificates matched out-of-band hashes; Node-local key
+  generation, enrollment, finish, live-mTLS observation, and post-install freshness all passed.
+- The desktop cutover occurred only after two-Node acceptance. Overview and web/database listeners
+  are loopback-only and the owned shortcut now names the r3 state.
+- The CP leaf expires at 2026-10-23 20:10:38 KST; Node leaves expire at 20:19:52 and 20:25:05.
+  The next rotation still needs matching `python3-venv` packages and the pinned
+  `cryptography==50.0.1` isolated runtime gate on both Nodes.
+- History: [[2026-10-17_20-34-55_KST_Card296_r3_bootstrap_live_acceptance_Codex]].
 
 ## 2026-10-17 Card 297 — real-psql variable verification
 
