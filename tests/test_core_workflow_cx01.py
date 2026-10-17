@@ -82,3 +82,20 @@ def test_build_admission_real_pg_cases_execute_once_in_a_focused_core_step():
     assert "assert len(cases) == 13" in text[gate:full]
     assert "assert not root.findall('.//skipped')" in text[gate:full]
     assert "--ignore=tests/integration/test_build_product_runtime_real_pg.py" in text[full:]
+
+
+def test_lan_database_real_pg_case_executes_once_in_a_focused_core_step():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    backend = (ROOT / ".github" / "workflows" / "backend.yml").read_text(encoding="utf-8")
+
+    focused = text.index("name: Verify LAN pilot database scripts with real PostgreSQL")
+    gate = text.index("name: Require executed LAN pilot database evidence")
+    full = text.index("python -m pytest --junitxml=dist/core-tests.xml")
+    assert focused < gate < full
+    assert 'INV_TEST_LAN_DATABASE_IMAGE="$image"' in text[focused:gate]
+    assert "tests/integration/test_lan_pilot_database_real_pg.py" in text[focused:gate]
+    assert "assert len(cases) == 1" in text[gate:full]
+    assert "LAN database real-PG case must execute" in text[gate:full]
+    ignore = "--ignore=tests/integration/test_lan_pilot_database_real_pg.py"
+    assert ignore in text[full:]
+    assert ignore in backend

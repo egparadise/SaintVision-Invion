@@ -692,6 +692,15 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert "POSTGRES_HOST_AUTH_METHOD=trust" not in verifier
     assert "rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication" in verifier
     assert "'f|f|f|f|f'" in verifier
+    for audited_script in (script, verifier):
+        assert not re.search(r"(?m)^.*psql[^\n]*-[^\n]*c[^\n]*(?::'|:\")", audited_script)
+    assert (
+        verifier.count(
+            'exec psql -U postgres -d "$1" -v ON_ERROR_STOP=1 '
+            '-v runtime_role="$2" -At <<\'SQL\''
+        )
+        == 2
+    )
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="bash is unavailable")
@@ -899,8 +908,14 @@ case "$command_line" in
   *'HostConfig.PortBindings'*) echo 127.0.0.1 ;;
   *'PGPASSFILE=/dev/null'*) exit 1 ;;
   *'PGPASSWORD=wrong'*) exit 1 ;;
-  *'rolsuper, rolbypassrls'*) echo "${FAKE_RUNTIME_PRIVILEGES:-f|f|f|f|f}" ;;
-  *'pg_auth_members'*) echo "${FAKE_UNEXPECTED_MEMBERSHIPS:-0}" ;;
+  *'sh -s -- saintvision_lan_r3_871e74dc inv_lan_runtime_r3_871e74dc'|*'sh -s -- saintvision_lan inv_lan_runtime')
+    payload=$(cat)
+    case "$payload" in
+      *'rolsuper, rolbypassrls'*) echo "${FAKE_RUNTIME_PRIVILEGES:-f|f|f|f|f}" ;;
+      *'pg_auth_members'*) echo "${FAKE_UNEXPECTED_MEMBERSHIPS:-0}" ;;
+      *) echo unexpected-verifier-stdin >&2; exit 4 ;;
+    esac
+    ;;
   *'pg_hba_file_rules'*) echo "${FAKE_AUTH_METHODS:-scram-sha-256}" ;;
   *'SHOW password_encryption'*) echo scram-sha-256 ;;
   *'SELECT current_user'*'inv_lan_runtime_r3_871e74dc'*) echo inv_lan_runtime_r3_871e74dc ;;
