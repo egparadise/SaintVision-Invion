@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.333"
+version: "1.0.335"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T18:43:54+09:00"
+updated: "2026-10-19T22:57:36+09:00"
 source_of_truth: "Git"
-active_card: "CARD-300 bytecode-free venvless leaf runtime"
-active_card_status: "PR #396 is approved by Claude at 6af107b8 and is in merge train 76; the live r3 retry remains stopped"
-active_card_next: "After approval and landing, obtain operator authorization before cleaning the two Node runtimes, abandoning the expired unstaged batch, and preparing a fresh batch"
+active_card: "CARD-301 pinned standalone worker-module closure"
+active_card_status: "Card 301 code and tests are in progress after the authorized live retry stopped at the first Node restart seam; no further live change is authorized"
+active_card_next: "Claude reviews PR #397; no live work is authorized, and operators must either finish the exact batch before 2026-10-20 02:23:05 KST or separately authorize fresh-only rollback"
 ---
+
+## 2026-10-19 Card 301 — pinned standalone worker-module closure
+
+- The authorized train 76 retry safely stopped when the first Node reached the restart seam and
+  `worker_config.py` was absent. CP staging and global switching remained zero; the second Node was
+  untouched.
+- The offline runtime bundle now pins both local modules, checks their AST import closure before
+  downloading, installs them in an exact private directory, and prevents external module shadowing.
+- Hosted Backend runs the actual wheels through install/restart receipt/finalize and a separate
+  install/rollback lifecycle using the real worker and its real fake-Docker boundary.
+- Current read-only conclusion: at the 22:57 KST read-back, the exact batch remained resumable only
+  until `2026-10-20 02:23:05 KST`; no live work is authorized here. Card 293 supersession requires a
+  `restarted` journal, while the Node is `installed`. An exact fresh-only rollback is the safe
+  alternative if that window is not used and the prerequisite after expiry, but is not executed.
+- History: [[2026-10-19_22-44-21_KST_Card301_standalone_worker_modules_Codex]].
 
 ## 2026-10-19 Card 300 — bytecode-free venvless leaf runtime
 
