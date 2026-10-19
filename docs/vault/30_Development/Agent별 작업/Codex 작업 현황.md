@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.332"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T16:36:42+09:00"
+updated: "2026-10-19T17:21:56+09:00"
 source_of_truth: "Git"
 active_card: "CARD-298 venvless leaf-rotation runtime"
-active_card_status: "The Linux x86_64 CPython 3.12/3.14 standalone runtime, pinned wheel supply path, fail-closed installer/launcher, and 9/9 mutation guards are implemented locally; live rotation remains forbidden"
-active_card_next: "Push the Card 298 head, require hosted Backend 3.12/3.14 actual-wheel preflight plus Core/Docs green, and obtain Claude approval before any r3 Node receives the runtime bundle"
+active_card_status: "PR #395 is approved by Claude at 820cfd0d with hosted Backend 3.12/3.14 actual-wheel preflight green and is in merge train 75; live rotation has not run"
+active_card_next: "After train 75 is verified and the operator approves, run the reviewed r3 batch rotation with the venvless runtime before the 2026-10-23 20:10 KST leaf expiry"
 ---
 
 ## 2026-10-19 Card 298 — venvless leaf-rotation runtime
