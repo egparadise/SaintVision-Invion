@@ -10,9 +10,9 @@ if [ "${1:-}" = "--standalone" ]; then
   worker_script=$3
   bundle=$4
   script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
-  python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" install \
+  python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" install \
     --bundle "$bundle" --runtime-dir "$runtime_dir"
-  python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" run \
+  python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" run \
     --runtime-dir "$runtime_dir" --worker-script "$worker_script" -- runtime-preflight
   exit 0
 fi

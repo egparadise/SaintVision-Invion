@@ -9,14 +9,14 @@
     "controlPlaneToolingCommit": "dea0a2b33ddc9726d9e8d7f9cab8b67610a4f6cf",
     "toolSHA256": {
       "tools/intranet_pki.py": "13774a637ccfa8d3ae10f1a996a0d5334e7b0a7a0d19248910a245de53189f01",
-      "tools/lan_pilot.py": "f9ac9e6edd0e6cc614156e8a4f2a1ab1568f15b0d7a55999f4c9a497901c8727",
+      "tools/lan_pilot.py": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
       "deploy/lan/prepare-pilot-database.sh": "200c49a9f8a7b25132c8087206cfca55736db2ad5c68bbe39c21c7f5014c5551",
       "deploy/lan/verify-pilot-database.sh": "f67e40b3c691427417c48bffab07f0c632c699db275f8b0992225ddd6821bfba",
       "deploy/lan/Dockerfile.node.remote": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae"
     },
     "toolGitBlobSHA1": {
       "tools/intranet_pki.py": "ef10834d2ffa7d36456ce0cbaaddf0135df4886d",
-      "tools/lan_pilot.py": "302c0a1a555ebae5cbc7c32bc72a878ce38a7909",
+      "tools/lan_pilot.py": "35c2668690b0681ab87da86099400e83f39d098b",
       "deploy/lan/prepare-pilot-database.sh": "0a5572cb6206b89c2691c199513ffba9adf8556f",
       "deploy/lan/verify-pilot-database.sh": "8af8372f312256b453e8908da43b277119dab316",
       "deploy/lan/Dockerfile.node.remote": "9139956d1102abe35422b81642c68b6ecd308216"

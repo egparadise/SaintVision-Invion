@@ -1,15 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.332"
+version: "1.0.333"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T17:21:56+09:00"
+updated: "2026-10-19T18:13:36+09:00"
 source_of_truth: "Git"
-active_card: "CARD-298 venvless leaf-rotation runtime"
-active_card_status: "PR #395 is approved by Claude at 820cfd0d with hosted Backend 3.12/3.14 actual-wheel preflight green and is in merge train 75; live rotation has not run"
-active_card_next: "After train 75 is verified and the operator approves, run the reviewed r3 batch rotation with the venvless runtime before the 2026-10-23 20:10 KST leaf expiry"
+active_card: "CARD-300 bytecode-free venvless leaf runtime"
+active_card_status: "Implementation and focused evidence complete; Claude review and exact-head hosted Backend/Core are pending; live r3 retry remains stopped"
+active_card_next: "After approval and landing, obtain operator authorization before cleaning the two Node runtimes, abandoning the expired unstaged batch, and preparing a fresh batch"
 ---
+
+## 2026-10-19 Card 300 — bytecode-free venvless leaf runtime
+
+- The authorized Card 298 live attempt stopped before Node mutation because preflight-created
+  bytecode made the next exact-tree install fail closed. Both Nodes and global CP remained old;
+  channel CAS count was zero and rollback was unnecessary.
+- Standalone commands now use `python3 -I -B`, while the launcher independently forces
+  `sys.dont_write_bytecode`. Exact installed-tree validation is not relaxed.
+- A narrow repair validates receipt, lock, wheels, and all pinned bytes before deleting only exact
+  interpreter-derived cache paths, then revalidates the complete tree.
+- The expired `prepared/staged 0` batch is not eligible for the partial-batch supersession path.
+  A new command archives and releases it only after expiry and proof that CP, every channel, and
+  every published Node leaf remain unchanged.
+- Focused result: **55 passed**; standalone mutations: **10/10 killed**. Live cleanup, batch
+  abandonment, and rotation retry were not executed.
+- History: [[2026-10-19_18-13-36_KST_Card300_runtime_no_bytecode_Codex]].
 
 ## 2026-10-19 Card 298 — venvless leaf-rotation runtime
 

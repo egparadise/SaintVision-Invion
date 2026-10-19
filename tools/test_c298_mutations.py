@@ -56,14 +56,20 @@ MUTANTS = (
     (
         "M8",
         SHELL,
+        '  python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" install \\\n',
         '  python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" install \\\n',
-        '  python3 "$script_dir/leaf_rotation_standalone_runtime.py" install \\\n',
     ),
     (
         "M9",
         RUNTIME,
         "    if _sha256(worker_raw) != WORKER_SHA256:\n",
         "    if False:\n",
+    ),
+    (
+        "M10",
+        RUNTIME,
+        "sys.dont_write_bytecode = True\n",
+        "sys.dont_write_bytecode = False\n",
     ),
 )
 
