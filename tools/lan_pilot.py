@@ -93,6 +93,7 @@ BATCH_JOURNAL_KEYS = {
 DEFAULT_ROTATION_OVERLAP_SECONDS = 14400
 RECOVERY_RECORD_SCHEMA = "saintvision-lan-leaf-rotation-recovery:1"
 OFFLINE_RECOVERY_RECORD_SCHEMA = "saintvision-lan-fully-expired-recovery:1"
+ABANDONED_BATCH_RECORD_SCHEMA = "saintvision-lan-abandoned-prepared-batch:1"
 OFFLINE_AUTHORIZATION_SCHEMA = "saintvision-lan-fully-expired-authorization:1"
 OFFLINE_AUTHORIZATION_CONFIRMATION = "fully-expired-offline-recovery-approved"
 
@@ -2732,6 +2733,110 @@ def prepare_leaf_rotation_batch(args):
     )
 
 
+def abandon_expired_prepared_leaf_rotation_batch(args):
+    """Archive an expired, entirely unstaged batch whose live authority never changed."""
+    path, state = args.state, load(args.state)
+    bundle = args.bundle.resolve()
+    manifest_raw, manifest, bundles = _batch_material(bundle)
+    archive = path / f'leaf-rotation-abandoned-{manifest["batchId"]}.json'
+    now = getattr(args, "_now", None) or datetime.now(timezone.utc)
+    overlap_expires = datetime.fromisoformat(
+        manifest["overlapExpiresAt"].replace("Z", "+00:00")
+    )
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        common = {
+            "schemaVersion": ABANDONED_BATCH_RECORD_SCHEMA,
+            "batchId": manifest["batchId"],
+            "batchDigest": _rotation_digest(manifest_raw),
+            "bundlePath": str(bundle),
+            "phase": "prepared",
+            "stagedNodeIds": [],
+            "overlapExpiresAt": manifest["overlapExpiresAt"],
+            "reason": "expired-before-any-node-stage",
+        }
+
+        def prior_archive() -> dict | None:
+            if not archive.exists():
+                return None
+            if archive.is_symlink() or not archive.is_file():
+                raise ValueError("Abandoned leaf rotation record path is unsafe")
+            prior = json.loads(archive.read_text("utf-8"))
+            if set(prior) != {*common, "abandonedAt"} or any(
+                prior.get(key) != value for key, value in common.items()
+            ):
+                raise ValueError("Abandoned leaf rotation record differs")
+            recorded = datetime.fromisoformat(prior["abandonedAt"].replace("Z", "+00:00"))
+            if recorded.tzinfo != timezone.utc or not overlap_expires < recorded <= now:
+                raise ValueError("Abandoned leaf rotation record timestamp differs")
+            return prior
+
+        if journal is None:
+            if prior_archive() is None:
+                raise ValueError("No prepared leaf rotation batch is active")
+            print(
+                json.dumps(
+                    {
+                        "abandoned": True,
+                        "idempotentReplay": True,
+                        "batchId": manifest["batchId"],
+                        "newBatchAllowed": True,
+                    }
+                )
+            )
+            return
+        _assert_batch_journal(
+            journal, manifest_raw=manifest_raw, manifest=manifest, bundle=bundle
+        )
+        if journal["phase"] != "prepared" or journal["stagedNodeIds"]:
+            raise ValueError("Only an entirely unstaged prepared batch may be abandoned")
+        if now <= overlap_expires:
+            raise ValueError("A prepared batch cannot be abandoned before overlap expiry")
+        current_control = x509.load_pem_x509_certificate((path / "control-cert.pem").read_bytes())
+        if fingerprint(current_control) != manifest["currentControlCertificateSHA256"]:
+            raise ValueError("Global Control Plane leaf changed; abandonment refused")
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            for node_id, (_raw, proposal, _files) in bundles.items():
+                node = node_by_id(state, node_id)
+                row = _channel_row(conn, state, node, lock=True)
+                if (row[0], row[1], row[3], row[4]) != (
+                    proposal["currentChannelVersion"],
+                    proposal["currentNodeCertificateSHA256"],
+                    True,
+                    f'https://{node["nodeIP"]}:{node["nodePort"]}',
+                ):
+                    raise ValueError("Node channel changed; abandonment refused")
+                local_node = x509.load_pem_x509_certificate(
+                    node_certificate_path(path, state, node).read_bytes()
+                )
+                if fingerprint(local_node) != proposal["currentNodeCertificateSHA256"]:
+                    raise ValueError("Published Node leaf changed; abandonment refused")
+        prior = prior_archive()
+        if prior is None:
+            atomic_write(archive, _canonical_json({**common, "abandonedAt": _utc_z(now)}))
+        journal_path = _batch_journal_path(path)
+        if journal_path.is_symlink() or not journal_path.is_file():
+            raise ValueError("Leaf rotation batch journal path is unsafe")
+        journal_path.unlink()
+        if os.name != "nt":
+            directory = os.open(path, os.O_RDONLY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+    print(
+        json.dumps(
+            {
+                "abandoned": True,
+                "idempotentReplay": False,
+                "batchId": manifest["batchId"],
+                "newBatchAllowed": True,
+            }
+        )
+    )
+
+
 def prepare_leaf_rotation(args):
     """Issue public rotation material from a Node-owned CSR without installing it."""
     path, state = args.state, load(args.state)
@@ -3652,6 +3757,14 @@ def main():
         default=DEFAULT_ROTATION_OVERLAP_SECONDS,
     )
     p.add_argument("--leaf-valid-seconds", type=int, choices=range(60, 518401), default=518400)
+    p = commands.add_parser(
+        "abandon-expired-prepared-leaf-rotation-batch",
+        help=(
+            "Archive only an expired, entirely unstaged batch after proving CP and channels "
+            "remain unchanged"
+        ),
+    )
+    p.add_argument("--bundle", type=Path, required=True)
     p = commands.add_parser(
         "prepare-leaf-rotation-batch",
         help="Issue one shared Control Plane leaf and exact bundles for every active Node",
