@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.334"
+version: "1.0.335"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T22:44:21+09:00"
+updated: "2026-10-19T22:57:36+09:00"
 source_of_truth: "Git"
 active_card: "CARD-301 pinned standalone worker-module closure"
 active_card_status: "Card 301 code and tests are in progress after the authorized live retry stopped at the first Node restart seam; no further live change is authorized"
-active_card_next: "Open the Card 301 PR for Claude review; before another live batch, restore the first Node with the reviewed fresh-only rollback after separate approval"
+active_card_next: "Claude reviews PR #397; no live work is authorized, and operators must either finish the exact batch before 2026-10-20 02:23:05 KST or separately authorize fresh-only rollback"
 ---
 
 ## 2026-10-19 Card 301 — pinned standalone worker-module closure
@@ -20,9 +20,10 @@ active_card_next: "Open the Card 301 PR for Claude review; before another live b
   downloading, installs them in an exact private directory, and prevents external module shadowing.
 - Hosted Backend runs the actual wheels through install/restart receipt/finalize and a separate
   install/rollback lifecycle using the real worker and its real fake-Docker boundary.
-- Current read-only conclusion: the expired batch cannot resume; Card 293 supersession requires a
-  `restarted` journal, while the Node is `installed`. An exact fresh-only rollback is the safe next
-  live prerequisite but is not executed by this card.
+- Current read-only conclusion: at the 22:57 KST read-back, the exact batch remained resumable only
+  until `2026-10-20 02:23:05 KST`; no live work is authorized here. Card 293 supersession requires a
+  `restarted` journal, while the Node is `installed`. An exact fresh-only rollback is the safe
+  alternative if that window is not used and the prerequisite after expiry, but is not executed.
 - History: [[2026-10-19_22-44-21_KST_Card301_standalone_worker_modules_Codex]].
 
 ## 2026-10-19 Card 300 — bytecode-free venvless leaf runtime

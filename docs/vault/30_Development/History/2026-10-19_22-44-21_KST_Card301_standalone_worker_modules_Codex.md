@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261019-CARD301-STANDALONE-WORKER-MODULES-CODEX"
 title: "Card 301 standalone worker local-module closure"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 created: "2026-10-19T22:44:21+09:00"
-updated: "2026-10-19T22:44:21+09:00"
+updated: "2026-10-19T22:57:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -59,9 +59,10 @@ No command in this card changes the live r3 state.
    used as an accidental retry.
 2. **Same-batch retry.** Before the recorded overlap deadline, `install()` would validate the same
    proposal with `installed=True`, preserve the exact journal/backup, run the missing restart seam,
-   and return the receipt idempotently. The deadline passed at 2026-10-20 02:23:05 KST, and
-   `validate_bundle()` now rejects the expired overlap before a restart. The same batch cannot be
-   continued.
+   and return the receipt idempotently. At this card's 2026-10-19 22:57 KST read-back, the
+   `2026-10-20 02:23:05 KST` deadline had **not** passed, so the exact same batch remained
+   technically resumable until that deadline. This card has no live authorization and does not
+   resume it. After the deadline, `validate_bundle()` rejects the expired overlap before restart.
 3. **Card 293 supersession.** `_supersede_expired_journal()` requires the old Node journal phase to
    be `restarted` and the new channel baseline to be the old target version. The measured journal is
    `installed`, no receipt was staged, and the DB channel remains the old current version. The
@@ -70,9 +71,10 @@ No command in this card changes the live r3 state.
 4. **Rollback recommendation.** The reviewed rollback explicitly accepts `installed`, validates
    the exact proposal and backup, and restores only while the prior Node leaf and one-fingerprint
    policy are fresh. The old Control Plane/Node authority remains within its 2026-10-23 window.
-   Therefore an exact fresh-only rollback is safe and is the recommended prerequisite before any
-   new batch. It is operationally necessary to remove the host/container split and unexpected
-   restart risk, but it requires separate live authorization and is not executed here.
+   Therefore an exact fresh-only rollback is safe and is the recommended alternative if the same
+   batch will not complete inside its remaining overlap window; after expiry it is the prerequisite
+   before any new batch. It removes the host/container split and unexpected-restart risk, but it
+   requires separate live authorization and is not executed here.
 
 ## Verification
 
