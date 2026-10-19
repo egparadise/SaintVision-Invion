@@ -372,8 +372,12 @@ python tools/build_leaf_rotation_runtime.py \
   --output <private-transfer-dir>/leaf-rotation-runtime.zip
 ```
 
-Transfer that public bundle, its separately calculated SHA-256, the lock, the
-standalone installer, the shell wrapper, and `worker_leaf_rotation.py` through
+The bundle contains the exact reviewed local worker-module closure
+(`worker_leaf_rotation.py` and `worker_config.py`) as well as the wheels. The
+builder parses the worker imports before any download and rejects a missing or
+unreviewed local module. Transfer that public bundle, its separately calculated
+SHA-256, the lock, the standalone installer, the shell wrapper, and the separately
+digest-checked `worker_leaf_rotation.py` entry point through
 the same out-of-band verified path as the rotation proposal. On each Node, the
 following command selects only a reviewed `x86_64` CPython 3.12 or 3.14 ABI,
 verifies every wheel and archive member, atomically extracts into a user-owned
@@ -410,10 +414,10 @@ the unchanged exact-tree validator. It refuses changed pinned bytes, an unknown 
 or any other extra member.
 
 The launcher removes ambient and system site-package paths, admits only the
-verified extracted runtime plus the worker directory and standard library, and
+verified extracted runtime, its pinned worker-module directory, and the standard library, and
 requires exact `cryptography==50.0.1`, `cffi==2.0.0`, and `pycparser==2.23`
-origins. A different ABI, missing or changed wheel, extra bundle member,
-symlink, path traversal, installed-file drift, or system `cryptography` fallback
+origins. A different ABI, missing or changed wheel or worker module, extra bundle member,
+symlink, path traversal, installed-file drift, external local-module shadow, or system `cryptography` fallback
 fails before the worker writes state. The venv command remains the explicit
 alternative; the two runtime modes must not be mixed within one rotation.
 
