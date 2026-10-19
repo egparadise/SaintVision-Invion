@@ -96,6 +96,37 @@ jobs:
             requirements-core.txt
       - run: python -m pip install -r requirements-backend.txt -r requirements-docs.txt
 
+      - name: Exercise the pinned venvless leaf-rotation runtime
+        run: |
+          bundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"
+          runtime="$RUNNER_TEMP/leaf-rotation-runtime-${{ matrix.python-version }}"
+          python tools/build_leaf_rotation_runtime.py --output "$bundle" > "$RUNNER_TEMP/leaf-runtime-build.json"
+          python -I deploy/lan/leaf_rotation_standalone_runtime.py install \
+            --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-install.json"
+          python -I deploy/lan/leaf_rotation_standalone_runtime.py run \
+            --runtime-dir "$runtime" \
+            --worker-script deploy/lan/worker_leaf_rotation.py \
+            -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-preflight.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP'])
+          build = json.loads((root / 'leaf-runtime-build.json').read_text('utf-8'))
+          install = json.loads((root / 'leaf-runtime-install.json').read_text('utf-8'))
+          preflight = json.loads((root / 'leaf-runtime-preflight.json').read_text('utf-8'))
+          assert build['wheelCount'] == 4
+          assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:1'
+          assert install['platformKey'] in {
+              'cpython-312-x86_64-linux-gnu',
+              'cpython-314-x86_64-linux-gnu',
+          }
+          assert preflight['compatible'] is True
+          assert preflight['cryptographyVersion'] == '50.0.1'
+          assert preflight['utcCertificateAPI'] is True
+          PY
+
       - name: Contract schemas match their models
         run: python tools/export_schemas.py --check
 

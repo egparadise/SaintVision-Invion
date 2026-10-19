@@ -1,6 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "${1:-}" = "--standalone" ]; then
+  if [ "$#" -ne 4 ]; then
+    echo "usage: prepare-leaf-rotation-runtime.sh --standalone <runtime-dir> <worker-script> <offline-bundle>" >&2
+    exit 2
+  fi
+  runtime_dir=$2
+  worker_script=$3
+  bundle=$4
+  script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+  python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" install \
+    --bundle "$bundle" --runtime-dir "$runtime_dir"
+  python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" run \
+    --runtime-dir "$runtime_dir" --worker-script "$worker_script" -- runtime-preflight
+  exit 0
+fi
+
 if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
   echo "usage: prepare-leaf-rotation-runtime.sh <venv-dir> <worker-script> [wheelhouse]" >&2
   exit 2
