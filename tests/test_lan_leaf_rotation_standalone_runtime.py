@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import importlib.util
 import json
 import os
@@ -138,6 +139,76 @@ def test_install_is_atomic_idempotent_and_rejects_changed_installed_file(tmp_pat
         runtime.install(bundle, destination)
 
 
+def test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode(tmp_path, monkeypatch):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels)
+    destination = tmp_path / "installed"
+    first = runtime.install(bundle, destination)
+    worker = tmp_path / "worker_leaf_rotation.py"
+    observed = tmp_path / "worker-count.txt"
+    worker.write_text(
+        "import cffi, cryptography, pathlib, pycparser, sys\n"
+        "target=pathlib.Path(sys.argv[1])\n"
+        "target.write_text(str(int(target.read_text() or '0') + 1) if target.exists() else '1')\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(runtime, "WORKER_SHA256", hashlib.sha256(worker.read_bytes()).hexdigest())
+    saved_path = list(sys.path)
+    saved_modules = {name: sys.modules.get(name) for name in ("cryptography", "cffi", "pycparser")}
+    for name in saved_modules:
+        sys.modules.pop(name, None)
+    try:
+        runtime.run_worker(destination, worker, [str(observed)])
+        second = runtime.install(bundle, destination)
+        runtime.run_worker(destination, worker, [str(observed)])
+        third = runtime.install(bundle, destination)
+    finally:
+        sys.path[:] = saved_path
+        for name, module in saved_modules.items():
+            sys.modules.pop(name, None)
+            if module is not None:
+                sys.modules[name] = module
+    assert first == second == third
+    assert observed.read_text("utf-8") == "2"
+    assert not list(destination.rglob("__pycache__"))
+    assert sys.dont_write_bytecode is True
+
+
+def test_bytecode_cleanup_is_narrow_verified_and_idempotent(tmp_path, monkeypatch):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels)
+    destination = tmp_path / "installed"
+    runtime.install(bundle, destination)
+    source = destination / "cryptography/__init__.py"
+    cache = Path(importlib.util.cache_from_source(str(source)))
+    cache.parent.mkdir()
+    cache.write_bytes(b"interpreter cache from the pre-Card-300 entrypoint")
+    cleaned = runtime.clean_bytecode_cache(destination)
+    assert cleaned == {
+        "cleaned": True,
+        "removedBytecodeFiles": 1,
+        "runtimeValidated": True,
+    }
+    assert runtime.clean_bytecode_cache(destination)["removedBytecodeFiles"] == 0
+
+    cache.parent.mkdir()
+    (cache.parent / "unreviewed.pyc").write_bytes(b"not derived from a pinned source")
+    with pytest.raises(ValueError, match="non-bytecode drift"):
+        runtime.clean_bytecode_cache(destination)
+
+    (cache.parent / "unreviewed.pyc").unlink()
+    cache.write_bytes(b"still present if receipt authority is wrong")
+    receipt = destination / ".saintvision-runtime.json"
+    damaged = json.loads(receipt.read_text("utf-8"))
+    damaged["platformKey"] = "unreviewed-platform"
+    receipt.write_text(json.dumps(damaged), encoding="utf-8")
+    with pytest.raises(ValueError, match="receipt authority"):
+        runtime.clean_bytecode_cache(destination)
+    assert cache.is_file()
+
+
 @pytest.mark.parametrize("damage", ["digest", "missing", "extra", "duplicate", "abi"])
 def test_install_rejects_hash_mismatch_missing_wheel_and_wrong_abi(tmp_path, monkeypatch, damage):
     raw, lock, wheels = _fixture_lock(monkeypatch)
@@ -249,7 +320,7 @@ def test_shell_keeps_venv_fallback_and_uses_isolated_standalone_runner():
     source = (ROOT / "deploy/lan/prepare-leaf-rotation-runtime.sh").read_text("utf-8")
     assert "python3 -m venv" in source
     assert "cryptography==50.0.1" in source
-    assert 'python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" install' in source
-    assert 'python3 -I "$script_dir/leaf_rotation_standalone_runtime.py" run' in source
+    assert 'python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" install' in source
+    assert 'python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" run' in source
     assert "sudo" not in source
     assert source.index(" install \\") < source.index(" run \\")

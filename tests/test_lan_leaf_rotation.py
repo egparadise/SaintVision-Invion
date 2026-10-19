@@ -1145,6 +1145,72 @@ def test_expired_partial_batch_is_superseded_by_fresh_all_node_batch(tmp_path, m
         )
 
 
+def test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare(
+    tmp_path, monkeypatch, capsys
+):
+    _fixture, _second_key, second_node, rows, args = _batch_inputs(tmp_path, monkeypatch)
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    capsys.readouterr()
+    _raw, manifest, _bundles = lan_pilot._batch_material(args.output)
+    expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
+    command = Namespace(state=args.state, bundle=args.output, _now=expires - timedelta(seconds=1))
+    with pytest.raises(ValueError, match="before overlap expiry"):
+        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    assert lan_pilot._load_batch_journal(args.state)["phase"] == "prepared"
+
+    journal_path = args.state / "leaf-rotation-batch.json"
+    original_journal = journal_path.read_bytes()
+    staged = json.loads(original_journal)
+    staged["phase"] = "staging"
+    staged["stagedNodeIds"] = [NODE_ID]
+    journal_path.write_text(json.dumps(staged), encoding="utf-8")
+    command._now = expires + timedelta(seconds=1)
+    with pytest.raises(ValueError, match="entirely unstaged"):
+        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    journal_path.write_bytes(original_journal)
+
+    control_path = args.state / "control-cert.pem"
+    old_control = control_path.read_bytes()
+    control_path.write_bytes(pem(second_node))
+    with pytest.raises(ValueError, match="Control Plane leaf changed"):
+        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    control_path.write_bytes(old_control)
+
+    rows[NODE_ID] = (
+        rows[NODE_ID][0] + 1,
+        rows[NODE_ID][1],
+        rows[NODE_ID][2],
+        rows[NODE_ID][3],
+        rows[NODE_ID][4],
+    )
+    with pytest.raises(ValueError, match="channel changed"):
+        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    rows[NODE_ID] = (
+        rows[NODE_ID][0] - 1,
+        rows[NODE_ID][1],
+        rows[NODE_ID][2],
+        rows[NODE_ID][3],
+        rows[NODE_ID][4],
+    )
+
+    lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    result = json.loads(capsys.readouterr().out)
+    assert result["abandoned"] is True
+    assert result["newBatchAllowed"] is True
+    assert lan_pilot._load_batch_journal(args.state) is None
+    archive = args.state / f'leaf-rotation-abandoned-{manifest["batchId"]}.json'
+    record = json.loads(archive.read_text("utf-8"))
+    assert record["phase"] == "prepared"
+    assert record["stagedNodeIds"] == []
+    assert record["reason"] == "expired-before-any-node-stage"
+
+    lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
+    assert json.loads(capsys.readouterr().out)["idempotentReplay"] is True
+    replacement = Namespace(**{**vars(args), "output": tmp_path / "replacement-batch"})
+    lan_pilot.prepare_leaf_rotation_batch(replacement)
+    assert lan_pilot._load_batch_journal(args.state)["batchId"] != manifest["batchId"]
+
+
 def test_expired_supersession_rejects_policy_or_channel_drift(tmp_path, monkeypatch, capsys):
     fixture, second_key, second_node, rows, args = _batch_inputs(tmp_path, monkeypatch)
     lan_pilot.prepare_leaf_rotation_batch(args)

@@ -390,10 +390,24 @@ Every subsequent `install`, `finalize`, or `rollback` invocation uses the same
 isolated launcher, for example:
 
 ```text
-python3 -I deploy/lan/leaf_rotation_standalone_runtime.py run \
+python3 -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \
   --runtime-dir "$HOME/.local/share/saintvision/leaf-rotation-runtime" \
   --worker-script ./worker_leaf_rotation.py -- install <worker arguments>
 ```
+
+`-B` and the launcher's independent `sys.dont_write_bytecode` guard keep the immutable runtime
+free of interpreter caches. A runtime used by the pre-Card-300 entrypoint remains fail-closed
+until the operator runs the narrow repair once:
+
+```text
+python3 -I -B deploy/lan/leaf_rotation_standalone_runtime.py clean-bytecode-cache \
+  --runtime-dir "$HOME/.local/share/saintvision/leaf-rotation-runtime"
+```
+
+That command first re-derives the pinned wheel tree and receipt, permits only the exact cache path
+that the current interpreter derives for a pinned `.py` source, removes it durably, and then runs
+the unchanged exact-tree validator. It refuses changed pinned bytes, an unknown `.pyc`, symlinks,
+or any other extra member.
 
 The launcher removes ambient and system site-package paths, admits only the
 verified extracted runtime plus the worker directory and standard library, and

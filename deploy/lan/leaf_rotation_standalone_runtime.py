@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -30,6 +31,11 @@ BUNDLE_SCHEMA = "saintvision-leaf-rotation-runtime-bundle:1"
 INSTALL_SCHEMA = "saintvision-leaf-rotation-runtime-install:1"
 MAX_WHEEL_BYTES = 16 * 1024 * 1024
 MAX_RUNTIME_BYTES = 64 * 1024 * 1024
+
+
+def _prevent_bytecode_writes() -> None:
+    """Backstop the reviewed command-line -B boundary for programmatic callers."""
+    sys.dont_write_bytecode = True
 
 
 def _canonical(value: object) -> bytes:
@@ -297,6 +303,75 @@ def validate_runtime(
     return receipt
 
 
+def clean_bytecode_cache(runtime_dir: Path) -> dict:
+    """Remove only interpreter-derived cache files, then restore exact validation."""
+    if not runtime_dir.is_absolute() or runtime_dir.is_symlink():
+        raise ValueError("Runtime directory must be an absolute non-symlink path")
+    _lock_raw, lock = load_lock()
+    key = _platform_key(lock)
+    receipt_path = runtime_dir / ".saintvision-runtime.json"
+    receipt = json.loads(_regular(receipt_path, limit=16384))
+    if (
+        not isinstance(receipt, dict)
+        or set(receipt)
+        != {
+            "schemaVersion",
+            "platformKey",
+            "lockSha256",
+            "bundleSha256",
+            "fileCount",
+            "filesSha256",
+        }
+        or (
+            receipt["schemaVersion"] != INSTALL_SCHEMA
+            or receipt["platformKey"] != key
+            or receipt["lockSha256"] != LOCK_SHA256
+        )
+    ):
+        raise ValueError("Standalone runtime receipt authority differs")
+    wheel_names = lock["platforms"][key]["wheels"]
+    wheels = {
+        filename: _regular(runtime_dir / ".wheels" / filename, limit=MAX_WHEEL_BYTES)
+        for filename in wheel_names
+    }
+    if any(_sha256(wheels[name]) != lock["wheels"][name]["sha256"] for name in wheels):
+        raise ValueError("Installed runtime wheel digest differs")
+    expected = _expected_files(lock, wheels, key)
+    files_digest = _sha256(_canonical({name: _sha256(expected[name]) for name in sorted(expected)}))
+    if receipt["fileCount"] != len(expected) or receipt["filesSha256"] != files_digest:
+        raise ValueError("Standalone runtime receipt does not describe installed files")
+    observed = _installed_files(runtime_dir)
+    changed = {name for name in set(observed) & set(expected) if observed[name] != expected[name]}
+    if changed:
+        raise ValueError("Installed standalone runtime pinned files differ")
+    extras = set(observed) - set(expected)
+    allowed = set()
+    for name in expected:
+        if not name.endswith(".py"):
+            continue
+        cached = Path(importlib.util.cache_from_source(str(runtime_dir / name)))
+        allowed.add(cached.relative_to(runtime_dir).as_posix())
+    if extras - allowed:
+        raise ValueError("Standalone runtime contains non-bytecode drift")
+    for name in sorted(extras):
+        target = runtime_dir / PurePosixPath(name)
+        target.unlink()
+        _fsync_directory(target.parent)
+    for directory in sorted(
+        (path for path in runtime_dir.rglob("__pycache__") if path.is_dir()), reverse=True
+    ):
+        if any(directory.iterdir()):
+            raise ValueError("Standalone runtime cache directory contains unexpected entries")
+        directory.rmdir()
+        _fsync_directory(directory.parent)
+    validated = validate_runtime(runtime_dir, lock, key, receipt.get("bundleSha256"))
+    return {
+        "cleaned": True,
+        "removedBytecodeFiles": len(extras),
+        "runtimeValidated": validated["schemaVersion"] == INSTALL_SCHEMA,
+    }
+
+
 def install(bundle: Path, runtime_dir: Path) -> dict:
     if not runtime_dir.is_absolute():
         raise ValueError("Runtime directory must be absolute")
@@ -346,6 +421,7 @@ def install(bundle: Path, runtime_dir: Path) -> dict:
 
 
 def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> None:
+    _prevent_bytecode_writes()
     _lock_raw, lock = load_lock()
     key = _platform_key(lock)
     validate_runtime(runtime_dir, lock, key)
@@ -383,6 +459,7 @@ def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> 
 
 
 def main() -> int:
+    _prevent_bytecode_writes()
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     build = commands.add_parser("build")
@@ -390,6 +467,8 @@ def main() -> int:
     install_command = commands.add_parser("install")
     install_command.add_argument("--bundle", type=Path, required=True)
     install_command.add_argument("--runtime-dir", type=Path, required=True)
+    clean = commands.add_parser("clean-bytecode-cache")
+    clean.add_argument("--runtime-dir", type=Path, required=True)
     run = commands.add_parser("run")
     run.add_argument("--runtime-dir", type=Path, required=True)
     run.add_argument("--worker-script", type=Path, required=True)
@@ -399,6 +478,8 @@ def main() -> int:
         result = build_bundle(args.output)
     elif args.command == "install":
         result = install(args.bundle, args.runtime_dir)
+    elif args.command == "clean-bytecode-cache":
+        result = clean_bytecode_cache(args.runtime_dir)
     else:
         arguments = args.arguments[1:] if args.arguments[:1] == ["--"] else args.arguments
         run_worker(args.runtime_dir, args.worker_script, arguments)
