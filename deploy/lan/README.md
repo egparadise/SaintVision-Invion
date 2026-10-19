@@ -362,6 +362,47 @@ policy are both still valid; expired material is never restored. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
+Leaf rotation has two isolated Python runtime choices. The existing venv path is
+still supported. When `python3-venv` is unavailable, build the reviewed offline
+runtime on the Control Plane from the exact PyPI URLs and SHA-256 values in
+`leaf-rotation-runtime-lock.json`:
+
+```text
+python tools/build_leaf_rotation_runtime.py \
+  --output <private-transfer-dir>/leaf-rotation-runtime.zip
+```
+
+Transfer that public bundle, its separately calculated SHA-256, the lock, the
+standalone installer, the shell wrapper, and `worker_leaf_rotation.py` through
+the same out-of-band verified path as the rotation proposal. On each Node, the
+following command selects only a reviewed `x86_64` CPython 3.12 or 3.14 ABI,
+verifies every wheel and archive member, atomically extracts into a user-owned
+directory, and runs preflight without pip, network, sudo, or a system package
+change:
+
+```text
+bash deploy/lan/prepare-leaf-rotation-runtime.sh --standalone \
+  "$HOME/.local/share/saintvision/leaf-rotation-runtime" \
+  ./worker_leaf_rotation.py ./leaf-rotation-runtime.zip
+```
+
+Every subsequent `install`, `finalize`, or `rollback` invocation uses the same
+isolated launcher, for example:
+
+```text
+python3 -I deploy/lan/leaf_rotation_standalone_runtime.py run \
+  --runtime-dir "$HOME/.local/share/saintvision/leaf-rotation-runtime" \
+  --worker-script ./worker_leaf_rotation.py -- install <worker arguments>
+```
+
+The launcher removes ambient and system site-package paths, admits only the
+verified extracted runtime plus the worker directory and standard library, and
+requires exact `cryptography==50.0.1`, `cffi==2.0.0`, and `pycparser==2.23`
+origins. A different ABI, missing or changed wheel, extra bundle member,
+symlink, path traversal, installed-file drift, or system `cryptography` fallback
+fails before the worker writes state. The venv command remains the explicit
+alternative; the two runtime modes must not be mixed within one rotation.
+
 ## Desktop launcher
 
 `deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has

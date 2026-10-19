@@ -1,15 +1,32 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.331"
+version: "1.0.332"
 status: "review"
 author: "Codex"
-updated: "2026-10-17T20:46:57+09:00"
+updated: "2026-10-19T16:36:42+09:00"
 source_of_truth: "Git"
-active_card: "CARD-296 fresh isolated r3 bootstrap live acceptance"
-active_card_status: "The train 73 r3 bootstrap is complete: two Nodes are online and fresh, the loopback live-mTLS console and owned shortcut use the r3 state, and every r2 artifact remains preserved"
-active_card_next: "PR #394 is approved by Claude at 2fe44acf and is in merge train 74; before the 2026-10-23 leaf expiry the operator installs the matching python3-venv package on both Nodes, then the reviewed batch rotation runs after the pinned cryptography runtime gate passes"
+active_card: "CARD-298 venvless leaf-rotation runtime"
+active_card_status: "The Linux x86_64 CPython 3.12/3.14 standalone runtime, pinned wheel supply path, fail-closed installer/launcher, and 9/9 mutation guards are implemented locally; live rotation remains forbidden"
+active_card_next: "Push the Card 298 head, require hosted Backend 3.12/3.14 actual-wheel preflight plus Core/Docs green, and obtain Claude approval before any r3 Node receives the runtime bundle"
 ---
+
+## 2026-10-19 Card 298 — venvless leaf-rotation runtime
+
+- Read-only SSH probes measured the two live r3 Nodes as Linux `x86_64`, CPython 3.14.4
+  (`cpython-314-x86_64-linux-gnu`) and CPython 3.12.3
+  (`cpython-312-x86_64-linux-gnu`). No remote write or live rotation occurred.
+- The lock names four official PyPI wheels and exact SHA-256 values: one shared cryptography
+  abi3 wheel, one ABI-specific cffi wheel per Node runtime, and one shared pycparser wheel.
+  Building happens on the CP; Nodes use no pip, network, sudo, venv, or system package change.
+- The stdlib-only installer rejects ABI/architecture drift, digest/member/path/symlink drift,
+  extracts atomically into a private directory, and revalidates exact installed bytes on every
+  run. The `python3 -I` launcher removes site packages and proves all three imports originate in
+  that directory before executing the existing worker.
+- Existing venv behavior remains an explicit alternative. Focused local result: **52 passed**;
+  standalone boundary mutations: **9/9 killed**. Hosted actual-wheel 3.12/3.14 evidence and
+  Claude review remain pending; live application is not authorized by this card.
+- History: [[2026-10-19_16-36-42_KST_Card298_venvless_leaf_rotation_runtime_Codex]].
 
 ## 2026-10-17 Card 296 — fresh isolated r3 bootstrap live acceptance
 
