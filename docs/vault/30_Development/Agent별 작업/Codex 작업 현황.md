@@ -4,10 +4,10 @@ title: "Codex 작업 현황"
 version: "1.0.333"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T18:13:36+09:00"
+updated: "2026-10-19T18:43:54+09:00"
 source_of_truth: "Git"
 active_card: "CARD-300 bytecode-free venvless leaf runtime"
-active_card_status: "Implementation and focused evidence complete; Claude review and exact-head hosted Backend/Core are pending; live r3 retry remains stopped"
+active_card_status: "PR #396 is approved by Claude at 6af107b8 and is in merge train 76; the live r3 retry remains stopped"
 active_card_next: "After approval and landing, obtain operator authorization before cleaning the two Node runtimes, abandoning the expired unstaged batch, and preparing a fresh batch"
 ---
 
