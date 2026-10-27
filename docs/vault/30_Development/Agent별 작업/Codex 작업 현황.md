@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.335"
+version: "1.0.336"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T11:34:52+09:00"
+updated: "2026-10-27T12:55:39+09:00"
 source_of_truth: "Git"
-active_card: "CARD-301 pinned standalone worker-module closure"
-active_card_status: "PR #397 is approved by Claude at f2936ae5 and is in merge train 77; no live change has run since the first Node restart stop, and the r3 overlap and leaves have since expired (both Nodes untrusted)"
-active_card_next: "Codex gives a read-only recovery assessment for fully expired r3 with the first Node half-installed; no live work runs until the operator chooses a recovery path"
+active_card: "CARD-299 standalone leaf-runtime guard coverage"
+active_card_status: "The fourteen Card 298 review coverage gaps now have behavioral witnesses; local non-symlink mutations are 21/21 killed and four symlink cases await the hosted Linux lane"
+active_card_next: "Claude independently reviews the exact-head hosted Backend result and verifies that Linux kills M22-M25; product runtime behavior remains unchanged"
 ---
+
+## 2026-10-27 Card 299 — standalone leaf-runtime guard coverage
+
+- Behavioral tests now bind redirect refusal, dependency origin/version, hostile archive spelling,
+  canonical manifests, recomputed receipts, collision/size limits, path absoluteness, and symlinks.
+- M11–M25 extend the existing mutation runner. Windows killed 21/21 executable mutants and
+  declared four Linux-only symlink cases; Backend Python 3.12 must kill all 25.
+- Product runtime, worker, lock, and rotation files are unchanged.
+- History: [[2026-10-27_12-55-39_KST_Card299_leaf_runtime_guard_coverage_Codex]].
 
 ## 2026-10-19 Card 301 — pinned standalone worker-module closure
 

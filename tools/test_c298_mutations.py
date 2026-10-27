@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -71,7 +72,107 @@ MUTANTS = (
         "sys.dont_write_bytecode = True\n",
         "sys.dont_write_bytecode = False\n",
     ),
+    (
+        "M11",
+        RUNTIME,
+        "        if response.status != 200 or response.geturl() != url:\n",
+        "        if response.status != 200:\n",
+    ),
+    (
+        "M12",
+        RUNTIME,
+        "        if runtime_dir.resolve() not in origin.parents:\n",
+        "        if False:\n",
+    ),
+    (
+        "M13",
+        RUNTIME,
+        '    if (\n        cryptography.__version__ != "50.0.1"\n'
+        '        or cffi.__version__ != "2.0.0"\n'
+        '        or pycparser.__version__ != "2.23"\n    ):\n',
+        "    if False:\n",
+    ),
+    (
+        "M14",
+        RUNTIME,
+        "            if total > MAX_RUNTIME_BYTES or path.as_posix() in result:\n",
+        "            if total > MAX_RUNTIME_BYTES:\n",
+    ),
+    (
+        "M15",
+        RUNTIME,
+        '                or info.filename.startswith("/")\n',
+        "                or False\n",
+    ),
+    (
+        "M16",
+        RUNTIME,
+        '                or "\\\\" in info.filename\n',
+        "                or False\n",
+    ),
+    (
+        "M17",
+        RUNTIME,
+        "        if manifest != expected_manifest or manifest_raw != _canonical(expected_manifest):\n",
+        "        if manifest != expected_manifest:\n",
+    ),
+    (
+        "M18",
+        RUNTIME,
+        '    if (\n        receipt["fileCount"] != len(expected)\n'
+        '        or receipt["filesSha256"] != files_digest\n'
+        '        or receipt["workerModulesSha256"] != worker_digest\n    ):\n'
+        '        raise ValueError("Standalone runtime receipt does not describe installed files")\n'
+        "    return receipt\n",
+        "    if False:\n"
+        '        raise ValueError("Standalone runtime receipt does not describe installed files")\n'
+        "    return receipt\n",
+    ),
+    (
+        "M19",
+        RUNTIME,
+        "            if name in expected:\n",
+        "            if False:\n",
+    ),
+    (
+        "M20",
+        RUNTIME,
+        "            if total > MAX_RUNTIME_BYTES or path.as_posix() in result:\n",
+        "            if path.as_posix() in result:\n",
+    ),
+    (
+        "M21",
+        RUNTIME,
+        "    if not runtime_dir.is_absolute():\n",
+        "    if False:\n",
+    ),
+    (
+        "M22",
+        RUNTIME,
+        "    if output.exists() or output.is_symlink():\n",
+        "    if output.exists():\n",
+    ),
+    (
+        "M23",
+        RUNTIME,
+        "    if runtime_dir.is_symlink():\n",
+        "    if False:\n",
+    ),
+    (
+        "M24",
+        RUNTIME,
+        "            if (root_path / name).is_symlink():\n",
+        "            if False:\n",
+    ),
+    (
+        "M25",
+        RUNTIME,
+        "            if path.is_symlink() or not path.is_file():\n",
+        "            if not path.is_file():\n",
+    ),
 )
+
+LINUX_ONLY_MUTANTS = {"M22", "M23", "M24", "M25"}
 
 
 def main() -> int:
@@ -79,6 +180,15 @@ def main() -> int:
     originals = {path: path.read_bytes() for _, path, _, _ in MUTANTS}
     try:
         for mutant_id, path, before, after in MUTANTS:
+            if os.name == "nt" and mutant_id in LINUX_ONLY_MUTANTS:
+                results.append(
+                    {
+                        "id": mutant_id,
+                        "killed": None,
+                        "skipped": "requires Linux symlink semantics",
+                    }
+                )
+                continue
             original = originals[path]
             text = original.decode("utf-8")
             if text.count(before) != 1:
@@ -102,7 +212,18 @@ def main() -> int:
     finally:
         for path, original in originals.items():
             path.write_bytes(original)
-    print(json.dumps({"total": len(results), "killed": len(results), "results": results}))
+    killed = sum(item.get("killed") is True for item in results)
+    skipped = sum("skipped" in item for item in results)
+    print(
+        json.dumps(
+            {
+                "total": len(results),
+                "killed": killed,
+                "skipped": skipped,
+                "results": results,
+            }
+        )
+    )
     return 0
 
 
