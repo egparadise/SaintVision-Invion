@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.337"
+version: "1.0.338"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T13:43:13+09:00"
+updated: "2026-10-27T14:32:04+09:00"
 source_of_truth: "Git"
-active_card: "CARD-299 standalone leaf-runtime guard coverage"
-active_card_status: "PR #399 is approved by Claude at abeed2d2 (hosted Backend 3.12 killed 26/26 mutants) and is in merge train 78 with the approved r4 acceptance record #398; r4 is live with both Nodes online"
-active_card_next: "Codex verifies train 78; the r4 automatic renewal window opens 2026-10-31 12:32:25 KST under the operator's standing approval"
+active_card: "CARD-304 session-independent scheduled leaf renewal"
+active_card_status: "Implementation and focused behavioral evidence are complete; Task Scheduler registration and live renewal remain unexecuted pending Claude review and train validation"
+active_card_next: "Open the Card 304 PR against coord/train78a-ci-1343, obtain Claude review and exact-head CI, then await the coordinator's separate live-registration instruction"
 ---
+
+## 2026-10-27 Card 304 — session-independent scheduled leaf renewal
+
+- A strict digest-pinned plan admits only the exact two-Node batch order and rejects added keys,
+  commands, Nodes, modified binaries, or modified inputs.
+- Public certificates determine the two-day window; tool-native status and both post-transition
+  observations require exactly two online/fresh Nodes.
+- Every gate has a stop-before-next behavioral witness. Expiry alerts without a renewal attempt;
+  outside-window runs are durable no-ops; lock and Task Scheduler both prevent overlap.
+- The current-user limited S4U task runs twice daily and exposes only redacted append-only and
+  Desktop status receipts. Live registration was not performed.
+- History: [[2026-10-27_14-32-04_KST_Card304_scheduled_leaf_renewal_Codex]].
 
 ## 2026-10-27 Fresh isolated r4 LAN pilot live acceptance
 
