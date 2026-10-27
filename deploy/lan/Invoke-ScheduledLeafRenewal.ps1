@@ -31,4 +31,3 @@ if ($renewalExit -ne 0) {
     # every expected outcome.  Do not print command output or private paths here.
     throw "Scheduled leaf renewal stopped (exit $renewalExit); inspect the redacted status file."
 }
-
