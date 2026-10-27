@@ -149,6 +149,10 @@ jobs:
           }
           PY
 
+      - name: Kill the standalone leaf-runtime guard mutations
+        if: matrix.python-version == '3.12'
+        run: python tools/test_c298_mutations.py > "$RUNNER_TEMP/leaf-runtime-mutations.json"
+
       - name: Contract schemas match their models
         run: python tools/export_schemas.py --check
 
