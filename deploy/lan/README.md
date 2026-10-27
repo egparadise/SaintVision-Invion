@@ -421,6 +421,29 @@ symlink, path traversal, installed-file drift, external local-module shadow, or 
 fails before the worker writes state. The venv command remains the explicit
 alternative; the two runtime modes must not be mixed within one rotation.
 
+### Session-independent scheduled renewal
+
+`Invoke-ScheduledLeafRenewal.ps1` is the non-interactive entry point for a reviewed private
+renewal plan. `Register-LeafRenewalTask.ps1` pins the plan, runner, and Python executor digests and
+registers two daily current-user S4U triggers with both Task Scheduler `IgnoreNew` and an
+executor lock. Registration refuses a foreign task with the same deterministic state-derived
+name. Live registration is an explicit post-review operation; neither script registers a task by
+being imported or tested.
+
+The plan's source commit must equal the checkout that owns the runner. It has one exact sequence:
+public-certificate window check, current two-Node status,
+two runtime preflights, prepare, two installs, two channel stages, one global commit, the reviewed
+Control Plane transition, post-transition observation, two finalizations, and a final observation.
+Each executable and referenced input file is SHA-256 pinned. A failed gate stops before every
+later command, preserves the partial batch, and emits only a redacted append-only JSONL receipt
+plus an atomically replaced Desktop status file. Windows pop-up notification is a separately
+explicit configuration bit required by live task registration; test/direct execution keeps it
+off, and outside-window no-ops never notify. The runner never reads `private-state.json`,
+prints command output, retries a failed gate, accepts an expired leaf, or edits a journal. An
+expired earliest public leaf produces an alert and no renewal command. The task configuration may
+contain paths to operator-private inputs, but not a credential, DSN, private key, or password
+value.
+
 ## Desktop launcher
 
 `deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has
