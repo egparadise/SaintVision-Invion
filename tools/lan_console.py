@@ -4,13 +4,39 @@ Loopback only. It exposes current observations and bounded acceptance results,
 never credentials, arbitrary files, signing, workload mutations or fake inventory.
 """
 import argparse
-from datetime import datetime,timezone
+from datetime import datetime,timedelta,timezone
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 import ipaddress
 import json
 from pathlib import Path
 from urllib.parse import urlsplit
 from lan_pilot import load,runtime
+
+RENEWAL_WINDOW_SECONDS=172800
+
+
+def _utc(value):
+    return value.astimezone(timezone.utc).isoformat() if value is not None else None
+
+
+def trust_view(rows,now):
+    """Earliest enabled-channel leaf expiry and the operator-approved renewal window.
+
+    The column is the current channel's own Node leaf not_after, so this is the earliest
+    Node leaf, not the earliest certificate in the mTLS path; the Control Plane leaf is not
+    in the database and can expire sooner.
+    """
+    expiries=[row['certificate_not_after'] for row in rows
+        if row.get('channel_enabled') is True and row.get('certificate_not_after') is not None]
+    if not expiries:
+        return dict(earliestCertificateNotAfter=None,renewalWindowStartsAt=None,
+            secondsUntilEarliestExpiry=None,state='unknown')
+    earliest=min(expiries)
+    window=earliest-timedelta(seconds=RENEWAL_WINDOW_SECONDS)
+    remaining=max(0.0,(earliest-now).total_seconds())
+    state='expired' if remaining<=0 else 'renewal-window' if now>=window else 'ok'
+    return dict(earliestCertificateNotAfter=_utc(earliest),renewalWindowStartsAt=_utc(window),
+        secondsUntilEarliestExpiry=round(remaining,1),state=state)
 
 
 def node_view(row,now):
@@ -29,6 +55,7 @@ def node_view(row,now):
     return dict(nodeId=row['node_id'],address=urlsplit(row.get('endpoint') or '').hostname,
         status=status,fresh=fresh,lastHeartbeatAt=row['heartbeat_at'].isoformat() if row.get('heartbeat_at') else None,
         lastSnapshotAt=stamp.isoformat() if stamp else None,observationAgeSeconds=round(age,1) if age is not None else None,
+        certificateNotAfter=_utc(row.get('certificate_not_after')),
         osType=snap.get('osType'),profileVersion=snap.get('profileVersion'),agentVersion=snap.get('agentVersion'),
         cpuCores=cpu/1000 if cpu is not None else None,
         cpuUsagePercent=round(busy/cpu*100,1) if cpu and busy is not None else None,
@@ -66,6 +93,7 @@ def snapshot(path):
     return dict(source='live-postgresql-mtls',serverAddress=state['serverIP'],generatedAt=now.isoformat(),
         nodes=[node_view(row,now) for row in rows],runs=[dict(runId=r['run_id'],state=r['state'],version=r['version']) for r in runs],
         offered={r['kind']:r['offered'] for r in resources},killSwitch=gate,
+        trust=trust_view(rows,now),
         userWorkloadSubmission=False,webAuthenticationConfigured=False,
         tests=acceptance_view(path/'acceptance-report.json',state['nodeId']))
 
