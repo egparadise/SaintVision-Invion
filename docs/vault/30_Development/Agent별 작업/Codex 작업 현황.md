@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.337"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T13:12:00+09:00"
+updated: "2026-10-27T13:43:13+09:00"
 source_of_truth: "Git"
 active_card: "CARD-299 standalone leaf-runtime guard coverage"
-active_card_status: "The fourteen Card 298 review coverage gaps and the E8 bounded-regular-file boundary now have behavioral witnesses; local non-symlink mutations are 21/21 killed and five Linux-only cases await the hosted lane"
-active_card_next: "Claude independently reviews the exact-head hosted Backend result and verifies that Linux kills M22-M26; product runtime behavior remains unchanged"
+active_card_status: "PR #399 is approved by Claude at abeed2d2 (hosted Backend 3.12 killed 26/26 mutants) and is in merge train 78 with the approved r4 acceptance record #398; r4 is live with both Nodes online"
+active_card_next: "Codex verifies train 78; the r4 automatic renewal window opens 2026-10-31 12:32:25 KST under the operator's standing approval"
 ---
 
 ## 2026-10-27 Fresh isolated r4 LAN pilot live acceptance
