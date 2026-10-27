@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.335"
+version: "1.0.336"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T11:34:52+09:00"
+updated: "2026-10-27T12:45:29+09:00"
 source_of_truth: "Git"
-active_card: "CARD-301 pinned standalone worker-module closure"
-active_card_status: "PR #397 is approved by Claude at f2936ae5 and is in merge train 77; no live change has run since the first Node restart stop, and the r3 overlap and leaves have since expired (both Nodes untrusted)"
-active_card_next: "Codex gives a read-only recovery assessment for fully expired r3 with the first Node half-installed; no live work runs until the operator chooses a recovery path"
+active_card: "R4-LIVE fresh isolated LAN pilot acceptance"
+active_card_status: "The operator-approved exact-train-77 r4 bootstrap is complete: exactly two Nodes are online/fresh, channel version 1, the desktop console is on r4, and r2/r3 artifacts remain untouched"
+active_card_next: "Resume Card 299 guard-coverage tests; the separately approved r4 batch renewal may start 2026-10-31 12:32:25 KST with a four-hour overlap and must stop/report on any failed gate"
 ---
+
+## 2026-10-27 Fresh isolated r4 LAN pilot live acceptance
+
+- Exact train 77 source created a new isolated r4 state and database namespace while preserving
+  every r2/r3 state, journal, container, volume, database namespace, and Node key.
+- Each Node generated its new key locally; only CSRs and public chain material crossed the boundary.
+  Repository enrollment and Node finish gates passed for exactly two Nodes.
+- The live overview is `live-postgresql-mtls`; both Nodes are online/fresh, both channels are
+  enabled at version 1, and the web/overview/database-forward listeners are loopback-only.
+- The Control Plane leaf expires 2026-11-02 12:32:25 KST. The approved reviewed-batch renewal may
+  start 2026-10-31 12:32:25 KST with a four-hour overlap and fail-closed stop/report behavior.
+- History: [[2026-10-27_12-45-29_KST_r4_fresh_bootstrap_live_acceptance_Codex]].
 
 ## 2026-10-19 Card 301 — pinned standalone worker-module closure
 
