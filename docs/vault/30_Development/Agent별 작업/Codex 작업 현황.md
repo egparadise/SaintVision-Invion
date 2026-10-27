@@ -1,22 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.336"
+version: "1.0.337"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T12:55:39+09:00"
+updated: "2026-10-27T13:12:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-299 standalone leaf-runtime guard coverage"
-active_card_status: "The fourteen Card 298 review coverage gaps now have behavioral witnesses; local non-symlink mutations are 21/21 killed and four symlink cases await the hosted Linux lane"
-active_card_next: "Claude independently reviews the exact-head hosted Backend result and verifies that Linux kills M22-M25; product runtime behavior remains unchanged"
+active_card_status: "The fourteen Card 298 review coverage gaps and the E8 bounded-regular-file boundary now have behavioral witnesses; local non-symlink mutations are 21/21 killed and five Linux-only cases await the hosted lane"
+active_card_next: "Claude independently reviews the exact-head hosted Backend result and verifies that Linux kills M22-M26; product runtime behavior remains unchanged"
 ---
 
 ## 2026-10-27 Card 299 — standalone leaf-runtime guard coverage
 
 - Behavioral tests now bind redirect refusal, dependency origin/version, hostile archive spelling,
   canonical manifests, recomputed receipts, collision/size limits, path absoluteness, and symlinks.
-- M11–M25 extend the existing mutation runner. Windows killed 21/21 executable mutants and
-  declared four Linux-only symlink cases; Backend Python 3.12 must kill all 25.
+- M11–M26 extend the existing mutation runner. Windows killed 21/21 executable mutants and
+  declared five Linux-only cases; Backend Python 3.12 must kill all 26.
 - Product runtime, worker, lock, and rotation files are unchanged.
 - History: [[2026-10-27_12-55-39_KST_Card299_leaf_runtime_guard_coverage_Codex]].
 

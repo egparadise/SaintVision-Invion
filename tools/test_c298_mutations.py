@@ -170,9 +170,15 @@ MUTANTS = (
         "            if path.is_symlink() or not path.is_file():\n",
         "            if not path.is_file():\n",
     ),
+    (
+        "M26",
+        RUNTIME,
+        "    if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= limit:\n",
+        "    if not 0 < info.st_size <= limit:\n",
+    ),
 )
 
-LINUX_ONLY_MUTANTS = {"M22", "M23", "M24", "M25"}
+LINUX_ONLY_MUTANTS = {"M22", "M23", "M24", "M25", "M26"}
 
 
 def main() -> int:
@@ -201,7 +207,43 @@ def main() -> int:
                 text=True,
             )
             killed = completed.returncode == 1
-            results.append({"id": mutant_id, "killed": killed, "exitCode": completed.returncode})
+            result = {"id": mutant_id, "killed": killed, "exitCode": completed.returncode}
+            if mutant_id == "M26":
+                witness = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pytest",
+                        "-q",
+                        f"{TEST}::test_regular_rejects_non_regular_input",
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+                remainder = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pytest",
+                        "-q",
+                        TEST,
+                        "-k",
+                        "not test_regular_rejects_non_regular_input",
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+                killed = killed and witness.returncode == 1 and remainder.returncode == 0
+                result.update(
+                    {
+                        "killed": killed,
+                        "witnessExitCode": witness.returncode,
+                        "remainderExitCode": remainder.returncode,
+                    }
+                )
+            results.append(result)
             path.write_bytes(original)
             if path.read_bytes() != original:
                 raise RuntimeError(f"{mutant_id} restore differs")

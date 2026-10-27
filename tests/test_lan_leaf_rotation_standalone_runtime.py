@@ -653,3 +653,17 @@ def test_installed_tree_refuses_directory_and_file_symlinks(tmp_path, kind):
         (runtime_dir / "linked.py").symlink_to(external)
     with pytest.raises(ValueError, match="symlink|non-regular"):
         runtime._installed_files(runtime_dir)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows runner cannot create the reviewed symlinks")
+@pytest.mark.parametrize("kind", ["symlink", "directory"])
+def test_regular_rejects_non_regular_input(tmp_path, kind):
+    candidate = tmp_path / "candidate"
+    if kind == "symlink":
+        target = tmp_path / "target"
+        target.write_bytes(b"bounded")
+        candidate.symlink_to(target)
+    else:
+        candidate.mkdir()
+    with pytest.raises(ValueError, match="bounded regular file"):
+        runtime._regular(candidate, limit=1024)

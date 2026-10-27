@@ -39,20 +39,22 @@ are declared Linux-only and run in the hosted Backend lane.
 
 ## Mutation evidence
 
-`tools/test_c298_mutations.py` retains M1–M10 and adds M11–M25. Fifteen mutants cover the fourteen
-review classes because installed directory and installed file symlinks are removed independently.
+`tools/test_c298_mutations.py` retains M1–M10 and adds M11–M26. M11–M21 and M23–M25 cover the
+fourteen original review classes exactly; M22 adds the new dangling-output-symlink boundary, and
+M26 adds the E8 bounded-regular-file boundary. The M26 runner also proves that only its dedicated
+symlink/directory witness fails while the remainder of the runtime suite passes.
 The runner restores byte-for-byte originals after every mutant and counts only pytest exit code 1
 as a kill. On Windows the non-symlink cases are **21/21 killed** and four Linux symlink mutants are
-explicitly skipped; the Backend Python 3.12 job runs the same tool on Linux and requires all
-**25/25** to die. Python 3.14 continues to exercise the actual-wheel lifecycle without duplicating
+explicitly skipped together with M26; the Backend Python 3.12 job runs the same tool on Linux and
+requires all **26/26** to die. Python 3.14 continues to exercise the actual-wheel lifecycle without duplicating
 the mutation cost.
 
-Local focused result before push: **32 passed, 4 declared Linux-only skips**; mutation result:
-**21 killed, 4 declared Linux-only skips**. Hosted Linux completion remains a review condition and
+Local focused result before push: **32 passed, 6 declared Linux-only skips**; mutation result:
+**21 killed, 5 declared Linux-only skips**. Hosted Linux completion remains a review condition and
 must not be inferred from the local result.
 
 ## Review handoff
 
-Reviewer: Claude. Confirm each prior survivor has a behavioral witness, M11–M25 remove the intended
+Reviewer: Claude. Confirm each prior survivor has a behavioral witness, M11–M26 remove the intended
 guards one at a time, the Linux job executes (rather than skips) all symlink cases, and no product
 runtime file changed.
