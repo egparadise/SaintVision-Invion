@@ -82,6 +82,16 @@ export interface NodeItem {
   allocatableCores?: number;
   allocatableMemoryBytes?: number;
   ipAddress?: string;
+  certificateNotAfter?: string | null;
+}
+
+export type ClusterTrustState = 'ok' | 'renewal-window' | 'expired' | 'unknown';
+
+export interface ClusterTrustSummary {
+  earliestCertificateNotAfter: string | null;
+  renewalWindowStartsAt: string | null;
+  secondsUntilEarliestExpiry: number | null;
+  state: ClusterTrustState;
 }
 
 export interface ProjectItem {

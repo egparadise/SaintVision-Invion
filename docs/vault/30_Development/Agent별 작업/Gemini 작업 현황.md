@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.238"
+version: "1.0.239"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-06T09:54:00+09:00"
+updated: "2026-10-27T14:27:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-27T14:27:00+09:00 (Card 303 자원 탐색기 ResourceExplorer 노드 인증서 만료·자동 갱신 상태 표시: base 03e17c31 coord/train78a-ci-1343, Claude Card 302 데이터 계약 연계 — nodes[i].certificateNotAfter ISO string | null 및 trust { earliestCertificateNotAfter, renewalWindowStartsAt, secondsUntilEarliestExpiry, state } 프런트엔드 수용; observedNode 매퍼 유효 ISO UTC 통과, null 보존, 잘못된 값 undefined fail-closed; ResourceExplorer 상단 배너 renewal-window='자동 갱신 창 — 만료까지 N일 N시간', expired='인증서 만료 — 노드 연결 끊김', unknown/필드 없음 배너 없음, ok 배너 없이 툴바 배지만 표시; 노드 행 및 상세에 명시적 Asia/Seoul KST 시각 표시; ACC-09 디자인 토큰 100% 준수; vitest 27개 단위 시험 전수 통과, 100개 파일 1184 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS).
 - 확인 기준: 2026-10-06T09:54:00+09:00 (Card 282 [r2] 웹 터미널 화면 WebTerminal 색상 리터럴 32 occurrences / 23 distinct → 0건 전수 토큰화 및 ACC-09 그랜드 마일스톤 달성 r2 리뷰 조치: PR #379, target agent/gemini/c281-monaco-editor-contrast, Claude r2 F1 조치: 죽은 textColor 필드 전면 삭제로 실제 렌더링 전경 키 colorVar가 checkConfigTables에 의해 직접 감사되도록 결속, connecting.colorVar 1:1 충돌 사살 실측(M7); tools/test_c282_mutations.py 40종 M1~M40 100% 사살 실측(Commit A'' 407a8e82 위 Receipt B'' 4ccc39a0 봉인), Test 9j-2 AST 래칫(WebTerminal 28/10/18/7/17/9/9, violations 0), COLOR_LITERAL_MULTISET_BASELINE 전 파일 {} 완결 래칫, var(--color-border-subtle) 487건/36개 파일 래칫 보존, tools/reproduce_c282_contrast.py 32개 지표 전원 통과; Vitest 46 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T07:25:00+09:00 (Card 281 Monaco 에디터 화면 MonacoWorkspaceEditor 색상 리터럴 86 occurrences / 29 distinct → 0건 전수 토큰화, React JSX 인메모리 에디터 인라인 스타일 CSS 변수 직접 결속 체계 정합 및 테마 종속성 규명, WORKSPACE_TERMINAL_STATUS_CONFIG satisfies Record<WorkspaceTerminalStatus, WorkspaceTerminalStatusConfigItem> 엄밀 결속, getWorkspaceTerminalStatusConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, brand-subtle 배경 위 brand-hover 텍스트(5.49:1 / 8.11:1 >= 4.5:1) 및 brand-primary 경계선(4.24:1 / 5.75:1 >= 3.0:1) 채택으로 WCAG 2.2 AA 100% 충족, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, var(--color-border-subtle) 정확히 484건/35개 파일 래칫 보존, Test 9ae 및 Test 9j-2 AST 래칫(MonacoWorkspaceEditor 69/15/42/26/41/21/22, violations 0건), Revert-Fail Probes 161~165, 40종 변이 100% 사살 실측(Commit A e425e4ff 위 Receipt B e5e01958 봉인), tools/reproduce_c281_contrast.py 69개 지표 전원 통과; Vitest 45 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-06T06:44:00+09:00 (Card 280 에디터 모달 묶음 화면 ConflictResolutionModal(16건), DiffViewer(18건), GitCommitModal(26건) 색상 리터럴 60 occurrences → 0건 전수 토큰화, index.css diff 전용 시맨틱 토큰 6종 양 테마 정의 및 동적 명도 대비(텍스트 6.49~8.60:1>=4.5:1, 경계선 3.15~7.02:1>=3.0:1) 100% 충족, 모달 backdrop overlay 비텍스트 시각 스크림(SC 1.4.11 / SC 1.4.3 N/A) 정합, CONFLICT_STATUS_CONFIG·DIFF_LINE_TYPE_CONFIG·GIT_FILE_STATUS_CONFIG·GIT_STAGE_STATE_CONFIG satisfies Record<..., ...> 엄밀 결속, getConflictStatusConfig/getDiffLineTypeConfig/getGitFileStatusConfig/getGitStageStateConfig fail-closed UNKNOWN (<raw>) 및 Object.hasOwn 프로토타입 오염 격리, COLOR_LITERAL_MULTISET_BASELINE 3개 파일 {} 래칫, var(--color-border-subtle) 정확히 471건/34개 파일 래칫 보존, Test 9ad 및 Test 9j-2 AST 래칫(ConflictResolutionModal 18/2/5/3/5/4/4, DiffViewer 17/4/8/4/8/3/3, GitCommitModal 25/4/12/8/12/6/6, violations 전 파일 0건), Revert-Fail Probes 156~160, 40종 변이 100% 사살 실측(Commit A f1c898ce 위 Receipt B b6ba31fb 봉인), tools/reproduce_c280_contrast.py 32개 지표 전원 통과; Vitest 44 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0, check_contract_bindings PASS, check_docs PASS, check_doc_path_citations --ratchet PASS, sync_obsidian --check 0 conflicts).
@@ -63,6 +64,27 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-27 자원 탐색기 화면 (ResourceExplorer) 노드 인증서 만료 및 자동 갱신 상태 표시 (Card 303, `agent/gemini/c303-node-cert-expiry`, base `coord/train78a-ci-1343`)
+- **목적**: LAN 파일럿 r3의 인증서 만료 단절 및 r4의 2026-11-02 12:32:25 KST 만료 / 10-31 12:32:25 KST 자동 갱신 대비를 위해 Claude Card 302 데이터 계약을 프런트엔드에 수용하고, 운영자가 클러스터 및 노드별 인증서 수명주기를 직관적으로 인지할 수 있도록 시각화 및 무결성 검증 체계 구현:
+  1. **데이터 계약 및 관측 매퍼 연계**:
+     - `NodeItem`에 `certificateNotAfter?: string | null;` 추가.
+     - `ClusterTrustSummary` (`earliestCertificateNotAfter`, `renewalWindowStartsAt`, `secondsUntilEarliestExpiry`, `state`) 계약 수용.
+     - `observedNode`에서 유효 ISO UTC 통과, null 보존, 비날짜 문자열/비문자열은 `undefined`로 fail-closed ('미확인 값은 꾸미지 않음' 원칙 엄수).
+  2. **상단 배너 및 상태 배지**:
+     - `renewal-window`: `자동 갱신 창 — 만료까지 N일 N시간` 상단 배너 (안내/경고, ACC-09 degraded 토큰).
+     - `expired`: `인증서 만료 — 노드 연결 끊김` 상단 배너 (오류, ACC-09 offline 토큰, `role="alert"`).
+     - `unknown` 및 필드 부재: 상단 배너 미표시.
+     - `ok`: 상단 배너 없이 툴바에 `● 인증서 정상` 배지만 표시 ("ok=배지만").
+  3. **노드 행 및 노드 상세 명시적 Asia/Seoul (KST) 표기**:
+     - Overview 탭 노드 카드: `인증서 만료 (KST): {formatKstDateTime(node.certificateNotAfter)}` 표시.
+     - Nodes 탭 선택기 및 상세 역량 그리드: `인증서 만료 (KST): ...` 표시.
+     - `Intl.DateTimeFormat`의 `timeZone: 'Asia/Seoul'`을 명시적으로 결속하여 브라우저 로컬 시각 왜곡 원천 차단.
+  4. **ACC-09 디자인 토큰 규격 준수**:
+     - 리터럴 0건, 모든 색상은 `var(--color-...)` 시맨틱 토큰 결속, WCAG 2.2 AA 명도 대비 불변식 100% 만족.
+  5. **단위 및 회귀 시험 100% 통과**:
+     - `apps/web/tests/node-cert-trust-expiry.test.tsx` 27개 시험 전수 통과 (4개 state + 필드 누락 + 잘못된 ISO + 음수 방어 + 윈도우 시작 정확 경계).
+     - 전체 vitest 100개 파일 1184 passed, tsc 0, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS.
 
 ## 2026-10-06 웹 터미널 화면 (WebTerminal) 색상 리터럴 전수 토큰화(32 occurrences / 23 distinct → 0건), 상태 계약 결속 및 ACC-09 그랜드 마일스톤 달성 (Card 282, `agent/gemini/c282-web-terminal-contrast`, PR 대상 `agent/gemini/c281-monaco-editor-contrast`)
 - **목적**: ACC-09 마지막 대상 파일(`WebTerminal.tsx`)의 색상 리터럴 전수 토큰화(32 occurrences / 23 distinct → 0건), 웹 터미널 상태/연결성 설정 테이블 엄밀 결속, fail-closed 방어 체계 구축, 명도 대비 감사 및 ACC-09 저장소 단위 그랜드 마일스톤 완성:
