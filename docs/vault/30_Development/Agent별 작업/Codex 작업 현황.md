@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.335"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T22:57:36+09:00"
+updated: "2026-10-27T11:30:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-301 pinned standalone worker-module closure"
-active_card_status: "Card 301 code and tests are in progress after the authorized live retry stopped at the first Node restart seam; no further live change is authorized"
-active_card_next: "Claude reviews PR #397; no live work is authorized, and operators must either finish the exact batch before 2026-10-20 02:23:05 KST or separately authorize fresh-only rollback"
+active_card_status: "PR #397 is approved by Claude at f2936ae5 and is in merge train 77; no live change has run since the first Node restart stop, and the r3 overlap and leaves have since expired (both Nodes untrusted)"
+active_card_next: "Codex gives a read-only recovery assessment for fully expired r3 with the first Node half-installed; no live work runs until the operator chooses a recovery path"
 ---
 
 ## 2026-10-19 Card 301 — pinned standalone worker-module closure
