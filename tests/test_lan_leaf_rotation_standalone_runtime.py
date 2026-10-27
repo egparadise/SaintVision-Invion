@@ -9,6 +9,7 @@ from pathlib import Path
 import stat
 import subprocess
 import sys
+import types
 import warnings
 import zipfile
 
@@ -437,3 +438,232 @@ def test_shell_keeps_venv_fallback_and_uses_isolated_standalone_runner():
     assert 'python3 -I -B "$script_dir/leaf_rotation_standalone_runtime.py" run' in source
     assert "sudo" not in source
     assert source.index(" install \\") < source.index(" run \\")
+
+
+class _DownloadResponse:
+    def __init__(self, *, status: int, url: str, value: bytes):
+        self.status = status
+        self._url = url
+        self._value = value
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def geturl(self) -> str:
+        return self._url
+
+    def read(self, _limit: int) -> bytes:
+        return self._value
+
+
+def _rewrite_zip_member(path: Path, target: str, replacement: bytes) -> None:
+    with zipfile.ZipFile(path) as archive:
+        entries = [(info, archive.read(info)) for info in archive.infolist()]
+    temporary = path.with_suffix(".rewrite")
+    with zipfile.ZipFile(temporary, "w") as archive:
+        for info, value in entries:
+            archive.writestr(info, replacement if info.filename == target else value)
+    temporary.replace(path)
+
+
+def test_download_rejects_redirect_even_when_response_is_success(monkeypatch):
+    requested = "https://files.pythonhosted.org/reviewed.whl"
+    response = _DownloadResponse(
+        status=200,
+        url="https://unreviewed.invalid/redirected.whl",
+        value=b"wheel",
+    )
+    monkeypatch.setattr(runtime.urllib.request, "urlopen", lambda *_args, **_kwargs: response)
+    with pytest.raises(RuntimeError, match="redirected"):
+        runtime._download(requested)
+
+
+@pytest.mark.parametrize(
+    ("damage", "message"),
+    [
+        ("origin", "outside the pinned directory"),
+        ("version", "dependency version differs"),
+    ],
+)
+def test_runner_rejects_preimported_dependency_origin_and_version(
+    tmp_path, monkeypatch, damage, message
+):
+    runtime_dir = tmp_path / "runtime"
+    installed_worker = runtime_dir / "worker" / runtime.WORKER_ENTRY
+    installed_worker.parent.mkdir(parents=True)
+    installed_worker.write_text("# pinned worker\n", encoding="utf-8")
+    worker = tmp_path / runtime.WORKER_ENTRY
+    worker.write_text("raise AssertionError('must not execute')\n", encoding="utf-8")
+    monkeypatch.setattr(runtime, "WORKER_SHA256", hashlib.sha256(worker.read_bytes()).hexdigest())
+    monkeypatch.setattr(runtime, "load_lock", lambda: (b"", {"platforms": {"fixture": {}}}))
+    monkeypatch.setattr(runtime, "_platform_key", lambda _lock: "fixture")
+    monkeypatch.setattr(runtime, "validate_runtime", lambda *_args: {})
+
+    versions = {"cryptography": "50.0.1", "cffi": "2.0.0", "pycparser": "2.23"}
+    for name, version in versions.items():
+        module = types.ModuleType(name)
+        package = runtime_dir / name / "__init__.py"
+        package.parent.mkdir(parents=True, exist_ok=True)
+        package.write_text("# fixture\n", encoding="utf-8")
+        module.__file__ = str(package)
+        module.__version__ = version
+        monkeypatch.setitem(sys.modules, name, module)
+    if damage == "origin":
+        sys.modules["cryptography"].__file__ = str(tmp_path / "ambient/cryptography.py")
+    else:
+        sys.modules["cryptography"].__version__ = "49.0.0"
+
+    saved_path = list(sys.path)
+    saved_argv = list(sys.argv)
+    try:
+        with pytest.raises(RuntimeError, match=message):
+            runtime.run_worker(runtime_dir, worker, ["runtime-preflight"])
+    finally:
+        sys.path[:] = saved_path
+        sys.argv[:] = saved_argv
+
+
+def test_wheel_unpack_rejects_duplicate_member_name():
+    from io import BytesIO
+
+    target = BytesIO()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with zipfile.ZipFile(target, "w") as archive:
+            archive.writestr("package/__init__.py", b"first")
+            archive.writestr("package/__init__.py", b"second")
+    with pytest.raises(ValueError, match="duplicated"):
+        runtime._wheel_members(target.getvalue())
+
+
+def test_wheel_unpack_rejects_absolute_path():
+    with pytest.raises(ValueError, match="unsafe member path"):
+        runtime._wheel_members(_wheel({"/absolute.py": b"x"}))
+
+
+def test_wheel_unpack_rejects_backslash_path(monkeypatch):
+    # zipfile normalizes os.sep while writing on Windows. Model the Linux Node's
+    # ZIP parser so the hostile backslash spelling survives into ZipInfo.
+    monkeypatch.setattr(zipfile.os, "sep", "/")
+    raw = _wheel({r"package\escape.py": b"x"})
+    with pytest.raises(ValueError, match="unsafe member path"):
+        runtime._wheel_members(raw)
+
+
+def test_bundle_manifest_must_use_canonical_bytes(tmp_path, monkeypatch):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels)
+    with zipfile.ZipFile(bundle) as archive:
+        manifest = json.loads(archive.read("runtime-bundle.json"))
+    _rewrite_zip_member(
+        bundle,
+        "runtime-bundle.json",
+        json.dumps(manifest, indent=2, sort_keys=True).encode("utf-8"),
+    )
+    with pytest.raises(ValueError, match="manifest differs"):
+        runtime.install(bundle, tmp_path / "installed")
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("fileCount", -1), ("filesSha256", "0" * 64), ("workerModulesSha256", "0" * 64)],
+)
+def test_runtime_receipt_must_describe_recomputed_installed_files(
+    tmp_path, monkeypatch, field, value
+):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels)
+    destination = tmp_path / "installed"
+    runtime.install(bundle, destination)
+    receipt = destination / ".saintvision-runtime.json"
+    damaged = json.loads(receipt.read_text("utf-8"))
+    damaged[field] = value
+    receipt.write_bytes(runtime._canonical(damaged))
+    with pytest.raises(ValueError, match="does not describe installed files"):
+        runtime.validate_runtime(destination, lock, "fixture-cpython")
+
+
+def test_selected_wheels_must_not_install_colliding_files(tmp_path, monkeypatch):
+    _raw, lock, wheels = _fixture_lock(monkeypatch)
+    wheels["cffi.whl"] = _wheel({"cryptography/__init__.py": b"collision"})
+    lock["wheels"]["cffi.whl"]["sha256"] = hashlib.sha256(wheels["cffi.whl"]).hexdigest()
+    with pytest.raises(ValueError, match="colliding files"):
+        runtime._expected_files(
+            lock,
+            wheels,
+            "fixture-cpython",
+            _reviewed_worker_modules(),
+        )
+
+
+def test_wheel_uncompressed_runtime_size_is_bounded(monkeypatch):
+    monkeypatch.setattr(runtime, "MAX_RUNTIME_BYTES", 1)
+    with pytest.raises(ValueError, match="oversized"):
+        runtime._wheel_members(_wheel({"package.py": b"xx"}))
+
+
+def test_install_rejects_relative_runtime_directory_before_reading_bundle():
+    with pytest.raises(ValueError, match="must be absolute"):
+        runtime.install(Path("missing-bundle.zip"), Path("relative-runtime"))
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows runner cannot create the reviewed symlinks")
+def test_build_refuses_dangling_output_symlink(tmp_path, monkeypatch):
+    _raw, lock, wheels = _fixture_lock(monkeypatch)
+    monkeypatch.setattr(
+        runtime,
+        "_download",
+        lambda url: wheels[url.rsplit("/", 1)[-1]],
+    )
+    output = tmp_path / "runtime.zip"
+    output.symlink_to(tmp_path / "missing-target.zip")
+    with pytest.raises(ValueError, match="replace an existing runtime bundle"):
+        runtime.build_bundle(output)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows runner cannot create the reviewed symlinks")
+def test_install_refuses_runtime_directory_symlink(tmp_path, monkeypatch):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels)
+    real = tmp_path / "real-runtime"
+    real.mkdir()
+    destination = tmp_path / "installed"
+    destination.symlink_to(real, target_is_directory=True)
+    with pytest.raises(ValueError, match="must not be a symlink"):
+        runtime.install(bundle, destination)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows runner cannot create the reviewed symlinks")
+@pytest.mark.parametrize("kind", ["directory", "file"])
+def test_installed_tree_refuses_directory_and_file_symlinks(tmp_path, kind):
+    runtime_dir = tmp_path / "runtime"
+    runtime_dir.mkdir()
+    external = tmp_path / "external"
+    if kind == "directory":
+        external.mkdir()
+        (runtime_dir / "linked").symlink_to(external, target_is_directory=True)
+    else:
+        external.write_bytes(b"outside")
+        (runtime_dir / "linked.py").symlink_to(external)
+    with pytest.raises(ValueError, match="symlink|non-regular"):
+        runtime._installed_files(runtime_dir)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows runner cannot create the reviewed symlinks")
+@pytest.mark.parametrize("kind", ["symlink", "directory"])
+def test_regular_rejects_non_regular_input(tmp_path, kind):
+    candidate = tmp_path / "candidate"
+    if kind == "symlink":
+        target = tmp_path / "target"
+        target.write_bytes(b"bounded")
+        candidate.symlink_to(target)
+    else:
+        candidate.mkdir()
+    with pytest.raises(ValueError, match="bounded regular file"):
+        runtime._regular(candidate, limit=1024)
