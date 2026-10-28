@@ -19,7 +19,7 @@ export type IntegrityVerificationStatus = UiIntegrityProjectionStatus;
 export const INTEGRITY_VERIFICATION_STATUSES = UI_INTEGRITY_PROJECTION_STATUSES;
 
 export function deriveIntegrityStatus(res: { output?: { verified?: boolean } | null; state?: string | null }): UiIntegrityProjectionStatus | string {
-  let integrityStatus: UiIntegrityProjectionStatus | string = 'UNVERIFIED';
+  let integrityStatus: UiIntegrityProjectionStatus | string;
   if (res.output?.verified === true) {
     integrityStatus = 'PASS';
   } else if (res.output && (res.output.verified as unknown) === false) {

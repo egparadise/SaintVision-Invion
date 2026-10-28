@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
     "eval:check": "vitest run tests/agent-eval-runner.test.ts",
     "contracts:generate": "node scripts/api-response-contracts.mjs --write",
@@ -23,15 +23,19 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/node": "^26.5.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
     "happy-dom": "^20.14.5",
     "json-schema-to-typescript": "^16.0.0",
     "typescript": "^5.7.3",
+    "typescript-eslint": "8.72.1",
     "vite": "^6.2.0",
     "vitest": "4.1.11"
   }

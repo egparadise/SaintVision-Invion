@@ -301,7 +301,7 @@ export async function verifyIdTokenSignature(
   }
 
   // Retrieve keys from JWKS
-  let keys: Array<JsonWebKey & { kid?: string; alg?: string }> = [];
+  let keys: Array<JsonWebKey & { kid?: string; alg?: string }>;
   if (config.jwks?.keys && Array.isArray(config.jwks.keys)) {
     keys = config.jwks.keys;
   } else if (config.idpJwksUrl) {
