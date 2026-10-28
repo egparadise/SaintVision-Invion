@@ -1,15 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.335"
+version: "1.0.336"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T22:57:36+09:00"
+updated: "2026-10-28T12:55:23+09:00"
 source_of_truth: "Git"
-active_card: "CARD-301 pinned standalone worker-module closure"
-active_card_status: "Card 301 code and tests are in progress after the authorized live retry stopped at the first Node restart seam; no further live change is authorized"
-active_card_next: "Claude reviews PR #397; no live work is authorized, and operators must either finish the exact batch before 2026-10-20 02:23:05 KST or separately authorize fresh-only rollback"
+active_card: "CARD-301 exact-head review and all-Agent continuation"
+active_card_status: "PR #397 exact head f2936ae5 has accepted Claude source review and successful Backend 3.12/3.14, Core, Docs, and Desktop Browser checks; live recovery is not authorized"
+active_card_next: "Land the 2026-10-28 review records through the normal PR CI path, then reselect the highest review/ready card whose remaining evidence does not require live Node authority"
 ---
+
+## 2026-10-28 Card 301 exact-head review and all-Agent continuation
+
+- Branch/HEAD: `agent/codex/c301-standalone-worker-modules` /
+  `f2936ae5e91787b3dbba0d069a85ccaef020c984`; PR #397 head and five reviewed file hashes match.
+- Claude independent verdict: **accepted**. Same-SHA Backend run `39264782855` passed on
+  Python 3.12 and 3.14; Core `39264782887`, Docs `39264783082`, and Desktop Browser
+  `39264783012` passed. Untriggered/skipped evidence lanes are not counted.
+- Codex direct exact-checkout focused suite: **19 passed**, exit 0. Documentation, Ontology, and
+  Obsidian read-only check each exited 0; sync reported 2,072 managed, 5 pending, 0 conflicts.
+- Gemini's code-free Frontend baseline is green at 99 files/1,157 tests plus typecheck/build,
+  bindings, integrity, and route coverage. This is not live API/browser or five-Node acceptance.
+- Orca's latest verified score remains landed 71.35%, candidate 72.40%, strict done 4.17%; no
+  score is inferred from this documentation cycle. Live rollback/rotation remains outside this
+  card and requires separate authority.
+- History: [[2026-10-28_12-55-23_KST_전체_Agent_연속실행_재개_Codex]].
 
 ## 2026-10-19 Card 301 — pinned standalone worker-module closure
 

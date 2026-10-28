@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.117"
+version: "1.2.119"
 status: "review"
 author: "Claude"
-updated: "2026-10-07T16:07:14+09:00"
+updated: "2026-10-28T12:50:34+09:00"
 
 
 
@@ -14,6 +14,19 @@ source_of_truth: "Git"
 ---
 
 # Claude 작업 현황
+
+2026-10-28 **Card 301 standalone worker module exact-head review accepted** = **Claude**:
+AST local-module closure, module/receipt digests, installed-worker import precedence, fake-Docker
+lifecycle, and the four read-only recovery conclusions were independently inspected. The unchanged
+filesystem snapshot's standalone suite passed **19/19** and both Python entry points compiled with
+exit 0; no corrective code finding was identified. The coordinator then re-observed branch and PR
+#397 head `f2936ae5e91787b3dbba0d069a85ccaef020c984`, CLEAN merge state, and exact equality of the five
+reviewed file hashes. Same-SHA Backend `39264782855` (3.12/3.14), Core `39264782887`, Docs
+`39264783082`, and Desktop browser `39264783012` all succeeded; the coordinator's direct focused
+suite passed 19/19 and docs/ontology/sync-check each exited 0. **Final independent verdict:
+accepted.** Unrelated skipped or untriggered lanes are not counted. Next owner Codex: integration
+handling. Live recovery remains separately authorized and out of scope.
+[[2026-10-28_12-43-10_KST_Card301_filesystem_review_Claude]]
 
 AC-11 집계기 CI 경로와 축 manifest (Claude, 2026-10-02, 카드 203, branch `feat/claude/c203-ac11-aggregate-lane`, base train 12 후보 `aaa0b083`): **카드 201의 답은 "조건에 맞는 행이 없다"였다** — 정본 48행 표를 파싱해 읽으니 75 미만 Claude 소유 세 행(`S03-ST` `G-24`, `S12-DB` `G-22`, `S12-ST` `G-20`·`G-22`)이 **전부 외부 전제**이고, 외부 의존이 없는 셋(`S03-DB`·`S10-DB`·`S10-ST`)은 이미 75에 운영 인수만 남았다. **정정 둘**: `S02-ST`·`S09-ST`는 50이 아니라 **75**이고(v1.7 정정), `S09-ST`의 scope인 diff·테스트·trace artifact pin은 `src/saintvision/services/records.py`에 **이미 있다**(그 docstring이 스스로 S09-ST라고 적는다). 카드 198의 조사가 과거 절을 현재 값으로 읽은 것이 원인이다. **만들지 않고 멈추고** 코디네이터가 범위를 정해 이 카드가 됐다. **집계기가 부르는 사람이 없어 0/8이었다** — 축이 실패한 수가 아니라 아무도 부르지 않은 수다(v1.8 §4-5-3). 세 가지를 넣었다: (1) `docs/ac11-axis-sources.json` — 8축의 producer→workflow→importer 경로를 tree에서 측정해 적고, **complete 2축**(migration 2), **incomplete 3축**(security는 importer가 있지만 axis envelope을 내지 않는다 — r1에서 정정, 처음엔 complete로 잘못 셌다; accessibility는 importer 없음 — 집계기가 요구하는 artifact digest 필드를 producer가 자기 artifact 안에 넣을 수 없다; long-soak은 workflow 없음), **absent 3축**(G-22·G-19/24·G-21/24)을 **이유와 함께** 적는다(이유 없는 incomplete/absent는 검사가 거부한다). (2) `tools/assemble_ac11_manifest.py` — 다른 SHA·digest 불일치·만료·unavailable·한 축 두 envelope·모르는 축·**중복 JSON key**를 거부하고, 모으지 못한 축은 **조용히 빼지 않고 이름과 사유로 보고**한다(축을 빼면 `INVALID_RUN`이 더 작은 PASS처럼 보인다). importer의 zip flag도 manifest가 든다 — 처음엔 lane에서 둘을 차례로 시도하게 썼다가 **실패 시 다른 flag로 재시도하는 것은 진짜 거부를 재시도로 바꾸므로** 지웠다. (3) `.github/workflows/ac11-aggregate.yml` — dispatch와 label opt-in `pull_request`(r1 추가: dispatch 전용 workflow는 등록 전 실행할 수 없다), 권한 `contents: read` + **`actions: read`**(다른 run의 artifact를 읽는 것이 이 lane이 따로 있는 이유다), `source_sha` 40-hex 강제, 착지 전 결과는 그 SHA 한정이고 착지 후 runbook §1에서 재실행. **push trigger를 두지 않았다** — push로 integration을 받으면 `post_landing_verify`에 lane을 빚지고, 이 lane은 다른 lane의 artifact를 읽으므로 그들 전에는 할 말이 없다. 역래칫은 고치지 않아도 통과하지만(97 passed) 그 판단을 **시험으로 적었고** `DISPATCH_ONLY_WORKFLOWS`에는 넣지 않았다(그 목록은 lane이 있는 workflow의 예외이고 그 자신의 시험이 "빠뜨림의 주차장이 되지 말 것"을 경고한다). **검증**: 신설 시험 r0 **32 passed** → r3 최종 `tests/core/test_assemble_ac11_manifest.py` **63 passed**(train 15 후보 `e8f2eb56` 착지 검증에서 재실행), `post_landing_verify` 97 passed, 집계기 시험 85 passed 무변경, workflow는 `yaml.safe_load` 통과·bash step 5개 전부 `bash -n` exit 0·내장 python 2개 전부 `ast.parse` 통과, 조립기를 빈 디렉터리로 돌려 8축 전부 absent와 사유를 출력. **지금 이 lane을 돌리면 `INVALID_RUN`이고 그것이 정직한 답이다** — 그 사실도 시험으로 고정했다(`test_the_aggregation_of_this_tree_cannot_be_valid_yet`). AC-11 축 정의는 손대지 않았다. **다음 첫 행동**: #299는 r3에서 검토 종결, train 착지 대기. incomplete 세 축 중 accessibility importer는 #302가 train 16에서, security envelope과 long-soak workflow는 별도 카드. 전문 [[2026-10-02_04-52-32_KST_Card203_AC11_집계기_CI경로와_축_manifest_Claude]].
 현재 상태 — 착지 대기와 다음 첫 행동 (Claude, 2026-10-02 07:20, 카드 212, branch `docs/claude/c212-boards-current`, base `d0b2a4c6`): **integration은 아직 `6fc0428b`** 다(`git ls-remote`로 확인). 사용자가 실행할 것은 **`merge-land-train3-14-d0b2a4c6.sh`** 하나이고, train 3~14를 `d0b2a4c6`으로 fast-forward하며 tip이 알려진 여덟 값이 아니면 멈춘다. `d0b2a4c6`의 **8 lane exact-head run이 전부 success**이고 그 tree는 migration `0057`·`0058`을 담고 **write·BuildKit flag는 기본 off**다. 다음 후보는 **train 15 `aa625469`** = `d0b2a4c6` + `#299`·`#300`·`#301`·`#302`(코드 head `8772a2bc`)·`#303`이고 07:17 기준 **일곱 success·Core 진행 중**이다. **절차를 중복해 쓰지 않았다** — 착지 직후는 `#294` runbook, 사용자 조치는 `#300` 체크리스트가 정본이고 링크만 걸었다. **점수**는 착지 **3,425 / 4,800 = 71.35%** 그대로이고 v1.10(`#304`)의 판정으로 **train 11~14 착지로 새로 오르는 행은 0**이다. **내 쪽 열린 것**: `#304`(재채점 v1.10 — r1에서 §5를 역사로 표시하고 §5-1을 신설, r2에서 그 표의 일곱 줄에 head SHA와 확인 시각을 붙였다), `#306`(카드 210 — `S08-BE` 제품 caller 설계 메모와 계약 질문 아홉 개, **계약 답 대기**), `#300`(사용자 조치 체크리스트 — r2까지 반영, train 15 후보에 포함), `#299`(AC-11 집계기 lane — **Codex r4 승인**, hosted 6 lane green, train 15 후보에 포함), `#295`(VF-CL-04 — r4 조치 뒤 검토 대기, 어느 후보에도 없다), `#294`(착지 runbook — r5 조치 뒤 train 12로 `d0b2a4c6`에 들어와 있다). **다음 첫 행동**: `#306`의 계약 답을 받으면 **설계안 → 승인 → 구현** 순으로 가고, 그 전에는 **flag를 제품 설정에 넣지 않는다**. 그리고 `#304`·`#306`의 Codex 검토 응답. **사용자**: 착지 스크립트 실행. [[2026-09-28 48 task 진행률 재채점]] · 설계 메모는 `#306`이 가져온다(이 base에 없으므로 wiki link를 걸지 않는다)

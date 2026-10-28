@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:13:25+09:00"
+updated: "2026-10-28T12:50:46+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,13 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-현재 별도 Orca 관리 세션의 자동 실행/수신은 확인하지 못했다. 사용자 지시에 따른 역할 정의이며 최초 집계는 Codex가 수행한다.
+2026-10-28 Orca 관리 세션이 전체 진행판·Agent 작업판·48-task/VF registry와 최신 History를 읽기 전용으로 대조했다. 공식 48-task 가중 산식의 마지막 고정 판정은 착지 `6fc0428b49f28379cb4da17830d92256b55c2eb2`의 **3,425/4,800 = 71.35%**, 미착지 후보 `5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6`의 **3,475/4,800 = 72.40%**다. 착지/후보 Agent별 가중률은 Codex **70.83%/71.88%**, Claude **68.75%/68.75%**, Gemini **75.00%/77.08%**다. 이 값은 구현 진척 산식이며 운영 인수 완료율이 아니다.
+
+엄격 registry 완료는 **2/48 = 4.17%**이고 canonical `ready`는 **0건**이다. registry는 S01 선행이 끝나지 않았는데 후속 18개 카드가 `review`인 DAG 불일치를 보이며, 공통 진행판(2026-10-19)과 Claude/Gemini/Orca 작업판(각각 2026-10-07/2026-10-07/2026-09-11 갱신)의 시차도 있다. 이 세 항목은 상태 정본 재조정 대상이며 자동으로 `done`이나 `ready`로 바꾸지 않는다.
+
+현재 작업 checkout은 coordinator 확인 기준 branch `agent/codex/c301-standalone-worker-modules`, head `f2936ae5e91787b3dbba0d069a85ccaef020c984`다. PR #397의 exact-head Backend/Core/Documentation/Desktop Browser checks가 성공했다는 coordinator 확인을 수신했다. 이 Orca 세션의 로컬 `.git` 포인터는 사라진 worktree metadata를 가리켜 branch/head/dirty 상태를 독립 재현하지 못했으므로, 해당 SHA와 CI는 **coordinator 확인 수신**으로 기록하고 Orca 자체 Git 관측으로 표시하지 않는다. Card 301의 독립 reviewer 판정과 운영 인수는 별도다. 상세: [[2026-10-28_12-50-46_KST_전체_Agent_진척_재점검_Orca]].
+
+Orca 카드 상태는 **OR-01 ready, OR-02 ready, OR-03 blocked, OR-04 planned**를 유지한다. PR #397 네 lane 성공만으로 OR-03의 원래 계정/전체 필수 CI 제한이 전역 해소됐다고 판정하지 않는다.
 
 ## 작업 카드
 
@@ -74,12 +80,12 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | 초기 배정표 작성. 제품 작업 착수는 담당 확인 대기 |
-| 실제 owner / 읽은 진행판 버전 / KST | 담당자 입력 대기 |
-| branch / base SHA / 구현 SHA | 담당자 입력 대기 |
-| 작업한 것 | 담당자 입력 대기 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 담당자 입력 대기 |
-| CI / 독립 reviewer / 운영 인수 | 각 상태를 따로 기록. 현재 전체 인수 완료 아님 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 해당 카드의 선행 조건 참조 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 위 ready 카드부터 하나 선택 후 담당자가 명시 |
-| History / 오류 / Evidence / PR / sync 결과 | 실제 링크와 SHA를 담당자가 기록 |
+| 마지막 작업 / 착수 카드 | OR-01·OR-02 집계 재개: 전체/Agent별 가중 진척, strict registry, DAG·작업판 시차 점검 |
+| 실제 owner / 읽은 진행판 버전 / KST | Orca / INDEX-PROGRESS-001 v1.0.373, WORKBOARD-ORCA-001 v1.0.0 / 2026-10-28T12:50:46+09:00 |
+| branch / base SHA / 구현 SHA | coordinator 확인 수신: `agent/codex/c301-standalone-worker-modules` / `f2936ae5e91787b3dbba0d069a85ccaef020c984`; 로컬 Git 포인터 단절로 Orca 독립 재현 불가 |
+| 작업한 것 | 공통판·4개 Agent 작업판·48-task/VF registry·최신 History 교차 집계. 제품 코드·공통 진행판·registry 무수정 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 문서·Ontology·diff gate 결과는 History에 기록. Windows PowerShell, workspace checkout |
+| CI / 독립 reviewer / 운영 인수 | coordinator 확인: PR #397 exact-head Backend/Core/Docs/Desktop 성공. 독립 reviewer 및 전체 운영 인수는 미완료 |
+| 남은 문제 / 차단 이유 / 해소 담당 | canonical ready 0, registry DAG 불일치, Agent 작업판 시차, 로컬 `.git` worktree 포인터 단절. Codex/Orca가 정본 조정, reviewer가 Card 301 판정 |
+| 다음 카드 / 첫 행동 / 다음 담당 | OR-01: exact-head reviewer 결과와 registry 정합 수신. OR-02: PR #397 인계 추적. OR-03은 전역 CI 제한 증거까지 blocked 유지. OR-04는 운영 인수 증거 수신 뒤 진행 |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-10-28_12-50-46_KST_전체_Agent_진척_재점검_Orca]] / PR #397 / Obsidian apply 미수행 |
