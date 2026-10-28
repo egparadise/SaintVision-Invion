@@ -1,5 +1,5 @@
 {
- "version": "1.6.0",
+ "version": "1.6.1",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -208,11 +208,10 @@
    "implemented": true,
    "locallyVerified": true,
    "ciVerified": false,
-   "independentlyReviewed": false,
+   "independentlyReviewed": true,
    "operationallyAccepted": false,
    "notApplicable": [
-    "ciVerified: a review card ships documents, not code CI executes",
-    "independentlyReviewed: this card IS the review function, so an independent review of it is the reviewer's act and not the owner's. Card 285 left the field false deliberately: the owner may not raise it, and Codex raising it is the only way it becomes true. Card 284 closed the other four cards' review blockers and did not reach this one, so it is now the only card without an independent review."
+    "ciVerified: a review card ships documents, not code CI executes"
    ],
    "blockers": []
   }

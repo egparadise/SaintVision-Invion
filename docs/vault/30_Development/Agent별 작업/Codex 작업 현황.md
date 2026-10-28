@@ -1,15 +1,34 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.336"
+version: "1.0.337"
 status: "review"
 author: "Codex"
-updated: "2026-10-28T12:55:23+09:00"
+updated: "2026-10-28T13:20:11+09:00"
 source_of_truth: "Git"
-active_card: "CARD-301 exact-head review and all-Agent continuation"
-active_card_status: "PR #397 exact head f2936ae5 has accepted Claude source review and successful Backend 3.12/3.14, Core, Docs, and Desktop Browser checks; live recovery is not authorized"
-active_card_next: "Land the 2026-10-28 review records through the normal PR CI path, then reselect the highest review/ready card whose remaining evidence does not require live Node authority"
+active_card: "REGISTRY-DEPENDENCY-STATE canonicalization and all-Agent continuation"
+active_card_status: "Registry v1.0.1 now has 2 done, 4 blocked, and 42 planned tasks; no card is falsely active above an unfinished prerequisite, and the new validation gate is locally green"
+active_card_next: "Run the full repository gates, land the frontend lint/VF-CL/review/state-correction batch through same-SHA CI, then continue the highest internally actionable evidence gap"
 ---
+
+## 2026-10-28 Registry dependency-state canonicalization
+
+- Base SHA: `6e1c4a365b1d4df3b3e3ba793b6e1f9eb162b401`; registry version `1.0.1`.
+- `S01-BE` and `S01-ST` are `blocked` on explicit user/live inputs. `S02-FE` and `S02-DB`
+  are `blocked` on the unfinished S01 chain. Sixteen downstream FE/DB rows whose prerequisites
+  are unfinished are corrected from `review` to `planned`.
+- Existing implementation, test, CI, History, and 75%-class slice evidence is preserved. This is
+  a canonical state correction, not a loss of implemented work and not a strict completion claim.
+- `check_docs.py` now rejects `ready`, `in_progress`, `review`, or `done` when any declared
+  prerequisite is not `done`; `planned` and `blocked` remain legal waiting states.
+- Gemini's zero-warning ESLint 10 flat configuration passed independent diff review, and Codex
+  wired `npm run lint` into the required Frontend CI job after dependency installation.
+- Targeted validation: 12 tests passed; documentation gate and fresh ontology graph-equivalence
+  gate each exited 0. Generated ontology artifacts were refreshed from the corrected registry.
+- Current canonical count: `done 2`, `blocked 4`, `planned 42`; strict completion remains
+  `2/48 = 4.17%`. Weighted evidence remains 71.35% landed / 72.40% candidate pending a new Orca
+  integration measurement.
+- History: [[2026-10-28_13-20-11_KST_작업상태_선행조건_정본화_Codex]].
 
 ## 2026-10-28 Card 301 exact-head review and all-Agent continuation
 

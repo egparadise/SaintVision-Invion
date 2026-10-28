@@ -11,11 +11,32 @@ PASSWORD_BEARING_POSTGRES_DSN = re.compile(
 )
 DOC_TEXT_SUFFIXES = {'.md', '.txt', '.json', '.jsonl', '.xml', '.yaml', '.yml', '.csv', '.log'}
 SECRET_BEARING_CONFIG_PATHS = ('.env.example', 'tools/deploy_intranet.ps1')
+ACTIVE_DEPENDENCY_STATUSES = {'ready', 'in_progress', 'review', 'done'}
 
 
 def password_bearing_postgres_dsn_count(text):
     """Count credential-bearing PostgreSQL URIs, excluding explicit mask markers."""
     return len(PASSWORD_BEARING_POSTGRES_DSN.findall(text))
+
+
+def dependency_status_errors(tasks):
+    """Reject active cards whose declared prerequisites are not complete."""
+    statuses = {task['task_id']: task['status'] for task in tasks}
+    errors = []
+    for task in tasks:
+        if task['status'] not in ACTIVE_DEPENDENCY_STATUSES:
+            continue
+        unmet = [
+            dependency
+            for dependency in task.get('depends_on', [])
+            if statuses.get(dependency) != 'done'
+        ]
+        if unmet:
+            errors.append(
+                f'Active task has unmet dependencies: {task["task_id"]} -> '
+                f'{", ".join(unmet)}'
+            )
+    return errors
 
 
 def validate(root=ROOT):
@@ -103,6 +124,7 @@ def validate(root=ROOT):
                 errors.append(f'Broken acceptance trace: {task["task_id"]}')
         if not set(task['depends_on']).issubset(task_ids):
             errors.append(f'Unknown dependency: {task["task_id"]}')
+    errors.extend(dependency_status_errors(tasks))
     graph = {t['task_id']: t['depends_on'] for t in tasks}
     visiting, visited = set(), set()
 
