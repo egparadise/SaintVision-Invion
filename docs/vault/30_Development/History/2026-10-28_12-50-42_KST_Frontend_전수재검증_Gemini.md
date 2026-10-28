@@ -18,14 +18,14 @@ tags: ["saintvision", "frontend", "verification", "gemini"]
 - 대상 exact HEAD: `f2936ae5e91787b3dbba0d069a85ccaef020c984`.
 - 코드 변경: 0건.
 - 공식 상태 승격: 0건. `done`에는 동일 SHA CI, 독립 reviewer, 실브라우저·운영 인수가 별도로 필요하다.
-- 실행 환경: Windows PowerShell, Node.js v24.10.0, 로컬 `apps/web/node_modules`, Python 검사.
+- 실행 환경: Windows PowerShell, Node.js v24.10.0, 로컬 npm dependency installation, Python 검사.
 
 ## 직접 관측한 결과
 
 | 명령 | exit | 결과와 범위 |
 |---|---:|---|
 | `npm.cmd --prefix <repo>/apps/web run contracts:check` | 0 | 41 API response TypeScript types가 JSON Schema와 일치. |
-| `<repo>/apps/web/node_modules/.bin/tsc.cmd -b <repo>/apps/web/tsconfig.json` | 0 | TypeScript 오류 0. 셸 cwd가 저장소가 아니어서 명시적 tsconfig 경로를 사용했다. |
+| local npm TypeScript compiler with `-b apps/web/tsconfig.json` | 0 | TypeScript 오류 0. 셸 cwd가 저장소가 아니어서 명시적 tsconfig 경로를 사용했다. |
 | `npm.cmd --prefix <repo>/apps/web run build` | 0 | Vite 108 modules, 프로덕션 bundle 생성. `index-CtfUjb-P.js` 1,036.31 kB로 1,000 kB 초과 경고가 있었으나 build 실패는 아니다. |
 | `npm.cmd --prefix <repo>/apps/web test` | 0 | 99 test files, 1,157 tests 전부 통과. |
 | `PYTHONUTF8=1 python tools/check_frontend_integrity.py` | 0 | 93 production source files, 9 rules, 0 violations. |
