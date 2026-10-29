@@ -1,15 +1,37 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.337"
+version: "1.0.338"
 status: "review"
 author: "Codex"
-updated: "2026-10-28T13:20:11+09:00"
+updated: "2026-10-29T14:21:59+09:00"
 source_of_truth: "Git"
-active_card: "REGISTRY-DEPENDENCY-STATE canonicalization and all-Agent continuation"
-active_card_status: "Registry v1.0.1 now has 2 done, 4 blocked, and 42 planned tasks; no card is falsely active above an unfinished prerequisite, and the new validation gate is locally green"
-active_card_next: "Run the full repository gates, land the frontend lint/VF-CL/review/state-correction batch through same-SHA CI, then continue the highest internally actionable evidence gap"
+active_card: "VF-CL-04 attested CI closure and required-CI repair"
+active_card_status: "VF-CL-04 hosted CI derivation is cryptographically bound to run 40633895766 while operational acceptance remains false; the AC-11 valid fixture time bomb is fixed at commit 751ea725"
+active_card_next: "Run all repository gates, push the two exact commits, require Backend/Core/Docs/Frontend same-SHA green, sync Obsidian, then stop only at the explicit user/live-environment blockers"
 ---
+
+## 2026-10-29 VF-CL-04 attested CI closure and AC-11 CI repair
+
+- Source head attested: `ad0132b35d7216552bbe929730562819af15e3bd`; evidence/test commit:
+  `751ea725c8353fe8df4982c0459321d57f53bb89`.
+- Workflow `S12 Acceptance Evidence` run `40633895766` succeeded. The tracked receipt and
+  Sigstore bundle bind repository, workflow, branch, exact head, run, artifact, and receipt bytes.
+  Independent local verification returned `VERIFIED` before the files were committed.
+- `VF-CL-04.ciVerified` is now true only for hosted CI derivation. `operationallyAccepted=false`,
+  `acceptedCards=0`, and the 48-task weighted score are intentionally unchanged.
+- Required Backend run `40632341602` and Core run `40632341610` each failed only because the
+  positive AC-11 fixture expired at `2026-10-28T04:00:00Z`. The valid fixture now expires in 2099;
+  explicit `expired=true` and `NOW-1 second` rejection cases remain unchanged.
+- Local evidence: VF-CL checker suite 215 passed; AC-11 importer suite 19 passed; registry
+  re-derivation exited 0. Claude independently approved with zero blocking findings. Orca
+  recomputed VF-CL CI maturity as 4/5 = 80% and preserved all product-progress numbers.
+- The Frontend integrity gate scanned 93 files with zero violations but its final Unicode symbol
+  raised `UnicodeEncodeError` on the default Windows CP949 console. Output is now ASCII-only;
+  the ordinary scan and the nine-rule negative control both exit 0 without environment overrides.
+- Canonical product state remains `done 2 / blocked 4 / planned 42 / ready 0`; strict completion
+  `2/48 = 4.17%`; landed `3,425/4,800 = 71.35%`; candidate `3,475/4,800 = 72.40%`.
+- History: [[2026-10-29_14-21-59_KST_VF-CL-04_attestation_CI수정_Codex]].
 
 ## 2026-10-28 Registry dependency-state canonicalization
 

@@ -571,21 +571,21 @@ def main() -> None:
     if args.test_negative:
         print("Running negative control sensitivity tests across all 9 integrity rules...")
         if run_negative_control():
-            print("✔ Negative control passed: Scanner successfully detects mutations across all 9 rules.")
+            print("PASS Negative control: scanner detects mutations across all 9 rules.")
             sys.exit(0)
         else:
-            print("❌ Negative control failed.")
+            print("FAIL Negative control.")
             sys.exit(1)
 
     # Normal execution
     errors = run_checks(verbose=True)
     if errors:
-        print(f"\n❌ Frontend Integrity Violations Detected ({len(errors)} errors):")
+        print(f"\nFAIL Frontend Integrity Check: {len(errors)} violation(s) detected:")
         for err in errors:
             print(f"  - {err}")
         sys.exit(1)
     else:
-        print("\n✔ Frontend Integrity Check Passed: All 9 integrity rules satisfied (0 violations).")
+        print("\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).")
         sys.exit(0)
 
 

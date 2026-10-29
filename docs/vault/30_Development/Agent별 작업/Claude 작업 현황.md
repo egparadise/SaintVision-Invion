@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.121"
+version: "1.2.122"
 status: "review"
 author: "Claude"
-updated: "2026-10-28T13:16:21+09:00"
+updated: "2026-10-28T13:29:39+09:00"
 
 
 
@@ -14,6 +14,18 @@ source_of_truth: "Git"
 ---
 
 # Claude 작업 현황
+
+2026-10-28 **REGISTRY-DEPENDENCY-STATE exact-head independent review accepted** = **Claude**:
+At head `ad0132b35d7216552bbe929730562819af15e3bd`, the active dependency rule correctly rejects
+`ready/in_progress/review/done` above an unfinished prerequisite while allowing `planned/blocked`
+to wait. All seven state cases passed; the combined check-docs regression set passed 12/12.
+Registry v1.0.1 is exactly 2 done, 4 blocked, 42 planned. Coordinator exact diff confirmed only
+the version and 20 status fields changed, preserving dependency, handoff, evidence, contract,
+scope, owner, and reviewer fields. `check_docs`, fresh ontology graph equivalence, full ontology,
+and a direct 48-task RDF status count all exited 0. Finding 0; local/source verdict accepted.
+Hosted CI was still running and is not claimed by this review. No product, registry, or common-board
+change was made by Claude. Next: Codex binds this reviewer verdict to the final required same-SHA CI.
+[[2026-10-28_13-29-39_KST_REGISTRY-DEPENDENCY-STATE_독립검토_Claude]]
 
 2026-10-28 **S02-DB review slice: no corrective finding; status unchanged** = **Claude**:
 User/Node/Capability/Snapshot migrations, models, API contracts, canonical units, composite FK/RLS
