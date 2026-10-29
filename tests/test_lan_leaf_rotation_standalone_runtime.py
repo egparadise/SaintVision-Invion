@@ -68,7 +68,18 @@ def _fixture_lock(monkeypatch: pytest.MonkeyPatch) -> tuple[bytes, dict, dict[st
     return raw, lock, wheels
 
 
-def _bundle(path: Path, raw: bytes, lock: dict, wheels: dict[str, bytes]) -> None:
+def _reviewed_worker_modules() -> dict[str, bytes]:
+    return {name: (ROOT / "deploy" / "lan" / name).read_bytes() for name in runtime.WORKER_MODULES}
+
+
+def _bundle(
+    path: Path,
+    raw: bytes,
+    lock: dict,
+    wheels: dict[str, bytes],
+    worker_modules: dict[str, bytes] | None = None,
+) -> None:
+    worker_modules = worker_modules or _reviewed_worker_modules()
     manifest = {
         "schemaVersion": runtime.BUNDLE_SCHEMA,
         "lockSha256": runtime.LOCK_SHA256,
@@ -76,12 +87,18 @@ def _bundle(path: Path, raw: bytes, lock: dict, wheels: dict[str, bytes]) -> Non
             name: lock["wheels"].get(name, {"sha256": hashlib.sha256(value).hexdigest()})["sha256"]
             for name, value in sorted(wheels.items())
         },
+        "workerModules": {
+            name: hashlib.sha256(value).hexdigest()
+            for name, value in sorted(worker_modules.items())
+        },
     }
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr(runtime.LOCK_NAME, raw)
         archive.writestr("runtime-bundle.json", runtime._canonical(manifest))
         for name, value in wheels.items():
             archive.writestr("wheels/" + name, value)
+        for name, value in worker_modules.items():
+            archive.writestr("worker/" + name, value)
 
 
 def test_reviewed_lock_is_exactly_two_observed_abis_and_four_pypi_wheels():
@@ -106,6 +123,50 @@ def test_reviewed_lock_is_exactly_two_observed_abis_and_four_pypi_wheels():
         hashlib.sha256((ROOT / "deploy/lan/worker_leaf_rotation.py").read_bytes()).hexdigest()
         == runtime.WORKER_SHA256
     )
+    assert runtime.WORKER_MODULES == {
+        "worker_config.py": hashlib.sha256(
+            (ROOT / "deploy/lan/worker_config.py").read_bytes()
+        ).hexdigest(),
+        "worker_leaf_rotation.py": runtime.WORKER_SHA256,
+    }
+
+
+def test_worker_local_import_closure_is_exact_and_missing_module_fails_before_download(
+    tmp_path,
+    monkeypatch,
+):
+    assert set(runtime._worker_sources()) == {
+        "worker_leaf_rotation.py",
+        "worker_config.py",
+    }
+    monkeypatch.setattr(
+        runtime,
+        "WORKER_MODULES",
+        {"worker_leaf_rotation.py": runtime.WORKER_SHA256},
+    )
+    downloaded = []
+    monkeypatch.setattr(runtime, "_download", lambda url: downloaded.append(url))
+    with pytest.raises(ValueError, match="local-module closure"):
+        runtime.build_bundle(tmp_path / "must-not-exist.zip")
+    assert downloaded == []
+    assert not (tmp_path / "must-not-exist.zip").exists()
+
+
+@pytest.mark.parametrize("damage", ["missing", "digest", "extra"])
+def test_bundle_rejects_any_worker_module_set_or_digest_drift(tmp_path, monkeypatch, damage):
+    raw, lock, wheels = _fixture_lock(monkeypatch)
+    modules = _reviewed_worker_modules()
+    if damage == "missing":
+        modules.pop("worker_config.py")
+    elif damage == "digest":
+        modules["worker_config.py"] += b"\n# drift"
+    else:
+        modules["unreviewed.py"] = b"pass\n"
+    bundle = tmp_path / "runtime.zip"
+    _bundle(bundle, raw, lock, wheels, modules)
+    with pytest.raises(ValueError):
+        runtime.install(bundle, tmp_path / "installed")
+    assert not (tmp_path / "installed").exists()
 
 
 def test_lock_digest_and_unreviewed_abi_are_fail_closed(tmp_path, monkeypatch):
@@ -132,7 +193,7 @@ def test_install_is_atomic_idempotent_and_rejects_changed_installed_file(tmp_pat
     first = runtime.install(bundle, destination)
     second = runtime.install(bundle, destination)
     assert first == second
-    assert first["fileCount"] == 6
+    assert first["fileCount"] == 8
     assert set(path.name for path in destination.parent.iterdir()) == {"runtime.zip", "installed"}
     (destination / "cryptography/__init__.py").write_text("changed", encoding="utf-8")
     with pytest.raises(ValueError, match="files differ"):
@@ -281,6 +342,9 @@ def test_isolated_runner_ignores_pythonpath_system_cryptography(tmp_path):
         "'paths': sys.path}), encoding='utf-8')\n",
         encoding="utf-8",
     )
+    installed_worker_dir = runtime_dir / "worker"
+    installed_worker_dir.mkdir()
+    (installed_worker_dir / runtime.WORKER_ENTRY).write_bytes(worker.read_bytes())
     harness = tmp_path / "harness.py"
     harness.write_text(
         "import hashlib, importlib.util, pathlib, sys\n"
@@ -304,6 +368,55 @@ def test_isolated_runner_ignores_pythonpath_system_cryptography(tmp_path):
     assert observed["version"] == "50.0.1"
     assert Path(observed["origin"]).is_relative_to(runtime_dir)
     assert all(str(hostile) not in path for path in observed["paths"])
+
+
+def test_runner_imports_local_module_only_from_installed_pinned_worker_directory(tmp_path):
+    runtime_dir = tmp_path / "runtime"
+    external = tmp_path / "external"
+    result = tmp_path / "result.txt"
+    for package, version in (
+        ("cryptography", "50.0.1"),
+        ("cffi", "2.0.0"),
+        ("pycparser", "2.23"),
+    ):
+        package_dir = runtime_dir / package
+        package_dir.mkdir(parents=True, exist_ok=True)
+        (package_dir / "__init__.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
+    installed_worker_dir = runtime_dir / "worker"
+    installed_worker_dir.mkdir()
+    (installed_worker_dir / runtime.WORKER_ENTRY).write_text(
+        "# installed entry\n", encoding="utf-8"
+    )
+    (installed_worker_dir / "worker_config.py").write_text(
+        'AUTHORITY = "installed-pinned"\n', encoding="utf-8"
+    )
+    external.mkdir()
+    worker = external / runtime.WORKER_ENTRY
+    worker.write_text(
+        "import pathlib, sys, worker_config\n"
+        "pathlib.Path(sys.argv[1]).write_text(worker_config.AUTHORITY, encoding='utf-8')\n",
+        encoding="utf-8",
+    )
+    (external / "worker_config.py").write_text(
+        'AUTHORITY = "external-unreviewed"\n', encoding="utf-8"
+    )
+    harness = tmp_path / "local-module-harness.py"
+    harness.write_text(
+        "import hashlib, importlib.util, pathlib\n"
+        f"spec=importlib.util.spec_from_file_location('standalone', {str(MODULE_PATH)!r})\n"
+        "module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)\n"
+        "module.load_lock=lambda: (b'', {'platforms': {'fixture': {}}})\n"
+        "module._platform_key=lambda lock: 'fixture'\n"
+        "module.validate_runtime=lambda *args: {}\n"
+        f"module.WORKER_SHA256=hashlib.sha256(pathlib.Path({str(worker)!r}).read_bytes()).hexdigest()\n"
+        f"module.run_worker(pathlib.Path({str(runtime_dir)!r}), pathlib.Path({str(worker)!r}), [{str(result)!r}])\n",
+        encoding="utf-8",
+    )
+    completed = subprocess.run(
+        [sys.executable, "-I", "-B", str(harness)], text=True, capture_output=True
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert result.read_text("utf-8") == "installed-pinned"
 
 
 def test_runner_rejects_an_unreviewed_worker_before_import(tmp_path, monkeypatch):

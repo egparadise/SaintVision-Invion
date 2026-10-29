@@ -1,15 +1,87 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.333"
+version: "1.0.338"
 status: "review"
 author: "Codex"
-updated: "2026-10-19T18:43:54+09:00"
+updated: "2026-10-29T14:21:59+09:00"
 source_of_truth: "Git"
-active_card: "CARD-300 bytecode-free venvless leaf runtime"
-active_card_status: "PR #396 is approved by Claude at 6af107b8 and is in merge train 76; the live r3 retry remains stopped"
-active_card_next: "After approval and landing, obtain operator authorization before cleaning the two Node runtimes, abandoning the expired unstaged batch, and preparing a fresh batch"
+active_card: "VF-CL-04 attested CI closure and required-CI repair"
+active_card_status: "VF-CL-04 hosted CI derivation is cryptographically bound to run 40633895766 while operational acceptance remains false; the AC-11 valid fixture time bomb is fixed at commit 751ea725"
+active_card_next: "Run all repository gates, push the two exact commits, require Backend/Core/Docs/Frontend same-SHA green, sync Obsidian, then stop only at the explicit user/live-environment blockers"
 ---
+
+## 2026-10-29 VF-CL-04 attested CI closure and AC-11 CI repair
+
+- Source head attested: `ad0132b35d7216552bbe929730562819af15e3bd`; evidence/test commit:
+  `751ea725c8353fe8df4982c0459321d57f53bb89`.
+- Workflow `S12 Acceptance Evidence` run `40633895766` succeeded. The tracked receipt and
+  Sigstore bundle bind repository, workflow, branch, exact head, run, artifact, and receipt bytes.
+  Independent local verification returned `VERIFIED` before the files were committed.
+- `VF-CL-04.ciVerified` is now true only for hosted CI derivation. `operationallyAccepted=false`,
+  `acceptedCards=0`, and the 48-task weighted score are intentionally unchanged.
+- Required Backend run `40632341602` and Core run `40632341610` each failed only because the
+  positive AC-11 fixture expired at `2026-10-28T04:00:00Z`. The valid fixture now expires in 2099;
+  explicit `expired=true` and `NOW-1 second` rejection cases remain unchanged.
+- Local evidence: VF-CL checker suite 215 passed; AC-11 importer suite 19 passed; registry
+  re-derivation exited 0. Claude independently approved with zero blocking findings. Orca
+  recomputed VF-CL CI maturity as 4/5 = 80% and preserved all product-progress numbers.
+- The Frontend integrity gate scanned 93 files with zero violations but its final Unicode symbol
+  raised `UnicodeEncodeError` on the default Windows CP949 console. Output is now ASCII-only;
+  the ordinary scan and the nine-rule negative control both exit 0 without environment overrides.
+- Canonical product state remains `done 2 / blocked 4 / planned 42 / ready 0`; strict completion
+  `2/48 = 4.17%`; landed `3,425/4,800 = 71.35%`; candidate `3,475/4,800 = 72.40%`.
+- History: [[2026-10-29_14-21-59_KST_VF-CL-04_attestation_CI수정_Codex]].
+
+## 2026-10-28 Registry dependency-state canonicalization
+
+- Base SHA: `6e1c4a365b1d4df3b3e3ba793b6e1f9eb162b401`; registry version `1.0.1`.
+- `S01-BE` and `S01-ST` are `blocked` on explicit user/live inputs. `S02-FE` and `S02-DB`
+  are `blocked` on the unfinished S01 chain. Sixteen downstream FE/DB rows whose prerequisites
+  are unfinished are corrected from `review` to `planned`.
+- Existing implementation, test, CI, History, and 75%-class slice evidence is preserved. This is
+  a canonical state correction, not a loss of implemented work and not a strict completion claim.
+- `check_docs.py` now rejects `ready`, `in_progress`, `review`, or `done` when any declared
+  prerequisite is not `done`; `planned` and `blocked` remain legal waiting states.
+- Gemini's zero-warning ESLint 10 flat configuration passed independent diff review, and Codex
+  wired `npm run lint` into the required Frontend CI job after dependency installation.
+- Targeted validation: 12 tests passed; documentation gate and fresh ontology graph-equivalence
+  gate each exited 0. Generated ontology artifacts were refreshed from the corrected registry.
+- Current canonical count: `done 2`, `blocked 4`, `planned 42`; strict completion remains
+  `2/48 = 4.17%`. Weighted evidence remains 71.35% landed / 72.40% candidate pending a new Orca
+  integration measurement.
+- History: [[2026-10-28_13-20-11_KST_작업상태_선행조건_정본화_Codex]].
+
+## 2026-10-28 Card 301 exact-head review and all-Agent continuation
+
+- Branch/HEAD: `agent/codex/c301-standalone-worker-modules` /
+  `f2936ae5e91787b3dbba0d069a85ccaef020c984`; PR #397 head and five reviewed file hashes match.
+- Claude independent verdict: **accepted**. Same-SHA Backend run `39264782855` passed on
+  Python 3.12 and 3.14; Core `39264782887`, Docs `39264783082`, and Desktop Browser
+  `39264783012` passed. Untriggered/skipped evidence lanes are not counted.
+- Codex direct exact-checkout focused suite: **19 passed**, exit 0. Documentation, Ontology, and
+  Obsidian read-only check each exited 0; sync reported 2,072 managed, 5 pending, 0 conflicts.
+- Gemini's code-free Frontend baseline is green at 99 files/1,157 tests plus typecheck/build,
+  bindings, integrity, and route coverage. This is not live API/browser or five-Node acceptance.
+- Orca's latest verified score remains landed 71.35%, candidate 72.40%, strict done 4.17%; no
+  score is inferred from this documentation cycle. Live rollback/rotation remains outside this
+  card and requires separate authority.
+- History: [[2026-10-28_12-55-23_KST_전체_Agent_연속실행_재개_Codex]].
+
+## 2026-10-19 Card 301 — pinned standalone worker-module closure
+
+- The authorized train 76 retry safely stopped when the first Node reached the restart seam and
+  `worker_config.py` was absent. CP staging and global switching remained zero; the second Node was
+  untouched.
+- The offline runtime bundle now pins both local modules, checks their AST import closure before
+  downloading, installs them in an exact private directory, and prevents external module shadowing.
+- Hosted Backend runs the actual wheels through install/restart receipt/finalize and a separate
+  install/rollback lifecycle using the real worker and its real fake-Docker boundary.
+- Current read-only conclusion: at the 22:57 KST read-back, the exact batch remained resumable only
+  until `2026-10-20 02:23:05 KST`; no live work is authorized here. Card 293 supersession requires a
+  `restarted` journal, while the Node is `installed`. An exact fresh-only rollback is the safe
+  alternative if that window is not used and the prerequisite after expiry, but is not executed.
+- History: [[2026-10-19_22-44-21_KST_Card301_standalone_worker_modules_Codex]].
 
 ## 2026-10-19 Card 300 — bytecode-free venvless leaf runtime
 

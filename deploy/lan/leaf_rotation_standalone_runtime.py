@@ -8,6 +8,7 @@ Node never invokes pip or reaches the network.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import importlib.util
 import io
@@ -26,9 +27,14 @@ import zipfile
 
 LOCK_NAME = "leaf-rotation-runtime-lock.json"
 LOCK_SHA256 = "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
-WORKER_SHA256 = "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4"
-BUNDLE_SCHEMA = "saintvision-leaf-rotation-runtime-bundle:1"
-INSTALL_SCHEMA = "saintvision-leaf-rotation-runtime-install:1"
+WORKER_ENTRY = "worker_leaf_rotation.py"
+WORKER_MODULES = {
+    "worker_config.py": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+    WORKER_ENTRY: "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4",
+}
+WORKER_SHA256 = WORKER_MODULES[WORKER_ENTRY]
+BUNDLE_SCHEMA = "saintvision-leaf-rotation-runtime-bundle:2"
+INSTALL_SCHEMA = "saintvision-leaf-rotation-runtime-install:2"
 MAX_WHEEL_BYTES = 16 * 1024 * 1024
 MAX_RUNTIME_BYTES = 64 * 1024 * 1024
 
@@ -138,8 +144,38 @@ def _download(url: str) -> bytes:
     return value
 
 
+def _worker_sources() -> dict[str, bytes]:
+    """Load the exact reviewed local-module closure before any network access."""
+    source_dir = Path(__file__).resolve().parent
+    available = {path.stem: path.name for path in source_dir.glob("*.py")}
+    loaded: dict[str, bytes] = {}
+    imported_local: set[str] = set()
+    for filename, expected_digest in WORKER_MODULES.items():
+        path = source_dir / filename
+        raw = _regular(path, limit=1024 * 1024)
+        if _sha256(raw) != expected_digest:
+            raise ValueError("Reviewed worker module digest differs")
+        tree = ast.parse(raw, filename=filename)
+        for node in ast.walk(tree):
+            names: list[str] = []
+            if isinstance(node, ast.Import):
+                names = [alias.name.split(".", 1)[0] for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                if node.level:
+                    raise ValueError("Reviewed worker modules must not use relative imports")
+                if node.module:
+                    names = [node.module.split(".", 1)[0]]
+            imported_local.update(name for name in names if name in available)
+        loaded[filename] = raw
+    expected_local = {Path(name).stem for name in WORKER_MODULES if name != WORKER_ENTRY}
+    if imported_local != expected_local:
+        raise ValueError("Reviewed worker local-module closure differs")
+    return loaded
+
+
 def build_bundle(output: Path) -> dict:
     lock_raw, lock = load_lock()
+    worker_modules = _worker_sources()
     if output.exists() or output.is_symlink():
         raise ValueError("Refusing to replace an existing runtime bundle")
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -153,6 +189,7 @@ def build_bundle(output: Path) -> dict:
         "schemaVersion": BUNDLE_SCHEMA,
         "lockSha256": LOCK_SHA256,
         "wheels": {name: lock["wheels"][name]["sha256"] for name in sorted(downloaded)},
+        "workerModules": dict(sorted(WORKER_MODULES.items())),
     }
     temporary = output.with_name(output.name + ".tmp")
     try:
@@ -165,20 +202,34 @@ def build_bundle(output: Path) -> dict:
                 info = zipfile.ZipInfo("wheels/" + filename, (1980, 1, 1, 0, 0, 0))
                 info.external_attr = 0o100600 << 16
                 archive.writestr(info, downloaded[filename])
+            for filename in sorted(worker_modules):
+                info = zipfile.ZipInfo("worker/" + filename, (1980, 1, 1, 0, 0, 0))
+                info.external_attr = 0o100600 << 16
+                archive.writestr(info, worker_modules[filename])
         os.replace(temporary, output)
     finally:
         if temporary.exists():
             temporary.unlink()
     raw = _regular(output, limit=MAX_RUNTIME_BYTES)
-    return {"bundle": str(output), "sha256": _sha256(raw), "bytes": len(raw), "wheelCount": 4}
+    return {
+        "bundle": str(output),
+        "sha256": _sha256(raw),
+        "bytes": len(raw),
+        "wheelCount": 4,
+        "workerModuleCount": len(WORKER_MODULES),
+    }
 
 
-def _bundle(bundle: Path, lock_raw: bytes, lock: dict) -> tuple[str, dict[str, bytes]]:
+def _bundle(
+    bundle: Path, lock_raw: bytes, lock: dict
+) -> tuple[str, dict[str, bytes], dict[str, bytes]]:
     raw = _regular(bundle, limit=MAX_RUNTIME_BYTES)
     with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-        expected = {LOCK_NAME, "runtime-bundle.json"} | {
-            "wheels/" + name for name in lock["wheels"]
-        }
+        expected = (
+            {LOCK_NAME, "runtime-bundle.json"}
+            | {"wheels/" + name for name in lock["wheels"]}
+            | {"worker/" + name for name in WORKER_MODULES}
+        )
         names = archive.namelist()
         if len(names) != len(expected) or set(names) != expected:
             raise ValueError("Offline runtime bundle member set differs")
@@ -190,6 +241,7 @@ def _bundle(bundle: Path, lock_raw: bytes, lock: dict) -> tuple[str, dict[str, b
             "schemaVersion": BUNDLE_SCHEMA,
             "lockSha256": LOCK_SHA256,
             "wheels": {name: lock["wheels"][name]["sha256"] for name in sorted(lock["wheels"])},
+            "workerModules": dict(sorted(WORKER_MODULES.items())),
         }
         if manifest != expected_manifest or manifest_raw != _canonical(expected_manifest):
             raise ValueError("Offline runtime bundle manifest differs")
@@ -199,7 +251,13 @@ def _bundle(bundle: Path, lock_raw: bytes, lock: dict) -> tuple[str, dict[str, b
             if not 0 < len(value) <= MAX_WHEEL_BYTES or _sha256(value) != item["sha256"]:
                 raise ValueError("Offline runtime wheel digest differs")
             wheels[filename] = value
-    return _sha256(raw), wheels
+        worker_modules = {}
+        for filename, expected_digest in WORKER_MODULES.items():
+            value = archive.read("worker/" + filename)
+            if not 0 < len(value) <= 1024 * 1024 or _sha256(value) != expected_digest:
+                raise ValueError("Offline runtime worker module digest differs")
+            worker_modules[filename] = value
+    return _sha256(raw), wheels, worker_modules
 
 
 def _wheel_members(raw: bytes) -> dict[str, bytes]:
@@ -233,7 +291,12 @@ def _wheel_members(raw: bytes) -> dict[str, bytes]:
     return result
 
 
-def _expected_files(lock: dict, wheels: dict[str, bytes], key: str) -> dict[str, bytes]:
+def _expected_files(
+    lock: dict,
+    wheels: dict[str, bytes],
+    key: str,
+    worker_modules: dict[str, bytes],
+) -> dict[str, bytes]:
     expected: dict[str, bytes] = {}
     for filename in lock["platforms"][key]["wheels"]:
         raw = wheels[filename]
@@ -242,7 +305,29 @@ def _expected_files(lock: dict, wheels: dict[str, bytes], key: str) -> dict[str,
             if name in expected:
                 raise ValueError("Selected wheels install colliding files")
             expected[name] = value
+    if set(worker_modules) != set(WORKER_MODULES):
+        raise ValueError("Installed worker module set differs")
+    for filename, value in worker_modules.items():
+        if _sha256(value) != WORKER_MODULES[filename]:
+            raise ValueError("Installed worker module digest differs")
+        expected["worker/" + filename] = value
     return expected
+
+
+def _installed_worker_modules(runtime_dir: Path) -> dict[str, bytes]:
+    modules = {}
+    worker_dir = runtime_dir / "worker"
+    if worker_dir.is_symlink() or not worker_dir.is_dir():
+        raise ValueError("Installed worker module directory differs")
+    names = {path.name for path in worker_dir.iterdir() if path.is_file()}
+    if names != set(WORKER_MODULES):
+        raise ValueError("Installed worker module set differs")
+    for filename, expected_digest in WORKER_MODULES.items():
+        raw = _regular(worker_dir / filename, limit=1024 * 1024)
+        if _sha256(raw) != expected_digest:
+            raise ValueError("Installed worker module digest differs")
+        modules[filename] = raw
+    return modules
 
 
 def _installed_files(runtime_dir: Path) -> dict[str, bytes]:
@@ -275,6 +360,7 @@ def validate_runtime(
         "bundleSha256",
         "fileCount",
         "filesSha256",
+        "workerModulesSha256",
     }:
         raise ValueError("Standalone runtime receipt shape differs")
     if (
@@ -291,14 +377,20 @@ def validate_runtime(
         if _sha256(raw) != lock["wheels"][filename]["sha256"]:
             raise ValueError("Installed runtime wheel digest differs")
         wheels[filename] = raw
-    expected = _expected_files(lock, wheels, key)
+    worker_modules = _installed_worker_modules(runtime_dir)
+    expected = _expected_files(lock, wheels, key, worker_modules)
     observed = _installed_files(runtime_dir)
     if set(observed) != set(expected) or any(
         observed[name] != value for name, value in expected.items()
     ):
         raise ValueError("Installed standalone runtime files differ from pinned wheels")
     files_digest = _sha256(_canonical({name: _sha256(expected[name]) for name in sorted(expected)}))
-    if receipt["fileCount"] != len(expected) or receipt["filesSha256"] != files_digest:
+    worker_digest = _sha256(_canonical(dict(sorted(WORKER_MODULES.items()))))
+    if (
+        receipt["fileCount"] != len(expected)
+        or receipt["filesSha256"] != files_digest
+        or receipt["workerModulesSha256"] != worker_digest
+    ):
         raise ValueError("Standalone runtime receipt does not describe installed files")
     return receipt
 
@@ -321,6 +413,7 @@ def clean_bytecode_cache(runtime_dir: Path) -> dict:
             "bundleSha256",
             "fileCount",
             "filesSha256",
+            "workerModulesSha256",
         }
         or (
             receipt["schemaVersion"] != INSTALL_SCHEMA
@@ -336,9 +429,15 @@ def clean_bytecode_cache(runtime_dir: Path) -> dict:
     }
     if any(_sha256(wheels[name]) != lock["wheels"][name]["sha256"] for name in wheels):
         raise ValueError("Installed runtime wheel digest differs")
-    expected = _expected_files(lock, wheels, key)
+    worker_modules = _installed_worker_modules(runtime_dir)
+    expected = _expected_files(lock, wheels, key, worker_modules)
     files_digest = _sha256(_canonical({name: _sha256(expected[name]) for name in sorted(expected)}))
-    if receipt["fileCount"] != len(expected) or receipt["filesSha256"] != files_digest:
+    worker_digest = _sha256(_canonical(dict(sorted(WORKER_MODULES.items()))))
+    if (
+        receipt["fileCount"] != len(expected)
+        or receipt["filesSha256"] != files_digest
+        or receipt["workerModulesSha256"] != worker_digest
+    ):
         raise ValueError("Standalone runtime receipt does not describe installed files")
     observed = _installed_files(runtime_dir)
     changed = {name for name in set(observed) & set(expected) if observed[name] != expected[name]}
@@ -377,7 +476,7 @@ def install(bundle: Path, runtime_dir: Path) -> dict:
         raise ValueError("Runtime directory must be absolute")
     lock_raw, lock = load_lock()
     key = _platform_key(lock)
-    bundle_sha256, all_wheels = _bundle(bundle, lock_raw, lock)
+    bundle_sha256, all_wheels, worker_modules = _bundle(bundle, lock_raw, lock)
     selected = {name: all_wheels[name] for name in lock["platforms"][key]["wheels"]}
     if runtime_dir.is_symlink():
         raise ValueError("Runtime directory must not be a symlink")
@@ -389,7 +488,7 @@ def install(bundle: Path, runtime_dir: Path) -> dict:
     )
     try:
         os.chmod(temporary, 0o700)
-        expected = _expected_files(lock, selected, key)
+        expected = _expected_files(lock, selected, key, worker_modules)
         for name, value in expected.items():
             target = temporary / PurePosixPath(name)
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -404,6 +503,7 @@ def install(bundle: Path, runtime_dir: Path) -> dict:
             "bundleSha256": bundle_sha256,
             "fileCount": len(expected),
             "filesSha256": files_digest,
+            "workerModulesSha256": _sha256(_canonical(dict(sorted(WORKER_MODULES.items())))),
         }
         _write_file(temporary / ".saintvision-runtime.json", _canonical(receipt))
         for directory in sorted(
@@ -428,11 +528,13 @@ def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> 
     worker_raw = _regular(worker_script, limit=1024 * 1024)
     if _sha256(worker_raw) != WORKER_SHA256:
         raise ValueError("Worker script digest differs from the reviewed leaf-rotation entry point")
+    installed_worker = runtime_dir.resolve() / "worker" / WORKER_ENTRY
+    _regular(installed_worker, limit=1024 * 1024)
     stdlib = Path(sysconfig.get_path("stdlib")).resolve()
     platstdlib = Path(sysconfig.get_path("platstdlib")).resolve()
     paths = [
         runtime_dir.resolve(),
-        worker_script.resolve().parent,
+        installed_worker.parent,
         stdlib,
         platstdlib,
         stdlib / "lib-dynload",
@@ -454,6 +556,9 @@ def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> 
         or pycparser.__version__ != "2.23"
     ):
         raise RuntimeError("Standalone runtime dependency version differs")
+    for filename in WORKER_MODULES:
+        if filename != WORKER_ENTRY:
+            sys.modules.pop(Path(filename).stem, None)
     sys.argv = [str(worker_script), *arguments]
     runpy.run_path(str(worker_script), run_name="__main__")
 

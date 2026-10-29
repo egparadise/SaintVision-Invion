@@ -92,9 +92,7 @@ export function getAuthToken(): string | null {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __sv_auth_teardown_listeners: Set<() => void> | undefined;
-  // eslint-disable-next-line no-var
   var __sv_has_auth_token: (() => boolean) | undefined;
 }
 

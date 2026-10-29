@@ -113,6 +113,8 @@ jobs:
             --runtime-dir "$runtime" \
             --worker-script deploy/lan/worker_leaf_rotation.py \
             -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-second-preflight.json"
+          python tools/check_leaf_rotation_standalone_lifecycle.py \
+            --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"
           test -z "$(find "$runtime" -type d -name __pycache__ -print -quit)"
           python - <<'PY'
           import json
@@ -125,8 +127,10 @@ jobs:
           preflight = json.loads((root / 'leaf-runtime-preflight.json').read_text('utf-8'))
           reinstall = json.loads((root / 'leaf-runtime-reinstall.json').read_text('utf-8'))
           second = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))
+          lifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))
           assert build['wheelCount'] == 4
-          assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:1'
+          assert build['workerModuleCount'] == 2
+          assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'
           assert install['platformKey'] in {
               'cpython-312-x86_64-linux-gnu',
               'cpython-314-x86_64-linux-gnu',
@@ -136,6 +140,13 @@ jobs:
           assert preflight['utcCertificateAPI'] is True
           assert reinstall == install
           assert second == preflight
+          assert lifecycle == {
+              'bytecodeCacheCount': 0,
+              'finalized': True,
+              'installRestartReceipt': True,
+              'restartCount': 4,
+              'rolledBack': True,
+          }
           PY
 
       - name: Contract schemas match their models

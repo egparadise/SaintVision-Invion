@@ -51,6 +51,10 @@ jobs:
         working-directory: apps/web
         run: npm ci
 
+      - name: Run ESLint
+        working-directory: apps/web
+        run: npm run lint
+
       - name: Run Vitest Unit Tests
         working-directory: apps/web
         run: npm run test

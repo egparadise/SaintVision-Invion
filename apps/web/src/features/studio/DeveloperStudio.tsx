@@ -2083,7 +2083,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   <span>🔒 격리: <code>0600 sandbox</code></span>
                   {(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt) && (
                     <span data-testid="studio-run-state-updated-at" style={{ color: 'var(--color-brand-hover)' }}>
-                      실행 상태 갱신: {new Date(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt!).toLocaleString('ko-KR')}
+                      실행 상태 갱신: {new Date(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt || '').toLocaleString('ko-KR')}
                     </span>
                   )}
                   {artifactData?.completedAt && (
