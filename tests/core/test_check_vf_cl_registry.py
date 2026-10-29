@@ -26,6 +26,8 @@ import subprocess
 import pytest
 
 from tools import check_vf_cl_registry as checker
+from tools import create_vf_cl_ci_attestation_receipt as attested_contract
+from tools import verify_vf_cl_ci_attestation as attestation_verifier
 
 
 #: The blocker this project actually carried, verbatim. The regression Codex found is that
@@ -1393,9 +1395,9 @@ def test_the_shipped_receipt_has_the_exact_key_sets():
     shipped = json.loads(
         (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
     )
-    assert set(shipped) == checker.RECEIPT_KEYS
-    assert set(shipped["artifact"]) == checker.RECEIPT_ARTIFACT_KEYS
-    assert set(shipped["inputDigests"]) == checker.RECEIPT_INPUT_KEYS
+    assert set(shipped) == attested_contract.RECEIPT_KEYS
+    assert set(shipped["producerJob"]) == attested_contract.PRODUCER_KEYS
+    assert set(shipped["evidenceArtifact"]) == attested_contract.ARTIFACT_KEYS
 
 
 def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
@@ -1408,14 +1410,15 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     """
     manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
     cards = manifest_document["cards"]
-    # False, and derived: the implementation exists, but no authoritative bundle is committed
-    # yet. Adding one breaks this assertion and forces a cryptographically verified true claim.
-    assert cards["VF-CL-04"]["impliesCiVerified"] is False
-    assert any(
-        check["kind"] == "path-absent"
-        and check["path"] == "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"
+    assert cards["VF-CL-04"]["impliesCiVerified"] is True
+    assert {
+        (check["kind"], check["path"])
         for check in cards["VF-CL-04"]["ciVerifiedChecks"]
-    )
+        if check["path"].startswith("docs/vf-cl-ci-")
+    } == {
+        ("path-exists", "docs/vf-cl-ci-receipts/VF-CL-04.json"),
+        ("path-exists", "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"),
+    }
     texts = [check.get("text") or check["path"]
              for check in cards["VF-CL-04"]["ciVerifiedChecks"]]
     assert "python tools/collect_s12_acceptance_evidence.py" in texts
@@ -1430,13 +1433,12 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
 
     registry_document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     four = next(card for card in registry_document["cards"] if card["id"] == "VF-CL-04")
-    assert four["ciVerified"] is False
-    # The run block stays -- as a measurement record bound to the receipt, not as a basis.
-    assert four["ciVerifiedRun"]["runId"].isdigit()
-    assert four["ciVerifiedRun"]["conclusion"] == "success"
-    assert "MEASUREMENT RECORD" in four["ciVerifiedNote"]
-    # The note may recount why it *was* false -- that is history -- but it must not still
-    # state it as the present, and it has to name the workflow that changed the answer.
+    assert four["ciVerified"] is True
+    recorded = four["ciVerifiedAttestation"]
+    assert recorded["runId"] == "40633895766"
+    assert recorded["headSha"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["headSha"]
+    assert recorded["receipt"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["receiptPath"]
+    assert recorded["bundle"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["bundlePath"]
     assert "s12-acceptance-evidence.yml" in four["ciVerifiedNote"]
     assert "stays false" not in four["ciVerifiedNote"]
 
@@ -1444,21 +1446,17 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
 def test_the_shipped_receipt_is_the_one_the_manifest_expects():
     """The receipt is a committed file, so its agreement with the pair is checkable here."""
     manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
-    expectation = manifest_document["cards"]["VF-CL-04"]["ciVerifiedReceipt"]
+    expectation = manifest_document["cards"]["VF-CL-04"]["ciVerifiedAttestation"]
     shipped = json.loads(
-        (checker.REPO_ROOT / expectation["path"]).read_text(encoding="utf-8")
+        (checker.REPO_ROOT / expectation["receiptPath"]).read_text(encoding="utf-8")
     )
-    assert shipped["schemaVersion"] == checker.RECEIPT_SCHEMA
+    assert shipped["schemaVersion"] == attested_contract.SCHEMA
     assert shipped["card"] == "VF-CL-04"
     assert shipped["workflowPath"] == expectation["workflowPath"]
-    assert sorted(shipped["requiredSteps"]) == sorted(expectation["requiredSteps"])
-    assert shipped["artifact"]["name"] == expectation["artifactNamePrefix"] + shipped["headSha"]
-    body = {key: value for key, value in shipped.items()
-            if key not in ("receiptSha256", "recordedAt")}
-    assert shipped["receiptSha256"] == hashlib.sha256(
-        json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        .encode("utf-8")
-    ).hexdigest()
+    assert shipped["headSha"] == expectation["headSha"]
+    assert shipped["headRef"] == expectation["headRef"]
+    assert shipped["receiptSha256"] == attested_contract.canonical_digest(shipped)
+    assert (checker.REPO_ROOT / expectation["bundlePath"]).is_file()
 
 
 def test_the_shipped_registry_marks_its_tree_as_a_pre_landing_candidate():
@@ -1553,10 +1551,10 @@ def test_a_receipt_whose_own_digest_is_not_a_digest_is_reported(tmp_path):
 
 
 def test_the_shipped_receipt_has_no_field_of_the_wrong_type():
-    shipped = json.loads(
-        (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
+    shipped = attestation_verifier.load_receipt(
+        checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json"
     )
-    assert checker.receipt_field_findings(shipped) == []
+    assert shipped["receiptSha256"] == attested_contract.canonical_digest(shipped)
 
 
 # --- r3 F2: json.loads keeps the last of two identical keys -----------------------------
@@ -1611,14 +1609,14 @@ def test_the_shipped_files_have_no_duplicate_keys(path):
 def test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote():
     """The value that vanished, pinned by content.
 
-    The duplicate meant VF-CL-04's ``whyCiVerified`` read as the older sentence. The reason
-    this card remains false now is the missing authoritative bundle, not missing machinery.
+    The duplicate meant VF-CL-04's ``whyCiVerified`` read as an older sentence. The current
+    reason must name the authoritative run and the cryptographic boundary that made it true.
     """
     manifest_document = checker.load_json_strictly(checker.DEFAULT_MANIFEST, "manifest")
     why = manifest_document["cards"]["VF-CL-04"]["whyCiVerified"]
-    assert "support a GitHub/Sigstore-attested" in why
-    assert "no authoritative bundle yet" in why
-    assert "implementation-only commit cannot attest" in why
+    assert "Run 40633895766" in why
+    assert "GitHub OIDC identity" in why
+    assert "independently re-checkable" in why
 
 
 # --- r4: a timestamp that parses is not a timestamp in UTC -------------------------------
@@ -1691,4 +1689,4 @@ def test_the_shipped_receipt_timestamps_are_utc():
         (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
     )
     assert checker._is_utc_timestamp(shipped["recordedAt"])
-    assert checker._is_utc_timestamp(shipped["artifact"]["expiresAt"])
+    assert checker._is_utc_timestamp(shipped["evidenceArtifact"]["expiresAt"])

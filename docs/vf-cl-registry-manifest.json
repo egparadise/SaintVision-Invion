@@ -168,18 +168,15 @@
   },
   "VF-CL-04": {
    "impliesImplemented": true,
-   "impliesCiVerified": false,
-   "whyCiVerified": "The workflow and checker now support a GitHub/Sigstore-attested CI-produced receipt, but this source tree intentionally carries no authoritative bundle yet. An implementation-only commit cannot attest its later Evidence commit or landing SHA, so rule 7 stays false until an exact-head workflow_dispatch run is verified and its receipt plus bundle are recorded. The path-absent check makes that distinction mechanical: adding the bundle breaks this false derivation and requires a cryptographically verified true claim rather than a prose flip.",
-   "ciVerifiedReceipt": {
-    "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
+   "impliesCiVerified": true,
+   "whyCiVerified": "Run 40633895766 produced the exact-head receipt in CI, signed it with the dispatch-only GitHub OIDC identity, and verified the receipt bytes, workflow, branch, repository, and head through Sigstore. The tracked receipt and bundle make the claim independently re-checkable until the named evidence artifact expires.",
+   "ciVerifiedAttestation": {
+    "receiptPath": "docs/vf-cl-ci-receipts/VF-CL-04.json",
+    "bundlePath": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json",
+    "repository": "egparadise/SaintVision-Invion",
     "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
-    "requiredSteps": [
-     "Derive the AC-12 acceptance items",
-     "Hold the bundle to its shape and to this head",
-     "Record that the two named observations were derived here",
-     "Upload the acceptance evidence"
-    ],
-    "artifactNamePrefix": "s12-acceptance-"
+    "headSha": "ad0132b35d7216552bbe929730562819af15e3bd",
+    "headRef": "refs/heads/agent/codex/c301-standalone-worker-modules"
    },
    "ciVerifiedChecks": [
     {
@@ -217,7 +214,11 @@
      "text": "python tools/verify_vf_cl_ci_attestation.py"
     },
     {
-     "kind": "path-absent",
+     "kind": "path-exists",
+     "path": "docs/vf-cl-ci-receipts/VF-CL-04.json"
+    },
+    {
+     "kind": "path-exists",
      "path": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"
     }
    ],
