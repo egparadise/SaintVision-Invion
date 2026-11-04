@@ -1,0 +1,21 @@
+{
+  "runId": "41773055219",
+  "sourceHeadSha": "b1e59f85e690ae61efe8748090815d2b53fd549d",
+  "logExit": 0,
+  "logSHA256": "a7b194062e380975dd83d9cc975410dfe15df3f95af27ff3f302116d944fa4ea",
+  "testSummary": [
+    "42 failed, 8353 passed, 75 skipped, 2 deselected, 2008 warnings, 9 errors in 1441.18s (0:24:01)",
+    "42 failed, 8353 passed, 75 skipped, 2 deselected, 2008 warnings, 9 errors in 1178.40s (0:19:38)"
+  ],
+  "schedulerLines": [],
+  "failureClasses": [
+    "AssertionError:",
+    "IntegrityError:",
+    "JSONDecodeError:"
+  ],
+  "partitionFailureRelations": [
+    "no partition of relation \"evidence_envelopes\" found for row"
+  ],
+  "runtime": [],
+  "checkout": []
+}

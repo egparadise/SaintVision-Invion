@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.345"
+version: "1.0.346"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T14:40:06+09:00"
+updated: "2026-11-04T14:52:47+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
 active_card_status: "R5 two-node live observation restored and root-corroborated; registry provenance and freshness map independently accepted; legacy13 classified; final UI/scheduler/harness owner corrections remain under review before full delivery"
@@ -119,6 +119,18 @@ active_card_next: "Integrate reviewed final owner heads, freeze source, run all 
   score is inferred from this documentation cycle. Live rollback/rotation remains outside this
   card and requires separate authority.
 - History: [[2026-10-28_12-55-23_KST_전체_Agent_연속실행_재개_Codex]].
+
+## 2026-10-27 Card 304 — session-independent scheduled leaf renewal
+
+- A strict digest-pinned plan admits only the exact two-Node batch order and rejects added keys,
+  commands, Nodes, modified binaries, or modified inputs.
+- Public certificates determine the two-day window; tool-native status and both post-transition
+  observations require exactly two online/fresh Nodes.
+- Every gate has a stop-before-next behavioral witness. Expiry alerts without a renewal attempt;
+  outside-window runs are durable no-ops; lock and Task Scheduler both prevent overlap.
+- The current-user limited S4U task runs twice daily and exposes only redacted append-only and
+  Desktop status receipts. Live registration was not performed.
+- History: [[2026-10-27_14-32-04_KST_Card304_scheduled_leaf_renewal_Codex]].
 
 ## 2026-10-27 Fresh isolated r4 LAN pilot live acceptance
 
