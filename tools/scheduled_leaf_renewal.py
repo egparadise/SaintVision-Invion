@@ -292,11 +292,14 @@ def _owner(plan: dict[str, Any], run_id: str) -> dict[str, Any]:
                 planSHA256=_plan_binding(plan), runId=run_id, token=uuid.uuid4().hex, pid=os.getpid())
 
 
-def _leaf_set(state: Path) -> str:
+def _leaf_members(state: Path) -> dict[str, str]:
     paths = [state / "control-cert.pem", *sorted((state / "public/nodes").glob("*/node-cert.pem"))]
-    return hashlib.sha256(json.dumps([
-        [path.relative_to(state).as_posix(), _sha256(_regular(path))] for path in paths
-    ], separators=(",", ":")).encode()).hexdigest()
+    return {path.relative_to(state).as_posix(): _sha256(_regular(path)) for path in paths}
+
+
+def _leaf_set(state: Path) -> str:
+    return hashlib.sha256(json.dumps(list(_leaf_members(state).items()),
+                                    separators=(",", ":")).encode()).hexdigest()
 
 
 def _attempt(path: Path, plan: dict[str, Any]) -> dict[str, Any] | None:
@@ -527,6 +530,7 @@ def execute(plan: dict[str, Any], now: datetime | None = None) -> int:
                     _record(plan, {**base, "outcome": "outside-window", "failedGate": None})
                     return 0
                 leaves = _leaf_set(Path(plan["statePath"]))
+                initial_members = _leaf_members(Path(plan["statePath"]))
                 if previous is not None and previous["leafSetSHA256"] == leaves:
                     raise ValueError("Completed renewal no longer has its changed fresh generation")
                 _record(plan, {**base, "outcome": "started", "failedGate": None})
@@ -586,9 +590,12 @@ def execute(plan: dict[str, Any], now: datetime | None = None) -> int:
                 active_gate = "post-renewal-certificates"
                 fresh = renewal_window(Path(plan["statePath"]), plan["renewalWindowSeconds"],
                                        datetime.now(timezone.utc))
+                renewed_members = _leaf_members(Path(plan["statePath"]))
                 if (fresh["nodeCertificateCount"] != plan["expectedNodeCount"]
                     or fresh["expired"] or fresh["inWindow"]
-                    or fresh["leafSetSHA256"] == leaves):
+                    or fresh["leafSetSHA256"] == leaves
+                    or renewed_members.keys() != initial_members.keys()
+                    or any(renewed_members[path] == digest for path, digest in initial_members.items())):
                     raise ValueError("Renewal did not publish a changed fresh certificate generation")
                 attempt.update(phase="completed", failedGate=None)
                 _atomic_json(latch, attempt)

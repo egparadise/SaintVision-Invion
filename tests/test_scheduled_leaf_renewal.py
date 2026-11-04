@@ -81,7 +81,11 @@ if gate == 'finalObserve' and failure != 'unchanged-finalObserve':
     state = pathlib.Path(trace).parent / 'state'
     fresh = pathlib.Path(trace).parent / 'fresh-leaf.pem'
     for target in [state / 'control-cert.pem', *state.glob('public/nodes/*/node-cert.pem')]:
+        if failure == 'unchanged-member-finalObserve' and target.parent.name == 'node-b':
+            continue
         target.write_bytes(fresh.read_bytes())
+    if failure == 'member-path-drift-finalObserve':
+        (state / 'public/nodes/node-b').rename(state / 'public/nodes/node-c')
 if failure == 'wait-' + gate:
     import os, time
     pathlib.Path(trace + '.pid').write_text(str(os.getpid()))
@@ -548,3 +552,23 @@ def test_lock_cleanup_preserves_the_primary_error_and_foreign_record(tmp_path: P
             lock.write_text("foreign replacement")
             raise RuntimeError("primary gate failure")
     assert lock.read_text() == "foreign replacement"
+
+
+@pytest.mark.parametrize("failure", ["unchanged-member-finalObserve", "member-path-drift-finalObserve"])
+def test_renewal_requires_every_original_public_leaf_member_to_change(tmp_path: Path, failure: str):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    # The unchanged member is still fresh and outside the window, so aggregate
+    # change + earliest expiry alone cannot detect this partial batch.
+    (state / "public/nodes/node-b/node-cert.pem").write_bytes(certificate(now + timedelta(days=3)))
+    target, plan, trace = plan_file(tmp_path, state, failure=failure)
+    with pytest.raises(ValueError, match="changed fresh certificate generation"):
+        module.execute(load(target), now=now)
+    assert module.renewal_window(state, 172800, now)["nodeCertificateCount"] == 2
+    receipt = json.loads(Path(plan["statusPath"]).read_text())
+    assert (receipt["outcome"], receipt["failedGate"]) == ("failed", "post-renewal-certificates")
+    assert json.loads(module._paths(plan)[1].read_text())["phase"] == "failed"
+    before = trace.read_bytes()
+    assert module.execute(load(target), now=now + timedelta(seconds=1)) == 2
+    assert trace.read_bytes() == before
+    assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "recovery-required"

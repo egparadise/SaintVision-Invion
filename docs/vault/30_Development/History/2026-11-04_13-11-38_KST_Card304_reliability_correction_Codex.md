@@ -147,3 +147,27 @@ gates without operator reset. Local N1/N2 focused suite exited **0**, **33 passe
 1 skipped** (Windows executable-symlink capability), JUnit in the unique Evidence
 directory. No live scheduler was installed or invoked. New exact-head review and
 CI remain required; older b1 review is not promoted to approval of this revision.
+
+## All-member renewal proof correction
+
+Coordinator msg_6c5dcbd65b3d relayed Claude's exact-head 5933a824 finding:
+an aggregate digest plus a fresh earliest expiry still allowed a later-due Node
+leaf to remain unchanged, or a Node member path to be replaced at the same count.
+At KST 14:27, both added regression cases against unchanged 5933 production
+code failed with pytest **exit 1**, **2 failed / 34 deselected** (DID NOT RAISE).
+This is reproduced defective behavior, not a passing verification lane.
+
+The executor now retains the in-memory map of relative public CP/all-Node leaf
+paths to SHA-256 before the attempt. After finalObserve it requires the identical
+path set and a changed digest for every member, in addition to count, validity,
+outside-window and aggregate-change gates. Durable latch schema is unchanged.
+The two new behavioral cases retain two Nodes, reach post-renewal-certificates,
+fail there, retain the failed mutation latch and refuse every command on the
+next trigger with recovery-required. No live certificate or scheduler is used.
+
+Windows Python 3.14.7 focused run on 5933 plus this explicit dirty correction:
+`python -m pytest tests/test_scheduled_leaf_renewal.py -q --junitxml=.work/supervision-codex-audit/c304-member-correction.xml`
+exited **0**, **35 passed / 1 skipped / 0 failed / 0 errors** at KST 14:29.
+The sole executable-symlink capability skip still requires hosted Linux evidence.
+Before/after JUnit is preserved in the unique Evidence directory. New exact source
+head, CI and Claude review remain required before any schedule registration.
