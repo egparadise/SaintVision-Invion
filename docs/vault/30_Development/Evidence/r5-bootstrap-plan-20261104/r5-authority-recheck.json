@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-11-04T04:35:02.438582+00:00",
+  "sshExit": 0,
+  "issuerPinAndKeyRechecked": true,
+  "queryExit": 0,
+  "networkOwned": true,
+  "networkInternal": false,
+  "newCredentialDirectoryAbsent": true,
+  "catalog": {
+    "unexpectedMemberships": 0,
+    "ownerIsAdmin": true,
+    "runtimeIsNotDbOwner": true
+  },
+  "clockProbes": [
+    {
+      "alias": "host-1",
+      "sshExit": 0,
+      "ntpSynchronized": true,
+      "roundTripSeconds": 0.366,
+      "midpointSkewSeconds": 0.487
+    },
+    {
+      "alias": "host-2",
+      "sshExit": 0,
+      "ntpSynchronized": true,
+      "roundTripSeconds": 0.337,
+      "midpointSkewSeconds": 0.438
+    }
+  ],
+  "priorStatesBaselined": 4,
+  "privatePlanSHA256": "2614a1b3b4b3201163d2f6e0ef0295747509d5b4ec0eb388e055f00c6a24c039"
+}

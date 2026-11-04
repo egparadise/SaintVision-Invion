@@ -1,0 +1,64 @@
+{
+  "observedAt": "2026-11-04T04:31:46.370761+00:00",
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "newStateName": "r5-03e17c31-f8923863",
+  "newDatabaseName": "saintvision_lan_r5_f8923863",
+  "newRoleName": "inv_lan_runtime_r5_f8923863",
+  "stateCollision": false,
+  "hosts": [
+    {
+      "alias": "host-1",
+      "sshExit": 0,
+      "ports": {
+        "18505Unused": true,
+        "18105Unused": true
+      },
+      "docker": {
+        "exit": 0,
+        "api": "1.52"
+      },
+      "database": [
+        {
+          "image": "postgres@sha256:ab8380566c3ea09690a9ecaa85a59d82bfc6eb86744151a2a54335866c83a3e9",
+          "ownerMatches": true,
+          "networkCount": 1,
+          "loopbackPublished": true,
+          "queryExit": 0,
+          "catalog": {
+            "readOnly": "on",
+            "newDatabaseCollisions": 0,
+            "newRoleCollisions": 0,
+            "oldRuntimeRole": {
+              "superuser": false,
+              "bypassRls": false,
+              "createDb": false,
+              "createRole": false,
+              "replication": false,
+              "login": true,
+              "scram": true,
+              "memberships": 1
+            },
+            "passwordEncryption": "scram-sha-256",
+            "hostAuthMethods": [
+              "scram-sha-256"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "alias": "host-2",
+      "sshExit": 0,
+      "ports": {
+        "18505Unused": true,
+        "18105Unused": true
+      },
+      "docker": {
+        "exit": 0,
+        "api": "1.56"
+      },
+      "database": []
+    }
+  ],
+  "privatePlanSHA256": "2614a1b3b4b3201163d2f6e0ef0295747509d5b4ec0eb388e055f00c6a24c039"
+}
