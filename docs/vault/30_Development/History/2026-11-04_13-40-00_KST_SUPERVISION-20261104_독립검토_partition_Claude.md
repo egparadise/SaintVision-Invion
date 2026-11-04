@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.8.0"
+version: "1.12.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T17:20:00+09:00"
+updated: "2026-11-04T18:57:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -538,6 +538,210 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Claude's source review phase for task `task_710152a20196` is closed. I did no source cleanup, because root owns the
   integration workspaces.
 
+## r5 WMI cycle packet review (task `task_e230ea589f7d`): changes required, one High
+
+Scope:
+- Core commit `9f5191eb` and the private packet `.work/r5-persistence-c50115dce654`.
+- Manifest `0e51a7c7`. I re-hashed all nine inputs, and they equal the manifest.
+- Plan pins: 105 and 103, with 0 mismatches.
+- Guard suite: 15 passed, and no file was written.
+- Read-only. Nothing was executed against the pilot.
+
+- **H1 High (measured):**
+  - In the attended cycle config `2a907e4b` and the scheduled proposal `9b96bb4a`, the `transition` gate keeps the venv
+    `python.exe` as its executable, but its arguments are now PowerShell arguments.
+  - I ran that `python.exe` with those arguments: `Unknown option: -N`, exit 2.
+  - So every released cycle would fail at gate 10, after `commit` and under the durable latch.
+  - The build script never sets the executable, and the guards check only the arguments.
+  - Fix: use the pinned `powershell.exe` with its hash, add a guard on the executable, then re-seal.
+- **M2 Medium:**
+  - `schedulerPath` (`source-b5b8/tools/scheduled_leaf_renewal.py`) is not among the plan pins.
+  - The scheduler itself checks only `git HEAD`, not a clean tree or the file's bytes.
+  - The file is byte-identical to the b5b8 blob today.
+- **Accepted rules:**
+  - Command, owner and pins: hashed plan, allowed operations, guards hash, ordinary non-reparse pins, an exact record
+    root, and the owner SID.
+  - One-shot records: intent/launch/result written with `CreateNew` + `Move`; no retry or fallback.
+  - Context: the job-free entry is asserted again inside the child. The ContextOnly receipt shows session 1,
+    interactive, `inJob` false, `WinSta0\Default`; the helper exited and nothing was relaunched.
+  - Before any stop: the status guard runs first. Each stop re-checks PID reuse (creation time, command line, owner
+    SID), stops leaves before the root, and refuses multiple independent roots.
+  - Primary failure: observer fallback, then a real 2/2 observation, then a `CreateNew` receipt, then a throw.
+  - Observer recovery is a separate operation. The Python environment variables are cleared and restored.
+  - For the WMI path, this closes my earlier attended-transition Medium.
+- **Scheduled proposal:**
+  - Replacing `51b02052` with the WMI controller in Scheduled mode closes my residual in source, but H1 applies to it
+    too.
+  - S4U is not accepted: the S4U-to-WMI desktop path is unmeasured, and actual registration was denied
+    (`0x80070005`).
+  - Low: the proposal shares its status/log paths with the attended cycle and has notifications disabled.
+- **Outside-window no-op proof: safe only with a fresh RunId.**
+  - At b5b8, `--window-only` only reads the config and the state. It writes no lock, latch, status or log, stops no
+    observer and changes no certificate. The entry returns refusal exit 4 with `cycleExecuted` false.
+  - The proof must not use the sealed RunId `20261104T082522Z-c50115dce654`. That is the first-cycle command's RunId,
+    and its one-shot guard would then refuse.
+- **Low:** the controller waits only 3 minutes for a Transition receipt, so a slow launch fails closed with completion
+  unknown.
+
+## r5 packet fix and eff93191 test-expectation review (task `task_0f5b922ea663`)
+
+### r5 packet fix `.work/r5-packet-fix-5babae638fde`: H1 and M2 closed, release conditions below
+
+Scope:
+- Manifest `993febe8`. All nine inputs re-hashed and equal to the manifest.
+- Attended config `5168c560`, scheduled proposal `8fbdbb6a`, cycle plan `3ffaa00a`.
+- Read-only. No cycle, transition, observer stop, certificate change or S4U attempt.
+
+What I checked:
+- Structural JSON diff against `r5-persistence-c50115dce654`:
+  - In both configs only the `transition` gate changed: executable, hash, packet paths and the plan hash.
+  - The other gates are byte-equal.
+  - The scheduled proposal also changed its log/status paths and `notificationsEnabled`.
+- **H1 closed (measured):**
+  - The gate executable is `C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe`. Its actual SHA-256 equals
+    the pinned `60c9b298…`.
+  - I ran the exact gate-10 argv of both configs with a fresh RunId and `-PlanOnly`: exit 0, operations `Transition`
+    and `ScheduledTransition`, `executed` false.
+  - `wmi-runtime` was unchanged after the run.
+- **M2 closed:**
+  - The cycle plan now has `schedulerSHA256` `d4284248…` and exactly one matching pin. That equals the file and the
+    `b5b8ca68` blob `8d9f030d`.
+  - The scheduler imports no sibling repo module, only the standard library and `cryptography`.
+  - `Assert-SvPinnedScheduler` runs immediately before both scheduler invocations in the entry script. The controller's
+    pin check also covers it.
+  - The cycle argv with a fresh RunId and `-PlanOnly` exits 0.
+- **Lows closed:**
+  - The scheduled proposal has its own status and log files and notifications on, with all other gates equal.
+  - A receipt timeout now writes a `CreateNew` `completion-unknown` record (exit 124, no retry) and keeps the intent.
+    The one-shot check includes that record.
+- **Guard suite:** 30 passed on Python 3.14. No packet file was written.
+- **RunIds:** the ContextOnly, Cycle, ObserverRecovery and ScheduledTransition RunIds are distinct. None equals the old
+  sealed `20261104T082522Z-c50115dce654`. Only ContextOnly records exist.
+- **ContextOnly 17:58:40 receipt (read, not re-run):** helper 41708, owner matched, session 1, interactive, `inJob`
+  false, `WinSta0\Default`. The helper has exited.
+- **Read-only `--window-only` at 18:23 KST:** exit 0. `inWindow` false, `expired` false.
+  - `renewAt` is 2026-11-08 14:15:35 KST and `earliestNotAfter` is 2026-11-10 14:15:35 KST.
+  - The state tree and `wmi-runtime` were unchanged.
+- **Residual Low:**
+  - The controller still waits only 3 minutes for a `Transition` receipt, inside a 900-second scheduler gate.
+  - A slow but successful transition would therefore fail closed after `commit`, under the latch, and need manual
+    recovery.
+  - Measure the transition duration or raise the wait below 900 s before release.
+
+Outside-window no-op proof:
+- It is safe only as a `Cycle` with a new RunId that is not the sealed first-cycle RunId `20261104T090054Z-ccda46e61cd5`.
+- Run the standalone `--window-only` immediately before it, and run it only while that check shows `inWindow` false
+  with a wide margin before 2026-11-08 14:15:35 KST.
+- The proof is not structurally a no-op. If the window were open, the same command would run the real cycle.
+- The controller exits non-zero on the expected exit-4 refusal. That is the pass condition, not a failure to hide.
+
+Orca one-off on Nov 8, as the current-user alternative to S4U:
+- This is feasible as a supervised attended cycle.
+  - The WMI helper launch already proved a job-free session-1 context from an Orca-run caller.
+  - The window refusal is enforced inside the helper, so neither Orca "run now" nor a precheck bypass can force the
+    window.
+- It needs root's release, the user logged on in session 1 with Orca running, and the PC awake.
+- It must run the sealed first-cycle argv exactly once. On any failure the latch is preserved and the agent does not
+  retry.
+- Fallback slots are needed before the 2026-11-10 14:15:35 KST expiry.
+- `orca automations` triggers are recurring (preset, cron or RRULE). I did not create one, and a one-shot RRULE is
+  untested.
+- This does not accept S4U or unattended renewal, and C1 stays open.
+
+### eff93191 test-only correction (root uncommitted patch, diff SHA-256 `e5a70403…`)
+
+- **The change:** one test file only. The VF-CL-04 assertion no longer freezes run `40633895766`. Instead it binds the
+  registry's `runId`, `headRef` and artifact id/digest/expiry to the committed receipt.
+  - The `headSha`, receipt-path and bundle-path checks against the manifest are kept.
+  - No checker, criterion or product file changed.
+- **What I ran**, in a temporary detached checkout of `eff93191` (since removed):
+  - Before the patch, the selected case fails: `40633895766` against `41792498330`.
+  - After applying root's exact patch, both full files pass: `tests/core/test_check_vf_cl_registry.py` and
+    `tests/test_vf_cl_ci_attestation.py` give 244 passed, 0 skipped, exit 0.
+  - The registry checker exits 0 with `acceptedCards` 0.
+  - `verify_vf_cl_ci_attestation.py` against the committed receipt and bundle (head `fd1530d9`,
+    `refs/heads/integration/all-agents-unified`) returns `VERIFIED`, run `41792498330`.
+- **Mutants:** registry `runId` changed to `41792498331` fails; registry artifact digest changed fails.
+- **My earlier gap:** my VF-CL-04 recording review did not run this test file either.
+- **Opinion: land it.**
+  - It is defensible to land the test-only correction after this full two-file run, the real verification and Docs CI.
+  - All 8 required post-landing workflows must still pass at the exact landed head.
+  - Keep the `eff93191` FAILED record, and make no pre-8 pass claim.
+- **Text drift, not a test failure:**
+  - `docs/vf-cl-registry-manifest.json` `whyCiVerified` and the registry `note` still name run `40633895766`. A test
+    asserts the manifest text.
+  - Changing it is a criterion edit and needs its own review.
+
+## Root `59f0a3c2` CI-text correction review (task `task_169f7a385e7c`): accepted
+
+Diff `eff93191..59f0a3c2`, 3 files, one commit:
+- **Manifest:** only VF-CL-04 `whyCiVerified` changed.
+  - It now names `Run 41792498330` and the receipt named by `ciVerifiedAttestation`.
+  - It keeps the OIDC, Sigstore, re-checkable and expiry boundaries, and adds "does not grant operational acceptance".
+- **Registry:** only `version` (1.6.4 → 1.6.5) and the last sentence of `verifiedAgainst.note` changed.
+  - The 03e17c31 local re-verification facts are kept.
+  - The tree/ref/landedNote/hostedRun/reverification fields, and all machine-check, implies, receipt, bundle and
+    attestation fields, are unchanged.
+- **Test file:**
+  - The earlier `runId`/`headRef`/artifact binding is kept.
+  - `test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote` now requires `Run {runId}` from the committed
+    receipt, instead of the old constant, and keeps the OIDC and re-check anchors.
+
+What I found and ran:
+- **Root's first text edit broke a second test.** That edit made `whyCiVerified` generic, which broke this second
+  hard-coded `406` assertion.
+  - Root's `.work/source80-rationale-full.log` showed 1 failed, 243 passed, and I reproduced it.
+  - Root then named the current run and derived it in the test. That keeps the protection, so the old constant is not
+    simply weakened.
+- **At `59f0a3c2`, in a temporary detached checkout (since removed):**
+  - both full files: 244 passed, 0 skipped, exit 0;
+  - registry checker exit 0, `acceptedCards` 0;
+  - `check_docs` exit 0;
+  - the real verifier returns `VERIFIED` for run `41792498330`.
+- **Mutants:** the old `Run 40633895766` text and an unnamed-run text both fail the new assertion.
+- **One unexplained failure (not reproduced):** one full run of my scratch variant (before `59f0a3c2`) failed
+  `test_the_shipped_registry_agrees_with_this_tree` once.
+  - It passed alone and in the full rerun, and I did not capture the assertion.
+  - That test calls git against the live repository, so if it recurs in CI, treat it as a finding.
+- **Opinion:**
+  - Commit `59f0a3c2`, run Docs CI, land by the targeted plan, then require all 8 workflows at the exact landed head.
+  - Keep the `eff93191` FAILED record, with no pre-8 pass claim.
+
+## Train 80b landing script review (task `task_bf87ab92d622`): accepted, read-only
+
+Script: `merge-land-train3-80-59f0a3c2.sh.pending`, SHA-256 `2da6ef1a…`, 60 lines. `bash -n` exits 0. I did not execute
+it.
+
+Gates:
+- **Source:**
+  - It requires the exact head `59f0a3c2` and a clean tree. Both held at 18:56 KST.
+  - The `eff93191..59f0a3c2` path set must be exactly the three files.
+- **Strict JSON deep compares:**
+  - The manifest may differ only in VF-CL-04 `whyCiVerified`.
+  - The registry may differ only in `version` (1.6.4 → 1.6.5) and `verifiedAgainst.note`.
+- **Local test record:** the local JUnit must have 244 testcases with no failure, error or skip.
+  - Read now: 215 core plus 29 attestation testcases, all passing.
+- **Prior FAIL record:** the `eff93191` prelanding JSON must still read `FAIL`.
+- **Docs CI:** run 41810435583 is re-read and must be completed and successful, with the same head, branch,
+  `workflow_dispatch` and title.
+  - Read now: completed, success, workflow `Documentation Build`, job `docs` success.
+- **Signature:** real Sigstore verification of the FD receipt runs through `verify()`, which raises on any mismatch.
+- **Landing:**
+  - It requires the integration tip to equal `fd1530d9` (read now: `fd1530d9`) and `fd1530d9` to be an ancestor of
+    the landing commit.
+  - It pushes normally, without force, so a non-fast-forward is rejected.
+  - It reads the remote head back after the push.
+
+Lows, none blocking:
+- The JUnit timestamp (18:39:56) is earlier than the `59f0a3c2` commit time (18:44:07), and the file names no commit.
+  My exact-head 244 run and Docs CI cover the gap.
+- The Docs CI check does not pin `workflowName`; the title pins it in practice.
+- `json.loads` collapses duplicate keys. The strict-load test among the 244 covers the shipped files.
+- The prior FAIL JSON is checked by fields, not by a hash.
+
+The `eff93191` script (`99353908…`) is still `.pending` and separate. Nothing in this script claims a pre-8 pass for
+`59f0a3c2`. All 8 workflows at the exact landed head remain required.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -552,6 +756,9 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Next first action:
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
-  - Core prepares the attended WMI context artifact, and Claude reviews it.
+  - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
+  - Before any cycle release: measure or raise the 3-minute Transition wait, then run the fresh-RunId outside-window
+    proof.
+  - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
