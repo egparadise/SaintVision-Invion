@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T15:45:00+09:00"
+updated: "2026-11-04T16:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -282,6 +282,31 @@ Reviewer role: Claude is the reviewer the S07 spec names.
 - **Low 2:** a five-node-lab `BLOCKED` preflight exits 0, and a transform `KeyError` escapes the
   `ValueError`/`RuntimeError` catch.
 
+## Finishing checks before freeze
+
+- **PR #406 `af3a94ed` (delta over `deef98ad`): source accepted.** This closes my Low.
+  - Once `now > observedAt + 60000`, `nextNodeCertificateTransition` returns `null`, and the delay is clamped to
+    2147483647.
+  - My original probes re-run at the new head:
+    - fake clock, 90-day leaf: 0 calls after the observation goes stale;
+    - real timers, 90-day leaf: 0 calls and no `TimeoutOverflowWarning`.
+  - Removing the guard makes exactly the new 90-day test fail.
+  - Local: 63 focused and 1,218 full web tests passed; `eslint` and `tsc` exit 0.
+- **happy-dom `21.0.4` (root's dev-dependency bump):**
+  - I ran it uncommitted (`--no-save`) in my scratch checkout of `af3a94ed`: 102 files, 1,218 passed.
+  - I did not re-verify the advisory or the engines myself.
+- **S04 JUnit fix (root working tree; applied as a patch to my scratch copy only):**
+  - `test_s04_db_runner.py`: 27 passed.
+  - Reverting the runner hunk fails the 3 new cases.
+  - This closes my Low 1.
+- **Factual review of the docs (read-only; I edited nothing):**
+  - S07 spec 1.1.1: the facts are correct, but the "Claude review is separate" sentence is out of date.
+  - Catalog 1.6.0: the S04 row is correct together with the JUnit fix, and the S07 row correctly states that exit 0
+    can carry `BLOCKED`. I suggested keeping the original author attribution.
+  - Orca board 1.0.2: two "pending Claude" cells are out of date. I did not re-measure the r5 expiry myself.
+- **Shared stash:** a temporary entry I created during a mutation run, `claude-s04-mut`, was dropped by its tag.
+  Nobody else's stash entry was touched.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -293,6 +318,5 @@ Reviewer role: Claude is the reviewer the S07 spec names.
 - Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next first action: the coordinator decides whether the #406 Low (stale-timer overflow) is fixed before the
-  final freeze, then runs the final full hosted CI. Workers dispatch no full CI. If a fix is made, Claude reviews
-  the exact head.
+- Next first action: the coordinator updates the two out-of-date review cells, freezes the candidate, and runs the
+  final full hosted CI. Workers dispatch no CI. Operational acceptance stays unmeasured.
