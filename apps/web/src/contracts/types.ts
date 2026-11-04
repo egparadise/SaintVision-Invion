@@ -94,6 +94,21 @@ export interface ClusterTrustSummary {
   state: ClusterTrustState;
 }
 
+export interface ProjectNodeCertificateItem {
+  nodeId: string;
+  certificateNotAfter: string | null;
+  channelEnabled: boolean | null;
+}
+
+export interface ProjectNodeCertificateObservationResponse {
+  source: 'execution-kernel';
+  scope: 'project-node-certificates';
+  observedAt: string;
+  complete: boolean;
+  items: ProjectNodeCertificateItem[];
+  trust: ClusterTrustSummary;
+}
+
 export interface ProjectItem {
   id: string; // prj_...
   name: string;

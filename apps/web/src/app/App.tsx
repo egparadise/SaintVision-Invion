@@ -26,13 +26,13 @@ import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { clearSessionExpiration, onTokenExpired, performLogout } from '@/features/auth/session';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem, ClusterTrustSummary, ProjectNodeCertificateObservationResponse } from '@/contracts/types';
 import { apiClient, clearAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
 import type { NodePageResponse } from '@/contracts/node-page-response';
 import type { WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
 import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@/shared/api/projectObservation';
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
-import { observedNode } from '@/shared/api/nodeObservation';
+import { observedNode, fetchProjectNodeCertificates } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 import { getNodeResourceUsage } from '@/features/desktop/fabricControlApi';
 import type { ObservedNodeResourceUsage } from '@/contracts/kernel-observation';
@@ -92,6 +92,7 @@ export const App: React.FC = () => {
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [clusterTrust, setClusterTrust] = useState<ClusterTrustSummary | null>(null);
 
   const sessionRef = useRef(0);
   const scopeRef = useRef(0);
@@ -124,6 +125,7 @@ export const App: React.FC = () => {
     setNodeError(null);
     setLastNodesFetchedAt(null);
     setSelectedNodeId(null);
+    setClusterTrust(null);
 
     setNodeResourceUsage(null);
     setNodeResourceUsageState('idle');
@@ -182,6 +184,7 @@ export const App: React.FC = () => {
     activeProject.current = id;
     setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
+    setNodes([]); setClusterTrust(null);
     setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -280,8 +283,34 @@ export const App: React.FC = () => {
           throw err;
         }
       }
+
+      let certObs: ProjectNodeCertificateObservationResponse | null = null;
+      try {
+        certObs = await fetchProjectNodeCertificates(targetPrj);
+      } catch {
+        certObs = null;
+      }
+
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
-        setNodes(page.items.map(observedNode));
+        const certMap = new Map<string, string | null>();
+        if (certObs && Array.isArray(certObs.items)) {
+          for (const item of certObs.items) {
+            certMap.set(item.nodeId, item.certificateNotAfter);
+          }
+        }
+
+        const mappedNodes = page.items.map(observedNode).map((node) => {
+          if (certMap.has(node.id)) {
+            return {
+              ...node,
+              certificateNotAfter: certMap.get(node.id) ?? null,
+            };
+          }
+          return node;
+        });
+
+        setNodes(mappedNodes);
+        setClusterTrust(certObs?.trust ?? null);
         setNodesState('success');
         setLastNodesFetchedAt(new Date());
         setNodeError(null);
@@ -289,6 +318,7 @@ export const App: React.FC = () => {
     } catch (err: any) {
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
         setNodes([]);
+        setClusterTrust(null);
         setNodesState('error');
         setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
       }
@@ -520,7 +550,8 @@ export const App: React.FC = () => {
         currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
         onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
         onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
-        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        trust={clusterTrust} />
     </>
   );
 
@@ -742,6 +773,7 @@ export const App: React.FC = () => {
             onOpenTerminal={() => {
               setActiveTab('terminal');
             }}
+            trust={clusterTrust}
           />
         )}
 

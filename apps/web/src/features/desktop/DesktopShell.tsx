@@ -53,7 +53,7 @@ export function getNotificationLevelConfig(level?: string | null): NotificationL
     label: level ? `UNKNOWN (${level})` : 'UNKNOWN',
   };
 }
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ClusterTrustSummary } from '@/contracts/types';
 import { DesktopWindowComponent } from './DesktopWindow';
 import { ResourceExplorer } from './ResourceExplorer';
 import { InvFileExplorer } from './InvFileExplorer';
@@ -80,6 +80,7 @@ export interface DesktopShellProps {
   currentTheme: 'light' | 'dark';
   onToggleTheme: () => void;
   notifications?: DesktopNotification[];
+  trust?: ClusterTrustSummary | null;
 }
 
 const DEFAULT_WINDOWS: IDesktopWindow[] = [
@@ -208,6 +209,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   currentTheme,
   onToggleTheme,
   notifications: initialNotifications,
+  trust = null,
 }) => {
   const [windows, setWindows] = useState<IDesktopWindow[]>(() => {
     try {
@@ -946,6 +948,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   tenantId={tenantId}
                   projectId={projectId}
                   runId={runs[0]?.id}
+                  trust={trust}
                   onOpenTerminal={() => openApp('terminal')}
                 />
               )}

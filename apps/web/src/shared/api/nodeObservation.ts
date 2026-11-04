@@ -1,4 +1,5 @@
-import type { NodeItem, NodeStatus } from '@/contracts/types';
+import type { NodeItem, NodeStatus, ProjectNodeCertificateObservationResponse } from '@/contracts/types';
+import { apiClient, isRouteNotFoundError } from './client';
 
 const metrics = ['cpuCores', 'cpuUsagePercent', 'memoryTotalBytes', 'memoryUsedBytes',
   'gpuCount', 'storageTotalBytes', 'storageUsedBytes'] as const;
@@ -56,4 +57,27 @@ export function observedNode(value: object): NodeItem {
           ? ((raw.certificateNotAfter ?? raw.certificate_not_after) as string)
           : undefined,
   };
+}
+
+export async function fetchProjectNodeCertificates(
+  projectId: string,
+  signal?: AbortSignal
+): Promise<ProjectNodeCertificateObservationResponse | null> {
+  const target = (projectId || '').trim();
+  if (!target) return null;
+  try {
+    const res = await apiClient<ProjectNodeCertificateObservationResponse>(
+      `/v1/projects/${encodeURIComponent(target)}/node-certificates`,
+      { method: 'GET', cache: 'no-store', signal }
+    );
+    if (!res || res.scope !== 'project-node-certificates' || !Array.isArray(res.items)) {
+      return null;
+    }
+    return res;
+  } catch (err: any) {
+    if (isRouteNotFoundError(err)) {
+      return null;
+    }
+    throw err;
+  }
 }

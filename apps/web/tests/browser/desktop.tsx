@@ -4,6 +4,7 @@ import {setAuthToken} from '../../src/shared/api/client';
 import {InvFileExplorer} from '../../src/features/desktop/InvFileExplorer';
 import {ModelStudioView} from '../../src/features/desktop/ModelStudioView';
 import {ResourceExplorer} from '../../src/features/desktop/ResourceExplorer';
+import type { NodeItem, ClusterTrustSummary } from '../../src/contracts/types';
 
 const root = createRoot(document.getElementById('root')!);
 let generation = 0;
@@ -15,6 +16,8 @@ export type DesktopBrowserView = 'files' | 'model' | 'fabric' | 'resource';
   projectId: string;
   view: DesktopBrowserView;
   initialTab?: 'overview' | 'storage' | 'pools' | 'nodes' | 'discovery';
+  nodes?: NodeItem[];
+  trust?: ClusterTrustSummary | null;
 }) => {
   setAuthToken(input.token);
   if (input.view === 'files') {
@@ -25,7 +28,8 @@ export type DesktopBrowserView = 'files' | 'model' | 'fabric' | 'resource';
     root.render(
       <ResourceExplorer
         key={++generation}
-        nodes={[]}
+        nodes={input.nodes || []}
+        trust={input.trust}
         initialTab={input.initialTab || 'discovery'}
       />
     );

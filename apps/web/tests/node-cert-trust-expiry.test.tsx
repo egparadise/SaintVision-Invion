@@ -2,7 +2,14 @@
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ResourceExplorer, formatKstDateTime, getTrustBannerInfo } from '../src/features/desktop/ResourceExplorer';
+import {
+  ResourceExplorer,
+  formatKstDateTime,
+  isCertificateExpired,
+  getTrustBannerInfo,
+  TRUST_STATUS_CONFIG,
+  getTrustStatusConfig,
+} from '../src/features/desktop/ResourceExplorer';
 import { observedNode } from '../src/shared/api/nodeObservation';
 import type { NodeItem, ClusterTrustSummary } from '../src/contracts/types';
 
@@ -121,7 +128,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
   });
 
   // =========================================================================
-  // 2. formatKstDateTime timezone unit tests
+  // 2. formatKstDateTime & isCertificateExpired timezone unit tests
   // =========================================================================
   describe('formatKstDateTime explicit Asia/Seoul formatting', () => {
     it('formats UTC ISO timestamp into Asia/Seoul (KST) display string', () => {
@@ -129,13 +136,70 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       expect(formatKstDateTime('2026-11-02T03:32:25Z')).toBe('2026-11-02 12:32 KST');
       // 2026-10-31T03:32:25Z + 9h = 2026-10-31 12:32 KST
       expect(formatKstDateTime('2026-10-31T03:32:25Z')).toBe('2026-10-31 12:32 KST');
+      // Midnight in KST: 2026-11-02T15:00:00Z + 9h = 2026-11-03 00:00 KST (normalized 00, not 24)
+      expect(formatKstDateTime('2026-11-02T15:00:00Z')).toBe('2026-11-03 00:00 KST');
     });
 
-    it('fails-closed to 미확인 for null, undefined, empty, or invalid ISO', () => {
-      expect(formatKstDateTime(null)).toBe('미확인');
+    it('truthfully distinguishes null (인증서 없음) from undefined/empty/invalid (미확인)', () => {
+      expect(formatKstDateTime(null)).toBe('인증서 없음');
       expect(formatKstDateTime(undefined)).toBe('미확인');
       expect(formatKstDateTime('')).toBe('미확인');
       expect(formatKstDateTime('malformed-date-string')).toBe('미확인');
+      expect(formatKstDateTime(12345 as any)).toBe('미확인');
+    });
+
+    it('isCertificateExpired correctly determines past vs future timestamps', () => {
+      // Past date (e.g. 2026-10-23)
+      expect(isCertificateExpired('2026-10-23T03:32:25Z')).toBe(true);
+      // Far future date (e.g. 2030-01-01)
+      expect(isCertificateExpired('2030-01-01T00:00:00Z')).toBe(false);
+      // Missing, null, or invalid dates return false (fail-safe)
+      expect(isCertificateExpired(null)).toBe(false);
+      expect(isCertificateExpired(undefined)).toBe(false);
+      expect(isCertificateExpired('not-a-date')).toBe(false);
+    });
+  });
+
+  // =========================================================================
+  // 2b. TRUST_STATUS_CONFIG and getTrustStatusConfig fail-closed lookup
+  // =========================================================================
+  describe('TRUST_STATUS_CONFIG & getTrustStatusConfig fail-closed lookup', () => {
+    it('returns exact config for all canonical ClusterTrustState values', () => {
+      expect(getTrustStatusConfig('ok')).toEqual({
+        color: 'var(--color-status-online)',
+        border: 'var(--color-status-online)',
+        bg: 'var(--color-bg-subtle)',
+        label: '인증서 정상',
+      });
+      expect(getTrustStatusConfig('renewal-window')).toEqual({
+        color: 'var(--color-status-degraded)',
+        border: 'var(--color-status-degraded)',
+        bg: 'var(--color-bg-subtle)',
+        label: '인증서 갱신 창',
+      });
+      expect(getTrustStatusConfig('expired')).toEqual({
+        color: 'var(--color-status-offline)',
+        border: 'var(--color-status-offline)',
+        bg: 'var(--color-bg-subtle)',
+        label: '인증서 만료',
+      });
+      expect(getTrustStatusConfig('unknown')).toEqual({
+        color: 'var(--color-status-unknown)',
+        border: 'var(--color-status-unknown)',
+        bg: 'var(--color-bg-subtle)',
+        label: '신뢰 미확인',
+      });
+    });
+
+    it('fails closed to UNKNOWN (<raw>) on prototype keys and unrecognized strings', () => {
+      expect(getTrustStatusConfig('toString').label).toBe('UNKNOWN (toString)');
+      expect(getTrustStatusConfig('constructor').label).toBe('UNKNOWN (constructor)');
+      expect(getTrustStatusConfig('__proto__').label).toBe('UNKNOWN (__proto__)');
+      expect(getTrustStatusConfig('valueOf').label).toBe('UNKNOWN (valueOf)');
+      expect(getTrustStatusConfig('bogus').label).toBe('UNKNOWN (bogus)');
+      expect(getTrustStatusConfig('bogus').color).toBe('var(--color-status-unknown)');
+      expect(getTrustStatusConfig(null).label).toBe('신뢰 미확인');
+      expect(getTrustStatusConfig(undefined).label).toBe('신뢰 미확인');
     });
   });
 
@@ -181,7 +245,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       };
       expect(getTrustBannerInfo(trust)).toEqual({
         level: 'renewal-window',
-        message: '자동 갱신 창 — 만료까지 2일 0시간',
+        message: '인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간',
       });
     });
 
@@ -194,7 +258,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       };
       expect(getTrustBannerInfo(trust)).toEqual({
         level: 'renewal-window',
-        message: '자동 갱신 창 — 만료까지 0일 0시간',
+        message: '인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간',
       });
     });
   });
@@ -242,13 +306,13 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
       expect(banner?.getAttribute('role')).toBe('status');
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 2일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간');
       expect((banner as HTMLElement).style.color).toBe('var(--color-status-degraded)');
       expect((banner as HTMLElement).style.backgroundColor).toBe('var(--color-bg-subtle)');
 
       const badge = container.querySelector('[data-testid="trust-status-badge"]');
       expect(badge).not.toBeNull();
-      expect(badge?.textContent).toContain('자동 갱신 창');
+      expect(badge?.textContent).toContain('인증서 갱신 창');
     });
 
     it('State 3 (expired): renders banner with alert role and disconnected notice', async () => {
@@ -275,7 +339,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       expect(badge?.textContent).toContain('인증서 만료');
     });
 
-    it('State 4 (unknown): renders NO banner (unknown/필드 없음=배너 없음)', async () => {
+    it('State 4 (unknown): renders NO banner, but renders truthful status badge (신뢰 미확인)', async () => {
       const trust: ClusterTrustSummary = {
         state: 'unknown',
         earliestCertificateNotAfter: null,
@@ -290,7 +354,30 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).toBeNull();
       const badge = container.querySelector('[data-testid="trust-status-badge"]');
-      expect(badge).toBeNull();
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain('신뢰 미확인');
+      expect((badge as HTMLElement).style.color).toBe('var(--color-status-unknown)');
+    });
+
+    it('State 5 (unrecognized state): fails closed to UNKNOWN badge and does NOT false-alarm as expired', async () => {
+      const trust: any = {
+        state: 'unrecognized_state',
+        earliestCertificateNotAfter: null,
+        renewalWindowStartsAt: null,
+        secondsUntilEarliestExpiry: null,
+      };
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[mockNodeOnline, mockNodeSecond]} trust={trust} />);
+      });
+
+      const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
+      expect(banner).toBeNull();
+      const badge = container.querySelector('[data-testid="trust-status-badge"]');
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain('UNKNOWN (unrecognized_state)');
+      expect(badge?.textContent).not.toContain('인증서 만료');
+      expect((badge as HTMLElement).style.color).toBe('var(--color-status-unknown)');
     });
   });
 
@@ -298,20 +385,26 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
   // 5. Missing fields / invalid ISO / negative numbers / boundaries
   // =========================================================================
   describe('Robustness: Missing fields, invalid ISO, negative numbers, and boundary conditions', () => {
-    it('handles absent trust prop (필드 없음=배너 없음)', async () => {
+    it('handles absent trust prop (필드 없음=배너 없음, 신뢰 미확인 배지 표시)', async () => {
       await act(async () => {
         root.render(<ResourceExplorer nodes={[mockNodeOnline]} />);
       });
       expect(container.querySelector('[data-testid="trust-expiry-banner"]')).toBeNull();
-      expect(container.querySelector('[data-testid="trust-status-badge"]')).toBeNull();
+      const badge = container.querySelector('[data-testid="trust-status-badge"]');
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain('신뢰 미확인');
+      expect((badge as HTMLElement).style.color).toBe('var(--color-status-unknown)');
     });
 
-    it('handles null trust prop (필드 없음=배너 없음)', async () => {
+    it('handles null trust prop (필드 없음=배너 없음, 신뢰 미확인 배지 표시)', async () => {
       await act(async () => {
         root.render(<ResourceExplorer nodes={[mockNodeOnline]} trust={null} />);
       });
       expect(container.querySelector('[data-testid="trust-expiry-banner"]')).toBeNull();
-      expect(container.querySelector('[data-testid="trust-status-badge"]')).toBeNull();
+      const badge = container.querySelector('[data-testid="trust-status-badge"]');
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain('신뢰 미확인');
+      expect((badge as HTMLElement).style.color).toBe('var(--color-status-unknown)');
     });
 
     it('handles renewal-window with missing seconds and missing earliest date without crashing', async () => {
@@ -328,7 +421,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
     });
 
     it('handles invalid ISO date in trust without crashing', async () => {
@@ -345,7 +438,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
     });
 
     it('handles negative secondsUntilEarliestExpiry without showing negative numbers or crashing', async () => {
@@ -362,7 +455,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
     });
 
     it('handles boundary condition: exactly at window start (2 days = 172800s)', async () => {
@@ -378,7 +471,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       });
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 2일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간');
     });
 
     it('handles boundary condition: 1 day 23 hours remaining (169200s)', async () => {
@@ -394,7 +487,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       });
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
-      expect(banner?.textContent).toContain('자동 갱신 창 — 만료까지 1일 23시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 1일 23시간');
     });
   });
 
@@ -427,6 +520,57 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       const expiryDiv = container.querySelector(`[data-testid="node-card-cert-expiry-${nodeMissingCert.id}"]`);
       expect(expiryDiv).not.toBeNull();
       expect(expiryDiv?.textContent).toContain('인증서 만료 (KST): 미확인');
+    });
+
+    it('renders 인증서 없음 in Overview tab when node certificateNotAfter is explicitly null', async () => {
+      const nodeNoCert: NodeItem = {
+        ...mockNodeOnline,
+        id: 'nod_no_cert',
+        certificateNotAfter: null,
+      };
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[nodeNoCert]} initialTab="overview" />);
+      });
+
+      const expiryDiv = container.querySelector(`[data-testid="node-card-cert-expiry-${nodeNoCert.id}"]`);
+      expect(expiryDiv).not.toBeNull();
+      expect(expiryDiv?.textContent).toContain('인증서 만료 (KST): 인증서 없음');
+    });
+
+    it('renders (만료됨) with offline color in Overview tab when node certificate is expired', async () => {
+      const nodeExpired: NodeItem = {
+        ...mockNodeOnline,
+        id: 'nod_past_expired',
+        certificateNotAfter: '2026-10-23T03:32:25Z',
+      };
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[nodeExpired]} initialTab="overview" />);
+      });
+
+      const expiryDiv = container.querySelector(`[data-testid="node-card-cert-expiry-${nodeExpired.id}"]`) as HTMLElement;
+      expect(expiryDiv).not.toBeNull();
+      expect(expiryDiv.textContent).toContain('인증서 만료 (KST): 2026-10-23 12:32 KST (만료됨)');
+      expect(expiryDiv.style.color).toBe('var(--color-status-offline)');
+    });
+
+    it('renders future active certificate in Overview tab with muted color and no expired flag', async () => {
+      const nodeFuture: NodeItem = {
+        ...mockNodeOnline,
+        id: 'nod_future_active',
+        certificateNotAfter: '2030-01-01T00:00:00Z',
+      };
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[nodeFuture]} initialTab="overview" />);
+      });
+
+      const expiryDiv = container.querySelector(`[data-testid="node-card-cert-expiry-${nodeFuture.id}"]`) as HTMLElement;
+      expect(expiryDiv).not.toBeNull();
+      expect(expiryDiv.textContent).toContain('인증서 만료 (KST): 2030-01-01 09:00 KST');
+      expect(expiryDiv.textContent).not.toContain('(만료됨)');
+      expect(expiryDiv.style.color).toBe('var(--color-text-muted)');
     });
 
     it('renders KST expiration time in Nodes tab node selector and node detail', async () => {
