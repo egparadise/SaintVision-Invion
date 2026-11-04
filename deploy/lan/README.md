@@ -439,7 +439,7 @@ later command, preserves the partial batch, and emits only a redacted append-onl
 plus an atomically replaced Desktop status file. Windows pop-up notification is a separately
 explicit configuration bit required by live task registration; test/direct execution keeps it
 off, and outside-window no-ops never notify. The runner never reads `private-state.json`,
-prints command output, retries a failed gate, accepts an expired leaf, or edits a journal. An
+prints command output, retries a mutating gate, accepts an expired leaf, or edits a journal. An
 expired earliest public leaf produces an alert and no renewal command. The task configuration may
 contain paths to operator-private inputs, but not a credential, DSN, private key, or password
 value.
@@ -456,8 +456,13 @@ failure produce redacted receipts. Expired-leaf alerts remain available even if 
 lock is busy or stale. Invalid/untrusted configuration cannot safely select a status
 destination and is rejected before this receipt contract applies.
 
-A failed or interrupted attempt remains latched across later triggers. No failed
-gate is automatically retried. A completed generation is also never replayed. Operators
+Only read-only window/current-status/runtime preflights may run again on the next
+trigger after a transient failure; they write a failure receipt without a mutation
+latch. The durable latch starts immediately before `prepare`, the first mutating
+gate. A failed or interrupted mutating attempt remains latched across later triggers
+and is never automatically retried. Before success, the runner rereads all public
+leaves and requires a changed generation whose earliest valid expiry is outside the
+renewal window; command success and unchanged leaves cannot report renewal. Operators
 must inspect the exact rotation journal, child/remote operations and channel state and
 complete a separately reviewed recovery, preserving old material. Elapsed time or an
 absent PID never proves that a remote operation stopped.

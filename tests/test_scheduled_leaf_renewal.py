@@ -74,6 +74,14 @@ def fake_tool(tmp_path: Path) -> Path:
 gate, trace, failure = sys.argv[1:4]
 with pathlib.Path(trace).open('a', encoding='utf-8') as stream:
     stream.write(gate + '\\n')
+if failure == 'once-' + gate and not pathlib.Path(trace + '.failed-once').exists():
+    pathlib.Path(trace + '.failed-once').write_text('failed')
+    raise SystemExit(9)
+if gate == 'finalObserve' and failure != 'unchanged-finalObserve':
+    state = pathlib.Path(trace).parent / 'state'
+    fresh = pathlib.Path(trace).parent / 'fresh-leaf.pem'
+    for target in [state / 'control-cert.pem', *state.glob('public/nodes/*/node-cert.pem')]:
+        target.write_bytes(fresh.read_bytes())
 if failure == 'wait-' + gate:
     import os, time
     pathlib.Path(trace + '.pid').write_text(str(os.getpid()))
@@ -109,6 +117,8 @@ def command(identifier: str, fake: Path, trace: Path, failure: str) -> dict:
 
 def plan_file(tmp_path: Path, state: Path, *, failure: str = "none") -> tuple[Path, dict, Path]:
     fake = fake_tool(tmp_path)
+    fresh_expiry = datetime.now(timezone.utc) + timedelta(days=1 if failure == "still-in-window-finalObserve" else 6)
+    (tmp_path / "fresh-leaf.pem").write_bytes(certificate(fresh_expiry))
     trace = tmp_path / "trace.txt"
     groups = {
         "currentStatus": command("currentStatus", fake, trace, failure),
@@ -203,7 +213,7 @@ def test_in_window_runs_the_only_permitted_sequence(tmp_path: Path):
     before = trace.read_bytes()
     assert module.execute(load(target), now=now + timedelta(seconds=1)) == 0
     assert trace.read_bytes() == before
-    assert json.loads(Path(_plan["statusPath"]).read_text())["outcome"] == "already-renewed"
+    assert json.loads(Path(_plan["statusPath"]).read_text())["outcome"] == "outside-window"
 
 
 @pytest.mark.parametrize(
@@ -247,9 +257,15 @@ def test_each_failed_gate_stops_without_a_later_command(tmp_path: Path, failure:
     before = trace.read_bytes()
     plan = load(target)
     plan["statusPath"] = str(tmp_path / "other-status.json")
-    assert module.execute(plan, now=now + timedelta(seconds=1)) == 2
-    assert trace.read_bytes() == before
-    assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "recovery-required"
+    if failure in {"currentStatus", "runtimePreflight-1", "runtimePreflight-2"}:
+        with pytest.raises(RuntimeError, match="failed with exit 9"):
+            module.execute(plan, now=now + timedelta(seconds=1))
+        assert trace.read_bytes() == before + before
+        assert not module._paths(plan)[1].exists()
+    else:
+        assert module.execute(plan, now=now + timedelta(seconds=1)) == 2
+        assert trace.read_bytes() == before
+        assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "recovery-required"
 
 
 def test_lock_and_pin_drift_fail_before_any_command(tmp_path: Path):
@@ -341,7 +357,7 @@ def test_runner_and_registration_scripts_do_not_read_private_state():
 
 
 @pytest.mark.parametrize("fault", ["missing", "not-yet-valid", "node-count"])
-def test_certificate_preflight_failure_has_durable_status_and_latch(tmp_path: Path, fault: str):
+def test_certificate_preflight_failure_has_durable_status_without_mutation_latch(tmp_path: Path, fault: str):
     now = datetime.now(timezone.utc)
     state = public_state(tmp_path, now + timedelta(days=1))
     target, plan, trace = plan_file(tmp_path, state)
@@ -358,7 +374,9 @@ def test_certificate_preflight_failure_has_durable_status_and_latch(tmp_path: Pa
     assert not trace.exists()
     receipt = json.loads(Path(plan["statusPath"]).read_text())
     assert (receipt["outcome"], receipt["failedGate"]) == ("failed", "window")
-    assert module.execute(load(target), now=now) == 2
+    assert not module._paths(plan)[1].exists()
+    with pytest.raises(ValueError, match="Public certificate preflight failed"):
+        module.execute(load(target), now=now)
 
 
 def test_linux_python_symlink_is_canonicalized_by_fixture_but_still_rejected_as_input(tmp_path: Path, monkeypatch):
@@ -462,7 +480,7 @@ def test_latch_reset_requires_reviewed_changed_fresh_material_and_archives_histo
     assert trace.read_bytes() == before
 
 
-def test_receipt_storage_failure_never_starts_a_command_or_clears_the_latch(tmp_path: Path, monkeypatch):
+def test_receipt_storage_failure_never_starts_a_command_or_creates_mutation_latch(tmp_path: Path, monkeypatch):
     state = public_state(tmp_path, datetime.now(timezone.utc) + timedelta(days=1))
     target, plan, trace = plan_file(tmp_path, state)
     original = module._record
@@ -473,8 +491,8 @@ def test_receipt_storage_failure_never_starts_a_command_or_clears_the_latch(tmp_
         module.execute(load(target))
     assert not trace.exists()
     monkeypatch.setattr(module, "_record", original)
-    assert module.execute(load(target)) == 2
-    assert not trace.exists()
+    assert not module._paths(plan)[1].exists()
+    assert module.execute(load(target)) == 0
 
 
 def test_stale_lock_from_another_state_cannot_be_retired_by_hash_alone(tmp_path: Path):
@@ -488,3 +506,45 @@ def test_stale_lock_from_another_state_cannot_be_retired_by_hash_alone(tmp_path:
     with pytest.raises(ValueError, match="ownership differs"):
         module.recover_stale_lock(plan, digest)
     assert sha(lock) == digest
+
+
+@pytest.mark.parametrize("gate", ["currentStatus", "runtimePreflight-1", "runtimePreflight-2"])
+def test_transient_read_only_preflight_can_recover_on_the_next_trigger(tmp_path: Path, gate: str):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state, failure="once-" + gate)
+    with pytest.raises(RuntimeError, match="failed with exit 9"):
+        module.execute(load(target), now=now)
+    assert "prepare" not in trace.read_text().splitlines()
+    assert not module._paths(plan)[1].exists()
+    assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "failed"
+    # Same pinned plan, no operator reset and no certificate replacement needed.
+    assert module.execute(load(target), now=now + timedelta(seconds=1)) == 0
+    assert trace.read_text().splitlines().count("prepare") == 1
+    assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "renewed"
+
+
+@pytest.mark.parametrize("failure", ["unchanged-finalObserve", "still-in-window-finalObserve"])
+def test_successful_commands_without_changed_fresh_leaves_are_not_renewal(tmp_path: Path, failure: str):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state, failure=failure)
+    with pytest.raises(ValueError, match="changed fresh certificate generation"):
+        module.execute(load(target), now=now)
+    receipt = json.loads(Path(plan["statusPath"]).read_text())
+    assert (receipt["outcome"], receipt["failedGate"]) == ("failed", "post-renewal-certificates")
+    assert trace.read_text().splitlines()[-1] == "finalObserve"
+    before = trace.read_bytes()
+    assert module.execute(load(target), now=now) == 2
+    assert trace.read_bytes() == before
+
+
+def test_lock_cleanup_preserves_the_primary_error_and_foreign_record(tmp_path: Path):
+    state = public_state(tmp_path, datetime.now(timezone.utc) + timedelta(days=1))
+    _target, plan, _trace = plan_file(tmp_path, state)
+    lock, _latch = module._paths(plan)
+    with pytest.raises(RuntimeError, match="primary gate failure"):
+        with module._lock(lock, module._owner(plan, "test")):
+            lock.write_text("foreign replacement")
+            raise RuntimeError("primary gate failure")
+    assert lock.read_text() == "foreign replacement"

@@ -1,0 +1,57 @@
+{
+  "runtime": [
+    "Successfully set up CPython (3.12.15)",
+    "Successfully set up CPython (3.14.9)"
+  ],
+  "checkout": [
+    "0b1b523f0d6f95641970d2188f4059973ec81969",
+    "0b1b523f0d6f95641970d2188f4059973ec81969"
+  ],
+  "allFailedTests": [
+    "tests/core/test_check_vf_cl_registry.py::test_the_shipped_registry_agrees_with_this_tree",
+    "tests/integration/test_model_deployment_real_pg.py::test_a_deployment_records_the_servers_digest_and_one_allow_row",
+    "tests/integration/test_model_deployment_real_pg.py::test_a_grade_revoked_while_the_rows_are_locked_refuses_before_the_write",
+    "tests/integration/test_model_deployment_real_pg.py::test_the_request_grade_is_not_enough_and_the_refusal_is_audited",
+    "tests/integration/test_model_deployment_real_pg.py::test_the_same_key_on_another_version_is_a_conflict_not_a_replay",
+    "tests/integration/test_model_deployment_real_pg.py::test_this_projects_subject_and_run_are_accepted_and_recorded",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_different_decision_under_a_second_key_is_a_conflict",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_hand_built_principal_cannot_claim_fresh_authentication",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_reference_that_stops_resolving_refuses_the_confirmation",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_refused_state_transition_is_audited_once_with_the_action_the_contract_names",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_revoked_grant_between_proposal_and_confirmation_refuses",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_a_second_final_decision_on_one_criterion_is_refused",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_an_expired_proposal_keeps_its_closing_and_returns_the_same_409_to_any_key",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_an_expired_verified_token_cannot_cast_a_vote",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_confirmation_rebinds_to_the_proposal_criterion",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_the_committed_409_is_audited_once_however_many_times_it_is_asked",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_the_losing_confirmation_converges_on_the_recorded_decision",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_the_same_decision_under_a_second_key_converges_on_the_first_proposal",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_token_provenance_is_fail_closed_and_writes_nothing[client_id]",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_token_provenance_is_fail_closed_and_writes_nothing[expires_at]",
+    "tests/integration/test_release_acceptance_write_real_pg.py::test_token_provenance_is_fail_closed_and_writes_nothing[issuer]",
+    "tests/integration/test_replica_repair_plan_route_real_pg.py::test_a_project_the_caller_is_not_in_and_one_that_does_not_exist_answer_alike",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t12_a_non_owner_and_an_unknown_contribution_get_the_same_audited_404",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t13_no_project_role_stands_in_for_the_folders_owner[maintainer]",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t13_no_project_role_stands_in_for_the_folders_owner[owner]",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t14_the_same_key_and_body_replays_the_stored_answer_and_writes_nothing_new",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t15_the_same_key_with_a_different_body_is_a_409_that_adds_nothing",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t16_the_ledger_records_the_path_project_and_the_bounded_endpoint",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t18a_a_revoke_that_locks_first_makes_the_waiting_post_refuse",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t18b_a_post_that_locks_first_wins_and_the_revoke_lands_after_it",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t18c_no_location_is_inserted_after_a_revoke_has_committed",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t21_a_membership_revoked_while_the_key_lock_is_held_refuses_instead_of_replaying",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t22_a_project_archived_while_the_row_lock_is_awaited_refuses_before_the_insert",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t3_a_viewer_member_cannot_read_this_projects_catalogue",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t3_another_projects_member_reads_no_rows_and_learns_nothing",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t4_a_member_of_another_project_cannot_catalogue_into_this_one",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t4_a_viewer_of_this_project_cannot_catalogue_either",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t5_the_project_scope_is_only_opened_after_the_access_check_passes",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_t7_a_null_project_row_is_invisible_to_project_reads_and_still_visible_to_its_owner",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_the_0062_downgrade_refuses_while_a_location_holds_a_binding",
+    "tests/integration/test_storage_project_scope_real_pg.py::test_the_tenant_wide_uri_uniqueness_is_a_409_and_not_a_500",
+    "tests/test_import_ac11_migration_rehearsal.py::test_main_reads_zip_and_github_metadata_files"
+  ],
+  "newFailureVs403": [
+    "tests/core/test_check_vf_cl_registry.py::test_the_shipped_registry_agrees_with_this_tree"
+  ]
+}

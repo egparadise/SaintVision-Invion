@@ -271,12 +271,20 @@ def _lock(path: Path, owner: dict[str, Any]) -> Iterator[None]:
             stream.write(raw)
             stream.flush()
             os.fsync(stream.fileno())
+        body_failed = False
         try:
             yield
+        except BaseException:
+            body_failed = True
+            raise
         finally:
-            if _regular(path).read_bytes() != raw:
-                raise RuntimeError("Renewal lock owner record changed; preserving it")
-            path.unlink()
+            try:
+                if _regular(path).read_bytes() != raw:
+                    raise RuntimeError("Renewal lock owner record changed; preserving it")
+                path.unlink()
+            except Exception:
+                if not body_failed:
+                    raise
 
 
 def _owner(plan: dict[str, Any], run_id: str) -> dict[str, Any]:
@@ -514,33 +522,21 @@ def execute(plan: dict[str, Any], now: datetime | None = None) -> int:
                 except Exception:
                     window = None
                 if window is None:
-                    if previous is not None:
-                        _archive(latch, previous, _sha256(latch))
-                    attempt = dict(schemaVersion=ATTEMPT_SCHEMA, statePathSHA256=_state_binding(plan),
-                                   planSHA256=_plan_binding(plan), runId=run_id, leafSetSHA256=None,
-                                   phase="failed", failedGate="window")
-                    _atomic_json(latch, attempt)
                     raise ValueError("Public certificate preflight failed")
                 if not window["inWindow"]:
                     _record(plan, {**base, "outcome": "outside-window", "failedGate": None})
                     return 0
                 leaves = _leaf_set(Path(plan["statePath"]))
                 if previous is not None and previous["leafSetSHA256"] == leaves:
-                    _record(plan, {**base, "outcome": "already-renewed", "failedGate": None})
-                    return 0
-                attempt = dict(schemaVersion=ATTEMPT_SCHEMA, statePathSHA256=_state_binding(plan),
-                               planSHA256=_plan_binding(plan), runId=run_id, leafSetSHA256=leaves,
-                               phase="in-progress", failedGate="currentStatus")
-                if previous is not None:
-                    _archive(latch, previous, _sha256(latch))
-                _atomic_json(latch, attempt)
+                    raise ValueError("Completed renewal no longer has its changed fresh generation")
                 _record(plan, {**base, "outcome": "started", "failedGate": None})
                 commands = plan["commands"]
                 active_gate = "currentStatus"
                 started = datetime.now(timezone.utc)
                 def gate_run(command: dict[str, Any], identifier: str) -> str:
-                    attempt["failedGate"] = command["id"]
-                    _atomic_json(latch, attempt)
+                    if attempt is not None:
+                        attempt["failedGate"] = command["id"]
+                        _atomic_json(latch, attempt)
                     return _run(command, identifier)
                 _online_fresh(
                     gate_run(commands["currentStatus"], run_id),
@@ -553,6 +549,14 @@ def execute(plan: dict[str, Any], now: datetime | None = None) -> int:
                         active_gate = command["id"]
                         gate_run(command, run_id)
                 active_gate = "prepare"
+                # All preceding gates are read-only and safe to retry on a later
+                # trigger. Persist intent immediately before the first mutation.
+                attempt = dict(schemaVersion=ATTEMPT_SCHEMA, statePathSHA256=_state_binding(plan),
+                               planSHA256=_plan_binding(plan), runId=run_id, leafSetSHA256=leaves,
+                               phase="in-progress", failedGate=active_gate)
+                if previous is not None:
+                    _archive(latch, previous, _sha256(latch))
+                _atomic_json(latch, attempt)
                 gate_run(commands["prepare"], run_id)
                 for group in ("install", "stage"):
                     for command in commands[group]:
@@ -579,6 +583,13 @@ def execute(plan: dict[str, Any], now: datetime | None = None) -> int:
                     plan["heartbeatFreshnessSeconds"],
                     started,
                 )
+                active_gate = "post-renewal-certificates"
+                fresh = renewal_window(Path(plan["statePath"]), plan["renewalWindowSeconds"],
+                                       datetime.now(timezone.utc))
+                if (fresh["nodeCertificateCount"] != plan["expectedNodeCount"]
+                    or fresh["expired"] or fresh["inWindow"]
+                    or fresh["leafSetSHA256"] == leaves):
+                    raise ValueError("Renewal did not publish a changed fresh certificate generation")
                 attempt.update(phase="completed", failedGate=None)
                 _atomic_json(latch, attempt)
                 _record(plan, {**base, "outcome": "renewed", "failedGate": None})
