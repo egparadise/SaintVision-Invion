@@ -13,7 +13,11 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && github.event.label.name == 'run-ac11-migration')
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: the snapshot path runs the runner's pg_dump/pg_restore against
+    # the postgres:16 service. ubuntu-latest moved to 26.04, whose PostgreSQL 18 client writes
+    # SET transaction_timeout and fails the restore into 16 (run 41793552539). The 24.04 image
+    # ships the PostgreSQL 16 client; the runner still refuses any client/server major mismatch.
+    runs-on: ubuntu-24.04
     concurrency:
       group: ac11-migration-${{ github.event.pull_request.head.sha || github.sha }}
       cancel-in-progress: false
@@ -53,6 +57,15 @@ jobs:
 
       - name: Install runner dependencies
         run: python -m pip install -r requirements-backend.txt -r requirements-docs.txt
+
+      - name: Select the PostgreSQL 16 client tools explicitly
+        run: |
+          pg16=/usr/lib/postgresql/16/bin
+          test -x "$pg16/pg_dump"
+          test -x "$pg16/pg_restore"
+          "$pg16/pg_dump" --version | grep -Eq '^pg_dump \(PostgreSQL\) 16\.'
+          "$pg16/pg_restore" --version | grep -Eq '^pg_restore \(PostgreSQL\) 16\.'
+          echo "$pg16" >> "$GITHUB_PATH"
 
       - name: Record clean source and execute one owned rehearsal
         run: |

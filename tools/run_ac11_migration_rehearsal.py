@@ -285,6 +285,49 @@ def _run_checked(argv: list[str], *, env: dict[str, str], label: str) -> None:
         raise RehearsalError(f"{label} failed with exit {result.returncode}")
 
 
+#: The snapshot path shells out to these two. A pg_dump of a newer major writes settings an
+#: older server does not know (pg_dump 17+ emits ``SET transaction_timeout``, which the
+#: PostgreSQL 16 service rejects under --exit-on-error), and PostgreSQL does not promise that
+#: a dump loads into an older major. The client major must therefore equal the server major.
+PG_CLIENT_TOOLS = ("pg_dump", "pg_restore")
+PG_CLIENT_VERSION = re.compile(r"\A(pg_dump|pg_restore) \(PostgreSQL\) (\d+)(?:\.\d+)*(?: .*)?\Z")
+
+
+def _client_tool_version(tool: str) -> str:
+    try:
+        result = subprocess.run([tool, "--version"], cwd=ROOT, capture_output=True, timeout=30)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise RehearsalError(f"{tool} is not runnable") from exc
+    if result.returncode:
+        raise RehearsalError(f"{tool} --version failed with exit {result.returncode}")
+    try:
+        text = result.stdout.decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise RehearsalError(f"{tool} version is unreadable") from exc
+    match = PG_CLIENT_VERSION.fullmatch(text)
+    if match is None or match.group(1) != tool:
+        raise RehearsalError(f"{tool} version is unreadable")
+    return text
+
+
+def require_matching_client_tools(server_version_num: str, versions: dict[str, str]) -> None:
+    """Refuse before any database exists unless every snapshot tool matches the server major."""
+    if not re.fullmatch(r"\d{5,6}", server_version_num):
+        raise RehearsalError("server version number is unreadable")
+    server_major = int(server_version_num) // 10000
+    if set(versions) != set(PG_CLIENT_TOOLS):
+        raise RehearsalError("snapshot client tool versions are incomplete")
+    for tool in PG_CLIENT_TOOLS:
+        match = PG_CLIENT_VERSION.fullmatch(versions[tool])
+        if match is None or match.group(1) != tool:
+            raise RehearsalError(f"{tool} version is unreadable")
+        client_major = int(match.group(2))
+        if client_major != server_major:
+            raise RehearsalError(
+                f"{tool} major {client_major} differs from PostgreSQL server major {server_major}"
+            )
+
+
 def _create_database(admin_dsn: str, name: str) -> None:
     with psycopg.connect(admin_dsn, autocommit=True) as conn:
         conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
@@ -953,7 +996,13 @@ def run_rehearsal(
     catalog_difference: dict[str, Any] | None = None
     details: dict[str, Any] = {}
     passed_negative_cases: list[str] = []
+    client_tools: dict[str, str] = {}
     try:
+        for tool in PG_CLIENT_TOOLS:
+            client_tools[tool] = _client_tool_version(tool)
+        require_matching_client_tools(
+            _postgres_version(admin_dsn)["serverVersionNum"], client_tools
+        )
         for name in names:
             _create_database(admin_dsn, name)
             created.append(name)
@@ -1080,6 +1129,7 @@ def run_rehearsal(
             "synthetic": True,
             "physicalFiveNodeComparable": False,
             "postgres": _postgres_version(admin_dsn),
+            "postgresClient": dict(client_tools),
         },
         "startedAt": started_at,
         "finishedAt": finished_at,
