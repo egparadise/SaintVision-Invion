@@ -15,6 +15,7 @@ from tools.five_node_lab_preflight import (
     five_node_inventory_revision,
     write_registration_mtls_preflight,
 )
+from tools.measure_s07_recovery import run_five_node_preflight
 
 pytestmark = pytest.mark.postgres
 
@@ -34,9 +35,11 @@ def _database_state(dsn: str, node_ids: list[str]) -> list[tuple]:
         ).fetchall()
 
 
+@pytest.mark.parametrize("adapter", ["registration", "s07"])
 def test_registration_mtls_preflight_reads_five_real_rows_without_mutation(
     request: pytest.FixtureRequest,
     tmp_path: Path,
+    adapter: str,
 ):
     # Resolve dynamically so a pytest failure never renders the credential-bearing
     # disposable-PostgreSQL fixture value in the test-call argument list.
@@ -118,21 +121,45 @@ def test_registration_mtls_preflight_reads_five_real_rows_without_mutation(
     node_ids = [node["nodeId"] for node in nodes]
     before = _database_state(postgres.owner, node_ids)
 
-    report = write_registration_mtls_preflight(
-        inventory_path,
-        postgres.owner,
-        report_path,
-    )
+    if adapter == "s07":
+        report = run_five_node_preflight(
+            inventory_path,
+            postgres.owner,
+            report_path,
+            provenance={"codeSha": "a" * 40, "executor": "Codex"},
+        )
+    else:
+        report = write_registration_mtls_preflight(inventory_path, postgres.owner, report_path)
 
     assert _database_state(postgres.owner, node_ids) == before
     assert report["databaseReadOnly"] is True
     assert report["syntheticRowsCreated"] is False
     assert report["heartbeatUpdated"] is False
+    assert report["loadExecuted"] is False
     assert report["counts"]["registered"] == 5
     assert report["counts"]["ready"] == 5
     assert report["counts"]["cpColocated"] == 1
-    assert report["counts"]["timedWaveSelected"] == 4
-    assert report["allFiveSmokeReady"] is True
-    assert report["timedWaveReady"] is True
+    if adapter == "s07":
+        for field in (
+            "resourceSnapshotUpdated",
+            "nodeDisrupted",
+            "repairExecuted",
+            "operationalAcceptanceAssessed",
+        ):
+            assert report[field] is False
+        assert report["physicalRecovery"] == "UNMEASURED"
+        assert report["preflightStatus"] == "READY"
+        assert report["counts"]["s07Selected"] == 4
+        assert report["topologyReady"] is True
+        assert report["recoveryWaveReady"] is True
+        assert report["nodes"][0]["selectedForDisruption"] is False
+        assert report["nodes"][0]["disruptionExclusionReason"] == "cp-host-colocation"
+        assert report["plannedTargetCounts"] == {node["nodeId"]: 5 for node in nodes[1:]}
+    else:
+        assert report["counts"]["timedWaveSelected"] == 4
+        assert report["allFiveSmokeReady"] is True
+        assert report["timedWaveReady"] is True
     assert "tenantId" not in report
+    assert tenant_id not in report_path.read_text(encoding="utf-8")
+    assert postgres.owner not in report_path.read_text(encoding="utf-8")
     assert report_path.exists()

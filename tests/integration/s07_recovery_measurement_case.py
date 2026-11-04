@@ -160,7 +160,7 @@ def _seed_round(owner_engine, *, node_count: int, round_index: int):
                         "at": departed_at,
                     },
                 )
-    return tenant_id, node_ids, capability_ids, contribution_id, locations, departed_at
+    return tenant_id, project_id, node_ids, capability_ids, contribution_id, locations, departed_at
 
 
 def test_repeated_node_loss_and_synthetic_repair_measurement(
@@ -169,8 +169,8 @@ def test_repeated_node_loss_and_synthetic_repair_measurement(
     config = _configuration()
     rounds = []
     for round_index in range(config["repetitions"]):
-        tenant_id, node_ids, capability_ids, contribution_id, locations, departed_at = _seed_round(
-            owner_engine, node_count=config["nodes"], round_index=round_index
+        tenant_id, project_id, node_ids, capability_ids, contribution_id, locations, departed_at = (
+            _seed_round(owner_engine, node_count=config["nodes"], round_index=round_index)
         )
         deadline = time.monotonic() + config["livenessTimeoutSeconds"] + max(
             2.0, config["pollIntervalSeconds"] * 4
