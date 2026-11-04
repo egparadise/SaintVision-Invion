@@ -190,7 +190,10 @@ def metadata(archive: bytes, value: dict) -> tuple[dict, dict]:
         "name": f"s11-ac11-migration-{value['sourceHeadSha']}",
         "digest": "sha256:" + hashlib.sha256(archive).hexdigest(),
         "expired": False,
-        "expires_at": "2026-10-28T04:00:00Z",
+        # This is the valid-artifact fixture, not a clock-bound retention test. Keep its
+        # expiry well beyond the suite's wall clock; the explicit expired mutations below
+        # continue to exercise the fail-closed boundary against NOW.
+        "expires_at": "2099-10-28T04:00:00Z",
         "workflow_run": {
             "id": int(RUN_ID),
             "head_sha": value["sourceHeadSha"],

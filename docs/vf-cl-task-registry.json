@@ -1,5 +1,5 @@
 {
- "version": "1.6.0",
+ "version": "1.6.2",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -110,7 +110,7 @@
    ],
    "implemented": true,
    "locallyVerified": true,
-   "ciVerified": false,
+   "ciVerified": true,
    "independentlyReviewed": true,
    "operationallyAccepted": false,
    "blockers": [],
@@ -177,25 +177,18 @@
      ]
     }
    ],
-   "ciVerifiedNote": "Stays false, and the reason changed. The old reason -- no workflow runs tools/collect_s12_acceptance_evidence.py -- stopped being true when .github/workflows/s12-acceptance-evidence.yml landed with #283: CI derives the bundle, holds it to its shape and to the head it was derived at, and uploads it, and run 36851875128 did exactly that at 40b3ec78 (an ancestor of this tree). The new reason is that none of it is attested: the receipt below is built offline from gh api JSON and its receiptSha256 is a hash rather than a signature, so a run id forged in the receipt and the registry together survives re-hashing (#295 r2 F1, reproduced). ciVerifiedRun and the receipt are therefore a MEASUREMENT RECORD, not the basis of a true claim -- the checker binds them to each other, holds the receipt to an exact key set, and refuses impliesCiVerified: true outright until a receipt carries something it did not write. A CI-produced attested receipt is the follow-up card. The restore drill remains ci-verified by core.yml owned CX01 steps at this tree.",
-   "ciVerifiedRun": {
-    "runId": "36851875128",
-    "workflow": "S12 Acceptance Evidence",
-    "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
-    "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
-    "conclusion": "success",
-    "requiredSteps": [
-     "Derive the AC-12 acceptance items",
-     "Hold the bundle to its shape and to this head",
-     "Record that the two named observations were derived here",
-     "Upload the acceptance evidence"
-    ],
-    "artifact": {
-     "id": "11155274241",
-     "digest": "sha256:1d8e0acdcb49dc42a7a2888dd8484fe879280a0d9fb27a49ee93389981fba131"
+   "ciVerifiedNote": "Run 40633895766 explicitly dispatched .github/workflows/s12-acceptance-evidence.yml at exact head ad0132b35d7216552bbe929730562819af15e3bd. Its unprivileged producer ran tools/collect_s12_acceptance_evidence.py and shape-checked the S12 evidence bundle, then the dispatch-only OIDC job created the authoritative VF-CL-04 receipt, signed it through GitHub artifact attestation, and verified the Sigstore identity, workflow, branch, head SHA, and exact receipt bytes. Codex downloaded the receipt and bundle and independently re-ran tools/verify_vf_cl_ci_attestation.py with the same exact expectations; it returned VERIFIED. This proves the card's hosted CI derivation only. It does not grant operational acceptance or change the 48-task score.",
+   "ciVerifiedAttestation": {
+    "runId": "40633895766",
+    "headSha": "ad0132b35d7216552bbe929730562819af15e3bd",
+    "headRef": "refs/heads/agent/codex/c301-standalone-worker-modules",
+    "evidenceArtifact": {
+     "id": "12793030563",
+     "digest": "sha256:a2fafb0e29ffacb5a339b39fc61d23aad1579a48fac8737ae23ea04c2d7b03d3",
+     "expiresAt": "2026-11-27T04:44:01Z"
     },
     "receipt": "docs/vf-cl-ci-receipts/VF-CL-04.json",
-    "why": "The dispatch at #283's final head, which is an ancestor of this registry's verifiedAgainst.tree. The gate step is what makes it evidence rather than a green tick: check_s12_acceptance_shape.py re-derives the verdict and the seventeen item sources from the collector and refuses a bundle whose codeSha is not the head the run checked out, so a fabricated PASS cannot pass it. Every field here is bound to the receipt, which was built by tools/record_vf_cl_ci_receipt.py from three gh api documents and carries their digests -- the first version of this block was prose a checker read for shape, and five fabrications passed it."
+    "bundle": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"
    }
   },
   {
@@ -208,11 +201,10 @@
    "implemented": true,
    "locallyVerified": true,
    "ciVerified": false,
-   "independentlyReviewed": false,
+   "independentlyReviewed": true,
    "operationallyAccepted": false,
    "notApplicable": [
-    "ciVerified: a review card ships documents, not code CI executes",
-    "independentlyReviewed: this card IS the review function, so an independent review of it is the reviewer's act and not the owner's. Card 285 left the field false deliberately: the owner may not raise it, and Codex raising it is the only way it becomes true. Card 284 closed the other four cards' review blockers and did not reach this one, so it is now the only card without an independent review."
+    "ciVerified: a review card ships documents, not code CI executes"
    ],
    "blockers": []
   }

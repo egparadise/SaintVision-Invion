@@ -133,7 +133,7 @@ export class SseStreamManager {
           this.parseBlock(block);
         }
       }
-    } catch (err: unknown) {
+    } catch {
       if (this.isClosed) return;
       this.scheduleReconnect();
     }

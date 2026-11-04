@@ -345,22 +345,14 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       const status = err?.problem?.status;
       const retryableFlag = err?.problem?.retryable;
 
-      let shouldKeepCache = false;
-      if (!isProblem) {
-        // Network error (fetch failure, timeout before HTTP response)
-        shouldKeepCache = true;
-      } else if (retryableFlag === false) {
-        // Explicitly marked non-retryable by server (e.g. 409 GRAPH-0003, 403, 422)
-        shouldKeepCache = false;
-      } else if (status === 408 || status === 429 || (typeof status === 'number' && status >= 500)) {
-        // Transient server or rate-limit errors
-        shouldKeepCache = true;
-      } else if (retryableFlag === true && status !== 409 && status !== 403 && status !== 422) {
-        shouldKeepCache = true;
-      } else {
-        // Other 4xx client errors (400, 401, 403, 404, 409, 422)
-        shouldKeepCache = false;
-      }
+      const isTransientStatus = status === 408
+        || status === 429
+        || (typeof status === 'number' && status >= 500);
+      const shouldKeepCache = !isProblem
+        || (retryableFlag !== false && (
+          isTransientStatus
+          || (retryableFlag === true && status !== 409 && status !== 403 && status !== 422)
+        ));
 
       if (!shouldKeepCache) {
         cachedOperationsRef.current.delete(opKey);
