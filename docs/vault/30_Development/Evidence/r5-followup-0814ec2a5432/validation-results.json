@@ -1,0 +1,122 @@
+[
+  {
+    "name": "guard-suite",
+    "startedKST": "2026-11-04T16:39:11.568316+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "fd11a0b41b36d199db809fd823af29b7a3e6f4e2ec5c5575683248eb2ffa47a7",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "python-AST",
+    "exit": 0,
+    "files": 7
+  },
+  {
+    "name": "powershell-AST",
+    "startedKST": "2026-11-04T16:39:15.040151+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "61d37bc1b7d62ba98bac9f0f8859d8cd913eec06509dca5fbd2694fe3c8cd82e",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "C3-poisoned-help",
+    "startedKST": "2026-11-04T16:39:15.400436+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "9ee05cd756f54083b5c2b65d988f83105a3bdf55aaafd1856cddbf985d2bb53b",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "C3-poisoned-status",
+    "startedKST": "2026-11-04T16:39:16.403769+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "06f74289717c114185eede21d6e934e245d49457ab0c4c3b7bdb66a328812128",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "C3-poisoned-wrapper-status",
+    "startedKST": "2026-11-04T16:39:17.523428+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "06f74289717c114185eede21d6e934e245d49457ab0c4c3b7bdb66a328812128",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "window-only",
+    "startedKST": "2026-11-04T16:39:21.036957+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "c604b82cc0529d26036b18239c3241408675ca9af1dc7fca350ff13039b4be74",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "probe-describe",
+    "startedKST": "2026-11-04T16:39:21.328297+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "94a8dd1f22715f86393768a9e59675eb69728d1f0613cae3591104978a4d8fbd",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "probe-registration-PlanOnly",
+    "startedKST": "2026-11-04T16:39:21.510513+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "a53f28976d8163dfe1fd84f4e9a165a9ef5fb41d712b49b96ef6ce726b6b5d27",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "preserved-state-and-prior-packet",
+    "exit": 0,
+    "oldPacketFiles": 68,
+    "oldIdentityInputs": 5,
+    "stateBytesPreserved": true,
+    "identityTargetAbsent": true,
+    "backupTargetAbsent": true
+  },
+  {
+    "name": "source03-head",
+    "startedKST": "2026-11-04T16:39:22.144855+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "245023bba537a3499edfde257921b4afe43958d6e06ac184499c099d6c6b4477",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "source03-clean",
+    "startedKST": "2026-11-04T16:39:22.204593+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integration-head",
+    "startedKST": "2026-11-04T16:39:22.272289+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "d10e6bfa2bc2a89ff1e3c424be17c1fded9128e06d3ae86fda11922cb24ab636",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "fd-ci",
+    "startedKST": "2026-11-04T16:39:22.336612+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "stdoutSHA256": "dfac66d86e840b54e2f319964e85c65f8ba18fb1b40c81d18fea8822aa213acc",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "C1-C4-boundary",
+    "exit": 0,
+    "actualS4UProbeExecuted": false,
+    "runtimePreparationExecuted": false,
+    "identityWriteExecuted": false,
+    "scheduledTaskCreated": false,
+    "attendedCertificateTransitionExecuted": false,
+    "terminalReopenPersistencePending": true
+  }
+]

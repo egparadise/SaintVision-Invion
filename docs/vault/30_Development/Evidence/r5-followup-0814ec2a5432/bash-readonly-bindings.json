@@ -1,0 +1,22 @@
+[
+  {
+    "alias": "node-1",
+    "bashCommand": "/usr/bin/bash",
+    "bashResolved": "/usr/bin/bash",
+    "bashSHA256": "3efccc187bafa75ff1e37d246270ab3e7aa559f242c7a52bf3ec2a1b5450bdbd",
+    "bashOwnerUid": 0,
+    "bashMode": "0o755",
+    "bashVersion": "GNU bash, 버전 5.3.9(1)-release (x86_64-pc-linux-gnu)",
+    "python3Resolved": "/usr/bin/python3.14"
+  },
+  {
+    "alias": "node-2",
+    "bashCommand": "/usr/bin/bash",
+    "bashResolved": "/usr/bin/bash",
+    "bashSHA256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1",
+    "bashOwnerUid": 0,
+    "bashMode": "0o755",
+    "bashVersion": "GNU bash, 버전 5.2.21(1)-release (x86_64-pc-linux-gnu)",
+    "python3Resolved": "/usr/bin/python3.12"
+  }
+]

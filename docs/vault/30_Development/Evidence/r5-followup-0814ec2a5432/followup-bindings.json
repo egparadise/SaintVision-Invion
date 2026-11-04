@@ -1,0 +1,32 @@
+{
+  "basePacket": "52e236491213dc4d57ea98fc24d560187ab8d651",
+  "preparedAt": "2026-11-04T07:39:11.430410+00:00",
+  "renewalConfigurationSHA256": "9513bd3875ae3845a00f7f9ca674685bb393656db89963d9fc57ad7e25128d8f",
+  "bindingSHA256": "74aaadc8760a8582697fd9a310189bee1f413909c5e0cd15dbba54636e56ea06",
+  "idpProposalSHA256": "585413eeee73cddd483ff6552f3ce778213a31c7870b7294b97be659689717f0",
+  "s4uProbePlanSHA256": "c3f6553cc48d48cc853196333ffff2b2bfc4a05b6f93ebd2f9be750d8b927415",
+  "preparationCommandsSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+  "operationalSequenceSHA256": "18fe469f1ce459262c9071ad53ff67c47cdf163926a2a81ab97a6bfc6004144d",
+  "changedRenewalCommands": [
+    "currentStatus",
+    "runtimePreflight-1",
+    "runtimePreflight-2",
+    "prepare",
+    "install-1",
+    "install-2",
+    "stage-1",
+    "stage-2",
+    "commit",
+    "transition",
+    "observe",
+    "finalize-1",
+    "finalize-2",
+    "finalObserve"
+  ],
+  "sourceAndRuntimePathsUnchanged": true,
+  "unchangedSourceHead": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "runtimePrepExecuted": false,
+  "idpWriteExecuted": false,
+  "s4uProbeTaskCreated": false,
+  "attendedTransitionExecuted": false
+}

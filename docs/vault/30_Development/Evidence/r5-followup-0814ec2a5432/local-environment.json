@@ -1,0 +1,27 @@
+{
+  "platform": "Windows / PowerShell 5.1 / Asia-Seoul",
+  "operatorPython": "CPython 3.14.7",
+  "pilotPython": "CPython 3.14.7",
+  "nodePython": {
+    "node1": "3.14.4",
+    "node2": "3.12.3"
+  },
+  "workerDependencyRequired": "cryptography 50.0.1",
+  "privateGuardSuite": {
+    "exit": 0,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "certificateWindow": {
+    "schemaVersion": "saintvision-leaf-renewal-window:1",
+    "observedAt": "2026-11-04T07:39:21.299955Z",
+    "earliestNotAfter": "2026-11-10T05:15:35Z",
+    "renewAt": "2026-11-08T05:15:35Z",
+    "expired": false,
+    "inWindow": false,
+    "certificateCount": 3,
+    "nodeCertificateCount": 2,
+    "leafSetSHA256": "572e42758450effd9cb1be3a386b6fb21aa3911f2480a7a12a7f3c0d21e48a9d"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "r5-followup-evidence:1",
+  "taskId": "task_0814ec2a5432",
+  "dispatchId": "ctx_81cc0efa0eea",
+  "owner": "Codex",
+  "reviewer": "Claude (review requested; no review fabricated)",
+  "baseEvidenceSHA": "52e236491213dc4d57ea98fc24d560187ab8d651",
+  "branch": "agent/codex/r5-followup-0814ec2a5432",
+  "privateRoot": "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-followup-0814ec2a5432",
+  "sourceHead": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "livePilotSourceHead": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "currentLandedIntegrationHead": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "sealedAtKST": "2026-11-04T16:41:57.658162+09:00",
+  "inputs": [
+    {
+      "name": "renewal-config.private.json",
+      "sha256": "9513bd3875ae3845a00f7f9ca674685bb393656db89963d9fc57ad7e25128d8f"
+    },
+    {
+      "name": "bindings.private.json",
+      "sha256": "74aaadc8760a8582697fd9a310189bee1f413909c5e0cd15dbba54636e56ea06"
+    },
+    {
+      "name": "idp-local-repair-plan.private.json",
+      "sha256": "585413eeee73cddd483ff6552f3ce778213a31c7870b7294b97be659689717f0"
+    },
+    {
+      "name": "preparation-commands.private.json",
+      "sha256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6"
+    },
+    {
+      "name": "registration-and-first-attended-sequence.private.json",
+      "sha256": "18fe469f1ce459262c9071ad53ff67c47cdf163926a2a81ab97a6bfc6004144d"
+    },
+    {
+      "name": "s4u-probe-plan.private.json",
+      "sha256": "c3f6553cc48d48cc853196333ffff2b2bfc4a05b6f93ebd2f9be750d8b927415"
+    },
+    {
+      "name": "node-1-install-runtime.private.py",
+      "sha256": "2f678463bb2b99f5cf5a1786e6bf2088a253e047c25f210a74edbf3ac18a95d2"
+    },
+    {
+      "name": "node-2-install-runtime.private.py",
+      "sha256": "da4cd715e6b8f0aa1193709272da9f4ba2b8d2145cdaf2edfa5cdb76ea3b31db"
+    },
+    {
+      "name": "renewal_gate.py",
+      "sha256": "919a985dff0f5123247975fb042bdca43bcf63946e3f02c0932ce98485d6272d"
+    },
+    {
+      "name": "IdPPathGuards.private.ps1",
+      "sha256": "3410734dfb6b8a99cf56d79b3491cd922ae5432463042d1566abb9a4677b4116"
+    },
+    {
+      "name": "Apply-IdPLocalProposal.private.ps1",
+      "sha256": "61c5b8031efec10c82169199869ebbda8c0cef1be18a22acbdd3d7e806f2edf3"
+    },
+    {
+      "name": "Invoke-AttendedTransition.private.ps1",
+      "sha256": "5b4b85ddfd93471492e87b39d237a5e35bf59f8ff0b0ba000c3aadf831597709"
+    },
+    {
+      "name": "s4u_context_probe.py",
+      "sha256": "58700d9a2a756826b7d59866d4b4c5437e4851873a71826af28079e6ea1453d7"
+    },
+    {
+      "name": "Register-S4UContextProbe.private.ps1",
+      "sha256": "c1234125bbf8518828b08e3e3d8610ea054f8187772b1cccfa46023584dbe16c"
+    },
+    {
+      "name": "test_private_plan.py",
+      "sha256": "de3b296dcb55ae858ae4fdd39f4efca28c2a06c679b903fd9f28b4a2fe509bb7"
+    },
+    {
+      "name": "rebind_followup.py",
+      "sha256": "640654eaf7bc64362f7cbbf969e3b5b7e0a864f2a3a03200737a3e014b529848"
+    },
+    {
+      "name": "validate_followup.py",
+      "sha256": "d2072548be64f0783c2438865788be0267ba081b97f04b9f1e25b4f16a74ddce"
+    }
+  ],
+  "alreadyExecutedRestoration": [
+    {
+      "name": "Restore-R5Source03.private.ps1",
+      "sha256": "af53251b24ea455f2ec0f5ea2cb7d59d0a0e07d1fa79229326b8ed768ef2bf2c"
+    },
+    {
+      "name": "Launch-R5RecoveryContext.private.ps1",
+      "sha256": "bb46402865847247cf9dca17c700273b8f7b2d93e0a55d4d19727875810b026a"
+    },
+    {
+      "name": "recovery-context-plan.private.json",
+      "sha256": "d1c0b05eb950338d48adf3cd7317cecfd132d2339544ae4ddc1453336d01567b"
+    }
+  ],
+  "priorPacketUnchanged": true,
+  "runtimePreparationExecuted": false,
+  "idpWriteExecuted": false,
+  "certificateTransitionExecuted": false,
+  "scheduledTaskCreated": false,
+  "actualS4UProbeExecuted": false,
+  "terminalExitPersistenceAccepted": false,
+  "taskCount": {
+    "done": 2,
+    "blocked": 4,
+    "planned": 42,
+    "ready": 0
+  }
+}

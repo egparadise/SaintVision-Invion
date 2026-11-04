@@ -1,0 +1,55 @@
+{
+  "observedAtKST": "2026-11-04T16:22:36+09:00",
+  "querySucceeded": true,
+  "processes": [
+    {
+      "role": "observer",
+      "pid": 34380,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "inAnyJob": false
+    },
+    {
+      "role": "serve",
+      "pid": 40748,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "inAnyJob": false
+    },
+    {
+      "role": "console",
+      "pid": 54216,
+      "parentPid": 3756,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "inAnyJob": true
+    },
+    {
+      "role": "web",
+      "pid": 25608,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "inAnyJob": true
+    },
+    {
+      "role": "ssh",
+      "pid": 15408,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "inAnyJob": false
+    }
+  ],
+  "strictAllRolesOutsideAnyJobExit": 1,
+  "strictCriterionPassed": false,
+  "strictCriterionRetiredByCoordinator": true,
+  "reason": "An internal runtime job is not proof of Orca terminal ownership; functional same-PID/source/owner/state/tick persistence is the released criterion.",
+  "helperPid": 33976,
+  "helperExited": true,
+  "controllerPid": 29692,
+  "controllerExited": true,
+  "actualWorkerDoneAndFreshTerminalReopenProofPending": true
+}
