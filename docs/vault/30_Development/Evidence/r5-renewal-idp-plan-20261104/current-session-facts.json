@@ -1,0 +1,47 @@
+﻿{
+    "files":  [
+                  {
+                      "role":  "ssh-key",
+                      "efsEncrypted":  false,
+                      "reparsePoint":  false
+                  },
+                  {
+                      "role":  "issuer-key",
+                      "efsEncrypted":  false,
+                      "reparsePoint":  false
+                  },
+                  {
+                      "role":  "issuer-password-file",
+                      "efsEncrypted":  false,
+                      "reparsePoint":  false
+                  },
+                  {
+                      "role":  "python-runtime",
+                      "efsEncrypted":  false,
+                      "reparsePoint":  false
+                  }
+              ],
+    "listeners":  [
+                      {
+                          "port":  3000,
+                          "sessionId":  1,
+                          "loopback":  true
+                      },
+                      {
+                          "port":  18082,
+                          "sessionId":  1,
+                          "loopback":  true
+                      },
+                      {
+                          "port":  55448,
+                          "sessionId":  1,
+                          "loopback":  true
+                      }
+                  ],
+    "userInteractive":  true,
+    "probeSession":  1,
+    "taskRegistered":  false,
+    "unattendedAccepted":  false,
+    "observerSessionId":  1,
+    "schedulerTimeZone":  "Korea Standard Time"
+}

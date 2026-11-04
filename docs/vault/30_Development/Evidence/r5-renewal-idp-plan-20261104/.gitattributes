@@ -1,0 +1,3 @@
+# These review candidates must remain byte-identical to the pinned private inputs.
+*.review_candidate.py -text
+*.review_candidate.ps1 -text

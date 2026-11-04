@@ -1,0 +1,897 @@
+{
+  "schemaVersion": "redacted-review-matrix:not-executable",
+  "privateConfigurationSHA256": "4fb067d06a0796dab2d533d35134d9181abb14a16bd07e613d5da59686d6964e",
+  "privateBindingSHA256": "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+  "sourceHeadSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "operationalSourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "commands": [
+    {
+      "id": "currentStatus",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "currentStatus",
+        "--run-id",
+        "{runId}"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "runtimePreflight-1",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "runtimePreflight",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "1"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "runtimePreflight-2",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "runtimePreflight",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "2"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "prepare",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "prepare-leaf-rotation-batch",
+        "--csr",
+        "<actual-node-1-csrPath>",
+        "--csr",
+        "<actual-node-2-csrPath>",
+        "--output",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}",
+        "--ca-key",
+        "<preserved-authorized-issuer-key>",
+        "--ca-key-password-file",
+        "<preserved-issuer-password-file>",
+        "--ca-chain",
+        "<pinned-valid-issuer-chain>",
+        "--revocations",
+        "<preserved-revocations>",
+        "--safety-window-hours",
+        "48",
+        "--overlap-seconds",
+        "14400",
+        "--leaf-valid-seconds",
+        "518400"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "install-1",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "install",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "1"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "install-2",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "install",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "2"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "stage-1",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "stage-leaf-rotation-batch",
+        "--bundle",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}",
+        "--node-receipt",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}\\install-receipts\\<actual-node-1-nodeId>.json"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "stage-2",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "stage-leaf-rotation-batch",
+        "--bundle",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}",
+        "--node-receipt",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}\\install-receipts\\<actual-node-2-nodeId>.json"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "commit",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "commit-leaf-rotation-batch",
+        "--bundle",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}",
+        "--output",
+        "<actual-r5-state>\\scheduled-renewal-batches\\{runId}\\commit-receipts"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "transition",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "transition",
+        "--run-id",
+        "{runId}"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "observe",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "observe",
+        "--once"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "finalize-1",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "finalize",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "1"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "finalize-2",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-I",
+        "-B",
+        "<private-plan-workspace>\\renewal_gate.py",
+        "--bindings",
+        "<private-plan-workspace>\\bindings.private.json",
+        "--bindings-sha256",
+        "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+        "--action",
+        "finalize",
+        "--run-id",
+        "{runId}",
+        "--node",
+        "2"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    },
+    {
+      "id": "finalObserve",
+      "executable": "<pinned-Python-3.14.7>",
+      "executableSha256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "arguments": [
+        "-B",
+        "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+        "--state",
+        "<actual-r5-state>",
+        "observe",
+        "--once"
+      ],
+      "workingDirectory": "<reviewed-operational-source-03e17c31>"
+    }
+  ],
+  "commonInputPins": [
+    {
+      "path": "<private-plan-workspace>\\renewal_gate.py",
+      "sha256": "a83e32bdb73408e30d3dd4beefdb7d19b7095c297c4df521226aac046d72ad90"
+    },
+    {
+      "path": "<private-plan-workspace>\\bindings.private.json",
+      "sha256": "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956"
+    },
+    {
+      "path": "<pinned-existing-host-keys>",
+      "sha256": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2"
+    },
+    {
+      "path": "<private-plan-workspace>\\transition.private.ps1",
+      "sha256": "51b02052c9f06a3313cedc7cd9d62959547cd1c13ac55e03f0c63967d6b062b2"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\.venv\\pyvenv.cfg",
+      "sha256": "7e4a302ab2c41fb5604b65305fb181bb4706660016d9eba339928e4a0a63ff65"
+    },
+    {
+      "path": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "sha256": "4942b86a6597e5aee0128daa00050ed79bc21f6e709a78eb19cbfeb0c2f39ac9"
+    },
+    {
+      "path": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python314\\python314.dll",
+      "sha256": "0f9857ffdfe010fe6b99328d58c2e3c7472ce75f336bf9c2ad9bd5bca3bce700"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\tools\\lan_pilot.py",
+      "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\tools\\lan_pki.py",
+      "sha256": "8880087eacc4729795d344b65eaaefed907dcb748c87243328ae461d8b867d5c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\deploy\\lan\\worker_leaf_rotation.py",
+      "sha256": "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\deploy\\lan\\Start-LiveConsole.ps1",
+      "sha256": "89e12c71d4c0a9f496df43ac620f3ab625b9bc62a8ee39fa146aa86a16f5e6ce"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\deploy\\lan\\SvLauncherInput.ps1",
+      "sha256": "616ba0e59a294b032be5535b738784402027aeb5103745d89b2a032062a47cb0"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\app.py",
+      "sha256": "5c6c2336d9b498180d38c9f3e91c4d7ae9263c76ccc38381497607958c86b8f4"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\approvals.py",
+      "sha256": "89a6cd475351409c83f568dc9f3cb514b4c9bff00a88e5e4ce8a25a384c73523"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\buildkit_transport.py",
+      "sha256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_adapter.py",
+      "sha256": "313acf3d081b940f81be46bbfe689ea2b1a1271359a3bf7f5639f49ace877e72"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_execution.py",
+      "sha256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_execution_worker.py",
+      "sha256": "9913ab095db794037db281bc214d091a11048a8ab32a29703879f6f0be90c5cf"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_governance.py",
+      "sha256": "8f6487843ec883afc365bde4a4b36e87fba758510038eedebf7469a89fb362fa"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_preparations.py",
+      "sha256": "ede6e55e0090bc6dd25c014e40911f4de2ef97842b55ed0338087cdc37e91642"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\build_product_runtime.py",
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\business_auth.py",
+      "sha256": "d0ec2fd23edaba1de27573048e23a530e89158c59da68e70cf8ba5243771b6b0"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\business_cancel.py",
+      "sha256": "cdec76b4aaa245274874e9c19522872970fa524759f02cd1ec6eaf7272137395"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\business_handoff.py",
+      "sha256": "76d4049a656b7a7fcead36bc8d0b8b7645e159a9225122a603d13fee1adf4df4"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\business_surface.py",
+      "sha256": "4ba95eaf967a303d56316157325f08318cd0886e44694b0121fc2216a052e8fd"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\capacity.py",
+      "sha256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\configuration_readiness.py",
+      "sha256": "56e616f20d74bd9354081d738164d8c07451c8d96661a0c02b1d1fedbd77f94c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\containment.py",
+      "sha256": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\containment_approvals.py",
+      "sha256": "50994511be45f98c3263bcd7eb226c94aec4203667c8b42f0e1383a81fad1a8e"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\contracts.py",
+      "sha256": "a6362ee619b3ccfcd6a8ea67376fe29762fd253861e355ce82c7addc86e89f4b"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\control.py",
+      "sha256": "85bdc50771615fc5ec49f639e1fb3e16f2a7eaa719c8f92630598ac37c03a550"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\credential_registry.py",
+      "sha256": "2a540a7a00c429de10080c8b8a76bfcf700e74ea2dd9564f9d414dbdec0f62d9"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\db.py",
+      "sha256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\dispatch.py",
+      "sha256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\errors.py",
+      "sha256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\gpu.py",
+      "sha256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\identity.py",
+      "sha256": "5974f0a2f0c4111868d75c9705cd87bb164a63176bc46bf9ee4663521b6a7c7b"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\ids.py",
+      "sha256": "75b68d62ac922c95ff48fbc70c7b899b7cd27be01268ae85efa177adf0a8c560"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\leases.py",
+      "sha256": "e968852cea4fecd011a97e3b665302cc31e3ddec22d505f0f4ce9af2420987b6"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_commit.py",
+      "sha256": "b4c0ffcb5ae9ccf8325b93f8c642a7b71b1618841cdc5467c54a8530f45eb971"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_execution_registry.py",
+      "sha256": "f3619590c143becf8e7dcf653a39a1561c90404057cb37689f682702c71b6e8c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_locality.py",
+      "sha256": "b621d053a793b57b0ba8f8478038509dbacf03fab30db1f73cf98688073a48ef"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_manifest.py",
+      "sha256": "85623fe9a42906c4d82650fe93e3a6438d550a30160ca006e63c200136924552"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_registry_binding.py",
+      "sha256": "0819596acdea8dacdb2efc4df0bf59a00e9e2e9e16c3bd5dcd62dffb86f9d7c5"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_registry_config.py",
+      "sha256": "ed34befe3091579d741232e31b998b635a1826f7a87b18d4c97ae67e1f6277cc"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_retry.py",
+      "sha256": "c38066dcf03580e49f00fdf2c4c623380368bbec02ab2b01077809119bd0eed3"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_runtime.py",
+      "sha256": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_source.py",
+      "sha256": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_uri_resolver.py",
+      "sha256": "39fe7e3121401c6a6728c4654bb1568b8e94b34345ea2425da3f5480f5184673"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\model_view.py",
+      "sha256": "32b8f40f889c28949bb5a84fe506134de61e35c1d9d8456e1263c5122f457196"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_channels.py",
+      "sha256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_chunk.py",
+      "sha256": "9741d2540da6b8a098b9839290869d2ce537563f593e81bdd6ca039f05ecd4ae"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_execution.py",
+      "sha256": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_resource_usage.py",
+      "sha256": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_transfer.py",
+      "sha256": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\object_store.py",
+      "sha256": "1993835b87455aa806f0cc7b0c33fbbc3cce4bf68124a180d25c1c1963da1c2d"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\object_store_config.py",
+      "sha256": "ad0d2f696b8efe60dde3319bd652f10ce5a4a056cb4d47c4b015a9fa00a1e54a"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\observation.py",
+      "sha256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\outbox.py",
+      "sha256": "9af3697c6b28d21d254c266afc738c2af9568d61bb4829ece211523773e3bba7"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\output_ingestion.py",
+      "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\placement.py",
+      "sha256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\policy.py",
+      "sha256": "def0e49991da7e1bf3d33cb44cb1805c50daa46dee0290bd8beb95e005562817"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\remote_git.py",
+      "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\reservations.py",
+      "sha256": "f102379382e02421c3912e63b074615fd98e78f2f6179343cf063e98af337aa4"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\results.py",
+      "sha256": "232300304ffad1b2878af9f31f393952a6c1b300e9e260ce2bfaddc0791e2442"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\result_view.py",
+      "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\runs.py",
+      "sha256": "f4bcf054ef61a1f081381e2899ce95527438aa38d550a23a47908e51a7d7d784"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\s3_client.py",
+      "sha256": "83fb335c4fcc0978a860b5c2884b6486b5d8c7b3862a2517026097f45e946efb"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\s3_object_store.py",
+      "sha256": "2ec055ff767b005479069827feee3e5a97a0dec499d150633df756e4229e3c13"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\sandbox.py",
+      "sha256": "49db6097d9dce4001f16c246adc9256deaa8fe4d1abcab82263351af55638a0f"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\scheduler.py",
+      "sha256": "69e36fb43d37b0338db065be6e179288f97488f23adcbe8daf9ab9b7765fce0c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\shards.py",
+      "sha256": "29d8c19b33185826e17322bd0a95059738c83792550077b75fc1ca72f1c847c2"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\shard_completion.py",
+      "sha256": "a23ebae52b679ec7ccd50b7164690a5507af1804a7dc7832eb42d41b3af3e276"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\shard_recovery.py",
+      "sha256": "f50941ac9fc5455eea38ac4800dfc93b68dfe37ebb55993a773646df64fdf75c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\snapshots.py",
+      "sha256": "86f1df312d6a547e693538bb8363a005ae8fdd532ab01859cf5c299a48bb47b0"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\state.py",
+      "sha256": "83bdb0385c11afee191efc018b847c26fd8c702922762181d7eee20a765e2009"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\storage.py",
+      "sha256": "29ed6b1b65ac17cac99364495d243b8ee9f1c7830c0ad3ea0644ad33b7188555"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\storage_commit.py",
+      "sha256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\storage_view.py",
+      "sha256": "8e24d14ed469a93c9bdaa2424a41883a7c61094f46374d86e586e1eb2f6a9450"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\terminal.py",
+      "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\tooling.py",
+      "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\tracing.py",
+      "sha256": "5cd71494f3821a42535d93b201291f5805c6db62c9b24cc79935432afe9a5277"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\worker.py",
+      "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_api.py",
+      "sha256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_config.py",
+      "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_editor.py",
+      "sha256": "2a5e37f11645a27cf995e7a0c4d732db132b9ed3ffcffa79437f5cf2d0e61811"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_files.py",
+      "sha256": "bbc84661b234ff8ed58a2c0e65969b46d6426aa9f4f81a96a871cfba985d3e9d"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_git.py",
+      "sha256": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_recovery.py",
+      "sha256": "6e3311b26e98037095750dc85762906ccd5382ce89b15667e8df66782e3784c0"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_resume.py",
+      "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\workspace_start.py",
+      "sha256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5"
+    },
+    {
+      "path": "<reviewed-operational-source-03e17c31>\\services\\control-plane\\src\\inv\\__init__.py",
+      "sha256": "a0aa8b14934174410e275d8b85fb745157112a7307c95274f253634d1ab5d28c"
+    },
+    {
+      "path": "<actual-node-1-csrPath>",
+      "sha256": "7116ec6cb0f333cd9cc19a0ccdb29a0f97d7e1f2f48ca782ea6e51121334b43f"
+    },
+    {
+      "path": "<actual-node-2-csrPath>",
+      "sha256": "3e86908c20e3724926fe1cfdc63e5401fb3603899fe0ae4e150a44ca0fd1e45c"
+    }
+  ],
+  "registrationPlanOnly": {
+    "schemaVersion": "saintvision-leaf-renewal-task-plan:1",
+    "taskName": "SaintVision-Leaf-Renewal-b08b0726c9aaff4a",
+    "owner": "SaintVision leaf renewal owner=<current-user-SID>;config=4fb067d06a0796dab2d533d35134d9181abb14a16bd07e613d5da59686d6964e;runner=2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717;tool=d428424862b37b483b278539348c7930959dffde32b2db18675aec382a7b8544",
+    "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "arguments": [
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\Invoke-ScheduledLeafRenewal.ps1",
+      "-ConfigPath",
+      "<private-plan-workspace>\\renewal-config.private.json",
+      "-ExpectedConfigSha256",
+      "4fb067d06a0796dab2d533d35134d9181abb14a16bd07e613d5da59686d6964e",
+      "-ExpectedRunnerSha256",
+      "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+      "-ExpectedToolSha256",
+      "d428424862b37b483b278539348c7930959dffde32b2db18675aec382a7b8544",
+      "-PythonPath",
+      "<pinned-Python-3.14.7>"
+    ],
+    "triggers": [
+      "00:15",
+      "12:15"
+    ],
+    "multipleInstances": "IgnoreNew",
+    "logonType": "S4U",
+    "nonInteractive": true,
+    "elevated": false,
+    "executionTimeLimitHours": 4
+  },
+  "remoteRuntimePreparation": [
+    {
+      "id": "node-1-create-new-runtime-staging",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\ssh.exe",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "--",
+        "<known-node-1-SSH-target>",
+        "/usr/bin/python3.14",
+        "-I",
+        "-B",
+        "-"
+      ],
+      "stdinFile": "<private-plan-workspace>\\node-1-prepare-directory.private.py",
+      "stdinSHA256": "1fb0f51fbeb161063b53fcb349f320e64572ca86cd96c366d835d251aa71fd9f",
+      "mutatesOnlyNewR5RuntimeDirectory": true,
+      "executed": false
+    },
+    {
+      "id": "node-1-transfer-reviewed-runtime-public-inputs",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\scp.exe",
+        "-q",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "-o",
+        "ConnectTimeout=5",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\leaf_rotation_standalone_runtime.py",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\leaf-rotation-runtime-lock.json",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\worker_leaf_rotation.py",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\prepare-leaf-rotation-runtime.sh",
+        "<private-plan-workspace>\\leaf-rotation-runtime.zip",
+        "<known-node-1-SSH-target>:<actual-node-1-transferRoot>/"
+      ],
+      "executed": false
+    },
+    {
+      "id": "node-1-install-and-preflight-new-r5-runtime",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\ssh.exe",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "--",
+        "<known-node-1-SSH-target>",
+        "/usr/bin/python3.14",
+        "-I",
+        "-B",
+        "-"
+      ],
+      "stdinFile": "<private-plan-workspace>\\node-1-install-runtime.private.py",
+      "stdinSHA256": "e580d464606f23193c661e8f4b26f11d8f118d4e12d3fd0c7f75a83eb40d380d",
+      "nodeIdentityAndKeysUntouched": true,
+      "executed": false
+    },
+    {
+      "id": "node-2-create-new-runtime-staging",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\ssh.exe",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "--",
+        "<known-node-2-SSH-target>",
+        "/usr/bin/python3.12",
+        "-I",
+        "-B",
+        "-"
+      ],
+      "stdinFile": "<private-plan-workspace>\\node-2-prepare-directory.private.py",
+      "stdinSHA256": "d8c33597a4b26434ff3cddac9fe091b7d099863fc66344adf52fdb039e451cf8",
+      "mutatesOnlyNewR5RuntimeDirectory": true,
+      "executed": false
+    },
+    {
+      "id": "node-2-transfer-reviewed-runtime-public-inputs",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\scp.exe",
+        "-q",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "-o",
+        "ConnectTimeout=5",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\leaf_rotation_standalone_runtime.py",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\leaf-rotation-runtime-lock.json",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\worker_leaf_rotation.py",
+        "<scheduler-review-source-b5b8ca68>\\deploy\\lan\\prepare-leaf-rotation-runtime.sh",
+        "<private-plan-workspace>\\leaf-rotation-runtime.zip",
+        "<known-node-2-SSH-target>:<actual-node-2-transferRoot>/"
+      ],
+      "executed": false
+    },
+    {
+      "id": "node-2-install-and-preflight-new-r5-runtime",
+      "argv": [
+        "C:\\WINDOWS\\System32\\OpenSSH\\ssh.exe",
+        "-i",
+        "<existing-authorized-SSH-key>",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "-o",
+        "UpdateHostKeys=no",
+        "-o",
+        "UserKnownHostsFile=<pinned-existing-host-keys>",
+        "--",
+        "<known-node-2-SSH-target>",
+        "/usr/bin/python3.12",
+        "-I",
+        "-B",
+        "-"
+      ],
+      "stdinFile": "<private-plan-workspace>\\node-2-install-runtime.private.py",
+      "stdinSHA256": "af715a44222abaa251fbb81c0fd61407e4b023ae7d330cec94bea5b25ffe9052",
+      "nodeIdentityAndKeysUntouched": true,
+      "executed": false
+    }
+  ],
+  "onlyRuntimeExpansion": "The executor generates runId; there are no operator TODO values",
+  "installed": false
+}

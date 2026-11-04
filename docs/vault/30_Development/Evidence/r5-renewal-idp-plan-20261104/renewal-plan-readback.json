@@ -1,0 +1,96 @@
+{
+  "observedAt": "2026-11-04T15:37:31.589779+09:00",
+  "schedulerCandidateHead": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "operationalSourceHead": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "configurationSHA256": "4fb067d06a0796dab2d533d35134d9181abb14a16bd07e613d5da59686d6964e",
+  "bindingSHA256": "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+  "configurationBytes": 400889,
+  "gateScriptSHA256": "a83e32bdb73408e30d3dd4beefdb7d19b7095c297c4df521226aac046d72ad90",
+  "transitionScriptSHA256": "51b02052c9f06a3313cedc7cd9d62959547cd1c13ac55e03f0c63967d6b062b2",
+  "preparationCommandsSHA256": "1e5af979617c7ea688fb44696f392defff32e0a31c80b7b13b36922b3185fe7f",
+  "registrationCommandsSHA256": "d79184ed4671e51a90a7a3e952a23997450ee9c5b3b925c43061ce7cf6a1550e",
+  "offlineRuntimeBundleSHA256": "5e47591d9ac6d2d1e17c62bec33c7d33a7ab2f01c07cc0522424fe2b51e6f579",
+  "runtimeBundleBytes": 5317028,
+  "executableCount": 6,
+  "gateCount": 14,
+  "inputPinsPerGate": 99,
+  "allLocalInputPinsMatched": true,
+  "nodeRuntimePreparationExecuted": false,
+  "nodeRuntimePreflights": [
+    {
+      "node": 1,
+      "status": "BLOCKED_NOT_PREPARED",
+      "exit": 2
+    },
+    {
+      "node": 2,
+      "status": "BLOCKED_NOT_PREPARED",
+      "exit": 2
+    }
+  ],
+  "currentStatusNodeCount": 2,
+  "window": {
+    "earliestNotAfter": "2026-11-10T05:15:35Z",
+    "renewAt": "2026-11-08T05:15:35Z",
+    "expired": false,
+    "inWindow": false,
+    "nodeCertificateCount": 2
+  },
+  "taskName": "SaintVision-Leaf-Renewal-b08b0726c9aaff4a",
+  "currentUserOwnerBound": true,
+  "logonType": "S4U",
+  "triggers": [
+    "00:15",
+    "12:15"
+  ],
+  "elevated": false,
+  "multipleInstances": "IgnoreNew",
+  "executionTimeLimitHours": 4,
+  "desktopStatusFileName": "SaintVision-r5-leaf-renewal-status.json",
+  "sshKeyRequiresAgent": false,
+  "sshAgentRunning": "Stopped",
+  "currentSession": 1,
+  "currentSessionInteractive": true,
+  "unattendedAcceptance": false,
+  "taskRegistered": false,
+  "gates": [
+    {
+      "gate": "final-window-only",
+      "exit": 0,
+      "expectedExit": 0,
+      "executed": true,
+      "readOnly": true
+    },
+    {
+      "gate": "final-registrar-plan-only",
+      "exit": 0,
+      "expectedExit": 0,
+      "executed": true,
+      "readOnly": true
+    },
+    {
+      "gate": "expected-runtime-not-prepared-1",
+      "exit": 2,
+      "expectedExit": 2,
+      "executed": true,
+      "readOnly": true
+    },
+    {
+      "gate": "expected-runtime-not-prepared-2",
+      "exit": 2,
+      "expectedExit": 2,
+      "executed": true,
+      "readOnly": true
+    },
+    {
+      "gate": "final-current-status",
+      "exit": 0,
+      "expectedExit": 0,
+      "executed": true,
+      "readOnly": true
+    }
+  ],
+  "publishedWindowValidationExit": 0,
+  "publishedRegistrarPlanOnlyExit": 0,
+  "publishedOwnedTunnelAndStatusExit": 0
+}
