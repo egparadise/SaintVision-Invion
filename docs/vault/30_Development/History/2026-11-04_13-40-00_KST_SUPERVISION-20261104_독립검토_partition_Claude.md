@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.13.0"
+version: "1.14.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T19:10:00+09:00"
+updated: "2026-11-04T19:24:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -773,6 +773,59 @@ The `eff93191` script (`99353908…`) is still `.pending` and separate. Nothing 
   - `pitr-configuration-possible` stays absent, and `pitr-rehearsal-dry-run-observed` stays observed.
 - This proves the hosted CI derivation at the landed head only. It is not operational acceptance and does not change the
   48-task score. Backend and Core post-landing lanes were still running per root, and I did not read them.
+
+## Final report checkpoint `5ac8e315` review (task `task_ce352123553b`): no overstatement, two wording Lows
+
+Scope:
+- Branch `agent/codex/supervision-delivery-report-20261104` at `5ac8e315`, fetched. It descends from `59f0a3c2`.
+- 65 paths, all under `docs/`. No product, tool or test file changed.
+- The report worktree is read-only to me and stayed clean.
+
+Public-repo hygiene:
+- The diff adds `*.private.ps1` packet scripts and evidence JSON.
+- I scanned the added lines and found no key material, token, DSN password, owner SID, LAN IP, local username or email.
+- The plans and configs that hold the SID and local paths were not committed.
+
+Signed CI metadata:
+- **Receipt and bundle:** the committed files are byte-equal to my own downloads, `73bfbced…` and `8081d55c…`.
+- **Manifest:** only VF-CL-04 `whyCiVerified` changed (now naming `Run 41811861496`) and `ciVerifiedAttestation.headSha`
+  (`fd1530d9` → `59f0a3c2`).
+- **Registry 1.6.6:** only `version`, the VF-CL-04 `ciVerifiedNote` and `ciVerifiedAttestation`
+  run/head/artifact changed.
+  - `verifiedAgainst` stays tree `03e17c31` with the generic pointer.
+  - `acceptedCards` stays 0.
+- **At `5ac8e315`, in a temporary detached checkout (since removed):**
+  - both full files: 244 passed, 0 skipped;
+  - registry checker exit 0, `acceptedCards` 0;
+  - `check_docs` exit 0 (1207 documents);
+  - the committed pair verifies `VERIFIED` against head `59f0a3c2`.
+
+Report claims checked against GitHub at 19:2x KST:
+- **Post-landing lanes:**
+  - Frontend, Desktop, Docs, Portal, Security and Accessibility (41811280240–41811322547) are completed/success at
+    `59f0a3c2`.
+  - Backend 41811262312 and Core 41811272283 are still `in_progress`. The report says they were running "when this
+    section was written", which is accurate.
+- **S12:** run 41811861496 matches my independent verification.
+- **Docs CI:** runs 41810435583 (`59f0a3c2`) and 41813149485 (`5ac8e315`) succeeded.
+- **AC-11:**
+  - Migration 41812142359 and aggregate 41812412476 succeeded.
+  - I downloaded aggregate artifact 13312648361 myself; its zip equals digest `c7ed5e8f…`.
+  - `ac11-aggregate-result.json` says `INVALID_RUN`, `done` false. Axes: reversible `NOT_APPLICABLE`, restore-forward
+    and security `MEASURED_PASS`, accessibility `MEASURED_FAIL`. Four required axes are missing.
+  - The report states exactly that and does not turn the measurement into acceptance.
+- **Kept separate in the report:**
+  - `eff93191` pre-8 FAIL;
+  - `59f0a3c2` pre-landing 244 tests plus Docs, with no claim that all 8 passed before landing;
+  - the 6-of-8 post-landing state;
+  - the AC-11 result.
+- **Unchanged:** the original 48 tasks and criteria, and `0/5` acceptance.
+
+Lows (wording only):
+- The `ciVerifiedNote` says "His receipt, bundle and verification bytes…". It should read "Claude's".
+- The report calls core's Transition-wait change "the proposal that resolved the 3-minute fail-closed risk". I have not
+  reviewed that proposal, so it should say "proposed fix, pending Claude review".
+- Backend and Core results must be appended when they complete, before any final 8-of-8 statement.
 
 ## State boundaries
 
