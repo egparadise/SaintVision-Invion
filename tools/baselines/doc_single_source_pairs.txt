@@ -9,18 +9,15 @@ Agent 인계 대기 목록.md || Codex 작업 현황.md
 Agent 인계 대기 목록.md || 개발 과정 인덱스.md
 Claude 작업 현황.md || Codex 작업 현황.md
 Claude 작업 현황.md || Gemini 작업 현황.md
-Claude 작업 현황.md || Orca 작업 현황.md
 Codex VF 작업 현황.md || Codex 작업 현황.md
 Codex VF 작업 현황.md || 전체 개발 진행 현황.md
 Codex 검증 상태 지도와 재개 조건.md || Codex 작업 현황.md
 Codex 검증 상태 지도와 재개 조건.md || 검증 경계 감사 종합과 잔여 범위.md
 Codex 검증 상태 지도와 재개 조건.md || 전체 개발 진행 현황.md
 Codex 작업 현황.md || Gemini 작업 현황.md
-Codex 작업 현황.md || Orca 작업 현황.md
 Codex 작업 현황.md || 개발 과정 인덱스.md
 Codex 작업 현황.md || 검증 경계 감사 종합과 잔여 범위.md
 Codex 작업 현황.md || 전체 개발 진행 현황.md
-Gemini 작업 현황.md || Orca 작업 현황.md
 검증 경계 감사 종합과 잔여 범위.md || 전체 개발 진행 현황.md
 # 2026-09-28 card 13 (PR #120 F-R2): two RLS collector Markdown artifacts from two runs (1e8baf04 first run, fc0bf0ce
 # clean-head rerun) are both retained on purpose as measurement records, not living docs; generated structure overlaps.

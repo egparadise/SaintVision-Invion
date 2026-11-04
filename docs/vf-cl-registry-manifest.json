@@ -175,8 +175,8 @@
     "bundlePath": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json",
     "repository": "egparadise/SaintVision-Invion",
     "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
-    "headSha": "ad0132b35d7216552bbe929730562819af15e3bd",
-    "headRef": "refs/heads/agent/codex/c301-standalone-worker-modules"
+    "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+    "headRef": "refs/heads/integration/all-agents-unified"
    },
    "ciVerifiedChecks": [
     {

@@ -1,115 +1,27 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.3"
+version: "1.0.5"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T16:12:59+09:00"
+updated: "2026-11-04T16:49:40+09:00"
 source_of_truth: "Git"
 ---
 
-## 2026-11-04 16:08 KST 운영 재확인: r5 로컬 서비스 중단
-
-Codex root의 재확인에서 overview18082 연결이 WinError10061로 거절됐고 exit1이다. 별도 listener 관측에서3000/18082/55448이 모두 없고 r5-owned python/node/ssh도 없었다. observer 마지막 기록15:52:15와 worker 재개가 가까운 것은 상관관계이며 원인으로 단정하지 않는다. 14:37의2Node 성공은 과거 측정으로 보존하며 현재 복구 완료로 쓰지 않는다.
-
-Codex 운영 worker `ctx_81cc0efa0eea`가 source03의 기존 r5 observer/serve/web/tunnel만 진단·복구한다. Claude가 실행 수명과 복구안을 독립 검토한다. 해당 범위의 복구는 기존 사용자 승인으로 진행하며 새 인증서/rotation/renewal-task/외부 process 변경은 허용하지 않았다. 부모·worker terminal 종료 뒤 유지 증거가 복구 완료 조건이다. [[2026-11-04_r5_서비스수명_오류와_복구_감독_Codex]]
-
-별도 source `fd1530d9`의 여덟 hosted lane 중6개가 success이며 Backend/Core 전체 시험은 진행 중이다. frozen code worktree는 바꾸지 않고 이 report worktree에서 새 관측을 기록한다. Obsidian checkpoint는104 files exported/2175 hashes match/0 pending/0 conflicts로 직접 확인했다. 최종 운영·CI 보고 뒤 다시 동기화한다.
-
 # Orca 작업 현황
 
-## 2026-11-04 현재 감독 집계 — Codex 대행
+현재 관리 owner는 **Codex root(Orca 관리 역할 대행)**, 독립 reviewer는 Claude다. 별도 Orca 제품 구현 Agent가 동작했다고 주장하지 않는다. Run `run_e57ecd84a7bc`, 부모 카드 SUPERVISION-20261104.
 
-실제 별도 Orca 작성/검토 Agent가 수행했다고 주장하지 않는다. 상시 규칙에 따라 Codex root가 관리 역할을 맡아 Run `run_e57ecd84a7bc`의 실제 receipt·고정 소스·검증을 집계했다.
-
-| 담당/수신한 source | 확인한 상태 | 남은 첫 행동 |
-|---|---|---|
-| Gemini F1~F4 `789999d8`, Codex F5 `af3a94ed` | 반복 provider 명령 승인 대기로 Gemini 재시도는 확정 stop 후 두 파일 patch를 보존했다. 같은 Task의 Codex 재시도와 timer 보강을 수신했고 Claude가1218 frontend tests 및 mutation으로 소스를 수락했다 | 최종 후보 CI. 초기 Gemini 기여와 F5 Codex owner를 분리 기록 |
-| Codex scheduler `b5b8ca68` | Claude 독립 수락, root 후보 통합. preflight 재시도·실제 전체 leaf 변경·구성원 집합·lock 보호 검증 | 고정 통합 CI/착지 후 실제 r5용 검토된 task 등록 또는 검토된 수동 회전 방지 계획 |
-| Claude registry `87cdf206` / security pin `402cd283` | root 독립 수락·통합, registry9 negative/pin 재현→통과 확인. 기준·RLS·expiry 정책 승격 없음 | 최종 CI와 기록 인계 |
-| Codex legacy audit `36a53b9d` / ports `d44d7a08`·report `66975f00` | 열린234개 source 대조에서 과거13개를6대체/5후속설계상 stack제외/2보완으로 분류. 실제 PG 측정과 Claude S07/read-only 소스 수락을 수신·통합 | 최종 CI와 S04 오류 시 JSON/JUnit pair 정리 보강 |
-| Codex r5 `2b49312c` / runtime03 | 실제2Node fresh 관측과 loopback HTTP200 복구, root 별도 재확인. 만료11-10 14:15:35KST / 갱신창11-08 14:15:35KST | 만료 방지 private plan과 로컬 IdP 설정 보강 계획; 장비 미확인 입력은 실제 값 필요 |
-
-원래48-task **2 done /4 blocked /42 planned /0 ready**, VF-CL accepted0/5와 운영 인수=false를 유지한다. 현재 후보의 구현/로컬 검증/독립 review와 hosted CI/운영 인수는 따로 집계한다. 최종 증거·실패한 중복 tracking attempt·정확한 executor는 [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]]에 보존한다. user의 '네'는 진행 승인으로 받았으며 새 장비 설정 경로나 identity 값은 제공되지 않았다.
-
-## 초기 역할 정의와 이전 확인 기록
-
-[[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
-
-- 배정 owner: Orca. 독립 reviewer: Codex (제품 승인과 별도). 현재 카드 수신/착수 여부: **Codex의 초기 정의이며 각 담당 Agent의 수신 확인은 아직 없다**. Codex는 이 문서 작업만 실제 수행 중이다.
-- 공통 Skill: agent-delivery v1.1.0, 역할 Skill agent-delivery v1.1.0. 계획: [[Agent 역할과 인계 계약]].
-- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
-
-## 최근 확인한 진척
-
-2026-10-28 Orca 관리 세션이 전체 진행판·Agent 작업판·48-task/VF registry와 최신 History를 읽기 전용으로 대조했다. 공식 48-task 가중 산식의 마지막 고정 판정은 착지 `6fc0428b49f28379cb4da17830d92256b55c2eb2`의 **3,425/4,800 = 71.35%**, 미착지 후보 `5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6`의 **3,475/4,800 = 72.40%**다. 착지/후보 Agent별 가중률은 Codex **70.83%/71.88%**, Claude **68.75%/68.75%**, Gemini **75.00%/77.08%**다. 이 값은 구현 진척 산식이며 운영 인수 완료율이 아니다.
-
-엄격 registry 완료는 **2/48 = 4.17%**이고 canonical `ready`는 **0건**이다. registry는 S01 선행이 끝나지 않았는데 후속 18개 카드가 `review`인 DAG 불일치를 보이며, 공통 진행판(2026-10-19)과 Claude/Gemini/Orca 작업판(각각 2026-10-07/2026-10-07/2026-09-11 갱신)의 시차도 있다. 이 세 항목은 상태 정본 재조정 대상이며 자동으로 `done`이나 `ready`로 바꾸지 않는다.
-
-현재 작업 checkout은 coordinator 확인 기준 branch `agent/codex/c301-standalone-worker-modules`, head `f2936ae5e91787b3dbba0d069a85ccaef020c984`다. PR #397의 exact-head Backend/Core/Documentation/Desktop Browser checks가 성공했다는 coordinator 확인을 수신했다. 이 Orca 세션의 로컬 `.git` 포인터는 사라진 worktree metadata를 가리켜 branch/head/dirty 상태를 독립 재현하지 못했으므로, 해당 SHA와 CI는 **coordinator 확인 수신**으로 기록하고 Orca 자체 Git 관측으로 표시하지 않는다. Card 301의 독립 reviewer 판정과 운영 인수는 별도다. 상세: [[2026-10-28_12-50-46_KST_전체_Agent_진척_재점검_Orca]].
-
-Orca 카드 상태는 **OR-01 ready, OR-02 ready, OR-03 blocked, OR-04 planned**를 유지한다. PR #397 네 lane 성공만으로 OR-03의 원래 계정/전체 필수 CI 제한이 전역 해소됐다고 판정하지 않는다.
-
-## 작업 카드
-
-각 카드의 sprint/area/outcome/acceptance는 부모 task에서 상속한다. 원래 task owner를 바꾸지 않는다. CL-01은 독립 검토 업무다. 카드 상태와 원래 48개 task의 최종 done은 별개다. 각 카드의 base/branch와 실제 검증값은 착수 시 담당자가 고정한다.
-
-| 카드 | 우선순위 | 상태 | 부모 task | 범위 |
-|---|---|---|---|---|
-| OR-01 | P0 | ready | 전체 인계 관리 | 공통 진행판과 인계 기록 관리 |
-| OR-02 | P0 | ready | 전체 인계 관리 | PR 순서·브랜치·중복 정리 |
-| OR-03 | P0 | blocked | 전체 인계 관리 | CI 계정 제한 추적 |
-| OR-04 | P1 | planned | 전체 인계 관리 | 최초 12개 목표·48개 task 인수 관리 |
-
-### OR-01 — 공통 진행판과 인계 기록 관리
-
-- owner / reviewer: Orca / Codex (제품 승인과 별도); status: ready; priority: P0.
-- 원래 목표/합격 조건: OUT-01~12 추적 / AC-01~12 증거 관리.
-- 다음 첫 행동: 각 Agent의 수신 확인·현재 카드·branch/base·최근 확인·다음 행동을 모으고 이 페이지의 최신 요약을 갱신한다. Orca 관리 세션 미지정 기간에는 Codex가 집계한다.
-- 필요한 합격 증거: 담당자 한 명, 근거 있는 상태, 다음 담당/첫 행동, 기록과 실제 Git SHA가 일치. 세션을 자동 실행하거나 검토했다고 꾸미지 않음.
-- 선행/차단과 해소 담당: 새 관리 프로세스가 자동 가동된 것은 아님. 현재 이 페이지 작성·초기 집계 담당은 Codex.
-- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
-
-### OR-02 — PR 순서·브랜치·중복 정리
-
-- owner / reviewer: Orca / Codex (제품 승인과 별도); status: ready; priority: P0.
-- 원래 목표/합격 조건: OUT-01~12 추적 / AC-01~12 증거 관리.
-- 다음 첫 행동: #21→#22→#19의 선행/독립 검토/CI를 추적한다. #2~10은 main 포함 여부를 다시 확인 후 승계 종료 대상으로, #14는 오래된 review branch 차이를 확인한다.
-- 필요한 합격 증거: main 포함 변경 재구현/중복 병합 없음. 각 PR head/base/reviewer/CI/후속 담당 기록. 최신 Claude/Gemini 코드의 통합 여부도 별도 기록.
-- 선행/차단과 해소 담당: 17:07 snapshot: 열린 PR 13개, draft 12개. main 병합과 폐기 여부는 diff/ancestry 및 승인 범위 확인 후 결정.
-- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
-
-### OR-03 — CI 계정 제한 추적
-
-- owner / reviewer: Orca / Codex (제품 승인과 별도); status: blocked; priority: P0.
-- 원래 목표/합격 조건: OUT-01~12 추적 / AC-01~12 증거 관리.
-- 다음 첫 행동: 운영 책임자에게 결제/한도 문제와 실제 실패 run을 제시하고 해소 후 동일 코드의 CI 재실행 결과를 각 Agent에 연결한다.
-- 필요한 합격 증거: 실제 runner가 시작한 동일 SHA 필수 CI 성공. 로컬 검증 대체/초록 상태 조작 금지.
-- 선행/차단과 해소 담당: 계정 결제/한도 변경은 운영 책임자 조치 필요. 다른 ready 구현·로컬 검증은 계속한다.
-- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
-
-### OR-04 — 최초 12개 목표·48개 task 인수 관리
-
-- owner / reviewer: Orca / Codex (제품 승인과 별도); status: planned; priority: P1.
-- 원래 목표/합격 조건: OUT-01~12 추적 / AC-01~12 증거 관리.
-- 다음 첫 행동: 후속 카드가 원래 범위를 모두 충족하는지 보고 구현·검증·CI·review·운영 인수 증거를 대조해 registry 갱신을 조정한다.
-- 필요한 합격 증거: 범위 누락/이중 완료 0, 목표의 실제 표본·측정 기간 명시. 원래 owner 배정과 완료 gate 보존.
-- 선행/차단과 해소 담당: 각 Agent 완료 증거 수신 후. Orca는 별도 제품 Sprint owner가 아님.
-- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
-
-## 작업 후 갱신할 최신 기록
-
-아래 항목은 담당자가 매 작업 단위마다 갱신한다. 상세 기록은 History에 새 페이지로 남기며 이전 검증/실패 이력을 덮어쓰지 않는다.
-
-| 항목 | 현재 기록 |
+| 관리 범위 | 현재 확인·다음 담당 |
 |---|---|
-| 마지막 작업 / 착수 카드 | OR-01·OR-02 집계 재개: 전체/Agent별 가중 진척, strict registry, DAG·작업판 시차 점검 |
-| 실제 owner / 읽은 진행판 버전 / KST | Orca / INDEX-PROGRESS-001 v1.0.373, WORKBOARD-ORCA-001 v1.0.0 / 2026-10-28T12:50:46+09:00 |
-| branch / base SHA / 구현 SHA | coordinator 확인 수신: `agent/codex/c301-standalone-worker-modules` / `f2936ae5e91787b3dbba0d069a85ccaef020c984`; 로컬 Git 포인터 단절로 Orca 독립 재현 불가 |
-| 작업한 것 | 공통판·4개 Agent 작업판·48-task/VF registry·최신 History 교차 집계. 제품 코드·공통 진행판·registry 무수정 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 문서·Ontology·diff gate 결과는 History에 기록. Windows PowerShell, workspace checkout |
-| CI / 독립 reviewer / 운영 인수 | coordinator 확인: PR #397 exact-head Backend/Core/Docs/Desktop 성공. 독립 reviewer 및 전체 운영 인수는 미완료 |
-| 남은 문제 / 차단 이유 / 해소 담당 | canonical ready 0, registry DAG 불일치, Agent 작업판 시차, 로컬 `.git` worktree 포인터 단절. Codex/Orca가 정본 조정, reviewer가 Card 301 판정 |
-| 다음 카드 / 첫 행동 / 다음 담당 | OR-01: exact-head reviewer 결과와 registry 정합 수신. OR-02: PR #397 인계 추적. OR-03은 전역 CI 제한 증거까지 blocked 유지. OR-04는 운영 인수 증거 수신 뒤 진행 |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-10-28_12-50-46_KST_전체_Agent_진척_재점검_Orca]] / PR #397 / Obsidian apply 미수행 |
+| OR-01 진행·인계 | Index v1.0.388 기준. 각 Agent 결과의 실제 수신을 집계 중. 상세 증거는 아래 부모 History 한 곳에 둔다. |
+| OR-02 소스·PR | 전체 OPEN234 source 감사와 legacy13 분류 완료. train79/PR405는 정상 착지. 원래 card owner를 바꾸지 않았다. |
+| OR-03 CI | 현재 필수 hosted lane 실행은 가능하다. 과거 계정 제한은 역사로 보존하며 전역 결제/한도를 변경하지 않았다. |
+| OR-04 운영 인수 | 원래48-task2 done/4 blocked/42 planned/0 ready. 입력 차단과 실제 인수를 source CI 성공과 구분한다. |
+
+- Codex root: 착지 후 필수 CI와 AC11 집계를 감독. migration rehearsal의 client/server 호환 실패는 Claude 수정 카드로 배정했다.
+- Codex 운영 worker `ctx_81cc0efa0eea`: 새 r5 private packet을 봉인했고 worker 종료·재개 뒤 서비스 유지와 실제 context 검증을 인계한다. 아직 갱신 예약을 등록하지 않았다.
+- Claude: 새 서명 증거와 운영 packet의 독립 검토, AC11 client 호환 수정. 자기 수정은 root가 검토한다.
+- Gemini: 초기 UI F1~F4 작성 결과를 수신했다. F5/timer의 실제 후속 작성자는 Codex이며, 실장비 브라우저·접근성 인수는 미완료다.
+
+작업한 것·명령/exit·SHA/CI·다음 행동의 **단일 상세 정본**: [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]]. r5 실행 수명은 [[2026-11-04_r5_서비스수명_오류와_복구_감독_Codex]]. 이전 원문은 [[2026-11-04_Orca_작업판_기존본문_보존_Codex]]에 보존했다. 공통 진행은 [[전체 개발 진행 현황]]을 따른다.

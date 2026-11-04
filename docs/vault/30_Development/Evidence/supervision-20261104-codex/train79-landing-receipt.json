@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "supervision-landing-receipt:1",
+  "recordedAt": "2026-11-04T16:35:26+09:00",
+  "previous": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "landed": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "method": "normal fast-forward push, no force",
+  "landingExit": 0,
+  "githubPR": 405,
+  "githubPRState": "MERGED",
+  "githubMergedAt": "2026-11-04T07:26:47Z",
+  "scriptSha256": "e319e95e295b14977198ea1c9dd6f98295ed3e53790bb6879a72f6f8e630824a",
+  "constituentReviewer": "Claude",
+  "combinedValidation": "nine local gates and eight exact-head hosted lanes PASS",
+  "postLandingVerification": "in progress; separate receipt required",
+  "operationalAcceptancePromoted": false
+}

@@ -1,0 +1,173 @@
+{
+  "codeSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "collectorSha256": "cb04ea7f32ff300c8ab8d9af62d020f1fb74c16eec8c8aa4a32895dc1ddfa773",
+  "criteria": {
+    "accessibilityE2e": "a run of ac11-accessibility-e2e.yml exists at the landed SHA and every one of its jobs concluded success, including accessibility-e2e. this status is the run's job conclusions only: the AC-11 axis verdict is inside s11-ac11-accessibility-e2e.json in the run's artifact and is recomputed by tools/aggregate_ac11_evidence.py, so a MEASURED_FAIL there is not a failure of this lane and a pass here is not a pass of that axis",
+    "backend": "a run of backend.yml exists at the landed SHA and every one of its jobs concluded success, including 2 x backend, mlflow-live",
+    "core": "a run of core.yml exists at the landed SHA and every one of its jobs concluded success, including core, s01-storage-roundtrip",
+    "desktopBrowser": "a run of desktop-browser.yml exists at the landed SHA and every one of its jobs concluded success, including desktop-browser",
+    "docs": "a run of docs.yml exists at the landed SHA and every one of its jobs concluded success, including docs",
+    "frontend": "a run of frontend.yml exists at the landed SHA and every one of its jobs concluded success, including frontend",
+    "landingWasFastForward": "the previous SHA is an ancestor of the landed SHA, so this is the landing it claims to be and not an unrelated tree",
+    "portalLoginHarness": "a run of portal-login-harness.yml exists at the landed SHA and every one of its jobs concluded success, including portal-login-harness",
+    "refIsAtLandedSha": "the remote integration ref points at the landed SHA, so the runs describe the tree this evidence names",
+    "securityCriticalHigh": "a run of ac11-security-scan.yml exists at the landed SHA and every one of its jobs concluded success, including security-critical-high. this status is the run's job conclusions only: the AC-11 axis verdict is inside s11-ac11-security-scan.json in the run's artifact and is recomputed by tools/aggregate_ac11_evidence.py, so a MEASURED_FAIL there is not a failure of this lane and a pass here is not a pass of that axis"
+  },
+  "observations": {
+    "accessibilityE2e": {
+      "correlationId": "post-landing-verify/3a2c28d0d4a546dfb2209bbb5034c6b9",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "accessibility-e2e": "success"
+      },
+      "jobCount": 1,
+      "runConclusion": "success",
+      "runId": 41787988543,
+      "status": "MEASURED_PASS",
+      "workflow": "ac11-accessibility-e2e.yml"
+    },
+    "backend": {
+      "correlationId": "post-landing-verify/d8368130a7d8434fab5b2627d7568b65",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "backend (3.12)": "success",
+        "backend (3.14)": "success",
+        "mlflow-live": "success"
+      },
+      "jobCount": 3,
+      "runConclusion": "success",
+      "runId": 41787949446,
+      "status": "MEASURED_PASS",
+      "workflow": "backend.yml"
+    },
+    "core": {
+      "correlationId": "post-landing-verify/595319d557c2439db89ae2b24dcfeb12",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "core": "success",
+        "s01-storage-roundtrip": "success"
+      },
+      "jobCount": 2,
+      "runConclusion": "success",
+      "runId": 41787954864,
+      "status": "MEASURED_PASS",
+      "workflow": "core.yml"
+    },
+    "desktopBrowser": {
+      "correlationId": "post-landing-verify/d481c70e1b78450281550bf794d4ea8b",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "desktop-browser": "success"
+      },
+      "jobCount": 1,
+      "runConclusion": "success",
+      "runId": 41787966323,
+      "status": "MEASURED_PASS",
+      "workflow": "desktop-browser.yml"
+    },
+    "docs": {
+      "correlationId": "post-landing-verify/cc5a3f33cd80448db2320365be0a0942",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "docs": "success"
+      },
+      "jobCount": 1,
+      "runConclusion": "success",
+      "runId": 41787972506,
+      "status": "MEASURED_PASS",
+      "workflow": "docs.yml"
+    },
+    "frontend": {
+      "correlationId": "post-landing-verify/b5f634fa8bfa4b939533a2c3b8ab71f2",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "Portal Container Build & Hardened Runtime Smoke": "success",
+        "frontend": "success"
+      },
+      "jobCount": 2,
+      "runConclusion": "success",
+      "runId": 41787960414,
+      "status": "MEASURED_PASS",
+      "workflow": "frontend.yml"
+    },
+    "landingWasFastForward": {
+      "landedSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "previousSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "status": "MEASURED_PASS"
+    },
+    "portalLoginHarness": {
+      "correlationId": "post-landing-verify/f4cee54ac1064b7c8dd595219d336d0e",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "portal-login-harness": "success"
+      },
+      "jobCount": 1,
+      "runConclusion": "success",
+      "runId": 41787977895,
+      "status": "MEASURED_PASS",
+      "workflow": "portal-login-harness.yml"
+    },
+    "refIsAtLandedSha": {
+      "ref": "coord/train79a-ci-20261104-1548",
+      "refTipSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "status": "MEASURED_PASS"
+    },
+    "securityCriticalHigh": {
+      "correlationId": "post-landing-verify/78b8292ae33b4937946a1d1dd71525a5",
+      "event": "workflow_dispatch",
+      "headBranch": "coord/train79a-ci-20261104-1548",
+      "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+      "jobConclusions": {
+        "security-critical-high": "success"
+      },
+      "jobCount": 1,
+      "runConclusion": "success",
+      "runId": 41787983287,
+      "status": "MEASURED_PASS",
+      "workflow": "ac11-security-scan.yml"
+    }
+  },
+  "promotesScore": false,
+  "provenance": {
+    "branch": "agent/codex/supervision-integration-20261104",
+    "contentClean": true,
+    "executor": "codex",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "post-landing-verify:1",
+  "source": {
+    "adoptedWorkflows": [],
+    "dispatchedWorkflows": [
+      "ac11-accessibility-e2e.yml",
+      "ac11-security-scan.yml",
+      "backend.yml",
+      "core.yml",
+      "desktop-browser.yml",
+      "docs.yml",
+      "frontend.yml",
+      "portal-login-harness.yml"
+    ],
+    "inputBindingSha256": "35b7dec8cea9a672ada398e3f00a5f4816ea0cbce98ef7ba9ea18d0e60ebe88e",
+    "landedSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+    "landedShaSha256": "8e8df6b7436294310fe71701a4bdaa3265bf8ad52938cf14a9f5ebfecb655025",
+    "observedAt": "2026-11-04T06:48:08Z",
+    "previousSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "ref": "coord/train79a-ci-20261104-1548",
+    "sourceFinishedAt": "2026-11-04T07:25:50Z"
+  },
+  "verdict": "PASS"
+}
