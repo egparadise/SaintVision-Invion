@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.350"
+version: "1.0.353"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T17:21:44+09:00"
+updated: "2026-11-04T20:45:59+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Train79 pre/post exact lanes passed; independent PG16 tool repair accepted with207 tests; next candidate hosted verification and bounded operations continue"
-active_card_next: "Validate candidate migration and Docs at exact head, land with a normal fast-forward and verify all lanes; finish reviewed attended renewal context while preserving OS/physical blockers"
+active_card_status: "Source59f exact8 CI PASS; reviewed bounded current-user followups enabled; final report and future physical acceptance remain separately tracked"
+active_card_next: "Receive timed pilot result through the existing Orca run, independently verify actual14 gates, and resume blocked S01 work when the missing real-device input is available"
 ---
+
+## 2026-11-04 최종 운영 후속 인계
+
+작업한 것: Root가62개 시험과 실제 전환 후2sample 상태를 독립 확인했고, 실제8workflow/12job 증거·검토c24를 최종 release에 결속했다. 확인한 것: 세 precheck는 정상 현재시각에서exit20/outside-slot·무시도·claim없음이고 실제 Production.facts는 source/pin/owner/session/2fresh/zero-workload/3valid-leaf 모두 확인됐다. Root가최신ca684/config와d46/params로세 예약을 재편집·조회한 뒤 활성화했고 Claude777d8386도 실제 설정과0run을 확인했다. 다음 첫 행동/담당: 정해진 갱신창의 Codex 예약 실행이 실제 결과를 같은Orca Run으로 인계하고 root/Claude가14gate와 운영 증거를 독립 판정한다. 누락5Node 입력과 실제 인수는 별도며 강제 clock/window/claim reset은 없다.
+
+## 2026-11-04 train80 exact8 완료 수신
+
+작업한 것: 고정 통합59f의 착지 후8lane을 끝까지 감독하고 실제13job/API 및 hosted 시험 로그를 확인했다. 확인한 것: canonical PASS/exit0, Backend 두 Python 버전 각8519 pass, Core8877 pass이며 서명·복원·독립 검토 증거를 보고 branch에 보존했다. 다음 첫 행동/담당: root는 최종 report/Obsidian, Core는 미래 후속 M1 수정과 정밀 실행 계획, Claude는 수정 delta 및 실제 전환 측정의 독립 판정을 맡는다. 전체 인수 미충족 항목을 코드 CI 성공으로 승격하지 않는다.
+
+## 2026-11-04 19시 train80 최종 인계 작업
+
+작업 카드 SUPERVISION-20261104, owner Codex root / reviewer Claude. 착지 source59f0a3c2, 보고 branch `agent/codex/supervision-delivery-report-20261104`, base59f0a3c2다. 사전 eff93191의 실패는 보존하고244개 회귀 시험·실제 서명 검증과 독립 검토를 거친 최소 정정만 착지했다. 현재 해당 착지의 Backend/Core 전체 결과를 기다리며 새 서명 증거·운영 실행 기록을 보고 정본에 결속하고 있다. 다음 첫 행동은 root의 전체 CI 판정과 최종 문서 gate/sync, 운영 worker의 정상 갱신창 후속 packet 및 Claude 독립 검토다. 자세한 명령·exit·Evidence는 부모 History 한 곳을 따른다.
 
 ## 2026-11-04 AC11 client 호환 후속과 운영 차단 분리
 

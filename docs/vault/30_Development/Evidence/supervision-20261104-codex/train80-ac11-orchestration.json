@@ -1,0 +1,101 @@
+{
+  "aggregateRun": {
+    "artifactDigest": "sha256:c7ed5e8f5e745569342d9e622382d43fec54e4a95aed133ebebbdd2ac52efd9b",
+    "artifactExpiresAt": "2027-02-02T10:10:31Z",
+    "artifactId": 13312648361,
+    "artifactName": "s11-ac11-aggregate-59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "correlationId": "ac11-exact-sha/ac11-aggregate/b77a91b56f074c2895b3cd3afecef470",
+    "event": "workflow_dispatch",
+    "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "runAttempt": 1,
+    "runId": 41812412476,
+    "workflow": ".github/workflows/ac11-aggregate.yml"
+  },
+  "canonicalResult": {
+    "axes": [
+      {
+        "axis": "migration-reversible-segment",
+        "reasons": [],
+        "referenceOnly": false,
+        "verdict": "NOT_APPLICABLE"
+      },
+      {
+        "axis": "irreversible-restore-forward",
+        "reasons": [],
+        "referenceOnly": false,
+        "verdict": "MEASURED_PASS"
+      },
+      {
+        "axis": "security-critical-high-zero",
+        "reasons": [],
+        "referenceOnly": false,
+        "verdict": "MEASURED_PASS"
+      },
+      {
+        "axis": "accessibility-e2e",
+        "reasons": [],
+        "referenceOnly": false,
+        "verdict": "MEASURED_FAIL"
+      }
+    ],
+    "designHead": "a793f258",
+    "done": false,
+    "reasons": [
+      "missing required axes: actual-pitr-rpo-rto-retention, long-soak, physical-five-node-ac05-placement-load, physical-five-node-failure-recovery"
+    ],
+    "schemaVersion": "1.0.0",
+    "verdict": "INVALID_RUN"
+  },
+  "checkoutTreeSha": "294e49106832769cc0a5da1810f137ef0722e4ad",
+  "cleanCheckout": true,
+  "dispatchedWorkflows": [
+    ".github/workflows/ac11-aggregate.yml",
+    ".github/workflows/ac11-migration-rehearsal.yml"
+  ],
+  "finishedAt": "2026-11-04T10:11:59Z",
+  "producerRuns": [
+    {
+      "artifactDigest": "sha256:5566e7dfb68b60b876017489b87d91a135408eb0bb1747e44cdcf545ea631f1a",
+      "artifactExpiresAt": "2026-12-04T10:01:33Z",
+      "artifactId": 13312676720,
+      "artifactName": "s11-ac11-security-59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "event": "workflow_dispatch",
+      "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "reused": true,
+      "runAttempt": 1,
+      "runId": 41811315911,
+      "workflow": ".github/workflows/ac11-security-scan.yml"
+    },
+    {
+      "artifactDigest": "sha256:031300a7f0a63a73a84327acc3f1d2f0d68269a9b531169d03f3c570f022945b",
+      "artifactExpiresAt": "2026-12-04T10:03:08Z",
+      "artifactId": 13312552467,
+      "artifactName": "s11-ac11-accessibility-59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "event": "workflow_dispatch",
+      "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "reused": true,
+      "runAttempt": 1,
+      "runId": 41811322547,
+      "workflow": ".github/workflows/ac11-accessibility-e2e.yml"
+    },
+    {
+      "artifactDigest": "sha256:26ff6228ad049872c3359cfea86efea0ae295cbcc87cfd93c7c1e9fb247c86fe",
+      "artifactExpiresAt": "2026-12-04T10:09:19Z",
+      "artifactId": 13312841912,
+      "artifactName": "s11-ac11-migration-59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "event": "workflow_dispatch",
+      "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+      "reused": false,
+      "runAttempt": 1,
+      "runId": 41812142359,
+      "workflow": ".github/workflows/ac11-migration-rehearsal.yml"
+    }
+  ],
+  "promotesScore": false,
+  "ref": "integration/all-agents-unified",
+  "repository": "egparadise/SaintVision-Invion",
+  "schemaVersion": "ac11-exact-sha-orchestration:1",
+  "secretsRequired": false,
+  "sourceSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "startedAt": "2026-11-04T10:07:52Z"
+}

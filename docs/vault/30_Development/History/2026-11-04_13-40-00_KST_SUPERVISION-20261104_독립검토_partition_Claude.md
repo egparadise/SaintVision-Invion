@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.8.0"
+version: "1.19.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T17:20:00+09:00"
+updated: "2026-11-04T20:53:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -538,6 +538,685 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Claude's source review phase for task `task_710152a20196` is closed. I did no source cleanup, because root owns the
   integration workspaces.
 
+## r5 WMI cycle packet review (task `task_e230ea589f7d`): changes required, one High
+
+Scope:
+- Core commit `9f5191eb` and the private packet `.work/r5-persistence-c50115dce654`.
+- Manifest `0e51a7c7`. I re-hashed all nine inputs, and they equal the manifest.
+- Plan pins: 105 and 103, with 0 mismatches.
+- Guard suite: 15 passed, and no file was written.
+- Read-only. Nothing was executed against the pilot.
+
+- **H1 High (measured):**
+  - In the attended cycle config `2a907e4b` and the scheduled proposal `9b96bb4a`, the `transition` gate keeps the venv
+    `python.exe` as its executable, but its arguments are now PowerShell arguments.
+  - I ran that `python.exe` with those arguments: `Unknown option: -N`, exit 2.
+  - So every released cycle would fail at gate 10, after `commit` and under the durable latch.
+  - The build script never sets the executable, and the guards check only the arguments.
+  - Fix: use the pinned `powershell.exe` with its hash, add a guard on the executable, then re-seal.
+- **M2 Medium:**
+  - `schedulerPath` (`source-b5b8/tools/scheduled_leaf_renewal.py`) is not among the plan pins.
+  - The scheduler itself checks only `git HEAD`, not a clean tree or the file's bytes.
+  - The file is byte-identical to the b5b8 blob today.
+- **Accepted rules:**
+  - Command, owner and pins: hashed plan, allowed operations, guards hash, ordinary non-reparse pins, an exact record
+    root, and the owner SID.
+  - One-shot records: intent/launch/result written with `CreateNew` + `Move`; no retry or fallback.
+  - Context: the job-free entry is asserted again inside the child. The ContextOnly receipt shows session 1,
+    interactive, `inJob` false, `WinSta0\Default`; the helper exited and nothing was relaunched.
+  - Before any stop: the status guard runs first. Each stop re-checks PID reuse (creation time, command line, owner
+    SID), stops leaves before the root, and refuses multiple independent roots.
+  - Primary failure: observer fallback, then a real 2/2 observation, then a `CreateNew` receipt, then a throw.
+  - Observer recovery is a separate operation. The Python environment variables are cleared and restored.
+  - For the WMI path, this closes my earlier attended-transition Medium.
+- **Scheduled proposal:**
+  - Replacing `51b02052` with the WMI controller in Scheduled mode closes my residual in source, but H1 applies to it
+    too.
+  - S4U is not accepted: the S4U-to-WMI desktop path is unmeasured, and actual registration was denied
+    (`0x80070005`).
+  - Low: the proposal shares its status/log paths with the attended cycle and has notifications disabled.
+- **Outside-window no-op proof: safe only with a fresh RunId.**
+  - At b5b8, `--window-only` only reads the config and the state. It writes no lock, latch, status or log, stops no
+    observer and changes no certificate. The entry returns refusal exit 4 with `cycleExecuted` false.
+  - The proof must not use the sealed RunId `20261104T082522Z-c50115dce654`. That is the first-cycle command's RunId,
+    and its one-shot guard would then refuse.
+- **Low:** the controller waits only 3 minutes for a Transition receipt, so a slow launch fails closed with completion
+  unknown.
+
+## r5 packet fix and eff93191 test-expectation review (task `task_0f5b922ea663`)
+
+### r5 packet fix `.work/r5-packet-fix-5babae638fde`: H1 and M2 closed, release conditions below
+
+Scope:
+- Manifest `993febe8`. All nine inputs re-hashed and equal to the manifest.
+- Attended config `5168c560`, scheduled proposal `8fbdbb6a`, cycle plan `3ffaa00a`.
+- Read-only. No cycle, transition, observer stop, certificate change or S4U attempt.
+
+What I checked:
+- Structural JSON diff against `r5-persistence-c50115dce654`:
+  - In both configs only the `transition` gate changed: executable, hash, packet paths and the plan hash.
+  - The other gates are byte-equal.
+  - The scheduled proposal also changed its log/status paths and `notificationsEnabled`.
+- **H1 closed (measured):**
+  - The gate executable is `C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe`. Its actual SHA-256 equals
+    the pinned `60c9b298…`.
+  - I ran the exact gate-10 argv of both configs with a fresh RunId and `-PlanOnly`: exit 0, operations `Transition`
+    and `ScheduledTransition`, `executed` false.
+  - `wmi-runtime` was unchanged after the run.
+- **M2 closed:**
+  - The cycle plan now has `schedulerSHA256` `d4284248…` and exactly one matching pin. That equals the file and the
+    `b5b8ca68` blob `8d9f030d`.
+  - The scheduler imports no sibling repo module, only the standard library and `cryptography`.
+  - `Assert-SvPinnedScheduler` runs immediately before both scheduler invocations in the entry script. The controller's
+    pin check also covers it.
+  - The cycle argv with a fresh RunId and `-PlanOnly` exits 0.
+- **Lows closed:**
+  - The scheduled proposal has its own status and log files and notifications on, with all other gates equal.
+  - A receipt timeout now writes a `CreateNew` `completion-unknown` record (exit 124, no retry) and keeps the intent.
+    The one-shot check includes that record.
+- **Guard suite:** 30 passed on Python 3.14. No packet file was written.
+- **RunIds:** the ContextOnly, Cycle, ObserverRecovery and ScheduledTransition RunIds are distinct. None equals the old
+  sealed `20261104T082522Z-c50115dce654`. Only ContextOnly records exist.
+- **ContextOnly 17:58:40 receipt (read, not re-run):** helper 41708, owner matched, session 1, interactive, `inJob`
+  false, `WinSta0\Default`. The helper has exited.
+- **Read-only `--window-only` at 18:23 KST:** exit 0. `inWindow` false, `expired` false.
+  - `renewAt` is 2026-11-08 14:15:35 KST and `earliestNotAfter` is 2026-11-10 14:15:35 KST.
+  - The state tree and `wmi-runtime` were unchanged.
+- **Residual Low:**
+  - The controller still waits only 3 minutes for a `Transition` receipt, inside a 900-second scheduler gate.
+  - A slow but successful transition would therefore fail closed after `commit`, under the latch, and need manual
+    recovery.
+  - Measure the transition duration or raise the wait below 900 s before release.
+
+Outside-window no-op proof:
+- It is safe only as a `Cycle` with a new RunId that is not the sealed first-cycle RunId `20261104T090054Z-ccda46e61cd5`.
+- Run the standalone `--window-only` immediately before it, and run it only while that check shows `inWindow` false
+  with a wide margin before 2026-11-08 14:15:35 KST.
+- The proof is not structurally a no-op. If the window were open, the same command would run the real cycle.
+- The controller exits non-zero on the expected exit-4 refusal. That is the pass condition, not a failure to hide.
+
+Orca one-off on Nov 8, as the current-user alternative to S4U:
+- This is feasible as a supervised attended cycle.
+  - The WMI helper launch already proved a job-free session-1 context from an Orca-run caller.
+  - The window refusal is enforced inside the helper, so neither Orca "run now" nor a precheck bypass can force the
+    window.
+- It needs root's release, the user logged on in session 1 with Orca running, and the PC awake.
+- It must run the sealed first-cycle argv exactly once. On any failure the latch is preserved and the agent does not
+  retry.
+- Fallback slots are needed before the 2026-11-10 14:15:35 KST expiry.
+- `orca automations` triggers are recurring (preset, cron or RRULE). I did not create one, and a one-shot RRULE is
+  untested.
+- This does not accept S4U or unattended renewal, and C1 stays open.
+
+### eff93191 test-only correction (root uncommitted patch, diff SHA-256 `e5a70403…`)
+
+- **The change:** one test file only. The VF-CL-04 assertion no longer freezes run `40633895766`. Instead it binds the
+  registry's `runId`, `headRef` and artifact id/digest/expiry to the committed receipt.
+  - The `headSha`, receipt-path and bundle-path checks against the manifest are kept.
+  - No checker, criterion or product file changed.
+- **What I ran**, in a temporary detached checkout of `eff93191` (since removed):
+  - Before the patch, the selected case fails: `40633895766` against `41792498330`.
+  - After applying root's exact patch, both full files pass: `tests/core/test_check_vf_cl_registry.py` and
+    `tests/test_vf_cl_ci_attestation.py` give 244 passed, 0 skipped, exit 0.
+  - The registry checker exits 0 with `acceptedCards` 0.
+  - `verify_vf_cl_ci_attestation.py` against the committed receipt and bundle (head `fd1530d9`,
+    `refs/heads/integration/all-agents-unified`) returns `VERIFIED`, run `41792498330`.
+- **Mutants:** registry `runId` changed to `41792498331` fails; registry artifact digest changed fails.
+- **My earlier gap:** my VF-CL-04 recording review did not run this test file either.
+- **Opinion: land it.**
+  - It is defensible to land the test-only correction after this full two-file run, the real verification and Docs CI.
+  - All 8 required post-landing workflows must still pass at the exact landed head.
+  - Keep the `eff93191` FAILED record, and make no pre-8 pass claim.
+- **Text drift, not a test failure:**
+  - `docs/vf-cl-registry-manifest.json` `whyCiVerified` and the registry `note` still name run `40633895766`. A test
+    asserts the manifest text.
+  - Changing it is a criterion edit and needs its own review.
+
+## Root `59f0a3c2` CI-text correction review (task `task_169f7a385e7c`): accepted
+
+Diff `eff93191..59f0a3c2`, 3 files, one commit:
+- **Manifest:** only VF-CL-04 `whyCiVerified` changed.
+  - It now names `Run 41792498330` and the receipt named by `ciVerifiedAttestation`.
+  - It keeps the OIDC, Sigstore, re-checkable and expiry boundaries, and adds "does not grant operational acceptance".
+- **Registry:** only `version` (1.6.4 → 1.6.5) and the last sentence of `verifiedAgainst.note` changed.
+  - The 03e17c31 local re-verification facts are kept.
+  - The tree/ref/landedNote/hostedRun/reverification fields, and all machine-check, implies, receipt, bundle and
+    attestation fields, are unchanged.
+- **Test file:**
+  - The earlier `runId`/`headRef`/artifact binding is kept.
+  - `test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote` now requires `Run {runId}` from the committed
+    receipt, instead of the old constant, and keeps the OIDC and re-check anchors.
+
+What I found and ran:
+- **Root's first text edit broke a second test.** That edit made `whyCiVerified` generic, which broke this second
+  hard-coded `406` assertion.
+  - Root's `.work/source80-rationale-full.log` showed 1 failed, 243 passed, and I reproduced it.
+  - Root then named the current run and derived it in the test. That keeps the protection, so the old constant is not
+    simply weakened.
+- **At `59f0a3c2`, in a temporary detached checkout (since removed):**
+  - both full files: 244 passed, 0 skipped, exit 0;
+  - registry checker exit 0, `acceptedCards` 0;
+  - `check_docs` exit 0;
+  - the real verifier returns `VERIFIED` for run `41792498330`.
+- **Mutants:** the old `Run 40633895766` text and an unnamed-run text both fail the new assertion.
+- **One unexplained failure (not reproduced):** one full run of my scratch variant (before `59f0a3c2`) failed
+  `test_the_shipped_registry_agrees_with_this_tree` once.
+  - It passed alone and in the full rerun, and I did not capture the assertion.
+  - That test calls git against the live repository, so if it recurs in CI, treat it as a finding.
+- **Opinion:**
+  - Commit `59f0a3c2`, run Docs CI, land by the targeted plan, then require all 8 workflows at the exact landed head.
+  - Keep the `eff93191` FAILED record, with no pre-8 pass claim.
+
+## Train 80b landing script review (task `task_bf87ab92d622`): accepted, read-only
+
+Script: `merge-land-train3-80-59f0a3c2.sh.pending`, SHA-256 `2da6ef1a…`, 60 lines. `bash -n` exits 0. I did not execute
+it.
+
+Gates:
+- **Source:**
+  - It requires the exact head `59f0a3c2` and a clean tree. Both held at 18:56 KST.
+  - The `eff93191..59f0a3c2` path set must be exactly the three files.
+- **Strict JSON deep compares:**
+  - The manifest may differ only in VF-CL-04 `whyCiVerified`.
+  - The registry may differ only in `version` (1.6.4 → 1.6.5) and `verifiedAgainst.note`.
+- **Local test record:** the local JUnit must have 244 testcases with no failure, error or skip.
+  - Read now: 215 core plus 29 attestation testcases, all passing.
+- **Prior FAIL record:** the `eff93191` prelanding JSON must still read `FAIL`.
+- **Docs CI:** run 41810435583 is re-read and must be completed and successful, with the same head, branch,
+  `workflow_dispatch` and title.
+  - Read now: completed, success, workflow `Documentation Build`, job `docs` success.
+- **Signature:** real Sigstore verification of the FD receipt runs through `verify()`, which raises on any mismatch.
+- **Landing:**
+  - It requires the integration tip to equal `fd1530d9` (read now: `fd1530d9`) and `fd1530d9` to be an ancestor of
+    the landing commit.
+  - It pushes normally, without force, so a non-fast-forward is rejected.
+  - It reads the remote head back after the push.
+
+Lows, none blocking:
+- The JUnit timestamp (18:39:56) is earlier than the `59f0a3c2` commit time (18:44:07), and the file names no commit.
+  My exact-head 244 run and Docs CI cover the gap.
+- The Docs CI check does not pin `workflowName`; the title pins it in practice.
+- `json.loads` collapses duplicate keys. The strict-load test among the 244 covers the shipped files.
+- The prior FAIL JSON is checked by fields, not by a hash.
+
+The `eff93191` script (`99353908…`) is still `.pending` and separate. Nothing in this script claims a pre-8 pass for
+`59f0a3c2`. All 8 workflows at the exact landed head remain required.
+
+## Post-landing S12 attestation at `59f0a3c2` (task `task_bf87ab92d622` follow-up `task_9285e19358a2`): VERIFIED
+
+- **Remote:** `integration/all-agents-unified` reads `59f0a3c2` (`git ls-remote`).
+- **Run 41811861496**, "S12 Acceptance Evidence", read from the GitHub API:
+  - `workflow_dispatch`, path `.github/workflows/s12-acceptance-evidence.yml`;
+  - head `59f0a3c2`, branch `integration/all-agents-unified`, attempt 1;
+  - title `supervision-train80-s12-59f0a3c2-20261104`;
+  - jobs `s12-acceptance-evidence` and `attest-vf-cl-ci-receipt` both succeeded.
+- **I downloaded both artifacts myself** into a new empty directory:
+  - `vf-cl-ci-attestation-59f0…`: id 13312139106, zip SHA-256 `4c7ce04d…`, which equals the API digest.
+  - `s12-acceptance-59f0…`: id 13312408285, zip `e4959ab8…`, which equals the API digest. The receipt names this same
+    id, digest and expiry (2026-12-04T10:06:19Z).
+  - My receipt (`73bfbced…`), bundle (`8081d55c…`) and workflow `verification.json` (`64ac10c2…`) are byte-equal to
+    root's `.work/post-landing/59f0…/vfcl` copies.
+- **Real verification:** I ran the verifier from `59f0a3c2` source, with the module extracted by `git show`.
+  - Result: `VERIFIED`, run `41811861496`, `receiptSha256` `3b57a4b4…`.
+  - The verified certificate names the `s12-acceptance-evidence.yml@refs/heads/integration/all-agents-unified`
+    signer, source digest `59f0a3c2`, a GitHub-hosted runner and a `workflow_dispatch` trigger.
+  - The signed subject digest equals the receipt bytes.
+- **Negatives, all refused with exit 2:**
+  - old head `fd1530d9`;
+  - wrong ref (the agent branch);
+  - wrong workflow;
+  - wrong repository;
+  - one appended byte in the receipt (refused by the GitHub signature/identity check itself).
+- **S12 evidence:** the 17 items are identical to the `fd1530d9` run. Only `codeSha`, `inputs`, `note` and
+  `provenance` differ.
+  - `verdict` FAIL and `acceptanceClaim` false are the expected non-acceptance, unchanged.
+  - `pitr-configuration-possible` stays absent, and `pitr-rehearsal-dry-run-observed` stays observed.
+- This proves the hosted CI derivation at the landed head only. It is not operational acceptance and does not change the
+  48-task score. Backend and Core post-landing lanes were still running per root, and I did not read them.
+
+## Final report checkpoint `5ac8e315` review (task `task_ce352123553b`): no overstatement, two wording Lows
+
+Scope:
+- Branch `agent/codex/supervision-delivery-report-20261104` at `5ac8e315`, fetched. It descends from `59f0a3c2`.
+- 65 paths, all under `docs/`. No product, tool or test file changed.
+- The report worktree is read-only to me and stayed clean.
+
+Public-repo hygiene:
+- The diff adds `*.private.ps1` packet scripts and evidence JSON.
+- I scanned the added lines and found no key material, token, DSN password, owner SID, LAN IP, local username or email.
+- The plans and configs that hold the SID and local paths were not committed.
+
+Signed CI metadata:
+- **Receipt and bundle:** the committed files are byte-equal to my own downloads, `73bfbced…` and `8081d55c…`.
+- **Manifest:** only VF-CL-04 `whyCiVerified` changed (now naming `Run 41811861496`) and `ciVerifiedAttestation.headSha`
+  (`fd1530d9` → `59f0a3c2`).
+- **Registry 1.6.6:** only `version`, the VF-CL-04 `ciVerifiedNote` and `ciVerifiedAttestation`
+  run/head/artifact changed.
+  - `verifiedAgainst` stays tree `03e17c31` with the generic pointer.
+  - `acceptedCards` stays 0.
+- **At `5ac8e315`, in a temporary detached checkout (since removed):**
+  - both full files: 244 passed, 0 skipped;
+  - registry checker exit 0, `acceptedCards` 0;
+  - `check_docs` exit 0 (1207 documents);
+  - the committed pair verifies `VERIFIED` against head `59f0a3c2`.
+
+Report claims checked against GitHub at 19:2x KST:
+- **Post-landing lanes:**
+  - Frontend, Desktop, Docs, Portal, Security and Accessibility (41811280240–41811322547) are completed/success at
+    `59f0a3c2`.
+  - Backend 41811262312 and Core 41811272283 are still `in_progress`. The report says they were running "when this
+    section was written", which is accurate.
+- **S12:** run 41811861496 matches my independent verification.
+- **Docs CI:** runs 41810435583 (`59f0a3c2`) and 41813149485 (`5ac8e315`) succeeded.
+- **AC-11:**
+  - Migration 41812142359 and aggregate 41812412476 succeeded.
+  - I downloaded aggregate artifact 13312648361 myself; its zip equals digest `c7ed5e8f…`.
+  - `ac11-aggregate-result.json` says `INVALID_RUN`, `done` false. Axes: reversible `NOT_APPLICABLE`, restore-forward
+    and security `MEASURED_PASS`, accessibility `MEASURED_FAIL`. Four required axes are missing.
+  - The report states exactly that and does not turn the measurement into acceptance.
+- **Kept separate in the report:**
+  - `eff93191` pre-8 FAIL;
+  - `59f0a3c2` pre-landing 244 tests plus Docs, with no claim that all 8 passed before landing;
+  - the 6-of-8 post-landing state;
+  - the AC-11 result.
+- **Unchanged:** the original 48 tasks and criteria, and `0/5` acceptance.
+
+Lows (wording only):
+- The `ciVerifiedNote` says "His receipt, bundle and verification bytes…". It should read "Claude's".
+- The report calls core's Transition-wait change "the proposal that resolved the 3-minute fail-closed risk". I have not
+  reviewed that proposal, so it should say "proposed fix, pending Claude review".
+- Backend and Core results must be appended when they complete, before any final 8-of-8 statement.
+
+## Orca supervised pilot packet `r5-orca-supervised-288670efba3d` (task `task_2ae5dd31f68d`): SOURCE_ACCEPTED with one Medium to fix before release
+
+Scope:
+- Read-only.
+- All seven declared hashes match: manifest `4f1f1ea8`, controller `c9fad676`, cycle plan `3d278293`, Transition plan
+  `f51623da`, manual config `01237ed5`, `pilot_guard.py` `c653b741`, wrapper config `c52c0fb0`.
+- No WMI launch, Cycle, Transition, Recovery, claim or Orca metadata action.
+
+What I checked:
+- **The 720-second packet** compared with the reviewed `5babae638fde` packet:
+  - Guards, entry and the transition core are byte-identical.
+  - The controller differs in one line: `Transition` waits 720 s, `Cycle` 4 h, and every other operation 180 s.
+  - Configs and plans differ only in packet paths, the controller and plan hashes, and fresh RunIds. The four
+    RunIds are distinct and none has a record yet.
+- **The manifest** binds the preserved `993febe8` baseline.
+- **Real `-PlanOnly` runs, all exit 0, `wmi-runtime` unchanged:**
+  - the gate-10 argv of both configs (`Transition` and `ScheduledTransition`);
+  - `ContextOnly`;
+  - the `Cycle` command, each with a fresh RunId.
+- **Wrapper read-only actions:** `describe` exits 0 for all three slots, with `claimExists` false. The not-due
+  precheck refuses with exit 20 (`outside-2026-slot`) and takes no claim.
+- **Tests:** the 48 isolated tests pass on Python 3.14. The packet and `run-state` were not written.
+- **Precheck budget:** the precheck hashes 133 pinned files (103 MB) in 0.19 s, well under its 60 s timeout.
+- **Pilot state:** the live `private-state.json` equals the pinned `7d62c49a`, unchanged since 14:17. The prepare,
+  stage, commit and observe commands do not call `save()`. No lock, latch or lock-guard file exists.
+- **Orca:** the installed `app.asar` SHA-256 equals the packet identity `c0446919`. I re-ran the replay and got the
+  same result:
+  - The packaged parser drops `COUNT=1` and the month/day fields of an RRULE, so it would recur daily.
+  - Annual cron fires on 2026-11-08 05:20Z, 11-09 03:15Z and 11-09 23:00Z, then again in 2027.
+  - The guard's absolute 2026 slot plus 10-minute grace refuses the 2027 occurrences and any "run now" outside the
+    slot.
+
+Accepted rules:
+- **Pins:** every plan, packet, executable, scheduler and source pin is checked, with clean `HEAD` for both sources.
+- **Leaf paths:** only state-relative paths are accepted, with containment and ordinary/reparse checks. This closes
+  root's High.
+- **Shared claim:** a single exclusive claim (`xb`) per run, after which every guard runs again; no reclaim.
+- **Waits:** 720 s fits under the 900 s gate. The wrapper waits at most 14520 s, then records unknown/124 without
+  killing the child or retrying.
+- **Window and margin:** a margin of at least 4 hours is required.
+- **Prior attempts:** a prior latch, lock, completion-unknown record, or intent without a result blocks the run. A safe
+  exit-4 refusal does not.
+- **Prompts:** they separate the current-user supervised pilot from S4U/production. The three automations are
+  disable-after-claim.
+
+Findings:
+- **M1 Medium (measured with fakes):** after a real invocation, `execute()` calls `post_facts()`, which re-runs
+  `facts()`. That includes `validate_release()` and every drift check. Any `Skip` raised there falls into the outer
+  `except Skip` branch.
+  - My probe: one invocation that returned renewed, then a post-readback `Skip('release-not-current')`.
+  - The wrapper reported `exit 20, outcome "skip"` with `claimTaken` true, and wrote no per-run result.
+  - This case is reachable. The fallback2 slot starts at 23:00–23:10Z, the release `validUntil` must be no later than
+    01:15:35Z, and the cycle may run up to 4 h.
+  - Safety holds through the claim, but an executed renewal would be reported as a skip.
+  - Fix before release:
+    - Do not re-validate the release after invocation.
+    - Classify any exception after `invoke()` as `postcondition-unverified` (exit 1, or 124), keep the child result,
+      and write the per-run result file.
+    - Add a fake test for this case.
+- **L1:** `validate_release()` accepts any 8 or more unique green checks. It should pin the exact eight workflow
+  paths/names and the expected ref.
+- **L2:** the prompt says "exact pinned993 Cycle", but the run uses the 720 packet; 993 is the bound baseline.
+- **L3:** the direct-transition test plan says "verify993" and "measure … vs180". It should name the 720 packet and
+  measure against 720.
+- `ScheduledTransition` and `ObserverRecovery` keep 180 s. That is acceptable while they are unreleased.
+
+The 3-minute Low:
+- Structurally, 720 s inside the 900 s gate closes it in source.
+- Closing it empirically requires one measured `Transition` with these conditions:
+  - elapsed comfortably below 720 s (I suggest half of it or less);
+  - all postconditions held: same public leaves and SPKI, two fresh nodes, an owned observer, a `CreateNew` receipt.
+- My opinion: one standalone `Transition` before Nov 8 is worth releasing.
+  - Conditions: a separate exact-plan review (fixing L3), root release, a fresh unused RunId
+    (`20261104T102449Z-d02f35d04547` currently has no record), and ObserverRecovery reviewed in advance.
+  - It is the only pre-cycle measurement of the live relaunch path. Without it, the first cycle's gate 10 is the
+    measurement, and a slow result there fails after `commit` under the latch.
+- Not S4U and not operational acceptance.
+
+## Standalone Transition contract, ObserverRecovery contract and M1 wrapper delta (task `task_18ed92bf40ff`)
+
+Scope:
+- Read-only, under `.work/r5-orca-supervised-288670efba3d`.
+- No WMI launch, Transition, ObserverRecovery, Cycle, claim or Orca metadata action.
+- Hashes read back at 19:57–20:00 KST:
+  - plan `643baaec`; Transition contract `e557f909`; ObserverRecovery contract `4b666847`;
+  - `pilot_guard.py` `98142111`, config `f868eaef`, prompt template `2dbaf609`, disabled CLI plans `a462506e`;
+  - all nine pins of both contracts equal the packet files: guards `e50c7f82`, controller `c9fad676`, entry
+    `a4d64539`, core `b0963259`, Transition plan `f51623da`, cycle plan `3d278293`, attended config `01237ed5`,
+    scheduled config `9b6a4bfb`, commands `b445b8fe`.
+- `wmi-runtime` and `run-state` are empty, and no file names either RunId. Live `private-state.json` is `7d62c49a`.
+
+### Transition measurement: exact plan ACCEPTED for ONE root-released call, with conditions
+
+What the call does (read in source, not measured):
+- The argv runs only the 720-packet controller with plan `f51623da`, `-Operation Transition` and RunId
+  `20261104T104550Z-a906a2b3fc0a`. The controller's watchdog is 720 s for `Transition`.
+- The core (`b0963259`):
+  1. runs the `currentStatus` gate;
+  2. refuses if `transition-core-<RunId>.json` already exists;
+  3. stops only the exact owner/creation/command-line-checked observer group, children first;
+  4. runs `Start-LiveConsole.ps1` without `-ReplaceForeignStateListener`;
+  5. asserts a real two-member mTLS observation, with snapshots at most 20 s old;
+  6. writes a `CreateNew` receipt.
+  On launcher failure it starts an observer, records the error class, writes the receipt and still throws.
+- `Start-LiveConsole.ps1` (`03e17c31`) reuses the owned SSH tunnel, `serve`, console (18082) and web (3000) when they
+  belong to the same state. So only the observer is relaunched.
+- Scope limit: the console keeps its in-memory TLS material. The test measures the observer relaunch and gate-10 cost,
+  not a certificate reload.
+- Live helpers at 19:5x KST (all created 16:20:1x, owned by the same parent):
+  - observer 34380/33812; `serve` 40748/52720; console 3756/54216;
+  - vite 25608; SSH tunnel 15408 (`55448`).
+
+Release conditions:
+- **Before the call:**
+  - A separate root release names this contract and this RunId.
+  - Only the RunId may be replaced, by a fresh, unused normal-clock value. Every executable, file and plan hash stays
+    fixed.
+  - The operation is `Transition`. `ScheduledTransition` and `Cycle` are excluded by name.
+  - The 993 baseline, the nine 720 inputs and all pins match. `--window-only` shows `expired` false and `inWindow`
+    false.
+  - No lock, latch or lock-guard file exists, and there is no intent without a result and no completion-unknown
+    record.
+  - Saved: the three member paths with their PEM SHA, SPKI and notAfter, plus the state hashes. No private material is
+    saved.
+  - Kill is true, workload submission false, and runs and offers are 0. Two members are fresh and advancing.
+  - Saved: the PIDs and creation times of the observer, `serve`, console, web and tunnel, and their listeners. Add
+    `serve` to the contract's "same PIDs" list.
+  - Owner SID, Session 1, interactive, and a job-free WMI child.
+- **After the call:**
+  - Identical member paths, PEM, SPKI, notAfter and protected-state hashes; three valid leaves.
+  - A new owned observer group, while every other helper PID and listener is unchanged.
+  - HTTP 200 from overview and `live-postgresql-mtls`; two fresh, advancing members; runs and offers 0; flags
+    unchanged.
+  - Intent, launch and result records, plus the `transition-core` receipt, all with this RunId and plan. Exit 0,
+    `primaryLauncherSucceeded` true, and the real owner/session context with `inJob` false.
+- **Duration:**
+  - Measured as monotonic elapsed time, both intent→result and outside wall clock.
+  - The 3-minute Low closes only if elapsed is at most about half of 720 s (360 s) and every postcondition held. One
+    sample is not a worst-case bound, and the contract says so.
+- **Any other outcome**, including `primaryLauncherSucceeded` false, exit 124 or an unknown record:
+  - It is recorded as a failure. No retry and no automatic ObserverRecovery.
+  - The Nov 8 cycle needs a new decision.
+
+### ObserverRecovery contract: approved only as a separate decision
+
+- Its argv uses the same controller and plan, `-Operation ObserverRecovery` and its own RunId
+  `20261104T105008Z-f3999067b773`.
+- The 180 s watchdog fits the branch, which does only three things: the `currentStatus` gate, starting the observer if
+  it is absent, and `observe --once`. It never stops an observer, never touches certificate material and writes no
+  core receipt.
+- **Release conditions:**
+  - A separate root release names the contract, the RunId and the hashes of the failure or unknown record.
+  - A diagnosed loss of a known observer.
+  - Every earlier writer has provably exited; silence or a reused PID is not proof.
+  - No live child and no foreign observer or listener.
+  - The original failure stays nonzero and is never relabelled PASS.
+- **Postconditions:** the same as for the Transition, apart from the observer.
+
+### M1 wrapper delta (`98142111`): M1, L1, L2 and L3 fixed; one new Medium, so do not arm yet
+
+Fixed:
+- **M1:** `post_facts` uses `revalidate_release=False` and requires the release check from entry, so an expiry after
+  release cannot become a skip. Any post-invocation exception becomes `postcondition-unverified` exit 1, with
+  `childResult` kept and the per-run result written. An outer `Skip` after invocation is now exit 1, not 20.
+- **L1:** exactly eight checks, unique IDs, the fixed name set, `workflowPath`
+  `.github/workflows/<file>` and the fixed ref. All eight workflow files exist on
+  `origin/integration/all-agents-unified`.
+- **L2 and L3:** the prompt says preserved993/execution720, and the plan names the 720 packet and 720/900.
+- **Handoff:** one internal `orca orchestration send --to run:run_e57ecd84a7bc --type status`, with no `worker_done`,
+  no old IDs and no external send. The CLI plans keep all three automations `--disabled`.
+- **Tests:** 56 passed in 2.73 s, exit 0, on Python 3.14, with `-B` and basetemp in scratch. The packet file list
+  was unchanged.
+
+New Medium (M1b), reproduced with fakes:
+- The probe is `probe_persistfail.py` in scratch. It makes `atomic_status` raise `PermissionError` for the
+  result/status files after one real invocation; on Windows, `os.replace` fails like this when a reader holds the file
+  open.
+- The exception escapes `execute()` from line 252, and the handler's own write at line 261 fails again. `main()` line
+  279 then reports `exit 20, outcome "skip", claimTaken false`.
+- Meanwhile the claim exists, one invocation happened, and only the history file was written.
+- The claim still blocks any retry, but an attempted invocation is reported as a no-claim skip.
+- Narrow fix:
+  - Make per-run and latest-status persistence best-effort inside `execute()`: on failure, return the in-memory
+    result with `resultPersisted` false and its error class, and never re-raise.
+  - In `main()`, a caught exception reports exit 124, `completion-unknown`, when the claim file exists. It never
+    reports `claimTaken` false.
+  - Add one fake test.
+
+Lows:
+- A `Skip` raised inside `invoke()` after the child started (for example a duplicate-key result) is reported as exit 1
+  `postcondition-unverified` rather than 124. It is safe but less exact.
+- `REQUIRED_REF` is `refs/heads/integration/all-agents-unified`. GitHub run `head_branch` has no `refs/heads/` prefix,
+  so whoever builds the receipt must write this exact form.
+
+Decision on the automatic wrapper: not armable until M1b is fixed and reviewed. Both contracts stay unreleased.
+
+Not S4U and not operational acceptance.
+
+## Measured standalone Transition and final M1b wrapper (task `task_6d2564cdd29b`)
+
+Scope:
+- Read-only, at 20:20–20:24 KST. No live operation, no precheck/entry/run, no Orca metadata change.
+- I read the files and live processes myself. The automation drafts were read only with `orca automations show/runs`.
+
+### The one released Transition (`20261104T104550Z-a906a2b3fc0a`): 3-minute Low closed empirically
+
+Records (all present, one per kind):
+- **Claim:** written 11:12:41Z (`CreateNew`), with release message `msg_2e6f7840251e`.
+- **Intent and launch:** intent 11:12:42.25Z; launch `returnValue` 0, helper PID 36884.
+- **Child result:** exit 0, plan `f51623da`, `transitionExecuted` true, `cycleExecuted` false. Context: session 1,
+  `ownerMatched`, `userInteractive`, `jobQuerySucceeded`, `inJob` false, `WinSta0\Default`.
+- **`transition-core` receipt** at 11:13:00.51Z: `primaryLauncherSucceeded` true, `observerRecovered` false, state
+  `7d62c49a`, source `03e17c31`.
+- **Duration result:** `cc168aa7`, elapsed 19.203 s, `controllerExit` 0, no observer-ceiling unknown, no child
+  termination, no retry.
+- **Absent:** no completion-unknown record, latch, lock or lock-guard file, and `run-state` is empty.
+
+Before/after snapshots, compared field by field:
+- **Unchanged:** member/PEM/SPKI/notAfter material and the state/local-key file digests. This holds in `before`,
+  `after` and all three after-samples.
+- **Window:** unchanged, `expired` false and `inWindow` false.
+- **Program:** HTTP 200/200, `live-postgresql-mtls`, kill true, workload false, runs and offers 0, `onlineFresh` 2.
+- **Ticks:** 11:12:35 before, then 11:12:59, 11:13:04 and 11:13:19 after. They advance; the gap during the observer
+  restart is about 24 s.
+- **Processes:** the only real changes are the observer pair, 34380/33812 → 49276/11276, and the snapshot helper's own
+  PID. `serve`, the console, vite with its esbuild child, and the SSH tunnel keep their PID, creation time and command
+  hash.
+
+My own live readback at 20:2x KST:
+- 49276/11276 run `observe` for this state under the expected SID in session 1; their parent 36884 has exited.
+- Every other helper is unchanged, with listeners 55448→15408, 18082→54216 and 3000→25608.
+- `private-state.json` is `7d62c49a`.
+- Overview: `live-postgresql-mtls`, both members online/fresh (heartbeat 3.4 s old), runs and offers 0. Web returns
+  200.
+- Job membership:
+  - The observer root 49276 is not in a job.
+  - Its child 11276 is in a job, and so is the console child 54216 from the original 16:20 launch. This is the
+    virtualenv redirector's own child job, not the caller's job, which was broken away from at 36884.
+
+Decision:
+- 19.2 s is far below my 360 s threshold and the 720/900 budgets, and every postcondition held.
+- The 3-minute Transition-wait Low is closed empirically for this path. It is one sample, not a worst-case bound.
+- With the wrapper's prior-attempt check on the final config, these records give `(earlier=False, unknown=False)`,
+  so the measurement does not block the cycle.
+
+### M1b final source (`pilot_guard.py` `acf8b4f6`): ACCEPTED
+
+Fixed:
+- Each result write in `execute()` is now best-effort.
+- A write failure keeps the in-memory outcome under `operationResult`. The top level becomes exit 1
+  `result-persistence-failed` (or stays 124), with `persistenceErrors` and `resultPublicationComplete` false. Records
+  that were written earlier get one correction.
+- If the pre-invocation history write fails, the run is refused (exit 1) before anything is invoked.
+- `main()` keeps a shared `attempt_state`. After a claim, an escaped exception reports 124 when there is an attempt but
+  no child result, otherwise 1 `claimed-result-unverified`. It never reports `claimTaken` false.
+- The three earlier semantic classes (post-run expiry, post-check exceptions, outer `Skip` after invocation) are
+  preserved.
+- `validate_release`, `facts` and `invoke` are unchanged.
+
+Evidence:
+- **My probe** (`probe_persistfail.py`) against `acf8b4f6`: `execute()` now returns exit 1
+  `result-persistence-failed`. It shows `attempted` true, `claimTaken` true, the child result kept, `operationResult`
+  renewed, two `PermissionError` entries and `resultPublicationComplete` false. Before the fix it raised into a
+  no-claim skip.
+- **Tests:** both files, 62 passed in 3.45 s, exit 0, with the packet file list unchanged.
+- **Config `ca684b45`:** its two `inputFiles` pins (`acf8b4f6` and prompt `2dbaf609`) match.
+
+Lows (non-blocking):
+- A successful run whose publication fails keeps the success fields at the top level next to exit 1. Exit and
+  `outcome` are authoritative.
+- A `Skip` inside `invoke()` after the child starts is still exit 1, not 124.
+- A `KeyboardInterrupt` (BaseException) escapes both handlers and leaves only the claim file.
+
+### Orca drafts: disabled and correct, but stale
+
+- All three IDs show `enabled` false and have no runs:
+  - primary `286d975e`;
+  - fallback1 `a3a9e396`;
+  - fallback2 `3e08faa1`.
+- They match the reviewed plan: provider `codex`, the existing workspace, a fresh session, `Asia/Seoul`, grace 10 and
+  a 60 s precheck timeout. Triggers and `nextRunAt` are 2026-11-08 05:20Z, 11-09 03:15Z and 11-09 23:00Z.
+- Their stored precheck and prompt still bind config `f868eaef`. Against `c1b9e14f` they differ only by that hash.
+- So every precheck would refuse with `wrapper-config-drift`, which fails closed. They must be re-edited with the
+  `c1b9e14f`/`ca684b45` vectors and read back before enabling.
+
+Not S4U and not operational acceptance of the cycle.
+
+## Final binding and enabled automations, read-only check (task `task_07f2c493c77e`): CONFIRMED
+
+Scope:
+- Read-only, at 20:32–20:35 KST.
+- Commands used: `orca automations show/runs`, `gh api` GET, and the wrapper's own `validate_release` run on a scratch
+  interpreter.
+- No precheck, entry, run, edit or test repetition.
+
+Pins:
+- Unchanged: `pilot_guard.py` `acf8b4f6`, config `ca684b45`, CLI plans `c1b9e14f`, prompt template `2dbaf609`, 720
+  manifest `4f1f1ea8`. `run-state` is empty.
+
+Release binding:
+- **`release-parameters.actual.json`** is `d46ddd2a`. It binds:
+  - receipt `final-ci-receipt.actual.json` (`2d9ca236`, hash matches);
+  - head `59f0a3c2`;
+  - the three automation IDs, primary `286d975e` first.
+- **Receipt content:** approved `SOURCE_ACCEPTED`, `Cycle`, current-user pilot scope; 993 baseline and 720 execution
+  packet; config `ca684b45`; executor `b5b8ca68`, runtime `03e17c31`; validity 2026-11-04 11:27:54Z to
+  2026-11-10 01:15:35Z. It also cites my review commit `c24c29ee` and the measured Transition (`cc168aa7`, 19.203 s).
+- **CI checks:** eight. Each has the exact workflow path, ref `refs/heads/integration/all-agents-unified`, head
+  `59f0a3c2`, and completed/success, with 12 required jobs in all:
+  - Backend 3, Core 2, Frontend 2, and 1 each for the other five.
+- **GitHub API:** I read all eight runs (41811262312 … 41811322547) and their jobs myself. Every path, branch, head,
+  conclusion and job name matches the receipt.
+- **`validate_release`:** passes now and at each slot instant (2026-11-08 05:20Z, 11-09 03:15Z, 11-09 23:10Z).
+
+Enabled automations, read back at 20:3x KST (before 20:35):
+- **IDs:** primary `286d975e`, fallback1 `a3a9e396`, fallback2 `3e08faa1`.
+- **State and schedule:**
+  - all `enabled` true; provider `codex`; `reuseSession` false;
+  - existing workspace `…/supervision-codex-20261104`; `Asia/Seoul`;
+  - `run_once_within_grace` with 10 minutes; precheck timeout 60 s.
+- **Next runs:** 2026-11-08 14:20, 11-09 12:15 and 11-10 08:00 KST. These match the guard's slots; the guard refuses
+  the 2027 repeats.
+- **Prompt and precheck:** for each automation they equal the `c1b9e14f` vector with one change: the
+  `<RELEASE_PARAMETERS_SHA256_AFTER_J_GREEN>` placeholder is replaced by `d46ddd2a…`.
+  - Each precheck names its own slot, the config and `release-parameters.actual.json`, and is precheck-only.
+  - `f868eaef` no longer appears.
+- **Runs:** none recorded.
+- **Prompt rules:** an internal `run:run_e57ecd84a7bc` status handoff, no `worker_done`, disable-after-attempt, S4U
+  not reopened.
+- **Disable commands:** `disable-after-attempt.ready.private.json` holds the three exact `--disabled` commands.
+- **Root's read-only precheck report:** all three slots exit 20 `outside-2026-slot`, with `attempted` and
+  `claimTaken` false.
+
+Low (non-blocking):
+- The prompt says "the reviewed disable commands in the final binding" without naming the `.ready` file. The template
+  `disable-after-attempt.plan.json` with placeholders still sits next to it.
+- The IDs are also bound in the release parameters and `PLAN.md`, and the shared claim blocks a second Cycle anyway.
+
+Scope: current-user supervised development pilot only. S4U stays denied and operational acceptance stays false until
+a slot actually runs and is measured.
+
+## Final aggregate report `d720a453` review (task `task_6b1dddd88219`): ACCEPTED, one evidence-wording Low
+
+Scope:
+- Read-only, at 20:4x–20:53 KST, on `agent/codex/supervision-delivery-report-20261104` at `d720a453`
+  (fetched).
+- No runtime action and no test repetition.
+- The live automations were read only with `orca automations show/runs`.
+
+What I checked:
+- **Change scope:**
+  - `d720a453` changes 10 paths: the parent History, the Index, the Claude/Codex/Orca boards and five sanitized
+    Evidence JSONs.
+  - Everything since `5ac8e315` is under `docs/`.
+  - Both registries are unchanged in this commit.
+  - The added lines contain no SID, local username, LAN IP, node ID, email, token or key material.
+- **Facts match what I verified:**
+  - Transition `20261104T104550Z-a906a2b3fc0a`: 19.203 s, exit 0, only the observer pair 34380/33812 → 49276/11276
+    replaced, the other helper PIDs kept, and no Cycle, ObserverRecovery, retry or kill. It says this is one sample,
+    not a worst-case bound.
+  - M1b: `acf8b4f6`, 62 passed / 0 skipped / exit 0.
+  - Release: params `d46ddd2a` and receipt bound to `59f0a3c2` with 8 workflows and 12 jobs.
+  - Schedules: three enabled future 2026 slots (11-08 14:20, 11-09 12:15, 11-10 08:00 KST) with the exact IDs.
+  - Attribution to me is correct: `43907495` (exact-plan acceptance), `c24c29ee` (measurement and M1b) and
+    `777d8386` (binding and enabled readback).
+- **Preserved boundaries:**
+  - original 48 tasks, read from `docs/task-registry.json` at `d720a453`: 2 done, 4 blocked, 42 planned, 0 ready;
+  - VF-CL `acceptedCards` 0 of 5 (registry 1.6.6);
+  - AC-11 aggregate `INVALID_RUN` with `done` false;
+  - S4U `0x80070005` denied;
+  - production and five-node acceptance incomplete; operational acceptance false.
+- **Root's post-review prompt clarification:** my live readback at 20:4x KST.
+  - Each new prompt is the old prompt (`ab9090fa`, `00cc1555`, `84ebf7ce`, equal to my `777d8386` readback) plus one
+    appended "Final coordinator clarification" paragraph. New hashes: `501aecb1`, `60c59f67`, `fe1a2e66`.
+  - Precheck and every other field are byte-identical; all three are enabled with no runs.
+  - The paragraph names the `.ready` disable file, replaces only argv[0] with the fixed Orca executable, reads back
+    `enabled=false`, keeps the claim and history, and uses only the internal status handoff.
+  - The report attributes this paragraph to root and says it is not part of `777d8386`'s review scope. That is
+    accurate.
+
+Low (wording only):
+- The report says root reproduced the health check "in two samples over 20 s at 20:20 KST".
+- The published `r5-root-post-transition-health.json` records `startedAt` 11:20:19.07Z and `observedAt`
+  11:20:19.28Z, a 0.21 s span. It has the booleans `sameMembersAcrossSamples` and `allSnapshotsAdvanced`, but no
+  sample count, interval or per-sample timestamps.
+- Either add the sample timestamps to the JSON or drop "20 s / 2 samples" from the text. It does not change any
+  verdict.
+
+Verdict: the final aggregate report is ACCEPTED, with no overstatement.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -552,6 +1231,10 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Next first action:
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
-  - Core prepares the attended WMI context artifact, and Claude reviews it.
+  - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
+  - Final report `d720a453` is accepted. Root runs the final Docs CI and Obsidian export (0 pending) and delivers. The
+    next real event is the primary slot on 2026-11-08 at 14:20 KST. After any claim, the operator disables all three
+    automations and sends the internal status, then Claude independently reviews the actual result.
+  - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.

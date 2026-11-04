@@ -1,0 +1,32 @@
+[
+  {
+    "id": "286d975e-75e2-4e54-b1fb-2805f7d68959",
+    "slot": "primary",
+    "enabled": true,
+    "oldPromptSHA256": "ab9090fab1e7dac7f3e92541440db467560a5b11c4eb5cfb73d0beb48c836cdb",
+    "newPromptSHA256": "501aecb19565807d449cf3edbc0a618a0cc44154221e92ca1b936fcae953edea",
+    "precheckUnchanged": true,
+    "scheduleUnchanged": true,
+    "change": "Added exact reviewed ready disable-file path and fixed Orca executable; no code/config/release binding changed"
+  },
+  {
+    "id": "a3a9e396-3b48-4aaa-8b73-f8377670f968",
+    "slot": "fallback1",
+    "enabled": true,
+    "oldPromptSHA256": "00cc15553a93caf8d5eed1fa90cea7726be6a64ea6a0ecc262ed0176751b0100",
+    "newPromptSHA256": "60c59f67520f1c0519b105f0fcc9eca17d4e93fef87c3c85a822a11d4f85c68b",
+    "precheckUnchanged": true,
+    "scheduleUnchanged": true,
+    "change": "Added exact reviewed ready disable-file path and fixed Orca executable; no code/config/release binding changed"
+  },
+  {
+    "id": "3e08faa1-4e85-4877-8b13-5645178b41b8",
+    "slot": "fallback2",
+    "enabled": true,
+    "oldPromptSHA256": "84ebf7cec2f3f2fbff2850beaadc5ac55f5260afdc46cd110c485424ac7ee941",
+    "newPromptSHA256": "fe1a2e66ea7c0199e64fdcdaf02d2d913691c6bfdf3fb0c2825946267ef347e1",
+    "precheckUnchanged": true,
+    "scheduleUnchanged": true,
+    "change": "Added exact reviewed ready disable-file path and fixed Orca executable; no code/config/release binding changed"
+  }
+]
