@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.17.0"
+version: "1.18.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T20:24:00+09:00"
+updated: "2026-11-04T20:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1114,6 +1114,60 @@ Lows (non-blocking):
 
 Not S4U and not operational acceptance of the cycle.
 
+## Final binding and enabled automations, read-only check (task `task_07f2c493c77e`): CONFIRMED
+
+Scope:
+- Read-only, at 20:32–20:35 KST.
+- Commands used: `orca automations show/runs`, `gh api` GET, and the wrapper's own `validate_release` run on a scratch
+  interpreter.
+- No precheck, entry, run, edit or test repetition.
+
+Pins:
+- Unchanged: `pilot_guard.py` `acf8b4f6`, config `ca684b45`, CLI plans `c1b9e14f`, prompt template `2dbaf609`, 720
+  manifest `4f1f1ea8`. `run-state` is empty.
+
+Release binding:
+- **`release-parameters.actual.json`** is `d46ddd2a`. It binds:
+  - receipt `final-ci-receipt.actual.json` (`2d9ca236`, hash matches);
+  - head `59f0a3c2`;
+  - the three automation IDs, primary `286d975e` first.
+- **Receipt content:** approved `SOURCE_ACCEPTED`, `Cycle`, current-user pilot scope; 993 baseline and 720 execution
+  packet; config `ca684b45`; executor `b5b8ca68`, runtime `03e17c31`; validity 2026-11-04 11:27:54Z to
+  2026-11-10 01:15:35Z. It also cites my review commit `c24c29ee` and the measured Transition (`cc168aa7`, 19.203 s).
+- **CI checks:** eight. Each has the exact workflow path, ref `refs/heads/integration/all-agents-unified`, head
+  `59f0a3c2`, and completed/success, with 12 required jobs in all:
+  - Backend 3, Core 2, Frontend 2, and 1 each for the other five.
+- **GitHub API:** I read all eight runs (41811262312 … 41811322547) and their jobs myself. Every path, branch, head,
+  conclusion and job name matches the receipt.
+- **`validate_release`:** passes now and at each slot instant (2026-11-08 05:20Z, 11-09 03:15Z, 11-09 23:10Z).
+
+Enabled automations, read back at 20:3x KST (before 20:35):
+- **IDs:** primary `286d975e`, fallback1 `a3a9e396`, fallback2 `3e08faa1`.
+- **State and schedule:**
+  - all `enabled` true; provider `codex`; `reuseSession` false;
+  - existing workspace `…/supervision-codex-20261104`; `Asia/Seoul`;
+  - `run_once_within_grace` with 10 minutes; precheck timeout 60 s.
+- **Next runs:** 2026-11-08 14:20, 11-09 12:15 and 11-10 08:00 KST. These match the guard's slots; the guard refuses
+  the 2027 repeats.
+- **Prompt and precheck:** for each automation they equal the `c1b9e14f` vector with one change: the
+  `<RELEASE_PARAMETERS_SHA256_AFTER_J_GREEN>` placeholder is replaced by `d46ddd2a…`.
+  - Each precheck names its own slot, the config and `release-parameters.actual.json`, and is precheck-only.
+  - `f868eaef` no longer appears.
+- **Runs:** none recorded.
+- **Prompt rules:** an internal `run:run_e57ecd84a7bc` status handoff, no `worker_done`, disable-after-attempt, S4U
+  not reopened.
+- **Disable commands:** `disable-after-attempt.ready.private.json` holds the three exact `--disabled` commands.
+- **Root's read-only precheck report:** all three slots exit 20 `outside-2026-slot`, with `attempted` and
+  `claimTaken` false.
+
+Low (non-blocking):
+- The prompt says "the reviewed disable commands in the final binding" without naming the `.ready` file. The template
+  `disable-after-attempt.plan.json` with placeholders still sits next to it.
+- The IDs are also bound in the release parameters and `PLAN.md`, and the shared claim blocks a second Cycle anyway.
+
+Scope: current-user supervised development pilot only. S4U stays denied and operational acceptance stays false until
+a slot actually runs and is measured.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -1129,9 +1183,9 @@ Not S4U and not operational acceptance of the cycle.
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
   - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
-  - Before enabling: root re-edits the three disabled drafts with the `c1b9e14f` vectors (config `ca684b45`) and
-    reads them back. Root then renders the final-J CI receipt (8 checks, 12 jobs) and runs read-only prechecks. The
-    measured Transition (19.2 s) and M1b `acf8b4f6` are accepted.
+  - The three automations are enabled and confirmed. The next real event is the primary slot on 2026-11-08 at 14:20
+    KST. After any claim, the operator disables all three and sends the internal status. Root then finishes the final
+    docs; core finishes the public seal.
   - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
