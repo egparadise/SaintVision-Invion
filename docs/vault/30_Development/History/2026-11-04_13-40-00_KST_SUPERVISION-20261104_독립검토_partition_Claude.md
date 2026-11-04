@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T15:00:00+09:00"
+updated: "2026-11-04T15:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -175,7 +175,7 @@ attestation edit, so I based on it to avoid conflicting with it.
 | exact head | verdict | basis |
 |---|---|---|
 | `5933a824` | **changes requested** (one Medium) | Local: 33 passed, 1 skipped (Windows symlink capability). Each mutation is caught: removing the post-renewal certificate check gives 2 failed; moving the latch back before `currentStatus` gives 6 failed; restoring the old lock cleanup gives 1 failed. N1 resolved: my `probe402_latch.py` run 2 now renews after a transient `currentStatus` failure. N2 resolved: unchanged or in-window leaves fail at `post-renewal-certificates` and latch. **Medium (synthetic reproduction):** `probe402_member.py`. CP and node-a are due in 1 day, node-b is already 3 days out, and node-b's leaf is not replaced. The run returns rc 0 `renewed`, because the post-check covers only the aggregate hash and the earliest expiry. The batch contract is all-Node (`lan_pilot.py:2604`), so every member must change. Hosted Backend `41777296911` matched the base's known 42F/9E set, with no `test_scheduled_leaf_renewal` failure. Core `41777296712` was cancelled. Desktop failed on the known Docker API 1.52 `KeyError: 'IPAddress'` (the base lacks #405). |
-| `b5b8ca68` | **source accepted** | The post-check now also requires the identical member key set and that every original member's digest changed. `_leaf_set` serializes byte-identically to `5933`; I checked that on a fixture, so existing latches stay comparable. Local: 35 passed, 1 skipped. My member probe now raises. Removing both new clauses gives 2 failed; removing only the key-set clause fails only the path-drift case. Hosted: Docs `41779908269` and Portal `41779908380` success; Desktop `41779908545` failed with the known `KeyError: 'IPAddress'`; Backend `41779908473` and Core `41779908364` were not finished when this was written. |
+| `b5b8ca68` | **source accepted** | The post-check now also requires the identical member key set and that every original member's digest changed. `_leaf_set` serializes byte-identically to `5933`; I checked that on a fixture, so existing latches stay comparable. Local: 35 passed, 1 skipped. My member probe now raises. Removing both new clauses gives 2 failed; removing only the key-set clause fails only the path-drift case. Hosted: Docs `41779908269` and Portal `41779908380` success; Desktop `41779908545` failed with the known `KeyError: 'IPAddress'`; Read back after both finished: Backend `41779908473` and Core `41779908364` each ended with 42 failed and 9 errors. That is the base `03e17c31` set (by file: release-acceptance write/resolver, model deployment, replica-repair route and storage project scope real-PG; AC-11 migration rehearsal; VF-CL registry), attributed to the partition gap, the AC-11 fixture and the VF-CL drift. None is in `test_scheduled_leaf_renewal`. |
 
 Low, still open: `currentStatus` and `runtimePreflight` retries are safe only because the reviewed plan's commands are
 read-only. `_command` does not enforce that. Scheduler registration and r5 live operation are a separate decision. I
@@ -234,10 +234,12 @@ Envelopes produced against the old allowlist will not be admissible, by design; 
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
   correction.
-- Independent review: root accepted `5dd3f83b`, `f42c4259` and `87cdf206`. The SEC-VF pin correction is waiting for
-  root review.
+- Independent review: root accepted `5dd3f83b`, `f42c4259` and `87cdf206`. Root also accepted the SEC-VF pin
+  correction at `402cd283` and merged it into `92856a9c`. Its basis was a Git-object comparison showing that only the
+  runner blob, the target `sourceDocument` and the six known pin strings change. Writer `--check` exits 0, and the
+  previously failing pin test now passes (1 passed).
 - Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next first action: Codex root reviews `agent/claude/s20261104-sec-vf-runner-repin` at its exact head. The
-  coordinator integrates it and then runs the full hosted CI that it deferred until this blocker was fixed.
+- Next first action: Claude reviews the final UI freshness head once it arrives; Codex now owns that retry. The
+  coordinator then runs the final full hosted CI. Workers dispatch no full CI.
