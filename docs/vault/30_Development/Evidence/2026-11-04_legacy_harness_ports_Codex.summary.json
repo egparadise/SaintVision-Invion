@@ -60,10 +60,10 @@
     "existingSyntheticDefect": "NameError project_id in s07_recovery_measurement_case.py, fixed only by returning/unpacking seeded project_id"
   },
   "artifactSha256": {
-    "2026-11-04_legacy_harness_ports_Codex.s04.json": "b2d03bc116c0b36962cc6864947e1aabeedb926050b3e5981b1cbdf44c03af0e",
+    "2026-11-04_legacy_harness_ports_Codex.s04.json": "763d9c8942c2bf0d1c0405978c8d69f8b51464be1ab3fc61ef08cc09d591f91b",
     "2026-11-04_legacy_harness_ports_Codex.s04.xml": "d8f6898bec4230cf5f21c674a2581e64d1ff46eeb083bf2e5e278bd02f16cf53",
     "2026-11-04_legacy_harness_ports_Codex.s07.xml": "ef84a1e67b68e0bfd559fcc0a0023db8a3aae13d58ac77b71ae77cb4142dadb1",
-    "2026-11-04_legacy_harness_ports_Codex.synthetic.json": "1875e5e4212f9f126ad9eb0099d50468ff745db099de0df2ebfbea4d03924b63",
+    "2026-11-04_legacy_harness_ports_Codex.synthetic.json": "9c7c410ef379a549ea7c50c099bec62bac42bda5f361f33956fd31e85255b684",
     "2026-11-04_legacy_harness_ports_Codex.synthetic.xml": "9b0394e5e11ff26e91d001246807a347541375a935d58b15090f1d0479b4932e"
   },
   "environment": {
@@ -221,5 +221,6 @@
       "endedKst": "2026-11-04T14:34:02.323060+09:00",
       "stdout": "CHECK: 2082 managed files, 17 pending exports, 0 conflicts. No writes.\n"
     }
-  ]
+  ],
+  "artifactHashRepresentation": "Committed Git blob bytes (LF normalization per repository attributes), not pre-normalization Windows working-copy bytes"
 }

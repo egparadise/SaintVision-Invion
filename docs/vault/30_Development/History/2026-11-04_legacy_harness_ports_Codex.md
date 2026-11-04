@@ -1,7 +1,7 @@
 ---
 doc_id: "HIST-20261104-LEGACY-HARNESS-PORTS-CODEX"
 title: "Legacy PR118 and PR119 narrow harness forward ports"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 created: "2026-11-04T14:20:00+09:00"
@@ -108,6 +108,9 @@ was measured. Every positive check above was repeated at exact source
 only the new History/Evidence. Delivery gates are recorded in the same log. The compact machine
 summary and final artifact hashes are in
 `docs/vault/30_Development/Evidence/2026-11-04_legacy_harness_ports_Codex.summary.json`.
+Its artifact hashes cover committed Git blob bytes (LF), explicitly accounting for Windows
+working-copy newline normalization; the S04 and synthetic JSON hashes were corrected after
+the first documentation commit so another checkout can verify them directly.
 
 ## Handoff
 
