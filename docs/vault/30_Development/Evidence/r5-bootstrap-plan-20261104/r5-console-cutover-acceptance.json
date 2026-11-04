@@ -1,0 +1,29 @@
+{
+  "observedAt": "2026-11-04T14:31:46.308389+09:00",
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "overviewHTTP": 200,
+  "webHTTP": 200,
+  "source": "live-postgresql-mtls",
+  "onlineFresh": 2,
+  "continuousSnapshotsAdvanced": true,
+  "killSwitch": true,
+  "runs": 0,
+  "resourceOffers": 0,
+  "userWorkloadSubmission": false,
+  "listenerOwnership": {
+    "listenersPerPort": 1,
+    "consoleStateOwned": true,
+    "tunnelOwned": true,
+    "loopbackOnly": true,
+    "webSourceOwned": true
+  },
+  "shortcut": {
+    "hidden": true,
+    "oldStateArgumentAbsent": true,
+    "exactSourceAndState": true,
+    "owned": true
+  },
+  "oldStateByteBaselinesUnchanged": true,
+  "firewallChanged": false,
+  "schedulerRegistered": false
+}

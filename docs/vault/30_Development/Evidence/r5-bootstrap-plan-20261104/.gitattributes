@@ -1,0 +1,4 @@
+# Preserve the exact executed dependency inputs and the hashed receipt bytes.
+launcher-runtime-lock.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+launcher-runtime-hashes.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+r5-execution-redacted.jsonl -text

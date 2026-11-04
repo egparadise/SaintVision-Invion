@@ -1,0 +1,29 @@
+{
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "nodes": [
+    {
+      "host": "host-1",
+      "running": true,
+      "readOnlyRoot": true,
+      "privileged": false,
+      "allCapabilitiesDropped": true,
+      "pidsLimited": true,
+      "memoryLimited": true,
+      "cpuLimited": true,
+      "nodeLocalKeyOwnerMatched": true,
+      "nodeLocalKeyMode": "0600"
+    },
+    {
+      "host": "host-2",
+      "running": true,
+      "readOnlyRoot": true,
+      "privileged": false,
+      "allCapabilitiesDropped": true,
+      "pidsLimited": true,
+      "memoryLimited": true,
+      "cpuLimited": true,
+      "nodeLocalKeyOwnerMatched": true,
+      "nodeLocalKeyMode": "0600"
+    }
+  ]
+}

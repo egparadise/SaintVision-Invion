@@ -1,0 +1,11 @@
+{
+  "originalPlanSHA256": "2614a1b3b4b3201163d2f6e0ef0295747509d5b4ec0eb388e055f00c6a24c039",
+  "preparedPlanSHA256": "2f2979c61015e1ce62d5c098befc5b8119c1938b76480e65c3022e8bf8e7bf1d",
+  "operationalSourceHeadSHA": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "schedulerCorrectionCodeSHA": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "finalPrivateOperatorSourceSHA256": "561719848b8a47ee104d0a46f125a9fb23eb7eb15df11137034d67e81cd4d690",
+  "finalPrivateOperatorSourcePath": ".work/supervision-codex-audit/r5_ops.py",
+  "redactedReceiptRows": 167,
+  "redactedReceiptSHA256": "2206db2f96c5332921bbb5fb368917d60fc699190e505a1bfaf1a2ae0cb5e23f",
+  "privatePlansAndDiagnosticsPublished": false
+}

@@ -1,0 +1,24 @@
+{
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "preparedPlanSHA256": "2f2979c61015e1ce62d5c098befc5b8119c1938b76480e65c3022e8bf8e7bf1d",
+  "originalPlanSHA256": "2614a1b3b4b3201163d2f6e0ef0295747509d5b4ec0eb388e055f00c6a24c039",
+  "runtime": {
+    "ready": true,
+    "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "ownGitCommonDir": true,
+    "runtimeLockSHA256": "42b1750b79f1598e2624f44e5f5000dd095aa19104221ad2fa6a5c523e80e016",
+    "runtimeHashLockSHA256": "aac4ef21de4e8f3e481962f4c86520f01206e6505e0fe16df9feaa26767fa92e",
+    "packageLockSHA256": "e26cb03e08efa76dbe19f43dfa5afe779b46189181e020ab8503ad4cf428a818",
+    "runtimeTests": "112 passed / 6 Windows symlink skips",
+    "npmCiExit": 0,
+    "buildExit": 0,
+    "pipCheckExit": 0,
+    "pythonVersion": "3.14.7",
+    "nodeVersion": "24.10.0",
+    "npmVersion": "11.6.1",
+    "viteVersion": "6.4.3"
+  },
+  "ownSourceRoot": "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-reviewed-source-03e17c31",
+  "observedAt": "2026-11-04T05:10:12.573056+00:00",
+  "liveMutationPerformed": false
+}
