@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.10.0"
+version: "1.11.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T18:24:00+09:00"
+updated: "2026-11-04T18:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -672,6 +672,41 @@ Orca one-off on Nov 8, as the current-user alternative to S4U:
     asserts the manifest text.
   - Changing it is a criterion edit and needs its own review.
 
+## Root `59f0a3c2` CI-text correction review (task `task_169f7a385e7c`): accepted
+
+Diff `eff93191..59f0a3c2`, 3 files, one commit:
+- **Manifest:** only VF-CL-04 `whyCiVerified` changed.
+  - It now names `Run 41792498330` and the receipt named by `ciVerifiedAttestation`.
+  - It keeps the OIDC, Sigstore, re-checkable and expiry boundaries, and adds "does not grant operational acceptance".
+- **Registry:** only `version` (1.6.4 → 1.6.5) and the last sentence of `verifiedAgainst.note` changed.
+  - The 03e17c31 local re-verification facts are kept.
+  - The tree/ref/landedNote/hostedRun/reverification fields, and all machine-check, implies, receipt, bundle and
+    attestation fields, are unchanged.
+- **Test file:**
+  - The earlier `runId`/`headRef`/artifact binding is kept.
+  - `test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote` now requires `Run {runId}` from the committed
+    receipt, instead of the old constant, and keeps the OIDC and re-check anchors.
+
+What I found and ran:
+- **Root's first text edit broke a second test.** That edit made `whyCiVerified` generic, which broke this second
+  hard-coded `406` assertion.
+  - Root's `.work/source80-rationale-full.log` showed 1 failed, 243 passed, and I reproduced it.
+  - Root then named the current run and derived it in the test. That keeps the protection, so the old constant is not
+    simply weakened.
+- **At `59f0a3c2`, in a temporary detached checkout (since removed):**
+  - both full files: 244 passed, 0 skipped, exit 0;
+  - registry checker exit 0, `acceptedCards` 0;
+  - `check_docs` exit 0;
+  - the real verifier returns `VERIFIED` for run `41792498330`.
+- **Mutants:** the old `Run 40633895766` text and an unnamed-run text both fail the new assertion.
+- **One unexplained failure (not reproduced):** one full run of my scratch variant (before `59f0a3c2`) failed
+  `test_the_shipped_registry_agrees_with_this_tree` once.
+  - It passed alone and in the full rerun, and I did not capture the assertion.
+  - That test calls git against the live repository, so if it recurs in CI, treat it as a finding.
+- **Opinion:**
+  - Commit `59f0a3c2`, run Docs CI, land by the targeted plan, then require all 8 workflows at the exact landed head.
+  - Keep the `eff93191` FAILED record, with no pre-8 pass claim.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -686,8 +721,7 @@ Orca one-off on Nov 8, as the current-user alternative to S4U:
 - Next first action:
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
-  - Root lands the `eff93191` test-only correction, keeping the FAILED record, and runs all 8 workflows at the exact
-    landed head.
+  - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
   - Before any cycle release: measure or raise the 3-minute Transition wait, then run the fresh-RunId outside-window
     proof.
   - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
