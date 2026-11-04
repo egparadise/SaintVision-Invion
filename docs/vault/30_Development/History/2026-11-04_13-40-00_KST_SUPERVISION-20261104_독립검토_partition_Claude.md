@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.14.0"
+version: "1.15.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T19:24:00+09:00"
+updated: "2026-11-04T19:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -826,6 +826,84 @@ Lows (wording only):
 - The report calls core's Transition-wait change "the proposal that resolved the 3-minute fail-closed risk". I have not
   reviewed that proposal, so it should say "proposed fix, pending Claude review".
 - Backend and Core results must be appended when they complete, before any final 8-of-8 statement.
+
+## Orca supervised pilot packet `r5-orca-supervised-288670efba3d` (task `task_2ae5dd31f68d`): SOURCE_ACCEPTED with one Medium to fix before release
+
+Scope:
+- Read-only.
+- All seven declared hashes match: manifest `4f1f1ea8`, controller `c9fad676`, cycle plan `3d278293`, Transition plan
+  `f51623da`, manual config `01237ed5`, `pilot_guard.py` `c653b741`, wrapper config `c52c0fb0`.
+- No WMI launch, Cycle, Transition, Recovery, claim or Orca metadata action.
+
+What I checked:
+- **The 720-second packet** compared with the reviewed `5babae638fde` packet:
+  - Guards, entry and the transition core are byte-identical.
+  - The controller differs in one line: `Transition` waits 720 s, `Cycle` 4 h, and every other operation 180 s.
+  - Configs and plans differ only in packet paths, the controller and plan hashes, and fresh RunIds. The four
+    RunIds are distinct and none has a record yet.
+- **The manifest** binds the preserved `993febe8` baseline.
+- **Real `-PlanOnly` runs, all exit 0, `wmi-runtime` unchanged:**
+  - the gate-10 argv of both configs (`Transition` and `ScheduledTransition`);
+  - `ContextOnly`;
+  - the `Cycle` command, each with a fresh RunId.
+- **Wrapper read-only actions:** `describe` exits 0 for all three slots, with `claimExists` false. The not-due
+  precheck refuses with exit 20 (`outside-2026-slot`) and takes no claim.
+- **Tests:** the 48 isolated tests pass on Python 3.14. The packet and `run-state` were not written.
+- **Precheck budget:** the precheck hashes 133 pinned files (103 MB) in 0.19 s, well under its 60 s timeout.
+- **Pilot state:** the live `private-state.json` equals the pinned `7d62c49a`, unchanged since 14:17. The prepare,
+  stage, commit and observe commands do not call `save()`. No lock, latch or lock-guard file exists.
+- **Orca:** the installed `app.asar` SHA-256 equals the packet identity `c0446919`. I re-ran the replay and got the
+  same result:
+  - The packaged parser drops `COUNT=1` and the month/day fields of an RRULE, so it would recur daily.
+  - Annual cron fires on 2026-11-08 05:20Z, 11-09 03:15Z and 11-09 23:00Z, then again in 2027.
+  - The guard's absolute 2026 slot plus 10-minute grace refuses the 2027 occurrences and any "run now" outside the
+    slot.
+
+Accepted rules:
+- **Pins:** every plan, packet, executable, scheduler and source pin is checked, with clean `HEAD` for both sources.
+- **Leaf paths:** only state-relative paths are accepted, with containment and ordinary/reparse checks. This closes
+  root's High.
+- **Shared claim:** a single exclusive claim (`xb`) per run, after which every guard runs again; no reclaim.
+- **Waits:** 720 s fits under the 900 s gate. The wrapper waits at most 14520 s, then records unknown/124 without
+  killing the child or retrying.
+- **Window and margin:** a margin of at least 4 hours is required.
+- **Prior attempts:** a prior latch, lock, completion-unknown record, or intent without a result blocks the run. A safe
+  exit-4 refusal does not.
+- **Prompts:** they separate the current-user supervised pilot from S4U/production. The three automations are
+  disable-after-claim.
+
+Findings:
+- **M1 Medium (measured with fakes):** after a real invocation, `execute()` calls `post_facts()`, which re-runs
+  `facts()`. That includes `validate_release()` and every drift check. Any `Skip` raised there falls into the outer
+  `except Skip` branch.
+  - My probe: one invocation that returned renewed, then a post-readback `Skip('release-not-current')`.
+  - The wrapper reported `exit 20, outcome "skip"` with `claimTaken` true, and wrote no per-run result.
+  - This case is reachable. The fallback2 slot starts at 23:00–23:10Z, the release `validUntil` must be no later than
+    01:15:35Z, and the cycle may run up to 4 h.
+  - Safety holds through the claim, but an executed renewal would be reported as a skip.
+  - Fix before release:
+    - Do not re-validate the release after invocation.
+    - Classify any exception after `invoke()` as `postcondition-unverified` (exit 1, or 124), keep the child result,
+      and write the per-run result file.
+    - Add a fake test for this case.
+- **L1:** `validate_release()` accepts any 8 or more unique green checks. It should pin the exact eight workflow
+  paths/names and the expected ref.
+- **L2:** the prompt says "exact pinned993 Cycle", but the run uses the 720 packet; 993 is the bound baseline.
+- **L3:** the direct-transition test plan says "verify993" and "measure … vs180". It should name the 720 packet and
+  measure against 720.
+- `ScheduledTransition` and `ObserverRecovery` keep 180 s. That is acceptable while they are unreleased.
+
+The 3-minute Low:
+- Structurally, 720 s inside the 900 s gate closes it in source.
+- Closing it empirically requires one measured `Transition` with these conditions:
+  - elapsed comfortably below 720 s (I suggest half of it or less);
+  - all postconditions held: same public leaves and SPKI, two fresh nodes, an owned observer, a `CreateNew` receipt.
+- My opinion: one standalone `Transition` before Nov 8 is worth releasing.
+  - Conditions: a separate exact-plan review (fixing L3), root release, a fresh unused RunId
+    (`20261104T102449Z-d02f35d04547` currently has no record), and ObserverRecovery reviewed in advance.
+  - It is the only pre-cycle measurement of the live relaunch path. Without it, the first cycle's gate 10 is the
+    measurement, and a slow result there fails after `commit` under the latch.
+- Not S4U and not operational acceptance.
 
 ## State boundaries
 
