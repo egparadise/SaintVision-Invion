@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "taskId": "task_2944648d1e21",
+  "dispatchId": "ctx_8fe0598e2b57",
+  "runId": "run_e57ecd84a7bc",
+  "baseSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "implementationSha": "d44d7a0800996a1e7f282e0a16ae4c7c40b1592f",
+  "branch": "agent/codex/legacy-harness-ports-20261104",
+  "originHeads": {
+    "118": "c149f8dff4df36aa8918ea8d2bb45fb200cc0d03",
+    "119": "367ac3398dee3f832e6f76cd18def715e8a5362c"
+  },
+  "sourcePaths": [
+    "tests/core/test_s04_db_runner.py",
+    "tests/core/test_s07_recovery_measurement.py",
+    "tests/integration/s04_db_runner_case.py",
+    "tests/integration/s07_recovery_measurement_case.py",
+    "tests/integration/test_five_node_lab_preflight.py",
+    "tools/five_node_lab_preflight.py",
+    "tools/measure_s07_recovery.py",
+    "tools/run_s04_db_evidence.py"
+  ],
+  "validation": {
+    "unitCompatibility": {
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "s04RealHttpPostgres": {
+      "pytestCasesPassed": 1,
+      "measuredSubcases": 4,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "s07RealPostgresPreflight": {
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0,
+      "rowsUnchanged": true,
+      "readOnly": true,
+      "physicalNodes": 0
+    },
+    "defaultSynthetic": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0,
+      "syntheticNodes": 3,
+      "physicalAcceptance": false
+    }
+  },
+  "baseline": {
+    "s04CollectionExit": 2,
+    "s07UnitExit": 1,
+    "s07Failed": 3,
+    "s07Passed": 7,
+    "existingSyntheticDefect": "NameError project_id in s07_recovery_measurement_case.py, fixed only by returning/unpacking seeded project_id"
+  },
+  "artifactSha256": {
+    "2026-11-04_legacy_harness_ports_Codex.s04.json": "b2d03bc116c0b36962cc6864947e1aabeedb926050b3e5981b1cbdf44c03af0e",
+    "2026-11-04_legacy_harness_ports_Codex.s04.xml": "d8f6898bec4230cf5f21c674a2581e64d1ff46eeb083bf2e5e278bd02f16cf53",
+    "2026-11-04_legacy_harness_ports_Codex.s07.xml": "ef84a1e67b68e0bfd559fcc0a0023db8a3aae13d58ac77b71ae77cb4142dadb1",
+    "2026-11-04_legacy_harness_ports_Codex.synthetic.json": "1875e5e4212f9f126ad9eb0099d50468ff745db099de0df2ebfbea4d03924b63",
+    "2026-11-04_legacy_harness_ports_Codex.synthetic.xml": "9b0394e5e11ff26e91d001246807a347541375a935d58b15090f1d0479b4932e"
+  },
+  "environment": {
+    "os": "Windows / PowerShell",
+    "python": "3.14.7",
+    "pytest": "9.1.1",
+    "postgresImage": "pgvector/pgvector:pg16",
+    "dockerServer": "20.10.22"
+  },
+  "disposableResources": [
+    {
+      "kind": "ownedContainerCleanup",
+      "containerId": "ac1acd2072f583baa8a5e4060598855fb67701bb81e41e6a293fe265b0a4a6f1",
+      "removeExit": 0,
+      "absentAfterRemoval": true,
+      "oldResourcesTouched": false
+    },
+    {
+      "kind": "disposablePostgres",
+      "containerId": "c921786e7edab73fc6b402fe4c9137d3738db71651f18db0fa8486602bd5ff12",
+      "imageId": "sha256:8e5355e9ff399a002fa46148399a1ac22fb3e9b2d390f857296e6da6b5559ba1",
+      "port": {
+        "HostIp": "127.0.0.1",
+        "HostPort": "57633"
+      },
+      "mounts": [],
+      "tmpfs": {
+        "/var/lib/postgresql/data": "rw"
+      },
+      "labels": {
+        "inv.test.owner": "codex",
+        "inv.test.task": "task_2944648d1e21"
+      },
+      "syntheticTestServer": true,
+      "liveResourcesUsed": false
+    },
+    {
+      "kind": "disposableResidue",
+      "databases": 0,
+      "loginRoles": 0
+    },
+    {
+      "kind": "ownedContainerCleanup",
+      "containerId": "c921786e7edab73fc6b402fe4c9137d3738db71651f18db0fa8486602bd5ff12",
+      "removeExit": 0,
+      "absentAfterRemoval": true,
+      "oldResourcesTouched": false
+    },
+    {
+      "kind": "disposablePostgres",
+      "containerId": "fa08bb6b06285bf0bdfe8faf23602d1cb411732472b426e0afeed0626c50dbb9",
+      "imageId": "sha256:8e5355e9ff399a002fa46148399a1ac22fb3e9b2d390f857296e6da6b5559ba1",
+      "port": {
+        "HostIp": "127.0.0.1",
+        "HostPort": "51914"
+      },
+      "mounts": [],
+      "tmpfs": {
+        "/var/lib/postgresql/data": "rw"
+      },
+      "labels": {
+        "inv.test.owner": "codex",
+        "inv.test.task": "task_2944648d1e21"
+      },
+      "syntheticTestServer": true,
+      "liveResourcesUsed": false
+    },
+    {
+      "kind": "disposableResidue",
+      "databases": 0,
+      "loginRoles": 0
+    },
+    {
+      "kind": "ownedContainerCleanup",
+      "containerId": "fa08bb6b06285bf0bdfe8faf23602d1cb411732472b426e0afeed0626c50dbb9",
+      "removeExit": 0,
+      "absentAfterRemoval": true,
+      "oldResourcesTouched": false
+    },
+    {
+      "kind": "disposablePostgres",
+      "containerId": "dc711a6dc7e8601af1b23e14fc0c96035c6b14a22c4eaa0516723a3a6488ec79",
+      "imageId": "sha256:8e5355e9ff399a002fa46148399a1ac22fb3e9b2d390f857296e6da6b5559ba1",
+      "port": {
+        "HostIp": "127.0.0.1",
+        "HostPort": "52377"
+      },
+      "mounts": [],
+      "tmpfs": {
+        "/var/lib/postgresql/data": "rw"
+      },
+      "labels": {
+        "inv.test.owner": "codex",
+        "inv.test.task": "task_2944648d1e21"
+      },
+      "syntheticTestServer": true,
+      "liveResourcesUsed": false
+    },
+    {
+      "kind": "disposableResidue",
+      "databases": 0,
+      "loginRoles": 0
+    },
+    {
+      "kind": "ownedContainerCleanup",
+      "containerId": "dc711a6dc7e8601af1b23e14fc0c96035c6b14a22c4eaa0516723a3a6488ec79",
+      "removeExit": 0,
+      "absentAfterRemoval": true,
+      "oldResourcesTouched": false
+    }
+  ],
+  "safety": {
+    "productPolicyChanged": false,
+    "publicSchemaChanged": false,
+    "migrationChanged": false,
+    "sharedBoardsChanged": false,
+    "existingVolumesTouched": false,
+    "liveNodesTouched": false,
+    "obsidianApply": false
+  },
+  "review": {
+    "owner": "Codex",
+    "independentReviewer": "root/Claude pending",
+    "hostedCi": "not-run",
+    "operationalAcceptance": "UNMEASURED"
+  },
+  "deliveryGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "endedKst": "2026-11-04T14:33:56.358678+09:00",
+      "stdout": "PASS: 24 original hashes, 1166 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\n"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "endedKst": "2026-11-04T14:33:58.779416+09:00",
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\n"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--conflicts-out",
+        "docs/vault/30_Development/Evidence/2026-11-04_legacy_harness_ports_Codex.sync-conflicts.json"
+      ],
+      "exitCode": 0,
+      "endedKst": "2026-11-04T14:34:02.323060+09:00",
+      "stdout": "CHECK: 2082 managed files, 17 pending exports, 0 conflicts. No writes.\n"
+    }
+  ]
+}
