@@ -1,5 +1,5 @@
 {
- "version": "1.6.2",
+ "version": "1.6.3",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -169,7 +169,7 @@
     {
      "what": "tests/integration/test_recovery_drill.py",
      "condition": "19 of 20 cases need a CX01 container on this host -- 17 for CX01_CONTAINER and 2 for the archiver image, which is that container's image. This workstation has no CX01 container and local docker is off by memory constraint.",
-     "measuredIn": "hosted Core run 37548456022 at 517880099743cf2d62131012191b7ba54650c44d (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed, asserted by core.yml rather than read from prose. Re-measured at this registry's tree; the previous measurement was run 36886647197 at 25f43a25 and the first was run 36521298082 at 6fc0428b, because a claim about a tree has to be shown at that tree.",
+     "measuredIn": "hosted Core run 40451334923 at 03e17c31cf535008d39534aaa80d3ae274bd75cc (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed, asserted by core.yml rather than read from prose. Re-measured at this registry's tree; earlier measurements were run 37548456022 at 51788009, run 36886647197 at 25f43a25 and run 36521298082 at 6fc0428b, because a claim about a tree has to be shown at that tree.",
      "note": "Filed as a blocker in registry 1.2.0 and in the restatedBlockers note. That was wrong twice over: first it waited for merged PR #126, then it waited for inputs hosted CI already supplies. A gap in my own measurement is not a gap in the work.",
      "blockerIdsThisReplaces": [
       "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
@@ -210,42 +210,57 @@
   }
  ],
  "verifiedAgainst": {
-  "tree": "517880099743cf2d62131012191b7ba54650c44d",
-  "ref": "coord/train63a-ci-0847",
-  "candidate": true,
-  "reverifyAt": "integration/all-agents-unified",
-  "candidateNote": "coord/train63a-ci-0847 is the train 63 landing CANDIDATE, not integration. Every claim re-derived here is about that candidate tree. When it reaches integration/all-agents-unified the claims must be re-verified and re-recorded at the landed SHA -- rule 8 reports until they are, because an ancestry relation is not a licence to carry a candidate's evidence forward.",
-  "note": "Card 285 re-recorded this block at the train 63 candidate (train 62 plus the single merge of #381). The previous entry named the train 11 candidate 25f43a25, which is an ancestor of this tree and still passed rule 8 only because it had never reached integration -- a claim that is technically admissible and 52 trains stale. All 56 manifest checks were re-applied here independently of the checker and all 56 hold, which is what re-derives implemented. locallyVerified was re-measured per card at this tree (see reverification). ciVerified is unchanged: the manifest still asserts nothing for VF-CL-01/02/03/05 and the hosted lane cannot attribute a directory run to one card, so the per-card attribution below records what the run does and does not show rather than upgrading the claim.",
+  "tree": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "ref": "integration/all-agents-unified",
+  "landedNote": "Re-recorded at the LANDED tree, not a candidate. The previous block named the train 63 candidate 517880099743cf2d62131012191b7ba54650c44d (coord/train63a-ci-0847) with candidate: true and reverifyAt integration/all-agents-unified. That tree reached integration, and rule 8 then reported it on every branch (check_vf_cl_registry.py exit 1 at 03e17c31). Train 78 03e17c31 landed on integration/all-agents-unified at 2026-11-04 12:08:42 KST (GitHub branch activity API, push 6fc0428b -> 03e17c31). It was not inherited by ancestry: the claims below were re-measured at this exact tree on 2026-11-04 (SUPERVISION-20261104, Claude), and the candidate/reverifyAt markers were removed only after that. A later candidate that re-records here has to put candidate: true and reverifyAt back.",
+  "note": "Every manifest check the checker applies held at 03e17c31: run at a detached checkout of that tree, check_vf_cl_registry.py reported exactly one finding, the rule-8 drift this block corrects. locallyVerified was re-measured per card at this tree (see reverification); the counts equal Card 285's at 51788009, and between the two trees no attributed test file changed. ciVerified is unchanged by this re-record. VF-CL-04's true claim rests on its own attestation (ciVerifiedAttestation, run 40633895766), not on this block.",
   "hostedRun": {
-   "runId": "37548456022",
+   "runId": "40451334923",
    "workflow": "Core Build",
-   "headSha": "517880099743cf2d62131012191b7ba54650c44d",
+   "headSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+   "headBranch": "coord/train78a-ci-1343",
+   "event": "workflow_dispatch",
    "conclusion": "success",
+   "attempt": 1,
+   "createdAt": "2026-10-27T04:43:52Z",
+   "updatedAt": "2026-10-27T05:19:23Z",
    "steps": [
     "Create disposable CX01 PostgreSQL: success",
-    "Run owned CX01 recovery drill evidence: success",
+    "Verify Workspace recovery boundary first: success",
+    "Run owned CX01 recovery drill evidence: success (log: 20 passed in 36.81s)",
     "Require executed CX01 recovery evidence: success",
     "Cleanup disposable CX01 PostgreSQL: success"
    ],
-   "attempt": 2,
-   "why": "core.yml asserts skips == Counter() and passed == 20 for the owned CX01 recovery drill, so a successful run is proof it executed with no skips at this exact tree. Attempt 1 of this run id concluded failure on one unrelated real-PG setup error (test_kernel_cancel_bridge_real_pg, NODE-0030 uncertain delivery; 8,623 passed, 0 failures, 1 error) and the failed job was re-run. The three owned CX01 steps succeeded in attempt 1 as well, so the drill measurement did not depend on the re-run; the attempt is recorded because a reader checking this run id sees both."
+   "why": "core.yml at this tree asserts skips == Counter() and passed == 20 for the owned CX01 recovery drill, so a successful step proves the drill ran with no skips at this exact source. The run was dispatched on 2026-10-27 13:43 KST against the train 78 candidate ref, before the landing. It is the same 40-character source that landed, so it is evidence about this tree. It is reused rather than re-dispatched because a new run at the same source would measure the same bytes. It is not a post-landing run. Attempt 1; no re-run."
   },
   "otherHostedRuns": [
    {
-    "runId": "37548452805",
+    "runId": "40451332159",
     "workflow": "Backend Build",
-    "headSha": "517880099743cf2d62131012191b7ba54650c44d",
-    "conclusion": "success"
+    "headSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "event": "workflow_dispatch",
+    "conclusion": "success",
+    "attempt": 1
    },
    {
-    "runId": "37548464717",
+    "runId": "40451343361",
     "workflow": "Documentation Build",
-    "headSha": "517880099743cf2d62131012191b7ba54650c44d",
-    "conclusion": "success"
+    "headSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "event": "workflow_dispatch",
+    "conclusion": "success",
+    "attempt": 1
    }
   ],
+  "postLandingRuns": {
+   "note": "The first integration push runs after the landing were red, and they are recorded so a reader checking this tree sees them. Backend 41765284237 and Core 41765284130 each ended with 42 failed and 9 errors. Causes: (1) the 2026-10 test-database partition gap after the 2026-11-01 calendar rollover, 40 failures and the 9 errors, fixed in test setup by PR #407 5dd3f83b; (2) the AC-11 fixture expiry, 1 failure, fixed by #397 751ea725; (3) this block's rule-8 drift, 1 failure, which is what this re-record fixes. None is an attributed VF-CL test. Desktop 41765284319 also failed, on Docker API 1.52 removing NetworkSettings.IPAddress (#405 38d443b7).",
+   "runs": [
+    "41765284237",
+    "41765284130",
+    "41765284319"
+   ]
+  },
   "reverification": {
-   "environment": "Python 3.14.7, docker hidden from PATH, real PostgreSQL only via a disposable database c285_reverify created and dropped on 127.0.0.1:55432 (the shared invdev database was not used)",
+   "environment": "Re-measured 2026-11-04 13:58-13:59 KST at a detached checkout of 03e17c31 with Python 3.14.7. Docker was hidden from PATH. Real PostgreSQL was a disposable postgres 16.15 container on 127.0.0.1:55493, where the test fixture creates and drops its own inv_backend_test_* database. The shared invdev database was not used.",
    "attributionRule": "A test counts for a card when it imports one of that card's DISTINCTIVE owned modules (an owned module that is not shared API infrastructure, counting a bare import of a tool's basename because tools are imported after a sys.path insert), or when the card's own manifest checks name that test file. A first attempt matched module basenames as substrings and pulled in 128-153 files per card, which is the failure whyCiVerified names: it would have read as coverage while asserting nothing. Recorded so the next reader can judge the rule, not just the result.",
    "perCard": {
     "VF-CL-01": {
@@ -298,8 +313,10 @@
      "localResult": "no code to run; this card ships review documents"
     }
    },
-   "whatThisDoesNotShow": "The hosted Core lane runs whole directories (pytest tests/core, pytest tests/), so a green lane shows the lane passed, not that a named card was exercised. The attributed tests above are the honest intersection; VF-CL-01's is a single file, which is the thinnest of the four and is stated rather than padded."
-  }
+   "whatThisDoesNotShow": "The hosted Core lane runs whole directories (pytest tests/core, pytest tests/), so a green lane shows the lane passed, not that a named card was exercised. The attributed tests above are the honest intersection; VF-CL-01's is a single file, which is the thinnest of the four and is stated rather than padded.",
+   "previous": "Card 285 at 51788009 (train 63 candidate), Python 3.14.7, disposable database c285_reverify on 127.0.0.1:55432"
+  },
+  "scope": "Source, local and hosted-CI provenance only. No card is operationallyAccepted, and this block measures no live system. acceptedCards stays 0."
  },
  "verifiedBy": "tools/check_vf_cl_registry.py"
 }

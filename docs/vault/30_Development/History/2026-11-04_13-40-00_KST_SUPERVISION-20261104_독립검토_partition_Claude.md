@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T13:40:00+09:00"
+updated: "2026-11-04T14:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -35,6 +35,10 @@ source_of_truth: "Git"
 | #397 | `a44d578a` (delta over `f2936ae5`) | Codex | **source accepted** | Dependency gate: 0 errors at the head vs 18 at train 78; 2/4/42/0. eslint exits 0, including merged with #401. I re-ran the attestation verifier: VERIFIED (head `ad0132b3`, run `40633895766`). Hosted runs at the head are green. |
 | #404 | `81a9982f` | Codex | **accepted as documentation** | `check_docs` exit 0, `git diff --check` exit 0. Its base is #397's branch, so landing order matters. |
 | #405 code | `925dd669..38d443b7` | Codex | **accepted** | 36 passed. Swapping in the old tool gives 29 failed. Hosted Desktop Browser `41771833216` success. |
+| #405 contract | `38d443b7..e97701bf` | Codex | **changes requested** (hosted) | Hosted Frontend `41774468131`: Portal container failed with TS2307, because the canonical schema import sat outside the Docker build context. Backend semantics accepted: 19 passed on real PG; frontend 14 passed; eslint exit 0. Notes: semantics diverge from #400's console; the client rejects clock skew. |
+| #405 portal fix | `5a980dba..cd24dcb5` | Codex | **accepted** (source and hosted) | Dockerfile COPY of the schema plus `.dockerignore`. I read back hosted Frontend `41775977367` at `cd24dcb5`: success. Jobs `frontend` `126396304151` and `Portal Container Build & Hardened Runtime Smoke` `126396304451` both succeeded. |
+| #402 corrected | `b1e59f85` (code `458c3389`) | Codex | **changes requested** | F1, F2 and F3 are addressed. Hosted Backend `41773055219` shows only the known 42F/9E set; locally 27 passed, 1 skipped. N1: a failure before any mutation latches, and the reset is refused inside the window. Probe `probe402_latch.py`: run 2 rc 2 `recovery-required`, reset raised ValueError. N2: `already-renewed` exits 0 silently when the leaves did not change (probe `probe402_silent.py`). Low: `_lock`'s `finally` can mask the original exception. |
+| r5 plan | `4f53b5ab` | Codex | **accepted with conditions** | I verified the plan digest `2614a1b3…c24c039`. Bootstrap source has no diff between `e8606423` and `03e17c31`. Conditions: C1, bind the step 4–5 arrays and resolve the bundle placeholders; C2, the 6-day default and maximum leaf expires about 2026-11-10, with the window opening about 11-08; C3, the admin-password copy widens the secret surface; C4, a clock-bound check. The coordinator relayed that root bound C1–C4. |
 
 ## Demonstrated gap fixed here: the test DB's 2026-10 partition gap
 
@@ -71,12 +75,7 @@ authority for those.
 
 ## Not executable by Claude alone, with the next action
 
-- **VF-CL registry rule 8.** `verifiedAgainst.tree 51788009` reached integration with train 78, so
-  `check_vf_cl_registry.py` exits 1 on train 78 and on #397. The shipped-registry tests require a `coord/*`
-  candidate (`candidate: true`, `reverifyAt` integration) and a successful hosted Core run at that exact tree.
-  03e17c31 has already landed, so it cannot be that candidate.
-  - Next: the coordinator names the next train candidate ref and dispatches Core there.
-  - Then Claude re-measures each card and re-records.
+- **VF-CL registry rule 8**: corrected; see the section below. It is no longer a non-executable item.
 - **All twelve Claude-owned 48-task cards** are `planned`/`blocked` and depend transitively on S01-BE (U2 IdP,
   U3 CA chain, U4 DNS) and S01-ST (U1 topology, U5 five-PC inventory/NTP, U6 storage product/credentials).
   - Next: the user supplies those inputs ([[2026-09-22_S01-BE_S01-ST_잔여_합격조건표_Claude]]).
@@ -98,9 +97,70 @@ authority for those.
 
 `check_docs` exit 0, ratchet exit 0, `git diff --check` exit 0.
 
+## PR #407 hosted readback
+
+Hosted Backend `41774047968` at `5dd3f83b` concluded failure, with 2 failed and 8,376 passed on each interpreter. Both
+failures are known and attributed:
+- `test_the_shipped_registry_agrees_with_this_tree` is the VF-CL rule 8 failure corrected below;
+- `test_main_reads_zip_and_github_metadata_files` is the AC-11 fixture failure that #397 `751ea725` fixes.
+
+No partition error remains: the run had 42 failed and 9 errors before this branch. I am not calling the red run
+green. The two remaining failures belong to the other two fixes.
+
+## VF-CL landed-tree provenance correction (branch `agent/claude/s20261104-vfcl-landed-provenance`)
+
+Base is `d8af53c2`, root's integration of #405 + #407 + #403. That candidate already carries #397's VF-CL-04
+attestation edit, so I based on it to avoid conflicting with it.
+
+- The defect: `verifiedAgainst` named the train 63 candidate `51788009` with `candidate: true`. That tree landed, so
+  rule 8 failed on every branch.
+- Re-measured at the landed tree `03e17c31` (detached checkout, 2026-11-04 13:58–13:59 KST, Python 3.14.7, Docker
+  hidden from PATH, disposable PG on 55493). Each card is equal to Card 285:
+  - VF-CL-01: 90 passed;
+  - VF-CL-02: 212 passed, 1 skipped (Windows symlink privilege);
+  - VF-CL-03: 124 passed;
+  - VF-CL-04: 195 passed, 31 skipped (Linux boundaries and CX01).
+- `git diff` confirms that no attributed test file changed between `51788009` and `03e17c31`, or between
+  `03e17c31` and `d8af53c2`. No VF-CL module changed either; the only VF-CL difference is #397's attestation.
+- `check_vf_cl_registry.py` at `03e17c31` reported exactly one finding: the rule-8 drift.
+- Hosted evidence: Core `40451334923`.
+  - Read back: headSha `03e17c31…`, `workflow_dispatch` on `coord/train78a-ci-1343`, attempt 1, success,
+    2026-10-27 13:43 KST.
+  - The owned CX01 steps succeeded, and the log shows `20 passed in 36.81s`.
+  - `core.yml` at that tree asserts `skips == Counter()` and `passed == 20`.
+  - This is a pre-landing run of the same source, recorded as exactly that. No new CI was invented.
+  - Other runs: Backend `40451332159` and Docs `40451343361`, both success.
+- The post-landing red push runs and their causes are recorded in `postLandingRuns`: Backend `41765284237`, Core
+  `41765284130` and Desktop `41765284319`.
+- Registry 1.6.2 → 1.6.3:
+  - `tree` is `03e17c31` and `ref` is `integration/all-agents-unified`;
+  - the `candidate` and `reverifyAt` markers are removed, after the re-measurement above;
+  - VF-CL-04's `measuredIn` now names `40451334923`;
+  - `scope` states that this is not operational acceptance, and `acceptedCards` stays 0.
+- Test change: `test_the_shipped_registry_marks_its_tree_as_a_pre_landing_candidate` became
+  `test_the_shipped_registry_names_its_provenance_state`. It accepts exactly two states:
+  - an unlanded `coord/*` candidate with both markers;
+  - an integration ref with neither marker, where the tree must be an ancestor of `origin/integration` in this clone.
+
+  The negative rule-8 tests and the exact-head `hostedRun` test are unchanged.
+- Mutation of the new test against five registry variants:
+
+| variant | new test |
+|---|---|
+| shipped (landed) | pass |
+| unlanded candidate with both markers | pass |
+| `coord/*` ref with no marker | rejected |
+| integration ref with the marker | rejected |
+| landed claim on unlanded tree `d8af53c2` | rejected |
+
+- Results: `check_vf_cl_registry.py` exit 0; `tests/core/test_check_vf_cl_registry.py` 215 passed, exit 0;
+  `check_docs` exit 0; `git diff --check` exit 0.
+
 ## State boundaries
 
-- Implemented and locally verified: the partition fixture only.
+- Implemented and locally verified: the partition fixture and the VF-CL landed-tree re-record.
 - CI, independent review (Codex), and operational acceptance for this branch are pending.
 - No other owner's code was edited.
-- Next owner: Codex reviews this branch and PR #403 `f42c4259`; the coordinator integrates.
+- Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
+- Next owner: Codex independently reviews the VF-CL provenance branch, and the coordinator integrates it. Hosted Core
+  at that head is the CI confirmation still pending.

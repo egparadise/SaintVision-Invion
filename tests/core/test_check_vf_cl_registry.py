@@ -1459,13 +1459,32 @@ def test_the_shipped_receipt_is_the_one_the_manifest_expects():
     assert (checker.REPO_ROOT / expectation["bundlePath"]).is_file()
 
 
-def test_the_shipped_registry_marks_its_tree_as_a_pre_landing_candidate():
-    """Rule 8's half of the shipped pair: the tree is a train candidate, and says so."""
+def test_the_shipped_registry_names_its_provenance_state():
+    """Rule 8's half of the shipped pair, in one of exactly two valid states.
+
+    An unlanded train candidate says so: ``candidate: true``, ``reverifyAt`` integration, and a
+    ``coord/*`` ref. A tree that has landed and was re-measured there drops both markers and
+    names integration as its ref. The candidate drift itself stays rule 8's job, and
+    ``test_the_shipped_registry_agrees_with_this_tree`` holds the shipped file to it. Anything
+    in between, such as a coord ref without the marker or integration with the marker, is
+    neither state and fails here. The exact-head binding of ``hostedRun`` is held by
+    ``test_the_shipped_registry_records_the_hosted_run_that_closed_the_drill``.
+    """
     registry_document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     verified = registry_document["verifiedAgainst"]
-    assert verified["candidate"] is True
-    assert verified["reverifyAt"] == "integration/all-agents-unified"
-    assert verified["ref"].startswith("coord/")
+    if "candidate" in verified or "reverifyAt" in verified:
+        assert verified["candidate"] is True
+        assert verified["reverifyAt"] == "integration/all-agents-unified"
+        assert verified["ref"].startswith("coord/")
+    else:
+        assert verified["ref"] == "integration/all-agents-unified"
+        # Landed means landed: the recorded tree must be integration's history in this clone,
+        # not just an ancestor of the branch under test. A clone that cannot answer cannot
+        # call it landed.
+        tip = checker.remote_tip(verified["ref"], checker.REPO_ROOT)
+        if tip is None or checker.shallow_repository(checker.REPO_ROOT):
+            pytest.skip("this clone cannot see origin/integration/all-agents-unified history")
+        assert checker.ancestry(verified["tree"], tip, checker.REPO_ROOT) is True
 
 
 # --- r3 F1: an exact key set says nothing about what is in the keys ---------------------
