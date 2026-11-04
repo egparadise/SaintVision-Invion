@@ -103,7 +103,9 @@ export function nextNodeCertificateTransition(
   observation: ProjectNodeCertificateObservationResponse,
   now = Date.now(),
 ): number | null {
-  const boundaries = [Date.parse(observation.observedAt) + 60001];
+  const observed = Date.parse(observation.observedAt);
+  if (now > observed + 60000) return null;
+  const boundaries = [observed + 60001];
   for (const timestamp of [observation.trust.renewalWindowStartsAt, observation.trust.earliestCertificateNotAfter]) {
     if (timestamp !== null) {
       // Browser clocks are millisecond based; round microseconds up to the first expired tick.
