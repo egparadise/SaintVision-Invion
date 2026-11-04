@@ -34,6 +34,7 @@ REQUIRED_TIME_FIELDS = {
     ("kernel", "RunResultView"): ("completedAt", "stateUpdatedAt"),  # output completion + durable state change
     ("kernel", "ModelCommitObservation"): "committedAt",
     ("kernel", "ModelExecutionManifestObservation"): "observedAt",
+    ("kernel", "ProjectNodeCertificateObservationResponse"): "observedAt",  # DB truth-time; client expires observations
     ("kernel", "StorageObservationView"): "createdAt",
     ("saintvision", "NodeResponse"): "lastHeartbeatAt",    # node liveness truth-time
     ("saintvision", "ReplicaObservationResponse"): "observedAt",

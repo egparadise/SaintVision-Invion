@@ -1,15 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.343"
+version: "1.0.344"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T13:52:06+09:00"
+updated: "2026-11-04T14:11:06+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Claude accepted Node-certificate backend semantics and found a portal schema context failure; corrected actual Docker/Node22 build exits 0; PR400 integrated, PR407 fixture and PR403 current-state correction independently accepted, final caller/review/CI still pending"
+active_card_status: "Portal correction has independent source acceptance and both hosted jobs green; PR400/403/407 and exact audit Evidence integrated; 234 OPEN PR heads audited, legacy13 assigned; freshness inventory11/11 passes while UI/scheduler/r5 owner work continues"
 active_card_next: "Publish the canonical observation contract for Gemini caller integration and Claude review; combine corrected scheduler, registry provenance, partition fixtures, and truthful current-state docs, then run final same-SHA CI and Obsidian delivery"
 ---
+
+## 2026-11-04 14:11 KST whole-project source audit
+
+- Worked: root merged accepted #407 and corrected #403 at `d8af53c2`, then unique Codex audit Evidence at `fe69e300`. New response is now pinned in report-only freshness inventory; its timestamp-removal negative case is preserved alongside Shard.
+- Checked: freshness tests3 passed/exit0, inventory11/11/exit0. Hosted `41775977367` frontend and hardened Portal jobs both success at `cd24dcb5`; Claude independently accepted that source delta. Whole OPEN PR list234 (limit1000) and exact-head ancestry audit exited0:212 already in integration,6 in candidate,16 outside,0 missing objects. Snapshot SHA256 `25176b919d4334c7e36503af5b35308efa2c2d99fee1eeee8634e1e8345fc681`.
+- Next: four supervised workers continue UI clock expiry (`ctx_b24bd172e007`), scheduler/r5 (`ctx_78f45e976cf3`), provenance/review (`ctx_0bdc8c734c3f`), legacy13 classification (`ctx_7cf31e3d629b`). Root integrates fixed heads and binds final CI/sync. Actual missing equipment configuration was requested as information, not renewed permission.
+- Evidence and limitations: [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]]. Original48-task done2/blocked4/planned42/ready0 and VF-CL operationallyAccepted=false stay explicit.
 
 ## 2026-11-04 13:52 KST portal build and owner review checkpoint
 

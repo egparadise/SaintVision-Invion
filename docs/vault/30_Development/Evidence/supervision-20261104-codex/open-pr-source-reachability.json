@@ -1,0 +1,2355 @@
+{
+  "observedAt": "2026-11-04T05:05:54.759546+00:00",
+  "landedSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "candidateSha": "fe69e300121edefe198a8a495ebc9abb08588667",
+  "openPullRequests": 234,
+  "counts": {
+    "head-already-in-integration": 212,
+    "head-in-supervision-candidate": 6,
+    "head-not-in-candidate": 16,
+    "object-unavailable": 0
+  },
+  "meaning": "Exact current PR head ancestry only; does not assert review, CI or operational acceptance; no PR state changed.",
+  "pullRequests": [
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/claude/s20261104-partition-rollover",
+      "headRefOid": "5dd3f83b9e9ee08ab08d5ce2316b31909fd99d5f",
+      "isDraft": false,
+      "number": 407,
+      "title": "test(db): provision every month from the frozen test clock to now",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/407",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "agent/gemini/c303-node-cert-expiry",
+      "headRefName": "agent/gemini/c303b-frontend-evidence",
+      "headRefOid": "789999d821702b8f2152f2721ace1fb4c2ba928c",
+      "isDraft": false,
+      "number": 406,
+      "title": "fix(web): close Card 303 review findings F1-F4 and wire typed certificate caller",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/406",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/supervision-integration-20261104",
+      "headRefOid": "d8af53c259c3909d498be6c92e06bc16454a866c",
+      "isDraft": true,
+      "number": 405,
+      "title": "fix(ci): restore browser execution and reconcile delivery audit",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/405",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "agent/codex/c301-standalone-worker-modules",
+      "headRefName": "agent/codex/supervision-20261104",
+      "headRefOid": "81a9982f8fbdac18428f57be628cfd49bdf7f391",
+      "isDraft": true,
+      "number": 404,
+      "title": "docs(governance): begin supervised delivery audit",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/404",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "agent/claude/c302-console-trust-expiry",
+      "headRefName": "docs/claude/c305-rescore-v1-21",
+      "headRefOid": "f42c42595ee5c8389d4c66328d3695a30bd91605",
+      "isDraft": false,
+      "number": 403,
+      "title": "docs(progress): rescore 48 tasks at v1.21 for train 78",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/403",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "coord/train78a-ci-1343",
+      "headRefName": "agent/codex/c304-scheduled-leaf-renewal",
+      "headRefOid": "b1e59f85e690ae61efe8748090815d2b53fd549d",
+      "isDraft": false,
+      "number": 402,
+      "title": "Card 304: schedule fail-closed LAN leaf renewal",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/402",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "coord/train78a-ci-1343",
+      "headRefName": "agent/gemini/c303-node-cert-expiry",
+      "headRefOid": "589d79675c1b25fc5ee0dfaa11b4047211c9933c",
+      "isDraft": false,
+      "number": 401,
+      "title": "Card 303: display node certificate expiration and trust renewal state in ResourceExplorer",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/401",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "coord/train78a-ci-1343",
+      "headRefName": "agent/claude/c302-console-trust-expiry",
+      "headRefOid": "611a9aab494e6f61825f7a96cfef0615b5b7cb7c",
+      "isDraft": false,
+      "number": 400,
+      "title": "feat(lan): publish console certificate expiry and renewal window",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/400",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "coord/train77b-ci-1135",
+      "headRefName": "agent/codex/c299-c298-guard-coverage",
+      "headRefOid": "abeed2d2a41d863b46fd1c667e02d7e1bb5b78a7",
+      "isDraft": false,
+      "number": 399,
+      "title": "test(lan): cover standalone runtime guards",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/399",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train77b-ci-1135",
+      "headRefName": "agent/codex/r4-e8606423-live-acceptance",
+      "headRefOid": "0816f362a731b922428cafe1f8d0106d03faf621",
+      "isDraft": false,
+      "number": 398,
+      "title": "docs(lan): record r4 live acceptance",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/398",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train76a-ci-1844",
+      "headRefName": "agent/codex/c301-standalone-worker-modules",
+      "headRefOid": "a44d578a0096003aba8dccbfd4447f5fbcc46934",
+      "isDraft": false,
+      "number": 397,
+      "title": "Card 301: pin standalone worker module closure",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/397",
+      "sourceReachability": "head-in-supervision-candidate"
+    },
+    {
+      "baseRefName": "coord/train75a-ci-1722",
+      "headRefName": "agent/codex/c300-runtime-no-bytecode",
+      "headRefOid": "6af107b83f3e432286a3f41782afbfa6b660b506",
+      "isDraft": false,
+      "number": 396,
+      "title": "Card 300: keep standalone leaf runtime bytecode-free",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/396",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train74a-ci-2047",
+      "headRefName": "agent/codex/c298-venvless-rotation-runtime",
+      "headRefOid": "820cfd0d235b8f05241d087a576690189bb5b89b",
+      "isDraft": false,
+      "number": 395,
+      "title": "Card 298: add venvless pinned leaf-rotation runtime",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/395",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train73a-ci-1916",
+      "headRefName": "agent/codex/c296-r3-bootstrap-live-evidence",
+      "headRefOid": "2fe44acfd9d273c2aea69f9064fee5c89e1b4500",
+      "isDraft": false,
+      "number": 394,
+      "title": "docs(lan): record live r3 bootstrap acceptance",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/394",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train72a-ci-1413",
+      "headRefName": "agent/codex/c297-verify-psql-vars",
+      "headRefOid": "18dbea2eff7eac0d99934b603a5ebc39782c1227",
+      "isDraft": false,
+      "number": 393,
+      "title": "Card 297: verify pilot DB with real psql stdin semantics",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/393",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train71a-ci-0819",
+      "headRefName": "agent/codex/c296-r3-bootstrap-db-name",
+      "headRefOid": "149ceff55790cf0146021ebfbabafdcfcc4934b7",
+      "isDraft": false,
+      "number": 392,
+      "title": "Card 296: isolate fresh r3 pilot database namespace",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/392",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train70a-ci-1006",
+      "headRefName": "agent/codex/c295-fully-expired-recovery",
+      "headRefOid": "c7b1973fbd5b587d224edb0cc211645ee448613d",
+      "isDraft": false,
+      "number": 391,
+      "title": "feat(lan): recover fully expired pilot identities",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/391",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train70a-ci-1006",
+      "headRefName": "agent/codex/c294-expired-pilot-recovery-plan",
+      "headRefOid": "72934014df546924aa9f61f51e0902e86bb0e540",
+      "isDraft": false,
+      "number": 390,
+      "title": "docs: plan fully expired LAN pilot recovery",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/390",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "coord/train69a-ci-1639",
+      "headRefName": "agent/codex/c293-rotation-recovery",
+      "headRefOid": "6c1d75628320cb22eaa07ae41df724a608f44ab8",
+      "isDraft": false,
+      "number": 389,
+      "title": "fix(lan): recover expired partial leaf rotations",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/389",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train68a-ci-1639",
+      "headRefName": "agent/codex/c291-batch-leaf-rotation",
+      "headRefOid": "3f7792f352fb0052d19e90be972f715b9f6788a3",
+      "isDraft": false,
+      "number": 388,
+      "title": "Card 291: make LAN leaf rotation one shared multi-Node batch",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/388",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train66c-ci-1336",
+      "headRefName": "docs/claude/c290-rescore-v1-20",
+      "headRefOid": "2eef4578f49615c2bbc9137a152128ee3f223917",
+      "isDraft": false,
+      "number": 387,
+      "title": "docs(rescore): 48 task v1.20 — 운영에 가장 가까운 여섯이 들어왔는데도 오르는 행은 0 (카드 290)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/387",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train66c-ci-1336",
+      "headRefName": "docs/claude/c289-desktop-launcher",
+      "headRefOid": "5aa363d36173ac141de986fde8574d526895d035",
+      "isDraft": false,
+      "number": 386,
+      "title": "feat(lan): 데스크톱 실행 경로 정식화 — live console 결함 3건 수정, 터널·state 일치·loopback·아이콘 (카드 289)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/386",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c287-lan-pilot-reconnect",
+      "headRefName": "agent/codex/c288-node-leaf-rotation",
+      "headRefOid": "8091b1c95535ddd2e20b0017b680eb89225fd04e",
+      "isDraft": false,
+      "number": 385,
+      "title": "Card 288: add fail-closed LAN leaf rotation",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/385",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train63a-ci-0847",
+      "headRefName": "agent/codex/c287-lan-pilot-reconnect",
+      "headRefOid": "57c3479f6d81ed8edffbe50b3195857ed59d2f15",
+      "isDraft": false,
+      "number": 384,
+      "title": "Card 287: reconnect LAN pilot nodes on fresh isolated state",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/384",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train63a-ci-0847",
+      "headRefName": "docs/claude/c285-vf-cl-reverify",
+      "headRefOid": "29db486740d3542fe305a1f37056a50be3bde297",
+      "isDraft": false,
+      "number": 383,
+      "title": "docs(vf-cl): VF-CL 구현측 주장을 train 63 후보에서 재검증 — verifiedAgainst를 52 train 만에 다시 기록 (카드 285)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/383",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train63a-ci-0847",
+      "headRefName": "agent/codex/c286-cancel-bridge-flake",
+      "headRefOid": "30921650090d8e9e43f2c7644bd6e51dc4cd71ad",
+      "isDraft": false,
+      "number": 382,
+      "title": "test(core): make cancel-bridge setup delivery deterministic",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/382",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train62a-ci-1059",
+      "headRefName": "agent/codex/c284-vf-cl-review-blockers",
+      "headRefOid": "b9ea99920fa8a8b349ab54ae8d59aebd294b2c98",
+      "isDraft": false,
+      "number": 381,
+      "title": "docs(vf-cl): close five independent review blockers",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/381",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train61a-ci-1013",
+      "headRefName": "docs/claude/c283-rescore-v1-19",
+      "headRefOid": "a6d50afcd801d5774ba02214d8f808655f57052b",
+      "isDraft": false,
+      "number": 380,
+      "title": "docs(rescore): 48 task v1.19 — ACC-09 사슬이 끝났고 오르는 행은 0, 완료는 train 61에서만 참이다 (카드 283)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/380",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c281-monaco-editor-contrast",
+      "headRefName": "agent/gemini/c282-web-terminal-contrast",
+      "headRefOid": "ac86432df429f4fca31894118f6785f9ce5404dd",
+      "isDraft": false,
+      "number": 379,
+      "title": "feat(terminal): tokenize color literals in WebTerminal and complete ACC-09 tokenization (Card 282)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/379",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c280-editor-modals-contrast",
+      "headRefName": "agent/gemini/c281-monaco-editor-contrast",
+      "headRefOid": "a17b0e7d0adfed7c4a2078d5cc042153b6ff59d4",
+      "isDraft": false,
+      "number": 378,
+      "title": "feat(editor): tokenize color literals in MonacoWorkspaceEditor and elevate contrast contracts (Card 281)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/378",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c279-terminal-session-contrast",
+      "headRefName": "agent/gemini/c280-editor-modals-contrast",
+      "headRefOid": "4fed3dcab291deac1a60f69f59387252ef6f60f2",
+      "isDraft": false,
+      "number": 377,
+      "title": "feat(editor): tokenize color literals in editor modals and elevate contrast contracts (Card 280)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/377",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c278-desktop-window-contrast",
+      "headRefName": "agent/gemini/c279-terminal-session-contrast",
+      "headRefOid": "94c99c72fe3bf6e77144c03c0b567a0347a1d74e",
+      "isDraft": false,
+      "number": 376,
+      "title": "feat(desktop): tokenize color literals in TerminalSessionView and elevate contrast contracts (Card 279)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/376",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c277-app-shell-release-contrast",
+      "headRefName": "agent/gemini/c278-desktop-window-contrast",
+      "headRefOid": "9c850d4631c9161b690436b63e0fe3830c6a73c3",
+      "isDraft": false,
+      "number": 375,
+      "title": "feat(desktop): tokenize color literals in DesktopWindow and elevate contrast (Card 278)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/375",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c276-approval-detail-header-contrast",
+      "headRefName": "agent/gemini/c277-app-shell-release-contrast",
+      "headRefOid": "e64881651a4f6b3d953f140adcebeccc480cba99",
+      "isDraft": false,
+      "number": 374,
+      "title": "feat(app): tokenize color literals in App and releaseEngine (Card 277)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/374",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c275-evidence-viewer-contrast",
+      "headRefName": "agent/gemini/c276-approval-detail-header-contrast",
+      "headRefOid": "89bc257f1a5f23585a08e372921450fb76236be6",
+      "isDraft": false,
+      "number": 373,
+      "title": "feat(approvals): tokenize color literals in ApprovalDetail and Header (Card 276)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/373",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c274-node-placement-detail-contrast",
+      "headRefName": "agent/gemini/c275-evidence-viewer-contrast",
+      "headRefOid": "c05196055530fb1564792f738e739a9ad729803d",
+      "isDraft": false,
+      "number": 372,
+      "title": "feat(evidence): tokenize color literals and bind integrity contracts in EvidenceViewer (Card 275)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/372",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c273-shared-ui-contrast",
+      "headRefName": "agent/gemini/c274-node-placement-detail-contrast",
+      "headRefOid": "17da19c5bb152f5fb822a55b81ea4774dfbcba06",
+      "isDraft": false,
+      "number": 371,
+      "title": "feat(node-detail): tokenize color literals and enforce fail-closed status contrast across node and placement detail screens (Card 274)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/371",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c271-node-list-contrast",
+      "headRefName": "agent/gemini/c273-shared-ui-contrast",
+      "headRefOid": "4a26c79ab149c13515cc55881ccf60e0a3806dd1",
+      "isDraft": false,
+      "number": 370,
+      "title": "feat(shared-ui): tokenize color literals and enforce fail-closed status contrast across shared and minor screens (Card 273)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/370",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train49a-ci-0356",
+      "headRefName": "docs/claude/c272-rescore-v1-18",
+      "headRefOid": "ae843bc64aee93d21403f5249d71830c8258706c",
+      "isDraft": false,
+      "number": 369,
+      "title": "docs(rescore): 48 task 재산정 v1.18 — ACC-09 카드는 이미 0이던 칸을 닫는다, 오르는 행 0 (카드 272)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/369",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c270-workspace-list-contrast",
+      "headRefName": "agent/gemini/c271-node-list-contrast",
+      "headRefOid": "ca54f53e7c622f217f48082a1380a7f3601f91a6",
+      "isDraft": false,
+      "number": 368,
+      "title": "feat(nodes): tokenize NodeList colors, enforce fail-closed status contrast, and seal 40/40 mutation test results (Card 271)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/368",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c248-cluster-overview-contrast",
+      "headRefName": "agent/gemini/c270-workspace-list-contrast",
+      "headRefOid": "32ff85b1d50e24bb950193fdfe8cde9bc1322773",
+      "isDraft": false,
+      "number": 367,
+      "title": "feat(workspaces): tokenize color literals and bind WORKSPACE_STATUS_CONFIG to contrast ratchet (Card 270)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/367",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c245-approval-center-contrast",
+      "headRefName": "agent/gemini/c248-cluster-overview-contrast",
+      "headRefOid": "fed695a2a69a82c93429ea0574ed0cf9a0784ce5",
+      "isDraft": false,
+      "number": 366,
+      "title": "feat(dashboard): tokenize ClusterOverview colors and enforce contrast compliance (Card 248)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/366",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train46b-ci-2256",
+      "headRefName": "docs/claude/c269-rescore-v1-17b",
+      "headRefOid": "ce435cb5b4715e83d7a6f6b097dbb8f8554e6515",
+      "isDraft": false,
+      "number": 365,
+      "title": "docs(rescore): 48 task 재산정 v1.17.1 — #364 r2 내용 그대로, 폐기 후보 2b2af9d2를 이력에서 뺀 재배치 (카드 269)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/365",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train43a-ci-1644",
+      "headRefName": "agent/codex/c268-audit-reader-disposition",
+      "headRefOid": "86307263c065702bf6a32a60c916428a8f13a63d",
+      "isDraft": false,
+      "number": 363,
+      "title": "Card 268: retire inv_audit_reader disposition",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/363",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train42a-ci-1511",
+      "headRefName": "feat/claude/c266-storage-check-collect",
+      "headRefOid": "7dadc30affdb31bb4c7cb29e41b38e514e2e0702",
+      "isDraft": false,
+      "number": 362,
+      "title": "feat(vf-cl-04): storage check 실행 경로 — 동기 collect route와 ledger 결속 (카드 266)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/362",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train42a-ci-1511",
+      "headRefName": "agent/codex/c267-ac11-post-landing-orchestration",
+      "headRefOid": "ca61515ae77ee913aa6f2bd555bab481b13853f0",
+      "isDraft": false,
+      "number": 361,
+      "title": "fix(ac11): bind post-landing exact-SHA orchestration",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/361",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train40a-ci-1352",
+      "headRefName": "agent/codex/c264-tenants-disposition",
+      "headRefOid": "f1ef90d3d7e547c928cb9d9ef3a310559ee6ddea",
+      "isDraft": false,
+      "number": 360,
+      "title": "security(db): remove inv_app tenant registry enumeration (Card 264)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/360",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train41a-ci-1421",
+      "headRefName": "docs/claude/c265-rescore-v1-16",
+      "headRefOid": "c27dd41fe0905910a9ea4de4253e481e5e68bf21",
+      "isDraft": false,
+      "number": 359,
+      "title": "docs(rescore): 48 task 재산정 v1.16 — 오르는 행 0, 그리고 내 pin 회전이 security 축 증거를 깼다 (카드 265)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/359",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train39a-ci-1248",
+      "headRefName": "docs/claude/c263-vf-cl-restore-observe",
+      "headRefOid": "0e4c898ae17c2566885fedf3690e7c154b9a02fd",
+      "isDraft": false,
+      "number": 358,
+      "title": "docs(vf-cl-04): 복원·관측 측정과 닫을 수 있는 공백 (카드 263, 구현 0줄)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/358",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train38b-ci-1240",
+      "headRefName": "agent/codex/c262-server-config-volume-split",
+      "headRefOid": "498a347352cf53ff2973a4c7e0cf9d8fd2e379e2",
+      "isDraft": false,
+      "number": 357,
+      "title": "Card 262: split API and worker configuration volumes",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/357",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train37a-ci-1106",
+      "headRefName": "feat/claude/c261-s10-lineage-write",
+      "headRefOid": "7a6611bea9fd5d766e27febd744f1fbdf6017967",
+      "isDraft": false,
+      "number": 356,
+      "title": "feat(s10): migration 0064와 lineage·deployment 쓰기 경로 (카드 261)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/356",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train37a-ci-1106",
+      "headRefName": "agent/codex/c260-ac11-exact-sha-automation",
+      "headRefOid": "bee1e66572824d3b7363a47b689e335286435f8a",
+      "isDraft": false,
+      "number": 355,
+      "title": "feat(ac11): automate exact-SHA aggregation evidence",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/355",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train37a-ci-1106",
+      "headRefName": "agent/codex/c258-ac11-axis-coverage",
+      "headRefOid": "96f7efe0560eaa46add17fc1b28be68a7d654145",
+      "isDraft": false,
+      "number": 354,
+      "title": "docs(ac11): record exact-SHA four-axis coverage measurement",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/354",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train37a-ci-1106",
+      "headRefName": "docs/claude/c259-user-checklist-train37",
+      "headRefOid": "e9d4096cd2875e1279d6e9bf8abbaf09612dd726",
+      "isDraft": false,
+      "number": 353,
+      "title": "docs(ops): 사용자 조치 체크리스트 train 27~37 분 (카드 259)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/353",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train36a-ci-1007",
+      "headRefName": "docs/claude/c257-model-registry-lineage",
+      "headRefOid": "bf202037cf0e4be4387a6650c532653b8cdc32d4",
+      "isDraft": false,
+      "number": 352,
+      "title": "docs(s10): model registry·lineage 쓰기 경로 설계 — 측정 먼저, 구현 0줄 (카드 257)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/352",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train35a-ci-0849",
+      "headRefName": "agent/codex/c255-s08-activation-prereqs",
+      "headRefOid": "c09415246ad1a5a14b6f6416def0a4a528be7eda",
+      "isDraft": false,
+      "number": 351,
+      "title": "feat(s08): close build activation authority gaps (Card 255)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/351",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train35a-ci-0849",
+      "headRefName": "docs/claude/c256-rescore-v1-15",
+      "headRefOid": "cad5318ec608770aeac9a719c537b2a0969da041",
+      "isDraft": false,
+      "number": 350,
+      "title": "docs(rescore): 48 task 재산정 v1.15 — S08-BE 50 → 75 (카드 256)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/350",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train33b-ci-0722",
+      "headRefName": "agent/codex/c254-audit-reader-disposition",
+      "headRefOid": "066413e085b054643ca060f3d682797e77b58a04",
+      "isDraft": false,
+      "number": 349,
+      "title": "security(ac11): re-review audit reader disposition",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/349",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train35a-ci-0849",
+      "headRefName": "feat/claude/c253-s02-storage-project-scope",
+      "headRefOid": "3840476787d7b281ee51311e511c93e4c44eced3",
+      "isDraft": false,
+      "number": 348,
+      "title": "feat(s02-st): 0062와 project 범위 카탈로그 route 구현 (카드 253)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/348",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c247-s08-build-request-entry",
+      "headRefName": "agent/codex/c251-s08-acceptance-evidence",
+      "headRefOid": "3e4e7ab37bcfb5a881250f3cfb737af3c33d8e7d",
+      "isDraft": false,
+      "number": 347,
+      "title": "feat(s08): add fixed-SHA acceptance evidence lane",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/347",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train32b-ci-0444",
+      "headRefName": "docs/claude/c252-index-train33",
+      "headRefOid": "a815ae0f21388bb8864d5b80f1e77d9fd045baa5",
+      "isDraft": false,
+      "number": 346,
+      "title": "docs(board): 공통 진행판의 현재 상태를 train 33 시점으로 갱신 (카드 252)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/346",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train32b-ci-0444",
+      "headRefName": "docs/claude/c250-storage-catalog-design",
+      "headRefOid": "e7e44a2890049909e1d83dc55424ea0ae17a2773",
+      "isDraft": false,
+      "number": 345,
+      "title": "docs(s02-st): 제공 폴더·DataLocation 카탈로그 설계 — 측정 먼저, 구현 0줄 (카드 250)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/345",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train30b-ci-0303",
+      "headRefName": "docs/claude/c249-rescore-v1-14",
+      "headRefOid": "1b51357bb5448c323242d5b046d6b8ef6f3afaeb",
+      "isDraft": false,
+      "number": 344,
+      "title": "docs(rescore): 48 task 재산정 v1.14 — train 30 후보에서 S08-BE·S11-BE의 막는 자리를 다시 측정 (카드 249)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/344",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c241-s08-admission-entry",
+      "headRefName": "agent/codex/c247-s08-build-request-entry",
+      "headRefOid": "479c9f41568db1e2e664211b88859416a547f860",
+      "isDraft": false,
+      "number": 343,
+      "title": "feat(s08): add governed BuildRequest product entry",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/343",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c235-placement-contrast",
+      "headRefName": "agent/gemini/c245-approval-center-contrast",
+      "headRefOid": "fb8cf07dc489e8556fda222ff65cbabcbb8120c0",
+      "isDraft": false,
+      "number": 342,
+      "title": "feat(approvals): tokenize ApprovalCenter colors and enforce contrast compliance (Card 245)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/342",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train28c-ci-2353",
+      "headRefName": "agent/codex/c246-s08-build-request-entry-design",
+      "headRefOid": "cf7ff9526999ddc35392b13c65c58fd37f57a939",
+      "isDraft": false,
+      "number": 341,
+      "title": "docs(s08): design server-owned build request entry",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/341",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c230-desktop-shell-contrast",
+      "headRefName": "agent/gemini/c235-placement-contrast",
+      "headRefOid": "ba8c8922983340369d4097ac8df2b8fc60dfa6b9",
+      "isDraft": false,
+      "number": 340,
+      "title": "feat(placement): tokenize PlacementSimulator colors and enforce contrast compliance (Card 235)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/340",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train28c-ci-2353",
+      "headRefName": "docs/claude/c243-post-landing-rehearsal",
+      "headRefOid": "6f0a94673f2f8119ff671e65983d80814f06ec52",
+      "isDraft": false,
+      "number": 339,
+      "title": "docs(ops): 착지 직후 runbook 리허설 — 세 자리를 고치고 train 27 후보의 Backend red를 찾았다 (카드 243)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/339",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train26b-ci-2131",
+      "headRefName": "agent/codex/c241-s08-admission-entry",
+      "headRefOid": "e99565764b3139f1940eef41f0749554791e0cde",
+      "isDraft": false,
+      "number": 338,
+      "title": "Card 241: S08-BE trusted admission entry and worker deployment",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/338",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train26b-ci-2131",
+      "headRefName": "docs/claude/c242-user-checklist-refresh",
+      "headRefOid": "6130dca248238bf2cda7c63be4a1f62077d2e0b1",
+      "isDraft": false,
+      "number": 337,
+      "title": "docs(ops): 사용자 조치 체크리스트에 train 17~26의 사용자 몫 네 항목 (카드 242)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/337",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train26b-ci-2131",
+      "headRefName": "docs/claude/c240-rescore-v1-13",
+      "headRefOid": "1d4bfce386116e6aad3f1d45f1f58e7de985b89a",
+      "isDraft": false,
+      "number": 336,
+      "title": "docs(rescore): 48 task 재산정 v1.13 — #331 포함 tree에서 S08-BE 75 조건 측정, S11-BE 사유 셋→둘 (카드 240)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/336",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train26b-ci-2131",
+      "headRefName": "docs/claude/c238-s08-enable-runbook",
+      "headRefOid": "35303961a6eda06e64e35d1a93ca59031524bf43",
+      "isDraft": false,
+      "number": 335,
+      "title": "docs(ops): S08 BuildKit 제품 dispatch 활성화 절차 — 켜기 전 확인·켜는 순서·켠 직후 관측·끄기와 격리 해제 (카드 238)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/335",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train24a-ci-1848",
+      "headRefName": "agent/claude/c236-rls-audit-seed",
+      "headRefOid": "bdf2b0faadcd2f86de05e7803a6653f3703df294",
+      "isDraft": false,
+      "number": 334,
+      "title": "feat(ac11): SEC-RLS-001의 빈 audit 표를 제품 쓰기 경로로 채우고, 보고서가 말한 disposition으로 판정한다 (카드 236)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/334",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train26b-ci-2131",
+      "headRefName": "agent/codex/c237-definer-review-gap",
+      "headRefOid": "9401044d006d24b2f4b18429139c7583c71b74ed",
+      "isDraft": false,
+      "number": 333,
+      "title": "security(ac11): review SECURITY DEFINER allowlist gap",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/333",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train22a-ci-1713",
+      "headRefName": "agent/claude/c233-ac11-aggregate-vf-input",
+      "headRefOid": "7e42a0dc8b69f12031e7615d34f311b78ffb029d",
+      "isDraft": false,
+      "number": 332,
+      "title": "feat(ac11): 집계 lane이 브라우저 artifact를 security importer에 넘긴다 (카드 233)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/332",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c229-build-claim-fencing",
+      "headRefName": "agent/codex/c232-s08-worker-loop-producer",
+      "headRefOid": "265456f7792b9276324ac7f3a2407b3f8ef21cab",
+      "isDraft": false,
+      "number": 331,
+      "title": "Card 232: connect S08 BuildKit product worker and producer",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/331",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train23a-ci-1802",
+      "headRefName": "agent/claude/c234-rls-census-repin-0059",
+      "headRefOid": "f91ce5db644c1190f77c776bb07a63c3fd32af88",
+      "isDraft": false,
+      "number": 330,
+      "title": "fix(ac11): RLS census를 0059까지 재생성·repin하고 stale을 CI가 잡게 한다 (카드 234)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/330",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train23a-ci-1802",
+      "headRefName": "docs/claude/c231-rescore-v1-12",
+      "headRefOid": "5964784ccb841353e20bdb41a0d965dfd1f513db",
+      "isDraft": false,
+      "number": 329,
+      "title": "docs(progress): 48 task 재산정 v1.12 — train 20~22, 오르는 행 0, S08-BE 두 조건 중 하나가 닫혔다 (카드 231)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/329",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c228-nl-run-contrast",
+      "headRefName": "agent/gemini/c230-desktop-shell-contrast",
+      "headRefOid": "81e9851b291efb81281afa2ded648506f8a28675",
+      "isDraft": false,
+      "number": 328,
+      "title": "fix(a11y): DesktopShell light/dark contrast and notification level contract purity (Card 230)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/328",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c223-build-execution-product-path",
+      "headRefName": "agent/codex/c229-build-claim-fencing",
+      "headRefOid": "c57697d2ab80877f44e189c1efe172a6dd03a7e6",
+      "isDraft": false,
+      "number": 327,
+      "title": "feat(s08-be): fence build intent claim ownership (Card 229)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/327",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train20a-ci-1327",
+      "headRefName": "agent/claude/c227-quarantine-clear-negatives",
+      "headRefOid": "e56b7cff05166e711bab9bce2b530843c75a3f20",
+      "isDraft": false,
+      "number": 326,
+      "title": "test(s08-be): node 격리 해제 경로 전용 부정 시험 (카드 227)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/326",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c226-model-studio-contrast",
+      "headRefName": "agent/gemini/c228-nl-run-contrast",
+      "headRefOid": "f17a486f32cda3b7483a710a3292f9b3d25dacd6",
+      "isDraft": false,
+      "number": 325,
+      "title": "feat(a11y): tokenize NaturalLanguageRunView color literals and ensure high contrast (Card 228)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/325",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c220-release-contrast",
+      "headRefName": "agent/gemini/c226-model-studio-contrast",
+      "headRefOid": "02d5f9699ff1443708ae5d0d69813a29d091defd",
+      "isDraft": false,
+      "number": 324,
+      "title": "feat(a11y): tokenize ModelStudioView color literals and ensure high contrast (Card 226)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/324",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c222-node-quarantine-channel",
+      "headRefName": "agent/codex/c223-build-execution-product-path",
+      "headRefOid": "233c2da1f689cc6e940d61e31eeefe1a9e710aec",
+      "isDraft": false,
+      "number": 323,
+      "title": "S08-BE: add durable product build intent worker",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/323",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c221-ac11-threat-producers",
+      "headRefName": "agent/claude/c225-rls-e4-measurable",
+      "headRefOid": "060a84beeef4cc6fd934a08213c9dacd18a7645f",
+      "isDraft": false,
+      "number": 322,
+      "title": "feat(s02-db): E4가 소유자가 유일성을 측정한 readable key로도 판정된다 — 미측정 한 행이 MEASURED_PASS가 됐다 (카드 225)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/322",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c218-recovery-contrast",
+      "headRefName": "agent/gemini/c220-release-contrast",
+      "headRefOid": "72fe74ce4adf5b46a3ba97fe5a4f15ecea84f3ea",
+      "isDraft": false,
+      "number": 321,
+      "title": "feat(a11y): tokenize ReleaseCandidateView color literals and ensure high contrast (Card 220)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/321",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train19a-ci-1224",
+      "headRefName": "docs/claude/c224-post-landing-runbook",
+      "headRefOid": "d0f0fc2f76814fdf275056a7b6f0ef6c2b6334c1",
+      "isDraft": false,
+      "number": 320,
+      "title": "docs(ops): 착지 직후 첫 행동 정본 — train 12 이후를 런타임 tip에 묶고 VF-CL attestation·AC-11 순서·S08 금지·실패 기록을 적는다 (카드 224)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/320",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train18a-ci-1112",
+      "headRefName": "agent/claude/c221-ac11-threat-producers",
+      "headRefOid": "5ef4d3cd080f0218e903f93c823e93fd0fa98253",
+      "isDraft": false,
+      "number": 319,
+      "title": "feat(ac11): security 축의 나머지 세 threat report를 배선한다 — 축이 NOT_OBSERVED로 평가되고 막는 것은 세 검토 결정이다 (카드 221)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/319",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train17a-ci-1056",
+      "headRefName": "agent/codex/c222-node-quarantine-channel",
+      "headRefOid": "63df4120b8ea58c62216254de2dccf2526ad2d81",
+      "isDraft": false,
+      "number": 318,
+      "title": "Card 222: durable node-agent quarantine channel",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/318",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train17a-ci-1056",
+      "headRefName": "docs/claude/c219-rescore-v1-11",
+      "headRefOid": "e402c3a06f4e39e582fa5807bd08cf237de96e5e",
+      "isDraft": false,
+      "number": 317,
+      "title": "docs(progress): 재채점 v1.11 — 확정 열 train 16·후보 train 17, 새로 오르는 행 0 (카드 219)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/317",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c215-runlist-contrast",
+      "headRefName": "agent/gemini/c218-recovery-contrast",
+      "headRefOid": "23fbedae680c8e4ff4e296f1091ed88888bba62d",
+      "isDraft": false,
+      "number": 316,
+      "title": "feat(a11y): tokenize DistributedRecoveryView color literals and ensure high contrast (Card 218)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/316",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c216-ac11-security-envelope",
+      "headRefName": "agent/claude/c217-ac11-long-soak",
+      "headRefOid": "351225e17f85d972f5e000be960a988d32650ee8",
+      "isDraft": false,
+      "number": 315,
+      "title": "feat(ac11): long-soak 축은 hosted로 만족할 수 없다 — 축을 낮추지 않고 사내망 절차와 사유를 남긴다 (카드 217)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/315",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c213-runs-contrast",
+      "headRefName": "agent/gemini/c215-runlist-contrast",
+      "headRefOid": "3ebfb1b8fada37d22ba6fb201101b25ae9d7c816",
+      "isDraft": false,
+      "number": 314,
+      "title": "feat(a11y): audit and tokenize runs execution list screen contrast (Card 215)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/314",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train16c-ci-0857",
+      "headRefName": "agent/claude/c216-ac11-security-envelope",
+      "headRefOid": "7183aafff9c674fbf0f909d2055669033c1a4622",
+      "isDraft": false,
+      "number": 313,
+      "title": "feat(ac11): security importer가 axis envelope을 낸다 — 축이 집계기에 닿았다 (카드 216)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/313",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c214-buildkit-receipts-contract",
+      "headRefName": "agent/claude/c214-s08-be-caller",
+      "headRefOid": "7273814f65914212ddcae14f52528e8ce3197893",
+      "isDraft": false,
+      "number": 312,
+      "title": "feat(s08-be): S08-BE 제품 caller — orchestration과 원자적 commit (카드 214)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/312",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train15d-ci-0812",
+      "headRefName": "agent/codex/c214-buildkit-receipts-contract",
+      "headRefOid": "113a17bb3a426bc8c5ab695fa5832825b5403664",
+      "isDraft": false,
+      "number": 311,
+      "title": "contracts: define authenticated BuildKit node receipts",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/311",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c206-developer-studio-contrast",
+      "headRefName": "agent/gemini/c213-runs-contrast",
+      "headRefOid": "3485985b5858761a3b6b3792660c80f6ac095924",
+      "isDraft": false,
+      "number": 310,
+      "title": "feat(a11y): audit and tokenize runs execution record screens contrast (Card 213)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/310",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "agent/codex/c211-vfcl-ci-attestation",
+      "headRefOid": "c50d8721938b93d829b0b078a90bade477afedfe",
+      "isDraft": false,
+      "number": 309,
+      "title": "feat(ci): attest VF-CL acceptance receipts",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/309",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c202-intranet-deploy-contrast",
+      "headRefName": "agent/gemini/c206-developer-studio-contrast",
+      "headRefOid": "02d5ecd4402d06d0a110f5e596ff4c864d8c97e4",
+      "isDraft": false,
+      "number": 308,
+      "title": "feat(a11y): elevate DeveloperStudio color literals to design tokens (Card 206)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/308",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "docs/claude/c212-boards-current",
+      "headRefOid": "558f9841a60a9e276726b7b3a9a2f7fa3ae9b735",
+      "isDraft": false,
+      "number": 307,
+      "title": "docs(index): 정본 진행판·Claude 작업판에 2026-10-02 현재 상태 (카드 212)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/307",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "docs/claude/c210-s08be-caller-memo",
+      "headRefOid": "9963f8a043a15a143266547c9f12db9e83a071a5",
+      "isDraft": false,
+      "number": 306,
+      "title": "docs(s08-be): 제품 caller 연결 설계 메모와 Codex 계약 질문 아홉 개 (카드 210)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/306",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "agent/codex/c209-idp-mapper-readback",
+      "headRefOid": "aa011c521d558d1cb147cec2ad5a83cea0fc350c",
+      "isDraft": false,
+      "number": 305,
+      "title": "Card 209: apply and read back intranet fresh-auth mappers",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/305",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "docs/claude/c208-rescore-v110",
+      "headRefOid": "c5ba9427e578ef18c4a1726b4199b9dbd62ff1a8",
+      "isDraft": false,
+      "number": 304,
+      "title": "docs(progress): 재채점 v1.10 — train 11~14 후보 K·L·M·N, 새로 오르는 행 0 (카드 208)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/304",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train14-ci-0528",
+      "headRefName": "agent/codex/c207-buildkit-oci-pid",
+      "headRefOid": "2c07dde600ba582ba64ca646816da63a17167ffa",
+      "isDraft": false,
+      "number": 303,
+      "title": "test(buildkit): bind OCI digests and live daemon PID",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/303",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train13-ci-0436",
+      "headRefName": "agent/codex/c205-ac11-manual-acceptance",
+      "headRefOid": "a797d291a3c6c00d720614a58f8b15ced9077c62",
+      "isDraft": false,
+      "number": 302,
+      "title": "feat(ac11): import user-device accessibility acceptance",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/302",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c199-admin-security-contrast",
+      "headRefName": "agent/gemini/c202-intranet-deploy-contrast",
+      "headRefOid": "b78b3b041b142caa298470af8f0e8f88b797f6f5",
+      "isDraft": false,
+      "number": 301,
+      "title": "feat(a11y): elevate IntranetDeploymentView color literals to design tokens (Card 202)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/301",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train12b-ci-0345",
+      "headRefName": "docs/claude/c204-user-action-checklist",
+      "headRefOid": "c8b6ee22559845efe0a5986010fbbfe12e631ee2",
+      "isDraft": false,
+      "number": 300,
+      "title": "docs(ops): 사용자 조치 단일 체크리스트 — 열한 항목, 각각 여는 것·명령·관측·순서 (카드 204)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/300",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train12b-ci-0345",
+      "headRefName": "feat/claude/c203-ac11-aggregate-lane",
+      "headRefOid": "1c5730359c6b81bdafbe476bf31d3a4bc44ef2db",
+      "isDraft": false,
+      "number": 299,
+      "title": "feat(ac11): 집계기를 부르는 CI 경로와 축 manifest — 0/8은 아무도 부르지 않은 수였다 (카드 203)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/299",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c197-model-lineage-contrast",
+      "headRefName": "agent/gemini/c199-admin-security-contrast",
+      "headRefOid": "dca1aa0607f1105b079955d532cfc94fba559a82",
+      "isDraft": false,
+      "number": 298,
+      "title": "feat(a11y): elevate AdminSecurityConsole color literals to design tokens (Card 199)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/298",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train11-ci-0047",
+      "headRefName": "agent/codex/c200-s08-buildkit-transport",
+      "headRefOid": "dd9672a36d10487ad5021a66f725aed741c1f355",
+      "isDraft": false,
+      "number": 297,
+      "title": "feat(s08): add rootless BuildKit reference transport",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/297",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c195-desktop-explorer-contrast",
+      "headRefName": "agent/gemini/c197-model-lineage-contrast",
+      "headRefOid": "67df36e827936b5a17981941b03e9cefbac5e1fb",
+      "isDraft": false,
+      "number": 296,
+      "title": "feat(a11y): elevate ModelLineageView color literals to design tokens (Card 197)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/296",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train11-ci-0047",
+      "headRefName": "docs/claude/c198-vfcl04-civerified",
+      "headRefOid": "7b42d56961b595616cfb69099e8ae2ffbff05a07",
+      "isDraft": false,
+      "number": 295,
+      "title": "feat(vf-cl): VF-CL-04 ciVerified 재도출과 레지스트리 rule 7 — 거짓이던 이유가 #283로 사라졌다 (카드 198)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/295",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train11-ci-0047",
+      "headRefName": "docs/claude/c196-landing-runbook",
+      "headRefOid": "a4a2c7fd0c1435dfe44e4d28ccef0913c373c766",
+      "isDraft": false,
+      "number": 294,
+      "title": "docs(ops): train 3~11 착지 직후 첫 행동 runbook — 여덟 lane 결속·AC-11 security 축·OPEN 137건의 16/106/15·train 12 (카드 196)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/294",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c193-nodedetail-residual",
+      "headRefName": "agent/gemini/c195-desktop-explorer-contrast",
+      "headRefOid": "ea82c6ae118173e0d590c2d017ab1734eda89141",
+      "isDraft": false,
+      "number": 293,
+      "title": "feat(a11y): elevate Desktop Explorer color literals to design tokens (Card 195)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/293",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train10-ci-2245",
+      "headRefName": "docs/claude/c191-rescore-v19",
+      "headRefOid": "84b76494949ef7e11b80ff392490e0ec97b148e9",
+      "isDraft": false,
+      "number": 292,
+      "title": "docs(progress): rescore v1.9 — three candidates, and the first rows that would rise (card 191)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/292",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c187-s12-acceptance-write",
+      "headRefName": "agent/codex/c194-s12-acceptance-resolver",
+      "headRefOid": "8fbc0f9186126c5ec850fc37b711d4b2e96804f0",
+      "isDraft": false,
+      "number": 291,
+      "title": "feat(s12): bind target and Evidence acceptance resolver",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/291",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c189-node-residual-contrast",
+      "headRefName": "agent/gemini/c193-nodedetail-residual",
+      "headRefOid": "db37dbc53f2e45ed987b9ed0e0b81ed88f2a7644",
+      "isDraft": false,
+      "number": 290,
+      "title": "fix(a11y): eliminate 9 residual color literals in NodeDetail (Card 193)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/290",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c188-fresh-auth-claims",
+      "headRefName": "agent/gemini/c192-portal-step-up",
+      "headRefOid": "bfa0ebf905fc5d97e35186f5c46c5d9065f23133",
+      "isDraft": false,
+      "number": 289,
+      "title": "feat(auth): portal step-up re-login entry point (Card 192)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/289",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c186-nodelist-badge-contrast",
+      "headRefName": "agent/gemini/c189-node-residual-contrast",
+      "headRefOid": "3e19b68260c71248ee591eac1d3d839e84d84f4e",
+      "isDraft": false,
+      "number": 288,
+      "title": "feat(a11y): elevate residual color literals in NodeList and NodeDetail to design tokens (Card 189)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/288",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c184-s12-acceptance-contract",
+      "headRefName": "agent/codex/c190-s12-acceptance-resolver",
+      "headRefOid": "82367c5b47eb886e4b3d0577e20cb828726de104",
+      "isDraft": false,
+      "number": 287,
+      "title": "Card 190: define S12 acceptance target and Evidence resolver contract",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/287",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/c184-s12-acceptance-contract",
+      "headRefName": "agent/claude/c187-s12-acceptance-write",
+      "headRefOid": "a3a38478e24174090d6390e6f346675af03eca63",
+      "isDraft": false,
+      "number": 286,
+      "title": "feat(s12-be): two-person release acceptance write path, implemented and held closed (card 187)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/286",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train9-ci-2100",
+      "headRefName": "agent/codex/c188-fresh-auth-claims",
+      "headRefOid": "6b2a378675aaffa78df57dc1070f17c0db240ff4",
+      "isDraft": false,
+      "number": 285,
+      "title": "Card 188: supply verified fresh-auth claims",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/285",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/c180-s11fe-contrast-fixes",
+      "headRefName": "agent/gemini/c186-nodelist-badge-contrast",
+      "headRefOid": "e1ac394dd9442d10317d7794f26a6a9c86ec5afb",
+      "isDraft": false,
+      "number": 284,
+      "title": "feat(a11y): elevate NodeList status badge colors to design tokens for light theme contrast (Card 186)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/284",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train8c-ci-1900",
+      "headRefName": "agent/claude/c185-vfcl-next",
+      "headRefOid": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
+      "isDraft": false,
+      "number": 283,
+      "title": "feat(s12): AC-12 수락 묶음을 CI가 도출하게 — VF-CL-04의 ciVerified 공백 해소 (카드 185)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/283",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c182-s12-manifest-routes",
+      "headRefName": "agent/codex/c184-s12-acceptance-contract",
+      "headRefOid": "b96068b6d009cf2d9ea677b9801749a1e6efd9d0",
+      "isDraft": false,
+      "number": 282,
+      "title": "design(s12): secure release acceptance and operator sign-off writes",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/282",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c182-s12-manifest-routes",
+      "headRefName": "agent/gemini/c183-s12fe-release-binding",
+      "headRefOid": "38c6a17d71d3c0d30c688f60c5308f4e28588a71",
+      "isDraft": false,
+      "number": 281,
+      "title": "feat(s12-fe): bind release manifest and operator sign-off views to server routes (card 183)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/281",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train8b-ci-1820",
+      "headRefName": "agent/claude/c182-s12-manifest-routes",
+      "headRefOid": "79fcb772cb54c3fe451572178d737b4efb55dd89",
+      "isDraft": false,
+      "number": 280,
+      "title": "feat(s12-be): release manifest·수락 읽기 route — operatorSignOff를 묻을 수 있게 하고, 쓰기는 보안 경계로 Codex 계약 요청 (카드 182)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/280",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train8-ci-1803",
+      "headRefName": "agent/codex/card181-a11y-runner-dialog",
+      "headRefOid": "1f838e12dd224abf220da4b3dded5c03cbcdd73c",
+      "isDraft": false,
+      "number": 279,
+      "title": "fix(a11y): align browser runner with start menu dialog",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/279",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s08-be-build-adapter",
+      "headRefName": "agent/codex/s08-be-single-gpu",
+      "headRefOid": "abb6e546a074f8b17706d7dc9d19606267e0c2f2",
+      "isDraft": false,
+      "number": 278,
+      "title": "feat(s08-be): bind measured single GPU execution",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/278",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train8c-ci-1900",
+      "headRefName": "agent/gemini/c180-s11fe-contrast-fixes",
+      "headRefOid": "6c6bdb2d047c37561705595f9d535ad2d208afce",
+      "isDraft": false,
+      "number": 277,
+      "title": "feat(a11y): Card 180 S11-FE ACC-09 design token contrast calculation and bulk resolution",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/277",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train7-ci-1641",
+      "headRefName": "agent/claude/c178b-a11y-lane",
+      "headRefOid": "04d9f5472bf6bc4d9e16e66441f7da775d4dfe81",
+      "isDraft": false,
+      "number": 276,
+      "title": "feat(ci): 착지 증명에 accessibility-e2e lane 추가 — lane의 job 성공과 AC-11 축 verdict를 기록에서 구별 (카드 178b)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/276",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train6-ci-1413",
+      "headRefName": "agent/gemini/c174-s11fe-acc01-09",
+      "headRefOid": "61470953e48f6d3a1c5a4456544193124174e3ab",
+      "isDraft": false,
+      "number": 275,
+      "title": "feat(a11y): implement ACC-01~09 interactive card keyboard navigation and tablist ARIA (Card 174 Part 2)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/275",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s08-be-roof-binding",
+      "headRefName": "agent/codex/s08-be-build-adapter",
+      "headRefOid": "3059c97868f237bac291c70bb89464b6ea8077c7",
+      "isDraft": false,
+      "number": 274,
+      "title": "feat(s08-be): require admitted Build adapter dispatch",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/274",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train6-ci-1413",
+      "headRefName": "agent/claude/c178-plv-lanes",
+      "headRefOid": "2b267a3a9ce0fd90ae13d6f31e9e71cfb4fc9d26",
+      "isDraft": false,
+      "number": 273,
+      "title": "feat(ci): 착지 증명에 portal-login-harness lane 추가 — 그리고 lane 목록을 workflow 디렉터리와 대조하는 시험 (카드 178)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/273",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s08-be-buildkit-boundary",
+      "headRefName": "agent/codex/s08-be-roof-binding",
+      "headRefOid": "7eb5e77e006ff952acb0eb114fb36440c6957087",
+      "isDraft": false,
+      "number": 272,
+      "title": "feat(s08-be): bind builds to ROOF controls",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/272",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/c168-rescore-v17",
+      "headRefName": "agent/claude/c176-rescore-v18",
+      "headRefOid": "c144f5737d57d527529cb9890e68f46663331dc2",
+      "isDraft": false,
+      "number": 271,
+      "title": "docs(progress): 진행률 재산정 v1.8 — train 6 후보까지 다섯 tree 연속 3,425/4,800, AC-11 축 ledger를 처음 셌다 (카드 176)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/271",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train5-ci-1243",
+      "headRefName": "agent/gemini/c174-s11fe-a11y-fixes",
+      "headRefOid": "3af878293a89fd8a201be2a542dcab1b8bb6d5dd",
+      "isDraft": false,
+      "number": 270,
+      "title": "fix(a11y): restore trigger focus upon overlay dismissal and enforce focus trap (Card 174)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/270",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train5-ci-1243",
+      "headRefName": "agent/codex/s08-be-buildkit-boundary",
+      "headRefOid": "c5bd3db4f1d3430fd893e118dd97bc9ab8736273",
+      "isDraft": false,
+      "number": 269,
+      "title": "feat(s08-be): define strict BuildKit contract boundary",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/269",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train5-ci-1135",
+      "headRefName": "agent/gemini/c169-s08fe-killswitch-real-wiring",
+      "headRefOid": "f9b785776661b9a0b0c201aeef508184fb95b602",
+      "isDraft": false,
+      "number": 267,
+      "title": "feat(web): wire emergency kill-switch to backend control plane (Card 169)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/267",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train5-ci-1135",
+      "headRefName": "agent/codex/card171-ac11-hosted-axis",
+      "headRefOid": "6b35ef130c494a7945c1bf2e69548f798c3dcecd",
+      "isDraft": false,
+      "number": 266,
+      "title": "ci(ac11): measure accessibility e2e axis",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/266",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train5-ci-1135",
+      "headRefName": "agent/codex/card170-s08be-design",
+      "headRefOid": "ecb43d4d86362de6209d0c2d169810d2f5681bed",
+      "isDraft": false,
+      "number": 265,
+      "title": "docs(s08-be): define ROOF BuildKit and single-GPU boundaries",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/265",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "coord/train4d-ci-1004",
+      "headRefName": "agent/codex/card166-kernel-cancel-shard-fixture",
+      "headRefOid": "a96130c07a195a59ce7c2b37d6b2a66792bcbfaf",
+      "isDraft": false,
+      "number": 263,
+      "title": "test: close S04 shard cancel bridge evidence gap",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/263",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/card159-s04-cancel-audit-producer",
+      "headRefName": "agent/codex/card160-s04-cancel-product-bridge-design",
+      "headRefOid": "42f3df5b5c882bf4c43ffe0aafa76403242cbaee",
+      "isDraft": false,
+      "number": 257,
+      "title": "feat(s04): bridge kernel cancellation into business audit",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/257",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/card150-intranet-pki-lan",
+      "headRefName": "agent/codex/card156-portal-pki",
+      "headRefOid": "b309f5075ad307cb77ff9accac54a52a05aa0bfe",
+      "isDraft": false,
+      "number": 251,
+      "title": "docs(intranet): hand off portal TLS leaf",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/251",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/card138-fe-bundle",
+      "headRefName": "agent/claude/train2-docs-ratchet",
+      "headRefOid": "860e641bc98384427136ff4b8dc609912e96c20e",
+      "isDraft": false,
+      "number": 246,
+      "title": "docs(train2): docs ratchet 정렬 — Claude 보드 인용 1건 실제 경로, stale baseline 4건 제거 (카드 147)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/246",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/card126-audit-fixes",
+      "headRefName": "agent/gemini/card138-fe-bundle",
+      "headRefOid": "5d2079de582746b01e0b1a6b5ce78f6c057fd797",
+      "isDraft": false,
+      "number": 245,
+      "title": "feat(web): bundle non-blocking FE audit follow-ups (Card 138)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/245",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/pr232-legacy-idempotency",
+      "headRefName": "agent/codex/card135-legacy-problem-details",
+      "headRefOid": "75d80847b2a32ea5d4eb1e8da7588796bf853078",
+      "isDraft": false,
+      "number": 244,
+      "title": "fix(api): legacy 404 and bounded write locks",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/244",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/g05-fe-model-registry",
+      "headRefName": "agent/gemini/card126-audit-fixes",
+      "headRefOid": "ffa3bfb9ecd6d2cf0232baf7ab95c48cb30f701b",
+      "isDraft": false,
+      "number": 243,
+      "title": "fix(web): remediate systemic audit findings F1-F7 across apps/web (Card 126)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/243",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "coord/train-land-2330",
+      "headRefName": "agent/claude/card128-s09-s10-collector",
+      "headRefOid": "5f1a2cd147cc355a68978032f0da7543938b5235",
+      "isDraft": false,
+      "number": 242,
+      "title": "feat(evidence): S09-DB·S10-DB·S10-ST 운영 판정 collector — 측정 가능한 넷만 측정, 여덟은 이유와 함께 미관측 (카드 128)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/242",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/pr232-storage-idempotency",
+      "headRefName": "agent/codex/pr232-legacy-idempotency",
+      "headRefOid": "77a0620f1e988da0bdf0d5aac670dbceb94dc33f",
+      "isDraft": false,
+      "number": 241,
+      "title": "fix(api): consume legacy mutation idempotency keys",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/241",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/pr232-pool-boundary",
+      "headRefName": "agent/codex/pr232-storage-idempotency",
+      "headRefOid": "5118b5bb5414042ad380e76bf2d87d43c5f45104",
+      "isDraft": false,
+      "number": 240,
+      "title": "fix(storage): serialize contribution registration",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/240",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/release-idempotency",
+      "headRefName": "agent/gemini/g05-fe-release-reexpose",
+      "headRefOid": "54134cc73a57e0a39e6e8d681fe4c3fc64df6402",
+      "isDraft": false,
+      "number": 239,
+      "title": "feat(mlops): re-expose model release write UI with server idempotency contract (Card 118)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/239",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/pr232-security-followup",
+      "headRefName": "agent/codex/pr232-pool-boundary",
+      "headRefOid": "00a59f83077faf59b56edd8d81a0725fb2b4a041",
+      "isDraft": false,
+      "number": 238,
+      "title": "fix(security): bind pool writes to live project access",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/238",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/card108-done-criteria",
+      "headRefName": "agent/codex/card123-s04-s08-collector",
+      "headRefOid": "5a648e39dad7f20ad6abba9d435a018329176c38",
+      "isDraft": false,
+      "number": 237,
+      "title": "feat(evidence): collect S04 S08 operational verdicts",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/237",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/ac11-composite-long-soak-repin",
+      "headRefName": "agent/codex/ac11-composite-long-soak-runner",
+      "headRefOid": "8b0a6d6c5a5376ae8f64059320fc4ed2da8454a7",
+      "isDraft": false,
+      "number": 236,
+      "title": "feat(ac11): add composite long-soak producer dry-run",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/236",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/card122-write-route-audit",
+      "headRefName": "agent/codex/pr232-security-followup",
+      "headRefOid": "4aee7b0f7179f9d6261583a6dcbc6a8bb22c1f5d",
+      "isDraft": false,
+      "number": 234,
+      "title": "fix(identity): block duplicate node admission tokens",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/234",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g03-conformance-stage2-impl",
+      "headRefName": "agent/gemini/g03-fe-stage2",
+      "headRefOid": "2e7aac64dfb03d22ae763d7b2c2c7ef2c2ba7822",
+      "isDraft": false,
+      "number": 233,
+      "title": "feat(mlops): connect G-03 Stage 2 adapter conformance routes and UI (Card 115)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/233",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/release-idempotency",
+      "headRefName": "agent/claude/card122-write-route-audit",
+      "headRefOid": "ca05edcef2baed7521a0c02ae5029fa679993298",
+      "isDraft": false,
+      "number": 232,
+      "title": "audit(api): 카드 122 — 전역 쓰기 route idempotency·lock·권한 감사 + eval_runs lock-wait bound",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/232",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g03-conformance-stage2-impl",
+      "headRefName": "agent/claude/release-idempotency",
+      "headRefOid": "41fe5c3cbf3e99de6a0251fa1d6453d022170c04",
+      "isDraft": false,
+      "number": 229,
+      "title": "feat(api): release route idempotency — 필수 Idempotency-Key·ledger replay·다른 payload GRAPH-0002·mirror intent 1회 (카드 113, Codex #219 r4 F1)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/229",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/g05-fe-model-registry",
+      "headRefName": "agent/gemini/g05-fe-verify-eval",
+      "headRefOid": "705154fed4bbe841b423baf685daa8adc85f5fd7",
+      "isDraft": false,
+      "number": 228,
+      "title": "feat(mlops): connect W3 Verify and W5 Eval Run business routes to ModelLineageView (Card 101)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/228",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/ac11-composite-long-soak-repin",
+      "headRefName": "agent/codex/ac11-security-hosted-scan",
+      "headRefOid": "1feab4deea54909cfd870a256d1d81fe80a9c5f0",
+      "isDraft": false,
+      "number": 226,
+      "title": "feat(security): add AC-11 critical-high hosted scan",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/226",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w3-verify-route",
+      "headRefName": "agent/claude/g03-conformance-stage2-impl",
+      "headRefOid": "fe649d776b2a371caf738a74aec29193249afe34",
+      "isDraft": false,
+      "number": 221,
+      "title": "feat(conformance): G-03 2단계 — 실행 기록 저장(0055)·RECORDED branch·fixture 생산자·host 결속 (카드 103)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/221",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w4-retention-pin",
+      "headRefName": "agent/gemini/g05-fe-model-registry",
+      "headRefOid": "fda2aaa54abdf6c71fdaa9878d1bd058d9c837d8",
+      "isDraft": false,
+      "number": 219,
+      "title": "feat(mlops): G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (Card 94)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/219",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g03-conformance-api-impl",
+      "headRefName": "agent/claude/g03-conformance-stage2-design",
+      "headRefOid": "56106eac6c42a97587e8c1a24fb10cbdf66e4bf2",
+      "isDraft": false,
+      "number": 218,
+      "title": "docs(g-03): design stage two — conformance run record storage and exposure (card 95)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/218",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s11-storage-hosted-lane",
+      "headRefName": "agent/codex/ac11-composite-long-soak-repin",
+      "headRefOid": "35c5b207682c19cdc2be3e05df22e91bd4f4475f",
+      "isDraft": false,
+      "number": 217,
+      "title": "feat(ac11): repin composite long-soak target",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/217",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w3-measurement-0054",
+      "headRefName": "agent/claude/g04-w3-verify-route",
+      "headRefOid": "3bdc6e70b7a83c4ecdaf0b0ee267eef11215201f",
+      "isDraft": false,
+      "number": 215,
+      "title": "feat(api): W3 verify route — measurement-only body, 3 spans, snapshot re-binding (design #209 v1.1 §6, card 88)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/215",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s11-acceptance-design",
+      "headRefName": "agent/codex/ac11-composite-long-soak-design",
+      "headRefOid": "5489f002305c571bcd225f40d00ab1c24d722e8a",
+      "isDraft": false,
+      "number": 214,
+      "title": "docs(ac11): define composite physical long-soak target (card 89)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/214",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w5-migration-0053",
+      "headRefName": "agent/claude/g04-w3-measurement-0054",
+      "headRefOid": "c59d6ebd9376e0ee0204d25ce2bbb1c6f106b84b",
+      "isDraft": false,
+      "number": 213,
+      "title": "feat(db): 0054 model version measurements — W3 seam PR A-1 (kernel table + verified binding + verify_model_version(measurement_id))",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/213",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w1-seal-record",
+      "headRefName": "agent/gemini/g04-fe-seal-record",
+      "headRefOid": "5b2609d94f7b348111fff66f5e1591c5a0c171fc",
+      "isDraft": false,
+      "number": 212,
+      "title": "feat(runs): RunDetail 봉인 기록(R1·R2·R3) 읽기 전용 패널 및 무결성 검증 연동 (Card 86)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/212",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w1-seal-record",
+      "headRefName": "agent/claude/g04-lock-wait-bound",
+      "headRefOid": "d0306f1e8e4d06a517d639ac7dd8b4fea54d4a1c",
+      "isDraft": false,
+      "number": 211,
+      "title": "feat(api): one lock-wait bound for every business-lane write — SYS-0001/503 retryable (card 84)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/211",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w5-migration-0053",
+      "headRefName": "agent/claude/g05-w5-eval-run",
+      "headRefOid": "a083d6d2db6a8571bf2fd52ca40a2c5083fb0245",
+      "isDraft": true,
+      "number": 210,
+      "title": "feat(g-05): W5 run an eval suite — POST /projects/{p}/eval/suites/{suite_id}/runs (PR 8/8, design #183)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/210",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g03-conformance-api-impl",
+      "headRefName": "agent/gemini/s10-fe-conformance-status",
+      "headRefOid": "0f0d82df9b5916a90b36e07b27652a385abca70e",
+      "isDraft": false,
+      "number": 208,
+      "title": "feat(mlops): S10-FE 어댑터 conformance 화면 새 API(G-03 1단계) 연동 및 불변식 가드",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/208",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/adapters-route-http-tests",
+      "headRefName": "agent/claude/g01-adapters-canonical-404",
+      "headRefOid": "f440d8126ab95228822d628a789b420114923d3f",
+      "isDraft": false,
+      "number": 205,
+      "title": "feat(g-01): the unknown adapter 404 becomes the canonical ProblemDetails (card 76)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/205",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s11-storage-failure-importer",
+      "headRefName": "agent/codex/s11-storage-hosted-lane",
+      "headRefOid": "887e4f089534fa85c6ee192f060f80bb5cb3e02a",
+      "isDraft": false,
+      "number": 204,
+      "title": "ci(s11): add hosted storage failure reference lane",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/204",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/g07-eval-runner-impl",
+      "headRefName": "agent/gemini/g07-nl-run-view-ui",
+      "headRefOid": "7632ff7a8ce01f8980bf12b478cba5111d3ce676",
+      "isDraft": false,
+      "number": 203,
+      "title": "feat(agent): NaturalLanguageRunView 화면 연동 및 거버넌스 가드 (REP-02/03/04, EVL-01, G-26)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/203",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-f1-digest-scope",
+      "headRefName": "agent/claude/g04-w5-migration-0053",
+      "headRefOid": "9c2733dec561cb9e783a2bc2bc1e854285d903d9",
+      "isDraft": false,
+      "number": 202,
+      "title": "feat(db): eval_suites.project_id — migration 0053 (W5 prerequisite, design #183 §5-1)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/202",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-r1-run-record-read",
+      "headRefName": "agent/claude/g04-w1-seal-record",
+      "headRefOid": "81fc8b00ca083684fc3a7fb7264a36676dd8fc25",
+      "isDraft": false,
+      "number": 201,
+      "title": "feat(g-04): W1 seal a run record from the server's own rows — POST /projects/{p}/runs/{run_id}/record (PR 7/8, design #183 §5-2)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/201",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g03-conformance-api-design",
+      "headRefName": "agent/claude/g03-conformance-api-impl",
+      "headRefOid": "a0e807b52d0326714b617a85ce26120fdee04ecc",
+      "isDraft": false,
+      "number": 200,
+      "title": "feat(s10-be): G-03 phase one — conformance status says NOT_OBSERVED, CHECKLIST gets one source (design #182)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/200",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-r1-run-record-read",
+      "headRefName": "agent/claude/g04-r3-context-bundle",
+      "headRefOid": "d3b4bdf1547842ea340076d98633ad1830c13dd4",
+      "isDraft": false,
+      "number": 199,
+      "title": "feat(g-04): R3 context bundle metadata + hashVerified — GET /projects/{p}/runs/{run_id}/context-bundle (PR 3/8, design #183)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/199",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s3-object-store-observations",
+      "headRefName": "agent/codex/s11-local-retention-journal",
+      "headRefOid": "dc458d09c6937eb0a8f97864c529962f1008b906",
+      "isDraft": false,
+      "number": 198,
+      "title": "fix(s11): fail closed on Local capacity and resume retention apply",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/198",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/s10-be-mlflow-mirror-p2",
+      "headRefName": "agent/claude/g04-f1-digest-scope",
+      "headRefOid": "977faf900c8f7430418beeed639c1ec0e93a6044",
+      "isDraft": false,
+      "number": 197,
+      "title": "feat(db): scope the model version digest uniqueness to the model — migration 0052 (#191 F1)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/197",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w2-model-version-register",
+      "headRefName": "agent/claude/g04-w4-retention-pin",
+      "headRefOid": "0b94945441ed1b6a3a2320db395dec39083ebecd",
+      "isDraft": false,
+      "number": 196,
+      "title": "feat(g-04): W4 retention pin — POST /projects/{p}/models/{m}/versions/{v}/retention-pin (PR 6/8, design #183 §5-3)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/196",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-w2-model-version-register",
+      "headRefName": "agent/claude/canonical-denial-audit",
+      "headRefOid": "c5d03f4a32374b44c860e4498e444b5a3b98bb74",
+      "isDraft": false,
+      "number": 194,
+      "title": "feat(api): canonical 403 denials audited once at the shared handler boundary (Codex contract, card 69)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/194",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/codex/s11-ac11-registry-repin",
+      "headRefName": "agent/codex/s11-storage-failure-importer",
+      "headRefOid": "f2ef0f85a2f1cfd1f605395fb6bb2e35680c2d65",
+      "isDraft": false,
+      "number": 193,
+      "title": "feat(s11-st): add PG-free storage fault evidence importer",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/193",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s11-migration-rehearsal",
+      "headRefName": "agent/codex/s11-ac11-registry-repin",
+      "headRefOid": "1f81ddf390be9e93d618844ae37a9fff92b1937d",
+      "isDraft": false,
+      "number": 192,
+      "title": "feat(ac11): repin PITR fault target registry",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/192",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/s10-lineage-query-impl",
+      "headRefName": "agent/claude/g04-w2-model-version-register",
+      "headRefOid": "9e9f1a0b802bb12d8b3b46bee20b7aa4f4e5b782",
+      "isDraft": false,
+      "number": 191,
+      "title": "feat(g-04): W2 register a model version — POST /projects/{p}/models/{m}/versions (PR 4/8, draft under design #183)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/191",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/gemini/g07-eval-runner-plan",
+      "headRefName": "agent/gemini/g07-eval-runner-impl",
+      "headRefOid": "399e5b57da4f01d03341c829b7d8b4c56ec54224",
+      "isDraft": false,
+      "number": 190,
+      "title": "feat(g-07): G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 (EVL-05 합성 러너·130건 픽스처·변이 연산자 6종·회귀 가드 스위트)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/190",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g04-r1-run-record-read",
+      "headRefName": "agent/claude/g04-r2-record-artifacts",
+      "headRefOid": "5c34aaca2c98904cb770f41671cebd4ca0d5418d",
+      "isDraft": false,
+      "number": 188,
+      "title": "feat(g-04): R2 record artifacts list + pin verify (PR 2/8, draft under design #183, on #184)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/188",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/g02-live-archiver-design",
+      "headRefName": "agent/claude/g02-live-archiver-impl",
+      "headRefOid": "fef042b5e9223e7c3cec277d02b6285443c7e8ab",
+      "isDraft": false,
+      "number": 187,
+      "title": "feat(g-02): live archiver RPO 케이스를 hosted에서 실행 — 실행자 주입·docker exec probe·격리 유지, Backend 19→17, Core gate 20/0 (카드 54 2단계, #181 위 stack)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/187",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/s10-lineage-query-impl",
+      "headRefName": "agent/claude/g04-r1-run-record-read",
+      "headRefOid": "c47811b2e19f5844ca07b924c3b9f62c0ae91764",
+      "isDraft": false,
+      "number": 184,
+      "title": "feat(g-04): R1 GET /projects/{p}/runs/{run}/record + run_in_project helper (PR 1/8, draft under design #183)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/184",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s11-ac11-aggregator",
+      "headRefName": "agent/codex/s11-migration-rehearsal",
+      "headRefOid": "dfe21ab5ec6ae5dd1b8d2c6334531ef1c1a68a06",
+      "isDraft": false,
+      "number": 177,
+      "title": "feat(ac11): add hosted migration restore rehearsal",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/177",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/s10-be-mlflow-mirror-impl",
+      "headRefName": "agent/claude/s10-be-mlflow-mirror-p2",
+      "headRefOid": "1ddd85d0d30d214e6912bf6ee34ef92a31eea1b2",
+      "isDraft": false,
+      "number": 176,
+      "title": "feat(s10-be): MLflow 미러 2단계 — 실 REST sink·tenant 범위 service credential(0051)·worker 경로·run-mlflow live lane (카드 bh, #172 위 stack)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/176",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/vfcl03-import-impl",
+      "headRefName": "agent/claude/s10-lineage-query-impl",
+      "headRefOid": "6ea127006f609a00ae5f07f384185a3384e68630",
+      "isDraft": false,
+      "number": 175,
+      "title": "feat(s10-db): open the lineage reads, counting what a project member may not be shown",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/175",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/s10-be-mlflow-mirror-impl",
+      "headRefName": "agent/claude/s10-lineage-digest-index",
+      "headRefOid": "e95db0897c3e0c8dbe6764bd4517238ea0133194",
+      "isDraft": false,
+      "number": 174,
+      "title": "feat(s10-db): index the dataset content digest concurrently, as migration 0050",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/174",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s3-object-store-implementation-v2",
+      "headRefName": "agent/codex/s3-object-store-observations",
+      "headRefOid": "b1df022603852b7fc3762b118eef5587ae60667f",
+      "isDraft": false,
+      "number": 173,
+      "title": "fix(storage): fail closed on provider drift before state changes",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/173",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s05-legacy-clean",
+      "headRefName": "agent/codex/s05-legacy-quality",
+      "headRefOid": "773523512f0dc6476c745f4bd8f62db9e906d30e",
+      "isDraft": false,
+      "number": 165,
+      "title": "test(ci): harden S05 staircase evidence",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/165",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s3-object-store-implementation-v1",
+      "headRefName": "agent/codex/s3-object-store-implementation-v2",
+      "headRefOid": "5e206aa4dbc0e18735ced4e94407461437848f94",
+      "isDraft": false,
+      "number": 159,
+      "title": "feat(storage): bind S3 ObjectStore to product paths",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/159",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s01-storage-roundtrip",
+      "headRefName": "agent/codex/s3-object-store-implementation-v1",
+      "headRefOid": "5a794ae9734602cc8e2d077a92ea72d6cf64bf62",
+      "isDraft": false,
+      "number": 149,
+      "title": "feat(storage): add S3 object store SPI and shared signer",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/149",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s05-admission-decision",
+      "headRefName": "agent/codex/s05-legacy-staircase",
+      "headRefOid": "99f0efd541244487bb32e8c8e6ff308c1ca7a373",
+      "isDraft": false,
+      "number": 148,
+      "title": "ci(s05): add legacy concurrency staircase lane",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/148",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/codex/s05-hosted-wave",
+      "headRefName": "agent/codex/s05-admission-decision",
+      "headRefOid": "9efc4dcc5902b469ab613e847963060167708d85",
+      "isDraft": false,
+      "number": 145,
+      "title": "docs(s05): decide bounded admission follow-up",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/145",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/claude/vfcl-ledger",
+      "headRefName": "agent/codex/vf-cl-registry",
+      "headRefOid": "59d0df391336b5711a78760e8c024761d8805da9",
+      "isDraft": false,
+      "number": 143,
+      "title": "docs(vf-cl): add reviewed track registry",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/143",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s01-readiness-preflight",
+      "headRefName": "agent/codex/s01-readiness-preflight-followup",
+      "headRefOid": "24663f4cc880a1f55da05232e016d51b4a456b84",
+      "isDraft": false,
+      "number": 142,
+      "title": "feat(s01): align readiness preflight with settings and storage evidence",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/142",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/s05-bounded-semaphore",
+      "headRefName": "agent/codex/s05-hosted-wave",
+      "headRefOid": "429e831cfe8d8b24393a308206fd894327b5caf1",
+      "isDraft": false,
+      "number": 141,
+      "title": "ci(s05): add opt-in hosted placement waves",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/141",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/s3-object-store-design",
+      "headRefOid": "9c02a89b44f5cdf9360fd45010a826dc8099f4d6",
+      "isDraft": false,
+      "number": 140,
+      "title": "docs(storage): design S3-compatible object adapter",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/140",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/claude/s02-checklist-surface",
+      "headRefName": "agent/claude/s02-checklist-cfg-readiness",
+      "headRefOid": "734c2a1ec9909e498643365a1a70b0f97fb75ad5",
+      "isDraft": false,
+      "number": 138,
+      "title": "docs(ops): S02 체크리스트 §7 — 운영 설정 확인을 operator configuration-readiness route로 (#125·#129 병합 뒤 병합)",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/138",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/claude/vf-ledger",
+      "headRefName": "agent/codex/vf-registry-evidence",
+      "headRefOid": "0b917209aaa46f5397a1244cb97226293164a87e",
+      "isDraft": false,
+      "number": 133,
+      "title": "docs(vf): apply reviewed CI and independent-review evidence",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/133",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/s07-five-node-adapter",
+      "headRefOid": "367ac3398dee3f832e6f76cd18def715e8a5362c",
+      "isDraft": false,
+      "number": 119,
+      "title": "feat(s07): add five-node registration dry-run adapter",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/119",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/s04-db-runner",
+      "headRefOid": "c149f8dff4df36aa8918ea8d2bb45fb200cc0d03",
+      "isDraft": false,
+      "number": 118,
+      "title": "test(s04): add HTTP+PG approval outbox evidence runner",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/118",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/s05-bounded-semaphore",
+      "headRefOid": "08f4a6a95d08f28e90bea300d32b2f657f3cf656",
+      "isDraft": false,
+      "number": 115,
+      "title": "feat(s05): add bounded placement semaphore",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/115",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "agent/codex/continuation-20260922",
+      "headRefOid": "39d8c238c286698a583eb03807dbd1c6cb075d8d",
+      "isDraft": false,
+      "number": 35,
+      "title": "fix: recover first hosted CI regressions",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/35",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/codex/vf-browser-auth-integration",
+      "headRefName": "agent/codex/vf-pitr-boundary",
+      "headRefOid": "56fe6ca996114e4794f3df88b570a26362d80900",
+      "isDraft": true,
+      "number": 33,
+      "title": "fix: PITR 설정 관측의 비밀출력과 복구 인수 경계",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/33",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-desktop-layout",
+      "headRefName": "agent/codex/vf-browser-auth-integration",
+      "headRefOid": "f00341e4815e053c5637703dfe22962602e8202d",
+      "isDraft": true,
+      "number": 32,
+      "title": "fix(web): restore verified login and complete browser acceptance lane",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/32",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-desktop-http",
+      "headRefName": "agent/codex/vf-desktop-layout",
+      "headRefOid": "54f3206fa4903e738810027357e1fe7fc22f1af7",
+      "isDraft": true,
+      "number": 31,
+      "title": "fix(web): recover safely from malformed persisted Desktop layouts",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/31",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-desktop-integration",
+      "headRefName": "agent/codex/vf-desktop-http",
+      "headRefOid": "b947b1c0b8f03ba6cf221e898c3db5e740e01ad4",
+      "isDraft": true,
+      "number": 30,
+      "title": "test(web): exercise Desktop through real HTTP and PostgreSQL",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/30",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-deployment-guard",
+      "headRefName": "agent/codex/vf-desktop-integration",
+      "headRefOid": "0fcbea4ac0e1d6321a0ee79bb76465d2ab2238a2",
+      "isDraft": true,
+      "number": 29,
+      "title": "fix(web): integrate Desktop with scoped storage and model observations",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/29",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-model-observation",
+      "headRefName": "agent/codex/vf-deployment-guard",
+      "headRefOid": "7d18b626e8d4e17d0448cc244bd217b73efa036c",
+      "isDraft": true,
+      "number": 28,
+      "title": "Serialize deployment registry writes and refresh approval validity",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/28",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-replica-observation",
+      "headRefName": "agent/codex/vf-model-observation",
+      "headRefOid": "0db07c85b743bcbf0b31f653c7d3331f1fab5e87",
+      "isDraft": true,
+      "number": 27,
+      "title": "Expose project-authorized historical model commitment summaries",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/27",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-model-review",
+      "headRefName": "agent/codex/vf-replica-observation",
+      "headRefOid": "c74ce2e6a9db4e83e9255867893bd9439158a99e",
+      "isDraft": true,
+      "number": 26,
+      "title": "Expose owner-scoped recorded replica state counts",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/26",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-storage-api",
+      "headRefName": "agent/codex/vf-model-review",
+      "headRefOid": "1f71d891c8ba52bad9f7837ea2804ed3b30ed599",
+      "isDraft": true,
+      "number": 25,
+      "title": "Resolve model review findings with shard boundary evidence and registry contract",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/25",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-service-integration",
+      "headRefName": "agent/codex/vf-storage-api",
+      "headRefOid": "116e6e518cc697795ec1970a80e1801ed2b165b3",
+      "isDraft": true,
+      "number": 24,
+      "title": "Expose owner-scoped storage catalogue reads through the canonical server",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/24",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/vf-cx-05",
+      "headRefName": "agent/codex/vf-service-integration",
+      "headRefOid": "58f037023ad2eeb5d3c5413f2988528b29931166",
+      "isDraft": true,
+      "number": 23,
+      "title": "Preserve replica retention on node loss and integrate VF storage services",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/23",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/provisioning-integrity",
+      "headRefName": "agent/codex/resource-offer-integrity",
+      "headRefOid": "609c807d8cd61cbfab2f9a705baf9660459c3744",
+      "isDraft": true,
+      "number": 22,
+      "title": "fix(api): align resource offers, result routes and tenant-scoped readiness",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/22",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/result-observation",
+      "headRefName": "agent/codex/provisioning-integrity",
+      "headRefOid": "d945633afb590feaef0dd5777edc7da4210a4d43",
+      "isDraft": true,
+      "number": 21,
+      "title": "계정 실행 권한의 원자 준비와 migration 무결성 보강",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/21",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/resource-offer-integrity",
+      "headRefName": "agent/codex/workspace-bridge",
+      "headRefOid": "9bb7184eaf794d42c45c940059ea3222f8c326c5",
+      "isDraft": true,
+      "number": 19,
+      "title": "Integrate Workspace execution, scoped credentials and recovery integrity",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/19",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "integration/all-agents-unified",
+      "headRefName": "review/claude-pr11-pr12",
+      "headRefOid": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+      "isDraft": false,
+      "number": 14,
+      "title": "Independent review of PR #11 and #12: merge them, run them together, fix what only that shows",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/14",
+      "sourceReachability": "head-not-in-candidate"
+    },
+    {
+      "baseRefName": "agent/codex/execution-recovery",
+      "headRefName": "agent/codex/shard-status-audit",
+      "headRefOid": "39bd9e97819deaca66eab0368910a7b446cbd4e1",
+      "isDraft": true,
+      "number": 10,
+      "title": "docs(shards): 샤드 실행 현황·통합 누락·남은 합격 범위 확인",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/10",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/storage-node-runtime",
+      "headRefName": "agent/codex/execution-recovery",
+      "headRefOid": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "isDraft": true,
+      "number": 9,
+      "title": "feat(core): 실행 결과 확정·Workspace 복원·샤드 수명주기·실측 배치",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/9",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/durable-dispatch",
+      "headRefName": "agent/codex/storage-node-runtime",
+      "headRefOid": "227cd2984a256092f5496d9895060092cbf87145",
+      "isDraft": true,
+      "number": 8,
+      "title": "feat(core): 체크포인트 복원과 Node 관측·전송·독립 샤드 실행",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/8",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/control-integration",
+      "headRefName": "agent/codex/durable-dispatch",
+      "headRefOid": "6c4f8a937c399d7e79bf49d2538e0bce53f24af4",
+      "isDraft": true,
+      "number": 7,
+      "title": "feat(core): 실행 전달 대기열과 중단 후 관찰·취소 복구",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/7",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/node-transport",
+      "headRefName": "agent/codex/control-integration",
+      "headRefOid": "7d657602d3f48122c20207cfff0919755e97f959",
+      "isDraft": true,
+      "number": 6,
+      "title": "feat(api): 인증된 Run API와 Node 관측·원격 취소",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/6",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/node-runtime",
+      "headRefName": "agent/codex/node-transport",
+      "headRefOid": "31f423679107ddc55c9d05566959d6aa69a36e2d",
+      "isDraft": true,
+      "number": 5,
+      "title": "feat(node): mTLS 실행 전달과 인증서 폐기·복구 경계",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/5",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/tool-admission",
+      "headRefName": "agent/codex/node-runtime",
+      "headRefOid": "75e22940ca9807f603d4787619f9c8e9599e31dd",
+      "isDraft": true,
+      "number": 4,
+      "title": "feat(node): 서명된 격리 실행과 장애 시 정지 영수증",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/4",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/approval-boundary",
+      "headRefName": "agent/codex/tool-admission",
+      "headRefOid": "85a8747a92efd56d14ed7fdfcba85fe03f60463f",
+      "isDraft": true,
+      "number": 3,
+      "title": "feat(core): ToolGateway 일회 실행 허가와 Sandbox 계약",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/3",
+      "sourceReachability": "head-already-in-integration"
+    },
+    {
+      "baseRefName": "agent/codex/core-foundation",
+      "headRefName": "agent/codex/approval-boundary",
+      "headRefOid": "0fbf66e2487cfdea54de66aadcb8c8b646335591",
+      "isDraft": true,
+      "number": 2,
+      "title": "feat(core): 승인 내용 고정과 일회용 승인 원자 소비",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/2",
+      "sourceReachability": "head-already-in-integration"
+    }
+  ]
+}
