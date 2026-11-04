@@ -1,15 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.349"
+version: "1.0.350"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T16:35:26+09:00"
+updated: "2026-11-04T17:21:44+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Train79 source landed with all prelanding lanes PASS; new exact-integration attestation verified; parent-exit r5 recovery corroborated with runtime-job criterion corrected"
-active_card_next: "Finish postlanding lanes and exact AC11 aggregate; measure worker-reopen persistence and reviewed r5 runtime/context operations; final canonical report and Obsidian synchronization"
+active_card_status: "Train79 pre/post exact lanes passed; independent PG16 tool repair accepted with207 tests; next candidate hosted verification and bounded operations continue"
+active_card_next: "Validate candidate migration and Docs at exact head, land with a normal fast-forward and verify all lanes; finish reviewed attended renewal context while preserving OS/physical blockers"
 ---
+
+## 2026-11-04 AC11 client 호환 후속과 운영 차단 분리
+
+- 작업한 것: train79 전후8lane PASS 수신, PG16 client 수정38a1을 독립 수락. 새 candidate branch `agent/codex/supervision-final-integration-20261104`, basecc1de3b3, source parentFD. 실제 source38 delta와 fixture/importer/conformance207 tests exit0.
+- 확인한 것: 코드 작성Claude/리뷰Codex root를 분리했다. r5 재개 후 동일5PID와2fresh/advancing/HTTP200을 root가 재측정했다. runtime·IdP 작업은 운영 worker의 실행 증거이며 S4U 실제OS거부는 사용자 승인 부족이 아니다.
+- 다음 첫 행동/담당: root가 고정 candidate의 hosted migration/Docs 및 제품 source 차이를 대조해 다음 착지와 전 lane 검증을 결속한다. 운영 worker는 WMI first-attended context를 준비하며 실제 인증서 cycle은 독립 검토 전 실행하지 않는다.
+- 명령·exit·CI·실패·범위 정본: [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]], [[2026-11-04_착지후_검증오류와_수정_Codex]].
 
 ## 2026-11-04 train79 착지와 r5 부모 종료 후 복구 재측정
 
