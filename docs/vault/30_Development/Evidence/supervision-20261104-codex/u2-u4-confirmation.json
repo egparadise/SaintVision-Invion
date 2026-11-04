@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-11-04T04:02:59.978352+00:00",
+  "dns": [
+    {
+      "role": "controlPlane",
+      "resolved": false,
+      "errorClass": "gaierror"
+    },
+    {
+      "role": "portal",
+      "resolved": false,
+      "errorClass": "gaierror"
+    },
+    {
+      "role": "idp",
+      "resolved": false,
+      "errorClass": "gaierror"
+    }
+  ],
+  "idpCandidates": [
+    {
+      "alias": "inventory-node-1",
+      "errorClass": "SSLCertVerificationError"
+    },
+    {
+      "alias": "inventory-node-2",
+      "errorClass": "TimeoutError"
+    },
+    {
+      "alias": "inventory-node-3",
+      "errorClass": "TimeoutError"
+    }
+  ],
+  "apiConfig": {
+    "documentedIssuerMatches": false,
+    "issuerScheme": "https",
+    "configuredTrustFileExists": true,
+    "inventoryHostnamesAllConfigured": false
+  }
+}

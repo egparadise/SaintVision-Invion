@@ -1,0 +1,174 @@
+[
+  {
+    "tree": "Y",
+    "artifactSHA256": "69d2dcf3afd5a8096e8e83ce2467f3a78678b73e1bdfd6f647d5a3ed06f107fb",
+    "observationsCanonicalSHA256": "d57b5549ec9180caed31a37a436d4281fd869a89bb831053ca8d76162e543b00",
+    "sourceHeadSha": "5d0c9e6224f2c2d3cd1cd5cc06e6bbdcd5ad58c6",
+    "verdict": "MEASURED_FAIL",
+    "acceptanceClaim": false,
+    "observations": [
+      {
+        "metric": "canonicalJourneyFailureCount",
+        "n": 5,
+        "successCount": 5,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "desktopInvariantFailureCount",
+        "n": 9,
+        "successCount": 9,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "contrastFailureCount",
+        "n": 3,
+        "successCount": 3,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "keyboardFailureCount",
+        "n": 2,
+        "successCount": 2,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "manualAcceptanceMissingCount",
+        "n": 1,
+        "successCount": 0,
+        "failureCount": 1,
+        "skipCount": 0,
+        "value": 1,
+        "errorsByClass": {
+          "manual-acceptance-not-supplied": 1
+        }
+      }
+    ],
+    "payloadSha256": "4d554cffe77be716bcfaee33f993fd6306f69487fd458756d7d05506bca291a7",
+    "targetRef": {
+      "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+      "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+      "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+      "criteria": {
+        "canonicalJourneyFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "desktopInvariantFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "contrastFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "keyboardFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "manualAcceptanceMissingCount": {
+          "operator": "eq",
+          "value": 0
+        }
+      }
+    },
+    "cleanCheckout": true
+  },
+  {
+    "tree": "Z",
+    "artifactSHA256": "a20a964c90bf2163be96733a3d790d4d074845ac0d95be46e76fd1f396a4d8ef",
+    "observationsCanonicalSHA256": "d57b5549ec9180caed31a37a436d4281fd869a89bb831053ca8d76162e543b00",
+    "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "verdict": "MEASURED_FAIL",
+    "acceptanceClaim": false,
+    "observations": [
+      {
+        "metric": "canonicalJourneyFailureCount",
+        "n": 5,
+        "successCount": 5,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "desktopInvariantFailureCount",
+        "n": 9,
+        "successCount": 9,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "contrastFailureCount",
+        "n": 3,
+        "successCount": 3,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "keyboardFailureCount",
+        "n": 2,
+        "successCount": 2,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "manualAcceptanceMissingCount",
+        "n": 1,
+        "successCount": 0,
+        "failureCount": 1,
+        "skipCount": 0,
+        "value": 1,
+        "errorsByClass": {
+          "manual-acceptance-not-supplied": 1
+        }
+      }
+    ],
+    "payloadSha256": "9516e76a16414fe0d598392f0f8a9d5dc9060f024f64e5f7baa4749b79f4ce2b",
+    "targetRef": {
+      "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+      "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+      "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+      "criteria": {
+        "canonicalJourneyFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "desktopInvariantFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "contrastFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "keyboardFailureCount": {
+          "operator": "eq",
+          "value": 0
+        },
+        "manualAcceptanceMissingCount": {
+          "operator": "eq",
+          "value": 0
+        }
+      }
+    },
+    "cleanCheckout": true
+  }
+]
