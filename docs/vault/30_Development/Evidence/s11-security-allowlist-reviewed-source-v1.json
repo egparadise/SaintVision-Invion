@@ -25,7 +25,7 @@
   "secVf001": {
     "runner": {
       "path": "tools/run_vf_security_tests.py",
-      "blob": "d9a40a03829a1a314383f920909ca980d62368d8"
+      "blob": "df9a3f964f07b8f966d2df2afef72b655a94391f"
     },
     "workflow": {
       "path": ".github/workflows/desktop-browser.yml",
