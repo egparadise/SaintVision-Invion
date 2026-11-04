@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.7.0"
+version: "1.8.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T17:08:00+09:00"
+updated: "2026-11-04T17:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -515,6 +515,29 @@ records the measured time, 15:58 KST.
   - whether the hosted image provides the PostgreSQL 16 tools today (the workflow step fails closed if it does not);
   - root's independent review.
 
+## Closing the source review phase
+
+The items below were reported by root or core on Orca. I did not measure them myself.
+
+- **AC-11 fix `38a1bede`:** root independently accepted the source.
+  - Root read the three-file diff and ran 207 tests: exit 0, 0 skipped.
+  - The hosted `ubuntu-24.04` PostgreSQL 16 path is still pending actual CI.
+- **VF-CL-04 note:** root fixed the required `ciVerifiedNote` text in `f0536e95`. The signature CLI and checker exit 0.
+- **r5 persistence:**
+  - Core reports a measurement after a fresh worker reopen at 16:50–16:52, and root reports one at 16:56–16:57.
+  - Both found the same five PIDs, sources, owners and listeners, two advancing intervals, 2 nodes online and fresh,
+    and HTTP 200.
+  - The literal "all roles outside any job" gate stays failed and retired.
+- **Runtime preparation:** passed on Python 3.12 and 3.14.
+- **IdP:** the new profile was applied, and the five originals are unchanged.
+- **S4U probe registration:** `Register-ScheduledTask` was denied with `0x80070005`, once, with no fallback. C1 is
+  therefore still open for the S4U run context, and no renewal task is registered.
+- **Still open from my verdicts:**
+  - the attended-transition job condition (Medium). Core will reopen a new attended WMI context for separate review;
+  - the scheduled `transition` gate still pins the old script, and that path is not released.
+- Claude's source review phase for task `task_710152a20196` is closed. I did no source cleanup, because root owns the
+  integration workspaces.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -527,7 +550,8 @@ records the measured time, 15:58 KST.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
 - Next first action:
-  - Root reviews AC-11 fix `38a1bede` and runs the hosted rehearsal at the exact source.
-  - Root measures r5 persistence across a terminal reopen.
-  - The attended-transition job condition is met before the first attended cycle.
+  - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
+    hosted AC-11 rehearsal on `ubuntu-24.04`.
+  - Core prepares the attended WMI context artifact, and Claude reviews it.
+  - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
