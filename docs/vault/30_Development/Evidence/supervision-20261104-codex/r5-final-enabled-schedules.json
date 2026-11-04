@@ -1,0 +1,47 @@
+[
+  {
+    "slot": "primary",
+    "id": "286d975e-75e2-4e54-b1fb-2805f7d68959",
+    "enabled": true,
+    "nextUTC": "2026-11-08T05:20:00Z",
+    "nextKST": "2026-11-08T14:20:00+09:00",
+    "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+    "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "observedAt": "2026-11-04T11:30:35.077655+00:00",
+    "scope": "current-user Orca supervised development pilot",
+    "nativeOneOff": false,
+    "year2026SlotGuard": true,
+    "sharedAtMostOnceClaim": true,
+    "cycleRunNowInvoked": false
+  },
+  {
+    "slot": "fallback1",
+    "id": "a3a9e396-3b48-4aaa-8b73-f8377670f968",
+    "enabled": true,
+    "nextUTC": "2026-11-09T03:15:00Z",
+    "nextKST": "2026-11-09T12:15:00+09:00",
+    "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+    "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "observedAt": "2026-11-04T11:30:35.865157+00:00",
+    "scope": "current-user Orca supervised development pilot",
+    "nativeOneOff": false,
+    "year2026SlotGuard": true,
+    "sharedAtMostOnceClaim": true,
+    "cycleRunNowInvoked": false
+  },
+  {
+    "slot": "fallback2",
+    "id": "3e08faa1-4e85-4877-8b13-5645178b41b8",
+    "enabled": true,
+    "nextUTC": "2026-11-09T23:00:00Z",
+    "nextKST": "2026-11-10T08:00:00+09:00",
+    "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+    "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "observedAt": "2026-11-04T11:30:36.669036+00:00",
+    "scope": "current-user Orca supervised development pilot",
+    "nativeOneOff": false,
+    "year2026SlotGuard": true,
+    "sharedAtMostOnceClaim": true,
+    "cycleRunNowInvoked": false
+  }
+]

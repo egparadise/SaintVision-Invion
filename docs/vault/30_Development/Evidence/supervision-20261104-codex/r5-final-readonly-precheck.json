@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "supervision-r5-final-readonly-precheck:1",
+  "executor": "Codex root",
+  "observedAt": "2026-11-04T11:29:44.510227+00:00",
+  "slots": [
+    {
+      "slot": "primary",
+      "exitCode": 20,
+      "exit": 20,
+      "outcome": "skip",
+      "reason": "outside-2026-slot",
+      "attempted": false,
+      "claimTaken": false,
+      "childResult": null,
+      "S4UAccepted": false,
+      "productionAccepted": false
+    },
+    {
+      "slot": "fallback1",
+      "exitCode": 20,
+      "exit": 20,
+      "outcome": "skip",
+      "reason": "outside-2026-slot",
+      "attempted": false,
+      "claimTaken": false,
+      "childResult": null,
+      "S4UAccepted": false,
+      "productionAccepted": false
+    },
+    {
+      "slot": "fallback2",
+      "exitCode": 20,
+      "exit": 20,
+      "outcome": "skip",
+      "reason": "outside-2026-slot",
+      "attempted": false,
+      "claimTaken": false,
+      "childResult": null,
+      "S4UAccepted": false,
+      "productionAccepted": false
+    }
+  ],
+  "actualProductionFacts": {
+    "packetValid": true,
+    "releaseValid": true,
+    "ownerMatched": true,
+    "sessionId": 1,
+    "interactive": true,
+    "sourceValid": true,
+    "membersMatched": true,
+    "onlineFresh": 2,
+    "killSwitch": true,
+    "workloadSubmission": false,
+    "runs": 0,
+    "offers": 0,
+    "earlierRealCycle": false,
+    "unknownCompletion": false
+  },
+  "publicLeafCount": 3,
+  "window": {
+    "schemaVersion": "saintvision-leaf-renewal-window:1",
+    "observedAt": "2026-11-04T11:29:40.394282Z",
+    "earliestNotAfter": "2026-11-10T05:15:35Z",
+    "renewAt": "2026-11-08T05:15:35Z",
+    "expired": false,
+    "inWindow": false,
+    "certificateCount": 3,
+    "nodeCertificateCount": 2,
+    "leafSetSHA256": "572e42758450effd9cb1be3a386b6fb21aa3911f2480a7a12a7f3c0d21e48a9d"
+  },
+  "claimExists": false,
+  "entryInvoked": false,
+  "cycleInvoked": false,
+  "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+  "releaseParametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6"
+}

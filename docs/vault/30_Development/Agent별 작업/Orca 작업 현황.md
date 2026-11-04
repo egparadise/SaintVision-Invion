@@ -1,12 +1,16 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.8"
+version: "1.0.9"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T19:41:23+09:00"
+updated: "2026-11-04T20:45:59+09:00"
 source_of_truth: "Git"
 ---
+
+## 2026-11-04 후속 감독 경로 확정
+
+Codex root가 현재 사용자 Orca 예약3개를 실제 활성화·재조회했고 Claude가 설정과검증 결속을 독립 확인했다. 실제 시도 후에는 세 예약을 끄고 영구 claim을 보존하며 같은 Run `run_e57ecd84a7bc`로 내부 status를 인계한다. 원래48-task 완료 상태나 S4U 인수를 대신 완료 처리하지 않는다. 관리 상세·예약ID·실패·검토·다음 owner는 부모 감독 History 한 곳에 둔다.
 
 ## 2026-11-04 최종 관리 수신
 
@@ -18,7 +22,7 @@ Codex root는 source59f의8개 CI와 모든12job success를 직접 집계했다.
 
 | 관리 범위 | 현재 확인·다음 담당 |
 |---|---|
-| OR-01 진행·인계 | Index v1.0.391 기준. 각 Agent 결과의 실제 수신을 집계 중. 상세 증거는 아래 부모 History 한 곳에 둔다. |
+| OR-01 진행·인계 | Index v1.0.392 기준. 각 Agent 결과의 실제 수신을 집계 중. 상세 증거는 아래 부모 History 한 곳에 둔다. |
 | OR-02 소스·PR | 전체 OPEN234 source 감사와 legacy13 분류 완료. train79/PR405 및 train80/59f는 정상 착지. 원래 card owner를 바꾸지 않았다. |
 | OR-03 CI | 현재 필수 hosted lane 실행은 가능하다. 과거 계정 제한은 역사로 보존하며 전역 결제/한도를 변경하지 않았다. |
 | OR-04 운영 인수 | 원래48-task2 done/4 blocked/42 planned/0 ready. 입력 차단과 실제 인수를 source CI 성공과 구분한다. |
