@@ -12,6 +12,7 @@ import * as runs from '../src/shared/api/runApprovalObservation';
 import * as fabric from '../src/features/desktop/fabricControlApi';
 import * as storage from '../src/shared/api/storageObservation';
 import type { ProjectNodeCertificateObservationResponse } from '../src/contracts/node-certificate-observation';
+import { nextNodeCertificateTransition } from '../src/shared/api/nodeCertificateObservation';
 
 const initialTime = Date.parse('2026-11-04T04:00:00Z');
 const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
@@ -146,6 +147,33 @@ describe('App canonical certificate trust remains bounded while refreshes hang',
       expect(badge()).toBe('● 신뢰 미확인');
     },
   );
+
+  it('stops scheduling a 90-day certificate after the inclusive 60000ms freshness edge', async () => {
+    expiry = initialTime + 90 * day;
+    const retainedObservation = observation(projectA, expiry);
+    const timeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+    await mountDesktop();
+    expect(badge()).toBe('● 인증서 정상');
+    mode = 'pending-certificate';
+    await advance(60000);
+    expect(badge()).toBe('● 인증서 정상');
+    expect(pending).toHaveLength(12);
+    // Accept another validated observation at exactly the inclusive age limit.
+    // Replacing the observation forces the timer effect to run at age === 60000.
+    await act(async () => pending.at(-1)!(retainedObservation));
+    expect(badge()).toBe('● 인증서 정상');
+    expect(nextNodeCertificateTransition(retainedObservation, Date.now())).toBe(initialTime + 60001);
+    await advance(1);
+    expect(badge()).toBe('● 신뢰 미확인');
+    expect(nextNodeCertificateTransition(retainedObservation, Date.now())).toBeNull();
+    expect(certificate()).toContain('미확인');
+    const delays = timeoutSpy.mock.calls.map(([, delay]) => delay ?? 0);
+    expect(delays.some(delay => delay > 2147483647)).toBe(false);
+    const scheduledAtStale = timeoutSpy.mock.calls.length;
+    await advance(1000);
+    expect(badge()).toBe('● 신뢰 미확인');
+    expect(timeoutSpy.mock.calls).toHaveLength(scheduledAtStale);
+  });
 
   it('crosses a fresh near-expiry observation into expired between polls while refreshes remain pending', async () => {
     expiry = initialTime + 12345;

@@ -111,7 +111,7 @@ export const App: React.FC = () => {
     const next = nextNodeCertificateTransition(certificateObservation, currentTime);
     if (next === null) return;
     // Independent of the 5s network polls, including when every request hangs.
-    const timer = setTimeout(() => setCertificateClock(Date.now()), next - currentTime);
+    const timer = setTimeout(() => setCertificateClock(Date.now()), Math.min(next - currentTime, 2147483647));
     return () => clearTimeout(timer);
   }, [certificateObservation, certificateClock]);
 
