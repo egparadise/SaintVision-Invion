@@ -3,10 +3,10 @@
   "card": "VF-CL-04",
   "repository": "egparadise/SaintVision-Invion",
   "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
-  "runId": "41792498330",
+  "runId": "41811861496",
   "runAttempt": "1",
   "event": "workflow_dispatch",
-  "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
   "headRef": "refs/heads/integration/all-agents-unified",
   "producerJob": {
     "name": "s12-acceptance-evidence",
@@ -19,12 +19,12 @@
     "Upload the acceptance evidence"
   ],
   "evidenceArtifact": {
-    "id": "13304081651",
-    "name": "s12-acceptance-fd1530d9b46e6b90a708daa59b4394599684309a",
-    "digest": "sha256:87bcbda1e0a98e5869bbca1719ab2b34557d0012bfa8a354b3dfa1b1e878b4a3",
-    "createdAt": "2026-11-04T07:29:04Z",
-    "expiresAt": "2026-12-04T07:29:03Z"
+    "id": "13312408285",
+    "name": "s12-acceptance-59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "digest": "sha256:e4959ab8bfe5c67b51513da1836f9f35adec96c9dc4279d9346fe49458c82fcd",
+    "createdAt": "2026-11-04T10:06:20Z",
+    "expiresAt": "2026-12-04T10:06:19Z"
   },
-  "recordedAt": "2026-11-04T07:29:15.327566Z",
-  "receiptSha256": "3c17ca5c272478c463cf8d85edc72e3909b31207a6a04f837913ffa83bd6e975"
+  "recordedAt": "2026-11-04T10:06:32.960191Z",
+  "receiptSha256": "3b57a4b475dc2d492ff7280da69582c80cc29e6b1a8d5d0c830a4f985511d06b"
 }

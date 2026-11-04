@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0.0",
+  "runPurpose": "s11-ac11-migration-rehearsal",
+  "sourceRunId": "41812142359",
+  "sourceHeadSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "checkoutTreeSha": "294e49106832769cc0a5da1810f137ef0722e4ad",
+  "cleanCheckout": true,
+  "junitSha256": "a4e39e4116f677fc1034d8a1d4251c625fa5f6bdb0e92b548178bbf68ca1604d",
+  "fixtureManifestSha256": "320779809efc234f8bffd0905ef03cb9ef69c718bca453d4b10bb2652995d57b",
+  "environment": {
+    "runnerImage": "Linux-X64",
+    "topology": "hosted-single-postgres-service",
+    "synthetic": true,
+    "physicalFiveNodeComparable": false,
+    "postgres": {
+      "serverVersion": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "serverVersionNum": "160015",
+      "lockTimeout": "0",
+      "statementTimeout": "0"
+    },
+    "postgresClient": {
+      "pg_dump": "pg_dump (PostgreSQL) 16.15 (Ubuntu 16.15-1.pgdg24.04+2)",
+      "pg_restore": "pg_restore (PostgreSQL) 16.15 (Ubuntu 16.15-1.pgdg24.04+2)"
+    }
+  },
+  "startedAt": "2026-11-04T10:09:05.848700Z",
+  "finishedAt": "2026-11-04T10:09:19.390604Z",
+  "verdict": "MEASURED_PASS",
+  "axes": [
+    {
+      "axis": "migration-reversible-segment",
+      "verdict": "NOT_APPLICABLE",
+      "structuralException": {
+        "reason": "no-reversible-tail",
+        "reversibleTailCount": 0
+      }
+    },
+    {
+      "axis": "irreversible-restore-forward",
+      "verdict": "MEASURED_PASS",
+      "observationCount": 1,
+      "details": {
+        "startingRevision": "0066_tenant_registry_revoke",
+        "headRevision": "0067_audit_reader_revoke",
+        "restoreBarrierRevision": "0067_audit_reader_revoke",
+        "snapshotSha256": "fa58eeb221b8de70346b12ed15dee593fd23888a5df2aea1bc9d24099229ab6b",
+        "sentinelSha256": "d2b546de7bd4b58c38299bdf9e8ec43430bbead49e57baae8bf7ea794a225945",
+        "postForwardSentinelSha256": "83d1d3958bc1168ba9ae8cb288966648ff39dc67a9ce942a87106eb4e23e5886",
+        "postForwardSentinelDisposition": "DECLARED_LOSS_REQUIRES_RESTORE",
+        "catalogSha256": "f4b3529be463ef99a32b52a586433f2efc74da251e266cb43615bafbde93da40",
+        "catalogCounts": {
+          "tables": 173,
+          "columns": 1654,
+          "constraints": 1041,
+          "indexes": 444,
+          "functions": 59,
+          "tableGrants": 1669,
+          "routineGrants": 81,
+          "policies": 177,
+          "roleMemberships": 0
+        },
+        "reversibleSegment": {
+          "reason": "no-reversible-tail",
+          "reversibleTailCount": 0
+        },
+        "negativeFixtures": {
+          "passedCount": 4,
+          "cases": [
+            {
+              "case": "existing-object-deletion",
+              "verdict": "EXPECTED_FINDING"
+            },
+            {
+              "case": "ellipsis-noop",
+              "verdict": "EXPECTED_FINDING"
+            },
+            {
+              "case": "0009-duplicate-key",
+              "verdict": "EXPECTED_FINDING"
+            },
+            {
+              "case": "0053-scoped-row-refusal",
+              "verdict": "EXPECTED_FINDING"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "fixtureClassifications": {
+    "PRESERVED": [
+      "0008_node_certificate_lookup",
+      "0024_project_kernel_link",
+      "0026_subject_kernel_link",
+      "0028_subject_kernel_link",
+      "0029_run_outputs",
+      "0030_apply_resource_offer",
+      "0031_workspace_input_state",
+      "0047_audit_events_isolation",
+      "0050_dataset_digest_lookup",
+      "0053_eval_suite_project_scope",
+      "0054_model_version_measurements",
+      "0055_adapter_conformance_records",
+      "0056_kernel_cancel_audit_bridge",
+      "0057_release_acceptance_quorum",
+      "0058_release_acceptance_resolver",
+      "0059_build_execution_intents",
+      "0060_build_execution_admissions",
+      "0061_build_preparations",
+      "0062_data_location_project_scope",
+      "0063_build_policy_budgets",
+      "0064_model_version_run_fk"
+    ],
+    "DECLARED_LOSS_REQUIRES_RESTORE": [
+      "0001_s02_baseline",
+      "0002_s03_execution",
+      "0003_s09_context_eval",
+      "0004_s10_lineage",
+      "0005_s12_pilot_operations",
+      "0006_discovery_pools_placement",
+      "0007_locality_replicas",
+      "0009_idempotency_and_inbox_scope",
+      "0010_canonical_resource_units",
+      "0025_workspace_tool_choice"
+    ]
+  },
+  "executionScope": {
+    "restoreStartingRevisionsExecuted": [
+      "0066_tenant_registry_revoke"
+    ],
+    "reversibleDowngradeTargetsExecuted": [],
+    "lossyReversibleRevisionsExecuted": [],
+    "lossyReversibleRevisionsClassifiedForFutureRestore": [
+      "0001_s02_baseline",
+      "0002_s03_execution",
+      "0003_s09_context_eval",
+      "0004_s10_lineage",
+      "0005_s12_pilot_operations",
+      "0006_discovery_pools_placement",
+      "0007_locality_replicas",
+      "0009_idempotency_and_inbox_scope",
+      "0010_canonical_resource_units",
+      "0025_workspace_tool_choice"
+    ]
+  },
+  "cleanup": {
+    "resourceKind": "postgres-database",
+    "ownedNamePrefix": "inv_s11_",
+    "attemptedCount": 8,
+    "residueCount": 0,
+    "cleanupErrorTypes": []
+  },
+  "failureType": null,
+  "failureReason": null,
+  "catalogDifference": null
+}
