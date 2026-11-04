@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.15.0"
+version: "1.16.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T19:35:00+09:00"
+updated: "2026-11-04T20:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -905,6 +905,126 @@ The 3-minute Low:
     measurement, and a slow result there fails after `commit` under the latch.
 - Not S4U and not operational acceptance.
 
+## Standalone Transition contract, ObserverRecovery contract and M1 wrapper delta (task `task_18ed92bf40ff`)
+
+Scope:
+- Read-only, under `.work/r5-orca-supervised-288670efba3d`.
+- No WMI launch, Transition, ObserverRecovery, Cycle, claim or Orca metadata action.
+- Hashes read back at 19:57–20:00 KST:
+  - plan `643baaec`; Transition contract `e557f909`; ObserverRecovery contract `4b666847`;
+  - `pilot_guard.py` `98142111`, config `f868eaef`, prompt template `2dbaf609`, disabled CLI plans `a462506e`;
+  - all nine pins of both contracts equal the packet files: guards `e50c7f82`, controller `c9fad676`, entry
+    `a4d64539`, core `b0963259`, Transition plan `f51623da`, cycle plan `3d278293`, attended config `01237ed5`,
+    scheduled config `9b6a4bfb`, commands `b445b8fe`.
+- `wmi-runtime` and `run-state` are empty, and no file names either RunId. Live `private-state.json` is `7d62c49a`.
+
+### Transition measurement: exact plan ACCEPTED for ONE root-released call, with conditions
+
+What the call does (read in source, not measured):
+- The argv runs only the 720-packet controller with plan `f51623da`, `-Operation Transition` and RunId
+  `20261104T104550Z-a906a2b3fc0a`. The controller's watchdog is 720 s for `Transition`.
+- The core (`b0963259`):
+  1. runs the `currentStatus` gate;
+  2. refuses if `transition-core-<RunId>.json` already exists;
+  3. stops only the exact owner/creation/command-line-checked observer group, children first;
+  4. runs `Start-LiveConsole.ps1` without `-ReplaceForeignStateListener`;
+  5. asserts a real two-member mTLS observation, with snapshots at most 20 s old;
+  6. writes a `CreateNew` receipt.
+  On launcher failure it starts an observer, records the error class, writes the receipt and still throws.
+- `Start-LiveConsole.ps1` (`03e17c31`) reuses the owned SSH tunnel, `serve`, console (18082) and web (3000) when they
+  belong to the same state. So only the observer is relaunched.
+- Scope limit: the console keeps its in-memory TLS material. The test measures the observer relaunch and gate-10 cost,
+  not a certificate reload.
+- Live helpers at 19:5x KST (all created 16:20:1x, owned by the same parent):
+  - observer 34380/33812; `serve` 40748/52720; console 3756/54216;
+  - vite 25608; SSH tunnel 15408 (`55448`).
+
+Release conditions:
+- **Before the call:**
+  - A separate root release names this contract and this RunId.
+  - Only the RunId may be replaced, by a fresh, unused normal-clock value. Every executable, file and plan hash stays
+    fixed.
+  - The operation is `Transition`. `ScheduledTransition` and `Cycle` are excluded by name.
+  - The 993 baseline, the nine 720 inputs and all pins match. `--window-only` shows `expired` false and `inWindow`
+    false.
+  - No lock, latch or lock-guard file exists, and there is no intent without a result and no completion-unknown
+    record.
+  - Saved: the three member paths with their PEM SHA, SPKI and notAfter, plus the state hashes. No private material is
+    saved.
+  - Kill is true, workload submission false, and runs and offers are 0. Two members are fresh and advancing.
+  - Saved: the PIDs and creation times of the observer, `serve`, console, web and tunnel, and their listeners. Add
+    `serve` to the contract's "same PIDs" list.
+  - Owner SID, Session 1, interactive, and a job-free WMI child.
+- **After the call:**
+  - Identical member paths, PEM, SPKI, notAfter and protected-state hashes; three valid leaves.
+  - A new owned observer group, while every other helper PID and listener is unchanged.
+  - HTTP 200 from overview and `live-postgresql-mtls`; two fresh, advancing members; runs and offers 0; flags
+    unchanged.
+  - Intent, launch and result records, plus the `transition-core` receipt, all with this RunId and plan. Exit 0,
+    `primaryLauncherSucceeded` true, and the real owner/session context with `inJob` false.
+- **Duration:**
+  - Measured as monotonic elapsed time, both intent→result and outside wall clock.
+  - The 3-minute Low closes only if elapsed is at most about half of 720 s (360 s) and every postcondition held. One
+    sample is not a worst-case bound, and the contract says so.
+- **Any other outcome**, including `primaryLauncherSucceeded` false, exit 124 or an unknown record:
+  - It is recorded as a failure. No retry and no automatic ObserverRecovery.
+  - The Nov 8 cycle needs a new decision.
+
+### ObserverRecovery contract: approved only as a separate decision
+
+- Its argv uses the same controller and plan, `-Operation ObserverRecovery` and its own RunId
+  `20261104T105008Z-f3999067b773`.
+- The 180 s watchdog fits the branch, which does only three things: the `currentStatus` gate, starting the observer if
+  it is absent, and `observe --once`. It never stops an observer, never touches certificate material and writes no
+  core receipt.
+- **Release conditions:**
+  - A separate root release names the contract, the RunId and the hashes of the failure or unknown record.
+  - A diagnosed loss of a known observer.
+  - Every earlier writer has provably exited; silence or a reused PID is not proof.
+  - No live child and no foreign observer or listener.
+  - The original failure stays nonzero and is never relabelled PASS.
+- **Postconditions:** the same as for the Transition, apart from the observer.
+
+### M1 wrapper delta (`98142111`): M1, L1, L2 and L3 fixed; one new Medium, so do not arm yet
+
+Fixed:
+- **M1:** `post_facts` uses `revalidate_release=False` and requires the release check from entry, so an expiry after
+  release cannot become a skip. Any post-invocation exception becomes `postcondition-unverified` exit 1, with
+  `childResult` kept and the per-run result written. An outer `Skip` after invocation is now exit 1, not 20.
+- **L1:** exactly eight checks, unique IDs, the fixed name set, `workflowPath`
+  `.github/workflows/<file>` and the fixed ref. All eight workflow files exist on
+  `origin/integration/all-agents-unified`.
+- **L2 and L3:** the prompt says preserved993/execution720, and the plan names the 720 packet and 720/900.
+- **Handoff:** one internal `orca orchestration send --to run:run_e57ecd84a7bc --type status`, with no `worker_done`,
+  no old IDs and no external send. The CLI plans keep all three automations `--disabled`.
+- **Tests:** 56 passed in 2.73 s, exit 0, on Python 3.14, with `-B` and basetemp in scratch. The packet file list
+  was unchanged.
+
+New Medium (M1b), reproduced with fakes:
+- The probe is `probe_persistfail.py` in scratch. It makes `atomic_status` raise `PermissionError` for the
+  result/status files after one real invocation; on Windows, `os.replace` fails like this when a reader holds the file
+  open.
+- The exception escapes `execute()` from line 252, and the handler's own write at line 261 fails again. `main()` line
+  279 then reports `exit 20, outcome "skip", claimTaken false`.
+- Meanwhile the claim exists, one invocation happened, and only the history file was written.
+- The claim still blocks any retry, but an attempted invocation is reported as a no-claim skip.
+- Narrow fix:
+  - Make per-run and latest-status persistence best-effort inside `execute()`: on failure, return the in-memory
+    result with `resultPersisted` false and its error class, and never re-raise.
+  - In `main()`, a caught exception reports exit 124, `completion-unknown`, when the claim file exists. It never
+    reports `claimTaken` false.
+  - Add one fake test.
+
+Lows:
+- A `Skip` raised inside `invoke()` after the child started (for example a duplicate-key result) is reported as exit 1
+  `postcondition-unverified` rather than 124. It is safe but less exact.
+- `REQUIRED_REF` is `refs/heads/integration/all-agents-unified`. GitHub run `head_branch` has no `refs/heads/` prefix,
+  so whoever builds the receipt must write this exact form.
+
+Decision on the automatic wrapper: not armable until M1b is fixed and reviewed. Both contracts stay unreleased.
+
+Not S4U and not operational acceptance.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -920,8 +1040,9 @@ The 3-minute Low:
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
   - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
-  - Before any cycle release: measure or raise the 3-minute Transition wait, then run the fresh-RunId outside-window
-    proof.
+  - Before any cycle release: core fixes M1b (persistence-failure classification) for Claude's review. Root may then
+    release ONE standalone Transition under the task_18ed92bf40ff conditions; ObserverRecovery only by a separate
+    release.
   - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
