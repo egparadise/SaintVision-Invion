@@ -1,5 +1,5 @@
 {
- "version": "1.6.4",
+ "version": "1.6.5",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -213,7 +213,7 @@
   "tree": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
   "ref": "integration/all-agents-unified",
   "landedNote": "Re-recorded at the LANDED tree, not a candidate. The previous block named the train 63 candidate 517880099743cf2d62131012191b7ba54650c44d (coord/train63a-ci-0847) with candidate: true and reverifyAt integration/all-agents-unified. That tree reached integration, and rule 8 then reported it on every branch (check_vf_cl_registry.py exit 1 at 03e17c31). Train 78 03e17c31 landed on integration/all-agents-unified at 2026-11-04 12:08:42 KST (GitHub branch activity API, push 6fc0428b -> 03e17c31). It was not inherited by ancestry: the claims below were re-measured at this exact tree on 2026-11-04 (SUPERVISION-20261104, Claude), and the candidate/reverifyAt markers were removed only after that. A later candidate that re-records here has to put candidate: true and reverifyAt back.",
-  "note": "Every manifest check the checker applies held at 03e17c31: run at a detached checkout of that tree, check_vf_cl_registry.py reported exactly one finding, the rule-8 drift this block corrects. locallyVerified was re-measured per card at this tree (see reverification); the counts equal Card 285's at 51788009, and between the two trees no attributed test file changed. ciVerified is unchanged by this re-record. VF-CL-04's true claim rests on its own attestation (ciVerifiedAttestation, run 40633895766), not on this block.",
+  "note": "Every manifest check the checker applies held at 03e17c31: run at a detached checkout of that tree, check_vf_cl_registry.py reported exactly one finding, the rule-8 drift this block corrects. locallyVerified was re-measured per card at this tree (see reverification); the counts equal Card 285's at 51788009, and between the two trees no attributed test file changed. ciVerified is unchanged by this re-record. The current VF-CL-04 CI claim rests on the independently verified ciVerifiedAttestation record, whose run/head/ref/artifact fields are authoritative. This block records the 03e17c31 local implementation re-verification and does not attest a later head.",
   "hostedRun": {
    "runId": "40451334923",
    "workflow": "Core Build",

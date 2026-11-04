@@ -1435,7 +1435,17 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     four = next(card for card in registry_document["cards"] if card["id"] == "VF-CL-04")
     assert four["ciVerified"] is True
     recorded = four["ciVerifiedAttestation"]
-    assert recorded["runId"] == "40633895766"
+    # A fresh signed receipt legitimately rotates the run id. Bind the registry to the
+    # committed authoritative receipt rather than freezing a historical run forever;
+    # signature/identity and mismatch rejection remain covered by the verifier tests.
+    receipt = json.loads(
+        (checker.REPO_ROOT / recorded["receipt"]).read_text(encoding="utf-8")
+    )
+    assert recorded["runId"] == receipt["runId"]
+    assert recorded["headRef"] == receipt["headRef"]
+    assert recorded["evidenceArtifact"] == {
+        key: receipt["evidenceArtifact"][key] for key in ("id", "digest", "expiresAt")
+    }
     assert recorded["headSha"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["headSha"]
     assert recorded["receipt"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["receiptPath"]
     assert recorded["bundle"] == cards["VF-CL-04"]["ciVerifiedAttestation"]["bundlePath"]
@@ -1633,7 +1643,11 @@ def test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote():
     """
     manifest_document = checker.load_json_strictly(checker.DEFAULT_MANIFEST, "manifest")
     why = manifest_document["cards"]["VF-CL-04"]["whyCiVerified"]
-    assert "Run 40633895766" in why
+    receipt = json.loads(
+        (checker.REPO_ROOT / manifest_document["cards"]["VF-CL-04"]["ciVerifiedAttestation"]["receiptPath"])
+        .read_text(encoding="utf-8")
+    )
+    assert f"Run {receipt['runId']}" in why
     assert "GitHub OIDC identity" in why
     assert "independently re-checkable" in why
 

@@ -169,7 +169,7 @@
   "VF-CL-04": {
    "impliesImplemented": true,
    "impliesCiVerified": true,
-   "whyCiVerified": "Run 40633895766 produced the exact-head receipt in CI, signed it with the dispatch-only GitHub OIDC identity, and verified the receipt bytes, workflow, branch, repository, and head through Sigstore. The tracked receipt and bundle make the claim independently re-checkable until the named evidence artifact expires.",
+   "whyCiVerified": "Run 41792498330 produced the exact-head receipt named by ciVerifiedAttestation in CI, signed it with the dispatch-only GitHub OIDC identity, and verified the receipt bytes, workflow, branch, repository and head through Sigstore. The tracked receipt and bundle make the claim independently re-checkable until the named evidence artifact expires; this proves hosted CI derivation only and does not grant operational acceptance.",
    "ciVerifiedAttestation": {
     "receiptPath": "docs/vf-cl-ci-receipts/VF-CL-04.json",
     "bundlePath": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json",
