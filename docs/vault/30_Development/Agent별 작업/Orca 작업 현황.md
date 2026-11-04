@@ -10,7 +10,7 @@ source_of_truth: "Git"
 
 ## 2026-11-04 최종 관리 수신
 
-Codex root는 source59f의8개 CI와 모든13job success를 직접 집계했다. 운영 worker와 reviewer는 준비 packet의 post-invoke 오분류 M1을 수정·검토하며, 실제 실행 전까지 예약을 비활성으로 유지한다. 관리 역할은 현재 남은 내부 gate와 실장비 입력 차단을 추적한다. 각 Agent의 수신·검토·실행 사실은 개별 History에만 귀속한다.
+Codex root는 source59f의8개 CI와 모든12job success를 직접 집계했다. 운영 worker와 reviewer는 준비 packet의 post-invoke 오분류 M1을 수정·검토하며, 실제 실행 전까지 예약을 비활성으로 유지한다. 관리 역할은 현재 남은 내부 gate와 실장비 입력 차단을 추적한다. 각 Agent의 수신·검토·실행 사실은 개별 History에만 귀속한다.
 
 # Orca 작업 현황
 
