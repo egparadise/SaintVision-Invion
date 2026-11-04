@@ -1,0 +1,16 @@
+{
+  "technicalRelease": "msg_c6fa3bda6ff3",
+  "finishedAtKST": "2026-11-04T17:01:02.853795+09:00",
+  "planSHA256": "585413eeee73cddd483ff6552f3ce778213a31c7870b7294b97be659689717f0",
+  "exit": 0,
+  "stdoutSHA256": "a699a1b6df321c6f9227e1b40c3d13b739c8672900302e1a4513ebce35683917",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "targetProfileHashMatched": true,
+  "targetBundleHashMatched": true,
+  "originalInputsUnchanged": 5,
+  "verifiedBackups": 5,
+  "existingCAUnchanged": true,
+  "serviceSwitched": false,
+  "freshTokenAcceptance": false,
+  "browserAcceptance": false
+}

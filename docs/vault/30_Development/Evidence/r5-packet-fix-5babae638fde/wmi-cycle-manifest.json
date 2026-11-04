@@ -1,0 +1,53 @@
+{
+  "baseSealedPacketSHA": "9f5191eb006f06acf105e8dc2a714ce196308964",
+  "upstreamBindingsPacketSHA": "65b85bc59e402125a264dc6cda475f8c764d255d",
+  "codeSourceHead": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "livePilotSourceHead": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "inputs": [
+    {
+      "name": "R5ContextGuards.private.ps1",
+      "sha256": "e50c7f821ebd29cce7ff2827bc5018998e11d37abe042cbe46e9042af0d38288"
+    },
+    {
+      "name": "Invoke-R5WmiContext.private.ps1",
+      "sha256": "8868cd24b1faddfe6801a853dddd6facbc11befa9597a5b0cb97a3cdcd55fa6f"
+    },
+    {
+      "name": "Enter-R5WmiContext.private.ps1",
+      "sha256": "a4d64539b76891aa03990b3972315903dd186cff998b8d058fc9dd2d35394857"
+    },
+    {
+      "name": "Invoke-OwnedR5Transition.private.ps1",
+      "sha256": "b0963259bc7791f9b226bc07dcef110bb33c70129eb0584c527c26ab3dbba4fa"
+    },
+    {
+      "name": "transition-context-plan.private.json",
+      "sha256": "5fda707021193777ceef0a6e3a1d594d7c617fdb88ad0127cbe0c2d872a40b1e"
+    },
+    {
+      "name": "cycle-context-plan.private.json",
+      "sha256": "3ffaa00a8e8fe6f09e53ebf29485d1fe15f78221848b4511a0e19b17fab510cf"
+    },
+    {
+      "name": "attended-cycle-config.private.json",
+      "sha256": "5168c56027230a3202b8045322aa0ff552d7b9f563427080de0c51bc4b183b5a"
+    },
+    {
+      "name": "scheduled-config-proposed-only.private.json",
+      "sha256": "8fbdbb6a85876b25e35170ae84d67b95ffc4a731d81079e2343cdef563d969c0"
+    },
+    {
+      "name": "wmi-cycle-commands.private.json",
+      "sha256": "3d857bd9fff03800b189deb00cd244e0c32470a212f8290844ef5ee3ee11f5fe"
+    }
+  ],
+  "fourteenGatesPreserved": true,
+  "unchangedNonTransitionCommands": 13,
+  "canonicalDurableLatchAndCASAndPostconditions": true,
+  "normalClockAnd172800SecondWindow": true,
+  "cycleExecutionReleased": false,
+  "transitionExecutionReleased": false,
+  "observerRecoveryReleased": false,
+  "scheduledTransitionProposedOnly": true,
+  "S4UAcceptance": false
+}

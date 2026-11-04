@@ -1,0 +1,14 @@
+{
+  "exit": 1,
+  "stage": "Invoke-CimMethod Win32_Process.Create",
+  "HRESULT": "0x80041002",
+  "actualStartupClassProperty": "WinstationDesktop",
+  "unsupportedSubmittedProperty": "Desktop",
+  "firstIntentPreserved": true,
+  "firstLaunchReceiptProduced": false,
+  "firstHelperReceiptProduced": false,
+  "failedAllNineInputVersionsReconstructedAndHashVerified": true,
+  "cycleExecuted": false,
+  "transitionExecuted": false,
+  "correctedFreshNamespaceContextOnlyExit": 0
+}

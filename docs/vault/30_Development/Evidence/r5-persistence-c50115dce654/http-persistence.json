@@ -1,0 +1,102 @@
+{
+  "taskId": "task_c50115dce654",
+  "terminal": "term_6a916231e43b4f5acc65d986dde2726a",
+  "priorWorkerDoneMessage": "msg_22ee1c05cc1d",
+  "actualNewDispatch": true,
+  "observedAtKST": "2026-11-04T16:52:07.082706+09:00",
+  "samples": [
+    {
+      "observedAtKST": "2026-11-04T16:51:49.307770+09:00",
+      "overviewHTTP": 200,
+      "webHTTP": 200,
+      "nodes": [
+        {
+          "alias": "node-1",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:51:47.074741+00:00",
+          "snapshotAt": "2026-11-04T07:51:47.074741+00:00",
+          "observationAgeSeconds": 2.6
+        },
+        {
+          "alias": "node-2",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:51:47.076879+00:00",
+          "snapshotAt": "2026-11-04T07:51:47.076879+00:00",
+          "observationAgeSeconds": 2.6
+        }
+      ],
+      "runs": 0,
+      "offers": 0,
+      "killSwitch": true,
+      "userWorkloadSubmission": false
+    },
+    {
+      "observedAtKST": "2026-11-04T16:51:57.766341+09:00",
+      "overviewHTTP": 200,
+      "webHTTP": 200,
+      "nodes": [
+        {
+          "alias": "node-1",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:51:54.643275+00:00",
+          "snapshotAt": "2026-11-04T07:51:54.643275+00:00",
+          "observationAgeSeconds": 3.5
+        },
+        {
+          "alias": "node-2",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:51:54.644598+00:00",
+          "snapshotAt": "2026-11-04T07:51:54.644598+00:00",
+          "observationAgeSeconds": 3.5
+        }
+      ],
+      "runs": 0,
+      "offers": 0,
+      "killSwitch": true,
+      "userWorkloadSubmission": false
+    },
+    {
+      "observedAtKST": "2026-11-04T16:52:06.204771+09:00",
+      "overviewHTTP": 200,
+      "webHTTP": 200,
+      "nodes": [
+        {
+          "alias": "node-1",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:52:02.270851+00:00",
+          "snapshotAt": "2026-11-04T07:52:02.270851+00:00",
+          "observationAgeSeconds": 4.3
+        },
+        {
+          "alias": "node-2",
+          "status": "online",
+          "fresh": true,
+          "heartbeatAt": "2026-11-04T07:52:02.265957+00:00",
+          "snapshotAt": "2026-11-04T07:52:02.265957+00:00",
+          "observationAgeSeconds": 4.3
+        }
+      ],
+      "runs": 0,
+      "offers": 0,
+      "killSwitch": true,
+      "userWorkloadSubmission": false
+    }
+  ],
+  "advancingIntervals": 2,
+  "onlineFresh": 2,
+  "stateBytesPreserved": true,
+  "executablesPinned": true,
+  "pilotSourceHead": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "pilotSourceTrackedClean": true,
+  "relaunchExecuted": false,
+  "preparationExecuted": false,
+  "idpWriteExecuted": false,
+  "taskCreationExecuted": false,
+  "rotationExecuted": false,
+  "exit": 0
+}
