@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T16:05:00+09:00"
+updated: "2026-11-04T15:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -307,6 +307,88 @@ Reviewer role: Claude is the reviewer the S07 spec names.
 - **Shared stash:** a temporary entry I created during a mutation run, `claude-s04-mut`, was dropped by its tag.
   Nobody else's stash entry was touched.
 
+## Exact-commit binding of the finishing checks
+
+The checks in the previous section ran on scratch copies. They are now bound to root's commits.
+
+- **`c79c297c81767b03a8f8191532ca414713779533` (S04 JUnit fix): source accepted.**
+  - Its diff is byte-identical to the patch I reviewed.
+  - `tests/core/test_s04_db_runner.py`: 27 passed. The 3 new cases fail without the runner hunk.
+- **`b015019fe6d7d4f3cf53d05945e2fe614a20d4b4` (happy-dom bump): source accepted.**
+  - It changes only `apps/web/package.json` and `package-lock.json`: happy-dom `20.14.6` to `21.0.4`, with integrity.
+  - Measured in a clean scratch worktree at `b015019f` after `npm ci`:
+    - happy-dom `21.0.4` installed;
+    - vitest: 102 files, 1,218 passed;
+    - `eslint`: exit 0; `tsc --noEmit`: exit 0;
+    - `npm audit --omit=dev`: 0 vulnerabilities.
+- The coordinator froze the combined head `fd1530d9` at `coord/train79a-ci-20261104-1548` for the final hosted CI. I
+  did not read back those hosted lanes, and I record no result for them here.
+
+## r5 renewal and IdP plan (`52e23649`, private packet): source accepted as a non-executed plan
+
+Read-only review. I registered no task, applied nothing and prepared no node.
+
+### Verified
+
+- **Packet integrity.** Every private copy matches its packet digest:
+  - gate script `a83e32bd`; transition `51b02052`; IdP apply `f3af8c41`; guard suite `8de722a6`;
+  - config `4fb067d0`; bindings `a67edb51`;
+  - preparation `1e5af979`; registration `d79184ed`; run-context probes `8430c453`; IdP plan `228403ff`;
+  - the four node stdin scripts match their pins.
+- **Gate order and fail-closed preparation.**
+  - The plan has 14 gates.
+  - Only `currentStatus` and the two `runtimePreflight` gates run before the durable latch. The latch is written
+    before `prepare`.
+  - Scheduler `_run` checks the executable digest, every input pin and the working directory before each gate.
+  - Registration is `-PlanOnly` only.
+  - The preparation arrays create only new r5 directories: they assert the directory is absent and use `mkdir 0700`.
+    They use pinned interpreters and files, leave node identity untouched, and are marked `executed=false`.
+- **IdP repair scope.**
+  - All five sources and the existing TLS CA still have their planned hashes, and the target and backup directories
+    are absent.
+  - The candidate profile's tenant, issuer and `jwks_file` point only at the new `r5-f8923863\identity` directory.
+  - The plan changes no service switch, global trust or DNS setting.
+- **Guard suite.** 15 passed. I ran it from my scratch venv with no bytecode or cache, and no file was written into
+  the packet.
+- **Two hypotheses I tested and dropped:**
+  - A detached child started by the launcher keeps the gate's captured stdout open and hangs the transition gate. A
+    synthetic Windows PowerShell 5.1 probe returned in under 1 s, both with and without redirection.
+  - The launcher picks a different interpreter. The reviewed source is a standalone clone, so the launcher resolves
+    to its own pinned `.venv`.
+
+### Conditions (none blocks landing; C1 must be met before live registration)
+
+- **C1 Medium: the run context is unmeasured.**
+  - All three read-only probes are `executedInS4U=false`. They must run once in the real S4U task context: expect
+    `currentStatus` exit 0, and both preflights exit 0 after preparation.
+  - `transition` also runs under S4U. `Start-LiveConsole` restarts the observer, and possibly the tunnel and serve,
+    in a non-interactive S4U session. No probe shows those processes survive the end of the task and the 4-hour
+    limit.
+  - Add a transition-context probe, or make the first transition attended.
+  - If the launcher fails after `Stop-Process`, the observer stays down and the latch reads recovery-required. That
+    is fail-closed, but the service is degraded.
+- **C2 Low: IdP apply leaves the backup directory's parent unchecked.**
+  - `.work\intranet\backups` does not exist today.
+  - `New-Item -ItemType Directory` silently creates missing intermediate directories; I measured this in scratch.
+  - The reparse check covers only `.work\intranet`.
+  - Fix: pre-create that directory and check it, or create it explicitly with the non-reparse check.
+- **C3 Low:** the `lan_pilot` gates run with `-B` but without `-I`, and the scheduler inherits the S4U user
+  environment, so `PYTHONPATH` and `PYTHONHOME` would be honored. Sanitize the environment or document it.
+- **C4 Low:**
+  - The remote install script calls `bash` through `PATH`; the script itself is hash-pinned.
+  - Node 2 uses `python3.12` while node 1 uses `3.14`. The install preflight must prove the worker runs on 3.12.
+- **Info:**
+  - The IdP candidate bundle expires on 2026-11-11 at 15:11:35 KST, about one day after the CP leaf expiry, so it
+    needs a weekly refresh.
+  - The repair restores no running service by itself (`serviceSwitchIncluded=false`).
+  - `transition.ps1` does not check the source HEAD itself. Gate 0 checks the HEAD and a clean tree, and the gate pins
+    cover `Start-LiveConsole.ps1`, `SvLauncherInput.ps1` and `lan_pilot.py`.
+
+### Time stamps
+
+The `updated` values of revisions 1.3.0 (15:45) and 1.4.0 (16:05) were ahead of the system clock. This revision
+records the measured time, 15:58 KST.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -318,5 +400,6 @@ Reviewer role: Claude is the reviewer the S07 spec names.
 - Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next first action: the coordinator updates the two out-of-date review cells, freezes the candidate, and runs the
-  final full hosted CI. Workers dispatch no CI. Operational acceptance stays unmeasured.
+- Next first action: the coordinator reads back the frozen `fd1530d9` hosted lanes and lands. Codex addresses r5
+  C1 before any live registration, and decides on C2–C4. Workers dispatch no CI. Operational acceptance stays
+  unmeasured.
