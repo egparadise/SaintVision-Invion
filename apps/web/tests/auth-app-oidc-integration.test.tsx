@@ -286,29 +286,54 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
   });
 
   it('wires clusterTrust from backend /node-certificates endpoint through App into DesktopShell and ResourceExplorer truthfully', async () => {
+    const testProjectId = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+    const testNodeId = 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+    const nowMs = Math.floor(Date.now() / 1000) * 1000;
+    const expiryMs = nowMs + 86400 * 1000;
+    const startsMs = expiryMs - 2 * 86400 * 1000;
+    const observedAt = new Date(nowMs).toISOString();
+    const expiryAt = new Date(expiryMs).toISOString();
+    const startsAt = new Date(startsMs).toISOString();
+
+    vi.spyOn(projectObsModule, 'fetchProjects').mockResolvedValue([
+      { id: testProjectId, name: 'Test Project', tenantId: 'ten_portal', createdAt: '2026-09-30T00:00:00Z' },
+    ]);
+
     // 1. Mock API with canonical /node-certificates endpoint
     vi.spyOn(clientModule, 'apiClient').mockImplementation(async (path: string) => {
       if (path === '/v1/projects') {
-        return [{ id: 'prj_test', name: 'Test Project', tenantId: 'ten_portal', createdAt: '2026-09-30T00:00:00Z' }];
+        return {
+          projects: [
+            {
+              projectId: testProjectId,
+              displayName: 'Test Project',
+              createdAt: '2026-09-30T00:00:00Z',
+              kernelLinked: true,
+              kernelEnabled: true,
+            },
+          ],
+          count: 1,
+        };
       }
       if (path.includes('/node-certificates')) {
         return {
           source: 'execution-kernel',
           scope: 'project-node-certificates',
-          observedAt: '2026-11-04T04:00:00Z',
+          projectId: testProjectId,
+          observedAt,
           complete: true,
           items: [
             {
-              nodeId: 'nod_pilot_01',
-              certificateNotAfter: '2026-11-02T03:32:25Z',
+              nodeId: testNodeId,
+              certificateNotAfter: expiryAt,
               channelEnabled: true,
             },
           ],
           trust: {
             state: 'renewal-window',
-            earliestCertificateNotAfter: '2026-11-02T03:32:25Z',
-            renewalWindowStartsAt: '2026-10-31T03:32:25Z',
-            secondsUntilEarliestExpiry: 172800,
+            earliestCertificateNotAfter: expiryAt,
+            renewalWindowStartsAt: startsAt,
+            secondsUntilEarliestExpiry: 86400,
           },
         };
       }
@@ -316,9 +341,18 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
         return {
           items: [
             {
-              nodeId: 'nod_pilot_01',
+              nodeId: testNodeId,
               hostname: 'pilot-01',
               status: 'online',
+              osType: 'linux',
+              cpuCores: 8,
+              cpuUsagePercent: 10,
+              memoryTotalBytes: 16000000,
+              memoryUsedBytes: 8000000,
+              storageTotalBytes: 50000000,
+              storageUsedBytes: 10000000,
+              gpuCount: 0,
+              lastHeartbeatAt: new Date(nowMs).toISOString(),
             },
           ],
           total: 1,
@@ -357,7 +391,7 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
 
     const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
     expect(banner).not.toBeNull();
-    expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간');
+    expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 1일 0시간');
   });
 
   it('keeps unknown trust visible when /node-certificates endpoint is unobserved or fails', async () => {
