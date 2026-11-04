@@ -35,9 +35,9 @@ $stateHashBytes = [Security.Cryptography.SHA256]::Create().ComputeHash(
 )
 $stateHash = -join ($stateHashBytes | ForEach-Object { $_.ToString('x2') })
 $taskName = "SaintVision-Leaf-Renewal-$($stateHash.Substring(0, 16))"
-$isWindows = $env:OS -eq 'Windows_NT'
-if (-not $isWindows -and -not $PlanOnly) { throw 'Task Scheduler registration requires Windows' }
-$sid = if ($isWindows) {
+$svIsWindows = $env:OS -eq 'Windows_NT'
+if (-not $svIsWindows -and -not $PlanOnly) { throw 'Task Scheduler registration requires Windows' }
+$sid = if ($svIsWindows) {
     [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
 } else {
     'NONWINDOWS-PLAN-ONLY'
@@ -66,6 +66,7 @@ if ($PlanOnly) {
         logonType = 'S4U'
         nonInteractive = $true
         elevated = $false
+        executionTimeLimitHours = 4
     } | ConvertTo-Json -Depth 5
     exit 0
 }
@@ -97,7 +98,7 @@ $statusParent = [IO.Path]::GetFullPath((Split-Path -Parent ([string]$document.st
 if ($statusParent -cne $desktop) { throw 'Scheduled status file must be placed on the current user Desktop' }
 $principal = New-ScheduledTaskPrincipal -UserId $sid -LogonType S4U -RunLevel Limited
 $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+    -ExecutionTimeLimit (New-TimeSpan -Hours 4)
 Register-ScheduledTask -TaskName $taskName -Description $owner -Action $action `
     -Trigger $triggers -Principal $principal -Settings $settings | Out-Null
 Write-Output $taskName

@@ -7,6 +7,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -37,7 +38,7 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def certificate(not_after: datetime) -> bytes:
+def certificate(not_after: datetime, *, not_before: datetime | None = None) -> bytes:
     key = Ed25519PrivateKey.generate()
     now = datetime.now(timezone.utc)
     name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "public-test-leaf")])
@@ -47,7 +48,7 @@ def certificate(not_after: datetime) -> bytes:
         .issuer_name(name)
         .public_key(key.public_key())
         .serial_number(x509.random_serial_number())
-        .not_valid_before(now - timedelta(minutes=1))
+        .not_valid_before(not_before or now - timedelta(minutes=1))
         .not_valid_after(not_after)
         .sign(key, algorithm=None)
         .public_bytes(serialization.Encoding.PEM)
@@ -73,6 +74,10 @@ def fake_tool(tmp_path: Path) -> Path:
 gate, trace, failure = sys.argv[1:4]
 with pathlib.Path(trace).open('a', encoding='utf-8') as stream:
     stream.write(gate + '\\n')
+if failure == 'wait-' + gate:
+    import os, time
+    pathlib.Path(trace + '.pid').write_text(str(os.getpid()))
+    time.sleep(60)
 if failure == gate:
     raise SystemExit(9)
 if gate in {'currentStatus', 'observe', 'finalObserve'}:
@@ -91,7 +96,7 @@ else:
 
 
 def command(identifier: str, fake: Path, trace: Path, failure: str) -> dict:
-    executable = Path(sys.executable)
+    executable = Path(sys.executable).resolve()
     return {
         "id": identifier,
         "executable": str(executable),
@@ -195,6 +200,10 @@ def test_in_window_runs_the_only_permitted_sequence(tmp_path: Path):
     receipt = json.loads((tmp_path / "Desktop" / "leaf-renewal-status.json").read_text())
     assert receipt["outcome"] == "renewed"
     assert receipt["failedGate"] is None
+    before = trace.read_bytes()
+    assert module.execute(load(target), now=now + timedelta(seconds=1)) == 0
+    assert trace.read_bytes() == before
+    assert json.loads(Path(_plan["statusPath"]).read_text())["outcome"] == "already-renewed"
 
 
 @pytest.mark.parametrize(
@@ -229,10 +238,18 @@ def test_each_failed_gate_stops_without_a_later_command(tmp_path: Path, failure:
         "failedGate": failure,
         "observedAt": now.isoformat().replace("+00:00", "Z"),
         "outcome": "failed",
-        "runId": now.strftime("%Y%m%dT%H%M%SZ"),
+        "runId": receipt["runId"],
         "schemaVersion": module.RECEIPT_SCHEMA,
         "sourceHeadSha": SOURCE_HEAD,
     }
+    # A later scheduled trigger, even with a newly reviewed config/status path,
+    # must observe the state-level latch rather than replay any command.
+    before = trace.read_bytes()
+    plan = load(target)
+    plan["statusPath"] = str(tmp_path / "other-status.json")
+    assert module.execute(plan, now=now + timedelta(seconds=1)) == 2
+    assert trace.read_bytes() == before
+    assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "recovery-required"
 
 
 def test_lock_and_pin_drift_fail_before_any_command(tmp_path: Path):
@@ -242,7 +259,7 @@ def test_lock_and_pin_drift_fail_before_any_command(tmp_path: Path):
     lock = Path(plan["statusPath"]).with_suffix(".lock")
     lock.parent.mkdir(parents=True)
     lock.write_text("other\n")
-    with pytest.raises(RuntimeError, match="already running"):
+    with pytest.raises(RuntimeError, match="manual ownership disposition"):
         module.execute(load(target), now=now)
     assert not trace.exists()
 
@@ -296,7 +313,7 @@ def test_registration_plan_is_current_user_limited_and_twice_daily(tmp_path: Pat
             "-ConfigPath",
             str(target),
             "-PythonPath",
-            sys.executable,
+            str(Path(sys.executable).resolve()),
             "-PlanOnly",
         ],
         capture_output=True,
@@ -312,6 +329,7 @@ def test_registration_plan_is_current_user_limited_and_twice_daily(tmp_path: Pat
     assert value["nonInteractive"] is True
     assert value["elevated"] is False
     assert sha(target) in value["owner"]
+    assert value["executionTimeLimitHours"] == 4
 
 
 def test_runner_and_registration_scripts_do_not_read_private_state():
@@ -320,3 +338,153 @@ def test_runner_and_registration_scripts_do_not_read_private_state():
     assert "New-ScheduledTaskPrincipal" in combined
     assert "-RunLevel Limited" in combined
     assert "-MultipleInstances IgnoreNew" in combined
+
+
+@pytest.mark.parametrize("fault", ["missing", "not-yet-valid", "node-count"])
+def test_certificate_preflight_failure_has_durable_status_and_latch(tmp_path: Path, fault: str):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state)
+    if fault == "missing":
+        (state / "control-cert.pem").unlink()
+    elif fault == "not-yet-valid":
+        (state / "control-cert.pem").write_bytes(certificate(now + timedelta(days=1), not_before=now + timedelta(hours=1)))
+    else:
+        extra = state / "public/nodes/extra"
+        extra.mkdir()
+        (extra / "node-cert.pem").write_bytes(certificate(now + timedelta(days=1)))
+    with pytest.raises(ValueError, match="Public certificate preflight failed"):
+        module.execute(load(target), now=now)
+    assert not trace.exists()
+    receipt = json.loads(Path(plan["statusPath"]).read_text())
+    assert (receipt["outcome"], receipt["failedGate"]) == ("failed", "window")
+    assert module.execute(load(target), now=now) == 2
+
+
+def test_linux_python_symlink_is_canonicalized_by_fixture_but_still_rejected_as_input(tmp_path: Path, monkeypatch):
+    link = tmp_path / "python-link"
+    try:
+        link.symlink_to(Path(sys.executable).resolve())
+    except OSError:
+        pytest.skip("Runner cannot create the reviewed executable symlink")
+    monkeypatch.setattr(sys, "executable", str(link))
+    fake = fake_tool(tmp_path)
+    value = command("runtimePreflight-1", fake, tmp_path / "trace", "none")
+    assert value["executable"] == str(link.resolve())
+    assert module._run(value, "test") == "{}"
+    with pytest.raises(ValueError, match="not a regular file"):
+        module._regular(link)
+    powershell = shutil.which("powershell.exe") or shutil.which("pwsh")
+    if powershell:
+        state = public_state(tmp_path, datetime.now(timezone.utc) + timedelta(days=5))
+        target, _plan, _trace = plan_file(tmp_path, state)
+        result = subprocess.run([powershell, "-NoProfile", "-File", str(REGISTRAR),
+                                 "-ConfigPath", str(target), "-PythonPath", str(link), "-PlanOnly"],
+                                capture_output=True, text=True, timeout=30)
+        assert result.returncode != 0
+        assert "not a regular file" in result.stderr
+
+
+def test_killed_owner_needs_exact_recovery_and_cannot_retry_uncertain_commands(tmp_path: Path):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state, failure="wait-prepare")
+    proc = subprocess.Popen([str(Path(sys.executable).resolve()), str(TOOL), "--config", str(target),
+                             "--expected-config-sha256", sha(target)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    child = None
+    try:
+        deadline = time.monotonic() + 15
+        pidfile = Path(str(trace) + ".pid")
+        while not pidfile.exists() and proc.poll() is None and time.monotonic() < deadline:
+            time.sleep(.05)
+        assert pidfile.exists(), "isolated fixture did not reach the prepare gate"
+        child = int(pidfile.read_text())
+        lock, latch = module._paths(plan)
+        lock_hash, latch_hash = sha(lock), sha(latch)
+        assert json.loads(latch.read_text())["failedGate"] == "prepare"
+        with pytest.raises(RuntimeError, match="kernel guard"):
+            module.recover_stale_lock(plan, lock_hash)
+        with pytest.raises(RuntimeError, match="kernel guard"):
+            module.execute(plan, now=now)
+        assert sha(lock) == lock_hash and sha(latch) == latch_hash
+        proc.kill()
+        proc.wait(timeout=10)
+        before = trace.read_bytes()
+        with pytest.raises(RuntimeError, match="explicit ownership-proven recovery"):
+            module.execute(plan, now=now)
+        # Even an abandoned lock cannot suppress an expiry alert.
+        assert module.execute(plan, now=now + timedelta(days=2)) == 3
+        assert json.loads(Path(plan["statusPath"]).read_text())["outcome"] == "expired-alert"
+        with pytest.raises(ValueError, match="digest differs"):
+            module.recover_stale_lock(plan, "0" * 64)
+        assert sha(lock) == lock_hash
+        module.recover_stale_lock(plan, lock_hash)
+        assert not lock.exists() and sha(latch) == latch_hash
+        # The fixture's child is deliberately still alive: acquiring a dead
+        # supervisor's guard proves no remote effect has stopped, so latch stays.
+        assert module.execute(plan, now=now) == 2
+        assert trace.read_bytes() == before
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=10)
+        if child is not None:
+            try:
+                os.kill(child, 15)
+            except ProcessLookupError:
+                pass
+
+
+def test_latch_reset_requires_reviewed_changed_fresh_material_and_archives_history(tmp_path: Path):
+    now = datetime.now(timezone.utc)
+    state = public_state(tmp_path, now + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state, failure="prepare")
+    with pytest.raises(RuntimeError):
+        module.execute(load(target), now=now)
+    _lock, latch = module._paths(plan)
+    digest = sha(latch)
+    with pytest.raises(ValueError, match="reviewed fresh"):
+        module.reset_failure_latch(plan, digest, module._leaf_set(state))
+    for cert in [state / "control-cert.pem", *state.glob("public/nodes/*/node-cert.pem")]:
+        cert.write_bytes(certificate(now + timedelta(days=6)))
+    with pytest.raises(ValueError, match="digest differs"):
+        module.reset_failure_latch(plan, "0" * 64, module._leaf_set(state))
+    with pytest.raises(ValueError, match="reviewed fresh"):
+        module.reset_failure_latch(plan, digest, "0" * 64)
+    assert sha(latch) == digest
+    before = trace.read_bytes()
+    module.reset_failure_latch(plan, digest, module._leaf_set(state))
+    assert not latch.exists()
+    archive = state / "scheduled-leaf-renewal-history" / f"{digest}.json"
+    assert json.loads(archive.read_text())["phase"] == "failed"
+    assert module.execute(plan, now=now) == 0
+    assert trace.read_bytes() == before
+
+
+def test_receipt_storage_failure_never_starts_a_command_or_clears_the_latch(tmp_path: Path, monkeypatch):
+    state = public_state(tmp_path, datetime.now(timezone.utc) + timedelta(days=1))
+    target, plan, trace = plan_file(tmp_path, state)
+    original = module._record
+    def unavailable(*_args):
+        raise OSError("synthetic receipt storage unavailable")
+    monkeypatch.setattr(module, "_record", unavailable)
+    with pytest.raises(OSError):
+        module.execute(load(target))
+    assert not trace.exists()
+    monkeypatch.setattr(module, "_record", original)
+    assert module.execute(load(target)) == 2
+    assert not trace.exists()
+
+
+def test_stale_lock_from_another_state_cannot_be_retired_by_hash_alone(tmp_path: Path):
+    state = public_state(tmp_path, datetime.now(timezone.utc) + timedelta(days=1))
+    _target, plan, _trace = plan_file(tmp_path, state)
+    lock, _latch = module._paths(plan)
+    owner = module._owner(plan, "old-run")
+    owner["statePathSHA256"] = "0" * 64
+    lock.write_text(json.dumps(owner))
+    digest = sha(lock)
+    with pytest.raises(ValueError, match="ownership differs"):
+        module.recover_stale_lock(plan, digest)
+    assert sha(lock) == digest
