@@ -23,5 +23,16 @@
   "renewalWindowStartsAt": "2026-11-08T05:15:35+00:00",
   "operationallyAccepted": false,
   "limits": "Root directly read the local live projection and public certificate dates; remote CSR/issuer/mTLS setup is attributed to the worker execution evidence, not independently repeated here.",
-  "readbackPassed": true
+  "readbackPassed": true,
+  "comparisonSamples": {
+    "firstGeneratedAt": "2026-11-04T11:19:58.783111+00:00",
+    "secondGeneratedAt": "2026-11-04T11:20:19.264192+00:00",
+    "sourceIntervalSeconds": 20.481081,
+    "firstSavedInputSHA256": "b070c3dbefca3a01cc5248fe6f60287ff2c907f7331b061c5235c97da4feb290",
+    "firstSnapshotTimes": [
+      "2026-11-04T11:19:56.133286+00:00",
+      "2026-11-04T11:19:56.135519+00:00"
+    ],
+    "comparisonMethod": "Saved first overview; actual20second delay; second overview; same members and advancing snapshot timestamps compared by Root helper. Top-level startedAt/observedAt describe second-phase processing, not total sampling span."
+  }
 }
