@@ -245,7 +245,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       };
       expect(getTrustBannerInfo(trust)).toEqual({
         level: 'renewal-window',
-        message: '인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간',
+        message: '인증서 갱신 창 (갱신 필요) — 만료까지 2일 0시간',
       });
     });
 
@@ -258,7 +258,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       };
       expect(getTrustBannerInfo(trust)).toEqual({
         level: 'renewal-window',
-        message: '인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간',
+        message: '인증서 갱신 창 (갱신 필요) — 만료까지 0일 0시간',
       });
     });
   });
@@ -306,7 +306,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
       expect(banner?.getAttribute('role')).toBe('status');
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 2일 0시간');
       expect((banner as HTMLElement).style.color).toBe('var(--color-status-degraded)');
       expect((banner as HTMLElement).style.backgroundColor).toBe('var(--color-bg-subtle)');
 
@@ -421,7 +421,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 0일 0시간');
     });
 
     it('handles invalid ISO date in trust without crashing', async () => {
@@ -438,7 +438,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 0일 0시간');
     });
 
     it('handles negative secondsUntilEarliestExpiry without showing negative numbers or crashing', async () => {
@@ -455,7 +455,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
       expect(banner).not.toBeNull();
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 0일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 0일 0시간');
     });
 
     it('handles boundary condition: exactly at window start (2 days = 172800s)', async () => {
@@ -471,7 +471,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       });
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 2일 0시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 2일 0시간');
     });
 
     it('handles boundary condition: 1 day 23 hours remaining (169200s)', async () => {
@@ -487,7 +487,7 @@ describe('Card 303: Node Certificate Expiry & Trust Renewal State', () => {
       });
 
       const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
-      expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 1일 23시간');
+      expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 1일 23시간');
     });
   });
 

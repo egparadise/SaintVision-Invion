@@ -82,6 +82,7 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
     container.remove();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('wires Header logout button to performLogout with redirectIdp: true and executes location.assign', async () => {
@@ -289,6 +290,8 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
     const testProjectId = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
     const testNodeId = 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV';
     const nowMs = Math.floor(Date.now() / 1000) * 1000;
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(nowMs);
     const expiryMs = nowMs + 86400 * 1000;
     const startsMs = expiryMs - 2 * 86400 * 1000;
     const observedAt = new Date(nowMs).toISOString();
@@ -391,7 +394,7 @@ describe('App Level OIDC Integration (Card 153 M1/M2/L5 Verification)', () => {
 
     const banner = container.querySelector('[data-testid="trust-expiry-banner"]');
     expect(banner).not.toBeNull();
-    expect(banner?.textContent).toContain('인증서 갱신 창 (스케줄러 미등록) — 만료까지 1일 0시간');
+    expect(banner?.textContent).toContain('인증서 갱신 창 (갱신 필요) — 만료까지 1일 0시간');
   });
 
   it('keeps unknown trust visible when /node-certificates endpoint is unobserved or fails', async () => {

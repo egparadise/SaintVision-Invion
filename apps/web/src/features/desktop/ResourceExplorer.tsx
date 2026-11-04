@@ -96,7 +96,7 @@ export function isCertificateExpired(isoString: string | null | undefined): bool
 
 /**
  * Trust / certificate banner resolver.
- * renewal-window='자동 갱신 창 — 만료까지 N일 N시간',
+ * renewal-window='인증서 갱신 창 (갱신 필요) — 만료까지 N일 N시간',
  * expired='인증서 만료 — 노드 연결 끊김',
  * unknown/absent field=no banner,
  * ok=badge only.
@@ -128,7 +128,7 @@ export function getTrustBannerInfo(trust?: ClusterTrustSummary | null): { level:
     }
     return {
       level: 'renewal-window',
-      message: `인증서 갱신 창 (스케줄러 미등록) — 만료까지 ${days}일 ${hours}시간`,
+      message: `인증서 갱신 창 (갱신 필요) — 만료까지 ${days}일 ${hours}시간`,
     };
   }
   return null;
