@@ -1,0 +1,25 @@
+{
+  "transactionReadOnly": true,
+  "ownedPinnedDatabase": true,
+  "clients": [
+    {
+      "pkce": null,
+      "enabled": true,
+      "client_id": "sv-api",
+      "public_client": false,
+      "standard_flow_enabled": false,
+      "service_accounts_enabled": false,
+      "direct_access_grants_enabled": false
+    },
+    {
+      "pkce": "S256",
+      "enabled": true,
+      "client_id": "sv-portal",
+      "public_client": true,
+      "standard_flow_enabled": true,
+      "service_accounts_enabled": false,
+      "direct_access_grants_enabled": false
+    }
+  ],
+  "observedAt": "2026-11-04T06:07:44.924299+00:00"
+}

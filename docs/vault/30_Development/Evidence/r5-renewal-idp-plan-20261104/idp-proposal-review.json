@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "r5-idp-local-proposal-review:1",
+  "privatePlanSHA256": "228403ffd4ec9c145ffe4492b1309ab7269fc66c92ce2b6307d619ec462dca94",
+  "applied": false,
+  "sourceProfile": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\smoke\\api.json",
+  "sourceProfileSHA256": "a2eb56f0bb2ba7d767b46203a1e998ef2ee8095938c8114d983ffb6a79e9f2cc",
+  "legacyProfilePreserved": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\api.json",
+  "legacyDevBundlePreserved": "D:\\Project\\SaintVisionI-Invion\\.work\\dev\\jwks.json",
+  "targetDirectory": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\r5-f8923863\\identity",
+  "targetProfile": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\r5-f8923863\\identity\\api.json",
+  "targetBundle": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\r5-f8923863\\identity\\oidc-trust-bundle.json",
+  "backupDirectory": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\backups\\2026-11-04-r5-identity-plan-9c44acb935e9",
+  "backups": [
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\api.json",
+      "sourceSHA256": "d2fd7135c7839fc685c4e6440c16184088376783641f26a457115d9a54a6f887",
+      "backupName": "original-1-api.json"
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\oidc-trust-bundle.json",
+      "sourceSHA256": "6f8ac61050e34234d8c96255906bc87896b3f005c5f82951c5a956b9c1af8457",
+      "backupName": "original-2-oidc-trust-bundle.json"
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\.work\\dev\\jwks.json",
+      "sourceSHA256": "0e376f44140b7f0d1e8052c88b69c42671f578a90cab4bb4c642b5fd900f43d9",
+      "backupName": "original-3-jwks.json"
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\smoke\\api.json",
+      "sourceSHA256": "a2eb56f0bb2ba7d767b46203a1e998ef2ee8095938c8114d983ffb6a79e9f2cc",
+      "backupName": "original-4-api.json"
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\.work\\intranet\\smoke\\oidc-trust-bundle.json",
+      "sourceSHA256": "fee3816aec406534d41646dc9ad1ef80d17b52b1dd5077ad6ee39f47dfff199c",
+      "backupName": "original-5-oidc-trust-bundle.json"
+    }
+  ],
+  "tenantBinding": "actual existing r5 tenant; no old profile/tenant is changed",
+  "issuer": "https://idp.sv.lan/realms/saintvision",
+  "audience": "sv-api",
+  "clientIds": [
+    "sv-portal"
+  ],
+  "existingTLS_CA_SHA256": "92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba",
+  "jwksInputSHA256": "878bd3256d65619d63bc8b43c0a89236dae3a74e92818919bdeb317dd52b4c18",
+  "candidateBundleSHA256": "f50a221d410aca0804e235d9c2256b9c3d541121d346b4b530fb2f6b8b55f530",
+  "candidateProfileSHA256": "3a3ab0717feaf1a781d26fc635d574c015dd615ee9adf9973bb4e0f56d4225ba",
+  "candidateBundleExpiresAt": "2026-11-11T06:11:35+00:00",
+  "applyScriptSHA256": "f3af8c41543a88bc3ca7d2bd0a6094c16e94bad372aa8105db68432d281f78ca",
+  "offlineVerifierConstructionAccepted": true,
+  "wrongIssuerRefused": true,
+  "expiredBundleRefused": true,
+  "serviceSwitchIncluded": false,
+  "tokenRequested": false,
+  "globalTrustChanged": false,
+  "configurationReadinessAcceptance": false
+}

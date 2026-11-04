@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "r5-review-packet-bindings:1",
+  "observedAt": "2026-11-04T15:37:31.589779+09:00",
+  "privateWorkspace": ".work\\r5-renewal-idp-plan-20261104",
+  "renewalConfigurationSHA256": "4fb067d06a0796dab2d533d35134d9181abb14a16bd07e613d5da59686d6964e",
+  "renewalBindingSHA256": "a67edb5148d20d704b11f5d7d9dd6a2c25d96d3fe0c2fab7b9c40640468ea956",
+  "nodePreparationCommandsSHA256": "1e5af979617c7ea688fb44696f392defff32e0a31c80b7b13b36922b3185fe7f",
+  "registrationCommandsSHA256": "d79184ed4671e51a90a7a3e952a23997450ee9c5b3b925c43061ce7cf6a1550e",
+  "runContextReadOnlyProbeCommandsSHA256": "8430c453494996a94f7fcdd32af9cc04508bf9394281f4e23c1e0c37adecb3e1",
+  "idpLocalProposalSHA256": "228403ffd4ec9c145ffe4492b1309ab7269fc66c92ce2b6307d619ec462dca94",
+  "reviewCandidateFileSHA256": {
+    "renewal_gate.review_candidate.py": "a83e32bdb73408e30d3dd4beefdb7d19b7095c297c4df521226aac046d72ad90",
+    "transition.review_candidate.ps1": "51b02052c9f06a3313cedc7cd9d62959547cd1c13ac55e03f0c63967d6b062b2",
+    "idp_apply.review_candidate.ps1": "f3af8c41543a88bc3ca7d2bd0a6094c16e94bad372aa8105db68432d281f78ca",
+    "plan_guard_checks.review_candidate.py": "8de722a64e91b3d8c95b80b73bfc955c6fc57671efeaf3b92b6710d2c4b35286"
+  },
+  "privateConfigurationOrCredentialsPublished": false
+}

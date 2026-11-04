@@ -1,0 +1,90 @@
+{
+  "observedAt": "2026-11-04T06:17:27.251680+00:00",
+  "runs": [
+    {
+      "runId": 41779908473,
+      "sourceHeadSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "conclusion": "failure",
+      "actualCheckouts": [
+        "45d6ab737f2baede2664b096dcc0e0846ff82c13"
+      ],
+      "actualCPythonVersions": [
+        "3.12.15",
+        "3.14.9"
+      ],
+      "testSummaries": [
+        "2026-11-04T05:50:25.7344539Z 42 failed, 8361 passed, 75 skipped, 2 deselected, 2006 warnings, 9 errors in 993.76s (0:16:33)",
+        "2026-11-04T05:57:43.8449523Z 42 failed, 8361 passed, 75 skipped, 2 deselected, 2008 warnings, 9 errors in 1393.91s (0:23:13)"
+      ],
+      "privateRawLogSHA256": "d1daa0a55a6ae30afc49fae36457c95788bc1422f9451c17c63f3c400b5b2173"
+    },
+    {
+      "runId": 41779908364,
+      "sourceHeadSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "conclusion": "failure",
+      "actualCheckouts": [
+        "45d6ab737f2baede2664b096dcc0e0846ff82c13"
+      ],
+      "actualCPythonVersions": [
+        "3.12.15"
+      ],
+      "testSummaries": [
+        "2026-11-04T06:04:35.4773015Z = 42 failed, 8719 passed, 46 skipped, 2 deselected, 2008 warnings, 9 errors in 1161.65s (0:19:21) ="
+      ],
+      "privateRawLogSHA256": "cb1e9df2d557a12b5aa6e076450029d38557b2993192998997723f207b70501c"
+    }
+  ],
+  "coreJUnit": {
+    "total": 8816,
+    "passed": 8719,
+    "failed": 42,
+    "errors": 9,
+    "skipped": 46
+  },
+  "schedulerJUnit": {
+    "total": 36,
+    "passed": 36,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "schedulerCaseNames": [
+    "test_outside_window_is_noop_and_expired_is_alert",
+    "test_in_window_runs_the_only_permitted_sequence",
+    "test_each_failed_gate_stops_without_a_later_command[currentStatus]",
+    "test_each_failed_gate_stops_without_a_later_command[runtimePreflight-1]",
+    "test_each_failed_gate_stops_without_a_later_command[runtimePreflight-2]",
+    "test_each_failed_gate_stops_without_a_later_command[prepare]",
+    "test_each_failed_gate_stops_without_a_later_command[install-1]",
+    "test_each_failed_gate_stops_without_a_later_command[install-2]",
+    "test_each_failed_gate_stops_without_a_later_command[stage-1]",
+    "test_each_failed_gate_stops_without_a_later_command[stage-2]",
+    "test_each_failed_gate_stops_without_a_later_command[commit]",
+    "test_each_failed_gate_stops_without_a_later_command[transition]",
+    "test_each_failed_gate_stops_without_a_later_command[observe]",
+    "test_each_failed_gate_stops_without_a_later_command[finalize-1]",
+    "test_each_failed_gate_stops_without_a_later_command[finalize-2]",
+    "test_each_failed_gate_stops_without_a_later_command[finalObserve]",
+    "test_lock_and_pin_drift_fail_before_any_command",
+    "test_plan_rejects_extra_key_duplicate_node_group_and_changed_digest",
+    "test_registration_plan_is_current_user_limited_and_twice_daily",
+    "test_runner_and_registration_scripts_do_not_read_private_state",
+    "test_certificate_preflight_failure_has_durable_status_without_mutation_latch[missing]",
+    "test_certificate_preflight_failure_has_durable_status_without_mutation_latch[not-yet-valid]",
+    "test_certificate_preflight_failure_has_durable_status_without_mutation_latch[node-count]",
+    "test_linux_python_symlink_is_canonicalized_by_fixture_but_still_rejected_as_input",
+    "test_killed_owner_needs_exact_recovery_and_cannot_retry_uncertain_commands",
+    "test_latch_reset_requires_reviewed_changed_fresh_material_and_archives_history",
+    "test_receipt_storage_failure_never_starts_a_command_or_creates_mutation_latch",
+    "test_stale_lock_from_another_state_cannot_be_retired_by_hash_alone",
+    "test_transient_read_only_preflight_can_recover_on_the_next_trigger[currentStatus]",
+    "test_transient_read_only_preflight_can_recover_on_the_next_trigger[runtimePreflight-1]",
+    "test_transient_read_only_preflight_can_recover_on_the_next_trigger[runtimePreflight-2]",
+    "test_successful_commands_without_changed_fresh_leaves_are_not_renewal[unchanged-finalObserve]",
+    "test_successful_commands_without_changed_fresh_leaves_are_not_renewal[still-in-window-finalObserve]",
+    "test_lock_cleanup_preserves_the_primary_error_and_foreign_record",
+    "test_renewal_requires_every_original_public_leaf_member_to_change[unchanged-member-finalObserve]",
+    "test_renewal_requires_every_original_public_leaf_member_to_change[member-path-drift-finalObserve]"
+  ],
+  "fullCorePassed": false
+}

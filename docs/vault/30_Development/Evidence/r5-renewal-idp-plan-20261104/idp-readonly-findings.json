@@ -1,0 +1,54 @@
+{
+  "observedAt": "2026-11-04T06:05:09.632769+00:00",
+  "readOnly": true,
+  "canonicalIssuer": "https://idp.sv.lan/realms/saintvision",
+  "configuredIssuerIsDev": true,
+  "configuredAudienceMatchesCanonical": false,
+  "configuredClientsMatchCanonical": false,
+  "legacyAPIUsesSeparateDevBundle": true,
+  "configuredBundle": {
+    "topLevelKeys": [
+      "expiresAt",
+      "issuer",
+      "keys"
+    ],
+    "keyCount": 1,
+    "hasPrivateComponent": false,
+    "expiresAt": "2026-10-04T23:08:30+00:00",
+    "expired": true
+  },
+  "staleCanonicalBundle": {
+    "topLevelKeys": [
+      "expiresAt",
+      "issuer",
+      "keys"
+    ],
+    "keyCount": 1,
+    "hasPrivateComponent": false,
+    "expiresAt": "2026-10-06T15:02:27+00:00",
+    "expired": true
+  },
+  "configuredVerifierConstructorAccepted": false,
+  "configuredVerifierErrorClass": "ValueError",
+  "smokeConfigIssuerMatchesCanonical": true,
+  "smokeAudienceMatchesCanonical": true,
+  "smokeClientsMatchCanonical": true,
+  "legacyTenantMatchesSmoke": false,
+  "legacyTenantMatchesR5": false,
+  "discoveryHTTP": 200,
+  "jwksHTTP": 200,
+  "discoveryIssuerMatchesCanonical": true,
+  "jwksSameOrigin": true,
+  "liveTLSLeafMatchesExistingLocalServiceCertificate": true,
+  "serviceTrustCAExistingSHA256": "92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba",
+  "liveServiceLeafSHA256": "e847af4f5ccb7b7671c97cf1d690a9120991bc8960dd38cc9533b3e6ea705b07",
+  "liveJWKS_SHA256": "878bd3256d65619d63bc8b43c0a89236dae3a74e92818919bdeb317dd52b4c18",
+  "liveRS256KeyCount": 1,
+  "nonSigningKeysDropped": 1,
+  "buildBundleInMemoryAccepted": true,
+  "proposedBundleTTLSeconds": 604800,
+  "tokenRequested": false,
+  "serviceOrConfigurationChanged": false,
+  "canonicalExpiredBundleSigningKeysMatchCurrentLive": true,
+  "configuredDevBundleSigningKeysMatchCurrentLive": false
+}
