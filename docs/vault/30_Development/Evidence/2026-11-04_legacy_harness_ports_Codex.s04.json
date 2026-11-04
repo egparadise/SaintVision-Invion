@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "cancelOutboxCount": 1,
+      "httpStatuses": [
+        201,
+        201,
+        200,
+        200
+      ],
+      "id": "http-run-idempotency-cancel",
+      "runCount": 1,
+      "status": "PASS"
+    },
+    {
+      "approvalStatus": "expired",
+      "authorizedCommandOutboxCount": 0,
+      "dispatchCount": 0,
+      "expiryClosedExactlyOnce": true,
+      "httpVoteStatuses": [
+        200,
+        200,
+        200
+      ],
+      "id": "approval-before-execution-and-expiry",
+      "status": "PASS"
+    },
+    {
+      "id": "outbox-publisher-crash-retry",
+      "sameEventPublicationCount": 2,
+      "status": "PASS"
+    },
+    {
+      "committedEffects": 1,
+      "committedInboxRows": 1,
+      "duplicateEffectCount": 0,
+      "id": "outbox-consumer-rollback-dedup",
+      "rolledBackEffects": 0,
+      "status": "PASS"
+    }
+  ],
+  "codeSha": "d44d7a0800996a1e7f282e0a16ae4c7c40b1592f",
+  "measurementScope": "disposable-postgresql-http-kernel",
+  "migrationChanged": false,
+  "operationalAcceptanceAssessed": false,
+  "physicalNodeDeliveryResumption": "UNMEASURED",
+  "provenance": {
+    "capturedAtKst": "2026-11-04T14:32:18+09:00",
+    "codeSha": "d44d7a0800996a1e7f282e0a16ae4c7c40b1592f",
+    "contentClean": true,
+    "executor": "Codex",
+    "integrationInSync": false,
+    "integrationSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "workingTreeClean": false
+  },
+  "publicContractChanged": false,
+  "schemaVersion": 1,
+  "taskId": "S04-DB"
+}

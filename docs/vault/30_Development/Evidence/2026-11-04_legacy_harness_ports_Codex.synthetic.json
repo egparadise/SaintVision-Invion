@@ -1,0 +1,65 @@
+{
+  "acceptanceShapeRequested": false,
+  "codeSha": "d44d7a0800996a1e7f282e0a16ae4c7c40b1592f",
+  "detectionDelaySeconds": {
+    "max": 0.112787,
+    "min": 0.112787,
+    "p50": 0.112787,
+    "p95": 0.112787
+  },
+  "detectionLimitSource": "explicit",
+  "detectionSloMet": true,
+  "findings": [
+    {
+      "id": "F-S07-02",
+      "severity": "acceptance-boundary",
+      "summary": "Current replica repair code plans and marks state; the harness fixture does not prove physical byte transfer or execution-shard replay."
+    },
+    {
+      "id": "F-S07-03",
+      "severity": "slo-boundary",
+      "summary": "The strict last_seen < now-timeout predicate is retained. AC-07 defines the detection limit as the liveness timeout plus one poll interval."
+    }
+  ],
+  "kernelFreshnessSeconds": 15.0,
+  "livenessTimeoutSeconds": 0.05,
+  "maxDetectionSeconds": 0.5,
+  "measurementClock": "harness-process-wall-clock-utc",
+  "measurementClockDefinition": "detectionDelaySeconds is detected_at minus departed_at; both are sampled with datetime.now(UTC) by the harness process, not PostgreSQL clock_timestamp().",
+  "measurementScope": "disposable-postgresql-synthetic-measured-nodes",
+  "nodesPerRound": 3,
+  "operationalAcceptanceAssessed": false,
+  "pollIntervalSeconds": 0.02,
+  "projectLockContentionMeasured": false,
+  "provenance": {
+    "capturedAtKst": "2026-11-04T14:32:44+09:00",
+    "codeSha": "d44d7a0800996a1e7f282e0a16ae4c7c40b1592f",
+    "contentClean": true,
+    "executor": "Codex",
+    "integrationInSync": false,
+    "integrationSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "workingTreeClean": false
+  },
+  "recoveryTargetMet": true,
+  "repetitions": 1,
+  "rounds": [
+    {
+      "departedNodeId": "nod_01M6JGQAZDK8WE66PCEV0S0CQN",
+      "departedReplicasStale": 1,
+      "detected": true,
+      "detectedWithinConfiguredLimit": true,
+      "detectionDelaySeconds": 0.112787,
+      "freshReplacementCandidates": 1,
+      "recoveryDurationSeconds": 0.028119,
+      "round": 1,
+      "shardsAttempted": 1,
+      "shardsRecovered": 1
+    }
+  ],
+  "schemaVersion": 2,
+  "shardsAttempted": 1,
+  "shardsRecovered": 1,
+  "syntheticRecoveryMode": "verified-owner-fixture-after-product-repair-plan",
+  "syntheticShardRecoverySuccessRate": 1.0,
+  "targetRecoverySuccessRate": 0.95
+}
