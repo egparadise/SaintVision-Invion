@@ -7,8 +7,8 @@ author: "Codex"
 updated: "2026-11-04T12:43:33+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Orca Run run_e57ecd84a7bc created; integration train 78 directly observed; Agent dispatch and acceptance results remain separate pending steps"
-active_card_next: "Dispatch independent Claude, Gemini, and Codex work, then reconcile exact heads, CI, review, S01 prerequisites, and Obsidian delivery"
+active_card_status: "Claude ctx_0bdc8c734c3f, Gemini ctx_afac04406137, and Codex ctx_78f45e976cf3 returned ready delivery receipts in separate Orca workspaces; results and acceptance remain pending"
+active_card_next: "Resume Run run_e57ecd84a7bc on worker reports; resolve findings, reconcile exact heads/CI/review/S01 prerequisites, and deliver the latest combined source to Obsidian"
 ---
 
 ## 2026-11-04 전체 개발 자동감독 착수
@@ -16,8 +16,9 @@ active_card_next: "Dispatch independent Claude, Gemini, and Codex work, then rec
 - User authorized continuing the overall audit and remaining project work without repeated routine approval; the runtime now reports full access and approval policy never.
 - Base `a44d578a0096003aba8dccbfd4447f5fbcc46934`, branch `agent/codex/c301-standalone-worker-modules`; three existing dirty documentation paths are preserved.
 - `git fetch origin` exited 0; remote integration and fetched ref both identify `03e17c31cf535008d39534aaa80d3ae274bd75cc`. Historical claims that train 78 remains unlanded require reconciliation against this direct observation.
-- Supervised Orca Run `run_e57ecd84a7bc` exists. Worker delivery, independent review, exact-head CI, live recovery, and operational acceptance are not yet claimed by this kickoff.
-- Next owner Codex coordinator: dispatch separate Claude/Gemini/Codex work, receive evidence, resolve review findings, and continue integration/reporting. Canonical task count remains 2 done / 4 blocked / 42 planned / 0 ready.
+- Supervised Orca Run `run_e57ecd84a7bc` has three separate-workspace ready receipts: Claude `ctx_0bdc8c734c3f`, Gemini/Antigravity `ctx_afac04406137`, Codex `ctx_78f45e976cf3`. Each worker-start exited 0; independent verdicts, exact-head CI, live recovery, and operational acceptance remain pending results.
+- Delivery branch `agent/codex/supervision-20261104`, kickoff commit `a954a270d65fa7e456c69e3061a455b51a7f64eb`, push exit 0, draft PR #404. An abandoned empty index lock was preserved after age/process/exclusive-open checks; the failed first stage was not called PASS.
+- Next owner Codex coordinator: resume automatically on Orca worker reports, receive evidence, resolve review findings, and continue integration/reporting. Canonical task count remains 2 done / 4 blocked / 42 planned / 0 ready. Obsidian apply waits for reconciliation with the newest combined source.
 - History: [[2026-11-04_전체개발_자동감독_착수_Codex]].
 
 ## 2026-10-29 VF-CL-04 attested CI closure and AC-11 CI repair
