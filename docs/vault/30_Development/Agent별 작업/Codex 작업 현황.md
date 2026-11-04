@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.347"
+version: "1.0.348"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T15:45:25+09:00"
+updated: "2026-11-04T16:12:59+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Final owner sources accepted and integrated; local combined and frontend gates passed; exact root fixes and private operations plan under final independent review"
-active_card_next: "Freeze exact final SHA, run all eight hosted lanes, land normally, then verify attestation and aggregate; finish bounded r5 expiry prevention and Obsidian synchronization"
+active_card_status: "Frozen fd1530d9 exact-head CI running; new r5 listener/process loss honestly recorded and controlled recovery delegated"
+active_card_next: "Finish exact-head CI and normal landing; restore source03 r5 with parent-exit persistence proof, complete reviewed operations conditions and final report/sync"
 ---
+
+## 2026-11-04 16:08 KST 운영 재확인: r5 로컬 서비스 중단
+
+Codex root의 재확인에서 overview18082 연결이 WinError10061로 거절됐고 exit1이다. 별도 listener 관측에서3000/18082/55448이 모두 없고 r5-owned python/node/ssh도 없었다. observer 마지막 기록15:52:15와 worker 재개가 가까운 것은 상관관계이며 원인으로 단정하지 않는다. 14:37의2Node 성공은 과거 측정으로 보존하며 현재 복구 완료로 쓰지 않는다.
+
+Codex 운영 worker `ctx_81cc0efa0eea`가 source03의 기존 r5 observer/serve/web/tunnel만 진단·복구한다. Claude가 실행 수명과 복구안을 독립 검토한다. 해당 범위의 복구는 기존 사용자 승인으로 진행하며 새 인증서/rotation/renewal-task/외부 process 변경은 허용하지 않았다. 부모·worker terminal 종료 뒤 유지 증거가 복구 완료 조건이다. [[2026-11-04_r5_서비스수명_오류와_복구_감독_Codex]]
+
+별도 source `fd1530d9`의 여덟 hosted lane 중6개가 success이며 Backend/Core 전체 시험은 진행 중이다. frozen code worktree는 바꾸지 않고 이 report worktree에서 새 관측을 기록한다. Obsidian checkpoint는104 files exported/2175 hashes match/0 pending/0 conflicts로 직접 확인했다. 최종 운영·CI 보고 뒤 다시 동기화한다.
 
 ## 2026-11-04 최종 통합 수신
 

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "supervision-r5-local-service-loss:1",
+  "recordedAt": "2026-11-04T16:12:59+09:00",
+  "observationApproximateKST": "2026-11-04 16:08",
+  "executor": "Codex root",
+  "bootstrapSource": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "overviewUrl": "http://127.0.0.1:18082/pilot/v1/overview",
+  "overviewResult": "connection refused, WinError10061",
+  "readbackExit": 1,
+  "listenerPortsChecked": [
+    3000,
+    18082,
+    55448
+  ],
+  "listenerCount": 0,
+  "ownedPythonNodeSshProcessCount": 0,
+  "observerLogLastWriteKST": "2026-11-04 15:52:15",
+  "rootCause": "UNDETERMINED; temporal correlation with worker reopening is not proof",
+  "canonicalHistoricalEvidenceOverwritten": false,
+  "operationallyAccepted": false
+}

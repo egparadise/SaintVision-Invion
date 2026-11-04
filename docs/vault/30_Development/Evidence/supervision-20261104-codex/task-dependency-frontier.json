@@ -1,0 +1,922 @@
+{
+  "schemaVersion": "supervision-task-frontier:1",
+  "observedAt": "2026-11-04T16:00:07+09:00",
+  "sourceHead": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "registryVersion": "1.0.1",
+  "meaning": "dependency eligibility is not ready status or operational acceptance; no registry mutation",
+  "counts": {
+    "blocked": 4,
+    "done": 2,
+    "planned": 42
+  },
+  "eligiblePlannedTasks": [],
+  "rootPrerequisites": [
+    {
+      "task_id": "S01-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "blocked",
+      "scope": "저장소·계약·개발 환경·권한 경계",
+      "next_handoff": "user-input:U2/U3/U4",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [
+        "S01-BE"
+      ],
+      "dependencyEligibleButNotDone": true
+    },
+    {
+      "task_id": "S01-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "blocked",
+      "scope": "URI·보존·제품 검증·장비 인벤토리",
+      "next_handoff": "user-input:U1/U5/U6",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": true
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "S01-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "done",
+      "scope": "사용자 여정·디자인 토큰·화면 상태 명세",
+      "next_handoff": "Orca",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S01-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "blocked",
+      "scope": "저장소·계약·개발 환경·권한 경계",
+      "next_handoff": "user-input:U2/U3/U4",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [
+        "S01-BE"
+      ],
+      "dependencyEligibleButNotDone": true
+    },
+    {
+      "task_id": "S01-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "done",
+      "scope": "ERD·ID·상태·마이그레이션 순서",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S01-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "blocked",
+      "scope": "URI·보존·제품 검증·장비 인벤토리",
+      "next_handoff": "user-input:U1/U5/U6",
+      "unfinishedImmediateDependencies": [],
+      "unfinishedRootPrerequisites": [
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": true
+    },
+    {
+      "task_id": "S02-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "blocked",
+      "scope": "로그인·Node 목록·상세·오류 상태",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S02-BE",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "OIDC·mTLS 등록·Heartbeat",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S02-DB",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "blocked",
+      "scope": "User·Node·Capability·Snapshot",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S02-ST",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "제공 폴더·DataLocation 카탈로그",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S03-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "Project·Workspace 생성과 실행 결과",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S02-FE",
+        "S02-BE",
+        "S02-DB",
+        "S02-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S03-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "Sandbox·Tool Gateway·기본 정책",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S02-FE",
+        "S02-BE",
+        "S02-DB",
+        "S02-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S03-DB",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "Workspace·Workload·Run·Evidence",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S02-FE",
+        "S02-BE",
+        "S02-DB",
+        "S02-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S03-ST",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "볼륨·Artifact 기본 전송",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S02-FE",
+        "S02-BE",
+        "S02-DB",
+        "S02-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S04-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "승인 화면·Run SSE 타임라인",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S03-FE",
+        "S03-BE",
+        "S03-DB",
+        "S03-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S04-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "취소·timeout·승인 digest·재연결",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S03-FE",
+        "S03-BE",
+        "S03-DB",
+        "S03-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S04-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "허용 상태 전이·outbox·idempotency",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S03-FE",
+        "S03-BE",
+        "S03-DB",
+        "S03-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S04-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "전송 재개·실제 checksum 검증",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S03-FE",
+        "S03-BE",
+        "S03-DB",
+        "S03-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S05-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "자원 그래프·후보 제외·Explain",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S04-FE",
+        "S04-BE",
+        "S04-DB",
+        "S04-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S05-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "Hard filter·가중 score·Node 재검증",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S04-FE",
+        "S04-BE",
+        "S04-DB",
+        "S04-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S05-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "Lease 잠금·Fencing·Allocation",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S04-FE",
+        "S04-BE",
+        "S04-DB",
+        "S04-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S05-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "지역성·전송 비용·권한 확인",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S04-FE",
+        "S04-BE",
+        "S04-DB",
+        "S04-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S06-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "Monaco·xterm·diff·session UX",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S05-FE",
+        "S05-BE",
+        "S05-DB",
+        "S05-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S06-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "Git·PTY·checkpoint·resume",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S05-FE",
+        "S05-BE",
+        "S05-DB",
+        "S05-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S06-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "RunAttempt·Step·Checkpoint·session",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S05-FE",
+        "S05-BE",
+        "S05-DB",
+        "S05-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S06-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "persistent snapshot·복원 경로",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S05-FE",
+        "S05-BE",
+        "S05-DB",
+        "S05-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S07-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "offline·recovering·stale 상태 UI",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S06-FE",
+        "S06-BE",
+        "S06-DB",
+        "S06-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S07-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "drain·재스케줄·reconciliation",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S06-FE",
+        "S06-BE",
+        "S06-DB",
+        "S06-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S07-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "갱신/반납/Offer 경합·복구 기록",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S06-FE",
+        "S06-BE",
+        "S06-DB",
+        "S06-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S07-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "복제·cache pin·quota",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S06-FE",
+        "S06-BE",
+        "S06-DB",
+        "S06-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S08-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "감사·격리·관리 화면",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S07-FE",
+        "S07-BE",
+        "S07-DB",
+        "S07-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S08-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "ROOF·kill switch·BuildKit·단일 GPU",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S07-FE",
+        "S07-BE",
+        "S07-DB",
+        "S07-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S08-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "RLS·감사 immutable·보존",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S07-FE",
+        "S07-BE",
+        "S07-DB",
+        "S07-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S08-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "GC·secret provider·backup",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S07-FE",
+        "S07-BE",
+        "S07-DB",
+        "S07-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S09-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "자연어 요청·예산·diff 검토",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S08-FE",
+        "S08-BE",
+        "S08-DB",
+        "S08-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S09-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "Prompt·Context·Skill·bounded repair",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S08-FE",
+        "S08-BE",
+        "S08-DB",
+        "S08-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S09-DB",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "불변 Context/RunRecord·eval",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S08-FE",
+        "S08-BE",
+        "S08-DB",
+        "S08-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S09-ST",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "diff·테스트·trace Artifact 연결",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S08-FE",
+        "S08-BE",
+        "S08-DB",
+        "S08-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S10-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "AI 도구·실험·모델·배포 화면",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S09-FE",
+        "S09-BE",
+        "S09-DB",
+        "S09-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S10-BE",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "두 Provider adapter·MLflow·승인 배포",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S09-FE",
+        "S09-BE",
+        "S09-DB",
+        "S09-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S10-DB",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "Dataset/commit/image/model lineage",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S09-FE",
+        "S09-BE",
+        "S09-DB",
+        "S09-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S10-ST",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "Model immutable version·보존 pin",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S09-FE",
+        "S09-BE",
+        "S09-DB",
+        "S09-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S11-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "접근성·시각 회귀·배포 후보",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S10-FE",
+        "S10-BE",
+        "S10-DB",
+        "S10-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S11-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "장시간·부하·security·rollback",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S10-FE",
+        "S10-BE",
+        "S10-DB",
+        "S10-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S11-DB",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "migration·restore·SLO 집계",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S10-FE",
+        "S10-BE",
+        "S10-DB",
+        "S10-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S11-ST",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "손상·용량·backup 장애 시험",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S10-FE",
+        "S10-BE",
+        "S10-DB",
+        "S10-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S12-FE",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "내부망 HTTPS 웹 배포·교육",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S11-FE",
+        "S11-BE",
+        "S11-DB",
+        "S11-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S12-BE",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "status": "planned",
+      "scope": "설치·upgrade·rollback·운영 인계",
+      "next_handoff": "Claude",
+      "unfinishedImmediateDependencies": [
+        "S11-FE",
+        "S11-BE",
+        "S11-DB",
+        "S11-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S12-DB",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "복원·권한·운영 인수",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S11-FE",
+        "S11-BE",
+        "S11-DB",
+        "S11-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    },
+    {
+      "task_id": "S12-ST",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "status": "planned",
+      "scope": "운영 점검·제공 폴더·복구 훈련",
+      "next_handoff": "Codex",
+      "unfinishedImmediateDependencies": [
+        "S11-FE",
+        "S11-BE",
+        "S11-DB",
+        "S11-ST"
+      ],
+      "unfinishedRootPrerequisites": [
+        "S01-BE",
+        "S01-ST"
+      ],
+      "dependencyEligibleButNotDone": false
+    }
+  ],
+  "registryWorkingBytesSha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+  "registryGitBlob": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+  "registryCanonicalSha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644"
+}
