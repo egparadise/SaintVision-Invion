@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.338"
+version: "1.0.340"
 status: "review"
 author: "Codex"
-updated: "2026-10-29T14:21:59+09:00"
+updated: "2026-11-04T12:43:33+09:00"
 source_of_truth: "Git"
-active_card: "VF-CL-04 attested CI closure and required-CI repair"
-active_card_status: "VF-CL-04 hosted CI derivation is cryptographically bound to run 40633895766 while operational acceptance remains false; the AC-11 valid fixture time bomb is fixed at commit 751ea725"
-active_card_next: "Run all repository gates, push the two exact commits, require Backend/Core/Docs/Frontend same-SHA green, sync Obsidian, then stop only at the explicit user/live-environment blockers"
+active_card: "SUPERVISION-20261104 overall delivery supervision"
+active_card_status: "Orca Run run_e57ecd84a7bc created; integration train 78 directly observed; Agent dispatch and acceptance results remain separate pending steps"
+active_card_next: "Dispatch independent Claude, Gemini, and Codex work, then reconcile exact heads, CI, review, S01 prerequisites, and Obsidian delivery"
 ---
+
+## 2026-11-04 전체 개발 자동감독 착수
+
+- User authorized continuing the overall audit and remaining project work without repeated routine approval; the runtime now reports full access and approval policy never.
+- Base `a44d578a0096003aba8dccbfd4447f5fbcc46934`, branch `agent/codex/c301-standalone-worker-modules`; three existing dirty documentation paths are preserved.
+- `git fetch origin` exited 0; remote integration and fetched ref both identify `03e17c31cf535008d39534aaa80d3ae274bd75cc`. Historical claims that train 78 remains unlanded require reconciliation against this direct observation.
+- Supervised Orca Run `run_e57ecd84a7bc` exists. Worker delivery, independent review, exact-head CI, live recovery, and operational acceptance are not yet claimed by this kickoff.
+- Next owner Codex coordinator: dispatch separate Claude/Gemini/Codex work, receive evidence, resolve review findings, and continue integration/reporting. Canonical task count remains 2 done / 4 blocked / 42 planned / 0 ready.
+- History: [[2026-11-04_전체개발_자동감독_착수_Codex]].
 
 ## 2026-10-29 VF-CL-04 attested CI closure and AC-11 CI repair
 
@@ -31,6 +40,10 @@ active_card_next: "Run all repository gates, push the two exact commits, require
   the ordinary scan and the nine-rule negative control both exit 0 without environment overrides.
 - Canonical product state remains `done 2 / blocked 4 / planned 42 / ready 0`; strict completion
   `2/48 = 4.17%`; landed `3,425/4,800 = 71.35%`; candidate `3,475/4,800 = 72.40%`.
+- Same-SHA hosted closure at `a44d578a0096003aba8dccbfd4447f5fbcc46934`: Backend
+  `40825208747`, Core `40825208800`, Docs `40825208769`, Frontend `40825208768`, Desktop
+  `40825208796`, and Portal `40825208817` all completed successfully. Dispatch-only acceptance
+  lanes skipped on `pull_request` as designed and are not counted as passing evidence.
 - History: [[2026-10-29_14-21-59_KST_VF-CL-04_attestation_CI수정_Codex]].
 
 ## 2026-10-28 Registry dependency-state canonicalization
