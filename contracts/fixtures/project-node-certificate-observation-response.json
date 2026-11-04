@@ -1,0 +1,20 @@
+{
+  "source": "execution-kernel",
+  "scope": "project-node-certificates",
+  "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "observedAt": "2026-11-04T04:00:00+00:00",
+  "complete": true,
+  "items": [
+    {
+      "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "certificateNotAfter": "2026-11-11T04:00:00+00:00",
+      "channelEnabled": true
+    }
+  ],
+  "trust": {
+    "state": "ok",
+    "earliestCertificateNotAfter": "2026-11-11T04:00:00+00:00",
+    "renewalWindowStartsAt": "2026-11-09T04:00:00+00:00",
+    "secondsUntilEarliestExpiry": 604800
+  }
+}

@@ -52,6 +52,7 @@ SERVING_MODULES = [
     "workspace_recovery.py",
     "control.py", "shards.py", "app.py",
     "node_resource_usage.py",  # Claude: GET .../nodes/{node_id}/resource-usage (decision #2 A)
+    "node_certificates.py",  # Project-scoped current-epoch certificate observations.
 ]
 # Argument names that mark a validate_contract call as validating a RESPONSE (not an input/id).
 RESPONSE_ARGS = {"result", "body", "response", "envelope", "evidence", "payload", "snapshot", "receipt", "prior"}

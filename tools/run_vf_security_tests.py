@@ -5,6 +5,7 @@ Node-dependent suites stay in the explicit Node acceptance lane. Skips are count
 """
 import json
 import hashlib
+from ipaddress import IPv4Address
 from datetime import datetime, timezone
 import os
 import re
@@ -25,9 +26,27 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class _HarnessUnavailable(RuntimeError):
-    """The host could not start the harness container -- a process-creation failure or
-    a timeout, not a docker/product error. The run is *unverified*, distinct from a
+    """The host could not start or configure the isolated harness -- a process-creation
+    failure, timeout, or unavailable network endpoint. The run is *unverified*, distinct from a
     product/test failure, so it must be recorded as such rather than reported as one."""
+
+
+def _container_database_host(info):
+    """Use the declared bridge endpoint, including on Docker API 1.52 and later."""
+    try:
+        address = info['NetworkSettings']['Networks']['bridge']['IPAddress']
+    except (KeyError, TypeError):
+        raise _HarnessUnavailable('isolated database bridge endpoint is unavailable') from None
+    try:
+        if not isinstance(address, str):
+            raise ValueError('not a string')
+        parsed = IPv4Address(address)
+        if parsed.is_unspecified or parsed.is_multicast:
+            raise ValueError('not a database endpoint')
+    except ValueError:
+        # Do not echo malformed inspect values into public Evidence.
+        raise _HarnessUnavailable('isolated database bridge endpoint is invalid') from None
+    return str(parsed)
 
 
 def _safe_failed_case_id(case):
@@ -142,6 +161,7 @@ def main():
             '--label', 'ai.saintvision.configured=' + name,
             '--label', 'ai.saintvision.cx01=' + name,
             '--memory', '768m', '--cpus', '1', '--pids-limit', '256',
+            '--network', 'bridge',
             '--tmpfs', '/var/lib/postgresql/data', '--publish', '127.0.0.1::5432',
             '--env', 'POSTGRES_PASSWORD', 'postgres:16',
         ], env={**base_env, 'POSTGRES_PASSWORD': password}, text=True)
@@ -156,6 +176,7 @@ def main():
                 raise _HarnessUnavailable('container inspect: ' + docker_diag.describe(inspected))
             raise RuntimeError('container inspect failed: ' + docker_diag.describe(inspected))
         info = json.loads(inspected.stdout)[0]
+        database_host = _container_database_host(info)
         port = info['NetworkSettings']['Ports']['5432/tcp'][0]['HostPort']
         dsn = make_conninfo(host='127.0.0.1', port=port, dbname='postgres',
                            user='postgres', password=password, connect_timeout=2)
@@ -177,7 +198,7 @@ def main():
                     **base_env, 'INV_TEST_ADMIN_DSN': dsn, 'CX01_CONTAINER': name,
                     'INV_BROWSER_TEST': browser_tests,
                     'INV_TEST_SERVER_IMAGE': server_image,
-                    'INV_CONTAINER_TEST_DB_HOST': info['NetworkSettings']['IPAddress'],
+                    'INV_CONTAINER_TEST_DB_HOST': database_host,
                 }, stdout=log, stderr=subprocess.STDOUT, timeout=1800)
                 code = result.returncode
             except subprocess.TimeoutExpired:

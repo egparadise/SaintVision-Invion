@@ -304,7 +304,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     try {
       await refreshShardState();
       await onRefreshRun?.();
-    } catch (e: any) {
+    } catch {
       setReclaimNotice('샤드 상태 새로고침에 실패했습니다. 마지막 확인 상태를 표시합니다.');
     } finally {
       setIsReclaiming(false);

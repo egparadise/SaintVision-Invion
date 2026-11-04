@@ -2179,6 +2179,45 @@ class ModelCommitObservation(BaseModel):
     requiresExecutionRevalidation: Literal[True]
 
 
+class NodeCertificateObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId
+    certificateNotAfter: Timestamp | None
+    channelEnabled: bool | None
+
+
+class State2(StrEnum):
+    ok = 'ok'
+    renewal_window = 'renewal-window'
+    expired = 'expired'
+    unknown = 'unknown'
+
+
+class NodeCertificateTrustSummary(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    state: State2
+    earliestCertificateNotAfter: Timestamp | None
+    renewalWindowStartsAt: Timestamp | None
+    secondsUntilEarliestExpiry: int | None
+
+
+class ProjectNodeCertificateObservationResponse(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    scope: Literal['project-node-certificates']
+    projectId: ProjectId
+    observedAt: Timestamp
+    complete: bool
+    items: list[NodeCertificateObservation] = Field(..., max_length=200)
+    trust: NodeCertificateTrustSummary
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
