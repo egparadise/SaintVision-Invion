@@ -344,6 +344,35 @@ def test_shared_database_fixture_covers_the_frozen_test_clock(
     assert all(status.months_ahead >= 1 for status in statuses)
 
 
+def test_every_month_from_the_frozen_clock_to_now_is_routable(
+    owner_engine, migrated, frozen_now
+):
+    """No gap between the frozen clock and the migration's wall-clock lead.
+
+    Module-level NOW values are pinned between FROZEN_NOW and today (2026-10 when
+    this was written). On 2026-11-01 the migration's lead started at 2026-11 while
+    the fixture covered only 2026-09, so every 2026-10 write failed at routing.
+    partition_status stops at the first gap, so a contiguous run from the frozen
+    month must reach at least the current month plus the migration's lead.
+    """
+    from frozen_clock import frozen_clock_span_months
+
+    span = frozen_clock_span_months()
+    with owner_engine.connect() as connection:
+        statuses = partition_status(connection, now=frozen_now)
+
+    assert all(status.months_ahead >= span + 1 for status in statuses), statuses
+
+
+def test_frozen_clock_span_is_whole_months_and_never_negative(frozen_now):
+    from frozen_clock import frozen_clock_span_months
+
+    assert frozen_clock_span_months(frozen_now) == 0
+    assert frozen_clock_span_months(dt.datetime(2026, 11, 4, tzinfo=UTC)) == 2
+    assert frozen_clock_span_months(dt.datetime(2027, 1, 1, tzinfo=UTC)) == 4
+    assert frozen_clock_span_months(dt.datetime(2026, 8, 31, tzinfo=UTC)) == 0
+
+
 def test_there_is_no_default_partition(app_engine, migrated):
     """CR-06: a DEFAULT partition would absorb stray rows and then block
     attaching the real partition for that range."""

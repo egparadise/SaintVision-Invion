@@ -20,11 +20,11 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from db_login import application_test_engine
+from frozen_clock import FROZEN_NOW, frozen_clock_span_months
 
 TEST_DB_ENV = "INV_TEST_DATABASE_URL"
 #: Migration-owned permission group; tests never change its login or password.
 APP_ROLE = "inv_app"
-FROZEN_NOW = dt.datetime(2026, 9, 9, 7, 0, 0, tzinfo=dt.timezone.utc)
 
 
 def pytest_configure(config):
@@ -128,13 +128,20 @@ def migrated(owner_engine, database_url):
         command.upgrade(config, "head")
 
     # The product migration intentionally provisions partitions from the wall-clock
-    # month forward. This disposable test database also uses a fixed historical
-    # clock so assertions stay deterministic; once the calendar advances, that
-    # month must be provisioned explicitly or unrelated writes fail at routing.
+    # month forward. This disposable test database also uses fixed historical
+    # clocks so assertions stay deterministic: FROZEN_NOW, and per-module NOW values
+    # pinned to later months (2026-10 today). Provisioning only FROZEN_NOW's month
+    # left every month between it and the wall clock unroutable once the calendar
+    # passed them -- on 2026-11-01 every 2026-10 fixture write failed with "no
+    # partition of relation ... found for row". So provision the whole span from
+    # FROZEN_NOW's month through the current month. This is test-database setup
+    # only: product migrations, the CR-06 no-DEFAULT rule, and retention are unchanged.
     from saintvision.db.partitions import ensure_partitions
 
     with owner_engine.begin() as connection:
-        ensure_partitions(connection, now=FROZEN_NOW, lead_months=0)
+        ensure_partitions(
+            connection, now=FROZEN_NOW, lead_months=frozen_clock_span_months()
+        )
     return True
 
 
