@@ -94,3 +94,29 @@ symlink boundaries unavailable on Windows. Input was base 0f8e461d plus the four
 modified tool/test/README paths and this untracked History (explicitly dirty,
 not an unchanged-source claim). Docs, ontology and diff gates exited 0.
 Isolated Obsidian check: 2075 pending / 0 conflicts, exit 0, no writes.
+
+
+## Exact code verification and further read-only equipment evidence
+
+Code commit **458c3389e30c6fdedfe8f63623c4a032fa9234fa** was tested directly
+with a clean tracked worktree at KST **13:21:22?13:21:46** using the same Windows
+CPython 3.14.7 runtime. Command `python -X utf8 -m pytest tests/test_scheduled_leaf_renewal.py -q --junitxml=.work/supervision-codex-audit/c304-exact-code.xml`
+exited **0**, **27 passed / 1 skipped / 0 failed / 0 errors / 0 deselected**.
+The sole executable-symlink capability skip remains assigned to hosted Linux.
+JUnit and combined dirty-tree evidence are under
+`docs/vault/30_Development/Evidence/c304-supervision-reliability/`; the report-only
+follow-up does not change these tested code inputs. Backend/Core/Docs and Claude
+review are pending at this report checkpoint; no green CI is inferred from push.
+
+Further read-only audit at KST **13:22**: the remaining known inventory worker's
+SSH attempt using the previously documented account/key was refused (SSH **255**,
+permission-denied); no key or authorized_keys change was attempted. Local CP Docker
+server reports **API 1.41**, exit **0**, still below co-located installer minimum
+1.45. Thus the CP slot is an actual measured compatibility blocker, not a missing
+topology decision. MinIO's readiness endpoint on its known inventory host returns
+**HTTP 200 through pinned TLS with hostname validation** when connected to the known
+address; other two bounded candidates timed out. Local hostname resolution is still
+missing and no object roundtrip, credential mutation or PITR operation ran. This
+updates the earlier audit: the storage service is reachable using already known
+data, while fresh attested read/write/cleanup acceptance remains unexecuted.
+Protected credentials and host identities remain unprinted and outside Git.
