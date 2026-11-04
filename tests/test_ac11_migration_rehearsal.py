@@ -484,6 +484,117 @@ def test_failure_diagnostics_keep_owned_reason_but_redact_arbitrary_exception_te
     assert runner.redacted_failure_reason(RuntimeError(secret)) == "RuntimeError"
 
 
+PG16_DUMP = "pg_dump (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+PG16_RESTORE = "pg_restore (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+
+
+def test_matching_client_tools_are_accepted_for_the_server_major():
+    runner.require_matching_client_tools(
+        "160015", {"pg_dump": PG16_DUMP, "pg_restore": PG16_RESTORE}
+    )
+
+
+@pytest.mark.parametrize(
+    "versions,reason",
+    [
+        # Run 41793552539: the ubuntu-26.04 client is 18 and its dump sets transaction_timeout.
+        ({"pg_dump": "pg_dump (PostgreSQL) 18.6", "pg_restore": PG16_RESTORE},
+         "pg_dump major 18 differs from PostgreSQL server major 16"),
+        ({"pg_dump": PG16_DUMP, "pg_restore": "pg_restore (PostgreSQL) 17.2"},
+         "pg_restore major 17 differs from PostgreSQL server major 16"),
+        # An older client is refused as well: equality, not "new enough".
+        ({"pg_dump": "pg_dump (PostgreSQL) 15.10", "pg_restore": PG16_RESTORE},
+         "pg_dump major 15 differs from PostgreSQL server major 16"),
+        ({"pg_dump": PG16_DUMP}, "snapshot client tool versions are incomplete"),
+        ({"pg_dump": "pg_restore (PostgreSQL) 16.15", "pg_restore": PG16_RESTORE},
+         "pg_dump version is unreadable"),
+        ({"pg_dump": "pg_dump 16", "pg_restore": PG16_RESTORE}, "pg_dump version is unreadable"),
+    ],
+)
+def test_mismatched_or_unreadable_client_tools_are_refused(versions, reason):
+    with pytest.raises(runner.RehearsalError) as excinfo:
+        runner.require_matching_client_tools("160015", versions)
+    assert str(excinfo.value) == reason
+
+
+def test_unreadable_server_version_number_is_refused():
+    with pytest.raises(runner.RehearsalError, match="server version number is unreadable"):
+        runner.require_matching_client_tools(
+            "16.15", {"pg_dump": PG16_DUMP, "pg_restore": PG16_RESTORE}
+        )
+
+
+def test_client_tool_version_reads_the_actual_binary_and_fails_closed(monkeypatch):
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append(argv)
+        if argv[0] == "pg_restore":
+            return subprocess.CompletedProcess(argv, 1, b"", b"")
+        return subprocess.CompletedProcess(argv, 0, PG16_DUMP.encode() + b"\n", b"")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    assert runner._client_tool_version("pg_dump") == PG16_DUMP
+    with pytest.raises(runner.RehearsalError, match="pg_restore --version failed with exit 1"):
+        runner._client_tool_version("pg_restore")
+    assert calls == [["pg_dump", "--version"], ["pg_restore", "--version"]]
+
+    def missing(argv, **kwargs):
+        raise FileNotFoundError(argv[0])
+
+    monkeypatch.setattr(runner.subprocess, "run", missing)
+    with pytest.raises(runner.RehearsalError, match="pg_dump is not runnable"):
+        runner._client_tool_version("pg_dump")
+
+
+def test_client_mismatch_is_refused_before_any_database_is_created(tmp_path, monkeypatch):
+    monkeypatch.setattr(runner, "validate_checkout", lambda _sha: ("0" * 40, True))
+    monkeypatch.setattr(
+        runner,
+        "_client_tool_version",
+        lambda tool: f"{tool} (PostgreSQL) 18.6",
+    )
+    monkeypatch.setattr(
+        runner,
+        "_postgres_version",
+        lambda _dsn: {
+            "serverVersion": "16.15",
+            "serverVersionNum": "160015",
+            "lockTimeout": "0",
+            "statementTimeout": "0",
+        },
+    )
+    created = []
+    monkeypatch.setattr(runner, "_create_database", lambda _dsn, name: created.append(name))
+    monkeypatch.setattr(runner, "_drop_database", lambda _dsn, _name: None)
+    monkeypatch.setattr(runner, "_residue", lambda _dsn, _names: [])
+
+    def no_migration(*_args, **_kwargs):
+        raise runner.RehearsalError("a migration ran after a client/server mismatch")
+
+    monkeypatch.setattr(runner, "_alembic_upgrade", no_migration)
+    report = tmp_path / "report.json"
+    junit = tmp_path / "junit.xml"
+    exit_code = runner.run_rehearsal(
+        admin_dsn="postgresql://synthetic@localhost/postgres",
+        source_run_id="1",
+        source_head_sha="0" * 40,
+        runner_image="Linux-X64",
+        report_path=report,
+        junit_path=junit,
+    )
+    assert exit_code == 1
+    assert created == []
+    evidence = json.loads(report.read_text(encoding="utf-8"))
+    assert evidence["verdict"] == "MEASURED_FAIL"
+    assert evidence["failureReason"] == "pg_dump major 18 differs from PostgreSQL server major 16"
+    assert evidence["environment"]["postgresClient"] == {
+        "pg_dump": "pg_dump (PostgreSQL) 18.6",
+        "pg_restore": "pg_restore (PostgreSQL) 18.6",
+    }
+    assert evidence["axes"][1]["verdict"] == "MEASURED_FAIL"
+
+
 def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     source = (ROOT / ".github" / "workflows" / "ac11-migration-rehearsal.yml").read_text(
         encoding="utf-8"
@@ -496,5 +607,11 @@ def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     assert "git fetch --no-tags origin a793f258dac9b2a4951df084089bf3a3a3ae1bcc" in source
     assert 'test -z "$(git status --porcelain)"' in source
     assert "postgres:16" in source
+    # The snapshot client must match the service major; ubuntu-latest moved to a PostgreSQL 18
+    # client (run 41793552539), so the image is pinned and the 16 tools are selected by path.
+    assert "runs-on: ubuntu-24.04" in source
+    assert "ubuntu-latest" not in source.split("runs-on:", 1)[1].splitlines()[0]
+    assert 'pg16=/usr/lib/postgresql/16/bin' in source
+    assert 'echo "$pg16" >> "$GITHUB_PATH"' in source
     assert "actions/upload-artifact@v4" in source
     assert "'tests': '7'" in source
