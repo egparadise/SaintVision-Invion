@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T15:58:00+09:00"
+updated: "2026-11-04T16:33:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -389,6 +389,75 @@ Read-only review. I registered no task, applied nothing and prepared no node.
 The `updated` values of revisions 1.3.0 (15:45) and 1.4.0 (16:05) were ahead of the system clock. This revision
 records the measured time, 15:58 KST.
 
+## Train 79 landing script, and the r5 live-console loss and restoration
+
+### Landing script `merge-land-train3-79-fd1530d9.sh.pending` (sha256 `65f19bf4`): accepted, one Low
+
+- The script runs only a normal fast-forward from `03e17c31`.
+- Before that, it requires:
+  - the exact `HEAD` and a clean tree;
+  - a prelanding receipt with `PASS`, the exact `codeSha`, the source binding, and ten `MEASURED_PASS` items;
+  - the integration tip still at `03e17c31`;
+  - `03e17c31` as an ancestor of `fd1530d9`.
+- The push is not forced, and the script reads the ref back afterwards.
+- Low: the header said I had reviewed the exact head `fd1530d9`. I reviewed only its constituent commits. Root fixed
+  the wording.
+- The coordinator reports that train 79 landed. I did not read that back myself.
+
+### Live console loss at 15:52 KST: cause not proven
+
+- The observer logged every ~7.5 s until 15:52:14.8 KST and missed the ~15:52:22 tick. At 16:08 root found no
+  listener on 3000, 18082 or 55448.
+- My session is ruled out:
+  - my only action in that window was a scratchpad file write;
+  - the `taskkill` filter (`WINDOWTITLE eq none`) in my earlier synthetic probe matches no process on this host.
+- What I measured:
+  - A process started from the Orca → agent → shell chain is in a job.
+  - Its `Start-Process` children stay in that job (`inJob=True`). A `CREATE_BREAKAWAY_FROM_JOB` child leaves it
+    (`inJob=False`).
+  - The source-03 launcher starts its helpers with `Start-Process`.
+- So "the helpers died with the launching agent's job" fits the facts but is not proven, because the job of the 14:26
+  launching agent can no longer be inspected.
+
+### Recovery artifact (plan `d1c0b05e`, controller `bb464028`, helper `af53251b`): accepted for one-shot invocation
+
+- The artifact checks:
+  - the plan, pins, SID, bindings, executables, state and known-hosts digests;
+  - the source-03 `HEAD` and a clean tree.
+- It does nothing else:
+  - it reuses a tunnel only through `Assert-SvOwnedTunnelListeners`;
+  - it uses no new credentials, writes no task, certificate or config, and runs the canonical launcher.
+- I ran the same WMI shape synthetically (`Win32_Process.Create`, `CreateFlags` 16777216, `ShowWindow` 0). The
+  process came back with return value 0, `WmiPrvSE` as its parent, `inJob=False`, session 1 and the same user.
+- Low: `ssh` reads the default user config because no `-F` is given.
+
+### Restoration process proof (follow-up folder, measured live 16:28–16:30 KST): not terminal-owned
+
+- My own readback:
+  - the overview reported `live-postgresql-mtls` with 2/2 nodes online and fresh, the kill switch on, 0 runs, and the
+    web page returned HTTP 200 (3 samples, 8 s apart);
+  - the observer log was still advancing;
+  - the helper and caller processes had exited.
+- Process tree, measured with `IsProcessInJob` on each PID:
+  - every process the helper started directly is job-free: `ssh` and the three venv redirectors;
+  - the real interpreters under the redirectors are in a job: observer, serve and console;
+  - node (vite) and its esbuild child are in a job.
+- Core's "all roles job-free" gate compared redirector PIDs for observer and serve but the interpreter PID for the
+  console. Measured consistently, all three behave the same way.
+- Synthetic mechanism checks:
+  - The venv redirector puts the real interpreter in its own job. Killing the redirector killed the interpreter.
+  - `node` started outside any job stays job-free until it spawns a child. After that, both node and the child are
+    in a job (`node` v24.10.0).
+  - Both are jobs internal to the runtime, not the terminal's job.
+- Verdict:
+  - The literal all-roles job-free gate stays failed, and it cannot pass by design.
+  - The functional criterion I proposed:
+    - every process the helper started directly is job-free;
+    - every process in a job is a pinned runtime child;
+    - the port owners and command lines match source 03 and the state;
+    - persistence is re-measured after the restoring worker sends `worker_done` and its terminal is reopened.
+  - Persistence is not measured yet.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -400,6 +469,8 @@ records the measured time, 15:58 KST.
 - Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next first action: the coordinator reads back the frozen `fd1530d9` hosted lanes and lands. Codex addresses r5
-  C1 before any live registration, and decides on C2–C4. Workers dispatch no CI. Operational acceptance stays
-  unmeasured.
+- Next first action:
+  - Core measures r5 persistence after the restoring worker sends `worker_done` and its terminal is reopened.
+  - Claude reviews core's C2–C4 changes to the private packet and its persistence proof.
+  - C1 still stands before any live renewal registration.
+  - Operational acceptance stays unmeasured.
