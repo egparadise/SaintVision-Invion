@@ -1028,7 +1028,7 @@ Not S4U and not operational acceptance.
 ## Measured standalone Transition and final M1b wrapper (task `task_6d2564cdd29b`)
 
 Scope:
-- Read-only, at 20:20–20:35 KST. No live operation, no precheck/entry/run, no Orca metadata change.
+- Read-only, at 20:20–20:24 KST. No live operation, no precheck/entry/run, no Orca metadata change.
 - I read the files and live processes myself. The automation drafts were read only with `orca automations show/runs`.
 
 ### The one released Transition (`20261104T104550Z-a906a2b3fc0a`): 3-minute Low closed empirically
