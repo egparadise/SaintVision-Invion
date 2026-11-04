@@ -1,15 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.344"
+version: "1.0.345"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T14:11:06+09:00"
+updated: "2026-11-04T14:40:06+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Portal correction has independent source acceptance and both hosted jobs green; PR400/403/407 and exact audit Evidence integrated; 234 OPEN PR heads audited, legacy13 assigned; freshness inventory11/11 passes while UI/scheduler/r5 owner work continues"
-active_card_next: "Publish the canonical observation contract for Gemini caller integration and Claude review; combine corrected scheduler, registry provenance, partition fixtures, and truthful current-state docs, then run final same-SHA CI and Obsidian delivery"
+active_card_status: "R5 two-node live observation restored and root-corroborated; registry provenance and freshness map independently accepted; legacy13 classified; final UI/scheduler/harness owner corrections remain under review before full delivery"
+active_card_next: "Integrate reviewed final owner heads, freeze source, run all required CI lanes and land normally; complete technically gated r5 expiry prevention, reconcile local configuration and actual equipment blockers, then Obsidian check/apply/check and final report"
 ---
+
+## 2026-11-04 r5 live restoration and continued supervision
+
+- Worked: root independently corroborated two fresh online r5 Nodes from frozen runtime03, both local HTTP200 and advancing snapshots; runs/offers0, kill switch on, workloads off. Public CP/all-Node earliest expiry is11-10 14:15:35KST, window11-08 14:15:35KST. Runtime03 and final code delivery are distinct.
+- Checked: root live-readback exit0, aggregate Evidence LF hash `ef947ab65469960466fcb10a1148579275e4402079ce48647d9e21eb2297b8dd`; each of3000/18082/55448 has1loopback listener. Registry87 accepted+merged, direct checker0 and9 selected negative tests pass; freshness map91ef independently accepted byClaude,3 tests/11of11 pass. Legacy13 report36a integrated; original architecture decisions were checked rather than importing old stacks.
+- Next: Claude reviews all-member schedulerb5b8, Gemini closes view freshness, legacy ownerctx_8fe0598e2b57 finishes actual-PG/readonly harness ports, Codex worker publishes r5 receipts and expiry-prevention plan. Root then freezes final source and runs CI/landing/sync. No task registration before its technical gates; IdP/local config plan and actual equipment inputs remain separate.
+- Full scope, source IDs, failed duplicate tracking attempt and actual evidence limits: [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]].
 
 ## 2026-11-04 14:11 KST whole-project source audit
 
