@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "supervision-ci-executed-counts:1",
+  "sourceSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "executor": "Codex root reading actual hosted job logs",
+  "backend": {
+    "runId": 41811262312,
+    "matrix": [
+      {
+        "python": "3.12",
+        "jobId": 126510815944,
+        "passed": 8519,
+        "skipped": 75,
+        "deselected": 2
+      },
+      {
+        "python": "3.14",
+        "jobId": 126510817569,
+        "passed": 8519,
+        "skipped": 75,
+        "deselected": 2
+      }
+    ]
+  },
+  "core": {
+    "runId": 41811272283,
+    "jobId": 126510842913,
+    "passed": 8877,
+    "skipped": 46,
+    "deselected": 2,
+    "separatelyExecuted": {
+      "provisionedLanInstaller": 15,
+      "cx01Recovery": 20
+    }
+  },
+  "overlapNote": "Counts identify separate lanes and steps; do not sum them as distinct product acceptance tests.",
+  "operationallyAccepted": false
+}

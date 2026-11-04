@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.351"
+version: "1.0.352"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T19:11:08+09:00"
+updated: "2026-11-04T19:41:23+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Train80 landed59f with independent review; exact postlanding eight-lane verification and final report continue"
+active_card_status: "Train80 source59f postlanding exact8 PASS; final reviewed report and bounded operations followup continue"
 active_card_next: "Finish current CI and evidence report; independently review bounded current-user future renewal followup; preserve real OS and physical acceptance gaps"
 ---
+
+## 2026-11-04 train80 exact8 완료 수신
+
+작업한 것: 고정 통합59f의 착지 후8lane을 끝까지 감독하고 실제13job/API 및 hosted 시험 로그를 확인했다. 확인한 것: canonical PASS/exit0, Backend 두 Python 버전 각8519 pass, Core8877 pass이며 서명·복원·독립 검토 증거를 보고 branch에 보존했다. 다음 첫 행동/담당: root는 최종 report/Obsidian, Core는 미래 후속 M1 수정과 정밀 실행 계획, Claude는 수정 delta 및 실제 전환 측정의 독립 판정을 맡는다. 전체 인수 미충족 항목을 코드 CI 성공으로 승격하지 않는다.
 
 ## 2026-11-04 19시 train80 최종 인계 작업
 
