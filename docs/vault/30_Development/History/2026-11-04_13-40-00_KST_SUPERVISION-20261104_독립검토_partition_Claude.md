@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.16.0"
+version: "1.17.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T20:00:00+09:00"
+updated: "2026-11-04T20:24:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1025,6 +1025,95 @@ Decision on the automatic wrapper: not armable until M1b is fixed and reviewed. 
 
 Not S4U and not operational acceptance.
 
+## Measured standalone Transition and final M1b wrapper (task `task_6d2564cdd29b`)
+
+Scope:
+- Read-only, at 20:20–20:35 KST. No live operation, no precheck/entry/run, no Orca metadata change.
+- I read the files and live processes myself. The automation drafts were read only with `orca automations show/runs`.
+
+### The one released Transition (`20261104T104550Z-a906a2b3fc0a`): 3-minute Low closed empirically
+
+Records (all present, one per kind):
+- **Claim:** written 11:12:41Z (`CreateNew`), with release message `msg_2e6f7840251e`.
+- **Intent and launch:** intent 11:12:42.25Z; launch `returnValue` 0, helper PID 36884.
+- **Child result:** exit 0, plan `f51623da`, `transitionExecuted` true, `cycleExecuted` false. Context: session 1,
+  `ownerMatched`, `userInteractive`, `jobQuerySucceeded`, `inJob` false, `WinSta0\Default`.
+- **`transition-core` receipt** at 11:13:00.51Z: `primaryLauncherSucceeded` true, `observerRecovered` false, state
+  `7d62c49a`, source `03e17c31`.
+- **Duration result:** `cc168aa7`, elapsed 19.203 s, `controllerExit` 0, no observer-ceiling unknown, no child
+  termination, no retry.
+- **Absent:** no completion-unknown record, latch, lock or lock-guard file, and `run-state` is empty.
+
+Before/after snapshots, compared field by field:
+- **Unchanged:** member/PEM/SPKI/notAfter material and the state/local-key file digests. This holds in `before`,
+  `after` and all three after-samples.
+- **Window:** unchanged, `expired` false and `inWindow` false.
+- **Program:** HTTP 200/200, `live-postgresql-mtls`, kill true, workload false, runs and offers 0, `onlineFresh` 2.
+- **Ticks:** 11:12:35 before, then 11:12:59, 11:13:04 and 11:13:19 after. They advance; the gap during the observer
+  restart is about 24 s.
+- **Processes:** the only real changes are the observer pair, 34380/33812 → 49276/11276, and the snapshot helper's own
+  PID. `serve`, the console, vite with its esbuild child, and the SSH tunnel keep their PID, creation time and command
+  hash.
+
+My own live readback at 20:2x KST:
+- 49276/11276 run `observe` for this state under the expected SID in session 1; their parent 36884 has exited.
+- Every other helper is unchanged, with listeners 55448→15408, 18082→54216 and 3000→25608.
+- `private-state.json` is `7d62c49a`.
+- Overview: `live-postgresql-mtls`, both members online/fresh (heartbeat 3.4 s old), runs and offers 0. Web returns
+  200.
+- Job membership:
+  - The observer root 49276 is not in a job.
+  - Its child 11276 is in a job, and so is the console child 54216 from the original 16:20 launch. This is the
+    virtualenv redirector's own child job, not the caller's job, which was broken away from at 36884.
+
+Decision:
+- 19.2 s is far below my 360 s threshold and the 720/900 budgets, and every postcondition held.
+- The 3-minute Transition-wait Low is closed empirically for this path. It is one sample, not a worst-case bound.
+- With the wrapper's prior-attempt check on the final config, these records give `(earlier=False, unknown=False)`,
+  so the measurement does not block the cycle.
+
+### M1b final source (`pilot_guard.py` `acf8b4f6`): ACCEPTED
+
+Fixed:
+- Each result write in `execute()` is now best-effort.
+- A write failure keeps the in-memory outcome under `operationResult`. The top level becomes exit 1
+  `result-persistence-failed` (or stays 124), with `persistenceErrors` and `resultPublicationComplete` false. Records
+  that were written earlier get one correction.
+- If the pre-invocation history write fails, the run is refused (exit 1) before anything is invoked.
+- `main()` keeps a shared `attempt_state`. After a claim, an escaped exception reports 124 when there is an attempt but
+  no child result, otherwise 1 `claimed-result-unverified`. It never reports `claimTaken` false.
+- The three earlier semantic classes (post-run expiry, post-check exceptions, outer `Skip` after invocation) are
+  preserved.
+- `validate_release`, `facts` and `invoke` are unchanged.
+
+Evidence:
+- **My probe** (`probe_persistfail.py`) against `acf8b4f6`: `execute()` now returns exit 1
+  `result-persistence-failed`. It shows `attempted` true, `claimTaken` true, the child result kept, `operationResult`
+  renewed, two `PermissionError` entries and `resultPublicationComplete` false. Before the fix it raised into a
+  no-claim skip.
+- **Tests:** both files, 62 passed in 3.45 s, exit 0, with the packet file list unchanged.
+- **Config `ca684b45`:** its two `inputFiles` pins (`acf8b4f6` and prompt `2dbaf609`) match.
+
+Lows (non-blocking):
+- A successful run whose publication fails keeps the success fields at the top level next to exit 1. Exit and
+  `outcome` are authoritative.
+- A `Skip` inside `invoke()` after the child starts is still exit 1, not 124.
+- A `KeyboardInterrupt` (BaseException) escapes both handlers and leaves only the claim file.
+
+### Orca drafts: disabled and correct, but stale
+
+- All three IDs show `enabled` false and have no runs:
+  - primary `286d975e`;
+  - fallback1 `a3a9e396`;
+  - fallback2 `3e08faa1`.
+- They match the reviewed plan: provider `codex`, the existing workspace, a fresh session, `Asia/Seoul`, grace 10 and
+  a 60 s precheck timeout. Triggers and `nextRunAt` are 2026-11-08 05:20Z, 11-09 03:15Z and 11-09 23:00Z.
+- Their stored precheck and prompt still bind config `f868eaef`. Against `c1b9e14f` they differ only by that hash.
+- So every precheck would refuse with `wrapper-config-drift`, which fails closed. They must be re-edited with the
+  `c1b9e14f`/`ca684b45` vectors and read back before enabling.
+
+Not S4U and not operational acceptance of the cycle.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -1040,9 +1129,9 @@ Not S4U and not operational acceptance.
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
   - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
-  - Before any cycle release: core fixes M1b (persistence-failure classification) for Claude's review. Root may then
-    release ONE standalone Transition under the task_18ed92bf40ff conditions; ObserverRecovery only by a separate
-    release.
+  - Before enabling: root re-edits the three disabled drafts with the `c1b9e14f` vectors (config `ca684b45`) and
+    reads them back. Root then renders the final-J CI receipt (8 checks, 12 jobs) and runs read-only prechecks. The
+    measured Transition (19.2 s) and M1b `acf8b4f6` are accepted.
   - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
