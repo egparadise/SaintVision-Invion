@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.8.0"
+version: "1.9.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T17:20:00+09:00"
+updated: "2026-11-04T17:52:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -538,6 +538,51 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Claude's source review phase for task `task_710152a20196` is closed. I did no source cleanup, because root owns the
   integration workspaces.
 
+## r5 WMI cycle packet review (task `task_e230ea589f7d`): changes required, one High
+
+Scope:
+- Core commit `9f5191eb` and the private packet `.work/r5-persistence-c50115dce654`.
+- Manifest `0e51a7c7`. I re-hashed all nine inputs, and they equal the manifest.
+- Plan pins: 105 and 103, with 0 mismatches.
+- Guard suite: 15 passed, and no file was written.
+- Read-only. Nothing was executed against the pilot.
+
+- **H1 High (measured):**
+  - In the attended cycle config `2a907e4b` and the scheduled proposal `9b96bb4a`, the `transition` gate keeps the venv
+    `python.exe` as its executable, but its arguments are now PowerShell arguments.
+  - I ran that `python.exe` with those arguments: `Unknown option: -N`, exit 2.
+  - So every released cycle would fail at gate 10, after `commit` and under the durable latch.
+  - The build script never sets the executable, and the guards check only the arguments.
+  - Fix: use the pinned `powershell.exe` with its hash, add a guard on the executable, then re-seal.
+- **M2 Medium:**
+  - `schedulerPath` (`source-b5b8/tools/scheduled_leaf_renewal.py`) is not among the plan pins.
+  - The scheduler itself checks only `git HEAD`, not a clean tree or the file's bytes.
+  - The file is byte-identical to the b5b8 blob today.
+- **Accepted rules:**
+  - Command, owner and pins: hashed plan, allowed operations, guards hash, ordinary non-reparse pins, an exact record
+    root, and the owner SID.
+  - One-shot records: intent/launch/result written with `CreateNew` + `Move`; no retry or fallback.
+  - Context: the job-free entry is asserted again inside the child. The ContextOnly receipt shows session 1,
+    interactive, `inJob` false, `WinSta0\Default`; the helper exited and nothing was relaunched.
+  - Before any stop: the status guard runs first. Each stop re-checks PID reuse (creation time, command line, owner
+    SID), stops leaves before the root, and refuses multiple independent roots.
+  - Primary failure: observer fallback, then a real 2/2 observation, then a `CreateNew` receipt, then a throw.
+  - Observer recovery is a separate operation. The Python environment variables are cleared and restored.
+  - For the WMI path, this closes my earlier attended-transition Medium.
+- **Scheduled proposal:**
+  - Replacing `51b02052` with the WMI controller in Scheduled mode closes my residual in source, but H1 applies to it
+    too.
+  - S4U is not accepted: the S4U-to-WMI desktop path is unmeasured, and actual registration was denied
+    (`0x80070005`).
+  - Low: the proposal shares its status/log paths with the attended cycle and has notifications disabled.
+- **Outside-window no-op proof: safe only with a fresh RunId.**
+  - At b5b8, `--window-only` only reads the config and the state. It writes no lock, latch, status or log, stops no
+    observer and changes no certificate. The entry returns refusal exit 4 with `cycleExecuted` false.
+  - The proof must not use the sealed RunId `20261104T082522Z-c50115dce654`. That is the first-cycle command's RunId,
+    and its one-shot guard would then refuse.
+- **Low:** the controller waits only 3 minutes for a Transition receipt, so a slow launch fails closed with completion
+  unknown.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -552,6 +597,7 @@ The items below were reported by root or core on Orca. I did not measure them my
 - Next first action:
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
-  - Core prepares the attended WMI context artifact, and Claude reviews it.
+  - Core fixes H1 (the transition gate executable) and M2 (the scheduler pin), re-seals the WMI cycle packet, and
+    Claude re-reviews the exact delta.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
