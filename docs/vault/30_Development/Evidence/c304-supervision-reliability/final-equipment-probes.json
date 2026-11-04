@@ -1,0 +1,28 @@
+{
+  "observedAt": "2026-11-04T04:22:06.436100+00:00",
+  "remainingWorker": [
+    {
+      "alias": "inventory-node-3",
+      "sshExit": 255,
+      "reason": "permission-denied"
+    }
+  ],
+  "cpDocker": {
+    "exit": 0,
+    "api": "1.41"
+  },
+  "storageHealth": [
+    {
+      "alias": "inventory-node-1",
+      "errorClass": "TimeoutError"
+    },
+    {
+      "alias": "inventory-node-2",
+      "httpStatus": 200
+    },
+    {
+      "alias": "inventory-node-3",
+      "errorClass": "TimeoutError"
+    }
+  ]
+}

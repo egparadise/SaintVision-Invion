@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="3.797" timestamp="2026-11-04T14:27:48.979032+09:00" hostname="DESKTOP-2IRPGV7"><testcase classname="tests.test_scheduled_leaf_renewal" name="test_renewal_requires_every_original_public_leaf_member_to_change[unchanged-member-finalObserve]" time="1.688"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-844/test_renewal_requires_every_or0')
+failure = 'unchanged-member-finalObserve'
+
+    @pytest.mark.parametrize("failure", ["unchanged-member-finalObserve", "member-path-drift-finalObserve"])
+    def test_renewal_requires_every_original_public_leaf_member_to_change(tmp_path: Path, failure: str):
+        now = datetime.now(timezone.utc)
+        state = public_state(tmp_path, now + timedelta(days=1))
+        # The unchanged member is still fresh and outside the window, so aggregate
+        # change + earliest expiry alone cannot detect this partial batch.
+        (state / "public/nodes/node-b/node-cert.pem").write_bytes(certificate(now + timedelta(days=3)))
+        target, plan, trace = plan_file(tmp_path, state, failure=failure)
+&gt;       with pytest.raises(ValueError, match="changed fresh certificate generation"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_scheduled_leaf_renewal.py:565: Failed</failure></testcase><testcase classname="tests.test_scheduled_leaf_renewal" name="test_renewal_requires_every_original_public_leaf_member_to_change[member-path-drift-finalObserve]" time="1.547"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-844/test_renewal_requires_every_or1')
+failure = 'member-path-drift-finalObserve'
+
+    @pytest.mark.parametrize("failure", ["unchanged-member-finalObserve", "member-path-drift-finalObserve"])
+    def test_renewal_requires_every_original_public_leaf_member_to_change(tmp_path: Path, failure: str):
+        now = datetime.now(timezone.utc)
+        state = public_state(tmp_path, now + timedelta(days=1))
+        # The unchanged member is still fresh and outside the window, so aggregate
+        # change + earliest expiry alone cannot detect this partial batch.
+        (state / "public/nodes/node-b/node-cert.pem").write_bytes(certificate(now + timedelta(days=3)))
+        target, plan, trace = plan_file(tmp_path, state, failure=failure)
+&gt;       with pytest.raises(ValueError, match="changed fresh certificate generation"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_scheduled_leaf_renewal.py:565: Failed</failure></testcase></testsuite></testsuites>

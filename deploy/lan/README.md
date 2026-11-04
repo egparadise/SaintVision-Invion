@@ -421,6 +421,72 @@ symlink, path traversal, installed-file drift, external local-module shadow, or 
 fails before the worker writes state. The venv command remains the explicit
 alternative; the two runtime modes must not be mixed within one rotation.
 
+### Session-independent scheduled renewal
+
+`Invoke-ScheduledLeafRenewal.ps1` is the non-interactive entry point for a reviewed private
+renewal plan. `Register-LeafRenewalTask.ps1` pins the plan, runner, and Python executor digests and
+registers two daily current-user S4U triggers with both Task Scheduler `IgnoreNew` and an
+executor lock. Registration refuses a foreign task with the same deterministic state-derived
+name. Live registration is an explicit post-review operation; neither script registers a task by
+being imported or tested.
+
+The plan's source commit must equal the checkout that owns the runner. It has one exact sequence:
+public-certificate window check, current two-Node status,
+two runtime preflights, prepare, two installs, two channel stages, one global commit, the reviewed
+Control Plane transition, post-transition observation, two finalizations, and a final observation.
+Each executable and referenced input file is SHA-256 pinned. A failed gate stops before every
+later command, preserves the partial batch, and emits only a redacted append-only JSONL receipt
+plus an atomically replaced Desktop status file. Windows pop-up notification is a separately
+explicit configuration bit required by live task registration; test/direct execution keeps it
+off, and outside-window no-ops never notify. The runner never reads `private-state.json`,
+prints command output, retries a mutating gate, accepts an expired leaf, or edits a journal. An
+expired earliest public leaf produces an alert and no renewal command. The task configuration may
+contain paths to operator-private inputs, but not a credential, DSN, private key, or password
+value.
+
+#### Failure and interrupted-run recovery
+
+The registrar's execution limit is four hours: fourteen gates each have a 900-second
+timeout (3.5 hours total), plus supervisor overhead. The operating system may still
+terminate a process. A state-local kernel guard therefore protects a durable owner
+record and attempt latch across every child command. The guard inode is never removed;
+different plans/status paths for the same state share it. `started` and per-gate intent
+are flushed before execution. Preflight failure, lock contention, and certificate-set
+failure produce redacted receipts. Expired-leaf alerts remain available even if the
+lock is busy or stale. Invalid/untrusted configuration cannot safely select a status
+destination and is rejected before this receipt contract applies.
+
+Only read-only window/current-status/runtime preflights may run again on the next
+trigger after a transient failure; they write a failure receipt without a mutation
+latch. The durable latch starts immediately before `prepare`, the first mutating
+gate. A failed or interrupted mutating attempt remains latched across later triggers
+and is never automatically retried. Before success, the runner rereads all public
+leaves and requires a changed generation whose earliest valid expiry is outside the
+renewal window; command success and unchanged leaves cannot report renewal. Operators
+must inspect the exact rotation journal, child/remote operations and channel state and
+complete a separately reviewed recovery, preserving old material. Elapsed time or an
+absent PID never proves that a remote operation stopped.
+
+There are two separate, explicit maintenance actions (same pinned config/source as
+normal invocation; placeholders are operator-reviewed public digests):
+
+```text
+python tools/scheduled_leaf_renewal.py --config <private-plan> --expected-config-sha256 <plan-sha> --recover-stale-lock --expected-lock-sha256 <exact-owner-record-sha>
+python tools/scheduled_leaf_renewal.py --config <private-plan> --expected-config-sha256 <plan-sha> --reset-failure-latch --expected-latch-sha256 <exact-attempt-sha> --reviewed-fresh-leaf-sha256 <reviewed-new-generation-sha>
+```
+
+Stale-lock recovery requires acquiring the same kernel guard, the exact owner-file
+digest, schema, state binding and owner token. It archives only that record and leaves
+the attempt latch untouched. It never resumes a batch or certifies child/remote quiescence.
+Legacy PID-only locks predate this guard and require manual ownership disposition;
+the automatic executor never removes them. Latch reset archives its exact reviewed
+record and requires different, currently valid CP/all-Node material outside the renewal
+window, with a matching reviewed generation digest (`--window-only` exposes the public
+digest). The digest is an acknowledgement of material independently reviewed for trust,
+not new issuing authority. Same/expired/in-window material cannot clear a failure.
+Neither maintenance action installs material, runs gates, edits rotation journals,
+changes a scheduled task, or enables workloads. These commands are not scheduled.
+
 ## Desktop launcher
 
 `deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has
