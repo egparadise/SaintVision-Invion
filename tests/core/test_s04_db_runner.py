@@ -211,3 +211,25 @@ def test_green_json_without_successful_executable_junit_is_removed(
         run_s04_db_evidence.main(["--json-out", str(json_out), "--junit-out", str(junit_out)]) != 0
     )
     assert not json_out.exists()
+
+
+@pytest.mark.parametrize("invalid_part", ["report", "junit", "missing-report"])
+def test_post_validation_failure_removes_the_requested_evidence_pair(tmp_path, monkeypatch, invalid_part):
+    json_out, junit_out = tmp_path / "evidence.json", tmp_path / "evidence.xml"
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "stub-only")
+    monkeypatch.setattr(run_s04_db_evidence, "measurement_provenance", lambda: {})
+
+    def completed(*args, **kwargs):
+        payload = report()
+        if invalid_part == "report":
+            payload["physicalNodeDeliveryResumption"] = "PASS"
+        if invalid_part != "missing-report":
+            json_out.write_text(json.dumps(payload), encoding="utf-8")
+        name = "unapproved_case" if invalid_part == "junit" else run_s04_db_evidence.EXPECTED_TEST
+        junit_out.write_text(f"<testsuite tests='1'><testcase name='{name}'/></testsuite>", encoding="utf-8")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(run_s04_db_evidence.subprocess, "run", completed)
+    assert run_s04_db_evidence.main(["--json-out", str(json_out), "--junit-out", str(junit_out)]) == 2
+    assert not json_out.exists()
+    assert not junit_out.exists()

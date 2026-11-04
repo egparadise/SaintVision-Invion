@@ -157,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
         print("S04 executable case did not complete successfully", file=sys.stderr)
         return completed.returncode
     if not json_out.is_file():
+        junit_out.unlink(missing_ok=True)
         print("S04 runner did not produce JSON evidence", file=sys.stderr)
         return completed.returncode or 2
     try:
@@ -165,6 +166,7 @@ def main(argv: list[str] | None = None) -> int:
         validate_junit(junit_out)
     except (OSError, ET.ParseError, ValueError) as exc:
         json_out.unlink(missing_ok=True)
+        junit_out.unlink(missing_ok=True)
         print(f"invalid S04 evidence: {exc}", file=sys.stderr)
         return completed.returncode or 2
     print(
