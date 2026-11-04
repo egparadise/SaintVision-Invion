@@ -1,0 +1,19 @@
+{
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "nonNodeArtifactHTTP": 403,
+  "nodes": [
+    {
+      "host": "host-1",
+      "healthHTTP": 200,
+      "ownPublicLeafHTTP": 200,
+      "ownPublicLeafDigestMatched": true
+    },
+    {
+      "host": "host-2",
+      "healthHTTP": 200,
+      "ownPublicLeafHTTP": 200,
+      "ownPublicLeafDigestMatched": true
+    }
+  ],
+  "firewallChanged": false
+}

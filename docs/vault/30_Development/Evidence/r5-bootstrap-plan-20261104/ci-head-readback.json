@@ -1,0 +1,148 @@
+{
+  "observedAt": "2026-11-04T14:39:12.849740+09:00",
+  "runs": [
+    {
+      "conclusion": "failure",
+      "databaseId": 41765284237,
+      "event": "push",
+      "headSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41765284237",
+      "actualCheckoutHeads": [
+        "03e17c31cf535008d39534aaa80d3ae274bd75cc"
+      ],
+      "actualCPythonVersions": [
+        "3.12.15",
+        "3.14.9"
+      ],
+      "testSummaries": [
+        "2026-11-04T03:27:28.2346025Z 42 failed, 8325 passed, 75 skipped, 2 deselected, 2009 warnings, 9 errors in 1027.41s (0:17:07)",
+        "2026-11-04T03:32:02.0692250Z 42 failed, 8325 passed, 75 skipped, 2 deselected, 2008 warnings, 9 errors in 1306.06s (0:21:46)"
+      ],
+      "protectedRawLogSHA256": "4c8cc8c82e2f01de76b093422c000f1265d4d60026024aa2f14be0b3797509e3"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 41773055392,
+      "event": "pull_request",
+      "headSha": "b1e59f85e690ae61efe8748090815d2b53fd549d",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41773055392",
+      "actualCheckoutHeads": [
+        "0b1b523f0d6f95641970d2188f4059973ec81969"
+      ],
+      "actualCPythonVersions": [
+        "3.12.15",
+        "3.12.16"
+      ],
+      "testSummaries": [
+        "2026-11-04T04:58:54.0767052Z = 42 failed, 8711 passed, 46 skipped, 2 deselected, 2009 warnings, 9 errors in 1343.21s (0:22:23) ="
+      ],
+      "protectedRawLogSHA256": "119abdc3d972d11f8aa3a13bc6635d4413fa588cad987d97aabe509ba114fd35"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41773326979,
+      "event": "pull_request",
+      "headSha": "f42c42595ee5c8389d4c66328d3695a30bd91605",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41773326979",
+      "actualCheckoutHeads": [
+        "4b6feb669e90968600b8a96f2b8242774c1cb3b9"
+      ],
+      "actualCPythonVersions": [
+        "3.12.16"
+      ],
+      "testSummaries": [],
+      "protectedRawLogSHA256": "4c985800843205b813d48d84328285e4aa1089f0715b5edfe7cf9115d6de1ac4"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 41773326973,
+      "event": "pull_request",
+      "headSha": "f42c42595ee5c8389d4c66328d3695a30bd91605",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41773326973",
+      "actualCheckoutHeads": [
+        "4b6feb669e90968600b8a96f2b8242774c1cb3b9"
+      ],
+      "actualCPythonVersions": [
+        "3.12.15",
+        "3.14.10"
+      ],
+      "testSummaries": [
+        "2026-11-04T04:51:48.0257394Z 42 failed, 8341 passed, 75 skipped, 2 deselected, 2007 warnings, 9 errors in 1354.46s (0:22:34)",
+        "2026-11-04T04:51:26.4770809Z 42 failed, 8341 passed, 75 skipped, 2 deselected, 2007 warnings, 9 errors in 1359.99s (0:22:39)"
+      ],
+      "protectedRawLogSHA256": "ed89ae83f15f616e90071e2afe58c1e3a7b46ef7d0dbca309e0ec571966c804b"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41779908269,
+      "event": "pull_request",
+      "headSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41779908269",
+      "actualCheckoutHeads": [
+        "45d6ab737f2baede2664b096dcc0e0846ff82c13"
+      ],
+      "actualCPythonVersions": [
+        "3.12.16"
+      ],
+      "testSummaries": [],
+      "protectedRawLogSHA256": "2f4fae16906218da0760ff50027222081996b9db6a1ad2c176c50b59a3b4c2a5"
+    },
+    {
+      "conclusion": "",
+      "databaseId": 41779908473,
+      "event": "pull_request",
+      "headSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "status": "in_progress",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41779908473"
+    },
+    {
+      "conclusion": "",
+      "databaseId": 41779908364,
+      "event": "pull_request",
+      "headSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "status": "in_progress",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41779908364"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 41779908545,
+      "event": "pull_request",
+      "headSha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41779908545"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 41777296712,
+      "event": "pull_request",
+      "headSha": "5933a824fbf2427262be04d9b66475b0b1ea998b",
+      "status": "completed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41777296712"
+    }
+  ],
+  "supersededB1CoreJUnit": {
+    "runId": 41773055392,
+    "sourceHeadSha": "b1e59f85e690ae61efe8748090815d2b53fd549d",
+    "allCases": {
+      "total": 8808,
+      "passed": 8711,
+      "failed": 42,
+      "errors": 9,
+      "skipped": 46
+    },
+    "scheduledLeafRenewal": {
+      "total": 28,
+      "passed": 28,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fullRunPassed": false,
+    "doesNotApproveLaterHeads": true
+  }
+}

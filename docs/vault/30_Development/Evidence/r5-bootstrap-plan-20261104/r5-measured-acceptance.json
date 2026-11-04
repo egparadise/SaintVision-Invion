@@ -1,0 +1,33 @@
+{
+  "sourceHeadSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "observedAt": "2026-11-04T05:22:49.611727+00:00",
+  "scope": "two-node-development-observation-only",
+  "nodeCount": 2,
+  "onlineFresh": 2,
+  "heartbeatsAdvanced": true,
+  "snapshotsAdvanced": true,
+  "killSwitch": true,
+  "runs": 0,
+  "resourceOffers": 0,
+  "userWorkloadSubmission": false,
+  "controlCertificateNotAfter": "2026-11-10T05:15:35+00:00",
+  "channels": [
+    {
+      "nodeId": "<r5-node-1>",
+      "version": 1,
+      "enabled": true,
+      "certificateNotAfter": "2026-11-10T05:19:30+00:00"
+    },
+    {
+      "nodeId": "<r5-node-2>",
+      "version": 1,
+      "enabled": true,
+      "certificateNotAfter": "2026-11-10T05:19:42+00:00"
+    }
+  ],
+  "earliestNotAfter": "2026-11-10T05:15:35+00:00",
+  "renewalWindowStartsAt": "2026-11-08T05:15:35+00:00",
+  "oldStateByteBaselinesUnchanged": true,
+  "privateKeysTransferred": false,
+  "schedulerRegistered": false
+}
