@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261029-VF-CL-04-ATTESTED-CI-CODEX"
 title: "VF-CL-04 attested CI closure and AC-11 required-CI repair"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 created: "2026-10-29T14:21:59+09:00"
-updated: "2026-10-29T14:21:59+09:00"
+updated: "2026-11-04T11:45:50+09:00"
 source_of_truth: "Git"
 ---
 
@@ -55,6 +55,11 @@ No regex, rule, finding, or exit-code branch changed.
 | Claude independent semantic review | approved; blocking findings 0 |
 | Gemini frontend-truth review | approved; blocking findings 0; no `apps/web` consumer or user-visible progress change |
 | Orca independent aggregation | VF-CL CI 4/5; product score and strict state unchanged |
+| Backend Build `40825208747` at `a44d578a` | completed success; Python 3.12 and 3.14 jobs green |
+| Core Build `40825208800` at `a44d578a` | completed success |
+| Documentation Build `40825208769` at `a44d578a` | completed success |
+| Frontend Build & Test `40825208768` at `a44d578a` | completed success, including required lint |
+| Desktop/Portal `40825208796` / `40825208817` | both completed success |
 
 Claude confirmed the receipt bytes match the Sigstore SLSA subject, the bundle binds repository,
 workflow, branch, exact head and run, and the fixed fixture preserves both explicit expiry
@@ -79,7 +84,8 @@ approved, findings none.
   operationally accepted 0/5, acceptedCards 0.
 - 48-task registry: done 2, blocked 4, planned 42, ready 0; strict 4.17%.
 - Weighted evidence: landed 71.35%, candidate 72.40%; no score inferred from this CI receipt.
-- Next owner/action: Codex pushes the exact commits and requires new same-SHA Backend/Core/Docs/
-  Frontend CI. After CI and Obsidian sync, no internally ready canonical card remains. User/live
+- Next owner/action: same-SHA CI and Obsidian sync are complete. Codex selects the highest-value
+  internal gap whose implementation does not require an external input; no canonical `ready` card
+  is fabricated while prerequisites remain incomplete. User/live
   IdP, CA/DNS, physical five-Node inputs, and explicit operational acceptance remain external
   boundaries and must not be auto-accepted.
