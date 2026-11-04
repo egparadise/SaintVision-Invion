@@ -1,0 +1,107 @@
+{
+  "observedAt": "2026-11-04T03:58:15.514479+00:00",
+  "nodeHistoricalIdentityChecks": [
+    {
+      "validSignedHistory": true
+    },
+    {
+      "validSignedHistory": true
+    }
+  ],
+  "inventory": [
+    {
+      "alias": "inventory-node-1",
+      "role": "worker",
+      "identityKnown": true,
+      "addressKnown": true,
+      "certificateKnown": false,
+      "installationKnown": true,
+      "folderCount": 0,
+      "allowedResourcesConfigured": true,
+      "ntp": {
+        "configured": true,
+        "source": "ntp.ubuntu.com",
+        "maxSkewSeconds": 1
+      },
+      "sshTCP": "connected"
+    },
+    {
+      "alias": "inventory-node-2",
+      "role": "worker",
+      "identityKnown": true,
+      "addressKnown": true,
+      "certificateKnown": false,
+      "installationKnown": true,
+      "folderCount": 1,
+      "allowedResourcesConfigured": true,
+      "ntp": {
+        "configured": true,
+        "source": "ntp.ubuntu.com",
+        "maxSkewSeconds": 1
+      },
+      "sshTCP": "connected"
+    },
+    {
+      "alias": "inventory-node-3",
+      "role": "worker",
+      "identityKnown": true,
+      "addressKnown": true,
+      "certificateKnown": false,
+      "installationKnown": true,
+      "folderCount": 0,
+      "allowedResourcesConfigured": true,
+      "ntp": {
+        "configured": true,
+        "source": "ntp.ubuntu.com",
+        "maxSkewSeconds": 1
+      },
+      "sshTCP": "connected"
+    },
+    {
+      "alias": "inventory-node-4",
+      "role": "worker",
+      "identityKnown": false,
+      "addressKnown": false,
+      "certificateKnown": false,
+      "installationKnown": false,
+      "folderCount": 0,
+      "allowedResourcesConfigured": false,
+      "ntp": null
+    },
+    {
+      "alias": "inventory-node-5",
+      "role": "cp-colocated",
+      "identityKnown": false,
+      "addressKnown": false,
+      "certificateKnown": false,
+      "installationKnown": false,
+      "folderCount": 0,
+      "allowedResourcesConfigured": false,
+      "ntp": null
+    }
+  ],
+  "ssh": [
+    {
+      "alias": "r4-node-1",
+      "exit": 0,
+      "utc": "2026-11-04T03:58:16.580897+00:00",
+      "keyExists": true,
+      "certificateExists": true,
+      "rotationJournalExists": false,
+      "publicKeyReadExit": 0,
+      "python": "3.14.4",
+      "preservedKeyMatchesCertificate": true
+    },
+    {
+      "alias": "r4-node-2",
+      "exit": 0,
+      "utc": "2026-11-04T03:58:16.895854+00:00",
+      "keyExists": true,
+      "certificateExists": true,
+      "rotationJournalExists": false,
+      "publicKeyReadExit": 0,
+      "python": "3.12.3",
+      "preservedKeyMatchesCertificate": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-11-04T04:01:20.777729+00:00",
+  "sshExit": 0,
+  "dockerPsExit": 0,
+  "readOnlyCandidates": [
+    {
+      "namespace": "r4",
+      "selectedByStatePort": true,
+      "queryExit": 0,
+      "result": {
+        "readOnly": "on",
+        "serverVersion": "16.10",
+        "killSwitch": true,
+        "runs": 0,
+        "nodes": 2,
+        "resources": 0,
+        "channels": [
+          {
+            "version": 1,
+            "enabled": true,
+            "expired": true
+          },
+          {
+            "version": 1,
+            "enabled": true,
+            "expired": true
+          }
+        ]
+      }
+    }
+  ]
+}

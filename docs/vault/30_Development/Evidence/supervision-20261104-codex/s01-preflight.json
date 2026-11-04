@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "s01-readiness-preflight:2",
+  "observedAt": "2026-11-04T04:04:47.987807+00:00",
+  "readOnly": true,
+  "redacted": true,
+  "overallStatus": "BLOCKED",
+  "checks": [
+    {
+      "id": "configuration-node-ca",
+      "status": "BLOCKED",
+      "code": "settings-url-missing",
+      "facts": {
+        "settingReady": false
+      }
+    },
+    {
+      "id": "configuration-object-store",
+      "status": "BLOCKED",
+      "code": "settings-url-missing",
+      "facts": {
+        "settingReady": false
+      }
+    },
+    {
+      "id": "readyz",
+      "status": "BLOCKED",
+      "code": "base-url-missing",
+      "facts": {
+        "readySignalValid": false
+      }
+    },
+    {
+      "id": "session-boundary",
+      "status": "BLOCKED",
+      "code": "base-url-missing",
+      "facts": {
+        "authenticatedSessionValid": false,
+        "anonymousBoundaryValid": false
+      }
+    },
+    {
+      "id": "node-certificate-chain",
+      "status": "BLOCKED",
+      "code": "inventory-not-ready",
+      "facts": {
+        "registeredLeafCount": 0,
+        "verifiedLeafCount": 0
+      }
+    },
+    {
+      "id": "dns-resolution",
+      "status": "BLOCKED",
+      "code": "inventory-not-ready",
+      "facts": {
+        "hostnameCount": 0,
+        "resolvedCount": 0
+      }
+    },
+    {
+      "id": "inventory-lint",
+      "status": "BLOCKED",
+      "code": "inventory-values-missing",
+      "facts": {
+        "nodeCount": 5,
+        "missingFieldCount": 74,
+        "invalidFieldCount": 0
+      }
+    },
+    {
+      "id": "pilot-capability-match",
+      "status": "BLOCKED",
+      "code": "inventory-not-ready",
+      "facts": {
+        "inventoryNodeCount": 0,
+        "registeredNodeCount": 0,
+        "matchedNodeCount": 0,
+        "databaseReadOnly": false
+      }
+    },
+    {
+      "id": "storage-roundtrip-evidence",
+      "status": "BLOCKED",
+      "code": "storage-evidence-or-attestation-missing",
+      "facts": {
+        "requiredCheckCount": 6,
+        "verifiedCheckCount": 0,
+        "codeReachable": false,
+        "observedAtValid": false,
+        "attestationComplete": false,
+        "attestationBound": false
+      }
+    }
+  ],
+  "inputs": {
+    "U1": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    },
+    "U2": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    },
+    "U3": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    },
+    "U4": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    },
+    "U5": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    },
+    "U6": {
+      "status": "BLOCKED",
+      "code": "input-blocked"
+    }
+  },
+  "acceptanceAssessed": false
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="19" time="0.500" timestamp="2026-11-04T13:02:39.985115+09:00" hostname="DESKTOP-2IRPGV7"><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_and_aggregator_pin_the_same_repository_registry" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_imported_restore_axis_is_consumed_by_stage_one_aggregator" time="0.004" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_zero_tail_imports_only_the_graph_proved_structural_exception" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_graph_tail_and_junit_evidence_kind_mismatch_is_rejected" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-failed rehearsal]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-cleanup]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-negative fixture]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-tail roundtrip0]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-tail roundtrip1]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_incomplete_or_failed_producer_evidence[&lt;lambda&gt;-sourceRunId]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[None-&lt;lambda&gt;-digest]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[None-&lt;lambda&gt;-expired0]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[None-&lt;lambda&gt;-expired1]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[&lt;lambda&gt;-None-successfully]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[&lt;lambda&gt;-None-head]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[None-&lt;lambda&gt;-sourceRunId]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_unbound_github_metadata[None-&lt;lambda&gt;-name]" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_importer_rejects_junit_result_drift" time="0.001" /><testcase classname="tests.test_import_ac11_migration_rehearsal" name="test_main_reads_zip_and_github_metadata_files" time="0.027"><failure message="AssertionError: assert 2 == 0&#10; +  where 2 = &lt;function main at 0x000001C82F327E20&gt;(['--artifact-zip', 'C:\\Users\\inviz\\AppData\\Local\\Temp\\pytest-of-inviz\\pytest-801\\test_main_reads_zip_and_githu...\Users\\inviz\\AppData\\Local\\Temp\\pytest-of-inviz\\pytest-801\\test_main_reads_zip_and_github0\\artifact.json', ...])&#10; +    where &lt;function main at 0x000001C82F327E20&gt; = importer.main">tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-801/test_main_reads_zip_and_github0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001C82F436530&gt;
+
+    def test_main_reads_zip_and_github_metadata_files(tmp_path, monkeypatch):
+        monkeypatch.setattr(importer, "_git", fake_git)
+        monkeypatch.setattr(
+            importer,
+            "_source_migration_segment",
+            lambda _source: (REVERSIBLE_HEAD, REVERSIBLE_BARRIER, 1),
+        )
+        archive, bundled = bundle()
+        run, artifact = metadata(archive, bundled)
+        archive_path = tmp_path / "evidence.zip"
+        run_path = tmp_path / "run.json"
+        artifact_path = tmp_path / "artifact.json"
+        output = tmp_path / "imported.json"
+        archive_path.write_bytes(archive)
+        run_path.write_text(json.dumps(run), encoding="utf-8")
+        artifact_path.write_text(json.dumps(artifact), encoding="utf-8")
+&gt;       assert importer.main(
+            [
+                "--artifact-zip", str(archive_path),
+                "--run-metadata", str(run_path),
+                "--artifact-metadata", str(artifact_path),
+                "--output", str(output),
+            ]
+        ) == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = &lt;function main at 0x000001C82F327E20&gt;(['--artifact-zip', 'C:\\Users\\inviz\\AppData\\Local\\Temp\\pytest-of-inviz\\pytest-801\\test_main_reads_zip_and_githu...\Users\\inviz\\AppData\\Local\\Temp\\pytest-of-inviz\\pytest-801\\test_main_reads_zip_and_github0\\artifact.json', ...])
+E        +    where &lt;function main at 0x000001C82F327E20&gt; = importer.main
+
+tests\test_import_ac11_migration_rehearsal.py:421: AssertionError</failure></testcase></testsuite></testsuites>

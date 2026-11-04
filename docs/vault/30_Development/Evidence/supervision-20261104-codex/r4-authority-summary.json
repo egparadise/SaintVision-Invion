@@ -1,0 +1,74 @@
+{
+  "observedAt": "2026-11-04T03:57:10.027520+00:00",
+  "sourceHead": "611a9aab494e6f61825f7a96cfef0615b5b7cb7c",
+  "state": {
+    "caMode": "external-intermediate",
+    "databaseMode": "ssh-tunnel-external",
+    "configuredNodeCount": 2,
+    "rotationJournalExists": false,
+    "rotationFiles": []
+  },
+  "cp": {
+    "notBefore": "2026-10-27T03:27:25+00:00",
+    "notAfter": "2026-11-02T03:32:25+00:00",
+    "expired": true,
+    "preservedKeyMatches": true,
+    "historicalIdentityValid": true,
+    "revoked": false
+  },
+  "issuer": {
+    "repositoryValidator": "PASS",
+    "keyMatches": true,
+    "chainMatchesStatePin": true,
+    "chainMatchesStateBytes": true,
+    "certificateValidity": [
+      {
+        "notBefore": "2026-09-29T14:50:37+00:00",
+        "notAfter": "2029-09-28T14:55:37+00:00"
+      },
+      {
+        "notBefore": "2026-09-29T14:50:37+00:00",
+        "notAfter": "2036-09-26T14:55:37+00:00"
+      }
+    ],
+    "revocationEntryCount": 0
+  },
+  "nodes": [
+    {
+      "alias": "r4-node-1",
+      "notAfter": "2026-11-02T03:37:16+00:00",
+      "expired": true,
+      "revoked": false
+    },
+    {
+      "alias": "r4-node-2",
+      "notAfter": "2026-11-02T03:37:19+00:00",
+      "expired": true,
+      "revoked": false
+    }
+  ],
+  "ports": {
+    "3000": "TimeoutError",
+    "18082": "TimeoutError",
+    "55448": "TimeoutError"
+  },
+  "adminDSN": {
+    "configured": true,
+    "loopback": true,
+    "port": "55448",
+    "passfileConfigured": true,
+    "passfileExists": true,
+    "readOnlyConnection": "FAIL",
+    "errorClass": "ConnectionTimeout"
+  },
+  "runtimeDSN": {
+    "configured": true,
+    "loopback": true,
+    "port": "55448",
+    "passfileConfigured": true,
+    "passfileExists": true,
+    "readOnlyConnection": "FAIL",
+    "errorClass": "ConnectionTimeout"
+  },
+  "nodeHistoricalIdentityRecheck": "PASS for both; initial probe used incorrect NodePrincipal arity and was corrected read-only"
+}

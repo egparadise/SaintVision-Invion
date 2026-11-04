@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-11-04T04:03:24.308676+00:00",
+  "idpCandidates": [
+    {
+      "alias": "inventory-node-1",
+      "httpStatus": 200,
+      "documentedIssuerMatches": true,
+      "jwksSameOrigin": true
+    },
+    {
+      "alias": "inventory-node-2",
+      "errorClass": "TimeoutError"
+    },
+    {
+      "alias": "inventory-node-3",
+      "errorClass": "TimeoutError"
+    }
+  ]
+}
