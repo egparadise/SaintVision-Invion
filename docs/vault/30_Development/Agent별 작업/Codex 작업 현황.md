@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.340"
+version: "1.0.341"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T12:43:33+09:00"
+updated: "2026-11-04T13:06:28+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Claude ctx_0bdc8c734c3f, Gemini ctx_afac04406137, and Codex ctx_78f45e976cf3 returned ready delivery receipts in separate Orca workspaces; results and acceptance remain pending"
-active_card_next: "Resume Run run_e57ecd84a7bc on worker reports; resolve findings, reconcile exact heads/CI/review/S01 prerequisites, and deliver the latest combined source to Obsidian"
+active_card_status: "Three workers are live; isolated train78 candidate includes prior audit; Docker API152 harness regression reproduced and locally fixed (48 passing cases), while independent review and hosted execution remain pending"
+active_card_next: "Publish and independently review the harness fix; bind exact-SHA CI; close PR401 caller/contract and PR402 failure-state findings, then reconcile reviewed delivery and real operational prerequisites"
 ---
+
+## 2026-11-04 Docker API152 browser harness repair
+
+- Candidate checkout `D:/Project/SaintVisionI-Invion/supervision-integration-20261104`, branch `agent/codex/supervision-integration-20261104`, base `925dd669ba87f3067fe8f17f102eb5a804c4b1d9`; owner Codex, reviewer Claude pending.
+- Read actual Desktop Browser failure job `126376855159`; regression exit 1 confirmed stale container-wide IP selection. The runner now pins and reads the declared bridge IPv4 endpoint and records unavailable endpoints as not-run exit 125.
+- CPython 3.14.7 focused `test_vf_evidence.py` + `test_docker_diag.py`: 48 passed / 0 failures/errors/skips, exit 0; git whitespace check exit 0. Actual Linux Docker/browser execution and independent review are pending.
+- Claude source verdicts: #402 changes requested (symlink fixture and cross-run failure handling), #401 changes requested (unreachable UI and unknown-state/copy/type gaps). Owner corrections were actually delivered through the supervised Run. Codex worker accepted #400 within its Node-leaf-only scope and requested a current-state correction to #403.
+- Next: exact-SHA CI and reviewer verdict for this fix; implement canonical certificate observation for frontend product wiring; preserve expired r4 while preparing supported isolated recovery. See [[2026-11-04_Docker_API152_브라우저_검증기_수정_Codex]].
 
 ## 2026-11-04 전체 개발 자동감독 착수
 
