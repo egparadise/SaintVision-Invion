@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.346"
+version: "1.0.347"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T14:52:47+09:00"
+updated: "2026-11-04T15:45:25+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "R5 two-node live observation restored and root-corroborated; registry provenance and freshness map independently accepted; legacy13 classified; final UI/scheduler/harness owner corrections remain under review before full delivery"
-active_card_next: "Integrate reviewed final owner heads, freeze source, run all required CI lanes and land normally; complete technically gated r5 expiry prevention, reconcile local configuration and actual equipment blockers, then Obsidian check/apply/check and final report"
+active_card_status: "Final owner sources accepted and integrated; local combined and frontend gates passed; exact root fixes and private operations plan under final independent review"
+active_card_next: "Freeze exact final SHA, run all eight hosted lanes, land normally, then verify attestation and aggregate; finish bounded r5 expiry prevention and Obsidian synchronization"
 ---
+
+## 2026-11-04 최종 통합 수신
+
+2026-11-04 **최종 source 통합 체크포인트 (Codex 감독 수신)**: UI `af3a94ed`, scheduler `b5b8ca68`, S04/S07 harness `d44d7a08`, VF-CL provenance `87cdf206` 및 보안 allowlist repin `402cd283`은 독립 source 수락을 받고 후보에 통합됐다. Root의 추가 S04 pair 무효화 `c79c297c`와 happy-dom21.0.4 `b015019f`는 exact-commit 최종 검토를 요청했다. 로컬 combined focused139 passed/1 Windows capability skip, S04 전체27 passed, frontend102 files/1218 passed 및 lint/contracts/build exit0이다. 각 시험 범위는 중복 합산하지 않는다. 고정 SHA hosted CI·통합 착지·Obsidian 최종 반영은 다음 gate다. r5 실행 source03의 실제2Node 관측과 전체5Node 운영 인수는 구분한다. 원래48-task는 done2/blocked4/planned42/ready0, VF-CL accepted0/5를 유지한다. [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]]
+
+- 작업한 것: 모든 owner source와 legacy 감사/누락 harness를 통합. 증거 pair 오류와 테스트 의존성의 high advisory를 최소 수정했다.
+- 확인한 것: 실제 로컬 검증은 위 범위별 수치와 exit0; 새 의존성 full audit은 high0/critical0/moderate13(dev), production0이다. 실제 사용자 브라우저/API 인수로 쓰지 않는다.
+- 이어서 할 첫 행동/담당: Codex root가 exact source review와 여덟 hosted lane을 결속하고 정상 fast-forward 착지한다. Claude가 private r5 갱신/IdP 계획을 검토한다. r5 새 runtime 준비와 실제 무인 context 검증 전 task 등록은 하지 않는다.
 
 ## 2026-11-04 r5 live restoration and continued supervision
 

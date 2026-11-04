@@ -1,14 +1,30 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-10-28T12:50:46+09:00"
+updated: "2026-11-04T15:22:21+09:00"
 source_of_truth: "Git"
 ---
 
 # Orca 작업 현황
+
+## 2026-11-04 현재 감독 집계 — Codex 대행
+
+실제 별도 Orca 작성/검토 Agent가 수행했다고 주장하지 않는다. 상시 규칙에 따라 Codex root가 관리 역할을 맡아 Run `run_e57ecd84a7bc`의 실제 receipt·고정 소스·검증을 집계했다.
+
+| 담당/수신한 source | 확인한 상태 | 남은 첫 행동 |
+|---|---|---|
+| Gemini F1~F4 `789999d8`, Codex F5 `af3a94ed` | 반복 provider 명령 승인 대기로 Gemini 재시도는 확정 stop 후 두 파일 patch를 보존했다. 같은 Task의 Codex 재시도와 timer 보강을 수신했고 Claude가1218 frontend tests 및 mutation으로 소스를 수락했다 | 최종 후보 CI. 초기 Gemini 기여와 F5 Codex owner를 분리 기록 |
+| Codex scheduler `b5b8ca68` | Claude 독립 수락, root 후보 통합. preflight 재시도·실제 전체 leaf 변경·구성원 집합·lock 보호 검증 | 고정 통합 CI/착지 후 실제 r5용 검토된 task 등록 또는 검토된 수동 회전 방지 계획 |
+| Claude registry `87cdf206` / security pin `402cd283` | root 독립 수락·통합, registry9 negative/pin 재현→통과 확인. 기준·RLS·expiry 정책 승격 없음 | 최종 CI와 기록 인계 |
+| Codex legacy audit `36a53b9d` / ports `d44d7a08`·report `66975f00` | 열린234개 source 대조에서 과거13개를6대체/5후속설계상 stack제외/2보완으로 분류. 실제 PG 측정과 Claude S07/read-only 소스 수락을 수신·통합 | 최종 CI와 S04 오류 시 JSON/JUnit pair 정리 보강 |
+| Codex r5 `2b49312c` / runtime03 | 실제2Node fresh 관측과 loopback HTTP200 복구, root 별도 재확인. 만료11-10 14:15:35KST / 갱신창11-08 14:15:35KST | 만료 방지 private plan과 로컬 IdP 설정 보강 계획; 장비 미확인 입력은 실제 값 필요 |
+
+원래48-task **2 done /4 blocked /42 planned /0 ready**, VF-CL accepted0/5와 운영 인수=false를 유지한다. 현재 후보의 구현/로컬 검증/독립 review와 hosted CI/운영 인수는 따로 집계한다. 최종 증거·실패한 중복 tracking attempt·정확한 executor는 [[2026-11-04_전체개발_통합검증과_감독_결과_Codex]]에 보존한다. user의 '네'는 진행 승인으로 받았으며 새 장비 설정 경로나 identity 값은 제공되지 않았다.
+
+## 초기 역할 정의와 이전 확인 기록
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 

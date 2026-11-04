@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S07-FIVE-NODE-ADAPTER-SPEC-001"
 title: "S07 5노드 실 Node adapter 사양"
-version: "1.1.0"
+version: "1.1.1"
 status: "proposed-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T11:45:00+09:00"
+updated: "2026-11-04T15:22:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S07-DB"]
@@ -14,8 +14,8 @@ tags: ["s07", "five-node", "adapter", "inventory", "read-only", "preflight"]
 
 # S07 5노드 실 Node adapter 사양
 
-> [!warning] 물리 wave 실행 권한 없음
-> v1.1은 공용 inventory와 등록/mTLS read-only preflight를 `tools/five_node_lab_preflight.py`로 추출하지만 실제 이탈·복구 wave는 구현하거나 승인하지 않는다. S07-DB는 `review`이며 AC-07·5노드 인수는 미측정이다.
+> [!warning] 물리 wave 인수 미측정
+> v1.1.1은 등록/mTLS read-only CLI가 source `d44d7a08`에 구현됐음을 반영한다. 실제 이탈·복구 wave와 AC-07·5노드 인수는 미측정이다. 원래48-task 상태는 `docs/task-registry.json` 정본을 따르며 이 helper 구현만으로 승격하지 않는다.
 
 ## 1. 목적
 
@@ -25,7 +25,7 @@ tags: ["s07", "five-node", "adapter", "inventory", "read-only", "preflight"]
 python tools/measure_s07_recovery.py --adapter five-node-lab --inventory "$LAB_INVENTORY_PATH" --dry-run --json-out "$LAB_EVIDENCE_ROOT/preflight/s07-five-node.json"
 ```
 
-`--adapter synthetic`이 기본이며 기존 `--nodes`, `--repetitions`, timeout/poll/target, JSON/JUnit 실행 의미를 바꾸지 않는다. 위 S07 CLI는 여전히 제안·미구현이다. 이번 카드의 helper는 #101 placement adapter의 등록/mTLS preflight만 공용화하며 Node disruption, repair, JUnit success를 실행하지 않는다.
+`--adapter synthetic`이 기본이며 기존 `--nodes`, `--repetitions`, timeout/poll/target, JSON/JUnit 실행 의미를 유지한다. 위 S07 CLI의 읽기 전용 경로는 source `d44d7a08`에 구현됐다. 공용 inventory/SQL과 callback 변환을 통해 등록/mTLS를 확인하며 Node disruption·repair·물리 JUnit success는 생성하지 않는다. 작성자 검증은 shared/S07 READ ONLY PG2 cases와 기본 synthetic PG1 case, 각각 skip0이다. 기존 synthetic fixture의 실제 project_id 전달 오류도 수정했다. Codex root의 소스 검토·후보 통합과 Claude의 고정 소스 독립 수락이 완료됐다. Claude는 같은8파일의 후보에서 실제 PG READ ONLY 두 cases와 synthetic CLI를 재현했다. 최종 hosted CI·물리 인수는 별도다. [[2026-11-04_legacy_harness_ports_Codex]]
 
 ### F-A: 물리 AC-07 제품 경로 결정
 
