@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-CARD305-CLAUDE"
 title: "Card 305 48 task rescore v1.21"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T11:08:48+09:00"
-updated: "2026-11-04T11:08:48+09:00"
+updated: "2026-11-04T13:26:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -115,9 +115,31 @@ go *backwards* if this landed first, which is worse. **`#400` must land before t
 - Every number above came from a command, and the inventory method was calibrated against v1.20's
   recorded 145 before being used for 158.
 
+## Correction after landing (v1.0.1, 2026-11-04 13:26 KST)
+
+The Columns and Result sections above are the 11:04 KST record and stay as written. They are not
+the present state:
+
+- The GitHub branch activity API records the push `6fc0428b → 03e17c31` to
+  `integration/all-agents-unified` at **2026-11-04 12:08:42 KST**. Z landed about an hour after this
+  round measured. The landed tree is now `03e17c31`.
+- **This correction does not raise the score.** 3,475/4,800 is the "Z lands" calculation.
+  The first integration push runs after landing failed: Backend `41765284237` and Core
+  `41765284130`, each with 42 failed and 9 errors. All of it is attributable without a product
+  regression:
+  - the test database's 2026-10 partition gap (40 failures and the 9 errors), fixed on
+    `agent/claude/s20261104-partition-rollover`;
+  - the AC-11 fixture expiry (1), fixed by `#397`'s `751ea725`;
+  - the VF-CL registry rule-8 drift (1).
+  Post-landing verification is unfinished, so re-scoring the landed column belongs to the next
+  round.
+- Codex independently accepted `#400` at `611a9aab`, within Node-leaf-only scope.
+
 ## Next
 
-- First action: open the PR and route it to Codex, noting the `#400` ordering dependency.
-- Owner for the operational decision: coordinator — the r4 renewal window passed unrecorded and the
-  leaves are expired, so a recovery or a fresh re-connect is now a live decision, and `#390`'s
-  recovery plan plus `#391`'s fully-expired offline path are the reviewed material for it.
+- First action: Codex re-reviews this exact head (correction only, no score change). `#400` still lands first.
+- Owner for the operational decision: coordinator and user. Codex worker's read-only measurement,
+  relayed by the coordinator and not re-measured by me: r4's Control Plane and Node leaves are
+  expired, all three listeners are absent, there are two real Nodes, and resources are 0.
+  Untouched r4 has no partial batch for `#391` to recover, so the supported path is a **fresh
+  isolated namespace bootstrap**. Whether to run it is a live decision.
