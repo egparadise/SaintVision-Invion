@@ -1,0 +1,784 @@
+{
+  "schemaVersion": 1,
+  "taskId": "task_fc87fbcb38e0",
+  "dispatchId": "ctx_7cf31e3d629b",
+  "runId": "run_e57ecd84a7bc",
+  "observedAt": "2026-11-04T14:09:46.113765+09:00",
+  "sourceSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "candidateSha": "fe69e300121edefe198a8a495ebc9abb08588667",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\legacy-pr-audit-20261104",
+  "branch": "agent/codex/legacy-pr-audit-20261104",
+  "snapshotSha256": "e1dde0e504f3b0304ad6357505c5161068093583afaef11894f95639bfe848b1",
+  "executor": "Codex dispatched worker",
+  "reviewer": "coordinator pending",
+  "productFilesChanged": false,
+  "environment": {
+    "os": "Windows / PowerShell",
+    "testPython": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "testPythonVersion": "3.14.7",
+    "inventoryPythonVersion": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+    "testPytestVersion": "9.1.1",
+    "postgresDsnPresent": false,
+    "liveNodesUsed": false,
+    "containersCreated": 0,
+    "externalMessages": "Orca coordinator only",
+    "testEnvironment": {
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTHONUTF8": "1",
+      "PYTHONPATH": "D:\\Project\\SaintVisionI-Invion\\legacy-pr-audit-20261104\\src;D:\\Project\\SaintVisionI-Invion\\legacy-pr-audit-20261104\\services\\control-plane\\src;D:\\Project\\SaintVisionI-Invion\\legacy-pr-audit-20261104"
+    }
+  },
+  "meaning": "Exact-head source disposition only. No ancestry, local test, old CI or design document is operational acceptance. No PR state changed.",
+  "excludedPrNumbers": [
+    401,
+    402,
+    406
+  ],
+  "counts": {
+    "reviewed": 13,
+    "exactHeadsInIntegration": 0,
+    "exactHeadsInCandidate": 0,
+    "wholeCommitPatchEquivalent": 0,
+    "superseded": 6,
+    "conflictsWithLaterArchitecture": 5,
+    "stillNeededSourceDelta": 2
+  },
+  "rawEvidence": "2026-11-04_legacy_pr_source_audit_Codex.json",
+  "pullRequests": [
+    {
+      "number": 390,
+      "title": "docs: plan fully expired LAN pilot recovery",
+      "headRefName": "agent/codex/c294-expired-pilot-recovery-plan",
+      "headRefOid": "72934014df546924aa9f61f51e0902e86bb0e540",
+      "verifiedRemoteHead": "72934014df546924aa9f61f51e0902e86bb0e540",
+      "baseRefName": "coord/train70a-ci-1006",
+      "mergeBase": "7c433080ab54f802c4e85f4851a037e86bc642fb",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "72934014df546924aa9f61f51e0902e86bb0e540 docs: plan fully expired pilot recovery"
+      ],
+      "verdict": "superseded",
+      "reason": "Historical two-option recovery plan is overtaken by Card295 offline recovery and Card296 isolated bootstrap; do not execute its old live commands.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/lan_pilot.py::_validate_expired_historical_leaf"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/lan_pilot.py::_load_offline_authorization"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "deploy/lan/worker_leaf_rotation.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "deploy/lan/prepare-pilot-database.sh"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/test_lan_leaf_rotation.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 0,
+        "absent-from-candidate": 1
+      }
+    },
+    {
+      "number": 306,
+      "title": "docs(s08-be): 제품 caller 연결 설계 메모와 Codex 계약 질문 아홉 개 (카드 210)",
+      "headRefName": "docs/claude/c210-s08be-caller-memo",
+      "headRefOid": "9963f8a043a15a143266547c9f12db9e83a071a5",
+      "verifiedRemoteHead": "9963f8a043a15a143266547c9f12db9e83a071a5",
+      "baseRefName": "coord/train14-ci-0528",
+      "mergeBase": "d0b2a4c6b05674a7d8d0ca011f080f580a873b06",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "9963f8a043a15a143266547c9f12db9e83a071a5 docs(s08-be): 제품 caller 연결 설계 메모와 Codex 계약 질문 아홉 개 (카드 210)"
+      ],
+      "verdict": "superseded",
+      "reason": "The nine caller questions are answered in the later internal caller, authenticated receipts, isolation/epoch checks, atomic completion and product worker composition; physical builder acceptance remains separate.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/build_execution.py::BuildExecutionService"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/build_product_runtime.py::configured_tenant_product_runtime"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/worker.py::consume_builds"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_build_product_runtime.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_build_product_runtime_real_pg.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 0,
+        "absent-from-candidate": 1
+      }
+    },
+    {
+      "number": 265,
+      "title": "docs(s08-be): define ROOF BuildKit and single-GPU boundaries",
+      "headRefName": "agent/codex/card170-s08be-design",
+      "headRefOid": "ecb43d4d86362de6209d0c2d169810d2f5681bed",
+      "verifiedRemoteHead": "ecb43d4d86362de6209d0c2d169810d2f5681bed",
+      "baseRefName": "coord/train5-ci-1135",
+      "mergeBase": "7851412db792b4ef6c53cb92944be530d77eb2de",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "ecb43d4d86362de6209d0c2d169810d2f5681bed docs(s08-be): close design review conditions",
+        "32290cb6004f6b5976ad6058bf2cc4b69c82e09b docs(s08-be): define ROOF BuildKit and single-GPU boundaries"
+      ],
+      "verdict": "superseded",
+      "reason": "Original design-only files are absent; later strict BuildRequest/Plan/Receipt, BuildKit governance and measured single-GPU allocation implement its direction. This is not a claim that every proposed design feature or hardware acceptance is complete.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "contracts/v1alpha1/core.schema.json"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/build_governance.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/build_adapter.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/gpu.py::current_single_gpu_allocation"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_single_gpu_contract.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_build_governance.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 1,
+        "absent-from-candidate": 2
+      }
+    },
+    {
+      "number": 194,
+      "title": "feat(api): canonical 403 denials audited once at the shared handler boundary (Codex contract, card 69)",
+      "headRefName": "agent/claude/canonical-denial-audit",
+      "headRefOid": "c5d03f4a32374b44c860e4498e444b5a3b98bb74",
+      "verifiedRemoteHead": "c5d03f4a32374b44c860e4498e444b5a3b98bb74",
+      "baseRefName": "agent/claude/g04-w2-model-version-register",
+      "mergeBase": "266adfc65f21b98c1fd8ad1e5dd7ac9ba3f99c6a",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "c5d03f4a32374b44c860e4498e444b5a3b98bb74 feat(api): canonical 403 denials are audited once at the shared handler boundary (Codex contract, #191)"
+      ],
+      "verdict": "superseded",
+      "reason": "Canonical denials call the shared recorder exactly once; the later shared denial_recorder also serves the kernel. audit_action and its tests are identical blobs; focused current tests pass.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "src/saintvision/api/app.py::_record_denial"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "src/saintvision/api/problem.py::install_canonical_problem_handler"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "src/saintvision/api/denial_recorder.py::record_denial"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/app.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_canonical_denial_audit.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_canonical_denial_audit_real_pg.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 2,
+        "different-blob": 8,
+        "absent-from-candidate": 0
+      }
+    },
+    {
+      "number": 148,
+      "title": "ci(s05): add legacy concurrency staircase lane",
+      "headRefName": "agent/codex/s05-legacy-staircase",
+      "headRefOid": "99f0efd541244487bb32e8c8e6ff308c1ca7a373",
+      "verifiedRemoteHead": "99f0efd541244487bb32e8c8e6ff308c1ca7a373",
+      "baseRefName": "agent/codex/s05-admission-decision",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "99f0efd541244487bb32e8c8e6ff308c1ca7a373 docs(s05): close semaphore line after hosted staircase",
+        "3a1790ff3431706e81a2ba258eb0b26ea456ed31 fix(s05): load database fingerprint dependency",
+        "2305abf1f3a912ade0ceefa1c4501542a028e1e7 ci(s05): add legacy concurrency staircase",
+        "9efc4dcc5902b469ab613e847963060167708d85 docs(s05): revise bounded admission decision",
+        "0bf394dc144dc923884533d9d09f40f9c2d82d5f docs(s05): propose bounded admission follow-up",
+        "429e831cfe8d8b24393a308206fd894327b5caf1 docs(s05): record final hosted provenance run",
+        "50c7b9dda93fa989a1f450ff0a5c2fb8fa0f9997 fix(s05): fetch product provenance ancestry",
+        "728f3c13f9f851b128d0f324ec1c35bcf530fad2 test(s05): pin product provenance and gate boundaries",
+        "0bace380e8ca8241a9c8dd18c839b97f67619d8a docs(s05): record hosted wave evidence",
+        "60a63fbf5ee60cacd6c6212b7362a99576d9d4af ci(s05): add opt-in hosted placement waves",
+        "08f4a6a95d08f28e90bea300d32b2f657f3cf656 fix(s05): address bounded semaphore review",
+        "548849613bd5d795df567525aa3d7660187f08bc feat(s05): add bounded placement semaphore"
+      ],
+      "verdict": "conflicts-with-later-architecture",
+      "reason": "Card46 historical result and later clean-base legacy staircase are preserved; inherited semaphore lifecycle and hosted-wave candidate arm were explicitly excluded by Card47. Do not merge the stack.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/S05 bounded admission 후속 결정 제안.md::sections 6-7"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/run_s05_legacy_staircase.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/test_s05_legacy_staircase.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": ".github/workflows/s05-legacy-staircase.yml"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 19,
+        "absent-from-candidate": 8
+      }
+    },
+    {
+      "number": 145,
+      "title": "docs(s05): decide bounded admission follow-up",
+      "headRefName": "agent/codex/s05-admission-decision",
+      "headRefOid": "9efc4dcc5902b469ab613e847963060167708d85",
+      "verifiedRemoteHead": "9efc4dcc5902b469ab613e847963060167708d85",
+      "baseRefName": "agent/codex/s05-hosted-wave",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "9efc4dcc5902b469ab613e847963060167708d85 docs(s05): revise bounded admission decision",
+        "0bf394dc144dc923884533d9d09f40f9c2d82d5f docs(s05): propose bounded admission follow-up",
+        "429e831cfe8d8b24393a308206fd894327b5caf1 docs(s05): record final hosted provenance run",
+        "50c7b9dda93fa989a1f450ff0a5c2fb8fa0f9997 fix(s05): fetch product provenance ancestry",
+        "728f3c13f9f851b128d0f324ec1c35bcf530fad2 test(s05): pin product provenance and gate boundaries",
+        "0bace380e8ca8241a9c8dd18c839b97f67619d8a docs(s05): record hosted wave evidence",
+        "60a63fbf5ee60cacd6c6212b7362a99576d9d4af ci(s05): add opt-in hosted placement waves",
+        "08f4a6a95d08f28e90bea300d32b2f657f3cf656 fix(s05): address bounded semaphore review",
+        "548849613bd5d795df567525aa3d7660187f08bc feat(s05): add bounded placement semaphore"
+      ],
+      "verdict": "conflicts-with-later-architecture",
+      "reason": "Decision prose is preserved and revised in the later canonical S05 decision; its inherited semaphore and candidate-wave stack was explicitly excluded by Card47.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/S05 bounded admission 후속 결정 제안.md::sections 6-7"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/run_s05_legacy_staircase.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 15,
+        "absent-from-candidate": 7
+      }
+    },
+    {
+      "number": 141,
+      "title": "ci(s05): add opt-in hosted placement waves",
+      "headRefName": "agent/codex/s05-hosted-wave",
+      "headRefOid": "429e831cfe8d8b24393a308206fd894327b5caf1",
+      "verifiedRemoteHead": "429e831cfe8d8b24393a308206fd894327b5caf1",
+      "baseRefName": "agent/codex/s05-bounded-semaphore",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "429e831cfe8d8b24393a308206fd894327b5caf1 docs(s05): record final hosted provenance run",
+        "50c7b9dda93fa989a1f450ff0a5c2fb8fa0f9997 fix(s05): fetch product provenance ancestry",
+        "728f3c13f9f851b128d0f324ec1c35bcf530fad2 test(s05): pin product provenance and gate boundaries",
+        "0bace380e8ca8241a9c8dd18c839b97f67619d8a docs(s05): record hosted wave evidence",
+        "60a63fbf5ee60cacd6c6212b7362a99576d9d4af ci(s05): add opt-in hosted placement waves",
+        "08f4a6a95d08f28e90bea300d32b2f657f3cf656 fix(s05): address bounded semaphore review",
+        "548849613bd5d795df567525aa3d7660187f08bc feat(s05): add bounded placement semaphore"
+      ],
+      "verdict": "conflicts-with-later-architecture",
+      "reason": "Hosted candidate-wave implementation depends on the rejected semaphore tree; later clean-base legacy-only staircase replaces the accepted measurement need.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/S05 bounded admission 후속 결정 제안.md::sections 6-7"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/run_s05_legacy_staircase.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/test_s05_legacy_staircase.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 13,
+        "absent-from-candidate": 7
+      }
+    },
+    {
+      "number": 140,
+      "title": "docs(storage): design S3-compatible object adapter",
+      "headRefName": "agent/codex/s3-object-store-design",
+      "headRefOid": "9c02a89b44f5cdf9360fd45010a826dc8099f4d6",
+      "verifiedRemoteHead": "9c02a89b44f5cdf9360fd45010a826dc8099f4d6",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "9c02a89b44f5cdf9360fd45010a826dc8099f4d6 docs(storage): harden local locator design",
+        "d78c143a45d27dab7ac4907580ec4bb127524676 docs(storage): resolve S3 adapter design review",
+        "4fcaa99aae9b3ac64551dcab2ddef2bb656ade0a docs(storage): design S3-compatible object adapter"
+      ],
+      "verdict": "superseded",
+      "reason": "Later ObjectStore SPI, shared S3Client, immutable provider/locator migration, verified provider-byte reads and provider-bound checkpoint tests implement the design; historical design-only files need not be restored.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/object_store.py::ObjectStore"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/s3_object_store.py::S3Objects"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/s3_client.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/verify_storage_roundtrip.py::S3Client"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "migrations/versions/0048_object_store_locator.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/result_view.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_s3_object_store.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_object_store_provider_binding.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_s3_object_store_postgres.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 2,
+        "absent-from-candidate": 2
+      }
+    },
+    {
+      "number": 119,
+      "title": "feat(s07): add five-node registration dry-run adapter",
+      "headRefName": "agent/codex/s07-five-node-adapter",
+      "headRefOid": "367ac3398dee3f832e6f76cd18def715e8a5362c",
+      "verifiedRemoteHead": "367ac3398dee3f832e6f76cd18def715e8a5362c",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "367ac3398dee3f832e6f76cd18def715e8a5362c docs(s07): record five-node dry-run adapter evidence",
+        "4d3221569f991ab2041574972464a9727af5960a feat(s07): add five-node registration dry-run adapter"
+      ],
+      "verdict": "still-needed-source-delta",
+      "reason": "S07 five-node read-only dry-run adapter is genuinely absent. Current spec is proposed-review and explicitly says this CLI is not implemented; this is a pending feature/harness delta, not a regression or physical acceptance.",
+      "missingDelta": {
+        "ownerRecommendation": "Codex; Claude independent review",
+        "scope": [
+          "tools/measure_s07_recovery.py",
+          "tools/five_node_lab_preflight.py",
+          "tests/core/test_s07_recovery_measurement.py",
+          "tests/integration/test_five_node_lab_preflight.py"
+        ],
+        "minimalAction": "Forward-port the read-only adapter from 4d322156, retain current synthetic path and shared strict inventory; no disruption, live DB mutation or acceptance promotion.",
+        "reproduction": "Recorded parser-only invocation exits 2; required synthetic knobs are still mandatory and --adapter/--inventory/--dry-run are unsupported."
+      },
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/measure_s07_recovery.py::parser"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/five_node_lab_preflight.py::write_registration_mtls_preflight"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/S07 5노드 실 Node adapter 사양.md::section 1"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 7,
+        "absent-from-candidate": 1
+      }
+    },
+    {
+      "number": 118,
+      "title": "test(s04): add HTTP+PG approval outbox evidence runner",
+      "headRefName": "agent/codex/s04-db-runner",
+      "headRefOid": "c149f8dff4df36aa8918ea8d2bb45fb200cc0d03",
+      "verifiedRemoteHead": "c149f8dff4df36aa8918ea8d2bb45fb200cc0d03",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "c149f8dff4df36aa8918ea8d2bb45fb200cc0d03 docs(s04): record hosted card34 gates",
+        "ff29ae3af55c6340f2b98e8488e5877d8b6549c5 docs(s04): record green card34 evidence",
+        "35d7250cba481b944846f385366e63c6dff9317a docs(s04): link card34 review PR",
+        "ec3cf9ff048ef21309bb55851e1efc92ecd561ed docs(s04): record card34 runner boundary",
+        "6f0156c7727a92a3afd8c17ed9a6d15dc55af2a2 test(s04): redact disposable database fixture",
+        "b9f3fa48571b44f6ab7dd46f32f21abee3d0ab16 fix(s04): preserve approval expiry immutability",
+        "01858fe1ee70a632f01e31530957986e758d099f fix(s04): bootstrap evidence runner imports",
+        "7fc2eda3e0b74c4439f1cdb17528fdf6925a4bb5 test(s04): add approval outbox evidence runner"
+      ],
+      "verdict": "still-needed-source-delta",
+      "reason": "All three source/test files for the unified HTTP+PG approval/outbox runner are absent. Later operational collectors and individual regressions do not replace this four-case executable report.",
+      "missingDelta": {
+        "ownerRecommendation": "Codex; Claude independent review",
+        "scope": [
+          "tools/run_s04_db_evidence.py",
+          "tests/core/test_s04_db_runner.py",
+          "tests/integration/s04_db_runner_case.py"
+        ],
+        "minimalAction": "Port only these three files after adapting to current fixture and schema; use a fresh disposable PostgreSQL instance and rerun the four cases. Do not import old green JSON/XML as current evidence.",
+        "reproduction": "git cat-file -e <candidate>:<each of the three files> exits 128; the branch versions exist and identify the four cases."
+      },
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_approvals.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_control_api.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/outbox.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/collect_s04_kernel_approval_evidence.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/collect_s04_s08_operational_evidence.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 2,
+        "absent-from-candidate": 6
+      }
+    },
+    {
+      "number": 115,
+      "title": "feat(s05): add bounded placement semaphore",
+      "headRefName": "agent/codex/s05-bounded-semaphore",
+      "headRefOid": "08f4a6a95d08f28e90bea300d32b2f657f3cf656",
+      "verifiedRemoteHead": "08f4a6a95d08f28e90bea300d32b2f657f3cf656",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "08f4a6a95d08f28e90bea300d32b2f657f3cf656 fix(s05): address bounded semaphore review",
+        "548849613bd5d795df567525aa3d7660187f08bc feat(s05): add bounded placement semaphore"
+      ],
+      "verdict": "conflicts-with-later-architecture",
+      "reason": "The process-local project semaphore and root-transaction permit lifecycle were deliberately not merged after the no-degrade-through-50 decision. Their absence is intentional.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/S05 bounded admission 후속 결정 제안.md::sections 6-7"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/db.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/placement.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 0,
+        "different-blob": 13,
+        "absent-from-candidate": 2
+      }
+    },
+    {
+      "number": 35,
+      "title": "fix: recover first hosted CI regressions",
+      "headRefName": "agent/codex/continuation-20260922",
+      "headRefOid": "39d8c238c286698a583eb03807dbd1c6cb075d8d",
+      "verifiedRemoteHead": "39d8c238c286698a583eb03807dbd1c6cb075d8d",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "51d53b7f6849ec6c8dcf257471fdcfc87b4de461",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "ea3901f91feb8d5c42b9e3c620d59ce33959cd6a docs: record first hosted CI recovery",
+        "db05daeeea7e75f6024c696dc0554742377f6a18 fix: close first hosted CI regressions",
+        "75c5390bed28c56ea29c2673b04260cb74b24906 docs: record final Codex stop baseline",
+        "70234d2e18ffff9549f8f5d9288603037109a504 docs: remove non-gating exit example",
+        "c74855d7c205c17283ab34f6e34ee6bb10cf6da5 docs: make gate examples fail closed",
+        "ff926916a70861769b64079b20409349c30664d4 docs: enforce R2-b gated push procedure",
+        "1c7c6ef571947f484dacfd8eb9c0154b28673adb docs: independently review anchor weight scope",
+        "cdfab100fd4accdb0e935bce6c2c8c639745a5dc test: prove WorkloadSpec input anchor weight",
+        "e9a786c7616111a453defc8d6136012b06e9fc12 test: cover remaining EvidenceEnvelope serving paths",
+        "60fbbe27b80af80aa02612c90c8e06c7e8c7c206 test: add EvidenceEnvelope serving rejection guards",
+        "de78c295b84ad6c3c92fef1cbd227fed36b62420 docs: record CI and development Python version boundary"
+      ],
+      "verdict": "superseded",
+      "reason": "Envelope/WorkloadSpec rejection tests, requirements, gate instructions and several integration tests are identical blobs. Provisioning refusal and catalogue behavior persist with later narrower exception handling and integrated UI.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_evidence_envelope_serving.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_workload_spec_input_anchors.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_serving_anchors.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/provision_credentials.py::validate_manifest"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/core/test_credential_provision_cli.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "apps/web/src/features/desktop/InvFileExplorer.tsx"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_desktop_browser.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/integration/test_studio_browser.py"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 17,
+        "different-blob": 9,
+        "absent-from-candidate": 0
+      }
+    },
+    {
+      "number": 14,
+      "title": "Independent review of PR #11 and #12: merge them, run them together, fix what only that shows",
+      "headRefName": "review/claude-pr11-pr12",
+      "headRefOid": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+      "verifiedRemoteHead": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+      "baseRefName": "integration/all-agents-unified",
+      "mergeBase": "22448534ea06810c3ded0e3455825d47cd772cb4",
+      "inIntegration": false,
+      "inCandidate": false,
+      "wholeCommitPatchEquivalent": false,
+      "uniqueNonMergeCommits": [
+        "e491ec73c6c1aa48e63dcf45f2df190c760d6465 fix(eval): a run in which every case errored is not a pass",
+        "5671100202b7c1385b585afe69467980519601c8 feat(eval): execute a suite against an adapter",
+        "54c157d8060cf863b3834787c142a1fccebff36e fix(gateway): the business surface projects node identity, not node liveness",
+        "442ecab2cff9b6903fc73d6d0aafb8f9ead20400 fix(gateway): project membership through a definer function, not a table write",
+        "b222c406e1f5d4ace43e7d2b7eafda399c24274e feat(gateway): reserve through the execution core, in one transaction",
+        "c06f59c87c16ebbbc32459a3116ee9144e9cd6bf fix(handoff): let the session see the lock it just released",
+        "2d25337a66ca3f00d6b02998f24aa96da4fdc9fd feat(epoch): seed the first recovery epoch so a migrated database can start",
+        "b3f8148d867d31bbc20ccbccbf5b70b19e8fc541 test(handoff): insert workloads with the columns the table requires",
+        "44756e1247600aa5fb2e294eeed16c90632ea6f9 feat(handoff): connect the business API to the execution core",
+        "fffb73b63c55cdda59cfc9356390a842cd4846f2 feat(grants): give the execution core a role it can connect as",
+        "75fc4a201fd78272d618442aa5076547c0ad9eac docs: record the independent review of PR #11 and #12",
+        "a3f98ca55c36004f217538ff3ed2d879561b41c4 ci: derive the node-dependent test list instead of typing it"
+      ],
+      "verdict": "conflicts-with-later-architecture",
+      "reason": "Eval executor/tests and numerous kernel modules are identical blobs, and the all-error gate fix persists. Experimental handoff/gateway, automatic epoch seeding and renumbered migration graph conflict with ADR050-052/064-065; later explicit binding/current-authority routes replace them.",
+      "missingDelta": null,
+      "sourceEvidence": [
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "src/saintvision/services/eval_execution.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tests/test_eval_execution.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "src/saintvision/services/evaluation.py::gate_passed"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "tools/node_dependent_tests.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/business_handoff.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "services/control-plane/src/inv/workspace_api.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "migrations/versions/0021_business_kernel.py"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/30_Development/Codex 업무 binding과 실행 커널 연결 계약.md::ADR-051"
+        },
+        {
+          "sha": "fe69e300121edefe198a8a495ebc9abb08588667",
+          "pathAndSymbol": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md::ADR-050-052,064-065"
+        }
+      ],
+      "blobComparisonCounts": {
+        "same-blob": 70,
+        "different-blob": 80,
+        "absent-from-candidate": 19
+      }
+    }
+  ],
+  "validation": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests/core/test_canonical_denial_audit.py",
+        "tests/core/test_audit_action.py",
+        "tests/core/test_credential_provision_cli.py",
+        "tests/core/test_evidence_envelope_serving.py",
+        "tests/core/test_workload_spec_input_anchors.py",
+        "tests/test_eval_execution.py"
+      ],
+      "exitCode": 0,
+      "atKst": "2026-11-04T14:13:27.939330+09:00"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "atKst": "2026-11-04T14:18:58.225569+09:00"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "atKst": "2026-11-04T14:19:00.758308+09:00"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--conflicts-out",
+        "docs/vault/30_Development/Evidence/2026-11-04_legacy_pr_source_audit_Codex.sync-conflicts.json"
+      ],
+      "exitCode": 0,
+      "atKst": "2026-11-04T14:19:04.938494+09:00"
+    }
+  ],
+  "localTests": {
+    "directSourceSha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "passed": 68,
+    "skipped": 13,
+    "failed": 0,
+    "errors": 0,
+    "deselected": 0,
+    "skipReason": "INV_TEST_ADMIN_DSN absent for 13 eval-execution PostgreSQL cases"
+  },
+  "ci": {
+    "newReportCi": "not-run",
+    "historicalCiCountsAsCurrentCandidateEvidence": false
+  },
+  "operationalAcceptance": "not-run"
+}
