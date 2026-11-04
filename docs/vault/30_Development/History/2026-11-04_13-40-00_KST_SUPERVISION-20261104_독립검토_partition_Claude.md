@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.11.0"
+version: "1.12.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T18:47:00+09:00"
+updated: "2026-11-04T18:57:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -706,6 +706,41 @@ What I found and ran:
 - **Opinion:**
   - Commit `59f0a3c2`, run Docs CI, land by the targeted plan, then require all 8 workflows at the exact landed head.
   - Keep the `eff93191` FAILED record, with no pre-8 pass claim.
+
+## Train 80b landing script review (task `task_bf87ab92d622`): accepted, read-only
+
+Script: `merge-land-train3-80-59f0a3c2.sh.pending`, SHA-256 `2da6ef1a…`, 60 lines. `bash -n` exits 0. I did not execute
+it.
+
+Gates:
+- **Source:**
+  - It requires the exact head `59f0a3c2` and a clean tree. Both held at 18:56 KST.
+  - The `eff93191..59f0a3c2` path set must be exactly the three files.
+- **Strict JSON deep compares:**
+  - The manifest may differ only in VF-CL-04 `whyCiVerified`.
+  - The registry may differ only in `version` (1.6.4 → 1.6.5) and `verifiedAgainst.note`.
+- **Local test record:** the local JUnit must have 244 testcases with no failure, error or skip.
+  - Read now: 215 core plus 29 attestation testcases, all passing.
+- **Prior FAIL record:** the `eff93191` prelanding JSON must still read `FAIL`.
+- **Docs CI:** run 41810435583 is re-read and must be completed and successful, with the same head, branch,
+  `workflow_dispatch` and title.
+  - Read now: completed, success, workflow `Documentation Build`, job `docs` success.
+- **Signature:** real Sigstore verification of the FD receipt runs through `verify()`, which raises on any mismatch.
+- **Landing:**
+  - It requires the integration tip to equal `fd1530d9` (read now: `fd1530d9`) and `fd1530d9` to be an ancestor of
+    the landing commit.
+  - It pushes normally, without force, so a non-fast-forward is rejected.
+  - It reads the remote head back after the push.
+
+Lows, none blocking:
+- The JUnit timestamp (18:39:56) is earlier than the `59f0a3c2` commit time (18:44:07), and the file names no commit.
+  My exact-head 244 run and Docs CI cover the gap.
+- The Docs CI check does not pin `workflowName`; the title pins it in practice.
+- `json.loads` collapses duplicate keys. The strict-load test among the 244 covers the shipped files.
+- The prior FAIL JSON is checked by fields, not by a hash.
+
+The `eff93191` script (`99353908…`) is still `.pending` and separate. Nothing in this script claims a pre-8 pass for
+`59f0a3c2`. All 8 workflows at the exact landed head remain required.
 
 ## State boundaries
 
