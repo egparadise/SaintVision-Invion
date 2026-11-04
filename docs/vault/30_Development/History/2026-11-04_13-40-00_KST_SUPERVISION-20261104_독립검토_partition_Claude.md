@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.12.0"
+version: "1.13.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T18:57:00+09:00"
+updated: "2026-11-04T19:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -741,6 +741,38 @@ Lows, none blocking:
 
 The `eff93191` script (`99353908…`) is still `.pending` and separate. Nothing in this script claims a pre-8 pass for
 `59f0a3c2`. All 8 workflows at the exact landed head remain required.
+
+## Post-landing S12 attestation at `59f0a3c2` (task `task_bf87ab92d622` follow-up `task_9285e19358a2`): VERIFIED
+
+- **Remote:** `integration/all-agents-unified` reads `59f0a3c2` (`git ls-remote`).
+- **Run 41811861496**, "S12 Acceptance Evidence", read from the GitHub API:
+  - `workflow_dispatch`, path `.github/workflows/s12-acceptance-evidence.yml`;
+  - head `59f0a3c2`, branch `integration/all-agents-unified`, attempt 1;
+  - title `supervision-train80-s12-59f0a3c2-20261104`;
+  - jobs `s12-acceptance-evidence` and `attest-vf-cl-ci-receipt` both succeeded.
+- **I downloaded both artifacts myself** into a new empty directory:
+  - `vf-cl-ci-attestation-59f0…`: id 13312139106, zip SHA-256 `4c7ce04d…`, which equals the API digest.
+  - `s12-acceptance-59f0…`: id 13312408285, zip `e4959ab8…`, which equals the API digest. The receipt names this same
+    id, digest and expiry (2026-12-04T10:06:19Z).
+  - My receipt (`73bfbced…`), bundle (`8081d55c…`) and workflow `verification.json` (`64ac10c2…`) are byte-equal to
+    root's `.work/post-landing/59f0…/vfcl` copies.
+- **Real verification:** I ran the verifier from `59f0a3c2` source, with the module extracted by `git show`.
+  - Result: `VERIFIED`, run `41811861496`, `receiptSha256` `3b57a4b4…`.
+  - The verified certificate names the `s12-acceptance-evidence.yml@refs/heads/integration/all-agents-unified`
+    signer, source digest `59f0a3c2`, a GitHub-hosted runner and a `workflow_dispatch` trigger.
+  - The signed subject digest equals the receipt bytes.
+- **Negatives, all refused with exit 2:**
+  - old head `fd1530d9`;
+  - wrong ref (the agent branch);
+  - wrong workflow;
+  - wrong repository;
+  - one appended byte in the receipt (refused by the GitHub signature/identity check itself).
+- **S12 evidence:** the 17 items are identical to the `fd1530d9` run. Only `codeSha`, `inputs`, `note` and
+  `provenance` differ.
+  - `verdict` FAIL and `acceptanceClaim` false are the expected non-acceptance, unchanged.
+  - `pitr-configuration-possible` stays absent, and `pitr-rehearsal-dry-run-observed` stays observed.
+- This proves the hosted CI derivation at the landed head only. It is not operational acceptance and does not change the
+  48-task score. Backend and Core post-landing lanes were still running per root, and I did not read them.
 
 ## State boundaries
 
