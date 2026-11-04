@@ -26,13 +26,14 @@ import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { clearSessionExpiration, onTokenExpired, performLogout } from '@/features/auth/session';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem, ProjectNodeCertificateObservationResponse } from '@/contracts/types';
 import { apiClient, clearAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
 import type { NodePageResponse } from '@/contracts/node-page-response';
 import type { WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
 import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@/shared/api/projectObservation';
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
+import { deriveEffectiveClusterTrust, fetchProjectNodeCertificates, isCurrentNodeCertificateObservation, nextNodeCertificateTransition } from '@/shared/api/nodeCertificateObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 import { getNodeResourceUsage } from '@/features/desktop/fabricControlApi';
 import type { ObservedNodeResourceUsage } from '@/contracts/kernel-observation';
@@ -57,7 +58,7 @@ export const App: React.FC = () => {
   const [desktop, setDesktop] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('login');
-  const [nodes, setNodes] = useState<NodeItem[]>([]);
+  const [observedNodes, setNodes] = useState<NodeItem[]>([]);
   const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
@@ -92,6 +93,27 @@ export const App: React.FC = () => {
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [certificateObservation, setCertificateObservation] = useState<ProjectNodeCertificateObservationResponse | null>(null);
+  const [certificateClock, setCertificateClock] = useState(Date.now);
+  const now = Date.now();
+  const clusterTrust = deriveEffectiveClusterTrust(certificateObservation, projectId, now);
+  const certificateIsCurrent = isCurrentNodeCertificateObservation(certificateObservation, projectId, now);
+  const nodes = React.useMemo(() => {
+    const certificateItems = certificateIsCurrent && certificateObservation ? certificateObservation.items : [];
+    const certificateMap = new Map(certificateItems.map(item => [item.nodeId, item.certificateNotAfter]));
+    // NodePage certificate fields have not passed the canonical observation verifier.
+    return observedNodes.map(node => ({ ...node, certificateNotAfter: certificateMap.get(node.id) }));
+  }, [observedNodes, certificateObservation, certificateIsCurrent]);
+
+  useEffect(() => {
+    if (!certificateObservation) return;
+    const currentTime = Date.now();
+    const next = nextNodeCertificateTransition(certificateObservation, currentTime);
+    if (next === null) return;
+    // Independent of the 5s network polls, including when every request hangs.
+    const timer = setTimeout(() => setCertificateClock(Date.now()), next - currentTime);
+    return () => clearTimeout(timer);
+  }, [certificateObservation, certificateClock]);
 
   const sessionRef = useRef(0);
   const scopeRef = useRef(0);
@@ -124,6 +146,7 @@ export const App: React.FC = () => {
     setNodeError(null);
     setLastNodesFetchedAt(null);
     setSelectedNodeId(null);
+    setCertificateObservation(null);
 
     setNodeResourceUsage(null);
     setNodeResourceUsageState('idle');
@@ -182,6 +205,7 @@ export const App: React.FC = () => {
     activeProject.current = id;
     setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
+    setNodes([]); setCertificateObservation(null);
     setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -280,8 +304,17 @@ export const App: React.FC = () => {
           throw err;
         }
       }
+
+      let certObs: ProjectNodeCertificateObservationResponse | null = null;
+      try {
+        certObs = await fetchProjectNodeCertificates(targetPrj);
+      } catch {
+        certObs = null;
+      }
+
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
         setNodes(page.items.map(observedNode));
+        setCertificateObservation(certObs);
         setNodesState('success');
         setLastNodesFetchedAt(new Date());
         setNodeError(null);
@@ -289,6 +322,7 @@ export const App: React.FC = () => {
     } catch (err: any) {
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
         setNodes([]);
+        setCertificateObservation(null);
         setNodesState('error');
         setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
       }
@@ -520,7 +554,8 @@ export const App: React.FC = () => {
         currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
         onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
         onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
-        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        trust={clusterTrust} />
     </>
   );
 
@@ -742,6 +777,7 @@ export const App: React.FC = () => {
             onOpenTerminal={() => {
               setActiveTab('terminal');
             }}
+            trust={clusterTrust}
           />
         )}
 

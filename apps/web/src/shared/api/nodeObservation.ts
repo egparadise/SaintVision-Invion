@@ -48,5 +48,12 @@ export function observedNode(value: object): NodeItem {
     allocatableMemoryBytes: Number.isFinite(number('allocatableMemoryBytes')) ? number('allocatableMemoryBytes') : undefined,
     isDraining: raw.isDraining === true, killSwitchEngaged: raw.killSwitchEngaged !== false,
     ipAddress: typeof raw.ipAddress === 'string' ? raw.ipAddress : undefined,
+    certificateNotAfter:
+      raw.certificateNotAfter === null || raw.certificate_not_after === null
+        ? null
+        : typeof (raw.certificateNotAfter ?? raw.certificate_not_after) === 'string' &&
+            Number.isFinite(Date.parse((raw.certificateNotAfter ?? raw.certificate_not_after) as string))
+          ? ((raw.certificateNotAfter ?? raw.certificate_not_after) as string)
+          : undefined,
   };
 }

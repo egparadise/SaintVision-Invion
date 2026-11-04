@@ -1,6 +1,138 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { NodeItem } from '@/contracts/types';
+import { NodeItem, ClusterTrustSummary, ClusterTrustState } from '@/contracts/types';
 import { LogicalResourceSummary } from '@/contracts/virtualFabric';
+
+export interface TrustStatusConfigItem {
+  color: string;
+  border: string;
+  bg: string;
+  label: string;
+}
+
+export const TRUST_STATUS_CONFIG = {
+  ok: {
+    color: 'var(--color-status-online)',
+    border: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    label: '인증서 정상',
+  },
+  'renewal-window': {
+    color: 'var(--color-status-degraded)',
+    border: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    label: '인증서 갱신 창',
+  },
+  expired: {
+    color: 'var(--color-status-offline)',
+    border: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    label: '인증서 만료',
+  },
+  unknown: {
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    label: '신뢰 미확인',
+  },
+} as const satisfies Record<ClusterTrustState, TrustStatusConfigItem>;
+
+export function getTrustStatusConfig(state?: string | null): TrustStatusConfigItem {
+  if (state && Object.hasOwn(TRUST_STATUS_CONFIG, state)) {
+    return TRUST_STATUS_CONFIG[state as ClusterTrustState];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    label: state ? `UNKNOWN (${state})` : '신뢰 미확인',
+  };
+}
+
+/**
+ * Format ISO timestamp into Asia/Seoul (KST) display string.
+ * Invalid or missing timestamps fail-closed to '미확인'.
+ * Explicit null (no certificate provisioned) returns '인증서 없음'.
+ */
+export function formatKstDateTime(isoString: string | null | undefined): string {
+  if (isoString === null) return '인증서 없음';
+  if (!isoString || typeof isoString !== 'string') return '미확인';
+  const parsed = Date.parse(isoString);
+  if (!Number.isFinite(parsed)) return '미확인';
+  try {
+    const d = new Date(parsed);
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Seoul',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(d);
+    const m: Record<string, string> = {};
+    for (const p of parts) {
+      m[p.type] = p.value;
+    }
+    if (!m.year || !m.month || !m.day || !m.hour || !m.minute) {
+      return '미확인';
+    }
+    const hour = m.hour === '24' ? '00' : m.hour;
+    return `${m.year}-${m.month}-${m.day} ${hour}:${m.minute} KST`;
+  } catch {
+    return '미확인';
+  }
+}
+
+/**
+ * Check whether a certificate timestamp is in the past (expired).
+ * Missing, null, or invalid strings return false (not expired certificate, but unverified/absent).
+ */
+export function isCertificateExpired(isoString: string | null | undefined): boolean {
+  if (!isoString || typeof isoString !== 'string') return false;
+  const parsed = Date.parse(isoString);
+  if (!Number.isFinite(parsed)) return false;
+  return parsed <= Date.now();
+}
+
+/**
+ * Trust / certificate banner resolver.
+ * renewal-window='인증서 갱신 창 (갱신 필요) — 만료까지 N일 N시간',
+ * expired='인증서 만료 — 노드 연결 끊김',
+ * unknown/absent field=no banner,
+ * ok=badge only.
+ */
+export function getTrustBannerInfo(trust?: ClusterTrustSummary | null): { level: 'renewal-window' | 'expired'; message: string } | null {
+  if (!trust || !trust.state || trust.state === 'unknown' || trust.state === 'ok') {
+    return null;
+  }
+  if (trust.state === 'expired') {
+    return {
+      level: 'expired',
+      message: '인증서 만료 — 노드 연결 끊김',
+    };
+  }
+  if (trust.state === 'renewal-window') {
+    let days = 0;
+    let hours = 0;
+    if (typeof trust.secondsUntilEarliestExpiry === 'number' && Number.isFinite(trust.secondsUntilEarliestExpiry)) {
+      const safeSec = Math.max(0, Math.floor(trust.secondsUntilEarliestExpiry));
+      days = Math.floor(safeSec / 86400);
+      hours = Math.floor((safeSec % 86400) / 3600);
+    } else if (typeof trust.earliestCertificateNotAfter === 'string') {
+      const parsed = Date.parse(trust.earliestCertificateNotAfter);
+      if (Number.isFinite(parsed)) {
+        const diffSec = Math.max(0, Math.floor((parsed - Date.now()) / 1000));
+        days = Math.floor(diffSec / 86400);
+        hours = Math.floor((diffSec % 86400) / 3600);
+      }
+    }
+    return {
+      level: 'renewal-window',
+      message: `인증서 갱신 창 (갱신 필요) — 만료까지 ${days}일 ${hours}시간`,
+    };
+  }
+  return null;
+}
 import {
   StorageContribution,
   StorageLocation,
@@ -54,6 +186,7 @@ export interface ResourceExplorerProps {
   initialPlanResult?: DistributedPlanResponse | null;
   initialDiscoveryMessage?: string;
   lastFetchedAt?: Date | null;
+  trust?: ClusterTrustSummary | null;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
@@ -79,10 +212,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialPlanResult,
   initialDiscoveryMessage,
   lastFetchedAt = null,
+  trust = null,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
   const [filterMode, setFilterMode] = useState<'all' | 'schedulable' | 'gpu' | 'observe'>('all');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(nodes[0]?.id || null);
+  const selectedNode = useMemo(() => nodes.find((n) => n.id === selectedNodeId) || nodes[0] || null, [nodes, selectedNodeId]);
 
   // ---------------------------------------------------------------------------
   // 1. Storage State
@@ -659,8 +794,55 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           >
             ● 온라인: {logicalSummary.onlineNodeCount} / {logicalSummary.totalNodeCount} Nodes
           </span>
+          {(() => {
+            const config = getTrustStatusConfig(trust?.state);
+            return (
+              <span
+                data-testid="trust-status-badge"
+                role="status"
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  padding: '4px 10px',
+                  borderRadius: '999px',
+                  backgroundColor: config.bg,
+                  color: config.color,
+                  border: `1px solid ${config.border}`,
+                }}
+              >
+                ● {config.label}
+              </span>
+            );
+          })()}
         </div>
       </div>
+
+      {/* Trust / Certificate Expiry Banner (ACC-09 Compliant Design Tokens Only) */}
+      {(() => {
+        const banner = getTrustBannerInfo(trust);
+        if (!banner) return null;
+        const isExpired = banner.level === 'expired';
+        return (
+          <div
+            role={isExpired ? 'alert' : 'status'}
+            data-testid="trust-expiry-banner"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              backgroundColor: 'var(--color-bg-subtle)',
+              color: isExpired ? 'var(--color-status-offline)' : 'var(--color-status-degraded)',
+              border: `1px solid ${isExpired ? 'var(--color-status-offline)' : 'var(--color-status-degraded)'}`,
+              fontSize: '0.8125rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span aria-hidden="true">{isExpired ? '❌' : '⚠️'}</span>
+            <strong>{banner.message}</strong>
+          </div>
+        );
+      })()}
 
       {/* 2. Top-Level Operational Navigation Tabs */}
       <div
@@ -1154,8 +1336,27 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       </div>
 
                       <div data-testid={`node-card-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                        마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
+                        마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul' }) : '미관측 (Heartbeat Absent)'}
                       </div>
+
+                      {(() => {
+                        const expired = isCertificateExpired(node.certificateNotAfter);
+                        const formatted = formatKstDateTime(node.certificateNotAfter);
+                        return (
+                          <div
+                            data-testid={`node-card-cert-expiry-${node.id}`}
+                            style={{
+                              fontSize: '0.6875rem',
+                              color: expired ? 'var(--color-status-offline)' : 'var(--color-text-muted)',
+                              fontWeight: expired ? 600 : 'normal',
+                              marginTop: '2px',
+                            }}
+                          >
+                            인증서 만료 (KST): {formatted}
+                            {expired && ' (만료됨)'}
+                          </div>
+                        );
+                      })()}
 
                       <div
                         data-testid={`node-utilization-status-${node.id}`}
@@ -2021,6 +2222,23 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   </option>
                 ))}
               </select>
+              {selectedNode && (() => {
+                const expired = isCertificateExpired(selectedNode.certificateNotAfter);
+                const formatted = formatKstDateTime(selectedNode.certificateNotAfter);
+                return (
+                  <span
+                    data-testid="selected-node-cert-expiry"
+                    style={{
+                      fontSize: '0.75rem',
+                      color: expired ? 'var(--color-status-offline)' : 'var(--color-text-muted)',
+                      fontWeight: expired ? 600 : 'normal',
+                    }}
+                  >
+                    인증서 만료 (KST): {formatted}
+                    {expired && ' (만료됨)'}
+                  </span>
+                );
+              })()}
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -2070,7 +2288,27 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <div>하트비트 시퀀스: <strong>#{nodeDetail.node.heartbeatSequence}</strong></div>
                 <div>상태: <strong style={{ color: 'var(--color-status-online)' }}>{nodeDetail.node.status}</strong></div>
                 <div data-testid="node-detail-last-heartbeat">
-                  마지막 하트비트: <strong style={{ color: 'var(--color-brand-primary)' }}>{nodeDetail.node.lastHeartbeatAt ? new Date(nodeDetail.node.lastHeartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}</strong>
+                  마지막 하트비트: <strong style={{ color: 'var(--color-brand-primary)' }}>{nodeDetail.node.lastHeartbeatAt ? new Date(nodeDetail.node.lastHeartbeatAt).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul' }) : '미관측 (Heartbeat Absent)'}</strong>
+                </div>
+                <div data-testid="node-detail-cert-expiry">
+                  {(() => {
+                    const cert = selectedNode?.certificateNotAfter;
+                    const expired = isCertificateExpired(cert);
+                    const formatted = formatKstDateTime(cert);
+                    return (
+                      <>
+                        인증서 만료 (KST):{' '}
+                        <strong
+                          style={{
+                            color: expired ? 'var(--color-status-offline)' : 'var(--color-brand-primary)',
+                          }}
+                        >
+                          {formatted}
+                          {expired && ' (만료됨)'}
+                        </strong>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
