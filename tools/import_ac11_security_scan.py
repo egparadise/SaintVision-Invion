@@ -43,9 +43,9 @@ EMITTED_AXES: tuple[str, ...] = (
 )
 #: The reviewed AC-11 target registry, pinned the same way the accessibility importer pins
 #: it: the aggregator refuses a targetRef whose blob is not the reviewed one.
-REGISTRY_COMMIT = "b1a0fb57488eff3ba6f0d3751b144f70ff6f984a"
+REGISTRY_COMMIT = "2542f6896534f997046cb7dcdcfc98462e97b93e"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "ef956db6ef0a68f93ba80e8ce0c8fa9571dc8fbe"
+REGISTRY_BLOB = "d53b11f8b0e32e70911f30c6c73c24d7ed4e104c"
 TARGET_ID = "s11-security-critical-high-zero-v0"
 #: The four threat reports the aggregator requires for this axis.  Only SEC-SCAN-001 has a
 #: producer in this repository, so an envelope built from the security-scan artifact alone
