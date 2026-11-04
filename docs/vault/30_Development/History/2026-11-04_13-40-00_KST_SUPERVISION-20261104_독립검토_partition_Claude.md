@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T14:05:00+09:00"
+updated: "2026-11-04T15:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -156,11 +156,88 @@ attestation edit, so I based on it to avoid conflicting with it.
 - Results: `check_vf_cl_registry.py` exit 0; `tests/core/test_check_vf_cl_registry.py` 215 passed, exit 0;
   `check_docs` exit 0; `git diff --check` exit 0.
 
+## PR #408 hosted readback (`87cdf206`)
+
+- Core `41777150275` (workflow_dispatch, full history): `tests/core/test_check_vf_cl_registry.py` passed in full,
+  and the owned CX01 steps (create, drill, require, cleanup) all succeeded.
+- Backend `41777076227`: no VF-CL failure.
+- Both runs ended with exactly **1 failed** test. It is not from this delta:
+  `test_import_ac11_security_scan.py::test_the_reviewed_security_allowlist_exactly_describes_this_tree`.
+  - Base `d8af53c2` Backend `41776276009` fails that test and the VF-CL drift, so #408 removes one of the two base
+    failures.
+  - Cause: #405 `38d443b7` moved `tools/run_vf_security_tests.py` from `d9a40a03` to `df9a3f96` without moving the
+    reviewed pin. I reproduced it locally (1 failed) and reported it to the coordinator.
+  - The coordinator then assigned the pin correction to me (section below).
+- Codex root independently accepted `87cdf206` and merged it into candidate `42bc8a10`.
+
+## PR #402 later heads (Codex)
+
+| exact head | verdict | basis |
+|---|---|---|
+| `5933a824` | **changes requested** (one Medium) | Local: 33 passed, 1 skipped (Windows symlink capability). Each mutation is caught: removing the post-renewal certificate check gives 2 failed; moving the latch back before `currentStatus` gives 6 failed; restoring the old lock cleanup gives 1 failed. N1 resolved: my `probe402_latch.py` run 2 now renews after a transient `currentStatus` failure. N2 resolved: unchanged or in-window leaves fail at `post-renewal-certificates` and latch. **Medium (synthetic reproduction):** `probe402_member.py`. CP and node-a are due in 1 day, node-b is already 3 days out, and node-b's leaf is not replaced. The run returns rc 0 `renewed`, because the post-check covers only the aggregate hash and the earliest expiry. The batch contract is all-Node (`lan_pilot.py:2604`), so every member must change. Hosted Backend `41777296911` matched the base's known 42F/9E set, with no `test_scheduled_leaf_renewal` failure. Core `41777296712` was cancelled. Desktop failed on the known Docker API 1.52 `KeyError: 'IPAddress'` (the base lacks #405). |
+| `b5b8ca68` | **source accepted** | The post-check now also requires the identical member key set and that every original member's digest changed. `_leaf_set` serializes byte-identically to `5933`; I checked that on a fixture, so existing latches stay comparable. Local: 35 passed, 1 skipped. My member probe now raises. Removing both new clauses gives 2 failed; removing only the key-set clause fails only the path-drift case. Hosted: Docs `41779908269` and Portal `41779908380` success; Desktop `41779908545` failed with the known `KeyError: 'IPAddress'`; Backend `41779908473` and Core `41779908364` were not finished when this was written. |
+
+Low, still open: `currentStatus` and `runtimePreflight` retries are safe only because the reviewed plan's commands are
+read-only. `_command` does not enforce that. Scheduler registration and r5 live operation are a separate decision. I
+claim no operational acceptance here.
+
+## Freshness inventory (`91efbdbb`, delta over `fe69e300`): source accepted
+
+Scope: only `tools/check_response_freshness.py` and `tests/test_response_freshness.py`.
+- Schema: `core.schema.json` `ProjectNodeCertificateObservationResponse` has `observedAt` as a required `Timestamp`.
+- Source of the value: `node_certificates.py:46` takes it from `SELECT clock_timestamp()`, emits it (`:68`), and
+  derives trust from it (`:31`).
+- Pin and negative case: the expected count 10→11 is pinned by hand, and the parametrized removal case keeps the old
+  `stateAsOf` case.
+- Results: 3 passed; the tool reports 11/11, exit 0. Deleting the new map line makes all 3 tests fail.
+- Still report-only, with no workflow or tool consumer.
+- Not verified by me: the client-side expiry the comment mentions. I will check it at the corrected UI head.
+
+## SEC-VF runner pin correction (branch `agent/claude/s20261104-sec-vf-runner-repin`, base `7a1348c9`)
+
+Reviewer basis: I independently reviewed `925dd669..38d443b7` and accepted it earlier in this page.
+- The runner blob moved only at `38d443b7` (`03e17c31`, `925dd669`: `d9a40a03`; `38d443b7`, `d8af53c2`, `7a1348c9`:
+  `df9a3f96`).
+- What changed: the delta takes the isolated DB host from `NetworkSettings.Networks.bridge.IPAddress`, validates it as
+  IPv4, maps a missing or invalid value to `_HarnessUnavailable`, and adds `--network bridge`.
+- What did not change: node IDs, case identities, the `expectedTests` 6/0/0/0 counts, and skip accounting.
+
+Three commits, following the precedent `c8de43ad` → `b1a0fb57` → `69944d33`:
+1. `20f11b23` (source):
+   - Only `secVf001.runner.blob` moves in the reviewed source.
+   - `write_ac11_security_allowlist.py` regenerates the allowlist: blob `f55d49e3`, canonical `35e89ed2…`.
+   - The aggregator's `ALLOWLIST_BLOB` and canonical digest take the writer's output.
+   - `verifiedAt`, the definer signatures, the RLS dispositions and expiries, the SEC-VF node/case inventory and the
+     workflow pin are untouched.
+2. `2542f689` (evidence): the security target's `sourceDocument` becomes `{commit 20f11b23, blob f55d49e3}`.
+3. `6184961f` (evidence):
+   - Registry blob `d53b11f8` goes into the aggregator and all four importers.
+   - The accessibility and security importers get `REGISTRY_COMMIT 2542f689`.
+   - The security importer blob `231d7b5d` goes into the dependency/SAST allowlist.
+   - The aggregator's `SCAN_ALLOWLIST_BLOB` becomes `b5b4265e`.
+
+No old pin remains, by grep. Verification:
+
+| check | result |
+|---|---|
+| `pytest` on the 14 AC-11/allowlist/threat files | 582 passed, 8 skipped (PG), exit 0 |
+| PG-dependent `test_run_ac11_security_threat_reports.py` + `test_ac11_security_scan.py`, disposable PG 55493 | 46 passed, exit 0 |
+| `write_ac11_security_allowlist.py --check` | exit 0 |
+| Negative: the aggregator `validate_allowlist` on the old allowlist | refused ("does not match the reviewed content") |
+| Negative: the old output under `--check` | exit 2 |
+| Negative: the old output under the pin test | 1 failed |
+| Old → new difference | only `secVf001.runner` |
+
+Envelopes produced against the old allowlist will not be admissible, by design; none was promoted.
+
 ## State boundaries
 
-- Implemented and locally verified: the partition fixture and the VF-CL landed-tree re-record.
-- CI, independent review (Codex), and operational acceptance for this branch are pending.
+- Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
+  correction.
+- Independent review: root accepted `5dd3f83b`, `f42c4259` and `87cdf206`. The SEC-VF pin correction is waiting for
+  root review.
+- Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next owner: Codex independently reviews the VF-CL provenance branch, and the coordinator integrates it. Hosted Core
-  at that head is the CI confirmation still pending.
+- Next first action: Codex root reviews `agent/claude/s20261104-sec-vf-runner-repin` at its exact head. The
+  coordinator integrates it and then runs the full hosted CI that it deferred until this blocker was fixed.
