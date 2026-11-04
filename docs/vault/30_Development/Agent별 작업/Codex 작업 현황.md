@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.341"
+version: "1.0.342"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T13:06:28+09:00"
+updated: "2026-11-04T13:33:38+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Three workers are live; isolated train78 candidate includes prior audit; Docker API152 harness regression reproduced and locally fixed (48 passing cases), while independent review and hosted execution remain pending"
-active_card_next: "Publish and independently review the harness fix; bind exact-SHA CI; close PR401 caller/contract and PR402 failure-state findings, then reconcile reviewed delivery and real operational prerequisites"
+active_card_status: "Docker harness delta accepted by Claude and hosted browser green; project Node certificate API has 6 actual PG/HTTP, 13 backend contract, and 14 frontend contract passes; product caller wiring and final review/CI remain pending"
+active_card_next: "Publish the canonical observation contract for Gemini caller integration and Claude review; combine corrected scheduler, registry provenance, partition fixtures, and truthful current-state docs, then run final same-SHA CI and Obsidian delivery"
 ---
+
+## 2026-11-04 Project Node certificate observation contract
+
+- Owner Codex / reviewer Claude pending / UI owner Gemini. Base `38d443b7e041b379a2d53b75b65c0d9e9e26bb25` + enumerated contract/API/fixture/adapter changes in the isolated integration checkout.
+- New authenticated `GET /v1/projects/{project}/node-certificates` reads existing current-epoch channel metadata with project grant/RLS and no private material. Missing/disabled/empty/truncated observations stay unknown; response carries project identity, DB observedAt, and no-store caching.
+- Actual isolated PostgreSQL/HTTP 6 passed, direct exit 0, owned container removed; backend contract 13 and frontend shared-fixture 14 passed. Contract/serving/route aggregate 63 includes the 13 and is not added twice. Initial 5 setup errors and 3 CAS fixture failures are preserved separately.
+- Browser harness source delta at `38d443b7` is accepted by Claude; reported hosted Desktop Browser `41771833216`, Frontend `41771833195`, Docs `41771833277` are successful. Backend/final combined source are still separate.
+- Current local Docker observation is Engine 20.10.22 / API 1.41; do not inherit a historical Node-5 acceptance claim. Remaining physical identities, IdP/DNS readiness and r4 expiry stay explicit.
+- Next: publish contract/generated types/adapter to Gemini, obtain Claude exact-head review, integrate owner fixes, and bind final CI/sync. [[2026-11-04_Project_Node_인증서_관측_계약_Codex]].
 
 ## 2026-11-04 Docker API152 browser harness repair
 

@@ -7326,6 +7326,135 @@
         "currentAvailability",
         "requiresExecutionRevalidation"
       ]
+    },
+    "NodeCertificateObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "certificateNotAfter",
+        "channelEnabled"
+      ],
+      "properties": {
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "certificateNotAfter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "channelEnabled": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NodeCertificateTrustSummary": {
+      "description": "Public Node channel certificate observation only, not Control Plane trust, scheduler registration, or operational acceptance. A two-day renewal window is advisory.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "earliestCertificateNotAfter",
+        "renewalWindowStartsAt",
+        "secondsUntilEarliestExpiry"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "ok",
+            "renewal-window",
+            "expired",
+            "unknown"
+          ]
+        },
+        "earliestCertificateNotAfter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "renewalWindowStartsAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secondsUntilEarliestExpiry": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ProjectNodeCertificateObservationResponse": {
+      "description": "Authenticated project-scoped read model over current-epoch Node channels. Missing, disabled, or truncated observations produce unknown. observedAt is the database observation clock.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "scope",
+        "projectId",
+        "observedAt",
+        "complete",
+        "items",
+        "trust"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "scope": {
+          "type": "string",
+          "const": "project-node-certificates"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/NodeCertificateObservation"
+          }
+        },
+        "trust": {
+          "$ref": "#/$defs/NodeCertificateTrustSummary"
+        }
+      }
     }
   },
   "oneOf": [
