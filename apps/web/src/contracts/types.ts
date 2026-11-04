@@ -87,12 +87,13 @@ export interface NodeItem {
 
 export type ClusterTrustState = 'ok' | 'renewal-window' | 'expired' | 'unknown';
 
-export interface ClusterTrustSummary {
-  earliestCertificateNotAfter: string | null;
-  renewalWindowStartsAt: string | null;
-  secondsUntilEarliestExpiry: number | null;
-  state: ClusterTrustState;
-}
+export type ClusterTrustSummary = import('./node-certificate-observation').NodeCertificateTrustSummary;
+export type ProjectNodeCertificateItem = import('./node-certificate-observation').NodeCertificateObservation;
+export type {
+  ProjectNodeCertificateObservationResponse,
+  NodeCertificateObservation,
+  NodeCertificateTrustSummary,
+} from './node-certificate-observation';
 
 export interface ProjectItem {
   id: string; // prj_...

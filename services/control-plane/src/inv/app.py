@@ -719,6 +719,15 @@ def create_app(
     def nodes(project: str, identity=Depends(authenticated)):
         return control.nodes(identity.principal, project)
 
+    @api.get("/v1/projects/{project}/node-certificates")
+    def node_certificates(project: str, identity=Depends(authenticated)):
+        from .node_certificates import serve
+
+        return JSONResponse(
+            serve(control, identity.principal, project),
+            headers={"Cache-Control": "no-store"},
+        )
+
     @api.get("/v1/projects/{project}/nodes/{node_id}/resource-usage")
     def node_resource_usage(project: str, node_id: str, identity=Depends(authenticated)):
         from .node_resource_usage import serve

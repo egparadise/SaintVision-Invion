@@ -1,15 +1,103 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.337"
+version: "1.0.342"
 status: "review"
 author: "Codex"
-updated: "2026-10-27T13:43:13+09:00"
+updated: "2026-11-04T13:33:38+09:00"
 source_of_truth: "Git"
-active_card: "CARD-299 standalone leaf-runtime guard coverage"
-active_card_status: "PR #399 is approved by Claude at abeed2d2 (hosted Backend 3.12 killed 26/26 mutants) and is in merge train 78 with the approved r4 acceptance record #398; r4 is live with both Nodes online"
-active_card_next: "Codex verifies train 78; the r4 automatic renewal window opens 2026-10-31 12:32:25 KST under the operator's standing approval"
+active_card: "SUPERVISION-20261104 overall delivery supervision"
+active_card_status: "Docker harness delta accepted by Claude and hosted browser green; project Node certificate API has 6 actual PG/HTTP, 13 backend contract, and 14 frontend contract passes; product caller wiring and final review/CI remain pending"
+active_card_next: "Publish the canonical observation contract for Gemini caller integration and Claude review; combine corrected scheduler, registry provenance, partition fixtures, and truthful current-state docs, then run final same-SHA CI and Obsidian delivery"
 ---
+
+## 2026-11-04 Project Node certificate observation contract
+
+- Owner Codex / reviewer Claude pending / UI owner Gemini. Base `38d443b7e041b379a2d53b75b65c0d9e9e26bb25` + enumerated contract/API/fixture/adapter changes in the isolated integration checkout.
+- New authenticated `GET /v1/projects/{project}/node-certificates` reads existing current-epoch channel metadata with project grant/RLS and no private material. Missing/disabled/empty/truncated observations stay unknown; response carries project identity, DB observedAt, and no-store caching.
+- Actual isolated PostgreSQL/HTTP 6 passed, direct exit 0, owned container removed; backend contract 13 and frontend shared-fixture 14 passed. Contract/serving/route aggregate 63 includes the 13 and is not added twice. Initial 5 setup errors and 3 CAS fixture failures are preserved separately.
+- Browser harness source delta at `38d443b7` is accepted by Claude; reported hosted Desktop Browser `41771833216`, Frontend `41771833195`, Docs `41771833277` are successful. Backend/final combined source are still separate.
+- Current local Docker observation is Engine 20.10.22 / API 1.41; do not inherit a historical Node-5 acceptance claim. Remaining physical identities, IdP/DNS readiness and r4 expiry stay explicit.
+- Next: publish contract/generated types/adapter to Gemini, obtain Claude exact-head review, integrate owner fixes, and bind final CI/sync. [[2026-11-04_Project_Node_인증서_관측_계약_Codex]].
+
+## 2026-11-04 Docker API152 browser harness repair
+
+- Candidate checkout `D:/Project/SaintVisionI-Invion/supervision-integration-20261104`, branch `agent/codex/supervision-integration-20261104`, base `925dd669ba87f3067fe8f17f102eb5a804c4b1d9`; owner Codex, reviewer Claude pending.
+- Read actual Desktop Browser failure job `126376855159`; regression exit 1 confirmed stale container-wide IP selection. The runner now pins and reads the declared bridge IPv4 endpoint and records unavailable endpoints as not-run exit 125.
+- CPython 3.14.7 focused `test_vf_evidence.py` + `test_docker_diag.py`: 48 passed / 0 failures/errors/skips, exit 0; git whitespace check exit 0. Actual Linux Docker/browser execution and independent review are pending.
+- Claude source verdicts: #402 changes requested (symlink fixture and cross-run failure handling), #401 changes requested (unreachable UI and unknown-state/copy/type gaps). Owner corrections were actually delivered through the supervised Run. Codex worker accepted #400 within its Node-leaf-only scope and requested a current-state correction to #403.
+- Next: exact-SHA CI and reviewer verdict for this fix; implement canonical certificate observation for frontend product wiring; preserve expired r4 while preparing supported isolated recovery. See [[2026-11-04_Docker_API152_브라우저_검증기_수정_Codex]].
+
+## 2026-11-04 전체 개발 자동감독 착수
+
+- User authorized continuing the overall audit and remaining project work without repeated routine approval; the runtime now reports full access and approval policy never.
+- Base `a44d578a0096003aba8dccbfd4447f5fbcc46934`, branch `agent/codex/c301-standalone-worker-modules`; three existing dirty documentation paths are preserved.
+- `git fetch origin` exited 0; remote integration and fetched ref both identify `03e17c31cf535008d39534aaa80d3ae274bd75cc`. Historical claims that train 78 remains unlanded require reconciliation against this direct observation.
+- Supervised Orca Run `run_e57ecd84a7bc` has three separate-workspace ready receipts: Claude `ctx_0bdc8c734c3f`, Gemini/Antigravity `ctx_afac04406137`, Codex `ctx_78f45e976cf3`. Each worker-start exited 0; independent verdicts, exact-head CI, live recovery, and operational acceptance remain pending results.
+- Delivery branch `agent/codex/supervision-20261104`, kickoff commit `a954a270d65fa7e456c69e3061a455b51a7f64eb`, push exit 0, draft PR #404. An abandoned empty index lock was preserved after age/process/exclusive-open checks; the failed first stage was not called PASS.
+- Next owner Codex coordinator: resume automatically on Orca worker reports, receive evidence, resolve review findings, and continue integration/reporting. Canonical task count remains 2 done / 4 blocked / 42 planned / 0 ready. Obsidian apply waits for reconciliation with the newest combined source.
+- History: [[2026-11-04_전체개발_자동감독_착수_Codex]].
+
+## 2026-10-29 VF-CL-04 attested CI closure and AC-11 CI repair
+
+- Source head attested: `ad0132b35d7216552bbe929730562819af15e3bd`; evidence/test commit:
+  `751ea725c8353fe8df4982c0459321d57f53bb89`.
+- Workflow `S12 Acceptance Evidence` run `40633895766` succeeded. The tracked receipt and
+  Sigstore bundle bind repository, workflow, branch, exact head, run, artifact, and receipt bytes.
+  Independent local verification returned `VERIFIED` before the files were committed.
+- `VF-CL-04.ciVerified` is now true only for hosted CI derivation. `operationallyAccepted=false`,
+  `acceptedCards=0`, and the 48-task weighted score are intentionally unchanged.
+- Required Backend run `40632341602` and Core run `40632341610` each failed only because the
+  positive AC-11 fixture expired at `2026-10-28T04:00:00Z`. The valid fixture now expires in 2099;
+  explicit `expired=true` and `NOW-1 second` rejection cases remain unchanged.
+- Local evidence: VF-CL checker suite 215 passed; AC-11 importer suite 19 passed; registry
+  re-derivation exited 0. Claude independently approved with zero blocking findings. Orca
+  recomputed VF-CL CI maturity as 4/5 = 80% and preserved all product-progress numbers.
+- The Frontend integrity gate scanned 93 files with zero violations but its final Unicode symbol
+  raised `UnicodeEncodeError` on the default Windows CP949 console. Output is now ASCII-only;
+  the ordinary scan and the nine-rule negative control both exit 0 without environment overrides.
+- Canonical product state remains `done 2 / blocked 4 / planned 42 / ready 0`; strict completion
+  `2/48 = 4.17%`; landed `3,425/4,800 = 71.35%`; candidate `3,475/4,800 = 72.40%`.
+- Same-SHA hosted closure at `a44d578a0096003aba8dccbfd4447f5fbcc46934`: Backend
+  `40825208747`, Core `40825208800`, Docs `40825208769`, Frontend `40825208768`, Desktop
+  `40825208796`, and Portal `40825208817` all completed successfully. Dispatch-only acceptance
+  lanes skipped on `pull_request` as designed and are not counted as passing evidence.
+- History: [[2026-10-29_14-21-59_KST_VF-CL-04_attestation_CI수정_Codex]].
+
+## 2026-10-28 Registry dependency-state canonicalization
+
+- Base SHA: `6e1c4a365b1d4df3b3e3ba793b6e1f9eb162b401`; registry version `1.0.1`.
+- `S01-BE` and `S01-ST` are `blocked` on explicit user/live inputs. `S02-FE` and `S02-DB`
+  are `blocked` on the unfinished S01 chain. Sixteen downstream FE/DB rows whose prerequisites
+  are unfinished are corrected from `review` to `planned`.
+- Existing implementation, test, CI, History, and 75%-class slice evidence is preserved. This is
+  a canonical state correction, not a loss of implemented work and not a strict completion claim.
+- `check_docs.py` now rejects `ready`, `in_progress`, `review`, or `done` when any declared
+  prerequisite is not `done`; `planned` and `blocked` remain legal waiting states.
+- Gemini's zero-warning ESLint 10 flat configuration passed independent diff review, and Codex
+  wired `npm run lint` into the required Frontend CI job after dependency installation.
+- Targeted validation: 12 tests passed; documentation gate and fresh ontology graph-equivalence
+  gate each exited 0. Generated ontology artifacts were refreshed from the corrected registry.
+- Current canonical count: `done 2`, `blocked 4`, `planned 42`; strict completion remains
+  `2/48 = 4.17%`. Weighted evidence remains 71.35% landed / 72.40% candidate pending a new Orca
+  integration measurement.
+- History: [[2026-10-28_13-20-11_KST_작업상태_선행조건_정본화_Codex]].
+
+## 2026-10-28 Card 301 exact-head review and all-Agent continuation
+
+- Branch/HEAD: `agent/codex/c301-standalone-worker-modules` /
+  `f2936ae5e91787b3dbba0d069a85ccaef020c984`; PR #397 head and five reviewed file hashes match.
+- Claude independent verdict: **accepted**. Same-SHA Backend run `39264782855` passed on
+  Python 3.12 and 3.14; Core `39264782887`, Docs `39264783082`, and Desktop Browser
+  `39264783012` passed. Untriggered/skipped evidence lanes are not counted.
+- Codex direct exact-checkout focused suite: **19 passed**, exit 0. Documentation, Ontology, and
+  Obsidian read-only check each exited 0; sync reported 2,072 managed, 5 pending, 0 conflicts.
+- Gemini's code-free Frontend baseline is green at 99 files/1,157 tests plus typecheck/build,
+  bindings, integrity, and route coverage. This is not live API/browser or five-Node acceptance.
+- Orca's latest verified score remains landed 71.35%, candidate 72.40%, strict done 4.17%; no
+  score is inferred from this documentation cycle. Live rollback/rotation remains outside this
+  card and requires separate authority.
+- History: [[2026-10-28_12-55-23_KST_전체_Agent_연속실행_재개_Codex]].
 
 ## 2026-10-27 Fresh isolated r4 LAN pilot live acceptance
 

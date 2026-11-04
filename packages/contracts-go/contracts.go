@@ -1564,3 +1564,26 @@ type ModelCommitObservation struct {
     CurrentAvailability string `json:"currentAvailability"`
     RequiresExecutionRevalidation bool `json:"requiresExecutionRevalidation"`
 }
+
+type NodeCertificateObservation struct {
+    NodeId NodeId `json:"nodeId"`
+    CertificateNotAfter *Timestamp `json:"certificateNotAfter"`
+    ChannelEnabled *bool `json:"channelEnabled"`
+}
+
+type NodeCertificateTrustSummary struct {
+    State string `json:"state"`
+    EarliestCertificateNotAfter *Timestamp `json:"earliestCertificateNotAfter"`
+    RenewalWindowStartsAt *Timestamp `json:"renewalWindowStartsAt"`
+    SecondsUntilEarliestExpiry *int64 `json:"secondsUntilEarliestExpiry"`
+}
+
+type ProjectNodeCertificateObservationResponse struct {
+    Source string `json:"source"`
+    Scope string `json:"scope"`
+    ProjectId ProjectId `json:"projectId"`
+    ObservedAt Timestamp `json:"observedAt"`
+    Complete bool `json:"complete"`
+    Items []NodeCertificateObservation `json:"items"`
+    Trust NodeCertificateTrustSummary `json:"trust"`
+}

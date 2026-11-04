@@ -23,7 +23,13 @@ def harness(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, 'dependents', lambda: [])
     monkeypatch.setenv('VF_EVIDENCE_PREFIX', 'same-prefix')
     monkeypatch.setattr(sys, 'argv', ['runner', 'tests/synthetic.py'])
-    state = {'calls': [], 'xml': PASS, 'rc': 0}
+    state = {
+        'calls': [], 'xml': PASS, 'rc': 0, 'childCalls': 0,
+        'networkSettings': {
+            'Ports': {'5432/tcp': [{'HostPort': '1'}]},
+            'Networks': {'bridge': {'IPAddress': '127.0.0.1'}},
+        },
+    }
 
     class Connection:
         def __enter__(self): return self
@@ -36,12 +42,14 @@ def harness(tmp_path, monkeypatch):
             state['name'] = args[args.index('--name') + 1]
             out = 'owned-container-id'
         elif args[1] == 'inspect' and '--format' not in args:
-            out = json.dumps([{'NetworkSettings': {'Ports': {'5432/tcp': [{'HostPort': '1'}]}, 'IPAddress': '127.0.0.1'}}])
+            out = json.dumps([{'NetworkSettings': state['networkSettings']}])
         elif args[1] == 'inspect': out = state['name']
         else: out = 'ok'
         return subprocess.CompletedProcess(args, 0, out, '')
 
     def child(args, **kwargs):
+        state['childCalls'] += 1
+        state['childEnv'] = kwargs['env']
         xml = Path(next(a.split('=', 1)[1] for a in args if a.startswith('--junitxml=')))
         if state['xml'] is not None: xml.write_text(state['xml'])
         if state['rc'] == 124: raise subprocess.TimeoutExpired(args, 1800)
@@ -58,6 +66,44 @@ def harness(tmp_path, monkeypatch):
         assert proof['exitCode'] == code
         return code, proof
     return state, invoke, tmp_path
+
+
+@pytest.mark.parametrize('legacy_address', [None, '10.20.30.98'])
+def test_runner_reads_the_declared_bridge_endpoint_from_modern_inspect(harness, legacy_address):
+    state, invoke, _ = harness
+    state['networkSettings']['Networks'] = {
+        'unrelated': {'IPAddress': '10.20.30.99'},
+        'bridge': {'IPAddress': '172.17.0.12'},
+    }
+    # The deprecated container-wide value is stale and must have no authority.
+    if legacy_address is not None:
+        state['networkSettings']['IPAddress'] = legacy_address
+    code, proof = invoke()
+    assert code == 0 and proof['evidenceStatus'] == 'complete'
+    assert state['childEnv']['INV_CONTAINER_TEST_DB_HOST'] == '172.17.0.12'
+    created = next(call for call in state['calls'] if call[1] == 'run')
+    assert created[created.index('--network') + 1] == 'bridge'
+
+
+@pytest.mark.parametrize('networks', [
+    None, [], {}, {'unrelated': {'IPAddress': '172.17.0.12'}},
+    {'bridge': None}, {'bridge': {}}, {'bridge': {'IPAddress': ''}},
+    {'bridge': {'IPAddress': 123}}, {'bridge': {'IPAddress': 'private-hostname'}},
+    {'bridge': {'IPAddress': '::1'}}, {'bridge': {'IPAddress': '0.0.0.0'}},
+    {'bridge': {'IPAddress': '224.0.0.1'}},
+])
+def test_unusable_bridge_metadata_cannot_start_tests_or_claim_acceptance(harness, networks):
+    state, invoke, root = harness
+    state['networkSettings']['Networks'] = networks
+    # No fallback to a legacy value or an unrelated network is permitted.
+    state['networkSettings']['IPAddress'] = '172.17.0.12'
+    code, proof = invoke()
+    assert code == 125 and proof['subprocessExitCode'] is None
+    assert proof['evidenceStatus'] == 'not-run' and 'tests' not in proof
+    assert proof['operationalAcceptance'] is False
+    assert state['childCalls'] == 0
+    assert proof['isolatedContainerRemoved']
+    assert not (root / proof['xmlPath']).exists()
 
 
 @pytest.mark.parametrize('xml,rc,status,exit_code', [

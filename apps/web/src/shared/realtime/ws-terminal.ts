@@ -44,7 +44,7 @@ export class WsTerminalClient {
       // First frame MUST be { ticket } authentication frame
       try {
         this.ws?.send(JSON.stringify({ ticket: oneTimeTicket }));
-      } catch (err) {
+      } catch {
         this.onStatus('error');
         return;
       }

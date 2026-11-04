@@ -1562,3 +1562,26 @@ export interface ModelCommitObservation {
   currentAvailability: "unknown";
   requiresExecutionRevalidation: true;
 }
+
+export interface NodeCertificateObservation {
+  nodeId: NodeId;
+  certificateNotAfter: (Timestamp | null);
+  channelEnabled: (boolean | null);
+}
+
+export interface NodeCertificateTrustSummary {
+  state: "ok" | "renewal-window" | "expired" | "unknown";
+  earliestCertificateNotAfter: (Timestamp | null);
+  renewalWindowStartsAt: (Timestamp | null);
+  secondsUntilEarliestExpiry: (number | null);
+}
+
+export interface ProjectNodeCertificateObservationResponse {
+  source: "execution-kernel";
+  scope: "project-node-certificates";
+  projectId: ProjectId;
+  observedAt: Timestamp;
+  complete: boolean;
+  items: Array<NodeCertificateObservation>;
+  trust: NodeCertificateTrustSummary;
+}
