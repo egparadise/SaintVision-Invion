@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-20261104-PROJECT-NODE-CERTIFICATES-CODEX"
 title: "2026-11-04 Project Node 인증서 관측 계약 Codex"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T13:33:38+09:00"
+updated: "2026-11-04T13:52:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -45,6 +45,16 @@ source_of_truth: "Git"
 - microsecond verifier 변경 뒤 `npm --prefix apps/web run build`(TypeScript + Vite), `npm --prefix apps/web run lint`는 각각 직접 exit 0이다. 문서(1182 versioned pages), ontology, single-source ratchet(19 baseline pairs·새 중복 0), sync check(2090 managed·10 pending·0 conflicts·쓰기 0), whitespace gate도 각각 직접 exit 0이다. 최종 같은-SHA hosted CI와 reviewer 판정은 후속 delivery 기록에 결속한다.
 
 ## 실제 한계와 다음 담당
+
+### 13:52 KST 독립 검토와 배포 컨테이너 보강
+
+Claude는 `38d443b7..e97701bf`의 backend 계약과 microsecond verifier 의미를 독립 검토했고, 실제 PG/contract 19 passed와 frontend 14 passed를 보고했다. 다만 hosted Frontend `41774468131`의 Portal Container job에서 canonical root schema가 build context에 없어 TS2307로 실패했으므로 전체 delta 판정은 changes requested였다.
+
+Codex는 `deploy/intranet/portal/Dockerfile`에 정본 schema **한 파일** COPY와 해당 Dockerfile 전용 ignore의 좁은 예외만 추가했다. 별도 schema 사본이나 public API 우회는 만들지 않았다. `5a980dba` + 이 두 수정의 dirty input에서 `DOCKER_BUILDKIT=1 docker build -f deploy/intranet/portal/Dockerfile -t saintvision-portal:supervision-20261104 .`를 실제 Linux daemon으로 실행해 **exit 0**을 확인했다. 이미지 config ID는 `sha256:3362916180a716666969b3ae4af83932bdadc8391323caaa19cf2f685e235301`, 로그는 `.work/portal-schema-context-build.log`다. Container 내부 Node 22의 `npm ci`, TypeScript와 Vite 빌드가 실행됐다. 독립 재검토와 수정 SHA의 hosted job은 아직 별도다.
+
+같은 감독 과정에서 Codex root는 Claude 소유 PR #407 `5dd3f83b`의 fixture-only 월 구간 보강과 PR #403 `f42c4259`의 현재형 정정을 검토해 수락했다. 전자는 Claude의 115 actual-PG 통과 및 revert 실패 증거와 함께 판단했고, 후자는 11:04 기록을 보존하면서 12:08 착지를 명시한 정정만 수락했다. 점수나 운영 인수를 승격하지 않았다. 다음 행동은 이 source들을 격리 후보에 합치고 Gemini의 실제 caller 및 scheduler/provenance 수정까지 같은 최종 SHA로 검증하는 것이다.
+
+`python -m pytest -q tests/test_intranet_portal_deploy.py`는 같은 수정에서 **71 passed**, 106.50초, 직접 exit 0이다. 이미지 빌드와 배포 검증의 성공을 기존 운영 Portal의 재배포로 해석하지 않는다.
 
 이 결과는 실제 개발용 PG/HTTP 검증과 synthetic wire 변이의 증거다. 외부 IdP 운영 인수, 제품 브라우저와 이 API의 실제 연결, 5대 PC 인수, CP 신뢰·scheduler 등록은 별도다. 원래 48-task done을 승격하지 않는다.
 

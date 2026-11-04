@@ -11,6 +11,8 @@ WORKDIR /workspace
 
 # Copy shared monorepo packages needed for type resolution
 COPY packages/contracts-ts/ ./packages/contracts-ts/
+# The runtime API validator imports the canonical JSON schema from this path.
+COPY contracts/v1alpha1/core.schema.json ./contracts/v1alpha1/core.schema.json
 
 # Install web dependencies
 COPY apps/web/package*.json ./apps/web/

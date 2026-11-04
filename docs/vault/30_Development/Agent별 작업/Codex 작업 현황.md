@@ -1,15 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.342"
+version: "1.0.343"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T13:33:38+09:00"
+updated: "2026-11-04T13:52:06+09:00"
 source_of_truth: "Git"
 active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Docker harness delta accepted by Claude and hosted browser green; project Node certificate API has 6 actual PG/HTTP, 13 backend contract, and 14 frontend contract passes; product caller wiring and final review/CI remain pending"
+active_card_status: "Claude accepted Node-certificate backend semantics and found a portal schema context failure; corrected actual Docker/Node22 build exits 0; PR400 integrated, PR407 fixture and PR403 current-state correction independently accepted, final caller/review/CI still pending"
 active_card_next: "Publish the canonical observation contract for Gemini caller integration and Claude review; combine corrected scheduler, registry provenance, partition fixtures, and truthful current-state docs, then run final same-SHA CI and Obsidian delivery"
 ---
+
+## 2026-11-04 13:52 KST portal build and owner review checkpoint
+
+- Worked: canonical schema included in both portal COPY and dedicated build-ignore; no duplicated contract. Source input `5a980dba` plus those two files; actual Docker/Node22 image build exit 0, config `sha256:3362916180a716666969b3ae4af83932bdadc8391323caaa19cf2f685e235301`.
+- Checked: Claude accepted backend/adapter semantics at `e97701bf`, but requested portal fix from hosted `41774468131`; local repair does not imply hosted acceptance. Root independently accepted Claude PR407 `5dd3f83b` fixture-only delta and PR403 `f42c4259` correction-only delta, relying on explicitly attributed actual-PG evidence.
+- Next: root integrates those accepted sources after checkpoint, obtains fix review and final hosted CI; Gemini owns product caller; Claude owns scheduler/r5 review and VF-CL provenance. Optional provider autocompact menu was selected without changing project approval or sandbox permissions; task instructions remained in supervised messages.
+- Evidence: [[2026-11-04_Project_Node_인증서_관측_계약_Codex]] and [[2026-11-04_Node_인증서_관측_검증_오류와해결]].
 
 ## 2026-11-04 Project Node certificate observation contract
 

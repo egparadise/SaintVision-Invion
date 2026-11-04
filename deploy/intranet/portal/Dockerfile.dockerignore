@@ -5,6 +5,9 @@
 !apps/web/**
 !packages/contracts-ts/
 !packages/contracts-ts/**
+!contracts/
+!contracts/v1alpha1/
+!contracts/v1alpha1/core.schema.json
 !deploy/intranet/portal/
 !deploy/intranet/portal/**
 apps/web/node_modules/
