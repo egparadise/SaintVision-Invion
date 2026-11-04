@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.18.0"
+version: "1.19.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T20:35:00+09:00"
+updated: "2026-11-04T20:53:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1168,6 +1168,55 @@ Low (non-blocking):
 Scope: current-user supervised development pilot only. S4U stays denied and operational acceptance stays false until
 a slot actually runs and is measured.
 
+## Final aggregate report `d720a453` review (task `task_6b1dddd88219`): ACCEPTED, one evidence-wording Low
+
+Scope:
+- Read-only, at 20:4x–20:53 KST, on `agent/codex/supervision-delivery-report-20261104` at `d720a453`
+  (fetched).
+- No runtime action and no test repetition.
+- The live automations were read only with `orca automations show/runs`.
+
+What I checked:
+- **Change scope:**
+  - `d720a453` changes 10 paths: the parent History, the Index, the Claude/Codex/Orca boards and five sanitized
+    Evidence JSONs.
+  - Everything since `5ac8e315` is under `docs/`.
+  - Both registries are unchanged in this commit.
+  - The added lines contain no SID, local username, LAN IP, node ID, email, token or key material.
+- **Facts match what I verified:**
+  - Transition `20261104T104550Z-a906a2b3fc0a`: 19.203 s, exit 0, only the observer pair 34380/33812 → 49276/11276
+    replaced, the other helper PIDs kept, and no Cycle, ObserverRecovery, retry or kill. It says this is one sample,
+    not a worst-case bound.
+  - M1b: `acf8b4f6`, 62 passed / 0 skipped / exit 0.
+  - Release: params `d46ddd2a` and receipt bound to `59f0a3c2` with 8 workflows and 12 jobs.
+  - Schedules: three enabled future 2026 slots (11-08 14:20, 11-09 12:15, 11-10 08:00 KST) with the exact IDs.
+  - Attribution to me is correct: `43907495` (exact-plan acceptance), `c24c29ee` (measurement and M1b) and
+    `777d8386` (binding and enabled readback).
+- **Preserved boundaries:**
+  - original 48 tasks, read from `docs/task-registry.json` at `d720a453`: 2 done, 4 blocked, 42 planned, 0 ready;
+  - VF-CL `acceptedCards` 0 of 5 (registry 1.6.6);
+  - AC-11 aggregate `INVALID_RUN` with `done` false;
+  - S4U `0x80070005` denied;
+  - production and five-node acceptance incomplete; operational acceptance false.
+- **Root's post-review prompt clarification:** my live readback at 20:4x KST.
+  - Each new prompt is the old prompt (`ab9090fa`, `00cc1555`, `84ebf7ce`, equal to my `777d8386` readback) plus one
+    appended "Final coordinator clarification" paragraph. New hashes: `501aecb1`, `60c59f67`, `fe1a2e66`.
+  - Precheck and every other field are byte-identical; all three are enabled with no runs.
+  - The paragraph names the `.ready` disable file, replaces only argv[0] with the fixed Orca executable, reads back
+    `enabled=false`, keeps the claim and history, and uses only the internal status handoff.
+  - The report attributes this paragraph to root and says it is not part of `777d8386`'s review scope. That is
+    accurate.
+
+Low (wording only):
+- The report says root reproduced the health check "in two samples over 20 s at 20:20 KST".
+- The published `r5-root-post-transition-health.json` records `startedAt` 11:20:19.07Z and `observedAt`
+  11:20:19.28Z, a 0.21 s span. It has the booleans `sameMembersAcrossSamples` and `allSnapshotsAdvanced`, but no
+  sample count, interval or per-sample timestamps.
+- Either add the sample timestamps to the JSON or drop "20 s / 2 samples" from the text. It does not change any
+  verdict.
+
+Verdict: the final aggregate report is ACCEPTED, with no overstatement.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -1183,9 +1232,9 @@ a slot actually runs and is measured.
   - Root merges `38a1bede` into the new final integration workspace, freezes the next source, and reads back the
     hosted AC-11 rehearsal on `ubuntu-24.04`.
   - Root lands `59f0a3c2` (keeping the `eff93191` FAILED record) and runs all 8 workflows at the exact landed head.
-  - The three automations are enabled and confirmed. The next real event is the primary slot on 2026-11-08 at 14:20
-    KST. After any claim, the operator disables all three and sends the internal status. Root then finishes the final
-    docs; core finishes the public seal.
+  - Final report `d720a453` is accepted. Root runs the final Docs CI and Obsidian export (0 pending) and delivers. The
+    next real event is the primary slot on 2026-11-08 at 14:20 KST. After any claim, the operator disables all three
+    automations and sends the internal status, then Claude independently reviews the actual result.
   - The Nov 8 cycle is a root-released, supervised attended Orca run of the sealed command.
   - S4U run context (C1) remains open.
   - Operational acceptance stays unmeasured.
