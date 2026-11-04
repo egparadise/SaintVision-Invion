@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.6.0"
+version: "1.7.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T16:33:00+09:00"
+updated: "2026-11-04T17:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -458,6 +458,63 @@ records the measured time, 15:58 KST.
     - persistence is re-measured after the restoring worker sends `worker_done` and its terminal is reopened.
   - Persistence is not measured yet.
 
+## VF-CL-04 landed attestation, r5 C1–C4 delta, and the AC-11 PostgreSQL 16 client fix
+
+### VF-CL-04 attestation recording (report worktree, four data files): accepted, one required text fix
+
+- What I checked independently:
+  - Run 41792498330: `workflow_dispatch` on `integration/all-agents-unified` at `fd1530d9`, success.
+  - Its artifact id, digest and expiry equal the recorded fields.
+  - I downloaded the artifacts myself. The receipt and bundle are byte-identical to the recorded files.
+  - The verifier returns `VERIFIED` at `fd1530d9`; the old head `ad0132b3` is refused with exit 2.
+  - The registry checker exits 0 with `acceptedCards` 0.
+- Required fix: the card's `ciVerifiedNote` still named the old run and head. Root is correcting it.
+
+### r5 C1–C4 delta (manifest `af73684d`, 17 inputs re-hashed): C2, C3 and C4 accepted, one new release condition
+
+- **Guard suite:** 27 passed.
+- **C2:** the IdP path guards check every directory from the trusted root to the scope. Only the exact immediate
+  `backups` directory may be created, and it is re-checked after creation.
+- **C3:**
+  - every `lan_pilot` gate runs with `-E`;
+  - the gate wrapper's children run without `PYTHONPATH`/`PYTHONHOME`;
+  - status runs with `-E`.
+- **C4:** node 2 pins `bash` and Python 3.12, and runs the real worker preflight after preparation.
+- **New condition (Medium):**
+  - The attended transition relaunches the helpers with plain `Start-Process`, so they inherit the caller's job.
+  - Before the first attended cycle, it must run from a context proven to be outside any job, or check
+    `IsProcessInJob` on every new helper root.
+- **Residual:** the scheduled `transition` gate still pins the old script. That path is not released.
+
+### AC-11 migration rehearsal: PostgreSQL 16 client fix (branch `agent/claude/ac11-pg16-client-20261104` @ `38a1bede`)
+
+- **Cause, measured:**
+  - The failing run 41793552539 used the `ubuntu-26.04` image (PostgreSQL 18.6 client).
+  - The last green run, 37093057306, used `ubuntu-24.04` (PostgreSQL 16.15).
+  - The 18 `pg_dump` writes `SET transaction_timeout`, which the 16.15 service rejects.
+- **Fix:**
+  - The workflow pins `ubuntu-24.04` and selects `/usr/lib/postgresql/16/bin` explicitly, after checking both tools
+    report 16.x.
+  - Before creating any database, the runner refuses unless both client majors equal the server major. It records the
+    client versions in the report.
+  - No SQL filtering, no tolerated restore errors, and no change to the migrations, the database or the acceptance
+    criteria.
+- **Tests:**
+  - 207 passed, including 11 new cases.
+  - A mutant without the preflight fails the new test.
+- **Real rehearsal** against a disposable PostgreSQL 16.15 server:
+
+  | Runner | Client | Result |
+  | --- | --- | --- |
+  | old `fd1530d9` | 18 | fails on `transaction_timeout`; same server error as CI |
+  | new `38a1bede` | 18 | refused before any database is created |
+  | old `fd1530d9` | 16 | `MEASURED_PASS` |
+  | new `38a1bede` | 16 | `MEASURED_PASS`; JUnit 7 tests, 0 failures, 1 skipped; residue 0 |
+
+- **Not measured:**
+  - whether the hosted image provides the PostgreSQL 16 tools today (the workflow step fails closed if it does not);
+  - root's independent review.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -470,7 +527,7 @@ records the measured time, 15:58 KST.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
 - Next first action:
-  - Core measures r5 persistence after the restoring worker sends `worker_done` and its terminal is reopened.
-  - Claude reviews core's C2–C4 changes to the private packet and its persistence proof.
-  - C1 still stands before any live renewal registration.
+  - Root reviews AC-11 fix `38a1bede` and runs the hosted rehearsal at the exact source.
+  - Root measures r5 persistence across a terminal reopen.
+  - The attended-transition job condition is met before the first attended cycle.
   - Operational acceptance stays unmeasured.
