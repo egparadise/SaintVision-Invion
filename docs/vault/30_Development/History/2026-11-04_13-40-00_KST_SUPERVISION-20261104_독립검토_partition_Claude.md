@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20261104-SUPERVISION-CLAUDE"
 title: "SUPERVISION-20261104 Claude 독립 검토와 시험 DB partition 공백 수정"
-version: "1.2.1"
+version: "1.4.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T15:20:00+09:00"
+updated: "2026-11-04T16:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -230,6 +230,83 @@ No old pin remains, by grep. Verification:
 
 Envelopes produced against the old allowlist will not be admissible, by design; none was promoted.
 
+## PR #406 final UI (`deef98ad`, F5 delta over `789999d8`): source accepted, one Low
+
+Scope: `App.tsx`, `ResourceExplorer.tsx`, `nodeCertificateObservation.ts` and three tests. Owner Codex retry
+`ctx_bb8984a92eb7`; Gemini is credited for F1–F4.
+
+- **Wiring:** `clusterTrust` is derived only from the retained, validated observation and the active project. It is
+  passed at `App.tsx:558` (DesktopShell) and `:780` (ResourceExplorer). This closes my #401 finding that no caller
+  passed `trust`. Per-node `certificateNotAfter` comes only from a current canonical observation, and the NodePage
+  fallback `2099-01-01` is excluded by a test.
+- **Local runs:**
+  - full web vitest suite: 102 files, 1,217 passed;
+  - the four focused files: 62 passed;
+  - `eslint`: exit 0; `tsc --noEmit`: exit 0.
+- **Negatives covered by the new suite:**
+  - pending-node and pending-certificate turn unknown at exactly 60 s + 1 ms, with no flicker;
+  - near-expiry → expired, and the renewal boundary, while polls stay pending;
+  - reject and missing-item clear the per-node values;
+  - late responses after a project switch-back and after re-authentication are ignored.
+- **Mutations**, each caught on the 8-case file:
+  - removing the 60 s bound: 2 failed;
+  - making the transition timer a no-op: 3 failed;
+  - letting per-node values ignore freshness: 2 failed.
+- **Low, synthetic probe:** once the observation is stale, `nextNodeCertificateTransition` still returns the
+  renewal-start and expiry boundaries.
+  - With a 90-day leaf, the app schedules `setTimeout` with a delay of 7,603,138,900 ms, beyond 2^31−1. Under real
+    timers Node logged `TimeoutOverflowWarning` (clamped to 1 ms).
+  - Browsers store the delay as int32 too, so they very likely re-render and reschedule continuously while stale.
+  - The loop itself was not reproduced: happy-dom measured 1 extra call in 1 s.
+  - Displayed trust stays `신뢰 미확인`, and 6-day pilot leaves do not trigger it.
+  - Fix: return `null` once `now >= observedAt + 60000`, and clamp the delay.
+  - Probes are kept outside the repository (scratchpad `zz-claude-probe-*.tsx`).
+
+## S04/S07 legacy harness forward port (`d44d7a08`, report `66975f00`): source accepted, two Low
+
+Reviewer role: Claude is the reviewer the S07 spec names.
+
+- **Byte identity:** the eight scoped files have the same blobs at `d44d7a08` and candidate `c71fb324`. I ran at
+  `c71fb324` against the disposable PG on 55493.
+- **Results:**
+  - S04/S07 unit tests: 38 passed (my file set; the author's 54 was not re-derived);
+  - `test_five_node_lab_preflight.py`: 2 passed (registration and s07 adapters; DB state unchanged, READ ONLY
+    verified);
+  - `run_s04_db_evidence.py`: exit 0, 4/4 PASS, physical delivery `UNMEASURED`, no operational-acceptance claim;
+  - S07 synthetic (3 nodes, 2 repetitions): exit 0.
+- **Negatives:**
+  - S04 without a DSN exits 2 `BLOCKED` and removes the stale outputs;
+  - five-node-lab without `--inventory`, or with `--nodes`, is refused.
+- **The S07 `NameError` was real:** at `03e17c31` the test body uses `project_id`, which only `_seed_round` defines.
+- **Low 1:** after a validation failure, S04 deletes the JSON but leaves a green JUnit.
+- **Low 2:** a five-node-lab `BLOCKED` preflight exits 0, and a transform `KeyError` escapes the
+  `ValueError`/`RuntimeError` catch.
+
+## Finishing checks before freeze
+
+- **PR #406 `af3a94ed` (delta over `deef98ad`): source accepted.** This closes my Low.
+  - Once `now > observedAt + 60000`, `nextNodeCertificateTransition` returns `null`, and the delay is clamped to
+    2147483647.
+  - My original probes re-run at the new head:
+    - fake clock, 90-day leaf: 0 calls after the observation goes stale;
+    - real timers, 90-day leaf: 0 calls and no `TimeoutOverflowWarning`.
+  - Removing the guard makes exactly the new 90-day test fail.
+  - Local: 63 focused and 1,218 full web tests passed; `eslint` and `tsc` exit 0.
+- **happy-dom `21.0.4` (root's dev-dependency bump):**
+  - I ran it uncommitted (`--no-save`) in my scratch checkout of `af3a94ed`: 102 files, 1,218 passed.
+  - I did not re-verify the advisory or the engines myself.
+- **S04 JUnit fix (root working tree; applied as a patch to my scratch copy only):**
+  - `test_s04_db_runner.py`: 27 passed.
+  - Reverting the runner hunk fails the 3 new cases.
+  - This closes my Low 1.
+- **Factual review of the docs (read-only; I edited nothing):**
+  - S07 spec 1.1.1: the facts are correct, but the "Claude review is separate" sentence is out of date.
+  - Catalog 1.6.0: the S04 row is correct together with the JUnit fix, and the S07 row correctly states that exit 0
+    can carry `BLOCKED`. I suggested keeping the original author attribution.
+  - Orca board 1.0.2: two "pending Claude" cells are out of date. I did not re-measure the r5 expiry myself.
+- **Shared stash:** a temporary entry I created during a mutation run, `claude-s04-mut`, was dropped by its tag.
+  Nobody else's stash entry was touched.
+
 ## State boundaries
 
 - Implemented and locally verified: the partition fixture, the VF-CL landed-tree re-record, and the SEC-VF runner pin
@@ -241,5 +318,5 @@ Envelopes produced against the old allowlist will not be admissible, by design; 
 - Operational acceptance: not claimed for anything on this page.
 - No other owner's code was edited.
 - Codex root accepted #407 `5dd3f83b` and #403 `f42c4259`, and integrated both at `d8af53c2`.
-- Next first action: Claude reviews the final UI freshness head once it arrives; Codex now owns that retry. The
-  coordinator then runs the final full hosted CI. Workers dispatch no full CI.
+- Next first action: the coordinator updates the two out-of-date review cells, freezes the candidate, and runs the
+  final full hosted CI. Workers dispatch no CI. Operational acceptance stays unmeasured.
