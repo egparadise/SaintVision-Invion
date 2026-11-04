@@ -1,0 +1,63 @@
+{
+  "observedAt": "2026-11-04T16:12:41.978969+09:00",
+  "logs": [
+    {
+      "name": "console.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lastWriteKST": "2026-11-04T14:26:44.217468+09:00"
+    },
+    {
+      "name": "console.stdout.log",
+      "bytes": 53,
+      "sha256": "3bd728ece75b3f2c05eb763afab2d5e16ee7730269be08131a8e63f9b3b29894",
+      "lastWriteKST": "2026-11-04T14:26:45.797359+09:00"
+    },
+    {
+      "name": "live-console-processes.json",
+      "bytes": 152,
+      "sha256": "25f6ce10044868010be88cd668b6c941da40d04125ff8e382b978e959b311da7",
+      "lastWriteKST": "2026-11-04T14:31:25.409904+09:00"
+    },
+    {
+      "name": "observer.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lastWriteKST": "2026-11-04T14:26:43.671502+09:00"
+    },
+    {
+      "name": "observer.stdout.log",
+      "bytes": 850830,
+      "sha256": "a3b15f12eac16d04ab66b3e7c7c9f8f029d24e6623b167abf417de5f16451838",
+      "lastWriteKST": "2026-11-04T15:52:15.467021+09:00"
+    },
+    {
+      "name": "serve.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lastWriteKST": "2026-11-04T14:26:43.253706+09:00"
+    },
+    {
+      "name": "serve.stdout.log",
+      "bytes": 243,
+      "sha256": "d4748db52705a35766bf39b4675ac728a58961d2f7c1ed21102b7058bb6e663c",
+      "lastWriteKST": "2026-11-04T14:26:45.973780+09:00"
+    },
+    {
+      "name": "web.stderr.log",
+      "bytes": 87402,
+      "sha256": "de0c2449d28c6d1c3256dece010548cfef69b9c33f4a1b4ae4a0d5087cdf2ddd",
+      "lastWriteKST": "2026-11-04T15:45:20.096163+09:00"
+    },
+    {
+      "name": "web.stdout.log",
+      "bytes": 73,
+      "sha256": "c16d9eef1e623c6f3f872b080982b2257895294e883359220084ee4fd70560da",
+      "lastWriteKST": "2026-11-04T14:26:47.716311+09:00"
+    }
+  ],
+  "currentProbeProcessInJob": true,
+  "oldPIDsAlive": false,
+  "loopbackListenersAbsent": true,
+  "cause": "terminal-job-cleanup-correlated-not-yet-proven"
+}

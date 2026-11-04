@@ -1,0 +1,62 @@
+{
+  "exit": 0,
+  "priorFieldsChanged": [
+    "nodes: appended Bash metadata only"
+  ],
+  "addedBindingFields": [
+    "attendedReceiptPath",
+    "attendedRunId",
+    "attendedTransitionScriptSHA256",
+    "followupGatePath",
+    "followupTask",
+    "recoveryObserverStderr",
+    "recoveryObserverStdout",
+    "scheduledTransitionScriptPath"
+  ],
+  "preservedCriticalBindingFields": [
+    "artifactRoot",
+    "batchParent",
+    "context",
+    "epoch",
+    "executables",
+    "issuerBundleSHA256",
+    "issuerChainPath",
+    "issuerKeyPath",
+    "issuerPasswordFile",
+    "knownHostsPath",
+    "knownHostsSHA256",
+    "pilotSource",
+    "pilotSourceHead",
+    "preparedAt",
+    "python",
+    "pythonSHA256",
+    "remoteSourceFiles",
+    "revocationsPath",
+    "runtime",
+    "runtimeBundlePath",
+    "runtimeBundleSHA256",
+    "schedulerSource",
+    "schedulerSourceHead",
+    "schemaVersion",
+    "scp",
+    "ssh",
+    "sshKeyPath",
+    "sshKeyRequiresAgent",
+    "statePath",
+    "stateSHA256",
+    "tenantId"
+  ],
+  "commands": 14,
+  "inputFilesPerCommand": 99,
+  "changedCommonPins": [
+    "bindings.private.json",
+    "renewal_gate.py"
+  ],
+  "changedPreparationCommands": [
+    "node-1-install-and-preflight-new-r5-runtime",
+    "node-2-install-and-preflight-new-r5-runtime"
+  ],
+  "otherPreparationCommandsUnchanged": true,
+  "idpCandidatesBaselinesTargetsUnchanged": true,
+  "canonicalProductSourceChanged": false
+}

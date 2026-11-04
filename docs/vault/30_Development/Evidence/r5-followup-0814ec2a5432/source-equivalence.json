@@ -1,0 +1,75 @@
+{
+  "b5Head": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "finalCandidateHead": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "files": [
+    {
+      "path": "tools/scheduled_leaf_renewal.py",
+      "b5Blob": "8d9f030d6067115616a55ada1f6d1638e9c5a093",
+      "fd1530d9Blob": "8d9f030d6067115616a55ada1f6d1638e9c5a093",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/Invoke-ScheduledLeafRenewal.ps1",
+      "b5Blob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+      "fd1530d9Blob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+      "b5Blob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "fd1530d9Blob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "b5Blob": "66edef84d181b4b1d5968db36c767c2cb9132060",
+      "fd1530d9Blob": "66edef84d181b4b1d5968db36c767c2cb9132060",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+      "b5Blob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+      "fd1530d9Blob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "b5Blob": "93616d16a4658f11f34ab7415ed1cac6f98dca7f",
+      "fd1530d9Blob": "93616d16a4658f11f34ab7415ed1cac6f98dca7f",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+      "b5Blob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+      "fd1530d9Blob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+      "equal": true
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "b5Blob": "35c2668690b0681ab87da86099400e83f39d098b",
+      "fd1530d9Blob": "35c2668690b0681ab87da86099400e83f39d098b",
+      "equal": true
+    },
+    {
+      "path": "tools/lan_pki.py",
+      "b5Blob": "f00045a28681e95e5568cfe46c72139af169301f",
+      "fd1530d9Blob": "f00045a28681e95e5568cfe46c72139af169301f",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/Start-LiveConsole.ps1",
+      "b5Blob": "0c8ec99a503ac91a0f810b77f7686f6142a7e5e4",
+      "fd1530d9Blob": "0c8ec99a503ac91a0f810b77f7686f6142a7e5e4",
+      "equal": true
+    },
+    {
+      "path": "deploy/lan/SvLauncherInput.ps1",
+      "b5Blob": "f44244df9c5d5af18e91d5d3947a270740caab18",
+      "fd1530d9Blob": "f44244df9c5d5af18e91d5d3947a270740caab18",
+      "equal": true
+    }
+  ],
+  "initialLandedIntegrationObserved": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "observedAtKST": "2026-11-04T16:39:22.336184+09:00",
+  "landedIntegrationObserved": "fd1530d9b46e6b90a708daa59b4394599684309a"
+}
