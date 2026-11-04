@@ -6,7 +6,7 @@ status: "review"
 author: "Claude"
 reviewer: "Codex"
 created: "2026-11-04T13:40:00+09:00"
-updated: "2026-11-04T19:16:00+09:00"
+updated: "2026-11-04T19:10:00+09:00"
 source_of_truth: "Git"
 ---
 
