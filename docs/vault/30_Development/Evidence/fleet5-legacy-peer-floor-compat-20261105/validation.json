@@ -1,6 +1,6 @@
 {
     "schemaVersion":  "fleet5-legacy-audit-validation:1",
-    "observedKST":  "2026-11-05T20:51:49.0224380+09:00",
+    "observedKST":  "2026-11-05T20:53:34.8368428+09:00",
     "task":  "task_fb415493ffa5",
     "dispatch":  "ctx_373e829bc65e",
     "base":  "9ec6d6bf4697745bfe41602bb720473b1ff9b22f",
@@ -33,11 +33,11 @@
     "liveOrPrivateActionsPerformed":  false,
     "hashes":  [
                    {
-                       "sha256":  "64c767a18a1ad46137a0383010f247c349942c72449e5342c9ce0edd13d542e1",
+                       "sha256":  "c5ca500fc96ce35371615b2eb3eead344ac8fd2615c72e864b96743d09704a96",
                        "path":  "audit_public_sources.py"
                    },
                    {
-                       "sha256":  "5220f52bbbe908c9b33bd3ff7a092c93a3715a533b69f3210addd927cbe3cb76",
+                       "sha256":  "a5d5946784a13a95d7ae7e14e44d90d3c0c82ca08867b76ec49bd504adb190d9",
                        "path":  "public-source-index.json"
                    },
                    {
@@ -50,5 +50,6 @@
                    }
                ],
     "independentAuditReview":  "pending via root",
-    "exactReportDocs":  "Run receipt bound to the publication SHA supplied in worker_done; no self-reference commit loop"
+    "exactReportDocs":  "Run receipt bound to the publication SHA supplied in worker_done; no self-reference commit loop",
+    "hashScope":  "Canonical LF artifact bytes; post-commit Git blob bytes independently compared before handoff"
 }

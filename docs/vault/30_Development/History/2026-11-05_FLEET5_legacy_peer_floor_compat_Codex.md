@@ -1,7 +1,7 @@
 ---
 doc_id: "HISTORY-FLEET5-LEGACY-PEER-FLOOR-COMPAT-20261105-CODEX"
 title: "FLEET5 legacy peer-floor source compatibility audit"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 updated: "2026-11-05T20:52:00+09:00"
@@ -313,6 +313,16 @@ Raw gate output is preserved in the evidence directory. Audit SHA256 values are
 bound by `validation.json`; report commit/push/exact Docs final status is supplied
 in the coordinator completion receipt, and remains independently visible in Git
 and Actions. A document CI pass does not green the previously red native proof.
+
+Before dispatching Docs, the first report commit
+`b57e4e3874d527710d7544814f3b951133c2d4cb` exposed a report-artifact newline
+binding error: Windows wrote the generated index with CRLF, while Git normalized
+it to LF. Its local artifact digest therefore did not identify the committed
+artifact bytes. The follow-up preserves that commit, makes the collector emit
+LF explicitly, and binds validation hashes to canonical LF Git artifact bytes.
+All underlying source hashes already came from raw Git blobs and are unchanged;
+no product source/native proof or historical observation was changed. Post-commit
+artifact hashes are checked against actual Git bytes before final handoff.
 
 Early findings were actually sent to P0 owner (`msg_3fc68bc4c5b0`) and root
 (`msg_8a638a946f1b`); root acknowledged and relayed them. Independent Claude review

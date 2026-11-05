@@ -102,7 +102,7 @@ def main():
         elif name == "publication-receipt.json":
             proof = json.loads(raw)
             result["existingNativeProofPublication"] = {k: proof[k] for k in ("sourceSHA", "headSHA", "goTestExit", "classification", "proofValid")}
-    OUT.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    OUT.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
     for path in list(FILES)[:5]:
         print(path)
         for label, data in result["commits"].items():
