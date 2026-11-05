@@ -6,7 +6,7 @@
   "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-consecutive-leaf-rotation-20261105",
   "interpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
   "pythonVersion": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
-  "observedKST": "2026-11-05T22:50:54.227502+09:00",
+  "observedKST": "2026-11-05T23:27:47.085345+09:00",
   "gates": [
     {
       "command": [
@@ -27,8 +27,8 @@
         "docs/vault/00_Index",
         "docs/vault/30_Development/Agent*"
       ],
-      "startedKST": "2026-11-05T22:50:12.816709+09:00",
-      "finishedKST": "2026-11-05T22:50:14.117329+09:00",
+      "startedKST": "2026-11-05T23:27:08.386422+09:00",
+      "finishedKST": "2026-11-05T23:27:09.672130+09:00",
       "exit": 0,
       "output": ""
     },
@@ -38,8 +38,8 @@
         "-B",
         "tools/check_docs.py"
       ],
-      "startedKST": "2026-11-05T22:50:14.117392+09:00",
-      "finishedKST": "2026-11-05T22:50:30.137088+09:00",
+      "startedKST": "2026-11-05T23:27:09.672187+09:00",
+      "finishedKST": "2026-11-05T23:27:15.481930+09:00",
       "exit": 0,
       "output": "PASS: 24 original hashes, 1211 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\n"
     },
@@ -49,8 +49,8 @@
         "-B",
         "tools/check_ontology_generation.py"
       ],
-      "startedKST": "2026-11-05T22:50:30.137136+09:00",
-      "finishedKST": "2026-11-05T22:50:31.613324+09:00",
+      "startedKST": "2026-11-05T23:27:15.481978+09:00",
+      "finishedKST": "2026-11-05T23:27:17.633311+09:00",
       "exit": 0,
       "output": "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation\n"
     },
@@ -60,8 +60,8 @@
         "-B",
         "tools/check_ontology.py"
       ],
-      "startedKST": "2026-11-05T22:50:31.613370+09:00",
-      "finishedKST": "2026-11-05T22:50:33.718301+09:00",
+      "startedKST": "2026-11-05T23:27:17.633355+09:00",
+      "finishedKST": "2026-11-05T23:27:19.624023+09:00",
       "exit": 0,
       "output": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\n"
     },
@@ -71,8 +71,8 @@
         "-B",
         "tools/check_contract_bindings.py"
       ],
-      "startedKST": "2026-11-05T22:50:33.718355+09:00",
-      "finishedKST": "2026-11-05T22:50:43.770707+09:00",
+      "startedKST": "2026-11-05T23:27:19.624085+09:00",
+      "finishedKST": "2026-11-05T23:27:28.743341+09:00",
       "exit": 0,
       "output": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\n"
     },
@@ -82,8 +82,8 @@
         "-B",
         "tools/check_frontend_integrity.py"
       ],
-      "startedKST": "2026-11-05T22:50:43.770763+09:00",
-      "finishedKST": "2026-11-05T22:50:44.747916+09:00",
+      "startedKST": "2026-11-05T23:27:28.743401+09:00",
+      "finishedKST": "2026-11-05T23:27:30.069783+09:00",
       "exit": 0,
       "output": "Scanning 94 frontend production source files under apps/web/src ...\n\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\n"
     },
@@ -94,8 +94,8 @@
         "tools/check_doc_single_source.py",
         "--ratchet"
       ],
-      "startedKST": "2026-11-05T22:50:44.747961+09:00",
-      "finishedKST": "2026-11-05T22:50:45.115592+09:00",
+      "startedKST": "2026-11-05T23:27:30.069834+09:00",
+      "finishedKST": "2026-11-05T23:27:31.473385+09:00",
       "exit": 0,
       "output": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\n"
     },
@@ -108,8 +108,8 @@
         "--base-ref",
         "f0278daffa616cae4485e4b1d4c07671715892dc"
       ],
-      "startedKST": "2026-11-05T22:50:45.115637+09:00",
-      "finishedKST": "2026-11-05T22:50:49.000084+09:00",
+      "startedKST": "2026-11-05T23:27:31.473428+09:00",
+      "finishedKST": "2026-11-05T23:27:36.335682+09:00",
       "exit": 0,
       "output": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\n"
     },
@@ -120,10 +120,10 @@
         "tools/sync_obsidian.py",
         "--check"
       ],
-      "startedKST": "2026-11-05T22:50:49.000128+09:00",
-      "finishedKST": "2026-11-05T22:50:53.754200+09:00",
+      "startedKST": "2026-11-05T23:27:36.335766+09:00",
+      "finishedKST": "2026-11-05T23:27:46.344977+09:00",
       "exit": 0,
-      "output": "CHECK: 2332 managed files, 126 pending exports, 0 conflicts. No writes.\n"
+      "output": "CHECK: 2334 managed files, 124 pending exports, 0 conflicts. No writes.\n"
     },
     {
       "command": [
@@ -131,8 +131,8 @@
         "diff",
         "--check"
       ],
-      "startedKST": "2026-11-05T22:50:53.754248+09:00",
-      "finishedKST": "2026-11-05T22:50:54.227457+09:00",
+      "startedKST": "2026-11-05T23:27:46.345057+09:00",
+      "finishedKST": "2026-11-05T23:27:47.085299+09:00",
       "exit": 0,
       "output": ""
     }
@@ -140,31 +140,31 @@
   "artifactHashes": [
     {
       "path": "acceptance-matrix.json",
-      "sha256": "fcce2f9416670872a2ac653c5ce3cee3334bd09fae54f122a5fa94095fdd556b"
+      "sha256": "e671501c9e901b117bafeef1de89ef6e1b0c3dccecc18eff29ba2e76c2071026"
     },
     {
       "path": "bootstrap-plan.json",
-      "sha256": "4c94faffa6a42c8afc7787cfdeeff44ff30395253eec545c1368ada2a9c083ce"
+      "sha256": "8ca9bb4a6eb28ffb8a0c7acd9e61dbfbabaed021546956c1d420333f3de8760a"
     },
     {
       "path": "bootstrap-plan.schema.json",
-      "sha256": "1112044d2ac0f175263d4eafa632aed46707deec87d2b582be449209011710f4"
+      "sha256": "5ba77834d34bc89c51eff81fed65bed216332aa9ba61f91a93bbcdfddddcc583"
     },
     {
       "path": "common-agent-mutation-fence-contract.json",
-      "sha256": "48c3d40cbdc90fb7efe33b981caa74bcfcffd04e42148eb33a6cf2643b4bf40f"
+      "sha256": "aa27a82e84c42a2686a7fa4e354e685176f30013592f672b00579454473495bb"
     },
     {
       "path": "desired-m2-v2-and-argv-contract.json",
-      "sha256": "9f1f05f6ab3105825991e75e1068299d3265788656904d6947540ded495234b5"
+      "sha256": "e797d506f36ee74929db85f81806bd912cf9fc67d68f08e7aa9812c5fb45cb9d"
     },
     {
       "path": "encoding-fixtures.json",
-      "sha256": "6c693feebfbe82e86e6c59a61fb571e929411092db1f811a5284d7c64839d891"
+      "sha256": "4757393f5b4632317875d6261de071b1b0b0aad0da44c056b0a479d147cfb140"
     },
     {
       "path": "encoding-validation.json",
-      "sha256": "a7cb4ea567dee2c67453bad6b2f922b7fb7a8dbb7a6ad15cf5fe96b96b44fb5e"
+      "sha256": "f05001bc1e720464a9755aeb00f6de6ad5ce9dfa76d748ea2996578df568f4d0"
     },
     {
       "path": "inspect-comparison-contract.json",
@@ -172,11 +172,19 @@
     },
     {
       "path": "legacy-consumer-closure.json",
-      "sha256": "2761ee8f643301572133a4c0dfdd2fcb897ef24c55acd1c6b19be2b0f4ac0148"
+      "sha256": "fc457de041d728b46bb0bd6b87b497505b58fb2724b506a254185ca853b946cd"
+    },
+    {
+      "path": "m2-v2-body-golden-fixtures.json",
+      "sha256": "311672954f6b0934b44754e7a80f7620dbbabf257c939800f69e7697fb02047d"
+    },
+    {
+      "path": "m2-v2-body-golden-validation.json",
+      "sha256": "846f0f7d6678064dc4218b0b85c37dd0ffa022a12bdc8277bbe964a09208b7f0"
     },
     {
       "path": "migration-predecessor-contract.json",
-      "sha256": "b156a25db07f60848e5fcf2f0f60c0c6e9426f74db65f713ffe9c67f31e57ed9"
+      "sha256": "ed3da7acd0618371e2c2c224e8e1ef7d1353403280b9eb4d94fad5d7024f1cc3"
     },
     {
       "path": "observer-exec-and-image-config-contract.json",
@@ -188,15 +196,15 @@
     },
     {
       "path": "parameter-gates.json",
-      "sha256": "555b7e73e56b51490b7ccf148ae2f0f73fcddda57a3d01f853a8c7cd4c675463"
+      "sha256": "6d2c0a98eaa84081203af75bcfc5f1795f0d67e8396af5e856d6bc6c6b523a8a"
     },
     {
       "path": "public-source-bindings.json",
-      "sha256": "8a8e6a7d32212eadf6a2dea641f7729d6163c3431edef7ad4e2ae99df643874d"
+      "sha256": "d0bd41c737030c522dd9b5baa35d69a3548b331f6184e54935743a597853251d"
     },
     {
       "path": "review-findings-closure.json",
-      "sha256": "5b4cc611b677b6532415c0236d89b251a36327faa8a554e883f5209aee419bea"
+      "sha256": "175955189c6ad30ad81671fc411e855ba59ed645b24fe07db8ef1de3116e988c"
     },
     {
       "path": "root-g2-planning-choice.json",
@@ -208,11 +216,11 @@
     },
     {
       "path": "schema-cases.json",
-      "sha256": "1805f80dd11806670d6df8718d4c77d102b2318128e4e60861405d8d889d6d23"
+      "sha256": "32a1b9a13229e8c79ac3023b527b5da3a2a4a334944330794d7ee6f7916f82b5"
     },
     {
       "path": "schema-validation.json",
-      "sha256": "490714dd2999bc9e38ae486a6e7ef1741366a6ef417ccf6655b3ec45ddb0d7c0"
+      "sha256": "d14f56e88e135d94f7469e28cee1029014f743b24953f3d04a797f211d87f906"
     },
     {
       "path": "source-review-cases.json",
@@ -220,18 +228,18 @@
     }
   ],
   "hashScope": "Canonical LF artifact bytes; checked against Git after commit",
-  "schemaCasesMatched": 26,
+  "schemaCasesMatched": 31,
   "schemaValidHold": 1,
-  "schemaRejectedMutations": 25,
+  "schemaRejectedMutations": 30,
   "closedTargetBindingsNull": 30,
   "closedRootBindingsNull": 18,
   "memberBindingsNull": true,
   "parameterGateClosure": true,
   "g2ExactSource03B5Files": 4,
-  "productAcceptanceCasesNotRun": 36,
+  "productAcceptanceCasesNotRun": 40,
   "productCoreRuns": 0,
   "privateOrRuntimeOrAutomationActions": 0,
-  "independentPlanReview": "Actual new delta review REQUIRED via Root; no prior ACCEPT borrowed; product/contract/operations remain HOLD",
+  "independentPlanReview": "Actual Low delta review REQUIRED; prior plan-only ACCEPT preserved, contract/code/operations HOLD",
   "preparationEvents": [
     {
       "kind": "partial-display-read",
@@ -376,7 +384,7 @@
       "output": ""
     }
   ],
-  "finalPlanRefinement": "R1 typed retained migration predecessor;R2 named common coded fence/all mutators;N1 desired separate signed executable bytes v2 absent6c;N2 JSON/raw mapping;R4 ExecIDs/inherited Config",
+  "finalPlanRefinement": "C1 explicit DENIED legacy registration/launcher/executor;C2 desired exact Go Marshal-map UTF8/HTML BODY with dedicated verifier and complete fixtures, no global normalization;C3 second binary migration BLOCK",
   "prior1057DocumentGateRun": [
     {
       "command": [
@@ -640,7 +648,142 @@
   ],
   "publicSourceReviewCasesMatched": 9,
   "syntheticEncodingCasesMatched": 10,
-  "actualPriorPlanReview": "REVISION REQUIRED;830efd9317d28fa27b696db709c9a6e7a3076331/eace0e2de11801be0e6d63a5cf08817c37214ea3",
+  "actualPriorPlanReview": "9e8 ACCEPT NONEXECUTING with Low C1-C3;actual a471ce1988e444270fdf83283fee18e0342ddd69",
   "thisRevisionActualIndependentVerdict": null,
-  "p0OwnerCoordinationMessage": "msg_5ffb02106b2c; no agreement inferred without actual reply"
+  "p0OwnerCoordinationMessage": "msg_5ffb02106b2c; no agreement inferred without actual reply",
+  "prior9e8DocumentGateRun": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "f0278daffa616cae4485e4b1d4c07671715892dc",
+        "--",
+        "deploy",
+        "services",
+        "tools",
+        "tests",
+        "contracts",
+        "packages",
+        ".github",
+        "skills",
+        "docs/task-registry.json",
+        "docs/vault/00_Index",
+        "docs/vault/30_Development/Agent*"
+      ],
+      "startedKST": "2026-11-05T22:50:12.816709+09:00",
+      "finishedKST": "2026-11-05T22:50:14.117329+09:00",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startedKST": "2026-11-05T22:50:14.117392+09:00",
+      "finishedKST": "2026-11-05T22:50:30.137088+09:00",
+      "exit": 0,
+      "output": "PASS: 24 original hashes, 1211 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "startedKST": "2026-11-05T22:50:30.137136+09:00",
+      "finishedKST": "2026-11-05T22:50:31.613324+09:00",
+      "exit": 0,
+      "output": "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startedKST": "2026-11-05T22:50:31.613370+09:00",
+      "finishedKST": "2026-11-05T22:50:33.718301+09:00",
+      "exit": 0,
+      "output": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "startedKST": "2026-11-05T22:50:33.718355+09:00",
+      "finishedKST": "2026-11-05T22:50:43.770707+09:00",
+      "exit": 0,
+      "output": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startedKST": "2026-11-05T22:50:43.770763+09:00",
+      "finishedKST": "2026-11-05T22:50:44.747916+09:00",
+      "exit": 0,
+      "output": "Scanning 94 frontend production source files under apps/web/src ...\n\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startedKST": "2026-11-05T22:50:44.747961+09:00",
+      "finishedKST": "2026-11-05T22:50:45.115592+09:00",
+      "exit": 0,
+      "output": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "f0278daffa616cae4485e4b1d4c07671715892dc"
+      ],
+      "startedKST": "2026-11-05T22:50:45.115637+09:00",
+      "finishedKST": "2026-11-05T22:50:49.000084+09:00",
+      "exit": 0,
+      "output": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startedKST": "2026-11-05T22:50:49.000128+09:00",
+      "finishedKST": "2026-11-05T22:50:53.754200+09:00",
+      "exit": 0,
+      "output": "CHECK: 2332 managed files, 126 pending exports, 0 conflicts. No writes.\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startedKST": "2026-11-05T22:50:53.754248+09:00",
+      "finishedKST": "2026-11-05T22:50:54.227457+09:00",
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "publishedEncodingNegativeInputsReproduced": 4,
+  "v2BodyGoldenValidMatchedPythonReference": 5,
+  "v2BodyGoldenInvalidRejectedPythonReference": 5,
+  "actualGoCrossLanguageOrSigningRuns": 0,
+  "p0OwnerC2Coordination": "msg_bb65618c0b49; actual earlier R1/N1 compatibility relayed by Root msg_03604b3e6bed, code unaccepted/unpublished"
 }

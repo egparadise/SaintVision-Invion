@@ -1,0 +1,160 @@
+{
+  "schema": "fleet5-plan803-actual-low-review-handoff:1",
+  "recordedAtKST": "2026-11-05T23:36:46+09:00",
+  "rootBase": "35f63e5bcaf9ac676b7d490d399c8afe847df06d",
+  "priorRootCheckpoint": {
+    "SHA": "35f63e5bcaf9ac676b7d490d399c8afe847df06d",
+    "Docs": 42043138962,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "exported": 6,
+    "independentlyMatchedNormalizedDestinationHashes": 2396,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "revisedPlan": "803ad270562b1b75e44d26f9e14b965c714ab519",
+  "priorAcceptedPlan": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+  "priorActualReview": "a471ce1988e444270fdf83283fee18e0342ddd69",
+  "planDocs": 42045613505,
+  "rootVerifiedExactHeadAllJobsSuccess": true,
+  "actualLowReview": {
+    "task": "task_667a078e2dc3",
+    "dispatch": "ctx_9fd4c380b503",
+    "state": "started; actual verdict pending",
+    "scope": "9e8-to803 C1-C3 and carried-rule nonregression; NONEXECUTING only",
+    "verdict": null
+  },
+  "ownerClaimsNotIndependentlyRerunByRoot": {
+    "documentCases": 31,
+    "artifactHashes": 22,
+    "PythonGoldenValid": 5,
+    "PythonGoldenInvalid": 5,
+    "publishedE04toE07": 4,
+    "actualGoRuns": 0,
+    "futureProductCases": 40,
+    "futureProductCasesExecuted": false
+  },
+  "planOwnerPendingQuestion": "msg_b661a20575b9",
+  "questionDeliberatelyPendingUntilActualVerdict": true,
+  "allTargetRootMemberBindings": null,
+  "P0CodeAccepted": false,
+  "contractsRuntimeOperationsAccepted": false,
+  "rootProductChanged": false,
+  "legacyThreeAutomations": "disabled",
+  "physicalOrKeyActions": false,
+  "wholeProgramComplete": false,
+  "imports": [
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/acceptance-matrix.json",
+      "SHA256": "e671501c9e901b117bafeef1de89ef6e1b0c3dccecc18eff29ba2e76c2071026"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.json",
+      "SHA256": "8ca9bb4a6eb28ffb8a0c7acd9e61dbfbabaed021546956c1d420333f3de8760a"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.schema.json",
+      "SHA256": "5ba77834d34bc89c51eff81fed65bed216332aa9ba61f91a93bbcdfddddcc583"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/common-agent-mutation-fence-contract.json",
+      "SHA256": "aa27a82e84c42a2686a7fa4e354e685176f30013592f672b00579454473495bb"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/desired-m2-v2-and-argv-contract.json",
+      "SHA256": "e797d506f36ee74929db85f81806bd912cf9fc67d68f08e7aa9812c5fb45cb9d"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/encoding-fixtures.json",
+      "SHA256": "4757393f5b4632317875d6261de071b1b0b0aad0da44c056b0a479d147cfb140"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/encoding-validation.json",
+      "SHA256": "f05001bc1e720464a9755aeb00f6de6ad5ce9dfa76d748ea2996578df568f4d0"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/legacy-consumer-closure.json",
+      "SHA256": "fc457de041d728b46bb0bd6b87b497505b58fb2724b506a254185ca853b946cd"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/m2-v2-body-golden-fixtures.json",
+      "SHA256": "311672954f6b0934b44754e7a80f7620dbbabf257c939800f69e7697fb02047d"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/m2-v2-body-golden-validation.json",
+      "SHA256": "846f0f7d6678064dc4218b0b85c37dd0ffa022a12bdc8277bbe964a09208b7f0"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/migration-predecessor-contract.json",
+      "SHA256": "ed3da7acd0618371e2c2c224e8e1ef7d1353403280b9eb4d94fad5d7024f1cc3"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/parameter-gates.json",
+      "SHA256": "6d2c0a98eaa84081203af75bcfc5f1795f0d67e8396af5e856d6bc6c6b523a8a"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/plan-validation.json",
+      "SHA256": "dee6480bfd73b373e99bb4455c007999a9c6ad822f4e0a31f388b35d9993995b"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/public-source-bindings.json",
+      "SHA256": "d0bd41c737030c522dd9b5baa35d69a3548b331f6184e54935743a597853251d"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/review-findings-closure.json",
+      "SHA256": "175955189c6ad30ad81671fc411e855ba59ed645b24fe07db8ef1de3116e988c"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-cases.json",
+      "SHA256": "32a1b9a13229e8c79ac3023b527b5da3a2a4a334944330794d7ee6f7916f82b5"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-validation.json",
+      "SHA256": "d14f56e88e135d94f7469e28cee1029014f743b24953f3d04a797f211d87f906"
+    },
+    {
+      "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_legacy_capability_bootstrap_plan_Codex.md",
+      "SHA256": "5919a7633f814be7c715d21b092e73512fba08045bb5414cd0fc4b3f2f8dea17"
+    }
+  ],
+  "nextFirstAction": {
+    "Claude": "return actual803 Low verdict and independent evidence",
+    "planOwner": "after actualLow review prepare authorized closed normative contract proposal; no helper code",
+    "P0Owner": "finish actual implementation/native/lifecycle/Core/new code review",
+    "Root": "route real next findings; retain HOLD"
+  },
+  "checkpointValidation": {
+    "docsExit": 0,
+    "ontologyExit": 0,
+    "syncCheckExit": 0,
+    "pathCitationsRatchetExit": 0,
+    "singleSourceRatchetExit": 0,
+    "syncManaged": 2399,
+    "syncPending": 22,
+    "syncConflicts": 0,
+    "pathBase": "35f63e5bcaf9ac676b7d490d399c8afe847df06d",
+    "productChanged": false
+  }
+}

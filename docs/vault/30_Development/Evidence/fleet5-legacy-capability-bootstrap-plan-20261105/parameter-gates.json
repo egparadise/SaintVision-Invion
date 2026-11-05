@@ -3,6 +3,8 @@
   "nonexecuting": true,
   "parameterClosure": "Exactly bootstrap-plan targetBindings/rootBindings/memberBindingNames; every future operational field required, null now; unknown/missing fields BLOCK; no force/skip/rollback/unsigned/legacy fallback",
   "physicalBindingsOwner": "Root later; no private input read by this worker",
+  "G9ExplicitDeniedLegacySchedulerSurfaces": ["Register-LeafRenewalTask.ps1", "Invoke-ScheduledLeafRenewal.ps1", "tools/scheduled_leaf_renewal.py"],
+  "G9RegistrationOutsideDisabledIDs": "DENIED too; no assumption three disabled IDs exhaust all registration/launcher surfaces",
   "gates": [
     {"id":"G1","status":"HOLD","parameters":["oldContainerId","oldInspectDigest","preservedConfigDigest","volumeMetadataDigest","imageInheritedConfigBeforeAfter","observedM2ExecIdsReceipt"],"requiredEvidence":"Exact observe image-only projection PLUS old/new IMAGE-inherited Config equality and only actual recorded observer ExecIDs lifecycle delta; no container override masking","refuse":"Unknown config/exec ID, inherited image delta, storage mount, drift or historical wrong container"},
     {"id":"G2","status":"HOLD","parameters":["rootG2Decision","runtimeInventoryContractSHA","preservedPermitImageDigest","legacyCPAgentImageValueHash"],"requiredEvidence":"Reviewed choice A; typed per-Node runtime/binary inventory and strict consumers; atomic cohort metadata CAS with legacy CP bytes and channel vector unchanged","refuse":"Implicit permit/global rewrite, false runtime truth from old field, unreviewed or partial publication"},

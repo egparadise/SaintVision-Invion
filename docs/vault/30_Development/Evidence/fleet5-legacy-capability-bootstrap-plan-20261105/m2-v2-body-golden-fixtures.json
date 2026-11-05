@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "fleet5-desired-m2-v2-body-golden-fixtures:1",
+  "scope": "Synthetic canonicalization documents, not valid signed floor receipts or runtime provenance; manually specified expected body strings checked by Python reference; actual Go comparison NOT RUN",
+  "positive": [
+    {
+      "id": "B01",
+      "inputObject": {
+        "z": 1,
+        "a": "plain",
+        "b": true
+      },
+      "inputDocumentUTF8Hex": "7b2261223a22706c61696e222c2262223a747275652c227a223a317d",
+      "inputDocumentSHA256": "3be3b25b4925159f0c09f20ca8b74ae7ed2bac1ceb64fb60e1325cc1632db2db",
+      "expectedBodyUTF8Hex": "7b2261223a22706c61696e222c2262223a747275652c227a223a317d",
+      "expectedBodySHA256": "3be3b25b4925159f0c09f20ca8b74ae7ed2bac1ceb64fb60e1325cc1632db2db",
+      "domainPrefixHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+      "expectedDomainPlusBodyHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f7632007b2261223a22706c61696e222c2262223a747275652c227a223a317d",
+      "expectedDomainPlusBodySHA256": "31ee6dc305103e6594e1ce03f616c1f3a31258b5ddf4ec7a56bd07b238eab0e8",
+      "transportNewlineHex": "0a",
+      "transportNewlinePartOfSignature": false,
+      "syntheticCanonicalizationOnly": true,
+      "validRuntimeReceiptClaim": false,
+      "actualGoRun": false
+    },
+    {
+      "id": "B02",
+      "inputObject": {
+        "text": "\ud55c\uae00 <>& caf\u00e9",
+        "a": "x"
+      },
+      "inputDocumentUTF8Hex": "7b2261223a2278222c2274657874223a225c75643535635c7561653030203c3e26206361665c7530306539227d",
+      "inputDocumentSHA256": "c814180f4d7f57fee717f57291010e16342a8cbce12dffbc49589e5e8347380c",
+      "expectedBodyUTF8Hex": "7b2261223a2278222c2274657874223a22ed959ceab880205c75303033635c75303033655c753030323620636166c3a9227d",
+      "expectedBodySHA256": "89cc0ed45910c2733f1be7d10c38a3fdee6185158dc0e3d5ceeaf088289f8767",
+      "domainPrefixHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+      "expectedDomainPlusBodyHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f7632007b2261223a2278222c2274657874223a22ed959ceab880205c75303033635c75303033655c753030323620636166c3a9227d",
+      "expectedDomainPlusBodySHA256": "6ff18c9cdbc99477b4e045818f8b8b22f14689233c3b53cacaeb96c5a85ccc36",
+      "transportNewlineHex": "0a",
+      "transportNewlinePartOfSignature": false,
+      "syntheticCanonicalizationOnly": true,
+      "validRuntimeReceiptClaim": false,
+      "actualGoRun": false
+    },
+    {
+      "id": "B03",
+      "inputObject": {
+        "text": "\b\f\n\r\t\u0000\u001f\u2028\u2029",
+        "quote": "\"\\/"
+      },
+      "inputDocumentUTF8Hex": "7b2271756f7465223a225c225c5c2f222c2274657874223a225c625c665c6e5c725c745c75303030305c75303031665c75323032385c7532303239227d",
+      "inputDocumentSHA256": "098cedc0e0e5162d288d42ddefd42bc9829041ee80129d7b9b5ec0a3f16faffc",
+      "expectedBodyUTF8Hex": "7b2271756f7465223a225c225c5c2f222c2274657874223a225c625c665c6e5c725c745c75303030305c75303031665c75323032385c7532303239227d",
+      "expectedBodySHA256": "098cedc0e0e5162d288d42ddefd42bc9829041ee80129d7b9b5ec0a3f16faffc",
+      "domainPrefixHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+      "expectedDomainPlusBodyHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f7632007b2271756f7465223a225c225c5c2f222c2274657874223a225c625c665c6e5c725c745c75303030305c75303031665c75323032385c7532303239227d",
+      "expectedDomainPlusBodySHA256": "bfe1cc706fba14e1792e44559bdd583ff6c2530e03f672951bd93a65024865a1",
+      "transportNewlineHex": "0a",
+      "transportNewlinePartOfSignature": false,
+      "syntheticCanonicalizationOnly": true,
+      "validRuntimeReceiptClaim": false,
+      "actualGoRun": false
+    },
+    {
+      "id": "B04",
+      "inputObject": {
+        "emoji": "\ud83d\ude00",
+        "combining": "e\u0301",
+        "precomposed": "\u00e9"
+      },
+      "inputDocumentUTF8Hex": "7b22636f6d62696e696e67223a22655c7530333031222c22656d6f6a69223a225c75643833645c7564653030222c22707265636f6d706f736564223a225c7530306539227d",
+      "inputDocumentSHA256": "d653c92820b1cbf54bbbd3e987ca70c6d39987cbeeedb5970327cbce5a0b12d8",
+      "expectedBodyUTF8Hex": "7b22636f6d62696e696e67223a2265cc81222c22656d6f6a69223a22f09f9880222c22707265636f6d706f736564223a22c3a9227d",
+      "expectedBodySHA256": "d3c42d120e4034979b7918c3ea77a7760a0c7c2c7fa6db177fa71cf051a454cc",
+      "domainPrefixHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+      "expectedDomainPlusBodyHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f7632007b22636f6d62696e696e67223a2265cc81222c22656d6f6a69223a22f09f9880222c22707265636f6d706f736564223a22c3a9227d",
+      "expectedDomainPlusBodySHA256": "1bd4af948634e031013fc96295b1bfdaaf96b5164e6878f02d571b41ef17fc92",
+      "transportNewlineHex": "0a",
+      "transportNewlinePartOfSignature": false,
+      "syntheticCanonicalizationOnly": true,
+      "validRuntimeReceiptClaim": false,
+      "actualGoRun": false
+    },
+    {
+      "id": "B05",
+      "inputObject": {
+        "\ud800\udc00": "supplement",
+        "\u4e2d": "han",
+        "\u00e9": "x",
+        "a": 0
+      },
+      "inputDocumentUTF8Hex": "7b2261223a302c225c7530306539223a2278222c225c7534653264223a2268616e222c225c75643830305c7564633030223a22737570706c656d656e74227d",
+      "inputDocumentSHA256": "5ef9396402c79e8ad0067d31e4c73231e70b5a08a34a5f18ea9e134ed3b5796e",
+      "expectedBodyUTF8Hex": "7b2261223a302c22c3a9223a2278222c22e4b8ad223a2268616e222c22f0908080223a22737570706c656d656e74227d",
+      "expectedBodySHA256": "bac7afaef64ba34ee2e132c3e5542ea4a94876595299bc70002c2147c6e0e058",
+      "domainPrefixHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+      "expectedDomainPlusBodyHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f7632007b2261223a302c22c3a9223a2278222c22e4b8ad223a2268616e222c22f0908080223a22737570706c656d656e74227d",
+      "expectedDomainPlusBodySHA256": "e97e69728de7bcbf08c71f09b0fe53a74833ae34e2d040ac3ad29f7e0a3cee20",
+      "transportNewlineHex": "0a",
+      "transportNewlinePartOfSignature": false,
+      "syntheticCanonicalizationOnly": true,
+      "validRuntimeReceiptClaim": false,
+      "actualGoRun": false
+    }
+  ],
+  "negative": [
+    {
+      "id": "B06",
+      "inputExactUTF8OrInvalidHex": "7b2274657874223a22ff227d",
+      "inputExactSHA256": "5e49a14a5cde153e824285fc9c1c4ac0c99de6a644a673cdf9c2b850156f4dfa",
+      "expectedResult": "REJECT",
+      "expectedReason": "invalid-utf8",
+      "expectedBodyHex": null,
+      "expectedBodySHA256": null,
+      "expectedDomainPlusBodyHex": null,
+      "expectedDomainPlusBodySHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22696e76616c69642d75746638222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "51439207a9c9601c4dd39063a301b97d81e80c5c36cdf0d2c592cda4d6f99a9f",
+      "syntheticCanonicalizationOnly": true,
+      "actualGoRun": false
+    },
+    {
+      "id": "B07",
+      "inputExactUTF8OrInvalidHex": "7b2274657874223a225c7564383030227d",
+      "inputExactSHA256": "7d38e2388498cec03881027e7753b07826c5af2d61dd589b4c1caaab14ec2cc4",
+      "expectedResult": "REJECT",
+      "expectedReason": "unpaired-high-surrogate",
+      "expectedBodyHex": null,
+      "expectedBodySHA256": null,
+      "expectedDomainPlusBodyHex": null,
+      "expectedDomainPlusBodySHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22756e7061697265642d686967682d737572726f67617465222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "579780060e3e739bba1bb756128c0c76d2616e1907310305d0f6672998e47953",
+      "syntheticCanonicalizationOnly": true,
+      "actualGoRun": false
+    },
+    {
+      "id": "B08",
+      "inputExactUTF8OrInvalidHex": "7b2274657874223a225c7564633030227d",
+      "inputExactSHA256": "84ceb359a7fdecb7d3538ec2e4a17a62d58078f8fbf828e69a286c5d1fc76e10",
+      "expectedResult": "REJECT",
+      "expectedReason": "unpaired-low-surrogate",
+      "expectedBodyHex": null,
+      "expectedBodySHA256": null,
+      "expectedDomainPlusBodyHex": null,
+      "expectedDomainPlusBodySHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22756e7061697265642d6c6f772d737572726f67617465222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "97cfcc10f686400c60d325f6dbf375c181eb04b3493f99b1b865c35e1ac45cbb",
+      "syntheticCanonicalizationOnly": true,
+      "actualGoRun": false
+    },
+    {
+      "id": "B09",
+      "inputExactUTF8OrInvalidHex": "7b2274657874223a22c0af227d",
+      "inputExactSHA256": "3c10d6860b6c09eb9b315ea670b3b5e9d9db8c8c5be6502480289ce48922a61f",
+      "expectedResult": "REJECT",
+      "expectedReason": "overlong-utf8",
+      "expectedBodyHex": null,
+      "expectedBodySHA256": null,
+      "expectedDomainPlusBodyHex": null,
+      "expectedDomainPlusBodySHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a226f7665726c6f6e672d75746638222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "29b5b2ec841c69abcd1542b52ee98f2a455ccd9e90923d05dc1c37df7700cc29",
+      "syntheticCanonicalizationOnly": true,
+      "actualGoRun": false
+    },
+    {
+      "id": "B10",
+      "inputExactUTF8OrInvalidHex": "7b2274657874223a2200227d",
+      "inputExactSHA256": "fafcdbd27c08ea9cd7207b33e14e6093d4a6fb2bb5cff57147c2bc702a8bbf05",
+      "expectedResult": "REJECT",
+      "expectedReason": "raw-unescaped-json-nul",
+      "expectedBodyHex": null,
+      "expectedBodySHA256": null,
+      "expectedDomainPlusBodyHex": null,
+      "expectedDomainPlusBodySHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a227261772d756e657363617065642d6a736f6e2d6e756c222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "13a9683c3a7e89d20c7027a58df3e9517d5879138c3dfbff0e701ab6580ce15f",
+      "syntheticCanonicalizationOnly": true,
+      "actualGoRun": false
+    }
+  ],
+  "bodyNulRule": "Escaped JSON string NUL follows Go Marshal as B03; raw unescaped JSON NUL rejected as B10; argv embedded NUL always rejected as E06; actual wire field validation separate",
+  "strictUnicodeNoReplacement": true,
+  "noBlanketAsciiIdentifierRestriction": true,
+  "globalV1OrOuterSignatureNormalization": false,
+  "actualGoCrossLanguageRun": false,
+  "requiredFutureEvidence": "Actual published Go producer plus dedicated Python v2 verifier must compare all golden bytes/digests and rejection inputs under native CI before acceptance"
+}

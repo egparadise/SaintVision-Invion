@@ -4,31 +4,372 @@
   "schema": "bootstrap-plan.schema.json",
   "scope": "Document closure/refusal only; never runtime acceptance; no fabricated valid target provenance",
   "cases": [
-    {"id":"D01","patch":[],"expectedSchemaValid":true,"executionAllowed":false},
-    {"id":"D02","patch":[{"op":"replace","path":"/executionAuthorized","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D03","patch":[{"op":"add","path":"/force","value":false}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D04","patch":[{"op":"replace","path":"/targetBindings/p0ExecutableSHA256","value":"UNPUBLISHED"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D05","patch":[{"op":"replace","path":"/targetBindings/p0CIrunId","value":42023306438}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D06","patch":[{"op":"replace","path":"/rootBindings/rootG2Decision","value":"silently-approved"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D07","patch":[{"op":"replace","path":"/rootReportedScheduleChange/enabledAfter","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D08","patch":[{"op":"replace","path":"/members/0/expectedProfile","value":"lan-workspace-v1"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D09","patch":[{"op":"replace","path":"/barriers/normalRenewalUnsignedFallbackAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D10","patch":[{"op":"remove","path":"/targetBindings/newGuardIndependentVerdict"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D11","patch":[{"op":"replace","path":"/status","value":"READY"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D12","patch":[{"op":"replace","path":"/barriers/oldBackupRestartAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D13","patch":[{"op":"replace","path":"/stateMachineScope/rootOrderDecision","value":"silently-approved"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D14","patch":[{"op":"replace","path":"/members/0/bindings","value":{"peerFloorVersion":1}}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D15","patch":[{"op":"replace","path":"/targetBindings/p0DockerImageId","value":"UNPUBLISHED"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D16","patch":[{"op":"replace","path":"/g2Proposal/rootPlanningChoice/operationalAcceptance","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D17","patch":[{"op":"replace","path":"/barriers/labelOnlyMigrationPredecessorAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D18","patch":[{"op":"replace","path":"/barriers/migrationMarkerClearedToAllowLegacy","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D19","patch":[{"op":"replace","path":"/barriers/leafMarkerAloneIsMigrationFence","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D20","patch":[{"op":"replace","path":"/barriers/unsignedOrV1CmdlineOnlyExecutableProofAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D21","patch":[{"op":"replace","path":"/barriers/unknownM2ExecIdAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D22","patch":[{"op":"replace","path":"/barriers/imageInheritedConfigOverrideMaskingAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D23","patch":[{"op":"replace","path":"/barriers/compareJSONArgvHashToRawCmdlineHashAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D24","patch":[{"op":"replace","path":"/barriers/laterNormalAuthorityMayUseMigrationBaseline","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D25","patch":[{"op":"replace","path":"/requiredContractRefs/desiredM2AndArgv","value":"legacy-v1-proof-is-enough"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D26","patch":[{"op":"replace","path":"/priorIndependentPlanReview/thisRevisionVerdict","value":"ACCEPT"}],"expectedSchemaValid":false,"executionAllowed":false}
+    {
+      "id": "D01",
+      "patch": [],
+      "expectedSchemaValid": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "D02",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/executionAuthorized",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D03",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/force",
+          "value": false
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D04",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/targetBindings/p0ExecutableSHA256",
+          "value": "UNPUBLISHED"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D05",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/targetBindings/p0CIrunId",
+          "value": 42023306438
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D06",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/rootBindings/rootG2Decision",
+          "value": "silently-approved"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D07",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/rootReportedScheduleChange/enabledAfter",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D08",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/members/0/expectedProfile",
+          "value": "lan-workspace-v1"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D09",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/normalRenewalUnsignedFallbackAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D10",
+      "patch": [
+        {
+          "op": "remove",
+          "path": "/targetBindings/newGuardIndependentVerdict"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D11",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/status",
+          "value": "READY"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D12",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/oldBackupRestartAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D13",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/stateMachineScope/rootOrderDecision",
+          "value": "silently-approved"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D14",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/members/0/bindings",
+          "value": {
+            "peerFloorVersion": 1
+          }
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D15",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/targetBindings/p0DockerImageId",
+          "value": "UNPUBLISHED"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D16",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/g2Proposal/rootPlanningChoice/operationalAcceptance",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D17",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/labelOnlyMigrationPredecessorAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D18",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/migrationMarkerClearedToAllowLegacy",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D19",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/leafMarkerAloneIsMigrationFence",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D20",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/unsignedOrV1CmdlineOnlyExecutableProofAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D21",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/unknownM2ExecIdAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D22",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/imageInheritedConfigOverrideMaskingAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D23",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/compareJSONArgvHashToRawCmdlineHashAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D24",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/laterNormalAuthorityMayUseMigrationBaseline",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D25",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/requiredContractRefs/desiredM2AndArgv",
+          "value": "legacy-v1-proof-is-enough"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D26",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/priorIndependentPlanReview/thisRevisionVerdict",
+          "value": "ACCEPT"
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D27",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/secondBinaryMigrationAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D28",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/legacySchedulerReRegistrationAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D29",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/globalOuterSignatureNormalizationAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D30",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/blanketAsciiIdentifierRestrictionAllowed",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "D31",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/barriers/bodyTransportNewlineIncludedInSignature",
+          "value": true
+        }
+      ],
+      "expectedSchemaValid": false,
+      "executionAllowed": false
+    }
   ]
 }

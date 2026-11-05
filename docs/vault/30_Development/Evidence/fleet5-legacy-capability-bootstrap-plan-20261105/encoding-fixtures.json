@@ -49,5 +49,68 @@
       "publishedExecutableSHA256": null,
       "runtimeExecutionAllowed": false
     }
-  ]
+  ],
+  "negativeVectors": [
+    {
+      "id": "E04",
+      "syntheticEncodingOnly": true,
+      "inputKind": "raw-nul-cmdline",
+      "inputExactHex": "2f696e762d6e6f6465002d2d7365727665",
+      "inputExactSHA256": "b4acc634d270f7c0f8c712ee43327236f9eec08b51488036702c12ddd6cf046d",
+      "expectedResult": "REJECT",
+      "expectedReason": "missing-terminal-nul",
+      "expectedCanonicalOutputHex": null,
+      "expectedCanonicalOutputSHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a226d697373696e672d7465726d696e616c2d6e756c222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "005fa25980099619dcdef814f4ebbec62bff143d41c6db3cbd39409aa9858ae5",
+      "verdictIsNotSignableBody": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "E05",
+      "syntheticEncodingOnly": true,
+      "inputKind": "raw-nul-cmdline",
+      "inputExactHex": "2f696e762d6e6f646500ff00",
+      "inputExactSHA256": "717afdb971fb73bb585d2c922fd43dcb722bd39cb900d1c6c9cf4f5a2ac4b667",
+      "expectedResult": "REJECT",
+      "expectedReason": "invalid-utf8",
+      "expectedCanonicalOutputHex": null,
+      "expectedCanonicalOutputSHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22696e76616c69642d75746638222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "51439207a9c9601c4dd39063a301b97d81e80c5c36cdf0d2c592cda4d6f99a9f",
+      "verdictIsNotSignableBody": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "E06",
+      "syntheticEncodingOnly": true,
+      "inputKind": "utf8-json-argv",
+      "inputExactHex": "5b222f696e762d6e6f6465222c22615c753030303062225d",
+      "inputExactSHA256": "8f82610a77e2fefd89a6c5ec97c8f1794ebaadf2bd3b55f17c2b3156b6edc4f5",
+      "expectedResult": "REJECT",
+      "expectedReason": "embedded-argv-nul",
+      "expectedCanonicalOutputHex": null,
+      "expectedCanonicalOutputSHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22656d6265646465642d617267762d6e756c222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "a71022c9a936cb85d9654175482f56250c56d17c2915c003a948d59711070a64",
+      "verdictIsNotSignableBody": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "E07",
+      "syntheticEncodingOnly": true,
+      "inputKind": "utf8-json-argv",
+      "inputExactHex": "5b222f696e762d6e6f6465222c225c7564383030225d",
+      "inputExactSHA256": "384d4ec3efa1cc18acb39c193a7602f0ecd111a638531e93d49a6e09c82c3afa",
+      "expectedResult": "REJECT",
+      "expectedReason": "unpaired-surrogate",
+      "expectedCanonicalOutputHex": null,
+      "expectedCanonicalOutputSHA256": null,
+      "expectedHarnessVerdictUTF8Hex": "7b22726561736f6e223a22756e7061697265642d737572726f67617465222c22726573756c74223a2252454a454354227d",
+      "expectedHarnessVerdictSHA256": "f411c5b5efd153bd1147c3055a1e145ab891be0abf31007b697a1a9c51241692",
+      "verdictIsNotSignableBody": true,
+      "runtimeExecutionAllowed": false
+    }
+  ],
+  "negativeVerdictEncoding": "UTF8 compact sorted JSON {reason,result}; harness record only, NOT canonical/signable body; invalid input produces no canonical bytes/digest"
 }

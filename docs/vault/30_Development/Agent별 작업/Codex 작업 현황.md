@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.371"
+version: "1.0.372"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T23:13:05+09:00"
+updated: "2026-11-05T23:36:46+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Actual9e8 NONEXECUTING plan ACCEPT with C1-C3; code/contracts/runtimeCI/operations unaccepted; P0 corrections and planLow/contractproposal active; legacy3 disabled"
-active_card_next: "Plan owner closes C1-C3 and proposes precise contracts; P0 owner delivers source/native/Core/review; Root handles actual results and keeps execution HOLD; integration waits actual P0"
+active_card_status: "803 plan C1-C3 actualLow review task667/ctx9fd4 started; prior9e8 NONEXECUTING ACCEPT preserved; actualGo0/P0 and contracts/runtime unaccepted"
+active_card_next: "Claude delivers actual803 Low verdict; owner then prepares authorized precise contracts; P0 delivers source/native/Core/review; Root keeps actual operations HOLD"
 ---
+
+## 2026-11-05 보완안803 Low 독립 검토
+
+작업한 것: plan803 exact Docs 성공과18문서 delta를 확인하고 실제 task_667a078e2dc3/ctx_9fd4c380b503를 시작했다. 확인한 것: owner의31문서/22hash/Python golden은 실제 Go0과 구별한다. 다음 첫 행동/담당: Claude가 C1–C3·재현 fixture·원래 guard 비회귀의 실제 판정을 제출하면 Root가 pending msg_b661a20575b9에 답한다. 계획 담당의 구체 계약 proposal과 P0 source/native 검증은 별도이며 운영은 HOLD다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 비실행 계획 수락과 후속 조건
 

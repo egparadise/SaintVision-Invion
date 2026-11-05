@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-LEGACY-CAPABILITY-BOOTSTRAP-PLAN-20261105-CODEX"
 title: "FLEET5 legacy capability bootstrap and replacement renewal plan"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T22:50:12+09:00"
+updated: "2026-11-05T23:27:08+09:00"
 source_of_truth: "Git"
 ---
 
@@ -233,8 +233,9 @@ sets include the new field. It is absent from unaccepted6c. Actual wire/source/
 binary/CI/verdict bindings remain null. Existing `servingProcessSHA256` retains
 its exact v1 meaning, SHA256 of raw cmdline including its final NUL; historical
 receipts are never reinterpreted. Existing v1/missing bytes field cannot satisfy
-the new bootstrap proof. Signing-body ASCII-escaped compact canonical JSON is
-separate again from argv JSON encoding.
+the new bootstrap proof. Root's later C2 selection below defines desired v2 BODY
+as Go Marshal-map compact UTF8/HTML-escaped bytes, distinct from argv JSON and
+from historical v1/outer-receipt/CP-commit signature canonicalization.
 
 `desired-m2-v2-and-argv-contract.json` names each hash. Cmd and Entrypoint JSON
 hashes preserve their separate exact ordered string arrays. Full serving argv is
@@ -490,3 +491,77 @@ Nine source cases and ten encoding cases matched independently of product code.
 Actual required local gates and canonical Git hashes are captured in the revised
 validation receipt; normal push/exact Docs/new actual delta review follow. No
 acceptance is inferred from an author response or a passing document schema.
+
+## Actual 9e8 ACCEPT and Low conditions C1–C3
+
+Actual Claude `task_3c24efc159b8` / `ctx_9fe3a9741db8` review
+`a471ce1988e444270fdf83283fee18e0342ddd69` **ACCEPTS immutable9e8 as a
+NONEXECUTING PLAN**, closing R1/R2/R4/N1/N2 at plan level with Low C1–C3 carried
+forward. This worker read the full original JSON and formal History; Root reports
+exact review Docs42041692267 successful at a471/all jobs. Earlier cde/1057
+REVISION REQUIRED verdicts and the original9e8 conditions remain preserved;
+this1.0.3 Low response is not yet independently reviewed. Implementation,
+contracts, P0, runtime CI, operations and physical acceptance remain unaccepted
+or HOLD, with all30/eighteen/member slots null and future product cases NOT RUN.
+
+**C1:** The common fence, consumer closure and G9 explicitly mark
+Register-LeafRenewalTask.ps1, Invoke-ScheduledLeafRenewal.ps1 and
+tools/scheduled_leaf_renewal.py **DENIED** generic registration/re-registration,
+launch and execution surfaces for every migration phase, including terminal.
+Registering a new Windows task outside the three disabled Orca IDs is still a
+launch surface; those three disabled IDs are not an exhaustive fence. No task,
+scheduler definition, precheck or permission was inspected or modified here.
+
+**C2 Root-selected desired v2 BODY:** Use **exact Go encoding/json.Marshal(map)
+semantics** on the strict typed body excluding nodeSignature: sorted keys,
+compact UTF8, Go HTML escaping for less-than/greater-than/ampersand and escaping
+of U+2028/U+2029; strict valid UTF8/Unicode scalars, no normalization, no BODY
+newline. A dedicated Python **v2 floor-body** mapping must generate the exact
+same bytes. `ensure_ascii=True` is not that mapping, and banning otherwise
+legitimate nonASCII identifiers to hide the mismatch is not allowed. Closed M2
+numeric fields keep their integer types; there is no float coercion.
+
+Transport encoder newline is separate from BODY and domain-plus-BODY bytes.
+Do not rewrite archived v1 bytes or normalize unrelated outer receipts/CP commit
+signature domains. Root's C2 direction was sent to the separately assigned P0
+author (`msg_bb65618c0b49`); source implementation is his scope. Actual earlier
+R1/N1 semantic compatibility (`msg_03604b3e6bed`, Root-relayed) is recorded as
+planning-only, with code/source/native/CI/verdict unpublished/unaccepted; it is
+not an inferred C2 implementation or operational acceptance.
+
+`m2-v2-body-golden-fixtures.json` publishes exact synthetic inputs, independently
+specified expected BODY/domain-message bytes and digests for nonASCII/HTML,
+controls, separators, combining/precomposed and supplementary scalars. Invalid
+UTF8/surrogate/raw-unescaped JSON NUL inputs and exact rejection expectations are
+also published. Escaped JSON NUL follows Go string encoding; argv embedded NUL
+is rejected. The positive expected bytes matched the Python document reference;
+**no actual Go producer/verifier/signing/runtime comparison has run**. Such a
+cross-language actual Go run is mandatory future evidence, not a document PASS.
+
+`encoding-fixtures.json` now publishes the exact E04–E07 negative inputs and their
+input SHA256, expected absence of canonical output, and fully specified synthetic
+harness rejection-record bytes/digests. These four inputs were reproduced; old
+E01–E03 vectors remain unchanged. A rejection record is not signable BODY or
+runtime evidence. No input, key or process observation came from private r5.
+
+**C3:** Any **second binary migration** on an existing migration journal/seal is
+BLOCKED until a separately reviewed design. Do not delete, replace, rotate or
+append predecessors, clear markers or expand the consumer count to make it work.
+Exact first-plan resume and approved normal:3 leaf renewals are distinct and
+remain governed by their existing rules; the latter does not change runtime image.
+
+After actual Low delta review, the next already-authorized documentation phase
+is a concrete proposal of **closed normative migration-journal, common-fence and
+runtime-inventory schemas**, precise APIs/ownership/provenance and acceptance-task
+breakdown for Root's contract/implementation decision. This is not permission to
+implement a helper/product, issue leaves, restart old images, change schedules or
+operate hardware. No user approval is needed for these authorized document tasks.
+
+The Low response's document validation matched **31/31** mutation cases
+(1 valid HOLD,30 rejected,0 failures), reproduced all4 newly published E04–E07
+negative inputs, and matched5 manually expected v2 BODY byte/digest vectors plus
+5 invalid BODY inputs with the Python document reference. Actual Go/signing/
+runtime runs remain0. Forty future product acceptance cases remain NOT RUN;
+all30 target/eighteen Root values and both member envelopes remain null. Local
+gate intervals/exits/raw output and final artifact hashes are recorded separately;
+the required Low delta review is actual and still pending for this new revision.

@@ -21,8 +21,11 @@
     "worker_config.install_files/credential publication and CLI", "worker_execution and Enable-ExecutionTests.ps1", "worker_workspace and Enable-Workspace.ps1 including rollback",
     "worker_storage/worker_storage_bridge and Replace-Storage.ps1", "worker_replace/worker_replacement mutating methods",
     "worker_leaf_rotation legacy/normal dispatch/restart/rollback", "worker_plain_rotation normal:3 mutations", "worker_peer_floor target/observe/context scope resolution",
+    "Register-LeafRenewalTask.ps1 DENIED", "Invoke-ScheduledLeafRenewal.ps1 DENIED", "tools/scheduled_leaf_renewal.py DENIED",
     "Controller cohort prepare/stage/commit/retire/metadata publication adapters and NEW renewal guard/launchers"
   ],
+  "legacySchedulerSurfaces": "DENIED generic registration/re-registration/invocation/execution for all migration marker phases, including terminal; a newly registered Windows task outside the three disabled Orca IDs is still an unauthorized launch surface and G9 HOLD",
+  "secondMigration": "DENY any second binary migration or new migration ID/target on a Node with an existing migration journal/seal until a separate reviewed design; no predecessor deletion/replacement/rotation, no marker reset; ordinary approved normal:3 leaf renewal is not a second binary migration",
   "firstMutationBoundary": "Guard before mkdir/CSR/key generation/copy/archive publication/image load/container start/stop/create/rename/restart or CP channel/publication mutation; read-only manifest parsing may only resolve and verify trusted existing scope",
   "directFunctionAndRawInvocationLimits": [
     "Future supported Python mutator functions require guard-owned operation context themselves, not just a top-level wrapper; Shell/PowerShell entrypoints delegate to fixed hash-bound guard runner that holds ownership for the entire operation",

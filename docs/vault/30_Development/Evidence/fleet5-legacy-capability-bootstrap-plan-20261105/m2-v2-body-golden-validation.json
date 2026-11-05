@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "fleet5-m2-v2-document-golden-validation:1",
+  "validExpectedBodiesMatched": 5,
+  "invalidInputsRejected": 5,
+  "failed": 0,
+  "manuallyPublishedExpectedBodyBytes": true,
+  "pythonReferenceOnly": true,
+  "actualGoRuns": 0,
+  "actualSigningOrRuntimeRuns": 0,
+  "productAcceptance": false
+}
