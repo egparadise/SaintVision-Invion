@@ -1,0 +1,92 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-migration-proof-envelope:1"
+        },
+        "contractId": {
+          "const": "saintvision-proof-m2-capability:1"
+        },
+        "typedSubject": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "m2-capability"
+            },
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "executableSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "receiptSchema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "sourceSHA",
+            "executableSHA256",
+            "receiptSchema"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        },
+        "validUntil": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "contractId",
+        "typedSubject",
+        "observedAt",
+        "validUntil"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "ci-attestor"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-k1-proposal.invalid/m2-capability.schema.json"
+}

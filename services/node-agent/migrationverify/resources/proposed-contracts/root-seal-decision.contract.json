@@ -1,0 +1,85 @@
+{
+  "contractId": "saintvision-proof-root-seal-decision:1",
+  "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+  "producerRole": "root-operator",
+  "signerRole": "root-seal",
+  "requiredVerifier": "pretrusted:root-seal-decision:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "root-seal-decision.schema.json",
+  "schemaSHA256": "2d277069f0d6ef238d496b03c15b5b2ab8a37c16dbad15a00a2afcffa9466acf",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "root-seal-decision"
+      },
+      "planEnvelopeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "inventoryEnvelopeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "recoveryEpoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          }
+        },
+        "required": [
+          "tenantId",
+          "nodeId",
+          "recoveryEpoch"
+        ]
+      },
+      "migrationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "planEnvelopeSHA256",
+      "inventoryEnvelopeSHA256",
+      "scope",
+      "migrationId"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "api-request[seal]:/arguments/rootSealDecision"
+  ]
+}

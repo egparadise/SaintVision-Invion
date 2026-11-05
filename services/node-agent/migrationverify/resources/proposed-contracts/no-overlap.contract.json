@@ -1,0 +1,59 @@
+{
+  "contractId": "saintvision-proof-no-overlap:1",
+  "signatureDomainASCII": "saintvision/proof/no-overlap/v1",
+  "producerRole": "root-process-reader",
+  "signerRole": "root-observer",
+  "requiredVerifier": "pretrusted:no-overlap:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "no-overlap.schema.json",
+  "schemaSHA256": "3153c18ab404681bbfb218e72d0dbdfe671f5d30fdf9fea0f611c176f628db1d",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "no-overlap"
+      },
+      "cohortScopesSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "operationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "descendantSetSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "allQuiescent": {
+        "const": true
+      }
+    },
+    "required": [
+      "kind",
+      "cohortScopesSHA256",
+      "operationId",
+      "descendantSetSHA256",
+      "allQuiescent"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/noOverlap"
+  ]
+}

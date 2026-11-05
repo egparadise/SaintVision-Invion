@@ -1,0 +1,110 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-migration-proof-envelope:1"
+        },
+        "contractId": {
+          "const": "saintvision-proof-no-overlap:1"
+        },
+        "typedSubject": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "no-overlap"
+            },
+            "cohortScopesSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "operationId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "descendantSetSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "allQuiescent": {
+              "const": true
+            }
+          },
+          "required": [
+            "kind",
+            "cohortScopesSHA256",
+            "operationId",
+            "descendantSetSHA256",
+            "allQuiescent"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        },
+        "validUntil": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\u0000]*$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "contractId",
+        "typedSubject",
+        "observedAt",
+        "validUntil",
+        "migrationId",
+        "operationId"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "root-observer"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-k1-proposal.invalid/no-overlap.schema.json"
+}

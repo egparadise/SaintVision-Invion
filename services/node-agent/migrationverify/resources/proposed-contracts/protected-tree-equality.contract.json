@@ -1,0 +1,91 @@
+{
+  "contractId": "saintvision-proof-protected-tree-equality:1",
+  "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+  "producerRole": "owned-host-adapter",
+  "signerRole": "host-helper",
+  "requiredVerifier": "pretrusted:protected-tree-equality:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "protected-tree-equality.schema.json",
+  "schemaSHA256": "87f30c0d14e5dd738cc6c55f6108cdfbf0af56ee178f85d3a99887f32567914a",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "protected-tree-equality"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "recoveryEpoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          }
+        },
+        "required": [
+          "tenantId",
+          "nodeId",
+          "recoveryEpoch"
+        ]
+      },
+      "volumeMetadataSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "beforeTreeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "afterTreeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "operationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "scope",
+      "volumeMetadataSHA256",
+      "beforeTreeSHA256",
+      "afterTreeSHA256",
+      "operationId"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+    "runtime-inventory:/body/members/*/protectedStateEquality"
+  ]
+}

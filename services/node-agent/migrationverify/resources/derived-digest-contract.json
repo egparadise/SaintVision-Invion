@@ -1,0 +1,12 @@
+{
+  "status": "PROPOSED_NOT_REGISTERED",
+  "classification": "DERIVED_DIGEST",
+  "derivedDomainASCII": "saintvision/derived/migration-cohort-projection-set/v1",
+  "suffixByteHex": "00",
+  "body": "The entire closed unsigned record itself, strict accepted C2 map bytes without BOM/newline; no body wrapper or signer",
+  "digest": "SHA256(domain ASCII +00+ C2 record)",
+  "signatureOrAttestation": false,
+  "rootFenceSignsDerivedSets": false,
+  "actualCanonicalRegistrySHA256": null,
+  "actualVerifierSourceArtifactCIReview": null
+}

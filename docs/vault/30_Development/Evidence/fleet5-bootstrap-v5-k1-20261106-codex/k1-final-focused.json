@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./migrationverify"
+  ],
+  "exit": 0,
+  "atKST": "2026-11-06T06:16:06.249082+09:00",
+  "reason": "final zero-state missing-registry guard hardening after full Node suite; no existing Node source changed",
+  "passedTopLevelTests": 30,
+  "passEvents": 121,
+  "failures": []
+}

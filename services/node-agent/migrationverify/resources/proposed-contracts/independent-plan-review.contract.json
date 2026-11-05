@@ -1,0 +1,43 @@
+{
+  "contractId": "saintvision-proof-independent-plan-review:1",
+  "signatureDomainASCII": "saintvision/proof/independent-plan-review/v1",
+  "producerRole": "independent-reviewer",
+  "signerRole": "independent-reviewer",
+  "requiredVerifier": "pretrusted:independent-plan-review:1",
+  "freshness": "validity-bounded-approval",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "independent-plan-review.schema.json",
+  "schemaSHA256": "f3bffb3e70b853236dd973550af2ff38aa5acff2593d1bb757ad3eb92c705f4f",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "independent-plan-review"
+      },
+      "planSubjectSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "planSubjectSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/independentPlanReview"
+  ]
+}

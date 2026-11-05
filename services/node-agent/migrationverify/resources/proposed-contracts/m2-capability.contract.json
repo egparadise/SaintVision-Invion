@@ -1,0 +1,55 @@
+{
+  "contractId": "saintvision-proof-m2-capability:1",
+  "signatureDomainASCII": "saintvision/proof/m2-capability/v1",
+  "producerRole": "native-test-producer",
+  "signerRole": "ci-attestor",
+  "requiredVerifier": "pretrusted:m2-capability:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "m2-capability.schema.json",
+  "schemaSHA256": "57c5db5e2533244c3ad8dd5e47c639626616b50e48ffbd32513f2c9a6d4fcfbd",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "m2-capability"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "executableSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "receiptSchema": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "sourceSHA",
+      "executableSHA256",
+      "receiptSchema"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/m2CapabilityProof"
+  ]
+}

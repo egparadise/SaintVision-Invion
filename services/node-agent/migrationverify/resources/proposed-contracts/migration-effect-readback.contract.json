@@ -1,0 +1,110 @@
+{
+  "contractId": "saintvision-proof-migration-effect-readback:1",
+  "signatureDomainASCII": "saintvision/proof/migration-effect-readback/v1",
+  "producerRole": "owned-engine-adapter",
+  "signerRole": "host-helper",
+  "requiredVerifier": "pretrusted:migration-effect-readback:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "migration-effect-readback.schema.json",
+  "schemaSHA256": "d5d08bd89b26749fd8d07a099a6ba7f7daa31f9a3c057c4b39a1ed90c98eee16",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "migration-effect-readback"
+      },
+      "planEnvelopeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "migrationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "operationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "sequence": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      },
+      "method": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "effectKind": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "targetSlot": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^[^\\u0000]*$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "intentEventSHA256": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "outcome": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "planEnvelopeSHA256",
+      "migrationId",
+      "operationId",
+      "sequence",
+      "method",
+      "effectKind",
+      "targetSlot",
+      "intentEventSHA256",
+      "outcome"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "migration-event:/body/effect/receipt"
+  ]
+}

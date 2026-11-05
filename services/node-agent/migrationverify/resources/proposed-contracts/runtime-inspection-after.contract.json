@@ -1,0 +1,107 @@
+{
+  "contractId": "saintvision-proof-runtime-inspection-after:1",
+  "signatureDomainASCII": "saintvision/proof/runtime-inspection-after/v1",
+  "producerRole": "owned-engine-adapter",
+  "signerRole": "host-helper",
+  "requiredVerifier": "pretrusted:runtime-inspection-after:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "runtime-inspection-after.schema.json",
+  "schemaSHA256": "560bf6179890ebef3e02aa1220c8115cc7eadeba8f9d1e2600bd020d96655e2a",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "runtime-inspection-after"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "recoveryEpoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          }
+        },
+        "required": [
+          "tenantId",
+          "nodeId",
+          "recoveryEpoch"
+        ]
+      },
+      "daemonIdentitySHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "containerId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "imageId": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "configSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "mountsSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "processGenerationSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "point": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "scope",
+      "daemonIdentitySHA256",
+      "containerId",
+      "imageId",
+      "configSHA256",
+      "mountsSHA256",
+      "processGenerationSHA256",
+      "point"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "runtime-inventory:/body/members/*/runtimeInspectionAfterM2"
+  ]
+}

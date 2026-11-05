@@ -1,0 +1,103 @@
+{
+  "contractId": "saintvision-proof-owned-engine-exec:1",
+  "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+  "producerRole": "owned-engine-adapter",
+  "signerRole": "host-helper",
+  "requiredVerifier": "pretrusted:owned-engine-exec:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "owned-engine-exec.schema.json",
+  "schemaSHA256": "4b521aaee09f39b4daf74448c696f24768003d9262e653fbc338561ea5a84119",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "owned-engine-exec"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "recoveryEpoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          }
+        },
+        "required": [
+          "tenantId",
+          "nodeId",
+          "recoveryEpoch"
+        ]
+      },
+      "daemonIdentitySHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "containerId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "execId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "commandSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "uid": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 4294967295
+      },
+      "exitCode": {
+        "const": 0
+      }
+    },
+    "required": [
+      "kind",
+      "scope",
+      "daemonIdentitySHA256",
+      "containerId",
+      "execId",
+      "commandSHA256",
+      "uid",
+      "exitCode"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "api-request[verifyBootstrap]:/arguments/execReceipt",
+    "runtime-inventory:/body/members/*/execReceipt"
+  ]
+}

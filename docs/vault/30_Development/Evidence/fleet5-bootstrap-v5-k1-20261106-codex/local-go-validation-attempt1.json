@@ -1,0 +1,81 @@
+{
+  "runs": [
+    {
+      "name": "node-go-suite",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "exit": 1,
+      "startedAtKST": "2026-11-06T06:08:35.294776+09:00",
+      "endedAtKST": "2026-11-06T06:09:01.094933+09:00",
+      "passedTests": 233,
+      "skippedTests": 0,
+      "failedTests": [
+        "TestAPI2RejectsEveryOldFieldAndNodeCohortTypeConfusion",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify"
+      ],
+      "packages": [
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer",
+          "action": "skip"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+          "action": "pass"
+        },
+        {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+          "action": "fail"
+        }
+      ],
+      "k1PassedTests": 119
+    }
+  ],
+  "go": "1.27.0 windows/amd64",
+  "raceLocal": "NOT RUN: CGO_ENABLED=0; exact hosted Core Linux go test -race ./... required",
+  "physicalActions": 0
+}

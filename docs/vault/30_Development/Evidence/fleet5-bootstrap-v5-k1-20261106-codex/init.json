@@ -1,0 +1,267 @@
+{
+  "task": "FLEET5-BOOTSTRAP-V5-K1-OFFLINE-VERIFIER-20261106",
+  "orcaTask": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "base": "e50c148287779add421265868ef16909ed984650",
+  "owner": "Codex",
+  "reviewer": "Claude via Root pending actual code review",
+  "rootIndex": "1.0.418",
+  "rootCodex": "1.0.379",
+  "registrationSHA256": "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562",
+  "designSource": "8874b2dfe0dda9a019bd5f334636668290702e13",
+  "startedAtKST": "2026-11-06T05:26:49.976324+09:00",
+  "scope": "pure offline verifier only; no operational effects; live trust NULL/HOLD",
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0"
+  },
+  "copiedPins": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/common.schema.json",
+      "rawBytes": 21464,
+      "rawSHA256": "d056b1b1b6bbc76f562cc1123036703ceea085bbd269bf86b86367b382ae6db4",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/common.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/common.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/migration-event.schema.json",
+      "rawBytes": 65364,
+      "rawSHA256": "9e9a9e47ea1300799a219c9f6634bec73f40ef4a2a63deb2cab228305601456d",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/migration-event.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/migration-event.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/migration-journal.schema.json",
+      "rawBytes": 18396,
+      "rawSHA256": "d2aff35f7090b1753964c67f8f0c184c2becce207b67e40c96058c3c7e8d36b3",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/migration-journal.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/migration-journal.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/operation-lease.schema.json",
+      "rawBytes": 13027,
+      "rawSHA256": "f84910b33336507a243414687ca2ca48e2867880cdba652c170f17e3f2017c3a",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/operation-lease.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/operation-lease.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/runtime-inventory.schema.json",
+      "rawBytes": 78148,
+      "rawSHA256": "b6088bb3c8dc1255b97a5770307f442deaabba032b88cfecdc4d94f56ac5f2bd",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/runtime-inventory.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/runtime-inventory.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/successor-plan.schema.json",
+      "rawBytes": 185917,
+      "rawSHA256": "7cdde62b82e5af7d9162313575c814ee1135e5b1ce12a66bd86f2536bd548161",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/successor-plan.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/successor-plan.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2/terminal-seal.schema.json",
+      "rawBytes": 16725,
+      "rawSHA256": "f8f9840cf8128d234acf2cb6b11e85a825c5737891fa1dc6db173fda5c9adab1",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v2/terminal-seal.schema.json",
+      "sourceHasExplicitID": false,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v2/terminal-seal.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-event.schema.json",
+      "rawBytes": 33624,
+      "rawSHA256": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/migration-event.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/migration-event.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-journal.schema.json",
+      "rawBytes": 3352,
+      "rawSHA256": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/migration-journal.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/migration-journal.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/operation-lease.schema.json",
+      "rawBytes": 1036,
+      "rawSHA256": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/operation-lease.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/operation-lease.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/runtime-inventory.schema.json",
+      "rawBytes": 4900,
+      "rawSHA256": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/runtime-inventory.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/runtime-inventory.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/successor-plan.schema.json",
+      "rawBytes": 1034,
+      "rawSHA256": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/successor-plan.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/successor-plan.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/terminal-seal.schema.json",
+      "rawBytes": 348,
+      "rawSHA256": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v3/terminal-seal.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v3/terminal-seal.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/migration-event.schema.json",
+      "rawBytes": 704,
+      "rawSHA256": "b5fddd5a9b55e7f8f278c45c960e92bed3644ab5f3ee685e639d94a911b0df35",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v4/migration-event.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v4/migration-event.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/api-request.schema.json",
+      "rawBytes": 150514,
+      "rawSHA256": "eaf004cad8357d8956da90a0891a0d3a612bf079ed5d452ba93fbc61f8135f8d",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v5/api-request.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v5/api-request.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/api-response.schema.json",
+      "rawBytes": 3551,
+      "rawSHA256": "b37764080b656dc4481cf1bfca47dec96e90194a864c13d802a07770b8e7f3aa",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v5/api-response.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v5/api-response.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/cohort-projection-set.schema.json",
+      "rawBytes": 4560,
+      "rawSHA256": "35e8a2b87216a62b75399313e0bb38856cba015820797286caee66712ff1a645",
+      "offlineResourceID": "https://fleet5-doc-fixture.invalid/v5/cohort-projection-set.schema.json",
+      "sourceHasExplicitID": true,
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/schemas/v5/cohort-projection-set.schema.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/trust-bootstrap-contract.json",
+      "rawBytes": 1510,
+      "rawSHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/trust-bootstrap-contract.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/proof-slot-registry.json",
+      "rawBytes": 138128,
+      "rawSHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/proof-slot-registry.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/recipe-definitions.json",
+      "rawBytes": 19687,
+      "rawSHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/recipe-definitions.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/derived-digest-contract.json",
+      "rawBytes": 531,
+      "rawSHA256": "707ada226f0fc6b62372ae176b94deb424adead002f462387f0a8bc8be95956b",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "resources/derived-digest-contract.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/dummy-signer-policy.json",
+      "rawBytes": 39241,
+      "rawSHA256": "e897f5a150a069ae05b1d2f9ff8fdc84aab5921c0c58c248b0e38b39bc7c2c90",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/dummy-signer-policy.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/artifact-reference-graph.json",
+      "rawBytes": 1034425,
+      "rawSHA256": "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/artifact-reference-graph.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/scenario-inputs.json",
+      "rawBytes": 86626,
+      "rawSHA256": "a4f4a40765f8815f70b130ee2db139c244ba9da5a209890285ed76380341346a",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/scenario-inputs.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/scenario-objects.json",
+      "rawBytes": 679142,
+      "rawSHA256": "d695fb715b0965e51052933ed948afdedf5888ed489c09b829f081a5ba10b841",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/scenario-objects.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/reference-graph-coverage.json",
+      "rawBytes": 79031,
+      "rawSHA256": "cdd9266060b1e84f0dbf00c90cfdbde71c2730c78d7c2230354a8859b60f2e09",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/reference-graph-coverage.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/actual-bindings-HOLD.json",
+      "rawBytes": 2170,
+      "rawSHA256": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/actual-bindings-HOLD.json"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/derived-byte-ordering-vectors.json",
+      "rawBytes": 37834,
+      "rawSHA256": "f6d79189bc45dd3d30d7b2b78590c272cb95bfb08181518555fc341164dc4b1b",
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "packagePath": "testdata/derived-byte-ordering-vectors.json"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-migration-proof-envelope:1"
+        },
+        "contractId": {
+          "const": "saintvision-proof-ci-attestation:1"
+        },
+        "typedSubject": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "ci-attestation"
+            },
+            "component": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "repository": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "workflow": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "headSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "event": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "runId": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "runAttempt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "kind",
+            "component",
+            "repository",
+            "workflow",
+            "headSHA",
+            "ref",
+            "event",
+            "runId",
+            "runAttempt",
+            "artifactSHA256"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        },
+        "validUntil": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "contractId",
+        "typedSubject",
+        "observedAt",
+        "validUntil"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "ci-attestor"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-k1-proposal.invalid/ci-attestation.schema.json"
+}

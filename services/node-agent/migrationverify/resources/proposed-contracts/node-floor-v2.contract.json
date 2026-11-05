@@ -1,0 +1,121 @@
+{
+  "contractId": "saintvision-proof-node-floor-v2:1",
+  "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+  "producerRole": "actual-serving-node",
+  "signerRole": "node-leaf",
+  "requiredVerifier": "pretrusted:node-floor-v2:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "native-m2-v2",
+  "schemaFile": "node-floor-v2.schema.json",
+  "schemaSHA256": "14f09f682837e8abfd84cfafc6acde88734e0d6480fec4098c0c4a60230fbf01",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "node-floor-v2"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          },
+          "recoveryEpoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\u0000]*$"
+          }
+        },
+        "required": [
+          "tenantId",
+          "nodeId",
+          "recoveryEpoch"
+        ]
+      },
+      "nonce": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "certificateDERSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "peerPolicyVersion": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      },
+      "peerPolicySHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "floorSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "journalIdentitySHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "journalUID": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 4294967295
+      },
+      "servingPID": {
+        "const": 1
+      },
+      "servingExecutableSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "servingProcessSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "scope",
+      "nonce",
+      "certificateDERSHA256",
+      "peerPolicyVersion",
+      "peerPolicySHA256",
+      "floorSHA256",
+      "journalIdentitySHA256",
+      "journalUID",
+      "servingPID",
+      "servingExecutableSHA256",
+      "servingProcessSHA256"
+    ]
+  },
+  "signatureProjection": "all native fields excluding nodeSignature",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": false,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "exact authenticated native fields and verified certificate",
+    "observedAt": "UTC whole-second conversion of signed Unix seconds",
+    "validUntil": "VERIFIED_DERIVED_BOUND min(observedAt+age,certificate.NotAfter,plan.expiresAt,currentLease.expiresAt)",
+    "keySPKISHA256": "SHA256(canonical Ed25519 SPKI DER from verified certificate)"
+  },
+  "slotIds": [
+    "api-request[verifyBootstrap]:/arguments/signedM2",
+    "runtime-inventory:/body/members/*/signedM2",
+    "terminal-seal:/body/bootstrapM2"
+  ]
+}

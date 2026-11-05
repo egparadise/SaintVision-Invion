@@ -1,0 +1,53 @@
+{
+  "contractId": "saintvision-proof-old-new-no-write:1",
+  "signatureDomainASCII": "saintvision/proof/old-new-no-write/v1",
+  "producerRole": "native-test-producer",
+  "signerRole": "ci-attestor",
+  "requiredVerifier": "pretrusted:old-new-no-write:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "old-new-no-write.schema.json",
+  "schemaSHA256": "37b7d1ca5893e70b863eac650074358df3d1151871afe487ec84a87ded902aa6",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "old-new-no-write"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "newExecutableSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "compatibilityFixtureSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "sourceSHA",
+      "newExecutableSHA256",
+      "compatibilityFixtureSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/oldNewNoWriteCompatibility"
+  ]
+}

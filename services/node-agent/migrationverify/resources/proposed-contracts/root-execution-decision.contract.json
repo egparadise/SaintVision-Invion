@@ -1,0 +1,57 @@
+{
+  "contractId": "saintvision-proof-root-execution-decision:1",
+  "signatureDomainASCII": "saintvision/proof/root-execution-decision/v1",
+  "producerRole": "root-operator",
+  "signerRole": "root-execution",
+  "requiredVerifier": "pretrusted:root-execution-decision:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "root-execution-decision.schema.json",
+  "schemaSHA256": "1e48a65750575b9013bf6c1f4a2c7a755d02a89ec80abe2ed895b00b878c6423",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "root-execution-decision"
+      },
+      "planEnvelopeSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "operationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "migrationId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "planEnvelopeSHA256",
+      "operationId",
+      "migrationId"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "api-request[reserve]:/arguments/rootExecutionDecision"
+  ]
+}

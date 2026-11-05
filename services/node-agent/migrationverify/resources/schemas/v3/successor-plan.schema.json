@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v3/successor-plan.schema.json",
+  "allOf": [
+    {
+      "$ref": "../v2/successor-plan.schema.json"
+    },
+    {
+      "properties": {
+        "body": {
+          "properties": {
+            "expectedInventoryHead": {
+              "properties": {
+                "readbackProof": {
+                  "properties": {
+                    "typedSubject": {
+                      "properties": {
+                        "cohortId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "NONEXECUTING v3 overlay; base v2 immutable. Offline resource registration required; no network schema discovery."
+}

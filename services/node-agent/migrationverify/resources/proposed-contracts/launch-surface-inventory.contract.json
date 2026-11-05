@@ -1,0 +1,53 @@
+{
+  "contractId": "saintvision-proof-launch-surface-inventory:1",
+  "signatureDomainASCII": "saintvision/proof/launch-surface-inventory/v1",
+  "producerRole": "root-launch-reader",
+  "signerRole": "root-observer",
+  "requiredVerifier": "pretrusted:launch-surface-inventory:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "launch-surface-inventory.schema.json",
+  "schemaSHA256": "7adedccf531968117bc985819a0d621ea5ea286a7cabbe04f6233c1a4aabb8e0",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "launch-surface-inventory"
+      },
+      "cohortScopesSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "registeredSurfacesSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "observedSurfaceSetSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "cohortScopesSHA256",
+      "registeredSurfacesSHA256",
+      "observedSurfaceSetSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/allLaunchSurfaces"
+  ]
+}

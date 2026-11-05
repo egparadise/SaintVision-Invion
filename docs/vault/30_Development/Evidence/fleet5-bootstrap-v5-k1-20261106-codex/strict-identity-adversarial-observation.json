@@ -1,0 +1,20 @@
+{
+  "classification": "OFFLINE_PUBLIC_ADVERSARIAL_VECTOR_NOT_LIVE_FAILURE",
+  "go": "1.27.0 windows/amd64",
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-run",
+    "TestRFC8032StrictVerification",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "publicKeyHex": "0100000000000000000000000000000000000000000000000000000000000000",
+  "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "messageHex": "",
+  "stdlibAccepted": true,
+  "strictProductRejected": true,
+  "atKST": "2026-11-06T06:19:37.825426+09:00"
+}

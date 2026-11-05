@@ -1,0 +1,43 @@
+{
+  "contractId": "saintvision-proof-root-publication-intent:1",
+  "signatureDomainASCII": "saintvision/proof/root-publication-intent/v1",
+  "producerRole": "root-operator",
+  "signerRole": "root-plan",
+  "requiredVerifier": "pretrusted:root-publication-intent:1",
+  "freshness": "validity-bounded-approval",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "root-publication-intent.schema.json",
+  "schemaSHA256": "09c7a38c987ed058d7738349eac50d07b8e47c16f8dc5e68adf75633ee542ef7",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "root-publication-intent"
+      },
+      "planSubjectSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "planSubjectSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/rootPublicationIntent"
+  ]
+}

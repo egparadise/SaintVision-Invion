@@ -1,0 +1,21 @@
+{
+  "canonicalSPKIMatches": 28,
+  "classification": "CROSS_LANGUAGE_EPHEMERAL_TEST_NOT_LIVE_PROVENANCE",
+  "exactReferentHashesMatch": 28,
+  "otherLibraryAcceptsIdentityForgery": true,
+  "otherLibraryIsNotStrictProductVerifier": true,
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "realEd25519Valid": 28,
+  "tamperedRejected": 56,
+  "wholeProductAcceptance": false,
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-bootstrap-v5-k1-20261106-codex\\verify_public_vectors.py",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-bootstrap-v5-k1-20261106-codex\\public-ephemeral-proof-vectors.json"
+  ],
+  "exit": 0,
+  "atKST": "2026-11-06T06:19:37.824905+09:00",
+  "cryptographyVersion": "50.0.1"
+}

@@ -1,0 +1,57 @@
+{
+  "contractId": "saintvision-proof-native-two-cycle:1",
+  "signatureDomainASCII": "saintvision/proof/native-two-cycle/v1",
+  "producerRole": "native-test-producer",
+  "signerRole": "ci-attestor",
+  "requiredVerifier": "pretrusted:native-two-cycle:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "native-two-cycle.schema.json",
+  "schemaSHA256": "e46e56d2fee968e83940b106e5a211f4f705e875258668c4af52927182143c7c",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "native-two-cycle"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "executableSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "fixtureCohortSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "completedCycles": {
+        "const": 2
+      }
+    },
+    "required": [
+      "kind",
+      "sourceSHA",
+      "executableSHA256",
+      "fixtureCohortSHA256",
+      "completedCycles"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/nativeTwoCycleProof"
+  ]
+}

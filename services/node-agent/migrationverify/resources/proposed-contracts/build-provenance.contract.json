@@ -1,0 +1,61 @@
+{
+  "contractId": "saintvision-proof-build-provenance:1",
+  "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+  "producerRole": "build-service",
+  "signerRole": "build-attestor",
+  "requiredVerifier": "pretrusted:build-provenance:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "build-provenance.schema.json",
+  "schemaSHA256": "ec75c0fa90cf6ee3d5f32f591aca3042e67a5e10989f5968b106517d8e70cba4",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "build-provenance"
+      },
+      "component": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "artifactSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "component",
+      "sourceSHA",
+      "artifactSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "runtime-inventory:/body/target/buildProvenance",
+    "successor-plan:/body/acceptedP0/buildProvenance",
+    "successor-plan:/body/migrationHelper/buildProvenance",
+    "successor-plan:/body/commonFence/buildProvenance",
+    "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+    "successor-plan:/body/schema3Helper/buildProvenance",
+    "successor-plan:/body/newRenewalGuard/buildProvenance"
+  ]
+}

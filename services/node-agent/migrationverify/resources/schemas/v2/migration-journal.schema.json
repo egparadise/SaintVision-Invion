@@ -1,0 +1,676 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-plain-agent-migration:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-plain-agent-migration:1"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workerRootRegistrationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tenantId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "recoveryEpoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            }
+          },
+          "required": [
+            "tenantId",
+            "nodeId",
+            "recoveryEpoch"
+          ]
+        },
+        "daemonIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ownerGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "commonFenceIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "latestEvent": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sequence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "envelopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "sequence",
+            "envelopeSHA256"
+          ]
+        },
+        "previousProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "enum": [
+            "PROVENANCE_LOCKED",
+            "RESERVED",
+            "FENCE_INTENT",
+            "OLD_RESTART_NO",
+            "OLD_STOP_INTENT",
+            "OLD_STOPPED_QUIESCENT",
+            "CAPTURED",
+            "PUBLICATION_INTENT",
+            "OLD_PRESERVED",
+            "NEW_CREATE_INTENT",
+            "NEW_CREATED",
+            "NEW_START_INTENT",
+            "NEW_STARTED_UNVERIFIED",
+            "BOOTSTRAP_VERIFIED_RESTART_NO",
+            "INVENTORY_PUBLICATION_INTENT",
+            "INVENTORY_PUBLISHED",
+            "SEAL_INTENT",
+            "SEALED",
+            "RESTART_RESTORE_INTENT",
+            "RESTART_POLICY_RESTORED",
+            "READY_FOR_NEW_RENEWAL_PLAN",
+            "BLOCKED_FORWARD_ONLY",
+            "QUIESCENCE_UNKNOWN"
+          ]
+        },
+        "ownerLeaseEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalSealEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "oldBackup": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "daemonIdentitySHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 256,
+                  "pattern": "^/[^/\\u0000]+$"
+                },
+                "inspectSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "imageId": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "configSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "mountsSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "restartPolicy": {
+                  "enum": [
+                    "no",
+                    "unless-stopped"
+                  ]
+                }
+              },
+              "required": [
+                "daemonIdentitySHA256",
+                "id",
+                "name",
+                "inspectSHA256",
+                "imageId",
+                "configSHA256",
+                "mountsSHA256",
+                "restartPolicy"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentContainer": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "daemonIdentitySHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 256,
+                  "pattern": "^/[^/\\u0000]+$"
+                },
+                "inspectSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "imageId": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "configSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "mountsSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "restartPolicy": {
+                  "enum": [
+                    "no",
+                    "unless-stopped"
+                  ]
+                }
+              },
+              "required": [
+                "daemonIdentitySHA256",
+                "id",
+                "name",
+                "inspectSHA256",
+                "imageId",
+                "configSHA256",
+                "mountsSHA256",
+                "restartPolicy"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "volume": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "driver": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "metadataSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "mountIdentitySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "protectedTreeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "goJournalPath": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 4096,
+              "pattern": "^/[^\\u0000]*$"
+            }
+          },
+          "required": [
+            "name",
+            "driver",
+            "metadataSHA256",
+            "mountIdentitySHA256",
+            "protectedTreeSHA256",
+            "goJournalPath"
+          ]
+        },
+        "sealedHistory": {
+          "type": "boolean"
+        },
+        "sealOriginEvent": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "envelopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "sequence",
+                "envelopeSHA256"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operationKind": {
+          "enum": [
+            "MIGRATION",
+            "RESTART_RESTORE",
+            "NONE"
+          ]
+        },
+        "leaseState": {
+          "enum": [
+            "NONE",
+            "HELD",
+            "RELEASED",
+            "UNKNOWN"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "workerRootRegistrationSHA256",
+        "scope",
+        "daemonIdentitySHA256",
+        "ownerGeneration",
+        "commonFenceIdentitySHA256",
+        "latestEvent",
+        "previousProjectionSHA256",
+        "phase",
+        "ownerLeaseEnvelopeSHA256",
+        "terminalSealEnvelopeSHA256",
+        "oldBackup",
+        "currentContainer",
+        "volume",
+        "sealedHistory",
+        "sealOriginEvent",
+        "operationKind",
+        "leaseState"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalSealEnvelopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "terminalSealEnvelopeSHA256": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealedHistory": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealOriginEvent": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sequence": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "envelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "sequence",
+                  "envelopeSHA256"
+                ]
+              },
+              "oldBackup": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "daemonIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 256,
+                    "pattern": "^/[^/\\u0000]+$"
+                  },
+                  "inspectSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "configSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountsSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "restartPolicy": {
+                    "enum": [
+                      "no",
+                      "unless-stopped"
+                    ]
+                  }
+                },
+                "required": [
+                  "daemonIdentitySHA256",
+                  "id",
+                  "name",
+                  "inspectSHA256",
+                  "imageId",
+                  "configSHA256",
+                  "mountsSHA256",
+                  "restartPolicy"
+                ]
+              },
+              "currentContainer": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "daemonIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 256,
+                    "pattern": "^/[^/\\u0000]+$"
+                  },
+                  "inspectSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "configSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountsSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "restartPolicy": {
+                    "enum": [
+                      "no",
+                      "unless-stopped"
+                    ]
+                  }
+                },
+                "required": [
+                  "daemonIdentitySHA256",
+                  "id",
+                  "name",
+                  "inspectSHA256",
+                  "imageId",
+                  "configSHA256",
+                  "mountsSHA256",
+                  "restartPolicy"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "sealOriginEvent": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "leaseState": {
+                "enum": [
+                  "HELD",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ownerLeaseEnvelopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "ownerLeaseEnvelopeSHA256": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "operationKind": {
+                "const": "NONE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "leaseState": {
+                "enum": [
+                  "NONE",
+                  "RELEASED"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "host-helper"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

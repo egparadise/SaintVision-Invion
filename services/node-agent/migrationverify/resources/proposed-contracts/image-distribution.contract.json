@@ -1,0 +1,69 @@
+{
+  "contractId": "saintvision-proof-image-distribution:1",
+  "signatureDomainASCII": "saintvision/proof/image-distribution/v1",
+  "producerRole": "artifact-publisher",
+  "signerRole": "build-attestor",
+  "requiredVerifier": "pretrusted:image-distribution:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "image-distribution.schema.json",
+  "schemaSHA256": "f59b10102399f8b3c5f91d1d61f84fb5e4372920811dbe6da3cda9cc275215c8",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "image-distribution"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "imageId": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "platformManifestDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "configDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "archiveSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "executableSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "sourceSHA",
+      "imageId",
+      "platformManifestDigest",
+      "configDigest",
+      "archiveSHA256",
+      "executableSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "runtime-inventory:/body/image/distributionProof",
+    "successor-plan:/body/image/distributionProof"
+  ]
+}

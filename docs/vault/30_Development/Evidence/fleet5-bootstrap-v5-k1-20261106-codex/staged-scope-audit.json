@@ -1,0 +1,1225 @@
+{
+  "atKST": "2026-11-06T06:31:34.934281+09:00",
+  "base": "e50c148287779add421265868ef16909ed984650",
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--no-renames",
+    "--name-status",
+    "-z"
+  ],
+  "fullNoPathspecStrictUTF8": true,
+  "rawNameStatusSHA256": "4a3dc6f4849f4ad388e68984d2066943eb182676276b1b33bb3b5c0719eb4b69",
+  "addedFiles": 139,
+  "existingModifiedFiles": 0,
+  "allPaths": [
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/cross-language-vectors.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-01-check_docs.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-02-check_ontology_generation.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-03-check_ontology.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-04-check_contract_bindings.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-05-check_frontend_integrity.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-06-check_doc_path_citations.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-07-check_doc_single_source.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-08-test_sync.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-09-build_docs.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/gate-10-sync_obsidian.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/init.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/k1-final-focused.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/k1-final-focused.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/k1-go-vet.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/local-go-validation-attempt1.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/local-go-validation-attempt2.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/local-go-validation-attempt3.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/local-go-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/local-source-gates.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/node-go-build.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/node-go-suite-attempt1.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/node-go-suite-attempt2.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/node-go-suite-attempt3.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/node-go-suite.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/public-ephemeral-proof-vectors.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/public-vectors-go.jsonl"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/staged-scope-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/strict-identity-adversarial-observation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/vector-test-run.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/verify_public_vectors.py"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_offline_verifier_Codex.md"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/README.md"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/api_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/contracts.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/crypto_fixture_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/ed25519.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/ed25519_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/graph.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/graph_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/json.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/json_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/native.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/native_history_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/proofs.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/recipes.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/recipes_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/derived-digest-contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/common.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-event.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-journal.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/operation-lease.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/runtime-inventory.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/successor-plan.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/terminal-seal.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-event.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-journal.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/runtime-inventory.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/successor-plan.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/terminal-seal.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v4/migration-event.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-request.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-response.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/cohort-projection-set.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/source-pins.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/schemas.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/schemas_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/security_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/actual-bindings-HOLD.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/artifact-reference-graph.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/derived-byte-ordering-vectors.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/dummy-signer-policy.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/reference-graph-coverage.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/scenario-inputs.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/testdata/scenario-objects.json"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/trust.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/vectors_test.go"
+    },
+    {
+      "status": "A",
+      "path": "services/node-agent/migrationverify/verify.go"
+    }
+  ],
+  "packageGitTree": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+  "packageFiles": [
+    {
+      "path": "services/node-agent/migrationverify/README.md",
+      "gitBlob": "23372057f1c59915014dc0d98c46083b25acc28a",
+      "rawBytes": 6683,
+      "rawSHA256": "0c55b41a85a433a69876899e68ecd92f580e6259cdbdd3a13b059d9722a07f3a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/api_test.go",
+      "gitBlob": "05bc299286b3f621cb54e82cf944e7377271c47b",
+      "rawBytes": 4749,
+      "rawSHA256": "debaa030495e9702a2a563abb34f71708cc3aa30d4f41104117b25835882b7c6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/contracts.go",
+      "gitBlob": "0d9b213157281fd068a9adc09839e00871f608d6",
+      "rawBytes": 4980,
+      "rawSHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967"
+    },
+    {
+      "path": "services/node-agent/migrationverify/crypto_fixture_test.go",
+      "gitBlob": "0d1a43db76e19c02a706073b1d4737e2f9cdeda1",
+      "rawBytes": 18594,
+      "rawSHA256": "37426d4a8fed49c8afc8ba0986dc34c4fca9bf7cfe405c4d1982ba8f84e981c6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519.go",
+      "gitBlob": "3b1c83c7a19a905ef46d87f3edd95fe6db0d6247",
+      "rawBytes": 4118,
+      "rawSHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5"
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519_test.go",
+      "gitBlob": "166677c2c7570bbfa0973fba53ccfaeb684d393c",
+      "rawBytes": 3402,
+      "rawSHA256": "e991cd089153d7fa80be575bbec765d6dc6344916e53e1233078d095e2a090bc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph.go",
+      "gitBlob": "f0e73328228433537ee5e301f9ead2cf7c8ea066",
+      "rawBytes": 9880,
+      "rawSHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph_test.go",
+      "gitBlob": "24d203a5d4a7054cc2f29c135fbe80af12106bfb",
+      "rawBytes": 2420,
+      "rawSHA256": "c6312b5f68075ee7889e0cfcdaacbe3d709b6c292d96d188810f4ce9e7e5d8a6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/json.go",
+      "gitBlob": "f469c414adca15f40a0b1671f5a12fa620ac1f06",
+      "rawBytes": 5504,
+      "rawSHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/json_test.go",
+      "gitBlob": "ca03af84ade6fbdb8fdade77d193b98e03996793",
+      "rawBytes": 1776,
+      "rawSHA256": "7f379a11a5c4132d1d309ce36a02d35b1e5d72b9fcf77d3233dc6ba647199bbb"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "gitBlob": "eadb7ff0b897689734985180ef0afeebc49dfc55",
+      "rawBytes": 4945,
+      "rawSHA256": "82edc0adf0791fa7503051d100bca7ffe2d3ff6ac6d1d3f2b4a2fa0c67497ddb"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native_history_test.go",
+      "gitBlob": "5709376836dcca496cd1fc035246bde5de499a4d",
+      "rawBytes": 4339,
+      "rawSHA256": "6b23bbf34f6c935d57c99b1d4c5023b812435eb56682a8987045e6be75a757dc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "gitBlob": "38ecea8e5082e06ef2c7f58b9df17b57786df4d9",
+      "rawBytes": 9315,
+      "rawSHA256": "071d58c2fe24115c4f13f4073618a0a95ed7458aa68832fd623f61d8ec025fe4"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes.go",
+      "gitBlob": "009762055645da0f836ad013faf257ba042abe4b",
+      "rawBytes": 10359,
+      "rawSHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes_test.go",
+      "gitBlob": "4c3873a5c9b258e1737b7433108a799c2eec54b1",
+      "rawBytes": 3547,
+      "rawSHA256": "12c5c33563d730c1748e29850b25842e8b140d1c5847bd447d297f04d3fd8c4b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/derived-digest-contract.json",
+      "gitBlob": "b3714fc76351c9d1e8bccbc6ed1a5d21056e6302",
+      "rawBytes": 531,
+      "rawSHA256": "707ada226f0fc6b62372ae176b94deb424adead002f462387f0a8bc8be95956b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json",
+      "gitBlob": "f98b5e853103333bc257c732b1e2da819e5c93ce",
+      "rawBytes": 138128,
+      "rawSHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.contract.json",
+      "gitBlob": "207deca482522f9c3d0b83f80e6fc3413a8e4840",
+      "rawBytes": 1972,
+      "rawSHA256": "57169c1e179332aeb41fd9c50ba9abaa01cc816564eb134eec6aeeb59a146793"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.schema.json",
+      "gitBlob": "bb9eab754242e4297ecefc3560fdae3bd8866fd2",
+      "rawBytes": 2286,
+      "rawSHA256": "ec75c0fa90cf6ee3d5f32f591aca3042e67a5e10989f5968b106517d8e70cba4"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.contract.json",
+      "gitBlob": "4ac1adee9f36b2de4f3d51095c5dd6d1ac422b46",
+      "rawBytes": 3312,
+      "rawSHA256": "6b1058699c5b2f9e57c69e4a53372dac19ca3fee6b407f9ee58f08de3f80a0bc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.schema.json",
+      "gitBlob": "3c0bcefa7da9a94f1a3b0ce7154d10d11c018bae",
+      "rawBytes": 3399,
+      "rawSHA256": "9ef78efbf72c62356c3cd254c1e6fba5dbf63e3bad2bc77578365d934a09ebf1"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.contract.json",
+      "gitBlob": "1d26c1ef764c7df68243c7dd8549ac864d9cfd62",
+      "rawBytes": 1756,
+      "rawSHA256": "08bdfb17d2adc7189bacf5964a27fd71e423ab3782d92a6eafd3e53b6e90c1cc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.schema.json",
+      "gitBlob": "d6f87e6e2139fa3622868892d7bac165cce97d3e",
+      "rawBytes": 2802,
+      "rawSHA256": "d662dc3e3381a787f28714423dc975b21ad8a90907b137dfd8439e9467f88413"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.contract.json",
+      "gitBlob": "890779650452b21e61d6bc77638497e37dcc4fa5",
+      "rawBytes": 1658,
+      "rawSHA256": "6c3007fe677038fc878ee1180337c72a09f99961702b7b0cb934972999c560cd"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.schema.json",
+      "gitBlob": "3a140c4cc49487b14d97ffb0ee68371655e29216",
+      "rawBytes": 2327,
+      "rawSHA256": "650e913892cb3b501e387fd0461cd4db51a8711c34c799babc025b9cc6123d8b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.contract.json",
+      "gitBlob": "1038c21fd9ae294afb6e293e0950b91e90909149",
+      "rawBytes": 2031,
+      "rawSHA256": "39c1a706ccf54187e9182eea0f19cead9b3959902442e8d73443ed4d5dd6d974"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.schema.json",
+      "gitBlob": "207e53eeba7d9cc88b505da602dc4c505f045767",
+      "rawBytes": 2714,
+      "rawSHA256": "f59b10102399f8b3c5f91d1d61f84fb5e4372920811dbe6da3cda9cc275215c8"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.contract.json",
+      "gitBlob": "00e0cdb61d4cbcfda786e074e722e2b1fb2ff1ed",
+      "rawBytes": 2412,
+      "rawSHA256": "ad81f205d924cfb93aa2f95a8f698818878adc44ce869421335b720b8861136c"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.schema.json",
+      "gitBlob": "5e5abe6aaf81bf052be2b7ec10ae911052c27129",
+      "rawBytes": 2719,
+      "rawSHA256": "54394f4b3b8ceee9fcffb3111eb565a9ad452d19e01c4eac9e5a30f6a8847a89"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.contract.json",
+      "gitBlob": "f51f66b9f88cdbacc5e752e1934e7a95629b25a6",
+      "rawBytes": 1402,
+      "rawSHA256": "c4a2ccd10b8e7e4f8aad7e18803d7d1049cbffdfcaa56ea33c711799fdd605ba"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.schema.json",
+      "gitBlob": "b2687b316940b1d0fed6334e05888b38678c2ade",
+      "rawBytes": 1975,
+      "rawSHA256": "f3bffb3e70b853236dd973550af2ff38aa5acff2593d1bb757ad3eb92c705f4f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json",
+      "gitBlob": "cd8e89c4e505fad1f2e941768db313ffc4f82701",
+      "rawBytes": 8683,
+      "rawSHA256": "733b918383bc0c45abdd0c266bac4baf51c11eeeaaf6f44cd4e4ea2464d90582"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.contract.json",
+      "gitBlob": "2a3d3d3de935f8fade300f73c63a9c5741b3650c",
+      "rawBytes": 3136,
+      "rawSHA256": "d31962924a87403f6117cadbd1ff29569c7181b8c63f12965c88f6d17337af79"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.schema.json",
+      "gitBlob": "8275717b5b21e841e88aeca553db7ac8642d31f7",
+      "rawBytes": 3035,
+      "rawSHA256": "01e115e8f9b7268ca412cfd8a33fdf93d29c9255ff761ac81e5b6bcd87066614"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.contract.json",
+      "gitBlob": "73ceb35497ba7f64d8ca5de219d34081ef842cb6",
+      "rawBytes": 1658,
+      "rawSHA256": "e5fadf62766737cddc44ba463ad0f4935eaee752e55beaa9d4bae77e7c089117"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.schema.json",
+      "gitBlob": "4d6c786c0785cd58f72b07ed9c4e0d600fd594ad",
+      "rawBytes": 2673,
+      "rawSHA256": "7adedccf531968117bc985819a0d621ea5ea286a7cabbe04f6233c1a4aabb8e0"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.contract.json",
+      "gitBlob": "806a4fca798432d80a85ebe484c862087e23b2c3",
+      "rawBytes": 1612,
+      "rawSHA256": "9ae795c1f5962c54eeafd0feb8beabdba8d6362921d994aee66489919d7ba748"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.schema.json",
+      "gitBlob": "6bca2c283e752158ccb0c8cc07b7937b63757c61",
+      "rawBytes": 2286,
+      "rawSHA256": "57c5db5e2533244c3ad8dd5e47c639626616b50e48ffbd32513f2c9a6d4fcfbd"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.contract.json",
+      "gitBlob": "eb05c154ea7f1651780be78ae747aad07e452aac",
+      "rawBytes": 2739,
+      "rawSHA256": "f801a27df679b2c78c22d5135cb951c28ba3f82f1ab7e3e02fbd02a4042e154d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.schema.json",
+      "gitBlob": "76c123bf08630bd1f9f51a435bbb078d74a77bdf",
+      "rawBytes": 4021,
+      "rawSHA256": "8170de0758758dc5fe5be046ff923dbb72023b58a5b5f0bf59a381c33efba29d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.contract.json",
+      "gitBlob": "420c022e7404a19cbf7c2e5978b2e6ed12f0b7ca",
+      "rawBytes": 2840,
+      "rawSHA256": "c6dcd04184732881856f2e5e2bf8e32770b3419395fef08d04f350e9c5462e86"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.schema.json",
+      "gitBlob": "5c3477fce00ccf418a066b6c3c9142042bd048c5",
+      "rawBytes": 4195,
+      "rawSHA256": "d5d08bd89b26749fd8d07a099a6ba7f7daa31f9a3c057c4b39a1ed90c98eee16"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.contract.json",
+      "gitBlob": "9b79b275e05cf8d26c64433dd7e5c04d9b61e626",
+      "rawBytes": 2301,
+      "rawSHA256": "7ad54c7fc2380880ca62e9a8ba3b745dc64daecca71ca2b6ed29ff5d145f5615"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.schema.json",
+      "gitBlob": "cdd7344bfd36267cf0d9afdbb837d3cbaaa5b8f2",
+      "rawBytes": 3508,
+      "rawSHA256": "345256de3a239204fb61b4b9381bb1b30b16d99f0346e3c59481e66c4e2fb9bc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.contract.json",
+      "gitBlob": "73146bd026c9762c4a5a34aa0e67e9142276c566",
+      "rawBytes": 1671,
+      "rawSHA256": "10ecd7182b813d5e2f64e91c585b0507091b6efe8c3acf2465e87e13d3d1eb3d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.schema.json",
+      "gitBlob": "fb1ac8056f6fd43304e942a9e64a2242624a2e5c",
+      "rawBytes": 2349,
+      "rawSHA256": "e46e56d2fee968e83940b106e5a211f4f705e875258668c4af52927182143c7c"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.contract.json",
+      "gitBlob": "38f0891f67d2f50b37a3802a63e4118877053c61",
+      "rawBytes": 1672,
+      "rawSHA256": "09a5bdcb43d5d23bca789aeb10a400f6902efb72cf0ecbc10fb61f8b7d4ac68e"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.schema.json",
+      "gitBlob": "8b5fc46916e32c468c5728a219f083044238c94b",
+      "rawBytes": 2758,
+      "rawSHA256": "3153c18ab404681bbfb218e72d0dbdfe671f5d30fdf9fea0f611c176f628db1d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.contract.json",
+      "gitBlob": "43d66f23767bd54269760df91f022367b4e71b02",
+      "rawBytes": 3452,
+      "rawSHA256": "ef03e4c2a035672a829d81d43c0d09be0483c196dda4b3664451ecd3b607e4fa"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.schema.json",
+      "gitBlob": "9d44b35cca6fa04574a51284b343e839f37421bc",
+      "rawBytes": 2234,
+      "rawSHA256": "14f09f682837e8abfd84cfafc6acde88734e0d6480fec4098c0c4a60230fbf01"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.contract.json",
+      "gitBlob": "fb80b2b8a67b5fb5b1d8431435979b1f6cfa4636",
+      "rawBytes": 1618,
+      "rawSHA256": "9719c303f4c31c7e0683e46a97d5405ec5d99c413351c8c3e85db3e2cc026c73"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.schema.json",
+      "gitBlob": "2f235d4fea4c18cfa8dca8c5814ddfdf84243172",
+      "rawBytes": 2265,
+      "rawSHA256": "37b7d1ca5893e70b863eac650074358df3d1151871afe487ec84a87ded902aa6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.contract.json",
+      "gitBlob": "c54d70c8ed16e340f44574f352cc7d7e53f9bbeb",
+      "rawBytes": 2767,
+      "rawSHA256": "b234a4dadeb31df06540e04d0af353a92ba05d43c42cbbafd04ed5812c3679b4"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.schema.json",
+      "gitBlob": "5e72cf63906d18518c88cab6ffd3e5b2e6d04a1c",
+      "rawBytes": 4022,
+      "rawSHA256": "4b521aaee09f39b4daf74448c696f24768003d9262e653fbc338561ea5a84119"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.contract.json",
+      "gitBlob": "e5fe44288650a5e7dcfaf7b7cb2ec5defa1a937d",
+      "rawBytes": 2789,
+      "rawSHA256": "2267728118b38c039d9dc21fe85adf8346ac38508feda76f079f59ce36126776"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.schema.json",
+      "gitBlob": "cdc3c3f040f9ac73d3b527cb6776cea8e433c733",
+      "rawBytes": 4100,
+      "rawSHA256": "6be629f142a908f8a92e68a571fe2eab72a2134ccfb1c7a23a5e92d2fe6a173a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.contract.json",
+      "gitBlob": "86b651ded8cac42619c3c535caece0506705945a",
+      "rawBytes": 2609,
+      "rawSHA256": "405a06f1e7d3b3855a7920f1c5f2a14c88121854d64f4d70fd035e1221f4d9f3"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.schema.json",
+      "gitBlob": "a5866beed2f29e1bcf0c9e210b28122bb243d5bf",
+      "rawBytes": 3760,
+      "rawSHA256": "87f30c0d14e5dd738cc6c55f6108cdfbf0af56ee178f85d3a99887f32567914a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.contract.json",
+      "gitBlob": "70463be983afadf1389e36e2e543492fa5f91962",
+      "rawBytes": 1712,
+      "rawSHA256": "4e88dfd58f1e564beb6c0459d43641ec2fe903772e259c3541b546cfd9b0fb25"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.schema.json",
+      "gitBlob": "007370ba6154a80b92fd1de4eda96768f62cae85",
+      "rawBytes": 2743,
+      "rawSHA256": "1e48a65750575b9013bf6c1f4a2c7a755d02a89ec80abe2ed895b00b878c6423"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.contract.json",
+      "gitBlob": "69e82874739be5236161d7fca0e657067fee0ae3",
+      "rawBytes": 1384,
+      "rawSHA256": "3716b51a60a37beef9939bba50e9c398cdb008f50aee41e48799d675b7054d68"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.schema.json",
+      "gitBlob": "178c284a1139d066b37ae6afaad9fa32d10d9938",
+      "rawBytes": 1964,
+      "rawSHA256": "09c7a38c987ed058d7738349eac50d07b8e47c16f8dc5e68adf75633ee542ef7"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.contract.json",
+      "gitBlob": "30977b13f2529790462956bf60a214e47add6053",
+      "rawBytes": 2766,
+      "rawSHA256": "a55312190de97c423055b80e61c104ffb73b91cd0dd50fb3865bf5b67c274626"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.schema.json",
+      "gitBlob": "a6f622feaa7fae87147310afb00b0e6f8590f682",
+      "rawBytes": 4041,
+      "rawSHA256": "87d1e23248113b03453cfccfdd91495d1e5090ac913202f908c88b0b0851e3ed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.contract.json",
+      "gitBlob": "204e9af804ec5431019ec862af18fdb96ec21dc2",
+      "rawBytes": 2383,
+      "rawSHA256": "a70bb825aaed6301f730f33261e3c648b94d51975d6ac5a499fab9b9175f0bef"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.schema.json",
+      "gitBlob": "e683cb7aaeddd9da2759160588bd6788344c109e",
+      "rawBytes": 3600,
+      "rawSHA256": "2d277069f0d6ef238d496b03c15b5b2ab8a37c16dbad15a00a2afcffa9466acf"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.contract.json",
+      "gitBlob": "151acfec9548f2658494d2a935064b8a308de6e9",
+      "rawBytes": 2940,
+      "rawSHA256": "d9b8b80b0e660e6925bb1ab2ddb1b3fcf9eeb537fca381a7074cefdd199cbfa6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.schema.json",
+      "gitBlob": "b44338c2acb0b8ce225814e8164611a9d8d1895d",
+      "rawBytes": 4257,
+      "rawSHA256": "560bf6179890ebef3e02aa1220c8115cc7eadeba8f9d1e2600bd020d96655e2a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.contract.json",
+      "gitBlob": "552821b7928c0749fa0e123f9bb7138f23c0147d",
+      "rawBytes": 2946,
+      "rawSHA256": "4f43ed65324d3aff28e21e1b1a9c15b0799596e8ff6fda0728ae26f108f6c6e7"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.schema.json",
+      "gitBlob": "46fa97c9f74d2a8a28703f01f633972959f30eaf",
+      "rawBytes": 4260,
+      "rawSHA256": "d8be7a9531caef138086db9e85a5d8733e0fa3e9d56b4ae4c69ccfafc13bf90d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.contract.json",
+      "gitBlob": "32db3d24b2325bb324a85bb63bafccc9a8d967d6",
+      "rawBytes": 1728,
+      "rawSHA256": "39c6b61caa9ecb86b1c5792cb0c63c2f492b6e04606e70803025ebb6d8cc7994"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.schema.json",
+      "gitBlob": "16bb1a14e2ecae7325a1d20c65758868d172aae5",
+      "rawBytes": 2754,
+      "rawSHA256": "8d4c081260c8c715f5ff48ca35e2aba7436fdaac090d3d8624fe418134d846d0"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.contract.json",
+      "gitBlob": "c8ed9f3b5d14c01e669fa331d8f97601cb153110",
+      "rawBytes": 2736,
+      "rawSHA256": "1f26d116a9e1b6baa3730f6c0bcdf8cec19ee9cec6d0c834b58b558c1f967dec"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.schema.json",
+      "gitBlob": "5d6e4201a03b37bf06c50ab1db352bf644a1ed78",
+      "rawBytes": 3937,
+      "rawSHA256": "48df9c31a686880e3e268046cd5248f45c202231da9c88cc9d3f10de2af6365f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+      "gitBlob": "2d336d7feec9b588b7d77b6e73fe9dd015d2ed6f",
+      "rawBytes": 19687,
+      "rawSHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/common.schema.json",
+      "gitBlob": "8591921f20871af07c8606ffae8d7bb1a7e69666",
+      "rawBytes": 21464,
+      "rawSHA256": "d056b1b1b6bbc76f562cc1123036703ceea085bbd269bf86b86367b382ae6db4"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-event.schema.json",
+      "gitBlob": "60a464a595420f0615db4643019dd16ce52c02a4",
+      "rawBytes": 65364,
+      "rawSHA256": "9e9a9e47ea1300799a219c9f6634bec73f40ef4a2a63deb2cab228305601456d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-journal.schema.json",
+      "gitBlob": "0bf9f36adc1e7d70b77d2c45af3f531d6b18bb72",
+      "rawBytes": 18396,
+      "rawSHA256": "d2aff35f7090b1753964c67f8f0c184c2becce207b67e40c96058c3c7e8d36b3"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/operation-lease.schema.json",
+      "gitBlob": "37588253f2804baebeedf36852201e0f30f49c9a",
+      "rawBytes": 13027,
+      "rawSHA256": "f84910b33336507a243414687ca2ca48e2867880cdba652c170f17e3f2017c3a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/runtime-inventory.schema.json",
+      "gitBlob": "33ca256119a20b3fd6368780c1cffd6a8a082f25",
+      "rawBytes": 78148,
+      "rawSHA256": "b6088bb3c8dc1255b97a5770307f442deaabba032b88cfecdc4d94f56ac5f2bd"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/successor-plan.schema.json",
+      "gitBlob": "46720f977116ecae6d7e8ac9172742434a7fcca5",
+      "rawBytes": 185917,
+      "rawSHA256": "7cdde62b82e5af7d9162313575c814ee1135e5b1ce12a66bd86f2536bd548161"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/terminal-seal.schema.json",
+      "gitBlob": "48811c8e5bdc9d54e80ed6b9b9d1e3be12ead860",
+      "rawBytes": 16725,
+      "rawSHA256": "f8f9840cf8128d234acf2cb6b11e85a825c5737891fa1dc6db173fda5c9adab1"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-event.schema.json",
+      "gitBlob": "0e1f8f19f38103e700d200c7d784e4ce15584ea5",
+      "rawBytes": 33624,
+      "rawSHA256": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-journal.schema.json",
+      "gitBlob": "8340131f635a9306363853f113c2bfffe1375031",
+      "rawBytes": 3352,
+      "rawSHA256": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+      "gitBlob": "7c67b2929f88cb18f0935dab5b9f2b0c94631ed2",
+      "rawBytes": 1036,
+      "rawSHA256": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/runtime-inventory.schema.json",
+      "gitBlob": "248704b3864f69f1542f1e4bab5001d825511eb5",
+      "rawBytes": 4900,
+      "rawSHA256": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/successor-plan.schema.json",
+      "gitBlob": "f70d250ac12895f78736ab95ac6985d2784ab998",
+      "rawBytes": 1034,
+      "rawSHA256": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/terminal-seal.schema.json",
+      "gitBlob": "68fa5fe7ccc2575af52229d5fc3a901440f4428b",
+      "rawBytes": 348,
+      "rawSHA256": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v4/migration-event.schema.json",
+      "gitBlob": "e3c1cf91814431354549e1cb0401884f3369afb8",
+      "rawBytes": 704,
+      "rawSHA256": "b5fddd5a9b55e7f8f278c45c960e92bed3644ab5f3ee685e639d94a911b0df35"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-request.schema.json",
+      "gitBlob": "0a17e1d9573051ac4ab6153297211e99faf691ba",
+      "rawBytes": 150514,
+      "rawSHA256": "eaf004cad8357d8956da90a0891a0d3a612bf079ed5d452ba93fbc61f8135f8d"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-response.schema.json",
+      "gitBlob": "6fdf1c7ef6dbd03b4ddd583f16964a1dbb90318a",
+      "rawBytes": 3551,
+      "rawSHA256": "b37764080b656dc4481cf1bfca47dec96e90194a864c13d802a07770b8e7f3aa"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/cohort-projection-set.schema.json",
+      "gitBlob": "ca0570f784df5661a21f4f4a2d9ba7390f226b6d",
+      "rawBytes": 4560,
+      "rawSHA256": "35e8a2b87216a62b75399313e0bb38856cba015820797286caee66712ff1a645"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/source-pins.json",
+      "gitBlob": "82f163823349e4917c8b2c1f20446ade18766eee",
+      "rawBytes": 15150,
+      "rawSHA256": "6c02c2e51f373ee74c823204e046ddc5381d3e52923f4479ece8c2ed70d56b99"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json",
+      "gitBlob": "b36c97241d5d5619e819d001a9717e25df8cc23f",
+      "rawBytes": 1510,
+      "rawSHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869"
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas.go",
+      "gitBlob": "697d7f643a1a263fce1c7110d46fba3c835e3e53",
+      "rawBytes": 5064,
+      "rawSHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec"
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas_test.go",
+      "gitBlob": "0303033945169a381b90616b593b606e7fde92c6",
+      "rawBytes": 1713,
+      "rawSHA256": "25c85ccb1e2fe2fd94c6d042f9bcd873ca0ce44cf7226def1cc3eabdc4f2a4cb"
+    },
+    {
+      "path": "services/node-agent/migrationverify/security_test.go",
+      "gitBlob": "5dcd597f19bbc5208d956441838e34e32ff9d2cc",
+      "rawBytes": 16500,
+      "rawSHA256": "0cd38c3bcf9da8346589ff5b7cb7b9482d49080e06b31c66c2c1a4fabfcebffc"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/actual-bindings-HOLD.json",
+      "gitBlob": "363572a4c45de8f8dc35f8a82e1b256a8f36ff66",
+      "rawBytes": 2170,
+      "rawSHA256": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/artifact-reference-graph.json",
+      "gitBlob": "fce498a8e3e65c9bf1222a053394695fa9312dcf",
+      "rawBytes": 1034425,
+      "rawSHA256": "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/derived-byte-ordering-vectors.json",
+      "gitBlob": "fce11f4e1377d3c5fd2399a27aee198eeac341fe",
+      "rawBytes": 37834,
+      "rawSHA256": "f6d79189bc45dd3d30d7b2b78590c272cb95bfb08181518555fc341164dc4b1b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/dummy-signer-policy.json",
+      "gitBlob": "10ebc7ff8e0e6b0a82827458f95a37ff6b578214",
+      "rawBytes": 39241,
+      "rawSHA256": "e897f5a150a069ae05b1d2f9ff8fdc84aab5921c0c58c248b0e38b39bc7c2c90"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/reference-graph-coverage.json",
+      "gitBlob": "89e13e15e6f84c79e626f40d0e1c097d32125de7",
+      "rawBytes": 79031,
+      "rawSHA256": "cdd9266060b1e84f0dbf00c90cfdbde71c2730c78d7c2230354a8859b60f2e09"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/scenario-inputs.json",
+      "gitBlob": "8b954a0fd8c6c9575697c8aaee42170aaacafdd1",
+      "rawBytes": 86626,
+      "rawSHA256": "a4f4a40765f8815f70b130ee2db139c244ba9da5a209890285ed76380341346a"
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/scenario-objects.json",
+      "gitBlob": "8b7c8868c0d5abce1cc74e8d4643750b3d362500",
+      "rawBytes": 679142,
+      "rawSHA256": "d695fb715b0965e51052933ed948afdedf5888ed489c09b829f081a5ba10b841"
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "gitBlob": "17b89d8bbcd1b0808ab36db517f99ec881e1aceb",
+      "rawBytes": 9286,
+      "rawSHA256": "0b9e7d3c67f8d04e15aaed24f059e0e584c834d1a15e54d250cba51824ac13eb"
+    },
+    {
+      "path": "services/node-agent/migrationverify/vectors_test.go",
+      "gitBlob": "1123601790d6893bcf44612bd7b209afc0d16c7a",
+      "rawBytes": 2626,
+      "rawSHA256": "e546e2ee5ad8bf8e56028016e479fa4ce5b3e598123914f31be4d6f395383cfd"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "gitBlob": "8ae70b9f50a5da0a73577f205053d0b29e6915e0",
+      "rawBytes": 12659,
+      "rawSHA256": "1fdab3e6b2fa267b6e7cba807ee9074e88c3ea9df9b2fbf49df989acc52e6d3a"
+    }
+  ],
+  "originalPinnedGitBlobsVerified": 28,
+  "oldDesignHeadAndUpstream": "8874b2dfe0dda9a019bd5f334636668290702e13",
+  "oldDesignCleanReadback": true,
+  "noObsidianApply": true,
+  "physicalActions": 0,
+  "scopeAuditDoesNotHashItsOwnContent": true
+}

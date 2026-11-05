@@ -1,0 +1,108 @@
+{
+  "contractId": "saintvision-proof-ci-attestation:1",
+  "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+  "producerRole": "github-actions",
+  "signerRole": "ci-attestor",
+  "requiredVerifier": "pretrusted:ci-attestation:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "ci-attestation.schema.json",
+  "schemaSHA256": "9ef78efbf72c62356c3cd254c1e6fba5dbf63e3bad2bc77578365d934a09ebf1",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "ci-attestation"
+      },
+      "component": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "repository": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "workflow": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "headSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "event": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "runId": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      },
+      "runAttempt": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      },
+      "artifactSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "component",
+      "repository",
+      "workflow",
+      "headSHA",
+      "ref",
+      "event",
+      "runId",
+      "runAttempt",
+      "artifactSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "runtime-inventory:/body/target/coreCI/attestation",
+    "runtime-inventory:/body/target/backendCI/attestation",
+    "successor-plan:/body/acceptedP0/coreCI/attestation",
+    "successor-plan:/body/acceptedP0/backendCI/attestation",
+    "successor-plan:/body/migrationHelper/coreCI/attestation",
+    "successor-plan:/body/migrationHelper/backendCI/attestation",
+    "successor-plan:/body/commonFence/coreCI/attestation",
+    "successor-plan:/body/commonFence/backendCI/attestation",
+    "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+    "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+    "successor-plan:/body/schema3Helper/coreCI/attestation",
+    "successor-plan:/body/schema3Helper/backendCI/attestation",
+    "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+    "successor-plan:/body/newRenewalGuard/backendCI/attestation"
+  ]
+}

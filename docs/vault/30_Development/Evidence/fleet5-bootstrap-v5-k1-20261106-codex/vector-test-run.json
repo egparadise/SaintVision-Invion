@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-json",
+    "-run",
+    "TestPublicEphemeralProofVectors",
+    "-count=1",
+    "./migrationverify"
+  ],
+  "exit": 0,
+  "vectors": 28,
+  "atKST": "2026-11-06T06:06:15.348314+09:00"
+}

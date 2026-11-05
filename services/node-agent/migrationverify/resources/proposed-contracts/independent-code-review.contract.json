@@ -1,0 +1,75 @@
+{
+  "contractId": "saintvision-proof-independent-code-review:1",
+  "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+  "producerRole": "independent-reviewer",
+  "signerRole": "independent-reviewer",
+  "requiredVerifier": "pretrusted:independent-code-review:1",
+  "freshness": "immutable-provenance",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "independent-code-review.schema.json",
+  "schemaSHA256": "54394f4b3b8ceee9fcffb3111eb565a9ad452d19e01c4eac9e5a30f6a8847a89",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "independent-code-review"
+      },
+      "component": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "sourceSHA": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "artifactSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "authorId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "reviewerId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      }
+    },
+    "required": [
+      "kind",
+      "component",
+      "sourceSHA",
+      "artifactSHA256",
+      "authorId",
+      "reviewerId"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "runtime-inventory:/body/target/independentReview/receipt",
+    "successor-plan:/body/acceptedP0/independentReview/receipt",
+    "successor-plan:/body/migrationHelper/independentReview/receipt",
+    "successor-plan:/body/commonFence/independentReview/receipt",
+    "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+    "successor-plan:/body/schema3Helper/independentReview/receipt",
+    "successor-plan:/body/newRenewalGuard/independentReview/receipt"
+  ]
+}

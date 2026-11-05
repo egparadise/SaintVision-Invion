@@ -1,0 +1,86 @@
+{
+  "contractId": "saintvision-proof-inventory-head-readback:1",
+  "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+  "producerRole": "cp-inventory-reader",
+  "signerRole": "cp-inventory",
+  "requiredVerifier": "pretrusted:inventory-head-readback:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "inventory-head-readback.schema.json",
+  "schemaSHA256": "01e115e8f9b7268ca412cfd8a33fdf93d29c9255ff761ac81e5b6bcd87066614",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "inventory-head-readback"
+      },
+      "cohortId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "presence": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "envelopeSHA256": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "registrationSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "cohortId",
+      "presence",
+      "envelopeSHA256",
+      "registrationSHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+    "api-request[reserve]:/expectedInventoryHead/readbackProof",
+    "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+    "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+    "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+    "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+    "api-request[createNew]:/expectedInventoryHead/readbackProof",
+    "api-request[startNew]:/expectedInventoryHead/readbackProof",
+    "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+    "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+    "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+    "api-request[seal]:/expectedInventoryHead/readbackProof",
+    "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+    "api-request[readState]:/expectedInventoryHead/readbackProof",
+    "api-request[release]:/expectedInventoryHead/readbackProof",
+    "operation-lease:/body/expectedInventoryHead/readbackProof",
+    "runtime-inventory:/body/previousInventoryHead/readbackProof",
+    "successor-plan:/body/expectedInventoryHead/readbackProof"
+  ]
+}

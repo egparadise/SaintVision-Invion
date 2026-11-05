@@ -1,0 +1,55 @@
+{
+  "contractId": "saintvision-proof-g2-planning-policy:1",
+  "signatureDomainASCII": "saintvision/proof/g2-planning-policy/v1",
+  "producerRole": "root-operator",
+  "signerRole": "root-policy",
+  "requiredVerifier": "pretrusted:g2-planning-policy:1",
+  "freshness": "validity-bounded-approval",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "g2-planning-policy.schema.json",
+  "schemaSHA256": "650e913892cb3b501e387fd0461cd4db51a8711c34c799babc025b9cc6123d8b",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "g2-planning-policy"
+      },
+      "cohortScopesSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "selection": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "pretrustedRegistrySHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "kind",
+      "cohortScopesSHA256",
+      "selection",
+      "pretrustedRegistrySHA256"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/rootG2Decision"
+  ]
+}

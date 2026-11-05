@@ -1,0 +1,2822 @@
+{
+  "schemaVersion": "fleet5-proof-slot-recipes:3",
+  "status": "PROPOSAL_NOT_REGISTERED",
+  "base": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+  "entries": [
+    {
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "inspectAndValidate",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "UNRECORDED"
+      ]
+    },
+    {
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "reserve",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED"
+      ]
+    },
+    {
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "artifact": "api-request",
+      "method": "reserve",
+      "fieldPath": "/arguments/rootExecutionDecision",
+      "contractId": "saintvision-proof-root-execution-decision:1",
+      "signatureDomainASCII": "saintvision/proof/root-execution-decision/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-operator",
+      "signerRole": "root-execution",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact FINAL signed plan envelope SHA256",
+        "operationId": "request.operationId",
+        "migrationId": "authenticated plan.migrationId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:root-execution-decision:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED"
+      ]
+    },
+    {
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "setOldRestartNo",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "RESERVED",
+        "FENCE_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "stopOld",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "OLD_RESTART_NO"
+      ]
+    },
+    {
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "captureFenced",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "OLD_STOPPED_QUIESCENT"
+      ]
+    },
+    {
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "artifact": "api-request",
+      "method": "captureFenced",
+      "fieldPath": "/arguments/quiescence",
+      "contractId": "saintvision-proof-process-quiescence:1",
+      "signatureDomainASCII": "saintvision/proof/process-quiescence/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "daemonIdentitySHA256": "registered member daemon",
+        "oldContainerId": "exact stopped OLD ID",
+        "volumeMetadataSHA256": "exact owned volume",
+        "operationId": "request.operationId",
+        "fenceEpoch": "held lease fenceEpoch",
+        "allProcessesStopped": "constant true"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:process-quiescence:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "OLD_STOPPED_QUIESCENT"
+      ]
+    },
+    {
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "preserveOld",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "CAPTURED",
+        "PUBLICATION_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "createNew",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "startNew",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_CREATED",
+        "NEW_START_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "verifyBootstrap",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ]
+    },
+    {
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "artifact": "api-request",
+      "method": "verifyBootstrap",
+      "fieldPath": "/arguments/signedM2",
+      "contractId": "saintvision-proof-node-floor-v2:1",
+      "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+      "domainSuffixByteHex": "00",
+      "producerRole": "actual-serving-node",
+      "signerRole": "node-leaf",
+      "subjectRecipe": {
+        "scope": "M2 tenantId/nodeId/recoveryEpoch",
+        "nonce": "fresh verifier challenge",
+        "certificateDERSHA256": "M2 certificateDER_SHA256",
+        "peerPolicyVersion": "M2 peerPolicyVersion",
+        "peerPolicySHA256": "M2 peerPolicySHA256",
+        "floorSHA256": "M2 floorSHA256",
+        "journalIdentitySHA256": "M2 journalIdentitySHA256",
+        "journalUID": "M2 journalUID",
+        "servingPID": "constant 1",
+        "servingExecutableSHA256": "M2 servingExecutableSHA256",
+        "servingProcessSHA256": "M2 servingProcessSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:node-floor-v2:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ]
+    },
+    {
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "artifact": "api-request",
+      "method": "verifyBootstrap",
+      "fieldPath": "/arguments/mtls",
+      "contractId": "saintvision-proof-unchanged-mtls:1",
+      "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-mtls-client",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "channelVersion": "unchanged CP C",
+        "nodeCertificateDERSHA256": "exact unchanged active Node DER",
+        "controlCertificateDERSHA256": "exact unchanged control DER",
+        "endpoint": "exact preserved channel endpoint",
+        "authoritySHA256": "SHA256(C2 preserved authority object)"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:unchanged-mtls:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ]
+    },
+    {
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "artifact": "api-request",
+      "method": "verifyBootstrap",
+      "fieldPath": "/arguments/protectedStateEquality",
+      "contractId": "saintvision-proof-protected-tree-equality:1",
+      "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "volumeMetadataSHA256": "exact owned volume",
+        "beforeTreeSHA256": "fenced protected tree",
+        "afterTreeSHA256": "poststart protected tree; MUST equal before",
+        "operationId": "request.operationId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:protected-tree-equality:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ]
+    },
+    {
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "artifact": "api-request",
+      "method": "verifyBootstrap",
+      "fieldPath": "/arguments/execReceipt",
+      "contractId": "saintvision-proof-owned-engine-exec:1",
+      "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "daemonIdentitySHA256": "registered daemon",
+        "containerId": "exact current ID",
+        "execId": "actual ExecCreate before ExecStart",
+        "commandSHA256": "expected observer direct argv JSON digest",
+        "uid": "registered journal UID",
+        "exitCode": "constant 0"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:owned-engine-exec:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ]
+    },
+    {
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "publishInventory",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "publishInventory",
+      "fieldPath": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "seal",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "artifact": "api-request",
+      "method": "seal",
+      "fieldPath": "/arguments/rootSealDecision",
+      "contractId": "saintvision-proof-root-seal-decision:1",
+      "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-operator",
+      "signerRole": "root-seal",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact FINAL plan envelope",
+        "inventoryEnvelopeSHA256": "exact published inventory envelope",
+        "scope": "exact seal member scope",
+        "migrationId": "first migration ID"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:root-seal-decision:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "restoreNewRestartPolicy",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "SEALED",
+        "RESTART_RESTORE_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "artifact": "api-request",
+      "method": "restoreNewRestartPolicy",
+      "fieldPath": "/arguments/rootRestoreDecision",
+      "contractId": "saintvision-proof-root-restart-restore:1",
+      "signatureDomainASCII": "saintvision/proof/root-restart-restore/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-operator",
+      "signerRole": "root-execution",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact FINAL plan envelope",
+        "scope": "exact member scope",
+        "newContainerId": "exact NEW ID",
+        "terminalSealEnvelopeSHA256": "immutable original seal",
+        "operationId": "new held restore operation ID",
+        "restartPolicy": "constant unless-stopped"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:root-restart-restore:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "SEALED",
+        "RESTART_RESTORE_INTENT"
+      ]
+    },
+    {
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "readState",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "artifact": "api-request",
+      "method": "release",
+      "fieldPath": "/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "artifact": "api-request",
+      "method": "release",
+      "fieldPath": "/arguments/allDescendantsQuiescent",
+      "contractId": "saintvision-proof-descendant-quiescence:1",
+      "signatureDomainASCII": "saintvision/proof/descendant-quiescence/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "operationId": "exact released operation ID",
+        "fenceEpoch": "exact held lease epoch",
+        "descendantSetSHA256": "authenticated EMPTY child registry digest",
+        "allQuiescent": "constant true"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:descendant-quiescence:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "artifact": "migration-event",
+      "method": null,
+      "fieldPath": "/body/memberStates/*/latestEvidence/*",
+      "contractId": "saintvision-proof-member-progress-evidence:1",
+      "signatureDomainASCII": "saintvision/proof/member-progress-evidence/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact plan envelope",
+        "migrationId": "first migration ID",
+        "scope": "memberStates item scope",
+        "phase": "memberStates item phase",
+        "operationId": "event.operationId",
+        "sequence": "event.sequence"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:member-progress-evidence:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "migration-event:/body/effect/receipt",
+      "artifact": "migration-event",
+      "method": null,
+      "fieldPath": "/body/effect/receipt",
+      "contractId": "saintvision-proof-migration-effect-readback:1",
+      "signatureDomainASCII": "saintvision/proof/migration-effect-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact plan envelope",
+        "migrationId": "first migration ID",
+        "operationId": "event.operationId",
+        "sequence": "event.sequence",
+        "method": "event.method",
+        "effectKind": "event.effect.kind",
+        "targetSlot": "event.effect.targetSlot",
+        "intentEventSHA256": "event.effect.intentEventSHA256",
+        "outcome": "authenticated exact known/unknown Engine or CP readback"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:migration-effect-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "migration-event:/body/evidence/*",
+      "artifact": "migration-event",
+      "method": null,
+      "fieldPath": "/body/evidence/*",
+      "contractId": "saintvision-proof-migration-event-evidence:1",
+      "signatureDomainASCII": "saintvision/proof/migration-event-evidence/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "planEnvelopeSHA256": "exact plan envelope",
+        "migrationId": "first migration ID",
+        "operationId": "event.operationId",
+        "sequence": "event.sequence",
+        "phase": "event.phase",
+        "method": "event.method",
+        "recordKind": "event.recordKind"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:migration-event-evidence:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "artifact": "operation-lease",
+      "method": null,
+      "fieldPath": "/body/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/target/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/target/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/target/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/target/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/image/distributionProof",
+      "contractId": "saintvision-proof-image-distribution:1",
+      "signatureDomainASCII": "saintvision/proof/image-distribution/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "artifact-publisher",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "sourceSHA": "plan.acceptedP0.sourceSHA",
+        "imageId": "image.dockerImageId",
+        "platformManifestDigest": "image.platformManifestDigest",
+        "configDigest": "image.configDigest",
+        "archiveSHA256": "image.archiveSHA256",
+        "executableSHA256": "image.executableSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:image-distribution:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/signedM2",
+      "contractId": "saintvision-proof-node-floor-v2:1",
+      "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+      "domainSuffixByteHex": "00",
+      "producerRole": "actual-serving-node",
+      "signerRole": "node-leaf",
+      "subjectRecipe": {
+        "scope": "M2 tenantId/nodeId/recoveryEpoch",
+        "nonce": "fresh verifier challenge",
+        "certificateDERSHA256": "M2 certificateDER_SHA256",
+        "peerPolicyVersion": "M2 peerPolicyVersion",
+        "peerPolicySHA256": "M2 peerPolicySHA256",
+        "floorSHA256": "M2 floorSHA256",
+        "journalIdentitySHA256": "M2 journalIdentitySHA256",
+        "journalUID": "M2 journalUID",
+        "servingPID": "constant 1",
+        "servingExecutableSHA256": "M2 servingExecutableSHA256",
+        "servingProcessSHA256": "M2 servingProcessSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:node-floor-v2:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/mtls",
+      "contractId": "saintvision-proof-unchanged-mtls:1",
+      "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-mtls-client",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "channelVersion": "unchanged CP C",
+        "nodeCertificateDERSHA256": "exact unchanged active Node DER",
+        "controlCertificateDERSHA256": "exact unchanged control DER",
+        "endpoint": "exact preserved channel endpoint",
+        "authoritySHA256": "SHA256(C2 preserved authority object)"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:unchanged-mtls:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/protectedStateEquality",
+      "contractId": "saintvision-proof-protected-tree-equality:1",
+      "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "volumeMetadataSHA256": "exact owned volume",
+        "beforeTreeSHA256": "fenced protected tree",
+        "afterTreeSHA256": "poststart protected tree; MUST equal before",
+        "operationId": "request.operationId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:protected-tree-equality:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/execReceipt",
+      "contractId": "saintvision-proof-owned-engine-exec:1",
+      "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "daemonIdentitySHA256": "registered daemon",
+        "containerId": "exact current ID",
+        "execId": "actual ExecCreate before ExecStart",
+        "commandSHA256": "expected observer direct argv JSON digest",
+        "uid": "registered journal UID",
+        "exitCode": "constant 0"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:owned-engine-exec:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/runtimeInspectionBeforeM2",
+      "contractId": "saintvision-proof-runtime-inspection-before:1",
+      "signatureDomainASCII": "saintvision/proof/runtime-inspection-before/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "daemonIdentitySHA256": "registered daemon",
+        "containerId": "exact current ID",
+        "imageId": "accepted runtime imageId",
+        "configSHA256": "exact captured Config hash",
+        "mountsSHA256": "exact captured mount hash",
+        "processGenerationSHA256": "owned live started process identity",
+        "point": "constant before-M2"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:runtime-inspection-before:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/members/*/runtimeInspectionAfterM2",
+      "contractId": "saintvision-proof-runtime-inspection-after:1",
+      "signatureDomainASCII": "saintvision/proof/runtime-inspection-after/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "daemonIdentitySHA256": "registered daemon",
+        "containerId": "exact current ID",
+        "imageId": "accepted runtime imageId",
+        "configSHA256": "exact captured Config hash",
+        "mountsSHA256": "exact captured mount hash",
+        "processGenerationSHA256": "same owned live started process identity",
+        "point": "constant after-M2"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:runtime-inspection-after:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "artifact": "runtime-inventory",
+      "method": null,
+      "fieldPath": "/body/previousInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/acceptedP0/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/acceptedP0/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/acceptedP0/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/acceptedP0/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/image/distributionProof",
+      "contractId": "saintvision-proof-image-distribution:1",
+      "signatureDomainASCII": "saintvision/proof/image-distribution/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "artifact-publisher",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "sourceSHA": "plan.acceptedP0.sourceSHA",
+        "imageId": "image.dockerImageId",
+        "platformManifestDigest": "image.platformManifestDigest",
+        "configDigest": "image.configDigest",
+        "archiveSHA256": "image.archiveSHA256",
+        "executableSHA256": "image.executableSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:image-distribution:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/migrationHelper/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/migrationHelper/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/migrationHelper/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/migrationHelper/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/commonFence/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/commonFence/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/commonFence/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/commonFence/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/runtimeInventoryAPI/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/schema3Helper/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/schema3Helper/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/schema3Helper/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/schema3Helper/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/newRenewalGuard/buildProvenance",
+      "contractId": "saintvision-proof-build-provenance:1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:build-provenance:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/newRenewalGuard/coreCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/newRenewalGuard/backendCI/attestation",
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "repository": "component.CI.repository",
+        "workflow": "component.CI.workflow",
+        "headSHA": "component.sourceSHA",
+        "ref": "component.CI.ref",
+        "event": "component.CI.event",
+        "runId": "component.CI.runId",
+        "runAttempt": "component.CI.runAttempt",
+        "artifactSHA256": "component.CI.artifactSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:ci-attestation:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/newRenewalGuard/independentReview/receipt",
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "component": "componentPath",
+        "sourceSHA": "component.sourceSHA",
+        "artifactSHA256": "component.artifactSHA256",
+        "authorId": "component.independentReview.authorId",
+        "reviewerId": "component.independentReview.reviewerId"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-code-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/nativeTwoCycleProof",
+      "contractId": "saintvision-proof-native-two-cycle:1",
+      "signatureDomainASCII": "saintvision/proof/native-two-cycle/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "sourceSHA": "plan.acceptedP0.sourceSHA",
+        "executableSHA256": "plan.image.executableSHA256",
+        "fixtureCohortSHA256": "authenticated native fixture cohort",
+        "completedCycles": "constant 2"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:native-two-cycle:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/oldNewNoWriteCompatibility",
+      "contractId": "saintvision-proof-old-new-no-write:1",
+      "signatureDomainASCII": "saintvision/proof/old-new-no-write/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "sourceSHA": "plan.acceptedP0.sourceSHA",
+        "newExecutableSHA256": "plan.image.executableSHA256",
+        "compatibilityFixtureSHA256": "authenticated native old/new exact fixture identities/images/metadata"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:old-new-no-write:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/m2CapabilityProof",
+      "contractId": "saintvision-proof-m2-capability:1",
+      "signatureDomainASCII": "saintvision/proof/m2-capability/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "subjectRecipe": {
+        "sourceSHA": "plan.acceptedP0.sourceSHA",
+        "executableSHA256": "plan.image.executableSHA256",
+        "receiptSchema": "constant saintvision-node-peer-policy-floor:2"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "immutable-provenance",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:m2-capability:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/rootG2Decision",
+      "contractId": "saintvision-proof-g2-planning-policy:1",
+      "signatureDomainASCII": "saintvision/proof/g2-planning-policy/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-operator",
+      "signerRole": "root-policy",
+      "subjectRecipe": {
+        "cohortScopesSHA256": "SHA256(C2 ordered plan.memberInputs.scope vector)",
+        "selection": "constant preserve-permit-split-runtime",
+        "pretrustedRegistrySHA256": "OUT-OF-BAND installed policy registry digest"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "validity-bounded-approval",
+        "maxAgeSeconds": null,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:g2-planning-policy:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/independentPlanReview",
+      "contractId": "saintvision-proof-independent-plan-review:1",
+      "signatureDomainASCII": "saintvision/proof/independent-plan-review/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "subjectRecipe": {
+        "planSubjectSHA256": "recomputed planSubjectSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "validity-bounded-approval",
+        "maxAgeSeconds": null,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:independent-plan-review:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/rootPublicationIntent",
+      "contractId": "saintvision-proof-root-publication-intent:1",
+      "signatureDomainASCII": "saintvision/proof/root-publication-intent/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-operator",
+      "signerRole": "root-plan",
+      "subjectRecipe": {
+        "planSubjectSHA256": "recomputed planSubjectSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "validity-bounded-approval",
+        "maxAgeSeconds": null,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:root-publication-intent:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/scheduleDisabledReadback",
+      "contractId": "saintvision-proof-schedule-disabled-readback:1",
+      "signatureDomainASCII": "saintvision/proof/schedule-disabled-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-schedule-reader",
+      "signerRole": "root-observer",
+      "subjectRecipe": {
+        "cohortScopesSHA256": "SHA256(C2 ordered plan.memberInputs.scope vector)",
+        "entryIdsSHA256": "exact three IDs canonical vector digest",
+        "configAndTargetsSHA256": "authenticated exact readback config+target vector",
+        "allDisabled": "constant true"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:schedule-disabled-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/allLaunchSurfaces",
+      "contractId": "saintvision-proof-launch-surface-inventory:1",
+      "signatureDomainASCII": "saintvision/proof/launch-surface-inventory/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-launch-reader",
+      "signerRole": "root-observer",
+      "subjectRecipe": {
+        "cohortScopesSHA256": "SHA256(C2 ordered plan.memberInputs.scope vector)",
+        "registeredSurfacesSHA256": "externally registered launch surface set digest",
+        "observedSurfaceSetSHA256": "authenticated current full set digest"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:launch-surface-inventory:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/noOverlap",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/noOverlap",
+      "contractId": "saintvision-proof-no-overlap:1",
+      "signatureDomainASCII": "saintvision/proof/no-overlap/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "root-process-reader",
+      "signerRole": "root-observer",
+      "subjectRecipe": {
+        "cohortScopesSHA256": "SHA256(C2 ordered plan.memberInputs.scope vector)",
+        "operationId": "registered attempted operation",
+        "descendantSetSHA256": "authenticated current EMPTY set digest",
+        "allQuiescent": "constant true"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:no-overlap:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "artifact": "successor-plan",
+      "method": null,
+      "fieldPath": "/body/expectedInventoryHead/readbackProof",
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "subjectRecipe": {
+        "cohortId": "registered fixed cohort ID",
+        "presence": "inventoryHead.presence",
+        "envelopeSHA256": "inventoryHead.envelopeSHA256",
+        "registrationSHA256": "OUT-OF-BAND CP inventory registration"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED"
+      ]
+    },
+    {
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "artifact": "terminal-seal",
+      "method": null,
+      "fieldPath": "/body/bootstrapM2",
+      "contractId": "saintvision-proof-node-floor-v2:1",
+      "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+      "domainSuffixByteHex": "00",
+      "producerRole": "actual-serving-node",
+      "signerRole": "node-leaf",
+      "subjectRecipe": {
+        "scope": "M2 tenantId/nodeId/recoveryEpoch",
+        "nonce": "fresh verifier challenge",
+        "certificateDERSHA256": "M2 certificateDER_SHA256",
+        "peerPolicyVersion": "M2 peerPolicyVersion",
+        "peerPolicySHA256": "M2 peerPolicySHA256",
+        "floorSHA256": "M2 floorSHA256",
+        "journalIdentitySHA256": "M2 journalIdentitySHA256",
+        "journalUID": "M2 journalUID",
+        "servingPID": "constant 1",
+        "servingExecutableSHA256": "M2 servingExecutableSHA256",
+        "servingProcessSHA256": "M2 servingProcessSHA256"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:node-floor-v2:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED"
+      ]
+    },
+    {
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "artifact": "terminal-seal",
+      "method": null,
+      "fieldPath": "/body/bootstrapMTLS",
+      "contractId": "saintvision-proof-unchanged-mtls:1",
+      "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+      "domainSuffixByteHex": "00",
+      "producerRole": "owned-mtls-client",
+      "signerRole": "host-helper",
+      "subjectRecipe": {
+        "scope": "current member scope",
+        "channelVersion": "unchanged CP C",
+        "nodeCertificateDERSHA256": "exact unchanged active Node DER",
+        "controlCertificateDERSHA256": "exact unchanged control DER",
+        "endpoint": "exact preserved channel endpoint",
+        "authoritySHA256": "SHA256(C2 preserved authority object)"
+      },
+      "scopeDigestRecipe": "SHA256(C2(typedSubject)); tagged kind INCLUDED; verifier recomputes every subject field from its exact scoped source/referent",
+      "freshness": {
+        "mode": "fresh",
+        "maxAgeSeconds": 120,
+        "maxFutureSkewSeconds": 30,
+        "requireValidUntil": true,
+        "historicalRead": "Authenticated immutable history may be checked later without recasting it as fresh authorization; a NEW consuming operation needs its own fresh current proofs/lease. M2 bootstrap history never supplies normal3 current M2."
+      },
+      "phase": "before consuming effect; bound to same current method/state/operation; immutable provenance may be archival but must remain unrevoked",
+      "requiredVerifier": "pretrusted:unchanged-mtls:1",
+      "actualContractSHA256": null,
+      "actualVerifierSourceArtifactCIReview": null,
+      "permittedPhases": [
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED"
+      ]
+    }
+  ],
+  "executableRecipeSpec": "recipe-definitions.json",
+  "actualRegistrySHA256": null,
+  "actualTrustRegistration": null
+}

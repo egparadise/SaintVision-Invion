@@ -1,0 +1,57 @@
+{
+  "contractId": "saintvision-proof-schedule-disabled-readback:1",
+  "signatureDomainASCII": "saintvision/proof/schedule-disabled-readback/v1",
+  "producerRole": "root-schedule-reader",
+  "signerRole": "root-observer",
+  "requiredVerifier": "pretrusted:schedule-disabled-readback:1",
+  "freshness": "fresh",
+  "status": "PROPOSED_CODE_REVIEW_REQUIRED",
+  "codec": "normalized-proof-v1",
+  "schemaFile": "schedule-disabled-readback.schema.json",
+  "schemaSHA256": "8d4c081260c8c715f5ff48ca35e2aba7436fdaac090d3d8624fe418134d846d0",
+  "subjectSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kind": {
+        "const": "schedule-disabled-readback"
+      },
+      "cohortScopesSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "entryIdsSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "configAndTargetsSHA256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "allDisabled": {
+        "const": true
+      }
+    },
+    "required": [
+      "kind",
+      "cohortScopesSHA256",
+      "entryIdsSHA256",
+      "configAndTargetsSHA256",
+      "allDisabled"
+    ]
+  },
+  "signatureProjection": "{body,signer:{role,keySPKISHA256}}",
+  "domainSuffixByteHex": "00",
+  "artifactIdentity": "SHA256(exact supplied referent bytes)",
+  "canonicalReferentRequired": true,
+  "scopeDigest": "SHA256(C2(typedSubject)) including kind",
+  "fieldMap": {
+    "typedSubject": "body.typedSubject",
+    "observedAt": "body.observedAt",
+    "validUntil": "body.validUntil",
+    "keySPKISHA256": "protected signer.keySPKISHA256"
+  },
+  "slotIds": [
+    "successor-plan:/body/scheduleDisabledReadback"
+  ]
+}
