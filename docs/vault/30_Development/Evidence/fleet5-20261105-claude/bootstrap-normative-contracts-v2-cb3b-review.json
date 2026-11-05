@@ -1,0 +1,83 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_c96ddeeb29b9 / ctx_289f895a6a61",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-06T01:30:26+09:00", "2026-11-06T01:42:00+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and at the last head check before writing; publication times are separate",
+  "reviewKind": "independent architecture/contract-PROPOSAL DELTA review of a nonexecuting document revision; design verdict only; not registered contracts, code authorization, runtime CI, physical or operational acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+    "base": "f932283de3fd96f3816a99ea5c38d6d14969b930",
+    "delta": {"files": 44, "insertions": 46611, "deletions": 0, "statuses": "44 added, 0 modified, 0 deleted", "outsideV2Dir": ["History/2026-11-06_FLEET5_bootstrap_contracts_v2_review_revision_Codex.md (78 lines)"], "nonDocsFiles": 0},
+    "readFrom": "Git objects only (git archive of cb3b and f932 into private scratch); author checkout untouched",
+    "priorVerdict": "78ae0138 f932 REVISION REQUIRED retained unchanged; 803 plan ACCEPT unchanged",
+    "docs": {"run": 42064006585, "headSHA": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7", "conclusion": "success", "jobs": "docs success", "checkedByClaude": "API only"}
+  },
+  "independentChecks": {
+    "interpreter": "main .venv Python 3.14.7 -B -I; jsonschema Draft 2020-12 with referencing registry; own Go Marshal emulator; no Go, no signing, no crypto verification",
+    "artifactHashes": "42/42 recomputed and matched (proposal-validation.json excluded to avoid self-reference); owner gates 11/11 exit 0 as recorded",
+    "schemas": "9/9 metaschema-valid",
+    "structuralPositives": "6/6 plus post-seal unknown 1/1 VALID",
+    "requiredRemovals": "owner 1866/1866 rejected; own enumeration of every key in all 7 fixtures 1920/1920 rejected (extra 54 = post-seal fixture)",
+    "originalAdversarial": "46/46: 41 schema-rejected, 5 schema-valid semantic-layer (owner labels them static subset)",
+    "ownLeafMutations": {"boolFlip": "23/23 rejected", "intAsBool/intAsFloat1.5/intAsString": "108/108 each rejected", "hexUpper": "560 rejected, 15 accepted (typedSubject containerId/execId/point/cohortId are loosely typed; semantic recompute must catch)", "extraKeyAtEveryObject": "237/237 rejected", "intAsFloatIntegral 1.0": "108/108 schema-accepted (by design: strict lexical reader before schema, L1)", "impossibleTime": "128/128 schema-accepted (by design: strict time reader, L2)"},
+    "api": "14 methods valid; own force/workerRoot/argv/wrongMethod 56/56 rejected; cross-method argument substitution 178 rejected, 2 accepted (methods with identical argument shapes); response sideEffectPermitted const false",
+    "proofSlots": {
+      "genericProofDef": "common.$defs.proof === false",
+      "count": "schema const slotIds 77 = registry 77 = synthetic 77; every proof subschema closed with const contractId/domain/producer/signer and closed typedSubject with const kind",
+      "contractsDomainsKinds": "28 contracts, 28 domains, 28 kinds, each one-to-one; pretrusted policy lists all 28 contracts and every signer role",
+      "scopeHash": "77/77 scopeSHA256 = SHA256(GoMarshal(typedSubject)) with the kind tag included (hash without kind differs 77/77); 80/80 embedded proofs also recompute",
+      "v1Coverage": "80 v1 raw proof refs = 74 normalized slots, all covered by v2; v2 adds 3 event slots (effect receipt, evidence[*], memberStates[*].latestEvidence[*]) that v1 fixtures left empty",
+      "swaps": "759/759 intra-artifact distinct-slot swaps and 143/143 cross-artifact same-contract reuses rejected by schema; plan approval swap schema-rejected; same-slot member swap of signedM2 is schema-valid and caught only by the subject node binding",
+      "ownerNegatives539": "539/539 rejected: 233 at schema layer, 306 only by own semantic predicate (scope recompute, expected-subject equality, strict time, current-window and 120 s freshness); 0 missed",
+      "planSubject": "recomputed; excludes exactly planSubjectSHA256, independentPlanReview, rootPublicationIntent; both approvals bind it with distinct kinds and contracts",
+      "executionDecision": "reserve rootExecutionDecision binds the computed final plan envelope fc2291db..., request operationId and plan migrationId; the plan has no execution-decision field, so no self-hash cycle",
+      "freshness": "41 fresh (120 s / 30 s skew), 33 immutable-provenance, 3 validity-bounded approvals (G2, plan review, publication intent)",
+      "registryBindings": "every actualContractSHA256 / actualVerifierSourceArtifactCIReview null; actualRegistrySHA256 and actualTrustRegistration null"
+    },
+    "m1": "plan canonicalContractSHA256 = synthetic external allowedRegistrySHA256 = G2 pretrustedRegistrySHA256; authentication order loads and verifies external policy first and BLOCKs before plan/reserve/lease; forbidden bundle trust root, plan-selected signer, caller verifier, self-certification, missing-registry fallback; 11 deployment bindings null; plan-carried key hashes are compared values, never grants",
+    "m3": "journal schema agrees with own rule set (sealedHistory<->seal<->origin, sealed phases, early phases false, HELD/UNKNOWN<->lease digest, NONE op never HELD/UNKNOWN) over 1152/1152 combinations; drop-seal schema-rejected; clear/replace rejected only by the history predicate (honest layer)",
+    "eventTable": "27/27 table intent/outcome rows schema-valid; method->effect.kind, recordKind->phase, early inventory/seal refs, outcome-without-intent bound by schema; priorPhase NOT schema-bound (441/441 off-table priors accepted); effect.targetSlot different from top-level targetSlot accepted 14/14",
+    "strictBytes": "J01-J09 input SHA256 9/9 and own lexical reader reaches the same reason 9/9 (1.0 decimal, 1e0/1E2 exponent, -0 negative zero)",
+    "strictTime": "6/6 own strict parse + exact roundtrip equals expected; schema timestamp def alone still admits 2026-02-30T25:61:61Z",
+    "canonicalBodies": "6/6 body, body SHA256, domain, domain+body SHA256, envelope SHA256 reproduced; no newline; 6 artifact domains distinct and none is the M2 floor domain",
+    "edgeCases": "18/18 reach the stated result under own schema/predicates",
+    "candidateABI": "7/7 files equal 4a928310 git blob, SHA256 and length; reference NONBINDING (acceptedProductBinding null)",
+    "hold": "executionAuthorized false, HOLD, target 30, Root 18 and member bindings all null; trust deployment bindings null; synthetic policy fixtureOnly/actualTrust false"
+  },
+  "findings": [
+    {"id": "M1", "severity": "Medium", "status": "closed (design)", "summary": "external installed/CP/worker-root trust, anchors and reviewed verifier registry precede plan authentication; plan selects only within the pinned set"},
+    {"id": "M2", "severity": "Medium", "status": "closed (design)", "summary": "77 closed specialized slots with constant contract/domain/roles/kind, typed recipes, freshness and phases; all v1 refs covered; swaps and relabels rejected"},
+    {"id": "M3", "severity": "Medium", "status": "closed (design)", "summary": "sealed history and original seal retained through blocked/unknown with operationKind/leaseState rules"},
+    {"id": "L1", "severity": "Low", "status": "closed (specified + fixtures)", "summary": "lexical integer grammar before schema; actual Go/Python readers NOT RUN"},
+    {"id": "L2", "severity": "Low", "status": "closed (specified + fixtures)", "summary": "strict parse + roundtrip; actual readers NOT RUN"},
+    {"id": "L3", "severity": "Low", "status": "closed", "summary": "OLD_RESTART_NO, OLD_STOP_INTENT and OLD_STOPPED_QUIESCENT distinct; capture only after the exact stop outcome"},
+    {"id": "L4", "severity": "Low", "status": "partially closed -> N-L4", "summary": "table published and most bindings schema-level; priorPhase and effect target equality remain verifier-only"},
+    {"id": "L5", "severity": "Low", "status": "partially closed -> N-L5", "summary": "seal/inventory backup-current pairs now coherent; embedded proof subjects in positives are not"},
+    {"id": "I1", "severity": "Info", "status": "closed (specified)", "summary": "PC2->PC4 OS locks, logical CAS under both locks, inverse release, trusted nested context, no stale steal"},
+    {"id": "I2", "severity": "Info", "status": "closed (specified)", "summary": "strict RFC 8032 rules stated; no crypto run claimed"},
+    {"id": "I3", "severity": "Info", "status": "closed", "summary": "failure from any phase, repeated blocked observation, refs retained"},
+    {"id": "N-L4", "severity": "Low", "status": "open", "summary": "the contract says method/recordKind/priorPhase/phase/targetSlot/effect.kind are bound by schema/table and member effect target must match the top-level target, but the event schema accepts any priorPhase (441/441 off-table priors) and effect.targetSlot != targetSlot (14/14)", "requiredRevision": "encode per-method/recordKind priorPhase enums and targetSlot->effect.targetSlot const in the schema, or label both explicitly verifier-only and add red fixtures"},
+    {"id": "N-L5", "severity": "Low", "status": "open", "summary": "positive fixtures violate their own subject recipes in the M2 joins: inventory execReceipt/runtimeInspectionBefore/After containerId (3 per member) are not the member currentContainer.id and are identical for PC2 and PC4, exec daemon differs from the member daemon (2/2); event effect-receipt/evidence/latestEvidence subjects bind plan envelope b84b1b... instead of fc2291...; API captureFenced quiescence oldContainerId/daemon differ from the request arguments; post-seal fixture latestEvent.sequence 1 < sealOriginEvent.sequence 20 with previousProjection null. The owner static positives compare against their own templates, so the recipe derivation is not exercised", "requiredRevision": "derive every embedded typedSubject from the containing fixture per recipe and check it, or label these positives template-only"},
+    {"id": "N-I1", "severity": "Info", "status": "open", "summary": "journal schema admits RESTART_RESTORE without sealed history, a restore operation in an early phase and MIGRATION with lease NONE; stated as verifier/history rules"},
+    {"id": "N-I2", "severity": "Info", "status": "open", "summary": "a failure record may carry effect intent digest and receipt; state whether that is an observed unknown-outcome receipt and never an outcome"},
+    {"id": "N-I3", "severity": "Info", "status": "open", "summary": "typedSubject containerId/execId/point/cohortId are loose strings while container fields are strict lowercase hex"}
+  ],
+  "verdicts": {
+    "designContractProposal": "ACCEPT at proposal/design level: M1-M3 closed, L1-L3 and I1-I3 closed as specified; N-L4 and N-L5 (Low) and N-I1-N-I3 (Info) are conditions to fix before contract registration or implementation, not blockers for Root's ownership decision",
+    "priorF932": "REVISION REQUIRED (78ae0138) retained as history, unchanged",
+    "registeredProductContracts": "none; not accepted",
+    "implementationOrCodeAuthorization": "none",
+    "runtimeCI": "none; actual Go, signatures, OS locks, Engine, atomicity and equipment cases 0; 40 future product cases NOT RUN",
+    "physicalOperations": "HOLD; target 30, Root 18, member and trust bindings null",
+    "p0Context": "4a ABI reference NONBINDING; 4f code ACCEPT at source level (2736aec1) is a separate scope and not borrowed here"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysClockGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "bindingsFilled": 0, "fullCIRuns": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record design ACCEPT with N-L4/N-L5 conditions; decide implementation ownership; keep bindings null and operations HOLD; release owner question msg_cfc760f08979 against this verdict"},
+    {"owner": "Codex (plan owner)", "action": "fix N-L4/N-L5 (and Info items) in a small fixture/schema delta before contract registration"},
+    {"owner": "Claude", "action": "review that delta when assigned"}
+  ]
+}
