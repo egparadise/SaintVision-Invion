@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"time"
 )
 
 // Packet is untrusted, immutable serialized input only. It has no trust policy,
@@ -23,10 +24,11 @@ type Report struct {
 	Digests                                  map[string]string
 }
 type verifiedPacket struct {
-	payloads map[string]any
-	digests  map[string]string
-	proofs   map[string][]authenticatedProof
-	report   Report
+	payloads  map[string]any
+	digests   map[string]string
+	proofs    map[string][]authenticatedProof
+	report    Report
+	referents map[string][]byte // Only the bounded per-call snapshot.
 }
 
 var outerDomains = map[string]string{
@@ -47,6 +49,30 @@ func (v *Verifier) Verify(packet Packet) (Report, error) {
 	return x.report, nil
 }
 
+// The caller owns packet maps/slices exclusively during this call. Copying is
+// defensive isolation, not synchronization with concurrent caller mutation.
+func snapshotPacket(packet Packet) (Packet, error) {
+	if len(packet.Records) > 4096 || len(packet.Referents) > 8192 {
+		return Packet{}, errors.New("packet object-count bound")
+	}
+	total := 0
+	for _, collection := range []map[string][]byte{packet.Records, packet.Referents} {
+		for _, raw := range collection {
+			if len(raw) > (32<<20)-total {
+				return Packet{}, errors.New("packet byte bound")
+			}
+			total += len(raw)
+		}
+	}
+	out := Packet{Records: make(map[string][]byte, len(packet.Records)), Referents: make(map[string][]byte, len(packet.Referents))}
+	for id, raw := range packet.Records {
+		out.Records[id] = append([]byte(nil), raw...)
+	}
+	for id, raw := range packet.Referents {
+		out.Referents[id] = append([]byte(nil), raw...)
+	}
+	return out, nil
+}
 func (v *Verifier) verify(packet Packet) (*verifiedPacket, error) {
 	if v == nil || v.contracts == nil || v.schemas == nil || v.graph == nil {
 		return nil, errors.New("missing installed verifier")
@@ -54,19 +80,12 @@ func (v *Verifier) verify(packet Packet) (*verifiedPacket, error) {
 	if len(packet.Records) != len(v.trust.NodeKinds) {
 		return nil, errors.New("missing or extra packet records")
 	}
-	if len(packet.Records) > 4096 || len(packet.Referents) > 8192 {
-		return nil, errors.New("packet object-count bound")
+	var e error
+	packet, e = snapshotPacket(packet)
+	if e != nil {
+		return nil, e
 	}
-	total := 0
-	for _, collection := range []map[string][]byte{packet.Records, packet.Referents} {
-		for _, raw := range collection {
-			if len(raw) > (32<<20)-total {
-				return nil, errors.New("packet byte bound")
-			}
-			total += len(raw)
-		}
-	}
-	x := &verifiedPacket{payloads: map[string]any{}, proofs: map[string][]authenticatedProof{}}
+	x := &verifiedPacket{payloads: map[string]any{}, proofs: map[string][]authenticatedProof{}, referents: packet.Referents}
 	for id, raw := range packet.Records {
 		kind, ok := v.trust.NodeKinds[id]
 		if !ok {
@@ -142,7 +161,11 @@ func (v *Verifier) verify(packet Packet) (*verifiedPacket, error) {
 		if e != nil {
 			return nil, e
 		}
-		key, e := v.key(role, authority, spki)
+		use, e := v.recordUse(id, x.payloads, d)
+		if e != nil {
+			return nil, e
+		}
+		key, e := v.keyAt(role, authority, spki, use.at)
 		if e != nil {
 			return nil, e
 		}
@@ -159,7 +182,7 @@ func (v *Verifier) verify(packet Packet) (*verifiedPacket, error) {
 		}
 		x.report.RealSignatures++
 	}
-	for _, op := range v.ctx.Operations {
+	for _, op := range v.ctx.History.Operations {
 		found := false
 		for id, digest := range d {
 			if digest != op.LeaseEnvelopeSHA256 || v.trust.NodeKinds[id] != "operation-lease" {
@@ -167,13 +190,13 @@ func (v *Verifier) verify(packet Packet) (*verifiedPacket, error) {
 			}
 			body, _ := pointer(x.payloads[id], "/body")
 			b, _ := object(body)
-			if b["mode"] != "HELD" || b["operationId"] != op.OperationID || b["migrationId"] != op.MigrationID || !equal(b["fenceEpoch"], json.Number(fmt.Sprint(op.FenceEpoch))) || b["acquiredAt"] != op.AcquiredAt.Format("2006-01-02T15:04:05Z") || b["expiresAt"] != op.ExpiresAt.Format("2006-01-02T15:04:05Z") {
-				return nil, errors.New("external operation differs from authenticated original lease")
+			if !v.leaseScopesMatch(b) || b["planEnvelopeSHA256"] != d["plan"] || b["mode"] != "HELD" || b["operationId"] != op.OperationID || b["migrationId"] != op.MigrationID || !equal(b["fenceEpoch"], json.Number(fmt.Sprint(op.FenceEpoch))) || b["acquiredAt"] != op.AcquiredAt.Format("2006-01-02T15:04:05Z") || b["expiresAt"] != op.ExpiresAt.Format("2006-01-02T15:04:05Z") {
+				return nil, errors.New("historical operation differs from authenticated original lease")
 			}
 			found = true
 		}
 		if !found {
-			return nil, errors.New("trusted operation has no authenticated original lease")
+			return nil, errors.New("historical operation has no authenticated original lease")
 		}
 	}
 	used := map[string]bool{}
@@ -305,13 +328,6 @@ func (v *Verifier) VerifyCurrentProjectionSet(packet Packet, setID string) (stri
 	if x.digests["plan"] != c.PlanEnvelopeSHA256 || len(c.MemberProjectionSHA256) != 2 {
 		return "", errors.New("current plan/member binding absent")
 	}
-	op, e := v.operation(c.OperationID)
-	if e != nil {
-		return "", e
-	}
-	if op.MigrationID != c.MigrationID || op.FenceEpoch != c.FenceEpoch || v.ctx.Now.Before(op.AcquiredAt) || !v.ctx.Now.Before(op.ExpiresAt) {
-		return "", errors.New("current operation/epoch expired or mismatched")
-	}
 	find := func(hash, kind string) (map[string]any, error) {
 		ids := []string{}
 		for id, d := range x.digests {
@@ -330,6 +346,25 @@ func (v *Verifier) VerifyCurrentProjectionSet(packet Packet, setID string) (stri
 		return "", e
 	}
 	lb, _ := object(lease["body"])
+	if lb["mode"] != "HELD" {
+		return "", errors.New("current lease is RELEASED or not HELD")
+	}
+	if e = v.latestCurrent(x, c); e != nil {
+		return "", e
+	}
+	op, e := v.operation(c.OperationID)
+	if e != nil {
+		return "", e
+	}
+	if op.MigrationID != c.MigrationID || op.FenceEpoch != c.FenceEpoch || v.ctx.Now.Before(op.AcquiredAt) || !v.ctx.Now.Before(op.ExpiresAt) {
+		return "", errors.New("current operation/epoch expired or mismatched")
+	}
+	if c.LeaseEnvelopeSHA256 != op.LeaseEnvelopeSHA256 || !v.leaseScopesMatch(lb) {
+		return "", errors.New("current lease differs from exact trusted operation/cohort")
+	}
+	if lb["acquiredAt"] != op.AcquiredAt.Format(time.RFC3339) || lb["expiresAt"] != op.ExpiresAt.Format(time.RFC3339) {
+		return "", errors.New("current operation window differs from authenticated HELD lease")
+	}
 	if lb["operationId"] != c.OperationID || lb["migrationId"] != c.MigrationID || !equal(lb["fenceEpoch"], json.Number(fmt.Sprint(c.FenceEpoch))) {
 		return "", errors.New("current signed lease/fence mismatch")
 	}
@@ -339,7 +374,7 @@ func (v *Verifier) VerifyCurrentProjectionSet(packet Packet, setID string) (stri
 	}
 	readback := false
 	for _, p := range x.proofs[c.InventoryReadbackSHA256] {
-		if p.contract == "saintvision-proof-inventory-head-readback:1" && p.operation == c.OperationID && p.migration == c.MigrationID && v.ctx.Now.Before(p.until) {
+		if p.contract == "saintvision-proof-inventory-head-readback:1" && p.operation == c.OperationID && p.migration == c.MigrationID && v.ctx.Now.Before(p.until) && !v.ctx.Now.Before(p.observed.Add(-30*time.Second)) && v.ctx.Now.Sub(p.observed) <= 120*time.Second {
 			subject, _ := object(p.subject)
 			head, _ := object(c.InventoryHead)
 			if subject["presence"] == head["presence"] && equal(subject["envelopeSHA256"], head["envelopeSHA256"]) {
@@ -349,6 +384,9 @@ func (v *Verifier) VerifyCurrentProjectionSet(packet Packet, setID string) (stri
 	}
 	if !readback {
 		return "", errors.New("current genuine CP head readback absent")
+	}
+	if e = v.currentReadback(c, x); e != nil {
+		return "", e
 	}
 	head, e := object(c.InventoryHead)
 	if e != nil {
@@ -380,6 +418,9 @@ func (v *Verifier) VerifyCurrentProjectionSet(packet Packet, setID string) (stri
 		if !equal(b["scope"], reg.Scope) || b["planEnvelopeSHA256"] != c.PlanEnvelopeSHA256 || b["ownerLeaseEnvelopeSHA256"] != c.LeaseEnvelopeSHA256 {
 			return "", errors.New("current original Node projection binding mismatch")
 		}
+	}
+	if e = v.currentNativeWitnesses(c, x); e != nil {
+		return "", e
 	}
 	return ArtifactDigest("cohort-projection-set", m)
 }

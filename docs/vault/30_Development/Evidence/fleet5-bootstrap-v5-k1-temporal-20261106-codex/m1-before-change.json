@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-run",
+    "TestCurrentRejectsConsistentSupersededViews",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 1,
+  "atKST": "2026-11-06T07:36:53.160702+09:00",
+  "expectedFail": true,
+  "codeBase": "c6f0d95ecbcd79fac96673c194e2368b510ad827"
+}

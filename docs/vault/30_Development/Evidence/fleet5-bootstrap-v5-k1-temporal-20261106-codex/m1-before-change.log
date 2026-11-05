@@ -1,0 +1,14 @@
+=== RUN   TestCurrentRejectsConsistentSupersededViews
+=== RUN   TestCurrentRejectsConsistentSupersededViews/cohort-33
+    temporal_test.go:34: accepted internally consistent obsolete current view
+=== RUN   TestCurrentRejectsConsistentSupersededViews/cohort-34
+    temporal_test.go:37: wrong rejection gate: current original Node projection binding mismatch
+=== RUN   TestCurrentRejectsConsistentSupersededViews/cohort-35
+    temporal_test.go:34: accepted internally consistent obsolete current view
+--- FAIL: TestCurrentRejectsConsistentSupersededViews (2.38s)
+    --- FAIL: TestCurrentRejectsConsistentSupersededViews/cohort-33 (0.73s)
+    --- FAIL: TestCurrentRejectsConsistentSupersededViews/cohort-34 (0.72s)
+    --- FAIL: TestCurrentRejectsConsistentSupersededViews/cohort-35 (0.72s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify	3.810s
+FAIL

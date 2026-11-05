@@ -140,15 +140,28 @@ type proofMutation func(proofLocation, *proofContract, []byte, map[string]any, m
 type cryptoFixtureOptions struct {
 	IncludeOptionalProofs bool
 	NativeLifetime        time.Duration
+	DurableHistory        bool
+	EventSeconds          map[string]int64
+	LeafUsageOverride     bool
+	LeafEKU               []x509.ExtKeyUsage
+	LeafKeyUsage          x509.KeyUsage
 }
 
 func newCryptoFixture(t *testing.T) *cryptoFixture { return newCryptoFixtureMutated(t, nil) }
 func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryptoFixtureOptions) *cryptoFixture {
 	t.Helper()
-	v, p, _ := shapeRecipeVerifier(t)
+	v, p, originalDigests := shapeRecipeVerifier(t)
 	var option cryptoFixtureOptions
 	if len(options) > 0 {
 		option = options[0]
+	}
+	graphRaw, e := os.ReadFile("testdata/artifact-reference-graph.json")
+	if e != nil {
+		t.Fatal(e)
+	}
+	var times map[string]time.Time
+	if option.DurableHistory {
+		graphRaw, times = durableFixtureTimeline(t, v, p, originalDigests, option.EventSeconds)
 	}
 	now := v.ctx.Now
 	inputs := v.ctx.SemanticInputs.(map[string]any)
@@ -220,6 +233,10 @@ func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryp
 			lifetime = option.NativeLifetime
 		}
 		leaf := &x509.Certificate{SerialNumber: big.NewInt(int64(i + 1)), Subject: pkix.Name{CommonName: "EPHEMERAL TEST " + m.Slot}, NotBefore: now.Add(-time.Hour), NotAfter: now.Add(lifetime), BasicConstraintsValid: true, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, URIs: []*url.URL{uri}}
+		if option.LeafUsageOverride {
+			leaf.ExtKeyUsage = option.LeafEKU
+			leaf.KeyUsage = option.LeafKeyUsage
+		}
 		der, e := x509.CreateCertificate(rand.Reader, leaf, caTemplate, priv.Public(), caKey)
 		if e != nil {
 			t.Fatal(e)
@@ -244,6 +261,7 @@ func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryp
 		body["memberStates"].([]any)[0].(map[string]any)["latestEvidence"] = []any{makeRef("migration-event:/body/memberStates/*/latestEvidence/*")}
 	}
 	v.ctx.Operations = map[string]OperationBinding{}
+	v.ctx.History = HistoricalContext{Operations: map[string]OperationBinding{}, Challenges: map[string]NativeChallenge{}}
 	v.ctx.Publications = map[string]PublicationStatus{}
 	v.ctx.Certificates = map[string]CertificateStatus{}
 	v.ctx.Challenges = map[string]NativeChallenge{}
@@ -257,12 +275,13 @@ func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryp
 		epoch, _ := b["fenceEpoch"].(json.Number).Int64()
 		op := OperationBinding{b["migrationId"].(string), b["operationId"].(string), shaHex([]byte("TEST initial pre-rebind " + id)), epoch, acq, exp}
 		v.ctx.Operations[op.OperationID] = op
+		v.ctx.History.Operations[op.OperationID] = op
 	}
 	for _, m := range v.trust.Members {
 		scopeHash, _ := canonicalHash(m.Scope)
 		nonce, _ := pointer(inputs, "/facts/nodes/"+m.Slot+"/observerNonce")
 		op := v.ctx.Operations[v.ctx.MigrationOperationID]
-		v.ctx.Challenges[op.OperationID+"\x00"+scopeHash] = NativeChallenge{nonce.(string), op.MigrationID, op.OperationID, scopeHash, op.FenceEpoch, now.Add(-time.Second), now.Add(time.Minute)}
+		v.ctx.History.Challenges[op.OperationID+"\x00"+scopeHash] = NativeChallenge{nonce.(string), op.MigrationID, op.OperationID, scopeHash, op.FenceEpoch, op.AcquiredAt, op.ExpiresAt}
 	}
 	digests := map[string]string{}
 	done := map[string]any{}
@@ -298,18 +317,52 @@ func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryp
 			t.Fatal("missing TEST key")
 		}
 		observed := now
-		until := now.Add(time.Minute)
+		if option.DurableHistory {
+			observed = times[loc.node]
+		}
+
+		until := observed.Add(time.Minute)
 		var op OperationBinding
 		if c.mode == "fresh" {
 			op, e = v.proofOperation(sources)
 			if e != nil {
 				t.Fatal(e)
 			}
+			if option.DurableHistory {
+				if c.kind == "node-floor-v2" {
+					sub := subject.(map[string]any)
+					scope := sub["scope"]
+					for _, m := range v.trust.Members {
+						if equal(m.Scope, scope) {
+							sec := 32
+							if m.Slot == "PC4" {
+								sec = 52
+							}
+							observed = times["plan"].Add(time.Duration(sec) * time.Second)
+						}
+					}
+				}
+				if c.kind == "inventory-head-readback" {
+					observed = op.AcquiredAt
+					if subject.(map[string]any)["presence"] == "PRESENT" && op.FenceEpoch == 1 {
+						observed = times["event-28"]
+					}
+				}
+				until = observed.Add(120 * time.Second)
+				for _, bound := range []time.Time{op.ExpiresAt, times["plan"].Add(1800 * time.Second)} {
+					if bound.Before(until) {
+						until = bound
+					}
+				}
+			}
 		} else if c.mode == "immutable-provenance" {
 			observed = now.Add(-2 * time.Hour)
 			until = now.Add(-time.Hour)
 		} else {
 			observed = now.Add(-3 * time.Hour)
+			if option.DurableHistory {
+				until = times["plan"].Add(300 * time.Second)
+			}
 		}
 		var raw []byte
 		if c.codec == "native-m2-v2" {
@@ -469,16 +522,57 @@ func newCryptoFixtureMutated(t *testing.T, mutate proofMutation, options ...cryp
 		op := v.ctx.Operations[b["operationId"].(string)]
 		op.LeaseEnvelopeSHA256 = digests[id]
 		v.ctx.Operations[op.OperationID] = op
+		v.ctx.History.Operations[op.OperationID] = op
 	}
 	current := p["cohort-36"].(map[string]any)
 	epoch, _ := current["fenceEpoch"].(json.Number).Int64()
 	seq, _ := current["sequence"].(json.Number).Int64()
 	members := current["members"].([]any)
 	v.ctx.Current = &CurrentProjectionContext{SetID: "cohort-36", MigrationID: current["migrationId"].(string), OperationID: current["operationId"].(string), PlanEnvelopeSHA256: current["planEnvelopeSHA256"].(string), LeaseEnvelopeSHA256: current["leaseEnvelopeSHA256"].(string), FenceEpoch: epoch, Sequence: seq, InventoryHead: current["inventoryHead"], InventoryReadbackSHA256: current["inventoryHeadReadbackSHA256"].(string), MemberProjectionSHA256: []string{members[0].(map[string]any)["projectionEnvelopeSHA256"].(string), members[1].(map[string]any)["projectionEnvelopeSHA256"].(string)}}
-	graphRaw, e := os.ReadFile("testdata/artifact-reference-graph.json")
-	if e != nil {
-		t.Fatal(e)
+
+	for _, member := range v.trust.Members {
+		scopeHash, _ := canonicalHash(member.Scope)
+		op := v.ctx.Operations[v.ctx.Current.OperationID]
+		nonce := shaHex([]byte("EPHEMERAL TEST current nonce " + member.Slot))
+		v.ctx.Challenges[op.OperationID+"\x00"+scopeHash] = NativeChallenge{nonce, op.MigrationID, op.OperationID, scopeHash, op.FenceEpoch, now.Add(-time.Second), now.Add(time.Minute)}
+		found := false
+		for _, raw := range referents {
+			value, err := ParseJSON(raw)
+			if err != nil {
+				t.Fatal(err)
+			}
+			body := value.(map[string]any)
+			scope := member.Scope.(map[string]any)
+			if body["schemaVersion"] != "saintvision-node-peer-policy-floor:2" || body["nodeId"] != scope["nodeId"] {
+				continue
+			}
+			body["nonce"] = nonce
+			body["observedAt"] = json.Number(fmt.Sprint(now.Unix()))
+			delete(body, "nodeSignature")
+			cert, err := x509.ParseCertificate(member.CertificateDER)
+			if err != nil {
+				t.Fatal(err)
+			}
+			spki, _ := publicSPKI(cert.PublicKey.(ed25519.PublicKey))
+			msg, err := CanonicalJSON(body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			body["nodeSignature"] = hex.EncodeToString(ed25519.Sign(keys[spki], append([]byte("saintvision/node-peer-policy-floor/v2\x00"), msg...)))
+			wire, err := CanonicalJSON(body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v.ctx.Current.NativeWitnesses = append(v.ctx.Current.NativeWitnesses, CurrentNativeWitness{member.Slot, append(wire, '\n')})
+			found = true
+			break
+		}
+		if !found {
+			t.Fatal("missing TEST current native source")
+		}
 	}
+	delete(v.ctx.Operations, v.ctx.MigrationOperationID)
+
 	v.trust.RegistrySHA256 = registryHash
 	v.trust.Verifier = VerifierPublication{"saintvision-migrationverify-k1:1", strings.Repeat("1", 40), shaHex([]byte("EPHEMERAL TEST verifier artifact provenance")), strings.Repeat("2", 40), []string{"EPHEMERAL TEST CI -- NOT REAL"}}
 	v.trust.Grants = grants

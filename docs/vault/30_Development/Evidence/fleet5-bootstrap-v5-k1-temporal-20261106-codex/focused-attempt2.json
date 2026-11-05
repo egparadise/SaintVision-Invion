@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-count=1",
+    "-json"
+  ],
+  "exit": 0,
+  "atKST": "2026-11-06T07:49:11.750349+09:00",
+  "stderr": ""
+}

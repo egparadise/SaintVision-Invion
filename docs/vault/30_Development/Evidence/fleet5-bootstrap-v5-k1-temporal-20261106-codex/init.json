@@ -1,0 +1,22 @@
+{
+  "task": "FLEET5-BOOTSTRAP-V5-K1-OFFLINE-VERIFIER-20261106",
+  "orcaTask": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "owner": "Codex",
+  "reviewer": "Claude via Root pending corrected-source delta",
+  "base": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "actualReview": "c2b15b707d94bca001d0d63c6486cfe9fd5cbcae",
+  "reviewVerdict": "REVISION REQUIRED",
+  "rootDecisions": [
+    "msg_87002d358dbb",
+    "msg_2a098fb1f4d3"
+  ],
+  "scope": "M1/M2 durable history/current separation and L1-L5 only; no primitive rewrite/live effects",
+  "frozenOriginalSource": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "frozenQualifiedReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
+  "oldCore": {
+    "run": 42113810160,
+    "status": "SUCCESS for rejected c6f only; not new source validation"
+  },
+  "startedAtKST": "2026-11-06T07:36:35.879148+09:00"
+}

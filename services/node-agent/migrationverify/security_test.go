@@ -482,23 +482,23 @@ func TestNativeM2ExactOriginalWireAndDerivedValidity(t *testing.T) {
 	// Independent current challenge/certificate/lease state is mandatory even
 	// when native bytes and signature are unchanged and valid.
 	for name, mutate := range map[string]func(){
-		"missing-challenge":        func() { v.ctx.Challenges = nil },
+		"missing-challenge":        func() { v.ctx.History.Challenges = nil },
 		"missing-revocation-state": func() { v.ctx.Certificates = nil },
-		"wrong-operation":          func() { v.ctx.Operations = nil },
+		"wrong-operation":          func() { v.ctx.History.Operations = nil },
 		"expired-operation": func() {
-			for k, o := range v.ctx.Operations {
+			for k, o := range v.ctx.History.Operations {
 				o.ExpiresAt = v.ctx.Now.Add(-time.Second)
-				v.ctx.Operations[k] = o
+				v.ctx.History.Operations[k] = o
 			}
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			orig := v.ctx
 			ops := map[string]OperationBinding{}
-			for k, o := range orig.Operations {
+			for k, o := range orig.History.Operations {
 				ops[k] = o
 			}
-			v.ctx.Operations = ops
+			v.ctx.History.Operations = ops
 			mutate()
 			if _, e = v.verifyProof(loc, p, d, f.packet.Referents); e == nil {
 				t.Fatal("missing native current context")

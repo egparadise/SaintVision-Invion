@@ -1,0 +1,58 @@
+"""Public Git source-only regression replay; never a runtime operation.
+
+Run with main Python -I -B from the fix repository root. Creates a new ignored
+.work baseline module, leaving both frozen source/report worktrees untouched.
+The fixture transforms only remove API fields unavailable in the old code and
+retain both original operation bindings so the OLD current-time check is reached.
+No production source in the baseline is modified.
+"""
+import datetime, hashlib, json, pathlib, subprocess
+
+root = pathlib.Path.cwd()
+evidence = root / 'docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-20261106-codex'
+base = 'c6f0d95ecbcd79fac96673c194e2368b510ad827'
+scratch = root / '.work/k1-temporal-baseline-c6f-attempt1'
+scratch.mkdir(parents=True, exist_ok=False)
+prefix = 'services/node-agent/'
+paths = subprocess.check_output(['git','ls-tree','-r','--name-only',base,'--',prefix+'migrationverify',prefix+'go.mod',prefix+'go.sum'],text=True).splitlines()
+hashes = {}
+for path in paths:
+    raw = subprocess.check_output(['git','show',base+':'+path])
+    dest = scratch / path.removeprefix(prefix)
+    dest.parent.mkdir(parents=True,exist_ok=True)
+    dest.write_bytes(raw)
+    hashes[path] = hashlib.sha256(raw).hexdigest()
+
+package = root / prefix / 'migrationverify'
+fixture = (package/'crypto_fixture_test.go').read_text(encoding='utf-8')
+start = fixture.index('\tv.ctx.History = HistoricalContext{')
+end = fixture.index('\n\tv.ctx.Publications',start)
+fixture = fixture[:start] + fixture[end:]
+fixture = '\n'.join(line for line in fixture.splitlines() if 'v.ctx.History.Operations[op.OperationID] = op' not in line)
+fixture = fixture.replace('v.ctx.History.Challenges','v.ctx.Challenges')
+start = fixture.index('\n\tfor _, member := range v.trust.Members {\n\t\tscopeHash',fixture.index('v.ctx.Current = &CurrentProjectionContext'))
+end = fixture.index('\n\tv.trust.RegistrySHA256',start)
+fixture = fixture[:start]+fixture[end:]
+(scratch/'migrationverify/crypto_fixture_test.go').write_text(fixture,encoding='utf-8')
+timeline = (package/'temporal_fixture_test.go').read_text(encoding='utf-8')
+timeline = timeline[:timeline.index('\nfunc TestDurableTwoEpochHistoryAndCurrent')]
+timeline += '''
+func number64(v any)(int64,error){s,e:=textNumber(v);if e!=nil{return 0,e};return strconv.ParseInt(s,10,64)}
+func TestBaselineDurableHistory(t *testing.T){
+ f:=newCryptoFixtureMutated(t,nil,cryptoFixtureOptions{DurableHistory:true})
+ t.Run("old-current-time-expiry",func(t *testing.T){v,e:=NewVerifier(f.installed,f.context);if e!=nil{t.Fatal(e)};if _,e=v.Verify(f.packet);e!=nil{t.Fatal("desired durable authentication rejected:",e)}})
+ t.Run("no-fabricated-current-epoch1",func(t *testing.T){delete(f.context.Operations,f.context.MigrationOperationID);v,e:=NewVerifier(f.installed,f.context);if e!=nil{t.Fatal(e)};if _,e=v.Verify(f.packet);e!=nil{t.Fatal("desired historical-only epoch1 rejected:",e)}})
+}
+'''
+timeline = timeline.replace('import (','import (\n"strconv"')
+(scratch/'migrationverify/temporal_fixture_test.go').write_text(timeline,encoding='utf-8')
+argv = ['go','test','./migrationverify','-run','^TestBaselineDurableHistory$','-count=1','-v']
+p = subprocess.run(argv,cwd=scratch,capture_output=True,text=True,encoding='utf-8')
+(evidence/'m2-before-change.log').write_text(p.stdout+p.stderr,encoding='utf-8')
+result = {'base':base,'copiedBaselineBlobsBeforeTestOnlyOverlay':hashes,'command':argv,'exit':p.returncode,'expectedFail':True,'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(),'fixtureAdaptations':'remove new History/CurrentNativeWitness API fields only; retain original current operations to reach old time check','fixtureTextUTF8SHA256':hashlib.sha256(fixture.encode()).hexdigest(),'fixtureRawSHA256':hashlib.sha256((scratch/'migrationverify/crypto_fixture_test.go').read_bytes()).hexdigest(),'timelineProbeTextUTF8SHA256':hashlib.sha256(timeline.encode()).hexdigest(),'timelineProbeRawSHA256':hashlib.sha256((scratch/'migrationverify/temporal_fixture_test.go').read_bytes()).hexdigest()}
+result['productionReadbackByteExact'] = {path:hashlib.sha256((scratch/path.removeprefix(prefix)).read_bytes()).hexdigest() for path in paths if not path.endswith('_test.go')}
+assert all(hashes[path]==actual for path,actual in result['productionReadbackByteExact'].items())
+(evidence/'m2-before-change.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+print(p.stdout+p.stderr)
+if p.returncode!=1 or 'stale/future/expired proof or trusted operation' not in p.stdout or 'missing trusted operation/lease binding' not in p.stdout:
+    raise SystemExit('baseline did not fail at both intended temporal gates')

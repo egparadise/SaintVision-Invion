@@ -51,11 +51,20 @@ type TrustedContext struct {
 	Now                  time.Time
 	SemanticInputs       any
 	Operations           map[string]OperationBinding
+	History              HistoricalContext
 	MigrationOperationID string
 	Challenges           map[string]NativeChallenge   // operationId + NUL + C2(scope) hash.
 	Publications         map[string]PublicationStatus // Exact referent raw SHA256.
 	Certificates         map[string]CertificateStatus // Exact authenticated leaf DER hash.
 	Current              *CurrentProjectionContext
+}
+
+// HistoricalContext contains independently pinned original HELD leases and
+// challenges. It does not grant a current operation. Consuming times are derived
+// from authenticated record/event bytes, never supplied here by the caller.
+type HistoricalContext struct {
+	Operations map[string]OperationBinding
+	Challenges map[string]NativeChallenge
 }
 type OperationBinding struct {
 	MigrationID, OperationID, LeaseEnvelopeSHA256 string
@@ -81,6 +90,14 @@ type CurrentProjectionContext struct {
 	InventoryHead                                                            any
 	InventoryReadbackSHA256                                                  string
 	MemberProjectionSHA256                                                   []string
+	NativeWitnesses                                                          []CurrentNativeWitness
+}
+
+// CurrentNativeWitness is original signed producer wire, authenticated again at
+// Now against the current challenge. Retained history cannot fill this field.
+type CurrentNativeWitness struct {
+	Slot string
+	Raw  []byte
 }
 
 type verifierKey struct {
@@ -160,6 +177,9 @@ func NewVerifier(installed InstalledTrust, context TrustedContext) (*Verifier, e
 	if e != nil {
 		return nil, e
 	}
+	if e = validateSemanticInputs(ctx.SemanticInputs); e != nil {
+		return nil, e
+	}
 	if ctx.Current != nil {
 		ctx.Current.InventoryHead, e = jsonCopy(context.Current.InventoryHead)
 		if e != nil {
@@ -236,8 +256,8 @@ func (v *Verifier) keyAt(role string, scope any, spki string, observed time.Time
 		return nil, e
 	}
 	k, ok := v.keys[role+"\x00"+s+"\x00"+spki]
-	if !ok || v.ctx.Now.Before(k.before) || !v.ctx.Now.Before(k.after) || observed.Before(k.before) || !observed.Before(k.after) {
-		return nil, errors.New("key not authorized for exact current role/scope")
+	if !ok || observed.IsZero() || observed.Before(k.before) || !observed.Before(k.after) {
+		return nil, errors.New("key not authorized for exact role/scope at authenticated use time")
 	}
 	return k.public, nil
 }
@@ -276,7 +296,13 @@ func componentAuthority(component string) any {
 }
 
 func (v *Verifier) operation(id string) (OperationBinding, error) {
-	o, ok := v.ctx.Operations[id]
+	return checkedOperation(v.ctx.Operations, id)
+}
+func (v *Verifier) historicalOperation(id string) (OperationBinding, error) {
+	return checkedOperation(v.ctx.History.Operations, id)
+}
+func checkedOperation(operations map[string]OperationBinding, id string) (OperationBinding, error) {
+	o, ok := operations[id]
 	if !ok || o.OperationID != id || o.MigrationID == "" || o.FenceEpoch < 1 || !goodHash(o.LeaseEnvelopeSHA256, 32) || o.AcquiredAt.IsZero() || !o.ExpiresAt.After(o.AcquiredAt) {
 		return o, errors.New("missing trusted operation/lease binding")
 	}

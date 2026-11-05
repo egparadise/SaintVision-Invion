@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-count=1",
+    "-json"
+  ],
+  "exit": 1,
+  "atKST": "2026-11-06T07:53:04.584858+09:00",
+  "stderr": "",
+  "topLevelPass": 38,
+  "passEvents": 155,
+  "failedTests": [
+    "TestDurableHistoricalSignedConsumingTimeControlsFreshness",
+    null
+  ]
+}

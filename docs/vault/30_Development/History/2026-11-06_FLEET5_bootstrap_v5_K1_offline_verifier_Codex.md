@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-20261106-BOOTSTRAP-V5-K1-CODEX"
 title: "FLEET5 bootstrap v5 K1 offline verifier 구현"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude via Root pending actual code review"
-updated: "2026-11-06T06:31:17+09:00"
+updated: "2026-11-06T07:50:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "e50c148287779add421265868ef16909ed984650"
@@ -14,6 +14,8 @@ tags: ["fleet5", "bootstrap", "offline-verifier", "codex"]
 ---
 
 # K1 착수와 범위
+
+2026-11-06 수정본의 L5 정정: 아래 06:11·06:16의 235/121 집계는 그 시각의 이전 시도 관측이다. 원 c6f의 실제 최종 attempt4는 06:28:10–06:28:31 KST, 전체 Go61상위/238 PASS event·K1 30상위/124 PASS event였다. 각 시도의 성공·실패 기록은 보존하며 새 수정본의 검증으로 재사용하지 않는다. 실제 c2b 독립 코드 검토는 M1/M2 및5Low 수정 필요이고, 후속 변경은 [[2026-11-06_FLEET5_K1_temporal_corrections_Codex]]에 기록한다. frozen c6f/37fe의 문서는 변경하지 않았다.
 
 Owner Codex, 실제 독립 code reviewer는 Root를 통한 Claude이며 아직 code 검토를 수행하지 않았다. Orca task `task_38393b5d1865` / dispatch `ctx_ceecb3824e33`의 계속 작업이다. Root `msg_a21df0511488`, `msg_bd4f1e921201`가 새 code 범위를 부여했다. 최신 Root Index 1.0.418 / Codex 1.0.379, agent-delivery 1.1.0 / core-reliability 1.0.0과 AGENTS 필수 지침을 적용한다. 공유 board·task registry·원문·Obsidian apply는 작업 범위에서 제외한다.
 
@@ -50,9 +52,9 @@ strict parser, 실제 UTC calendar/C2/argv 분리, 정확한 scope별 외부 key
 - source recipe/policy: 원래 112개 subject와 75 populated slot을 각각 유도했다. 추가 optional TEST evidence로 나머지 두 slot도 실제 crypto를 검증했다. 모든 112 key/subject 변조와 Node/cohort/component의 실제 잘못된 key로 서명·종속 hash를 모두 재결속한 packet을 거부했다.
 - RFC8032 vector와 small/mixed-order·noncanonical A/R·S>=L, strict 숫자/Unicode/calendar, fresh/approval/immutable 분리, 원본과 current M2 분리, current nonce/epoch/cert/raw bytes/expiry, API 옛 field 44개와 type 혼동 43개, graph missing/cycle/duplicate/leaf coverage, extra/partial packet/current set, 동시 읽기 4개를 확인했다. K1 30 top-level test에 121 PASS event(부모 subtest 포함), leaf 110개다.
 - 최초 Node suite attempt1은 새 API test의 잘못된 기대 때문에 exit 1이었다. response 22개는 schema만으로 종류를 결정하지 않고 authenticated request graph에 결속하는 accepted 설계다. schema 단계 거부 21개와 graph 단계 거부 22개로 test를 정정했고 원본 실패 log/JSON을 `node-go-suite-attempt1.log`, `local-go-validation-attempt1.json`에 보존했다. 재실행 근거는 이 한정 test 수정이며 실패를 숨기거나 제품 계약을 완화하지 않았다.
-- 06:11:23–06:11:52 KST 최종 `go test -json -count=1 ./...`, `go build ./...`, `go vet ./migrationverify` 모두 exit 0. 전체 Go suite는 top-level 61개, PASS event 235개(leaf 213), test skip 0, 기존 Node 7개 package PASS다. no-test-files package 6개는 시험 skip으로 계산하지 않는다. `local-go-validation.json`과 해당 log가 정본이다.
+- 06:11:23–06:11:52 KST 당시 시도 `go test -json -count=1 ./...`, `go build ./...`, `go vet ./migrationverify` 모두 exit 0. 그 시도 Go suite는 top-level 61개, PASS event 235개(leaf 213), test skip 0, 기존 Node 7개 package PASS다. no-test-files package 6개는 시험 skip으로 계산하지 않는다. `local-go-validation.json`과 해당 log는 이 이전 시도의 기록이다.
 - Windows Go 1.27.0의 실제 `CGO_ENABLED=0`이므로 local `-race`는 NOT RUN이다. exact source hosted Core의 Linux `go test -race ./...` 결과가 별도 필수다. 전체 Core/Docs CI와 실제 Claude code+wire review는 아직 대기다.
-- full Node suite 뒤 nil/zero-state verifier의 missing registry 경계를 두 군데 강화했고 06:16:06 KST 최종 K1 focused 재검증은 30 top-level/121 PASS event/exit 0이다. 기존 Node source 변경은 없다. public identity-point forgery는 local Go 표준 verifier와 별도 Python library가 받지만 K1 strict verifier는 거부한다는 실제 offline 반례도 기록했다. stdlib 성공을 prime-order 검증으로 세지 않는다. 이 public adversarial vector는 live fleet 실패 관측이 아니다.
+- full Node suite 뒤 nil/zero-state verifier의 missing registry 경계를 두 군데 강화했고 06:16:06 KST 당시 K1 focused 재검증은 30 top-level/121 PASS event/exit 0이다. 이 집계는 뒤의 실제 최종 attempt4와 구분한다. 기존 Node source 변경은 없다. public identity-point forgery는 local Go 표준 verifier와 별도 Python library가 받지만 K1 strict verifier는 거부한다는 실제 offline 반례도 기록했다. stdlib 성공을 prime-order 검증으로 세지 않는다. 이 public adversarial vector는 live fleet 실패 관측이 아니다.
 - 06:14:11–06:15:14 KST docs/ontology-generation/ontology/contract-bindings/frontend/path-ratchet/single-source-ratchet/test-sync/build-docs/sync-check 10개가 모두 exit 0이다. 경로 baseline 290과 중복 baseline 16은 unchanged/no new/no stale다. sync-check는 3216 managed/764 pending/0 conflicts와 No writes를 보고했다. 오래된 vault를 export하거나 apply하지 않는다. gate별 실제 argv/시각/exit/log는 `local-source-gates.json`에 있다.
 - 기존 설계 branch HEAD와 upstream은 모두 `8874b2dfe0dda9a019bd5f334636668290702e13`이고 실제 status는 clean임을 다시 확인했다. 원본 source vault·board·registry·기존 Node code·protected r5·runtime·장비를 변경하지 않았다.
 

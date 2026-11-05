@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 1,
+  "atKST": "2026-11-06T07:46:25.549847+09:00"
+}

@@ -19,7 +19,7 @@ type nativeOriginal struct {
 
 // NativeHistory authenticates immutable ORIGINAL native bytes only. It contains
 // no validUntil/current-operation/lease/nonce authorization or admission result.
-// It cannot substitute for a fresh native proof in Verify or current derivation.
+// It cannot substitute for a bound embedded proof or current derivation.
 type NativeHistory struct {
 	Classification, ExactReferentSHA256, ObservedAt string
 	Subject                                         any
@@ -83,6 +83,15 @@ func (v *Verifier) authenticateNativeOriginal(raw []byte, registeredSlot string,
 	if cert.IsCA || !ca.IsCA || !bytes.Equal(cert.Raw, member.CertificateDER) || !bytes.Equal(ca.Raw, member.CARootDER) {
 		return out, errors.New("native exact DER/CA mismatch")
 	}
+	serverAuth := false
+	for _, usage := range cert.ExtKeyUsage {
+		if usage == x509.ExtKeyUsageServerAuth {
+			serverAuth = true
+		}
+	}
+	if !serverAuth || cert.KeyUsage&x509.KeyUsageDigitalSignature == 0 {
+		return out, errors.New("native leaf requires explicit ServerAuth and DigitalSignature")
+	}
 	derHash := shaHex(cert.Raw)
 	status, ok := v.ctx.Certificates[derHash]
 	now := v.ctx.Now
@@ -110,6 +119,9 @@ func (v *Verifier) authenticateNativeOriginal(raw []byte, registeredSlot string,
 		return out, e
 	}
 	if _, e = v.keyAt(c.role, nodeAuthority(scope), spki, observed); e != nil {
+		return out, e
+	}
+	if _, e = v.keyAt(c.role, nodeAuthority(scope), spki, chainTime); e != nil {
 		return out, e
 	}
 	for _, k := range []string{"tenantId", "nodeId", "recoveryEpoch"} {

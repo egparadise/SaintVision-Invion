@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-run",
+    "^TestHistoricalNativeIsTypedAndCannotBecomeCurrentProof$",
+    "-count=1",
+    "-json"
+  ],
+  "exit": 0,
+  "atKST": "2026-11-06T07:56:27.999272+09:00"
+}

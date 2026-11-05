@@ -1,0 +1,43 @@
+[
+  {
+    "name": "go-suite-attempt4",
+    "argv": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "./..."
+    ],
+    "startedKST": "2026-11-06T07:54:05.443678+09:00",
+    "endedKST": "2026-11-06T07:54:42.961580+09:00",
+    "exit": 0,
+    "topLevelPass": 71,
+    "passEvents": 271,
+    "skipEvents": 0,
+    "failedTests": [],
+    "k1TopLevelPass": 40,
+    "k1PassEvents": 157
+  },
+  {
+    "name": "go-build-attempt4",
+    "argv": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "startedKST": "2026-11-06T07:54:42.966532+09:00",
+    "endedKST": "2026-11-06T07:54:45.466349+09:00",
+    "exit": 0
+  },
+  {
+    "name": "go-vet-attempt4",
+    "argv": [
+      "go",
+      "vet",
+      "./migrationverify"
+    ],
+    "startedKST": "2026-11-06T07:54:45.466700+09:00",
+    "endedKST": "2026-11-06T07:54:46.871327+09:00",
+    "exit": 0
+  }
+]

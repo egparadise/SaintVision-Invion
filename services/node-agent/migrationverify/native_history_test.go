@@ -32,6 +32,11 @@ func TestHistoricalNativeIsTypedAndCannotBecomeCurrentProof(t *testing.T) {
 		status.ExpiresAt = f.context.Now.Add(time.Minute)
 		f.context.Certificates[hash] = status
 	}
+	for hash, status := range f.context.Publications {
+		status.CheckedAt = f.context.Now
+		status.ExpiresAt = f.context.Now.Add(time.Minute)
+		f.context.Publications[hash] = status
+	}
 	v, e := NewVerifier(f.installed, f.context)
 	if e != nil {
 		t.Fatal(e)
@@ -43,8 +48,11 @@ func TestHistoricalNativeIsTypedAndCannotBecomeCurrentProof(t *testing.T) {
 	if h.Classification != "AUTHENTICATED_ORIGINAL_NATIVE_HISTORY_NOT_FRESH_PROOF" || h.ExactReferentSHA256 != shaHex(raw) {
 		t.Fatal("wrong historical type/bytes")
 	}
-	if _, e = v.Verify(f.packet); e == nil {
-		t.Fatal("historical M2 substituted for current operation")
+	if _, e = v.Verify(f.packet); e != nil {
+		t.Fatal("retained authenticated history wrongly requires a current operation or unexpired leaf at Now", e)
+	}
+	if _, e = v.VerifyCurrentProjectionSet(f.packet, "cohort-36"); e == nil {
+		t.Fatal("retained authenticated history substituted for current operation")
 	}
 	other := "PC2"
 	if slot == other {
@@ -75,24 +83,24 @@ func TestNativeExpiryIsDeterministicLeasePlanBound(t *testing.T) {
 	}
 	for name, change := range map[string]func(){
 		"lease-shorter": func() {
-			for id, o := range v.ctx.Operations {
+			for id, o := range v.ctx.History.Operations {
 				o.ExpiresAt = v.ctx.Now.Add(30 * time.Second)
-				v.ctx.Operations[id] = o
+				v.ctx.History.Operations[id] = o
 			}
 		},
 		"plan-shorter": func() {
 			v.ctx.SemanticInputs.(map[string]any)["plan"].(map[string]any)["expiresAt"] = v.ctx.Now.Add(30 * time.Second).Format("2006-01-02T15:04:05Z")
 		},
 		"wrong-challenge-nonce": func() {
-			for id, c := range v.ctx.Challenges {
+			for id, c := range v.ctx.History.Challenges {
 				c.Nonce = strings.Repeat("e", 64)
-				v.ctx.Challenges[id] = c
+				v.ctx.History.Challenges[id] = c
 			}
 		},
 		"wrong-challenge-epoch": func() {
-			for id, c := range v.ctx.Challenges {
+			for id, c := range v.ctx.History.Challenges {
 				c.FenceEpoch++
-				v.ctx.Challenges[id] = c
+				v.ctx.History.Challenges[id] = c
 			}
 		},
 	} {

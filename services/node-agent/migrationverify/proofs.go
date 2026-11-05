@@ -25,6 +25,13 @@ func normalizedMessage(domain string, body, signer map[string]any) ([]byte, erro
 }
 
 func (v *Verifier) verifyProof(loc proofLocation, payloads map[string]any, digests map[string]string, referents map[string][]byte) (authenticatedProof, error) {
+	use, e := v.recordUse(loc.node, payloads, digests)
+	if e != nil {
+		return authenticatedProof{}, e
+	}
+	return v.verifyProofAt(loc, payloads, digests, referents, use)
+}
+func (v *Verifier) verifyProofAt(loc proofLocation, payloads map[string]any, digests map[string]string, referents map[string][]byte, use proofUse) (authenticatedProof, error) {
 	var out authenticatedProof
 	s, e := v.slot(loc, payloads[loc.node])
 	if e != nil {
@@ -86,13 +93,13 @@ func (v *Verifier) verifyProof(loc proofLocation, payloads map[string]any, diges
 	}
 	var op OperationBinding
 	if c.mode == "fresh" {
-		op, e = v.proofOperation(sources)
+		op, e = v.proofOperationAt(sources, use.live)
 		if e != nil {
 			return out, e
 		}
 	}
 	if c.codec == "native-m2-v2" {
-		return v.verifyNative(raw, subject, r, c, op)
+		return v.verifyNativeAt(raw, subject, r, c, op, use)
 	}
 	canonical, e := CanonicalJSON(p)
 	if e != nil {
@@ -118,7 +125,7 @@ func (v *Verifier) verifyProof(loc proofLocation, payloads map[string]any, diges
 	if e != nil {
 		return out, e
 	}
-	key, e := v.key(c.role, authority, keyHash)
+	key, e := v.keyAt(c.role, authority, keyHash, use.at)
 	if e != nil {
 		return out, e
 	}
@@ -154,13 +161,16 @@ func (v *Verifier) verifyProof(loc proofLocation, payloads map[string]any, diges
 	if c.mode == "fresh" && (body["migrationId"] != op.MigrationID || body["operationId"] != op.OperationID) {
 		return out, errors.New("proof signed for different current operation")
 	}
-	if e = v.freshness(c, hash, sc, observed, until, op, sources); e != nil {
+	if e = v.freshnessAt(c, hash, sc, observed, until, op, sources, use); e != nil {
 		return out, e
 	}
 	return authenticatedProof{c.id, subject, op.MigrationID, op.OperationID, observed, until}, nil
 }
 
 func (v *Verifier) proofOperation(sources map[string]any) (OperationBinding, error) {
+	return v.proofOperationAt(sources, false)
+}
+func (v *Verifier) proofOperationAt(sources map[string]any, live bool) (OperationBinding, error) {
 	a, e := object(sources["aliases"])
 	if e != nil {
 		return OperationBinding{}, e
@@ -169,7 +179,10 @@ func (v *Verifier) proofOperation(sources map[string]any) (OperationBinding, err
 	if e != nil {
 		return OperationBinding{}, e
 	}
-	return v.operation(id)
+	if live {
+		return v.operation(id)
+	}
+	return v.historicalOperation(id)
 }
 
 func (v *Verifier) evidenceAge(plan any) (time.Duration, error) {
@@ -191,7 +204,7 @@ func (v *Verifier) evidenceAge(plan any) (time.Duration, error) {
 	return time.Duration(i) * time.Second, nil
 }
 
-func (v *Verifier) freshness(c *proofContract, hash, subjectHash string, observed, until time.Time, op OperationBinding, sources map[string]any) error {
+func (v *Verifier) freshnessAt(c *proofContract, hash, subjectHash string, observed, until time.Time, op OperationBinding, sources map[string]any, use proofUse) error {
 	if observed.After(until) {
 		return errors.New("proof validity reversed")
 	}
@@ -199,17 +212,21 @@ func (v *Verifier) freshness(c *proofContract, hash, subjectHash string, observe
 	if e != nil {
 		return e
 	}
-	expiry, e := strictTime(plan["expiresAt"].(string))
+	expiry, e := timeAt(plan, "/expiresAt")
 	if e != nil {
 		return e
 	}
 	now := v.ctx.Now
+	consume := use.at
+	if consume.IsZero() || consume.After(now) {
+		return errors.New("invalid authenticated consuming time")
+	}
 	if c.mode == "fresh" {
 		age, e := v.evidenceAge(plan)
 		if e != nil {
 			return e
 		}
-		if now.Before(observed.Add(-30*time.Second)) || now.After(observed.Add(age)) || !now.Before(until) || !now.Before(expiry) || now.Before(op.AcquiredAt) || !now.Before(op.ExpiresAt) {
+		if consume.Before(observed.Add(-30*time.Second)) || consume.After(observed.Add(age)) || !consume.Before(until) || !consume.Before(expiry) || consume.Before(op.AcquiredAt) || !consume.Before(op.ExpiresAt) || observed.Before(op.AcquiredAt.Add(-30*time.Second)) || !observed.Before(op.ExpiresAt) {
 			return errors.New("stale/future/expired proof or trusted operation")
 		}
 		if op.MigrationID != plan["migrationId"] {
@@ -222,13 +239,13 @@ func (v *Verifier) freshness(c *proofContract, hash, subjectHash string, observe
 		return errors.New("missing current authenticated publication/nonrevocation state")
 	}
 	if c.mode == "immutable-provenance" {
-		if p.PublishedAt.Before(observed) || p.PublishedAt.After(until) {
+		if p.PublishedAt.Before(observed) || p.PublishedAt.After(until) || p.PublishedAt.After(consume) {
 			return errors.New("publication outside original signed validity")
 		}
 		return nil
 	}
 	if c.mode == "validity-bounded-approval" {
-		if now.Before(observed) || !now.Before(until) || !now.Before(expiry) {
+		if consume.Before(observed) || !consume.Before(until) || !consume.Before(expiry) || p.PublishedAt.After(consume) {
 			return errors.New("approval/plan expired or future")
 		}
 		return nil
@@ -236,7 +253,7 @@ func (v *Verifier) freshness(c *proofContract, hash, subjectHash string, observe
 	return errors.New("unknown fixed freshness mode")
 }
 
-func (v *Verifier) verifyNative(raw []byte, subject any, ref map[string]any, c *proofContract, op OperationBinding) (authenticatedProof, error) {
+func (v *Verifier) verifyNativeAt(raw []byte, subject any, ref map[string]any, c *proofContract, op OperationBinding, use proofUse) (authenticatedProof, error) {
 	var out authenticatedProof
 	sub, _ := object(subject)
 	scope, e := object(sub["scope"])
@@ -249,7 +266,7 @@ func (v *Verifier) verifyNative(raw []byte, subject any, ref map[string]any, c *
 			slot = member.Slot
 		}
 	}
-	original, e := v.authenticateNativeOriginal(raw, slot, v.ctx.Now)
+	original, e := v.authenticateNativeOriginal(raw, slot, use.at)
 	if e != nil {
 		return out, e
 	}
@@ -257,14 +274,18 @@ func (v *Verifier) verifyNative(raw []byte, subject any, ref map[string]any, c *
 		return out, errors.New("native original fields/certificate differ from expected reference subject")
 	}
 	m, cert, observed := original.body, original.certificate, original.observed
-	now := v.ctx.Now
+	now := use.at
 	scopeHash, e := canonicalHash(scope)
 	if e != nil {
 		return out, e
 	}
-	challenge, ok := v.ctx.Challenges[op.OperationID+"\x00"+scopeHash]
-	if !ok || challenge.Nonce != m["nonce"] || challenge.MigrationID != op.MigrationID || challenge.OperationID != op.OperationID || challenge.ScopeSHA256 != scopeHash || challenge.FenceEpoch != op.FenceEpoch || now.Before(challenge.IssuedAt) || !now.Before(challenge.ExpiresAt) {
-		return out, errors.New("native nonce lacks trusted current operation challenge")
+	challenges := v.ctx.History.Challenges
+	if use.live {
+		challenges = v.ctx.Challenges
+	}
+	challenge, ok := challenges[op.OperationID+"\x00"+scopeHash]
+	if !ok || challenge.Nonce != m["nonce"] || challenge.MigrationID != op.MigrationID || challenge.OperationID != op.OperationID || challenge.ScopeSHA256 != scopeHash || challenge.FenceEpoch != op.FenceEpoch || now.Before(challenge.IssuedAt.Add(-30*time.Second)) || (use.live && now.Before(challenge.IssuedAt)) || !now.Before(challenge.ExpiresAt) || observed.Before(challenge.IssuedAt.Add(-30*time.Second)) || !observed.Before(challenge.ExpiresAt) {
+		return out, errors.New("native nonce/observation lacks matching operation challenge")
 	}
 	plan, e := pointer(v.ctx.SemanticInputs, "/plan")
 	if e != nil {
@@ -274,11 +295,7 @@ func (v *Verifier) verifyNative(raw []byte, subject any, ref map[string]any, c *
 	if e != nil {
 		return out, e
 	}
-	expiryString, e := pointer(plan, "/expiresAt")
-	if e != nil {
-		return out, e
-	}
-	expiry, e := strictTime(expiryString.(string))
+	expiry, e := timeAt(plan, "/expiresAt")
 	if e != nil {
 		return out, e
 	}
@@ -292,7 +309,7 @@ func (v *Verifier) verifyNative(raw []byte, subject any, ref map[string]any, c *
 		return out, errors.New("native reference time differs from VERIFIED DERIVED BOUND")
 	}
 	sources := map[string]any{"plan": plan}
-	if e = v.freshness(c, shaHex(raw), scopeHash, observed, until, op, sources); e != nil {
+	if e = v.freshnessAt(c, shaHex(raw), scopeHash, observed, until, op, sources, use); e != nil {
 		return out, e
 	}
 	return authenticatedProof{c.id, subject, op.MigrationID, op.OperationID, observed, until}, nil

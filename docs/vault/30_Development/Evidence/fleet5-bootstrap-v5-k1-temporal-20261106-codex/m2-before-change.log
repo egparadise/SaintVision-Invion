@@ -1,0 +1,11 @@
+=== RUN   TestBaselineDurableHistory
+=== RUN   TestBaselineDurableHistory/old-current-time-expiry
+    temporal_fixture_test.go:130: desired durable authentication rejected: plan/body/scheduleDisabledReadback: stale/future/expired proof or trusted operation
+=== RUN   TestBaselineDurableHistory/no-fabricated-current-epoch1
+    temporal_fixture_test.go:131: desired historical-only epoch1 rejected: plan/body/scheduleDisabledReadback: missing trusted operation/lease binding
+--- FAIL: TestBaselineDurableHistory (1.01s)
+    --- FAIL: TestBaselineDurableHistory/old-current-time-expiry (0.45s)
+    --- FAIL: TestBaselineDurableHistory/no-fabricated-current-epoch1 (0.41s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify	2.360s
+FAIL

@@ -76,7 +76,7 @@ Fresh, validity-bounded approval and immutable provenance semantics remain
 distinct. Archival provenance has no operation fields and requires its original
 publication validity plus current accepted publication/nonrevocation state.
 Approvals have no 120-second age requirement and bind their original reduced-plan
-or G2 subject. Fresh proofs bind current migration/operation/lease and the
+or G2 subject. Fresh proofs bind the consuming migration/operation/lease and the
 120-second age cap and 30-second future-skew cap.
 
 Native reference validity is explicitly a **verified derived bound**, never a
@@ -86,12 +86,32 @@ the external operation/member/epoch challenge. Host daemon/container/ExecID join
 are supplied through their separate scoped host proof contracts.
 
 `Verify` returns authenticated offline history, never operational authorization.
+Historical original HELD leases/challenges are separately supplied in
+`TrustedContext.History`. Freshness and key authorization apply at the signed
+containing record's time (or its exact causal signed event), with the original
+lease window. Current external publication/nonrevocation still uses trusted Now.
+The API does not backdate Now or turn historical verification into live admission.
+
 `VerifyCurrentProjectionSet` additionally matches both original Node projections,
 current lease/fence, complete member order and authenticated CP head/readback to
 the independent current context before returning derived data. Epoch 1 RELEASED
 and epoch 2 restore HELD remain distinct. `AuthenticateNativeHistory` returns a
 separate immutable historical type with no fresh expiry, nonce admission or lease;
 it cannot replace current verification.
+
+The selected current lease must be the exact independently pinned HELD lease;
+same-operation RELEASED history, a higher fence epoch of the registered cohort,
+and a nonmaximal authenticated event sequence reject an obsolete view. Current
+head readback is reverified at Now. Both ordered `Current.NativeWitnesses` contain
+original producer bytes verified separately at Now against the current scoped
+operation/epoch/nonce, expected state and the unchanged 120-second age bound.
+Historical receipts do not automatically fill these current witness slots.
+
+Each packet verification takes one bounded map/byte snapshot and uses it for all
+hashes, parsing, native raw identity and returned authentication data. Callers
+must own maps/slices without concurrent mutation during the call; a defensive
+copy is not synchronization. Constructor inputs, including witness bytes, are
+also copied. Immutable callers may share a verifier concurrently.
 
 ## Tests and remaining work
 
