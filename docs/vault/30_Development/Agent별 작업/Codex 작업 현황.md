@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.389"
+version: "1.0.390"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T08:25:37+09:00"
+updated: "2026-11-06T08:47:49+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 corrected56651 Claudeeeb actualreviewactive/fullCorepending/sameauthorsteered; B rev5 authorcontinues; physicalincomplete"
-active_card_next: "Claude actual56651 temporal/app-input delta verdict; K1 Codex sameCore/artifact/report; B Codex rev5; Root actualverdict then concretegate, no duplicateauthor or oldCI borrowing"
+active_card_status: "K1 56651 CoreFAILED1prep-rate test; actualClaudeeeb GoReviewactive; authorfailedreport then isolatedTESTclockcard; B rev5; physicalincomplete"
+active_card_next: "K1 Codex actualfailedCore report then deterministicrealPG test-onlyclock card; Claude actual56651verdict; Root independenttestdelta and combinedsourcechoice beforeONEfreshCore; B Codex rev5"
 ---
+
+## 2026-11-06T08:47:49+09:00 전체 Core 실패와 별도 시각 시험 카드
+
+작업한 것과 확인: K1 수정56651cba의 전체Core42126222201은 기존 rate-limit 통합시험1건으로 실제 실패했다. Root가 terminal/head/ref/job과 해당 Python 제품·시험의 c6f 대비 byte 동일을 대조했다. 분 경계는 미확정 가설이며, 같은 담당에게 실패 보고 뒤 별도 TEST-only 시각 경계 재현·교정 카드 msg_03792925724e를 배정했다. sourceDocs/Linuxrace 성공과 전체Core 실패를 분리했다. 다음 첫 행동/담당: 기존 Codex는 실제 실패 artifact/qualified report 뒤 새 고유 시험 branch를 진행하고, Claude는 고정56651 실제 판정을 낸다. Root가 실제 TEST delta를 독립 검토하고 결합 소스를 고른 뒤에만 새 전체 CI를 진행한다. 기존 실패를 무작정 재실행하거나 추가 Agent를 시작하지 않았다.
 
 ## 2026-11-06T08:25:37+09:00 실제 K1 검토 배정과 열린 작업 이어가기
 

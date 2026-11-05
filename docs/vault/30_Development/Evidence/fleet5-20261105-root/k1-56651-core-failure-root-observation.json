@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "fleet5-k1-56651-core-failure-root-observation:1",
+  "atKST": "2026-11-06T08:47:49+09:00",
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "Core": 42126222201,
+  "actualTerminalStatus": "completed",
+  "actualTerminalConclusion": "failure",
+  "rootVerifiedExactHeadRefAllJobs": true,
+  "actualJobs": [
+    {
+      "id": 127591007024,
+      "status": "completed",
+      "conclusion": "success",
+      "failedSteps": []
+    },
+    {
+      "id": 127591007221,
+      "status": "completed",
+      "conclusion": "failure",
+      "failedSteps": [
+        {
+          "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 33,
+          "started_at": "2026-11-05T23:17:05Z",
+          "completed_at": "2026-11-05T23:36:41Z"
+        }
+      ]
+    }
+  ],
+  "Docs": 42126225708,
+  "DocsConclusion": "SUCCESS independentlyverified earlier",
+  "LinuxNodeRace": "actualstepSUCCESS verifiedearlier; notwholeCore success",
+  "ownerReportedMainCases": {
+    "failed": 1,
+    "passed": 9214,
+    "skipped": 46,
+    "deselected": 2,
+    "seconds": 1172,
+    "failedTest": "tests/integration/test_build_preparations_real_pg.py::test_prepare_rate_limit_is_enforced_before_repeated_failed_work",
+    "observed": "GRAPH-0003/409/false",
+    "expected": "RES-0007/429/true",
+    "rootParsedRawXMLYet": false
+  },
+  "unchangedVsC6fFiles": [
+    {
+      "path": "services/control-plane/src/inv/build_preparations.py",
+      "unchangedVsC6f": true,
+      "sha256": "ede6e55e0090bc6dd25c014e40911f4de2ef97842b55ed0338087cdc37e91642"
+    },
+    {
+      "path": "tests/integration/test_build_preparations_real_pg.py",
+      "unchangedVsC6f": true,
+      "sha256": "709581f43e0a67435bda6079e577240022cf1bba9f3d020d8cc8800fe8213a30"
+    }
+  ],
+  "minuteRolloverHistoricalCauseEstablished": false,
+  "rawFailedArtifactQualifiedReport": "owner collecting SAME failedrun; no public rawZIP/JUnit",
+  "rootInitialAck": "msg_c399e00f3186",
+  "rootSeparateReadyCardScope": "msg_03792925724e",
+  "rerunCancelSourceChangeByRoot": false,
+  "actualK1DeltaReview": "ctx_c6a8ddbbde6d stillpending",
+  "noCodeOrWholeProductAcceptance": true
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "fleet5-core-preparation-rate-clock-test-root-decision:1",
+  "atKST": "2026-11-06T08:46:17+09:00",
+  "card": "FLEET5-CORE-PREP-RATE-CLOCK-20261106",
+  "owner": "same Codex task38393/ctx_ceecb3824e33 sequential ready subcard afterfailedCIreport",
+  "reviewer": "Root Codex independent TEST-only source review; Claude exact56651 package review separate",
+  "sourceBase": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "failedCore": 42126222201,
+  "status": "ACTUAL_FAILED_CORE; minute rollover hypothesis, deterministic counterexample requested",
+  "authorScope": "TEST-only realPG clock binding/boundary companion/unique docs; no runtimeclock orproductchange",
+  "newWholeCoreAuthorized": false,
+  "combinedSourceDecisionRequired": true,
+  "oldFailedCorePreserved": true,
+  "ownerReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_03792925724e"
+    }
+  },
+  "reviewerNotice": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_b020041e659c"
+    }
+  },
+  "extraAgentOrRestart": false,
+  "rootScopeSerializationAttempt": "First exec JS template contained literal source backticks and failed before tools/writes/send; corrected plain text",
+  "actualRootScopeBody": "CONCRETE next ready project subcard FLEET5-CORE-PREP-RATE-CLOCK-20261106, owner SAME Codex (you), independent reviewer Root Codex for this TEST-only delta; existing Claude remains reserved for56651 K1 review. Sequential next-card work under your existing open supervising assignment, NOT new simultaneous author/OrcaTask/process. FIRST finish/publish factual failed42126222201 report+ownDocs as proposed. THEN take this narrow isolated TEST-reliability card while original K1 code acceptance stays blocked/pending. No extra agents or genericapproval.\nRoot read frozen56651 exact _reserve373-416, failingtest437-462/setup48-170, db/BoundDatabase and verified terminalCoreFAILURE/head/ref/jobs. Productbuild_preparations.py and test are byte-identicalc6f. PREPARE_LIMITS5/30/60; _reserve reads DB clock_timestamp and uses minute .replace(second=0,microsecond=0), committing budget charge before later failedwork. Oldtest assumes setup+5requests samewindow withoutclockbinding. Rollover is source-consistent TESTcounterexample hypothesis, not proven historicalrun cause.\nISOLATE from56651 into new Orca-managed worktree/unique branch agent/codex/fleet5-prepare-rate-clock-test-20261106; frozen56651/c6f/37fe/8874/reportrefs unchanged. Only tests/integration/test_build_preparations_real_pg.py (or small UNIQUE test-only helper if necessary) +unique ownerHistory/Evidence may change. Product/Go/contracts/workflows/migrations/dependencies UNCHANGED. No boards/registry/ADR/Card150/Obsidianapply/rawprivate. Read latest Root Index1.0.428/Codex1.0.389 and record base/newcard under sameOrcaTask explicitly.\nInvestigate failure/transaction/clock/setup/idempotency first and preserve unknowns. Require deterministic source AND real-PG boundary evidence if existing safely test-owned harness available. A symbolic/unit model is NOTrealPG. If actualPG unavailable, record NOTRUN/resourceconstraint and send exact target/harness need; don't silently useproductionDB/resetunrelatedstate. Use only verified testowned DB/harness after identity/scope/resourcecheck; no installs/unfamiliarcontainerchanges.\nPreferred narrow fix: TEST-local controlled RATE-window clock including FIRSTsetup reserve+allsubsequentattempts. A scoped test service/transaction connection adapter may intercept ONLY exact _reserve rate-clock SELECT and return real parameterized PostgreSQL timestamptz row. Preserve real Database.transaction/epoch/RLS/grants/counterUPSERT/idempotency/commit/rollback; no global SQLclock/OSclock/approvaltime/productioninjection surface or fakecounter/guard monkeypatch. Verify exactclockintercepts/callcounts/realwindowrows. Testtime must remainwithin35dayretention; don't choose oldfixture cleanupdeletes.\nPin sixoriginalrequests inonewindow, assert exact6thRES0007/429/retryabletrue. Earlier failedwork must reach intendedGRAPH0003 path, not arbitraryDomainError. Assert realDBcounts/scopes. Add deterministic boundary companion: firstwindow5charged; exactnextminute allows nextreserve/GRAPHfailure, newwindow fifth/sixthlimit enforced; two buckets5->1, no fractionalperrequestbuckets. Force rollover to reproduce originalunpatched expected429 failingwithGRAPH409; samewindow passes. This is deterministic sourcecounterexample, not historicalrunclock evidence.\nCausal negatives detect missingclockbinding, unroundedperrequestbucket, disabledguard/increment as applicable; no goldenJSON-only or loosenedexpectederror. No sleep-untilminute/retry/xfail/skip/deselect/limitincrease/catch409or429/workflowbypass. If actual productdefect beyondtestclock appears, report exactrepro/narrowalternative and doNOTimplement runtimefixwithout concrete Rootscope.\nRun actualPG focused original+boundary/fullimpactedfile +coreunit tests ifavailable and normalgates. Preserve failedprobes/argv/exit/env/source/loghashes/strictskip/realvsmodel. Publish ONE immutable testsource+ownexactDocs; request Root independentTEST-source review. K1package tree remainsd83210590fdc064613d106b5a333b7ff8f3fa2ca unlesslaterRootexplicitacceptedsource; productdiff0.\nFRESH COMBINED VALIDATION: old56651CoreFAILURE stays. No blindrerun/oldCIborrow. Root chooses exactcombinedsource AFTER actualK1verdict +actualtestdelta review; if K1needsfurtherfixes carry testdelta forward explicitly. Only after concrete Rootchoice runONEnew fullCore+Docs oncombinedSHA including actualLinuxrace/wholePython+realPG cases/artifactcounts. DoNOTdispatchnewwholeCore NOW, restartall8e50/archive oroptionalnativeproofs. No K1worker_done/K2/5PCacceptance without fullgreenCore/newqualifiedreport/actualreview gates.\nProceed failedCIreport THEN isolatedreadycard. If immutableinputs/results trulyrequirehandoff, askRoot concretequestion ratherthan silently endingunfinishedturn.",
+  "wholeProgramComplete": false
+}

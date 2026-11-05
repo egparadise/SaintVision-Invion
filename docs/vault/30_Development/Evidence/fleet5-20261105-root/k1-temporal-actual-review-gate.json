@@ -40,29 +40,7 @@
     "qualifiedForReviewDispatch": true,
     "fullCoreStillRequiredBeforeCodeAcceptance": true
   },
-  "currentCoreSnapshot": {
-    "atKST": "2026-11-06T08:24:20+09:00",
-    "run": 42126222201,
-    "exactHeadRef": true,
-    "status": "in_progress",
-    "conclusion": null,
-    "jobs": [
-      {
-        "id": 127591007024,
-        "status": "completed",
-        "conclusion": "success",
-        "inProgressSteps": []
-      },
-      {
-        "id": 127591007221,
-        "status": "in_progress",
-        "conclusion": null,
-        "inProgressSteps": [
-          "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py"
-        ]
-      }
-    ]
-  },
+  "currentCoreSnapshot": "k1-56651-core-failure-root-observation.json",
   "verdict": null,
   "actualDeltaReviewCompleted": false,
   "codeAccepted": false,
@@ -76,5 +54,15 @@
     "future K2 independent authenticated producers not yet implemented"
   ],
   "fullCoreArtifactQualifiedReportStillRequired": true,
-  "noSecondReviewerOrCodeAuthorStarted": true
+  "noSecondReviewerOrCodeAuthorStarted": true,
+  "latestObservationAtKST": "2026-11-06T08:47:49+09:00",
+  "fullCoreGate": "FAILED actual56651/Core42126222201; separate test-reliability card pending",
+  "actualCodeAccepted": false,
+  "CIBlockerNotice": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_b020041e659c"
+    }
+  },
+  "nextAction": "Claude exact56651 actual Go verdict; same authorfailedCIreport then separate test-only card; Root actual combinedsource choice before freshCI"
 }

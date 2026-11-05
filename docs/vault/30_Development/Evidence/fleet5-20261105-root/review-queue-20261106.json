@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T08:25:37+09:00",
+  "atKST": "2026-11-06T08:47:49+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -20,7 +20,7 @@
     "state": "ready inputaccepted/live; actual verdict pending"
   },
   "pending": null,
-  "authorParallelWork": "K1 same fullCore/artifact/report continues through directsteer after finished-turn escalation; B rev5 sourceanalysis/contracts",
+  "authorParallelWork": "K1 author SAME failedCore artifact/report then isolated TEST-only rate-clock card; B rev5 sourceanalysis/contracts",
   "reason": "one actual Claude reviewer after proven settled/exited/released B4; corrected ownDocs and Linux race passed, fullCore still required",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "current K1 actual verdict; next B rev5 only after immutable source/ownDocs",
+  "nextActualReviewTrigger": "existing Claude actual56651 verdict; Root reviews actual testdelta when published, then chooses combined finalsource before freshCore",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -72,5 +72,8 @@
     "resource": "succeeded/settled/exited/released"
   },
   "BRev5Reply": "msg_03544733c9f3",
-  "K1FinishedTurnSteer": "msg_c4f86971960b"
+  "K1FinishedTurnSteer": "msg_c4f86971960b",
+  "K1CorrectedFullCore": "actual56651/Core42126222201 FAILURE; no rerun/borrowedgreen",
+  "K1SeparateRateTestCard": "FLEET5-CORE-PREP-RATE-CLOCK-20261106",
+  "additionalAuthorOrReviewerStarted": false
 }

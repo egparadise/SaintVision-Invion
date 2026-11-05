@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "c10e7f359d5ba6f6b3973fafdec223c5bffab2e0",
-    "Docs": 42127169716,
+    "SHA": "e588599b34cffc44331d7079ae3fe6369cf16765",
+    "Docs": 42129270859,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2745,
+    "independentlyMatchedNormalizedDestinationHashes": 2747,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T08:08:51+09:00"
+    "verifiedAtKST": "2026-11-06T08:27:56+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2455,7 +2455,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T08:25:37+09:00",
+  "latestRecordAtKST": "2026-11-06T08:47:49+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2769,7 +2769,7 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "same Core/artifact/report collection; actual delta reviewer inparallel; no retry/newauthorTask or K2/runtime",
+    "currentAuthorization": "same failedCIreport then isolated sequentialTEST-only clock card; no runtime/source567changes; no newwholeCI until Rootreviewedcombinedsourcechoice",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
     "actualCodeAccepted": false,
@@ -2780,10 +2780,11 @@
     "correctedSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
     "correctedSourceDocs": 42126225708,
     "correctedSourceCore": 42126222201,
-    "correctedSourceCoreAtObservation": "08:24:20KST main Python suite still inprogress",
+    "correctedSourceCoreAtObservation": "actual terminalFAILURE Core42126222201 mainpyteststep33",
     "actualCorrectedDeltaReview": "actual Claude running/verdict pending",
     "actualCorrectedDeltaReviewTask": "task_eeb63f89fecd",
-    "actualCorrectedDeltaReviewDispatch": "ctx_c6a8ddbbde6d"
+    "actualCorrectedDeltaReviewDispatch": "ctx_c6a8ddbbde6d",
+    "correctedSourceFullCoreAccepted": false
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -2990,5 +2991,7 @@
   "root426CIObserverRecovery": "root426-ci-observer-recovery.json",
   "K1CorrectedTemporalSourceObservation": "k1-temporal-root-source-observation.json",
   "K1ActualCorrectedDeltaReviewGate": "k1-temporal-actual-review-gate.json",
-  "K1FinishedTurnSupervision": "k1-temporal-finished-turn-supervision.json"
+  "K1FinishedTurnSupervision": "k1-temporal-finished-turn-supervision.json",
+  "K1CorrectedFullCoreActualFailure": "k1-56651-core-failure-root-observation.json",
+  "separatePreparationRateClockTestCard": "core-preparation-rate-clock-test-root-decision.json"
 }
