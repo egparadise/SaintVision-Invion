@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "f5-first-wave-plan:1",
+  "task": "FLEET5-FIRST-WAVE-PLAN-20261105",
+  "orcaTask": "task_05d9dcda1dca",
+  "dispatch": "ctx_faa86b318dd8",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "status": "nonexecuting; ready for independent plan review; runtime gates remain",
+  "branch": "agent/codex/fleet5-first-wave-plan-20261105",
+  "base": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
+  "productSource": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "existingCleanSourceAvailable": true,
+  "namespace": "f5-59f0a3c2-20261105-w12",
+  "state": ".work/lan-5node/f5-59f0a3c2-20261105-w12",
+  "database": "saintvision_lan_f5_59f0a3c2_20261105_w12",
+  "postgresImage": "postgres@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54",
+  "goImage": "golang@sha256:60deed95d3888cc5e4d9ff8a10c54e5edc008c6ae3fba6187be6fb592e19e8c0",
+  "newCAPolicy": "fresh development pilot self-signed, no reuse/import/system trust change; actual leaf expiry/renewal ownership bound after init",
+  "partialTopology": {
+    "plannedTotal": 5,
+    "phaseOneActualTargets": 2,
+    "targets": [
+      "worker1",
+      "worker2"
+    ],
+    "worker3": "runtime authority unresolved",
+    "worker4": "endpoint unknown",
+    "cp": "API1.41/no Ubuntu/needs own resource and operational assessment",
+    "fiveNodePass": false
+  },
+  "reservedBindings": {
+    "windowsTunnel": "127.0.0.1:55458",
+    "worker2Database": "127.0.0.1:55458",
+    "worker1Node": "<verified worker1 LAN IP>:18515",
+    "worker2Node": "<verified worker2 LAN IP>:18515",
+    "bootstrap18115": "plan-reserved optional only; not used in scp-first phase",
+    "reservationType": "logical packet reservation, not OS bind; must recheck before actual bind",
+    "supersedesOldUnverifiedCandidates": [
+      18085,
+      18086,
+      18447
+    ]
+  },
+  "collisionEvidence": {
+    "taskId": "FLEET5-FIRST-WAVE-PLAN-20261105",
+    "orcaTaskId": "task_05d9dcda1dca",
+    "namespace": "f5-59f0a3c2-20261105-w12",
+    "ports": {
+      "bootstrap": 18115,
+      "nodeTLS": 18515,
+      "databaseRemoteLoopback": 55458,
+      "databaseWindowsTunnel": 55458
+    },
+    "workers": [
+      {
+        "alias": "node-1",
+        "startKST": "2026-11-05T15:09:58.128519+09:00",
+        "endKST": "2026-11-05T15:09:58.867499+09:00",
+        "exit": 0,
+        "candidateListeners": [],
+        "projectFolderExists": false,
+        "dockerServerAPI": "1.52",
+        "dockerServerMinAPI": "1.44",
+        "subcommandExits": {
+          "memory": 0,
+          "disk": 0,
+          "dockerVersion": 0,
+          "dockerReservedPorts": 0,
+          "postgresImages": 0,
+          "goImage": 0,
+          "ownedNodeIDs": 0,
+          "dockerBuildHelp": 0
+        },
+        "goImageCached": true,
+        "postgresImageRows": 1,
+        "r5ProjectDigestCount": 6
+      },
+      {
+        "alias": "node-2",
+        "startKST": "2026-11-05T15:09:58.128519+09:00",
+        "endKST": "2026-11-05T15:09:58.699048+09:00",
+        "exit": 0,
+        "candidateListeners": [],
+        "projectFolderExists": false,
+        "dockerServerAPI": "1.56",
+        "dockerServerMinAPI": "1.40",
+        "subcommandExits": {
+          "memory": 0,
+          "disk": 0,
+          "dockerVersion": 0,
+          "dockerReservedPorts": 0,
+          "postgresImages": 0,
+          "goImage": 1,
+          "ownedNodeIDs": 0,
+          "dockerBuildHelp": 0
+        },
+        "goImageCached": false,
+        "postgresImageRows": 1,
+        "r5ProjectDigestCount": 6
+      }
+    ],
+    "windows": {
+      "observedKST": "2026-11-05T15:10:01.3156040+09:00",
+      "freePhysicalMemoryBytes": 1128951808,
+      "totalVisibleMemoryBytes": 16935796736,
+      "candidateListeners": []
+    },
+    "historicalCandidateOverlap": {},
+    "r5": {
+      "overviewHTTP": 200,
+      "nodeCount": 2,
+      "onlineFresh": 2,
+      "source": "live-postgresql-mtls",
+      "runs": 0,
+      "offers": 0,
+      "killSwitch": true,
+      "userWorkloadSubmission": false
+    },
+    "r5StateBytesUnchanged": true
+  },
+  "allContainerPortBindingChecks": [
+    {
+      "alias": "node-1",
+      "sshExit": 0,
+      "containerCount": 16,
+      "allContainerPortBindingReadExit": 0,
+      "conflictingHostPorts": [],
+      "postgresDigest": "postgres@sha256:ab8380566c3ea09690a9ecaa85a59d82bfc6eb86744151a2a54335866c83a3e9",
+      "postgresInspectExit": 0
+    },
+    {
+      "alias": "node-2",
+      "sshExit": 0,
+      "containerCount": 8,
+      "allContainerPortBindingReadExit": 0,
+      "conflictingHostPorts": [],
+      "postgresDigest": "postgres@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54",
+      "postgresInspectExit": 0
+    }
+  ],
+  "perNodePolicy": [
+    {
+      "slot": "worker1",
+      "measuredRAMAvailableBytes": 9414676480,
+      "measuredStorageAvailableBytes": 209872973824,
+      "proposedNewF5Ceiling": {
+        "cpuMillis": 2000,
+        "memoryBytes": 2147483648,
+        "gpuDevices": 0,
+        "storageBytes": 21474836480
+      },
+      "newProjectRoot": "$HOME/.local/share/saintvision/f5-59f0a3c2-20261105-w12",
+      "newNodePrivateRoot": "$HOME/.local/share/saintvision/<new assigned Node ID>",
+      "permissions": "0700 directories/0600 key or credential files; only new owned paths",
+      "workspaceMounts": false,
+      "storageHardQuotaConfigured": false,
+      "storageAdmission": "20GiB ceiling includes new namespace image/artifacts/DB volume; record per-stage owned usage and stop new phase before ceiling, never prune old data",
+      "declaredExistingCeiling": "9000m CPU; inventory RAM11953892352/12360480768B; GPU1; storage187344098304B",
+      "steadyNewAllocation": "Node0.5CPU/256MiB"
+    },
+    {
+      "slot": "worker2",
+      "measuredRAMAvailableBytes": 13966442496,
+      "measuredStorageAvailableBytes": 210626019328,
+      "proposedNewF5Ceiling": {
+        "cpuMillis": 2000,
+        "memoryBytes": 2147483648,
+        "gpuDevices": 0,
+        "storageBytes": 21474836480
+      },
+      "newProjectRoot": "$HOME/.local/share/saintvision/f5-59f0a3c2-20261105-w12",
+      "newNodePrivateRoot": "$HOME/.local/share/saintvision/<new assigned Node ID>",
+      "permissions": "0700 directories/0600 key or credential files; only new owned paths",
+      "workspaceMounts": false,
+      "storageHardQuotaConfigured": false,
+      "storageAdmission": "20GiB ceiling includes new namespace image/artifacts/DB volume; record per-stage owned usage and stop new phase before ceiling, never prune old data",
+      "declaredExistingCeiling": "9000m CPU; inventory RAM11953892352/12360480768B; GPU1; storage187344098304B",
+      "steadyNewAllocation": "Node0.5CPU/256MiB plus DB1CPU/768MiB"
+    }
+  ],
+  "cpImpact": {
+    "claudePublishedCommit": "138ece54",
+    "publishedDockerContainers": 25,
+    "publishedDockerRunning": 8,
+    "publishedAPI": "1.41",
+    "publishedUbuntuPresent": false,
+    "publishedFreeGB": 0.55,
+    "currentMeasuredFreeBytes": 1128951808,
+    "minimumPreStepFreeBytes": 536870912,
+    "abortIfFreeBelowBytes": 268435456,
+    "noLocalDockerOrWSLChange": true,
+    "noNewWindowsInboundListener": true,
+    "noNewWebOrConsole": true,
+    "newProcesses": "one attended SSH tunnel plus sequential transient existing Python3.14.7",
+    "requirementsClosureUnchangedBetweenSource03And59f": true
+  },
+  "timing": {
+    "canProceedBeforeNov10": "yes conditionally after independent review and live prerequisite gates; no shared-resource/date conflict proved",
+    "calendarDelayRequired": false,
+    "notBefore": "no arbitrary date; actual resource/port/firewall/build/source/identity gates",
+    "r5RenewalWindow": "2026-11-08T14:15:35+09:00",
+    "r5FollowupsUnchanged": [
+      "2026-11-08T14:20:00+09:00",
+      "2026-11-09T12:15:00+09:00",
+      "2026-11-10T08:00:00+09:00"
+    ]
+  },
+  "nextTechnicalGates": [
+    "Claude exact packet review",
+    "fresh prebind collision/headroom check and old-r5 hash/live comparison",
+    "new DB/name/port/digest and SCRAM rejection proof in isolated namespace only",
+    "hash newly generated identity/CA/epoch outputs before any per-Node preparation",
+    "bounded source59f image build and actual artifact digest/size proof; stop on nonzero",
+    "Linux18515 CP-only ingress and unauthorized-source denial proof by authorized operator",
+    "two real fresh advancing mTLS observations, zero offers/runs and old r5 healthy"
+  ],
+  "rollback": {
+    "trigger": "any nonzero, r5 regression, scope/hash mismatch or headroom/space threshold breach",
+    "action": "stop only newly recorded f5-owned processes/containers after ownership/PID/hash checks; preserve all new state, CA, keys, DB, volume and receipts for diagnosis",
+    "forbidden": [
+      "old r5 restart/stop",
+      "rotation or time/window/latch bypass",
+      "old or new database/volume deletion",
+      "prune or global builder/daemon changes",
+      "schedule edits",
+      "grant/profile weakening"
+    ]
+  },
+  "inputSHA256": {
+    "sourceArchive": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9",
+    "parameters": "629584cc62209d4a4752ff68b964eb594fa8eb8ffbaac24dbdf6bca3800b7286",
+    "executionVectors": "a9c6d1e353f1e42fe80423f614625fe8f6ab97ac78722c0c3b71f85a91008c4f",
+    "collisionRaw1": "7461ef28d099a42fdf5c60659c06a5aca755724434e9e43f21002149d0ecf064",
+    "collisionRaw2": "72654782c0f39ef794f86b8ab7c871498afc1a939bafb8238aaf8cccd6e0f3fb",
+    "allBindings1": "389bc1dd98c71ea7d87e927ac8572fb4d394858344ea3875eb5970be64966ace",
+    "allBindings2": "bf98f6c069a5fed3bf4108b7f74fd6668da44fc7afe7a385894968887b88215e"
+  },
+  "sourceFileSHA256": {
+    "tools/lan_pilot.py": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+    "deploy/lan/prepare-pilot-database.sh": "200c49a9f8a7b25132c8087206cfca55736db2ad5c68bbe39c21c7f5014c5551",
+    "deploy/lan/verify-pilot-database.sh": "f67e40b3c691427417c48bffab07f0c632c699db275f8b0992225ddd6821bfba",
+    "deploy/lan/Dockerfile.node.remote": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae",
+    "deploy/lan/prepare-worker.sh": "3e8dc5cf1a712ccc9c9ffa62f9b289a14d0b47f7af9b1031a4e60bae90f98b12",
+    "deploy/lan/finish-worker.sh": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+    "deploy/lan/start-node.sh": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+    "deploy/lan/worker_config.py": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+    "services/node-agent/go.mod": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990",
+    "services/node-agent/go.sum": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
+    "requirements-core.txt": "a6bbe231c4b68e7a3315b6e46057cfa94915f10006b8cc7f419fe483a66b6ce6",
+    "requirements-backend.txt": "135e7f972b2f0c204ebf6147ad38793472930cec8d2ea0de3e5c641d289d46ae"
+  },
+  "generatedRuntimeHashes": "not fabricated; mandatory post-init/pre-install checkpoint",
+  "currentTaskMutations": {
+    "remote": false,
+    "CA": false,
+    "database": false,
+    "enrollment": false,
+    "container": false,
+    "automation": false,
+    "adminAuthenticationAttempt": false
+  },
+  "sharedResourceAssessment": {
+    "existingR5DatabaseHost": "worker1; SSH tunnel15408 mapped read-only to established worker1",
+    "newF5BuildSharesR5DBHost": true,
+    "newF5BuildControls": "2CPU/1GiB, sequential, r5 live gate before/after; stop new build on actual r5 degradation",
+    "observedResourceConflictRequiringNov10Delay": false,
+    "newF5DBNodeFailureCorrelation": "worker2 loss affects both its new Node and the new F5 control-plane database; this is not independent-host recovery acceptance",
+    "recoveryAcceptance": "must explicitly model correlated database/worker loss or separate storage before later failure-domain claims"
+  }
+}

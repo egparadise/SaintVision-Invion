@@ -1,0 +1,36 @@
+[
+  {
+    "name": "final-docs",
+    "command": [
+      "<existing-source03-Python3.14.7>",
+      "tools/check_docs.py"
+    ],
+    "startKST": "2026-11-05T15:24:03.934742+09:00",
+    "endKST": "2026-11-05T15:24:07.019915+09:00",
+    "exit": 0
+  },
+  {
+    "name": "final-duplicates",
+    "command": [
+      "<existing-source03-Python3.14.7>",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "startKST": "2026-11-05T15:24:07.019915+09:00",
+    "endKST": "2026-11-05T15:24:07.404624+09:00",
+    "exit": 0
+  },
+  {
+    "name": "final-paths",
+    "command": [
+      "<existing-source03-Python3.14.7>",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "HEAD"
+    ],
+    "startKST": "2026-11-05T15:24:07.404624+09:00",
+    "endKST": "2026-11-05T15:24:10.328742+09:00",
+    "exit": 0
+  }
+]

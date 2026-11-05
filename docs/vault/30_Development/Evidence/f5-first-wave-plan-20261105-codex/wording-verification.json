@@ -1,0 +1,33 @@
+{
+  "task": "task_05d9dcda1dca",
+  "messageOnlyInstallerChange": true,
+  "numericAPIGate": ">= (1,45), unchanged",
+  "existingWorkerConfigTests": {
+    "passed": 32,
+    "failed": 0,
+    "exit": 0,
+    "rawStdoutSHA256": "fc73b5bede03da78401a5833eb21765444d86f3e5b6c9dd0d2556f7cdfea2b04"
+  },
+  "falseFloorSearch": {
+    "scope": [
+      "deploy",
+      "tools",
+      "apps",
+      "services",
+      "tests"
+    ],
+    "exit": 1,
+    "meaning": "no current false-floor match"
+  },
+  "newTestsAdded": 0,
+  "officialSources": [
+    "https://docs.docker.com/reference/api/engine/#api-version-matrix",
+    "https://docs.docker.com/desktop/release-notes/#4290"
+  ],
+  "historicalFeatureFloors": {
+    "engine": "26.0/API1.45",
+    "priorEngine": "25.0/API1.44",
+    "desktop": "4.29/Engine26.0.0"
+  },
+  "upgradeRecommendation": "choose a currently supported compatible release at actual upgrade; these floors are not installation pins"
+}
