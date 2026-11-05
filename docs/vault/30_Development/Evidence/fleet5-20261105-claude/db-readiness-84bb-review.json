@@ -1,0 +1,44 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_3122a97a4fef / ctx_5301317b669b (in-dispatch request msg_e22a2ee142c0: DB readiness repair source review)",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T16:33:00+09:00", "2026-11-05T16:36:00+09:00"],
+  "reviewedCommit": "84bbec6bcf06f88a2f226972982bfad68fef5848",
+  "parents": ["5caa60df1c2836672bf20bd466a320a7fe2f759b (test-first)", "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067"],
+  "integrity": {
+    "prepareScriptBlob": {"value": "a5695cab0a955d0aeeedf40f6459458ccef6210a", "matched": true},
+    "controlledRegressionTestBlob": {"value": "232528b317af817462811d21f4249358ba378480", "sameAt5caaAnd84bb": true},
+    "nonDocsFilesChangedFrom59f": [".github/workflows/core.yml", "deploy/lan/prepare-pilot-database.sh", "tests/integration/test_lan_pilot_database_real_pg.py"],
+    "fixDelta5caaTo84bb": "readiness psql adds -h 127.0.0.1 plus 2 comment lines",
+    "ciAssertion": "LAN database real-PG cases 1 -> 2; zero skipped/failure/error unchanged"
+  },
+  "verdict": "ACCEPT (source and controlled proof); hosted Core pending",
+  "reasoning": [
+    "official image init runs a Unix-socket-only temporary server (listen_addresses='') and creates POSTGRES_DB before stopping it; final server listens on '*'",
+    "old Unix SELECT 1 readiness could pass during init and race later role/privilege steps with temporary-server shutdown",
+    "new in-container TCP 127.0.0.1 with scram (--auth-host=scram-sha-256) succeeds only on the final server",
+    "existing-container credential check and verify-pilot-database.sh already use -h 127.0.0.1; post-readiness Unix commands run only after final server is up"
+  ],
+  "controlledProof": {
+    "design": "sources real image entrypoint, gates docker_setup_db to hold the temporary-Unix/pre-database state",
+    "assertsDuringHold": ["temporaryUnixSql", "temporaryTcpRejected", "targetDatabaseAbsent", "pendingBeforeRelease"],
+    "assertsAfterRelease": ["prepare exit 0 with databaseName", "finalTargetTcpSql", "wrongCredentialRejected", "missingCredentialRejected", "hostAuthentication scram-sha-256"],
+    "bindsImageIdAndEntrypointSHA256": true,
+    "shimForgesResult": false
+  },
+  "hosted": {
+    "baselineCore": {"run": 41985493178, "head": "5caa60df", "conclusion": "failure", "meaning": "expected red per root measurement"},
+    "repairedDocs": {"run": 41987455119, "head": "84bbec6b", "conclusion": "success"},
+    "repairedCore": {"run": 41987450905, "head": "84bbec6b", "status": "in_progress", "checkedAtKST": "2026-11-05T16:34:44+09:00", "countedAsSuccess": false}
+  },
+  "scopeLimits": ["generic defect proven; original Core 41982378091 guard failure cause not proven or judged by Claude", "no Docker or tests run by Claude in this review", "user statement that all PCs are configured recorded only; no remote verification"],
+  "lowFindings": ["readiness now requires password auth, so a wrong password file ends as 'readiness timed out'; optionally name credential/final-server in the timeout message"],
+  "archiveImpact": "prepare-pilot-database.sh is inside the F5 59f archive a9f0a3b8; do not patch 59f silently: stage03 with this fix needs a new source pin/archive revision with namespace/artifact version and fresh independent review; the old 59f archive keeps the race",
+  "currentTaskMutations": {"docker": 0, "remote": 0, "tests": 0, "authority": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "confirm repaired Core 41987450905 final result; on success accept 84bbec6b and plan new source pin/archive revision for stage03"},
+    {"owner": "Codex", "action": "optional timeout-message Low"},
+    {"owner": "Claude", "action": "review new archive/packet hashes when relayed"}
+  ]
+}
