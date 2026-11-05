@@ -1,0 +1,62 @@
+{
+  "scope": "original component review bytes and failures; no verdict applied to later combined SHA",
+  "files": [
+    {
+      "reviewCommit": "c2102592f9c2204ac96a49c5d0af4a2f888951f5",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-6c0f-review.json",
+      "bytes": 9830,
+      "sha256GitBytes": "9992bf77602bdb148543bbaaa0885818b141d8127f557a1bf2782bee722fa75b",
+      "gitBlobSHA1": "473d7b257cc61ce954fbcff1e2d522c4126da402"
+    },
+    {
+      "reviewCommit": "c2102592f9c2204ac96a49c5d0af4a2f888951f5",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-55-00_KST_FLEET5_P0_code_6c0f_검토_Claude.md",
+      "bytes": 9539,
+      "sha256GitBytes": "03927a3e9ef338d65f12f30ad3bb173fe1967ae8749cae3cc5a383e289d472e9",
+      "gitBlobSHA1": "6adbe00a8c336c4d3d25dd65dd103dbb482c0f35"
+    },
+    {
+      "reviewCommit": "8baaa6b568f1e467a76272faa6d7f2084545c525",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-4a92-review.json",
+      "bytes": 12873,
+      "sha256GitBytes": "11f4a6c504eef9fa82730c561534f9f2097773ada5b2cb7e6f18502eb61cad1b",
+      "gitBlobSHA1": "f608537e8e9e5883f0cea136f6a2cfa0a1ea77f4"
+    },
+    {
+      "reviewCommit": "8baaa6b568f1e467a76272faa6d7f2084545c525",
+      "path": "docs/vault/30_Development/History/2026-11-06_00-10-02_KST_FLEET5_P0_code_4a92_검토_Claude.md",
+      "bytes": 11728,
+      "sha256GitBytes": "17a72a55d0ad21a323f754c8d2329bde469a06fb6c2be1f919f890b6d3db6e10",
+      "gitBlobSHA1": "3e5e996aae0e9267a70344f63f3708baec46d30a"
+    },
+    {
+      "reviewCommit": "315411bcad1eaf83fed86df091d6864bf5258433",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-test-isolation-46b4-review.json",
+      "bytes": 6835,
+      "sha256GitBytes": "49f661c764828b65736f3e3b58bf855c2c3015822d0ccd8ae7bd96511d4a450a",
+      "gitBlobSHA1": "22cca5baa2da907c4aaacb924e7c30ae19057008"
+    },
+    {
+      "reviewCommit": "315411bcad1eaf83fed86df091d6864bf5258433",
+      "path": "docs/vault/30_Development/History/2026-11-06_00-26-51_KST_FLEET5_P0_test_isolation_46b4_검토_Claude.md",
+      "bytes": 6035,
+      "sha256GitBytes": "7a34d179415688b78fee5319eb209173355031f20e5e31aaaa78d7907c02c00c",
+      "gitBlobSHA1": "a1f277f3c8348106d7eda8c53545fff253f02e70"
+    },
+    {
+      "reviewCommit": "2736aec1303ca6b6ed80bdc4aa6b9c23c3693985",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-t123-4f97-review.json",
+      "bytes": 12139,
+      "sha256GitBytes": "ffed58a8071876fb7564cdece466bd76b286720e0c39dfb5a76ff4c8fd59b5ef",
+      "gitBlobSHA1": "53fb726aa593cdb27cd5789556138ab1117423ec"
+    },
+    {
+      "reviewCommit": "2736aec1303ca6b6ed80bdc4aa6b9c23c3693985",
+      "path": "docs/vault/30_Development/History/2026-11-06_01-10-31_KST_FLEET5_P0_T123_4f97_검토_Claude.md",
+      "bytes": 8040,
+      "sha256GitBytes": "0c5faee457be59e01e932b735933302aafdaf86c70e21c3ec57d765b71e17332",
+      "gitBlobSHA1": "d3148fa99f95f195421c96fa72b72de1cc1382f3"
+    }
+  ],
+  "combinedIndependentReview": "REQUIRED at actual new candidate; not performed by these imports"
+}

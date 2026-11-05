@@ -243,8 +243,11 @@ def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cl
 
 
 def test_public_nonexecuting_plan_never_fabricates_live_query_counts():
-    path = Path(__file__).resolve().parents[1] / "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/setup-plan.json"
+    from tools.build_fleet5_setup_packet import PLAN
+
+    path = Path(__file__).resolve().parents[1] / PLAN
     plan = json.loads(path.read_bytes())
+    assert plan["schemaVersion"] == "fleet5-exact-source-nonexecuting-plan:2"
     assert plan["executed"] is False
     assert plan["actualF5"]["queryExecuted"] is False
     assert all(value is None for value in plan["actualF5"]["counts"].values())
@@ -253,3 +256,10 @@ def test_public_nonexecuting_plan_never_fabricates_live_query_counts():
     assert plan["cohort"]["arbitraryExpansionAccepted"] is False
     assert plan["topology"]["selectedProposal"] == "FOUR_PLAIN_WORKSPACE_NODES_NO_SHARED_STORAGE_MOUNT"
     assert plan["topology"]["simultaneousComputeAndSharedStorageSupported"] is False
+    assert all(value is None for value in plan["operationalBindings"].values())
+    assert "verify_settled (SF1)" in plan["settlementGate"]["canonicalVerifier"]
+    assert plan["plainV3SourceContract"]["signedFloorSchema"] == "saintvision-node-peer-policy-floor:2"
+    assert len(plan["plainV3SourceContract"]["workerModules"]) == 5
+    assert plan["standaloneFixtureResultContract"]["rolledBack"] is False
+    assert plan["standaloneFixtureResultContract"]["rollbackRejected"] is True
+    assert plan["standaloneFixtureResultContract"]["actualGoAcceptanceAssessed"] is False

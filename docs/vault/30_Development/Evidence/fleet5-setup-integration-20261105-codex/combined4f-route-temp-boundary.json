@@ -1,0 +1,9 @@
+{
+  "scope": "explicit newly created disposable non-.work pytest fixture base only",
+  "resolvedTemporaryParent": "C:\\Users\\inviz\\AppData\\Local\\Temp",
+  "verifiedEmptyOwnedBase": "C:\\Users\\inviz\\AppData\\Local\\Temp\\saintvision-fleet5-route-20261106-unu2e_r6",
+  "createdForThisTest": true,
+  "recursiveCleanupBoundaryVerifiedBeforePytest": true,
+  "reason": "route_coverage.scan_served deliberately excludes any .work path component; prior --basetemp under .work was a harness error",
+  "sourceOrTestPredicateModified": false
+}

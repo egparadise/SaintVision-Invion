@@ -1,0 +1,49 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_nonempty_route_comparison_can_pass_or_fail[True-0] ___________
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/combined4f-route-isolated/test_nonempty_route_comparison1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FA305A70>
+capsys = <_pytest.capture.CaptureFixture object at 0x000001A2FA2F9950>
+served = True, expected = 0
+
+    @pytest.mark.parametrize("served,expected", [(False, 1), (True, 0)])
+    def test_nonempty_route_comparison_can_pass_or_fail(
+        tmp_path, monkeypatch, capsys, served, expected
+    ):
+        import json
+        import route_coverage
+    
+        (tmp_path / "client.ts").write_text("fetch('/v1/projects')")
+        if served:
+            (tmp_path / "api.py").write_text('@api.get("/v1/projects")')
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            ["route_coverage.py", "--served", str(tmp_path), "--client", str(tmp_path), "--json"],
+        )
+>       assert route_coverage.main() == expected
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <function main at 0x000001A2FA3BE1F0>()
+E        +    where <function main at 0x000001A2FA3BE1F0> = <module 'route_coverage' from 'D:\\Project\\SaintVisionI-Invion\\fleet5-setup-integration-20261105\\tools\\route_coverage.py'>.main
+
+tests\test_route_coverage.py:305: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{
+  "servedByTree": {
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-setup-integration-20261105\\.work\\fleet5-setup-integration\\combined4f-route-isolated\\test_nonempty_route_comparison1": []
+  },
+  "clientPaths": [
+    "/v1/projects"
+  ],
+  "assessment": "compared",
+  "unserved": [
+    "/v1/projects"
+  ],
+  "measurement": "source-declarations",
+  "operationalAcceptanceAssessed": false,
+  "limitations": "Static path shapes only; dynamic prefixes may be omitted. HTTP methods, payloads, authentication, live availability and operating acceptance are not verified."
+}
+=========================== short test summary info ===========================
+FAILED tests/test_route_coverage.py::test_nonempty_route_comparison_can_pass_or_fail[True-0]
+1 failed, 1 passed in 0.21s

@@ -25,3 +25,8 @@ A private preservation assertion initially exits1 after comparing working CRLF b
 
 
 The new redacted diagnostic retains pytest traceback trailing blanks, so staged git diff --check first exits2. The product-only check exits0. A single literal task-owned evidence attribute preserves this declared diagnostic's bytes/hash; no wildcard/root or product whitespace exception is added. Retry must exit0 before committing. The failed check and artifact-only resolution are recorded without rerunning tests.
+
+
+## Combined4f required route gate: .work test harness exclusion
+
+Ordered focus exits1 with387 pass/20 platform skips/1 route fixture failure; isolated same .work fixture root exits1 with1 fail/1 pass. scan_served intentionally excludes files with any .work path component, so placing pytest --basetemp there hides its declared served api.py fixture. The scanner and test are unchanged. A new empty verified-owned system-temp base gives the complete required route gate41 pass/0 skip/exit0. Original nonzero captures remain exact diagnostics with two literal attribute entries; no source guard is weakened and no broad suite is silently rerun. Root is informed before final freeze. This is a resolved harness placement error, not whole-candidate CI/physical acceptance.

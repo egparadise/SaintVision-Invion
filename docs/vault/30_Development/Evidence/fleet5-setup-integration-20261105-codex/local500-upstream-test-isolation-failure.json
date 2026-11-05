@@ -1,0 +1,46 @@
+{
+  "scope": "ROOT_RELAYED_UPSTREAM_FAILURE_ONLY; NO DUPLICATED FIX OR NEW ACCEPTANCE",
+  "observedAtKST": "2026-11-06T00:32:07.051479+09:00",
+  "rootMessage": "msg_df1a9ce59e12",
+  "authorReportRelayedByRoot": "msg_a76228cf2439",
+  "exactRuntimeSource": "4a928310e88ac336efb040c1621525fee7133f32",
+  "localPrepInputUnchanged": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "localPrepCommitUnchanged": "c91303105a9b82c63f4a091bb36bee9312c2cf51",
+  "upstreamBackend": {
+    "runId": 42047403498,
+    "matrix": "Python3.14",
+    "result": "FAILURE",
+    "failed": 5,
+    "passed": 8717,
+    "skipped": 75,
+    "deselected": 2,
+    "scope": "root relay of actual owner result; not independently rerun/downloaded by this worker"
+  },
+  "reportedCause": "standalone proof TEST removes five worker sys.modules entries without restoring them; later residue fixtures patch stale module objects",
+  "reportedOrderedReproducer": {
+    "withPriorImport": "5 failed,2 passed in ordered7 cases",
+    "withoutPriorImport": "6 passed"
+  },
+  "nextNarrowRevision": {
+    "SHA": null,
+    "owner": "upstream P0 author",
+    "scope": "ONLY exception-safe test sys.modules and argv restoration",
+    "runtimeChangeAuthorized": false,
+    "freshnessRelaxationAuthorized": false
+  },
+  "otherRuns": "original4a Core/Python3.12 still active at root observation; no success inferred, no cancellation",
+  "review": "ctx_1e0814952956 runtime4a+500 scope and new failure info; no actual verdict received",
+  "native": "root-confirmed4a actual2 cycles remains true; original C2 Unicode coverage partial and actual500Go still pending",
+  "priorOwnedPrepResults": "101+35 focused passes/0skips plus12 separate predicate controls remain locally scoped; no claim of full-suite isolation or acceptance",
+  "pendingExternalQuestionAlreadySent": "msg_753d333c5bfe",
+  "rootInstruction": "No idle confirmation or duplicate upstream fix; preserve literal local500 input and wait for actual narrow successor/results",
+  "notPerformed": [
+    "upstream isolation fix",
+    "production/test freshness relaxation",
+    "new broad tests or source merge",
+    "new source/candidate selection",
+    "finalfreeze/ci2/full8/archive/packet",
+    "remote/physical/Obsidian action"
+  ],
+  "wholeTaskDone": false
+}

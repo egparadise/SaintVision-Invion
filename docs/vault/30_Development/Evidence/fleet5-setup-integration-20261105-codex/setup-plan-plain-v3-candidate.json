@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "fleet5-exact-source-nonexecuting-plan:2",
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "executed": false,
+  "sourceBinding": "New exact candidate-source-manifest.json binds this separately named plain-v3 plan and every Git blob; source4f is a component, never the combined candidate pin",
+  "supersedes": "Only future F5 setup for this new exact combined-candidate packet; original59f and all intermediate packets/plans, historical source observations and failures remain frozen",
+  "actualF5": {
+    "queryExecuted": false,
+    "counts": {
+      "nodes": null,
+      "freshNodes": null,
+      "channels": null,
+      "offers": null,
+      "runs": null,
+      "uncommittedBatches": null,
+      "finalizedBatches": null
+    },
+    "settlement": "UNKNOWN_NO_F5_STATE",
+    "physicalAcceptance": false,
+    "wholeProductAcceptance": false
+  },
+  "cohort": {
+    "initialization": "ALL_FIVE_TOGETHER_AFTER_READY",
+    "arbitraryExpansionAccepted": false,
+    "sameAuthorityKeysAndIPsRequiredAcrossNormalRotations": true,
+    "newTenantEpochDatabaseNodeIdsAndCA": "distinct from old r5; resolve privately before any init; no issuance/enrollment performed here",
+    "independentLinuxSlots": [
+      "physicalPC1",
+      "physicalPC2",
+      "physicalPC3",
+      "physicalPC4"
+    ],
+    "controlPlaneColocatedSlot": "physicalPC5",
+    "excludeColocatedFromIndependentS05S07": true
+  },
+  "physicalPlanning": [
+    {
+      "slot": "physicalPC1",
+      "legacyMapping": "previously blank logical slot",
+      "remaining": [
+        "public key registration",
+        "Docker readiness"
+      ]
+    },
+    {
+      "slot": "physicalPC2",
+      "legacyMapping": "legacyworker1",
+      "remaining": [
+        "preserve existing active r5 Node",
+        "prove new isolated source prerequisites"
+      ]
+    },
+    {
+      "slot": "physicalPC3",
+      "legacyMapping": "legacyworker3",
+      "remaining": [
+        "Docker group authorization",
+        "fresh runtime evidence"
+      ]
+    },
+    {
+      "slot": "physicalPC4",
+      "legacyMapping": "legacyworker2",
+      "remaining": [
+        "preserve existing active r5 Node",
+        "dedicated share has prior read-only/write-denial evidence but no active storage policy or offer"
+      ]
+    },
+    {
+      "slot": "physicalPC5",
+      "legacyMapping": "Windows control plane",
+      "remaining": [
+        "current API1.41 incompatible with new Node gate",
+        "Ubuntu absent",
+        "UAC and cold backup",
+        "reviewed runtime maintenance and rollback"
+      ]
+    }
+  ],
+  "topology": {
+    "selectedProposal": "FOUR_PLAIN_WORKSPACE_NODES_NO_SHARED_STORAGE_MOUNT",
+    "actualComputePlacementsMeasured": false,
+    "simultaneousComputeAndSharedStorageSupported": false,
+    "pc4ShareActive": false,
+    "sourceConstraint": "worker_workspace.validate_install_target rejects storage-policy and unsupported mounts before mutation; rollback uses legacy validation",
+    "alternative": "One storage-only PC4 Node leaves three independent Linux workspace workers",
+    "implementationGap": "Combined storage plus workspace installation/upgrade preserving approved storage policy and mount is unimplemented; same-endpoint duplicate Nodes are not a supported workaround",
+    "workspace": {
+      "storage": "16MiB tmpfs",
+      "hostWorkspaceFolderUsed": false
+    },
+    "resourcePolicyProposal": {
+      "cpu": 2,
+      "memoryGiB": 2,
+      "diskGiB": 20,
+      "gpu": 0,
+      "enforcedAsHostQuota": false
+    },
+    "rootDecision": {
+      "messageIds": [
+        "msg_d0fb8945dbe5",
+        "msg_1e80d970d20d"
+      ],
+      "verdict": "BASELINE_ONLY",
+      "separateDesignTask": "task_a8fd2969f0b3",
+      "separateDesignDispatch": "ctx_6f0f8253b8a7",
+      "coexistenceSourceIncluded": false,
+      "contributedStorageAcceptance": false,
+      "independentHostCountInflationAllowed": false
+    }
+  },
+  "publicParameters": {
+    "nodeTLS": 18515,
+    "databaseLoopbackOrTunnel": 55458,
+    "optionalBootstrap": 18115,
+    "bundleDelivery": "SCP preferred; never assume public bootstrap listener or old CA trust",
+    "privateResolutionRequired": [
+      "CP private IPv4",
+      "four Linux private IPv4 values",
+      "exact authenticated host keys",
+      "operator account",
+      "existing separate issuer public trust",
+      "new namespace",
+      "exact image digest and inspection"
+    ],
+    "protectedExistingPorts": [
+      18082,
+      3000,
+      55448
+    ]
+  },
+  "settlementGate": {
+    "bareFinalizedAccepted": false,
+    "equalStaleNextIgnored": false,
+    "canonicalVerifier": "tools/lan_pilot.py:_verify_batch_archive plus deploy/lan/worker_leaf_rotation.py:verify_finalized_attestation plus deploy/lan/worker_plain_rotation.py:verify_settled (SF1)",
+    "fixtureProbe": "tests/test_fleet5_setup_packet.py; disposable temporary lifecycle and fixture channel store only",
+    "required": [
+      "Complete bounded catalog of every F5 batch, public output, original receipt, journal and archive; private paths, endpoint data and locks stay private",
+      "Exclude concurrent writers and take a current consistent snapshot with exact Node cohort, tenant/epoch, CA/keys/IPs, public files and enabled channel generations",
+      "Reject unsafe paths, symlinks, duplicates, unknown/missing/partial artifacts and any .next, including equal bytes; phase=finalized alone is insufficient",
+      "Verify canonical CP signed archive against exact original batch and switched/terminal journal bytes",
+      "Verify every distinct Node attestation through canonical proof validation, signed evidence, original byte-bound CP commit receipt and exact current Node journal/cert/final policy",
+      "Verify current unexpired CA chain, CP and every Node leaf, current keys/IPs/cohort, enabled channel versions/fingerprints/expiry/endpoint and final files",
+      "For every Node, canonical SF1 must bind the original immutable :3 Node archive/journal/original byte-bound CP receipt/current credential files and target, a NEW fresh nonce-bound Node-signed M2v2 final P+2/hash/DER observation, and the unchanged approved executable SHA256; stale/unsigned/v1/missing/wrong-cohort/changed-executable evidence is BLOCKED",
+      "Current/overlap/final peer generations are independent P/P+1/P+2; Node channel CAS is C+1. Original signed receipt/floor/archive raw bytes are verified without reserialization or fabricated old evidence",
+      "Only a separately authorized original verified finalize/retire replay may clean predecessor residue before successor preparation; this packet never removes or repairs evidence",
+      "Any uncertainty remains BLOCKED/UNKNOWN; absence of live F5 state never becomes zero counts or accepted settlement"
+    ]
+  },
+  "operatorSequence": [
+    "Root first obtains real final source delta review, combined source review and all eight exact-source workflows; job pass is distinct from operational axis acceptance",
+    "Require the actual exact-source all-eight run/job terminal evidence and independent combined review including new owned tests, new plain-v3 plan/builder path, complete five-module/tooling/image closure; component verdicts alone never accept this new candidate",
+    "Privately resolve five physical host identities and public schema inputs without rewriting historical inventory/pins; verify all five prerequisite receipts before a single new init",
+    "Review bounded per-host operator actions and explicit backup/rollback/UAC/sudo authority; no actions are executed by this packet",
+    "If later authorized, prove TCP18515 ingress CP-only on the exact source host and Docker backend before publication; no broad rules, flush or NOPASSWD ALL",
+    "Freshly re-prove ingress after reboot/firewall reload/runtime/network/order/hash change, including CP success, unauthorized Linux peer denial while listener is active, exact counters, current boot and rule identity; unknown history blocks resume",
+    "Initialize full fixed FIVE once using distinct namespace, retained reviewed issuer and exact candidate archive/image; four independent Linux workers use plain workspace profile with no shared storage policy/mount",
+    "Enroll/install/observe only after separate execution gates; no new Node, issuance, policy, workload, offer, database or listener exists by virtue of this plan",
+    "Perform physical load/failure/recovery/security/operations acceptance with actual evidence; colocated CP is excluded from independent S05/S07 claims"
+  ],
+  "preservation": {
+    "legacySource03AndR5": "unchanged; no executorB5, schedule, claim, lock, clock, pin, folder cleanup or original archive changes",
+    "frozenSource59fArchive": "unchanged; this is a separately named exact-source packet",
+    "task48": {
+      "done": 2,
+      "blocked": 4,
+      "planned": 42,
+      "ready": 0
+    },
+    "vfclAccepted": "0/5",
+    "sharedBoardsAndTaskRegistry": "root aggregates; this worker does not edit",
+    "obsidian": "no sync/apply by this worker"
+  },
+  "selectedPlainComponent": {
+    "source": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+    "codeReview": "2736aec1303ca6b6ed80bdc4aa6b9c23c3693985",
+    "scope": "PLAIN normal-v3 only; component CODE ACCEPT is separate from combined-source/packet review and physical acceptance",
+    "deliveryReportCommit": "3af3334ec7577f96b1d377164675e544504407ad",
+    "deliveryReportDocsRun": 42066623585,
+    "deliveryReportGate": "actual published remote SHA, docs-only product diff and exact head/all jobs SUCCESS independently verified before combined freeze"
+  },
+  "plainV3SourceContract": {
+    "rotationSchema": "saintvision-lan-leaf-rotation:3",
+    "batchSchema": "saintvision-lan-leaf-rotation-batch:3",
+    "signedFloorSchema": "saintvision-node-peer-policy-floor:2",
+    "signedNodeArchiveSchema": "saintvision-node-finalized-rotation:3",
+    "signedNodeAttestationSchema": "saintvision-node-finalized-attestation:3",
+    "signedCPArchiveSchema": "saintvision-lan-finalized-batch:3",
+    "workerModules": [
+      "worker_config.py",
+      "worker_leaf_rotation.py",
+      "peer_policy_phase.py",
+      "worker_peer_floor.py",
+      "worker_plain_rotation.py"
+    ],
+    "sourceImageRequirement": "Rebuild exact selected Go Node source with authenticated --observe-peer-policy-floor capability and approved executable provenance; an old image or unchanged Dockerfile digest is insufficient",
+    "legacyNormalSchemaInstallOrRollback": "REFUSED; do not reset any journal/floor or use this new plan on protected r5",
+    "afterStopBeforeFrozenFilesCopied": "BLOCKED; separate reviewed recovery required",
+    "restartedOrUnknownReentryPhase": "BLOCKED",
+    "boundedResume": "Only source-supported exact frozen publication same-container path with all fresh signed post-start acknowledgements; this plan executes none",
+    "bootstrapOrStorageBOrInventoryMigrationIncluded": false
+  },
+  "standaloneFixtureResultContract": {
+    "schemaVersion": "saintvision-leaf-rotation-standalone-lifecycle:3",
+    "fixtureOnly": true,
+    "actualGoAcceptanceAssessed": false,
+    "completedNormalCycles": 2,
+    "bytecodeCacheCount": 0,
+    "finalized": true,
+    "finalizedAttestationVerified": true,
+    "installRestartReceipt": true,
+    "restartCount": 4,
+    "rolledBack": false,
+    "rollbackRejected": true
+  },
+  "standaloneFixtureResultChecks": "exact11 keys/values,5 true identity,2 false identity,3 exact integer-not-bool/float checks; this result is synthetic fixture crypto/CLI interoperability, never actual Go or physical acceptance",
+  "operationalBindings": {
+    "approvedFiveHostInventory": null,
+    "candidateNodeImageDigest": null,
+    "sourcePairAuthorization": null,
+    "perNodeServingExecutableSHA256": null,
+    "actualF5Database": null,
+    "actualF5AuthorityAndMemberState": null,
+    "physicalAcceptanceReceipts": null
+  }
+}

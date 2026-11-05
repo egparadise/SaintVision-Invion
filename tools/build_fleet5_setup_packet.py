@@ -17,7 +17,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 TASK = "FLEET5-SETUP-INTEGRATION-20261105"
-PLAN = "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/setup-plan.json"
+PLAN = "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/setup-plan-plain-v3-candidate.json"
 
 
 def git(*args):

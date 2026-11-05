@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_ontology_generation.py"
+  ],
+  "startedAtKST": "2026-11-06T01:44:15.188273+09:00",
+  "finishedAtKST": "2026-11-06T01:44:24.417543+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "combined4f-ontology-generation.txt",
+  "sourceAtStart": "773e8523b6c7ca6d16fbe75d7ce55857675260ca",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

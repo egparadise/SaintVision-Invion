@@ -1,0 +1,85 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_fcd89694c5b7 / ctx_d0aa7908032b",
+  "reviewer": "Claude",
+  "author": "Codex (P0 owner ctx6f, ctx_6f0f8253b8a7)",
+  "observedWindowKST": ["2026-11-05T21:40:00+09:00", "2026-11-05T21:56:00+09:00"],
+  "earlyStatusMessage": "msg_c19e94fc184d",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+    "candidate": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+    "base": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+    "nonDocsDiff": {"files": 23, "insertions": 2450, "deletions": 360},
+    "readFrom": "Git objects; execution only in a temp worktree detached at 6c0f (removed); no author checkout read",
+    "priorF012ArchitectureVerdictAppliedToCode": false
+  },
+  "architectureConformanceObserved": {
+    "M1": "schema :3 exact keys; legacy :1/:2 install and rollback refused before mutation; legacy finalize only as replay of an already finalized record",
+    "M2": "Go ReadPeerPolicyFloor: openat no-follow walk, state dir 0700, .peer-policy/identity.json/peer-policy.json regular 0600 uid==dir uid nlink 1 size 1..65536 double-read stable, strict exact keys, canonical int <= 2^53-1, 64-hex hash == sha256(active peer-policy.json), version == policy version, scope; signed with domain 'saintvision/node-peer-policy-floor/v1\\x00' by Node TLS ed25519 key; PeerFloorServingProcess checks /proc uid, exe SameFile /proc/self/exe, exact --serve cmdline without recover/permit/storage-policy, profile set, no /contribution; Python worker_peer_floor requires exact name/volume/label, servingPID==1, before==after container/volume/consumers, docker exec by Id; peer_policy_phase.verify_floor checks exact keys, nonce, scope, cert fingerprint/SAN/EKU/validity, freshness -30..120s, ed25519 signature; no host mirror, no unsigned fallback, absent floor refused",
+    "M3": "independent P/P+1/P+2 and channel C+1, strict ints and overflow bound (owner test overflow fault)",
+    "M4": "validate_policy(before_write): expiry > now+630s and <= now+7d-30s, scope, version > floor, before the active write",
+    "M5": "durable record (installing, publicationIntent, peerPhaseBinding, prePeerFloor, targetContext) written before host files; rollback() always raises forward-only; docker_restart = stop, verify stopped, install_files(rotation_publication), start",
+    "M6": "post-restart observed floor == overlap with next DER; served DER not checked separately in production, but Go GetCertificate re-reads node-cert.pem/node-key.pem per handshake and copy happens while stopped, so file DER == served DER by construction (Info)",
+    "M7": "signed receipt carries pre and post floors; archive :3 and finalized journal carry peer fields; CP commit verified with control signature",
+    "M8": "_normal_floor_input/_plain_cp_floor bind CP-recorded node policy bytes hash and version P to the signed observation; batch preflight over all active members before journal or any mutation; per-member CAS kept; no broad atomic batch, no new CAS ladder",
+    "M9": "recovery batch and offline recovery install blocked by design",
+    "workspaceBackup": "second consumer allowed only as the exact Enable-Workspace backup (workspace-upgrade.json phase ready, previousId, backup name, upgradeId label, agentImage, not running, restart=no); no arbitrary container selection",
+    "genericHelperGuard": "rotation_mutation_guard O_EXCL leaf-rotation.lock (same as _exclusive); no_rotation_mutation blocks repair/workspace/execution/storage helpers when leaf-rotation.json, .next or leaf-rotation-finalized exists",
+    "standaloneClosure": {"workerModuleCount": 5, "hashesMatchBlobs": true, "prefix16": {"worker_config": "44662143b9d4095f", "worker_leaf_rotation": "1489ec11f47842b6", "peer_policy_phase": "7a60a59cfc8f839d", "worker_peer_floor": "406b8227b7330c3c", "worker_plain_rotation": "be31cd4866cbe900"}, "backendYml": "workerModuleCount 2 -> 5"}
+  },
+  "blocking": [
+    {
+      "id": "B1",
+      "severity": "BLOCK",
+      "surface": "M10 native Go two-cycle proof",
+      "fact": "Core 42028616559 at 6c0f failure at step 'FLEET5 fixed native Go two-cycle proof' with 'ValueError: mTLS heartbeat rejected'; later Core suites skipped",
+      "artifact": {"id": 13415121511, "sha256Prefix": "3d8e2bb0", "proofValid": false, "completedNormalCycles": 0, "floors": [7], "expiryBeforeWriteRejected": true, "floorCPMismatchRejected": true, "strictOldReaderRejected": true, "rollbackAfterHandshakePinRejected": false},
+      "cause": "6c0fc4ad:tests/proofs/run_fleet5_peer_phase_fixed_probe.py heartbeat() posts nonce base64(os.urandom(32)); NodeProbeInput contract requires ^[0-9a-f]{64}$ (proof fixture defect, not shown to be a product defect)",
+      "fix": "hex nonce (os.urandom(32).hex()), then rerun the exact dispatch to green with P7->11, C7->9 and all negatives true"
+    },
+    {
+      "id": "B2",
+      "severity": "BLOCK",
+      "surface": "2fb lifecycle guarantees re-proof on :3 (residue, retirement, successor, consecutive, archive)",
+      "fact": "at 6c0f the accepted 2fb lifecycle suites fail: test_lan_leaf_rotation 35 failed/6 passed; consecutive 42 failed/1 skipped; batch_successor 46 failed; predecessor_residue 2 failed; archive_residue 3 failed/7 passed/4 skipped; total 128 failed",
+      "causes": {"normalBatchRequiresSignedFloorFilesAndNonce": 67, "requiresFreshFloorNonce": 45, "legacyInstallBlocked": 9, "regexMismatch": 7},
+      "interpretation": "expected consequence of :3 contract, but tests were neither migrated to :3 fixtures nor replaced; no fixture skip/delete observed, but full Core would be red and residue/retirement/successor/consecutive are not re-proven on :3",
+      "fix": "migrate these suites to :3 with signed floor fixtures (keep every assertion), or add :3 equivalents; legacy-refusal cases stay as negatives"
+    }
+  ],
+  "findings": [
+    {"id": "F1", "severity": "Medium", "summary": "Backend typed checks: bd96479b is not an ancestor of 6c0f; 6c0f backend.yml only changes workerModuleCount; integration requires a field-wise merge keeping bd96 'is True' and 'type(x) is int' asserts plus the 5-module count"},
+    {"id": "F2", "severity": "Medium (liveness)", "summary": "no_rotation_mutation blocks repair/workspace/execution/storage helpers permanently after any finalized rotation because leaf-rotation.json persists; safe but over-broad; needs an explicit settled-finalized rule or documented operator path"},
+    {"id": "F3", "severity": "Medium (liveness)", "summary": "crash in docker_restart after copy but before start leaves the container stopped; observer requires running container -> BLOCKED; only recovery is an undocumented manual forward start"},
+    {"id": "F4", "severity": "Low", "summary": "Go observer requires floor hash == active hash, so active=overlap/floor=P is unobservable (only reachable while stopped); same reason makes :1-finalized nodes (floor != active) fail closed for the :1->:3 successor"},
+    {"id": "F5", "severity": "Info", "summary": "workspace-rolled-back node (two consumers, record phase rolled-back) blocked; fail-closed"},
+    {"id": "F6", "severity": "Info", "summary": "Go json.Marshal HTML-escapes <,>,& while Python ensure_ascii does not; non-ASCII or <>& in IDs makes signature verification fail closed"},
+    {"id": "F7", "severity": "Info", "summary": "batch preflight uses one shared nonce across members (bound per member by signature/scope; acceptable)"},
+    {"id": "F8", "severity": "Info", "summary": "_install_files(rotation_publication) parses with json.loads rather than the strict parser"}
+  ],
+  "ownRuns": {
+    "interpreter": "main .venv Python 3.14.7 -B",
+    "ownerFocused": {"files": 5, "result": "119 passed, 6 skipped (Windows symlink skips)"},
+    "v3SuiteTests": ["normal generator independent generations", "preparation refuses unknown floor x6 faults (nonce, signature, stale, cp-hash, overflow, expired-current)", "legacy install/rollback refused", "generic installer guard x6 states", "native fixed mode early gate", "mutation guard serializes with leaf writer, keeps stale lock"],
+    "legacyLifecycle": "128 failed (see B2)",
+    "native": "not run locally (no Go); hosted Core red",
+    "tempWorktree": "detached at 6c0f, removed after review"
+  },
+  "hosted": {
+    "core": {"run": 42028616559, "headSha": "6c0fc4ad", "conclusion": "failure", "countedAsSuccess": false},
+    "docs": {"run": 42028621267, "headSha": "6c0fc4ad", "conclusion": "success", "scope": "document gate only"},
+    "portalLogin": {"run": 42028578349, "conclusion": "success", "relevance": "unrelated"}
+  },
+  "verdict": "6c0fc4ad: code NOT ACCEPTED; REVISION REQUIRED (B1 native red, B2 lifecycle re-proof); architecture conformance observed for M1-M9 at source level only",
+  "goBlocker": "CONFIRMED native Go P0 remains open until a corrected candidate has native two-cycle green and :3 lifecycle re-proof",
+  "ci": "none accepted",
+  "physicalAcceptance": "none",
+  "outOfScope": "bootstrap G1-G10 plan (ctx_ceec); root disabled 3 old automations at 21:14 (not re-enabled, not verified by Claude)",
+  "historyEvidenceUntouched": "5023..6c0f changes no Claude History/Evidence",
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "goOrP0": 0, "privateRuntimeSchedule": 0, "physical": 0, "sharedBoardsObsidian": 0, "authorWorkspaceWrites": 0, "automations": 0},
+  "nextFirstAction": [
+    {"owner": "ctx_6f0f8253b8a7", "action": "fix probe hex nonce and rerun exact native dispatch; migrate the 128 legacy lifecycle tests to :3 without skips; field-wise merge bd96 typed checks; address F2/F3 operator paths"},
+    {"owner": "root", "action": "keep all-8/final archive/deploy HOLD; do not count Core 42028616559"},
+    {"owner": "Claude", "action": "review the corrected candidate delta at its exact SHA when assigned"}
+  ]
+}

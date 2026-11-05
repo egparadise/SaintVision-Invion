@@ -15,3 +15,5 @@ d073-lan-pilot-database-real-pg.xml -text -whitespace
 low-b1-b2-red-corrected-fixture.txt -text -whitespace
 low-b1-b2-green.txt -text -whitespace
 local500-own-migration-red.redacted.txt -text -whitespace
+combined4f-focused.txt -text -whitespace
+combined4f-route-isolated.txt -text -whitespace

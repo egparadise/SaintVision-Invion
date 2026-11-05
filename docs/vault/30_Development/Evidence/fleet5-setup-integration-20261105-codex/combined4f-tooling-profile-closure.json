@@ -1,0 +1,64 @@
+{
+  "scope": "selected4f public source/tooling/profile closure; independent combined review still required",
+  "selectedComponent": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "assemblyBase": "773e8523b6c7ca6d16fbe75d7ce55857675260ca",
+  "actualFivePinnedModules": [
+    {
+      "path": "deploy/lan/worker_config.py",
+      "bytes": 16855,
+      "sha256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "gitBlobSHA1": "e42f017ea011780ee2724866c3b11cdc087d7af6"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "bytes": 54096,
+      "sha256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "gitBlobSHA1": "2a03a3dd9445a51ffc1954a8878498ea51beab0b"
+    },
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "bytes": 10466,
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "gitBlobSHA1": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "bytes": 13159,
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "gitBlobSHA1": "b537809fb623ebc84dabc9f4b6a076948e1db3cc"
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "bytes": 25708,
+      "sha256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "gitBlobSHA1": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4"
+    }
+  ],
+  "currentActualPublicTooling": [
+    {
+      "path": "tools/lan_pilot.py",
+      "bytes": 198894,
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "gitBlobSHA1": "d8de953f7cd2f69f0e4915efccb24df352e7ea64"
+    },
+    {
+      "path": "deploy/lan/prepare-pilot-database.sh",
+      "bytes": 8430,
+      "sha256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+      "gitBlobSHA1": "a5695cab0a955d0aeeedf40f6459458ccef6210a"
+    }
+  ],
+  "allOtherCard150FieldsEqualTaskBase": true,
+  "historicalFieldsRepinned": false,
+  "storageWorkspaceGuard": {
+    "ASTEqualsAccepted17447988": true,
+    "storagePolicyOrUnsupportedMountUpgradeRejected": true,
+    "rollbackUsesLegacyValidateTarget": true,
+    "simultaneousComputeStorageImplemented": false,
+    "supportedBaseline": "four independent plain Linux workspace Nodes plus CP-colocated fifth; share inactive; no four-placement/physical assertion"
+  },
+  "builderDeltaFromAcceptedBd": "exactly PLAN constant to separately named new plain-v3 candidate plan; every B1 check unchanged",
+  "oldPlanWorkingBytesEqualGitAtBd": true,
+  "componentReportBeforeFreeze": "actual final report/exact Docs pending root relay; not inferred",
+  "operationalImageAndBinaryBindings": "null in nonexecuting plan; no old runtime capability inference or physical acceptance"
+}

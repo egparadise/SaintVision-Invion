@@ -1,0 +1,84 @@
+{
+  "scope": "current combined4f actual Backend caller; private copied-workflow negative controls only",
+  "assemblyBase": "0662b83fa57aa31f0f8fca1a4f1a27d2e2e92919",
+  "selectedComponent": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "actualResult": {
+    "baselineControlsPass": 12,
+    "weakeningsDetected": 12,
+    "survivors": 0
+  },
+  "controls": [
+    {
+      "field": "finalized",
+      "badValue": 1,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "finalizedAttestationVerified",
+      "badValue": 1,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "installRestartReceipt",
+      "badValue": 1,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "rollbackRejected",
+      "badValue": 1,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "fixtureOnly",
+      "badValue": 1,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "rolledBack",
+      "badValue": 0,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "actualGoAcceptanceAssessed",
+      "badValue": 0,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "restartCount",
+      "badValue": 4.0,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "bytecodeCacheCount",
+      "badValue": false,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "completedNormalCycles",
+      "badValue": 2.0,
+      "baseline": "rejects",
+      "weakening": "same owned test fails; detected"
+    },
+    {
+      "field": "missing-schema",
+      "baseline": "rejects",
+      "weakening": "detected"
+    },
+    {
+      "field": "extra-key",
+      "baseline": "rejects",
+      "weakening": "detected"
+    }
+  ],
+  "sourceWorkflowModified": false,
+  "CIOrNativeAcceptance": false
+}
