@@ -1,0 +1,40 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_ba13424828e2 / ctx_0141888e33d0",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T17:25:00+09:00", "2026-11-05T17:35:00+09:00"],
+  "reviewedRange": {"base": "84bbec6bcf06f88a2f226972982bfad68fef5848", "head": "864b49076c5aa4daa52419e04cb0e883e4df2163", "commits": 1},
+  "integrity": {
+    "prepareScriptBlobUnchanged": "a5695cab0a955d0aeeedf40f6459458ccef6210a",
+    "realPgTestBlobUnchanged": "232528b317af817462811d21f4249358ba378480",
+    "nonDocsChanged": ["tests/test_core_workflow_cx01.py (1 line: expected workflow literal len(cases) == 1 -> 2)"],
+    "githubDeployServicesToolsChanged": false,
+    "recomputedPrepareSHA256At864b": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+    "oldValuesMatch": {"sha256": "200c49a9f8a7b25132c8087206cfca55736db2ad5c68bbe39c21c7f5014c5551", "blob": "0a5572cb6206b89c2691c199513ffba9adf8556f", "equalsScriptAt": ["59f0a3c2", "5caa60df"]},
+    "card150StructuralDiffPaths": ["/source/toolGitBlobSHA1/deploy/lan/prepare-pilot-database.sh", "/source/toolSHA256/deploy/lan/prepare-pilot-database.sh"],
+    "historicalFieldsPreserved": true,
+    "copiedClaude84bbReviewBlob": {"value": "fd0ac85d86ad9cf914907a03e28171086c3ae197", "identicalToClaudeBranch": true}
+  },
+  "semantics": {
+    "toolMapIsCurrentHeadBinding": "tests/test_intranet_pki.py:219-235 asserts sha256(blob)==expected and HEAD:<path>==blob",
+    "historicalToolingCommitBlob": {"commit": "dea0a2b3", "prepareBlob": "bd4182742c09e187096a8b168c5760d17f0d821e", "equalsOldMapValue": false},
+    "precedentUpdates": ["18dbea2e", "6af107b8"],
+    "workflowGateAt864b": "core.yml:300-302 cases==2, no skipped, no failure/error (unchanged strictness)"
+  },
+  "ownRun": {"where": "temporary detached worktree at 864b, removed after", "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider", "files": ["tests/test_core_workflow_cx01.py", "tests/test_intranet_pki.py"], "result": "11 passed in 1.81s"},
+  "hosted": {
+    "docs": {"run": 41993283674, "head": "864b4907", "conclusion": "success"},
+    "core": {"run": 41993280120, "head": "864b4907", "status": "in_progress", "checkedAtKST": "2026-11-05T17:33:54+09:00", "countedAsSuccess": false},
+    "priorRepairedCore": {"run": 41987450905, "head": "84bbec6b", "conclusion": "failure", "counts": "8875 pass / 2 fail / 46 skip / 2 deselect", "retained": true}
+  },
+  "verdict": "ACCEPT (follow-up source and binding); hosted Core 41993280120 pending",
+  "lowFindings": ["Card150 test binds current HEAD tooling inside historical observation Evidence; consider splitting observation-time tooling from current-tooling binding so pinned-tool fixes do not require editing historical files (not required now)"],
+  "relayedRecordedNotJudged": ["CP plan 822 and guard 1744 accepted by root; guard e62a done; Core(1744) success", "S1 source worker ctx_4194506d5037 confirms two-cycle 7->8 then 8->9 blocked; fix pending", "physical mapping resolved by user; NewPC1 lacks CP pubkey/Docker; no accounts or keys guessed", "PC4 per-project storage folder/cap-drop probe by root; enrollment/init wait new source pin and operator date/P2"],
+  "currentTaskMutations": {"remote": 0, "device": 0, "runtime": 0, "admin": 0, "docker": 0, "localTempWorktree": "added and removed"},
+  "nextFirstAction": [
+    {"owner": "root", "action": "confirm Core 41993280120; on success accept 84bb repair and plan new source pin/archive revision (59f untouched)"},
+    {"owner": "Codex", "action": "if Core fails, classify only failing cases; optional Low"},
+    {"owner": "Claude", "action": "review new archive/packet hashes and S1 source fix when relayed"}
+  ]
+}
