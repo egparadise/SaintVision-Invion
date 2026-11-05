@@ -1,0 +1,24 @@
+{
+  "authorizedBy": "root reply msg_958ee1d13efe",
+  "recordedAtKST": "2026-11-05T19:28:07.946228+09:00",
+  "restored": [
+    {
+      "path": "docs/vault/30_Development/History/2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b_검토_Claude.md",
+      "sourceCommit": "d254fc6a511db108be351a3ba82645341748fea3",
+      "sourceBlob": "fd49e396bb34a1d2816dc60acedfe8d5928094c7",
+      "actualBlob": "fd49e396bb34a1d2816dc60acedfe8d5928094c7",
+      "sha256": "e590448c1ecb243d5ddbbef79604dd96dacb8955710d4c0cba55ffa4938ddac5",
+      "exactBytes": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/low-closure-af5b-review.json",
+      "sourceCommit": "d254fc6a511db108be351a3ba82645341748fea3",
+      "sourceBlob": "c67a39a78cb1839dc84d98a4331d3ed29d1be83d",
+      "actualBlob": "c67a39a78cb1839dc84d98a4331d3ed29d1be83d",
+      "sha256": "a402bceb2db7b354219cdb2b00d9665ffa4d8916848cdd5d3234bf643edf66c4",
+      "exactBytes": true
+    }
+  ],
+  "initialCheckDocsExit": 1,
+  "sharedBoardsChanged": false
+}

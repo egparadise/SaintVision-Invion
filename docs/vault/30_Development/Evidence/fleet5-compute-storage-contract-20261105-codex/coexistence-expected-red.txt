@@ -1,0 +1,6 @@
+﻿{
+  "scope": "synthetic-source-validator-only",
+  "expectedFailure": true,
+  "coexistenceSupported": false,
+  "rejectedByUnmodifiedSource": "Workspace upgrade does not support storage contribution; preserve this Node and use a separate plain Node for workspace acceptance"
+}

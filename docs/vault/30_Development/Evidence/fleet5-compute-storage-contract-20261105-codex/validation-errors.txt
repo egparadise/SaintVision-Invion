@@ -1,0 +1,16 @@
+2026-11-05 KST, FLEET5-COMPUTE-STORAGE-CONTRACT-20261105
+
+An initial Python -c metadata edit was rejected with SyntaxError/exit 1 because
+Windows PowerShell removed nested native argument quotes. No metadata write
+occurred and the shell stopped before gate execution. Corrected the timestamp
+using apply_patch; Git reflog fixes branch creation at 19:12:03+09:00.
+
+Required check_docs.py exited 1 on two existing History links to a missing
+2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b review page. The source files both
+exist in base 0bcf9670d098fac87667fc9e2448b332db46e691 (git cat-file exit 0).
+The target is absent in this checkout and root's latest vault. Exact Unicode
+paths and diagnostics are preserved in base-docs-blocker.json.
+
+The gate chain stopped; ontology/sync/other gates, commit, push and Docs CI
+were not attempted. No unrelated/shared page was repaired or silently skipped.
+Root must reconcile the missing combined documentation before publication.

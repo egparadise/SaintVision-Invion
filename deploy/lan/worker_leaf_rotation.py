@@ -574,6 +574,14 @@ def _finalized_evidence(
     )
 
 
+def _require_settled_archive(path: Path) -> None:
+    temporary = path.with_name(path.name + ".next")
+    if temporary.exists() or temporary.is_symlink():
+        raise ValueError(
+            "Predecessor staging residue requires exact predecessor finalize/retire replay"
+        )
+
+
 def _finalized_successor(
     worker_root: Path, journal: dict, validated: dict, *, now: datetime
 ) -> None:
@@ -583,7 +591,9 @@ def _finalized_successor(
     rotation_id = journal.get("rotationId")
     if not isinstance(rotation_id, str) or not re.fullmatch(r"[a-f0-9]{32}", rotation_id):
         raise ValueError("Finalized rotation identity differs")
-    archive_raw = _history_bytes(archive_dir / f"{rotation_id}.json")
+    archive_path = archive_dir / f"{rotation_id}.json"
+    _require_settled_archive(archive_path)
+    archive_raw = _history_bytes(archive_path)
     archive = json.loads(archive_raw)
     if (
         set(archive)

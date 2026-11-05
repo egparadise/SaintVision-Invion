@@ -1,0 +1,54 @@
+{
+  "taskId": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTaskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "baseProductionSourceSHA": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+  "implementationStatus": "not-started-pending-root-contract-decision",
+  "productionSourceChanged": false,
+  "localProofs": [
+    {
+      "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tests/proofs/fleet5_compute_storage_contract_probe.py --require-coexistence",
+      "exit": 1,
+      "expectedNonzero": true,
+      "meaning": "actual guarded source rejects legitimate storage fixture before workspace migration"
+    },
+    {
+      "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tests/proofs/fleet5_compute_storage_contract_probe.py",
+      "exit": 0,
+      "evidence": "current-contract-fixture.json"
+    },
+    {
+      "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B -m pytest -q tests/core/test_fleet5_compute_storage_contract_proof.py tests/core/test_lan_workspace_upgrade.py --junitxml=docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/fixture-tests.xml -p no:cacheprovider",
+      "exit": 0,
+      "passed": 34,
+      "scope": "fixture and existing guard tests; no Docker"
+    },
+    {
+      "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B -m pytest -q tests/core/test_fleet5_compute_storage_contract_proof.py --junitxml=docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/fixture-final.xml -p no:cacheprovider",
+      "exit": 0,
+      "passed": 1,
+      "scope": "final refined probe; overlaps preceding test count"
+    }
+  ],
+  "documentationGate": {
+    "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tools/check_docs.py",
+    "exit": 1,
+    "status": "blocked-by-preexisting-base-broken-links",
+    "evidence": "base-docs-blocker.json",
+    "ontologySyncAndOtherGates": "not-run-after-check-docs-failure"
+  },
+  "sourceDiffExit": 0,
+  "whitespaceDiffExit": 0,
+  "commit": "not-created-because-required-documentation-gate-failed",
+  "push": "not-attempted",
+  "docsCI": "not-dispatched",
+  "reportSHA": null,
+  "independentReview": "Claude-via-root-pending",
+  "operationalAcceptance": "not-performed",
+  "obsidianApply": "prohibited-by-dispatch",
+  "nextOwner": "root",
+  "nextAction": "Choose bounded preservation plus early renewal refusal (A), expanded compound renewal (B), or explicit deferral; resolve missing base documentation before normal publication gates",
+  "historicalSnapshot": true,
+  "supersededBy": "publication-stage-v1.json"
+}

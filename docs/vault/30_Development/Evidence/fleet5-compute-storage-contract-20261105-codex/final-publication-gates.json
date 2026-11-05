@@ -1,0 +1,87 @@
+[
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "exit": 0,
+    "log": "final-check-docs.txt",
+    "recordedAtKST": "2026-11-05T19:54:05.475420+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "exit": 0,
+    "log": "final-check-ontology.txt",
+    "recordedAtKST": "2026-11-05T19:54:07.529543+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "log": "final-sync-check.txt",
+    "recordedAtKST": "2026-11-05T19:54:11.964691+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_contract_bindings.py"
+    ],
+    "exit": 0,
+    "log": "final-check-contract-bindings.txt",
+    "recordedAtKST": "2026-11-05T19:54:19.281925+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_frontend_integrity.py"
+    ],
+    "exit": 0,
+    "log": "final-check-frontend-integrity.txt",
+    "recordedAtKST": "2026-11-05T19:54:19.800440+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "0bcf9670d098fac87667fc9e2448b332db46e691"
+    ],
+    "exit": 0,
+    "log": "final-path-citations.txt",
+    "recordedAtKST": "2026-11-05T19:54:23.483381+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "exit": 0,
+    "log": "final-single-source.txt",
+    "recordedAtKST": "2026-11-05T19:54:23.868095+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology_generation.py"
+    ],
+    "exit": 0,
+    "log": "final-ontology-generation.txt",
+    "recordedAtKST": "2026-11-05T19:54:25.440565+09:00"
+  }
+]

@@ -13,7 +13,8 @@ def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
     create = text.index("name: Create disposable CX01 PostgreSQL")
     migrations = text.index("name: Upgrade each published migration head")
     cleanup = text.index("name: Cleanup disposable CX01 PostgreSQL")
-    upload = text.index("uses: actions/upload-artifact@v4")
+    # Earlier opt-in diagnostic artifacts do not own the CX01 lifecycle.
+    upload = text.index("uses: actions/upload-artifact@v4", cleanup)
     assert create < migrations < cleanup < upload
 
     create_step = text[create:migrations]

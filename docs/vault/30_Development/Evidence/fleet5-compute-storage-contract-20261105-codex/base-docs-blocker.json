@@ -1,0 +1,22 @@
+{
+  "baseSourceSHA": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "checkDocsExit": 1,
+  "checkDocsStoppedLaterGates": true,
+  "brokenLinks": [
+    {
+      "source": "docs/vault/30_Development/History/2026-11-05_16-36-00_KST_FLEET5_DB_readiness_84bb_source검토_Claude.md",
+      "sourceExistsAtBaseExit": 0,
+      "target": "2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b_검토_Claude",
+      "targetPresentInThisCheckout": false,
+      "targetPresentInRootVault": false
+    },
+    {
+      "source": "docs/vault/30_Development/History/2026-11-05_18-40-00_KST_FLEET5_연속_leaf_rotation_8b53_검토_Claude.md",
+      "sourceExistsAtBaseExit": 0,
+      "target": "2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b_검토_Claude",
+      "targetPresentInThisCheckout": false,
+      "targetPresentInRootVault": false
+    }
+  ],
+  "remedy": "Root to restore missing combined documentation; no shared History edits authorized in this derivative"
+}

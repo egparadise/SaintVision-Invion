@@ -1,0 +1,14 @@
+{
+  "authorizationMessage": "msg_32fbfe98edd6",
+  "observedKST": "2026-11-05T19:13:27.608647+09:00",
+  "before": {
+    "sha256": "e1437600dad2231f40b24cb44d7c3edf1c147e42bc68d39dad2ebb0c9b51f574",
+    "gitBlobSHA1": "111922523062608efeb02f81de82f0b41a8189fe"
+  },
+  "after": {
+    "sha256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+    "gitBlobSHA1": "3d205d52a377b52163240b824c1e6a092346e867"
+  },
+  "onlyCurrentLanPilotPairChanged": true,
+  "allOtherFieldsExactlyEqual": true
+}

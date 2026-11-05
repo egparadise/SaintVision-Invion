@@ -1,0 +1,286 @@
+{
+  "lifecycleSourceSHA": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "checkoutBaseUnchanged": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "historicalRedProofRepinned": false,
+  "readVia": "git cat-file blob; no checkout or production edits",
+  "surfaces": [
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256GitBlob": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+      "anchors": [
+        {
+          "line": 41,
+          "text": "\"targetChannelVersion\","
+        },
+        {
+          "line": 202,
+          "text": "\"version\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 241,
+          "text": "or type(manifest[\"targetChannelVersion\"]) is not int"
+        },
+        {
+          "line": 242,
+          "text": "or manifest[\"targetChannelVersion\"] != manifest[\"currentChannelVersion\"] + 1"
+        },
+        {
+          "line": 465,
+          "text": "def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:"
+        },
+        {
+          "line": 510,
+          "text": "def _finalized_evidence("
+        },
+        {
+          "line": 521,
+          "text": "\"targetChannelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 538,
+          "text": "\"channelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 577,
+          "text": "def _require_settled_archive(path: Path) -> None:"
+        },
+        {
+          "line": 585,
+          "text": "def _finalized_successor("
+        },
+        {
+          "line": 633,
+          "text": "or old[\"targetChannelVersion\"] != new[\"currentChannelVersion\"]"
+        },
+        {
+          "line": 698,
+          "text": "\"channelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 789,
+          "text": "\"targetChannelVersion\": old_manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 803,
+          "text": "or new_manifest.get(\"currentChannelVersion\") != old_manifest[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 872,
+          "text": "\"targetChannelVersion\": candidate.get(\"targetChannelVersion\"),"
+        },
+        {
+          "line": 906,
+          "text": "\"targetChannelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 995,
+          "text": "\"channelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 1012,
+          "text": "or journal.get(\"targetChannelVersion\") != manifest[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 1019,
+          "text": "\"channelVersion\": manifest[\"targetChannelVersion\"],"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256GitBlob": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+      "anchors": [
+        {
+          "line": 1588,
+          "text": "\"targetChannelVersion\","
+        },
+        {
+          "line": 1600,
+          "text": "or row[\"targetChannelVersion\"] != row[\"currentChannelVersion\"] + 1"
+        },
+        {
+          "line": 1617,
+          "text": "or proposal[\"targetChannelVersion\"] != row[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 1751,
+          "text": "proposal[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 1817,
+          "text": "def _finalized_predecessor(path, state, journal, *, candidate=None):"
+        },
+        {
+          "line": 1841,
+          "text": "next_proposal[\"currentChannelVersion\"] != previous[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 1896,
+          "text": "def retire_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 2059,
+          "text": "\"targetChannelVersion\": target_version,"
+        },
+        {
+          "line": 2174,
+          "text": "\"targetChannelVersion\": target_version,"
+        },
+        {
+          "line": 2296,
+          "text": "old_manifest[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 2379,
+          "text": "old_manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 2425,
+          "text": "\"targetChannelVersion\": proposal[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 2634,
+          "text": "version = old_manifest[\"targetChannelVersion\"]"
+        },
+        {
+          "line": 2815,
+          "text": "\"targetChannelVersion\": proposal[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 2995,
+          "text": "\"targetChannelVersion\": proposal[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3250,
+          "text": "or manifest.get(\"targetChannelVersion\") != version + 1"
+        },
+        {
+          "line": 3266,
+          "text": "targetChannelVersion=manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3335,
+          "text": "\"targetChannelVersion\": target_version,"
+        },
+        {
+          "line": 3371,
+          "text": "targetChannelVersion=target_version,"
+        },
+        {
+          "line": 3390,
+          "text": "\"targetChannelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3429,
+          "text": "def stage_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3473,
+          "text": "manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3506,
+          "text": "def commit_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3528,
+          "text": "manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3572,
+          "text": "\"channelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3612,
+          "text": "\"targetChannelVersion\": manifest[\"targetChannelVersion\"],"
+        },
+        {
+          "line": 3669,
+          "text": "manifest[\"targetChannelVersion\"],"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256GitBlob": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+      "anchors": [
+        {
+          "line": 88,
+          "text": "authority, err := transport.NewAuthority(config, clientCA, peerPolicy, journal.PinPeerPolicy)"
+        },
+        {
+          "line": 99,
+          "text": "configured, err := transport.NewStorageSampler(config, storagePolicy, tlsConfig, journal.PinStoragePolicy)"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/trust.go",
+      "sha256GitBlob": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "anchors": [
+        {
+          "line": 49,
+          "text": "func NewAuthority(config node.Config, ca, policy string, pin func(int64, string) error) (*Authority, error) {"
+        },
+        {
+          "line": 85,
+          "text": "if err = a.pin(policy.Version, hex.EncodeToString(hash[:])); err != nil {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/runtime/journal.go",
+      "sha256GitBlob": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "anchors": [
+        {
+          "line": 339,
+          "text": "// PinPeerPolicy persists an anti-rollback floor separately from allocation fences."
+        },
+        {
+          "line": 341,
+          "text": "func (j *Journal) PinPeerPolicy(version int64, hash string) error {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/runtime/storage_policy.go",
+      "sha256GitBlob": "8a15937331502f5f94abc2e489d0f0c9cfe48473b857e6bd266218a69b8cb33f",
+      "anchors": [
+        {
+          "line": 31,
+          "text": "func (j *Journal) PinStoragePolicy(next StoragePolicyPin) error {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/storage.go",
+      "sha256GitBlob": "9bf91ac747df5e9ceb14ffa990d73e8384ddb024f1ecec66630f00d0c00e6e12",
+      "anchors": [
+        {
+          "line": 30,
+          "text": "func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config, pin func(node.StoragePolicyPin) error) (*ConfiguredStorage, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/storage/sample.go",
+      "sha256GitBlob": "296892a8a2b3a80c9146daf9922fe195a3c0808de81da08b8b11b28798f9a7c8",
+      "anchors": []
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "sha256GitBlob": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "anchors": []
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0005_node_channels.sql",
+      "sha256GitBlob": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+      "anchors": [
+        {
+          "line": 34,
+          "text": "OR NEW.version<>OLD.version+1 THEN"
+        }
+      ]
+    }
+  ]
+}
