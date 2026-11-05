@@ -1,0 +1,102 @@
+{
+ "commit": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
+ "logFilesInDir": 13,
+ "logsWithRecordedHash": 13,
+ "allRecordedHashesMatch": true,
+ "logsWithoutRecordedHash": [],
+ "perLog": {
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/key-delivery-grant-expected-red.log": [
+   {
+    "recordedIn": "key-delivery-grant-expected-red.json",
+    "match": true
+   },
+   {
+    "recordedIn": "proof-checks.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/rev3-fixtures.log": [
+   {
+    "recordedIn": "proof-checks.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/unchanged-r4-positive.log": [
+   {
+    "recordedIn": "proof-checks.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/unchanged-coexistence-expected-red.log": [
+   {
+    "recordedIn": "proof-checks.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/source-ledger-verification.log": [
+   {
+    "recordedIn": "proof-checks.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-1.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-2.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-3.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-4.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-5.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-6.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-7.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ],
+  "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-8.log": [
+   {
+    "recordedIn": "publication-gates.json",
+    "match": true
+   }
+  ]
+ },
+ "initialFixtureRed": {
+  "passed": 207,
+  "failed": 5
+ },
+ "initialFixtureRedFailedNames": [
+  "symbolic-chain-positive",
+  "token-120-positive",
+  "per-node-same-config-readmit",
+  "new-protected-generation-release-positive",
+  "raw-capability-positive-SYNTHETIC"
+ ]
+}

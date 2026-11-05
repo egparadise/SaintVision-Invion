@@ -1,0 +1,14 @@
+{
+  "interpreter": "Python 3.14.7 (shared .venv, read-only use), -I -B, one process at a time",
+  "workspace": "git archive of e9932f30 rev3 Evidence+History into private scratch; owner scripts run from a scratch copy; reviewer scripts read git objects only",
+  "runs": [
+    {"atKST": "2026-11-06T05:50:44+09:00", "command": "python -I -B census_audit.py <repo> <scratch>/callsite-locks.json", "exit": 0, "output": "census-result.json"},
+    {"atKST": "2026-11-06T05:55:04+09:00", "command": "python -I -B contract_fixtures.py (scratch copy of owner evidence dir)", "exit": 0, "output": "242 passed/0 failed; fixture-results.json and synthetic-positive-fixtures.json byte-identical to committed; stdout equals rev3-fixtures.log"},
+    {"atKST": "2026-11-06T05:55:05+09:00", "command": "GIT_DIR=<repo git dir> python -I -B verify_source_ledger.py (scratch copy)", "exit": 0, "output": "65 files/602 expressions/138 assets, 0 mismatches"},
+    {"atKST": "2026-11-06T05:55:36+09:00", "command": "python -I -B logs_audit.py <repo> e9932f306550a07e4893ab7a1a7dc6944b31e271", "exit": 0, "output": "logs-result.json: 13/13 recorded log hashes match; initial red 207/5 preserved"},
+    {"atKST": "2026-11-06T05:57:09+09:00", "command": "python -I -B adversarial.py <scratch copy of owner evidence dir>", "exit": 0, "output": "adversarial-result.json: 33 cases, 14 agree, 19 disagree"},
+    {"atKST": "between 05:57:09 and 05:58:31 KST (not individually timestamped)", "command": "python -B -c <owner 15823 grant check, verbatim from proof-checks.json>", "exit": 1, "expectedExit": 1, "output": "{\"missingExecuteGrants\": [\"b_record_key_delivery\"]}"},
+    {"atKST": "between 05:57:09 and 05:58:31 KST (not individually timestamped)", "command": "gh run view 42105739288 --json headSha,headBranch,event,workflowName,conclusion,jobs", "exit": 0, "output": "headSha e9932f30, workflow_dispatch, job 127519951449 docs=success"}
+  ],
+  "note": "Adversarial 'disagree' cases are contract-vs-model gaps (missing schemas/fixtures/inputs) at SCHEMA/STATIC/SYMBOLIC level, not runtime failures. The first adversarial run used a too-strict matrix rule for the revoked member and a non-reordering token probe; both were corrected before the recorded run (05:57:09)."
+}
