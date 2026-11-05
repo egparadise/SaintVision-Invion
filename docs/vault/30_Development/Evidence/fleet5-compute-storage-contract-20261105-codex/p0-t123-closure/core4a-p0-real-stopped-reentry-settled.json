@@ -1,0 +1,67 @@
+{
+  "scope": "owned-disposable-linux-docker",
+  "actualGo": true,
+  "actualDocker": true,
+  "phaseFloors": [
+    8,
+    9
+  ],
+  "sameContainerPreserved": true,
+  "originalArchivePreserved": true,
+  "reentry": {
+    "schemaVersion": "saintvision-peer-publication-reentry:1",
+    "rotationId": "cccccccccccccccccccccccccccccccc",
+    "phase": "overlap",
+    "startAttempted": true,
+    "containerId": "b1ce3742e189efbf6ae39a47583e2e865dc42ce2f8eab7d7ef820a97b560e36c",
+    "actualPeerFloor": {
+      "certificateDER_SHA256": "f685b4c2aeaa57d76fab7c295f5209cb00b7408a6b8377f06184998c05953604",
+      "floorSHA256": "a1798bdff00c4a097d3b0e97187425ef9c72eec11a25865d67b422cdded45e62",
+      "journalIdentitySHA256": "06d356ec3ad0a665ced06b406ef964161f68f2802c5e345a8f564542a009cae3",
+      "journalUID": 0,
+      "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+      "nodeSignature": "908f00f5067497936ac7f456915c443fa51ce9952be6f215ad97735f2663d356f3be8a4d79ffcfe779061d9baf05d74144511a24431abf5310fb72adb04dfd01",
+      "nonce": "f63dba18a3824afaaeed8173b34c0269b63376c602e14c5484b3059e77d8f348",
+      "observedAt": 1793890165,
+      "peerPolicySHA256": "0e3a530bb6083e62b495406787638ea31a331229c27c5556ec2aca1bde078b07",
+      "peerPolicyVersion": 8,
+      "plainServingProcess": true,
+      "recoveryEpoch": "11111111-1111-4111-8111-111111111111",
+      "schemaVersion": "saintvision-node-peer-policy-floor:2",
+      "servingExecutableSHA256": "6cfae915b0b75f9965e2aaf27cb5b2463c98f1c99a9cb73f5eaf9de8c1065bfe",
+      "servingPID": 1,
+      "servingProcessSHA256": "dbb5117e7557689056de883515b826eeb0ea9bfb1864279fddca831c672bd08f",
+      "tenantId": "22222222-2222-4222-8222-222222222222"
+    },
+    "acceptanceAssessed": false
+  },
+  "final": {
+    "schemaVersion": "saintvision-peer-publication-reentry:1",
+    "rotationId": "cccccccccccccccccccccccccccccccc",
+    "phase": "final",
+    "startAttempted": true,
+    "containerId": "b1ce3742e189efbf6ae39a47583e2e865dc42ce2f8eab7d7ef820a97b560e36c",
+    "actualPeerFloor": {
+      "certificateDER_SHA256": "f685b4c2aeaa57d76fab7c295f5209cb00b7408a6b8377f06184998c05953604",
+      "floorSHA256": "623257e39244c62434f925c0b7a95c82b6b66002879b1abb03c9f5b7aea03da0",
+      "journalIdentitySHA256": "06d356ec3ad0a665ced06b406ef964161f68f2802c5e345a8f564542a009cae3",
+      "journalUID": 0,
+      "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+      "nodeSignature": "2ebf05cd20c28d03484b482af8279af334e6709ebbc4f4921c8dd9aeb031fd95b3f57cd53f4d0057170c49535ab0dfcf05da4291ccd22175c924f9a693f4fd0d",
+      "nonce": "b3ba9737bcfe493aa4f5c32abc45513833e27e172d8b4eef9862fc74414f3dc0",
+      "observedAt": 1793890185,
+      "peerPolicySHA256": "f42d0dce528aaa5bf0c4244021c651707df5f0a6c442006110418b7772b8ff71",
+      "peerPolicyVersion": 9,
+      "plainServingProcess": true,
+      "recoveryEpoch": "11111111-1111-4111-8111-111111111111",
+      "schemaVersion": "saintvision-node-peer-policy-floor:2",
+      "servingExecutableSHA256": "6cfae915b0b75f9965e2aaf27cb5b2463c98f1c99a9cb73f5eaf9de8c1065bfe",
+      "servingPID": 1,
+      "servingProcessSHA256": "dbb5117e7557689056de883515b826eeb0ea9bfb1864279fddca831c672bd08f",
+      "tenantId": "22222222-2222-4222-8222-222222222222"
+    },
+    "acceptanceAssessed": false
+  },
+  "physicalAcceptanceAssessed": false,
+  "bootstrapConsumerClassImplemented": false
+}

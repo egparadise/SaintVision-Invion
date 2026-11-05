@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -71,6 +72,7 @@ if args[:3]==['exec',cid,'/inv-node'] and args[3]=='--observe-peer-policy-floor'
   floorSHA256=sha(canonical(dict(Version=s['version'],Hash=s['hash']))),journalIdentitySHA256=sha(canonical(dict(Tenant=meta['tenantId'],Node=meta['nodeId'],Epoch=meta['epoch']))),
   journalUID=0,servingPID=1,servingProcessSHA256=sha(b'SYNTHETIC CLI ARGV'),servingExecutableSHA256=sha(b'SYNTHETIC UNIT EXECUTABLE BYTES'),plainServingProcess=True)
  value['nodeSignature']=key.sign(b'saintvision/node-peer-policy-floor/v2\x00'+canonical(value)).hex()
+ if meta.get('invalidFixtureSignature') is True:value['nodeSignature']='0'*128
  print(json.dumps(value));sys.exit(0)
 sys.exit(2)
 '''
@@ -96,7 +98,8 @@ def validate_result(value):
 
 
 def main():
-    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--runtime-dir',type=Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--runtime-dir',type=Path,required=True)
+    parser.add_argument('--settled-proof-output',type=Path,required=True);args=parser.parse_args()
     if sys.platform!='linux' or os.environ.get('GITHUB_ACTIONS')!='true':
         raise ValueError('Installed CLI fixture PKI proof is restricted to isolated Linux CI')
     sys.path[:0]=[str(ROOT/'tests'),str(ROOT/'tools'),str(ROOT/'deploy/lan')]
@@ -150,6 +153,9 @@ def main():
             for archived,body in archives.items():assert archived.read_bytes()==body
             archive=fixture.worker/'leaf-rotation-finalized'/(manifest['rotationId']+'.json');archives[archive]=archive.read_bytes()
             current_control=x509.load_pem_x509_certificate(files['control-cert.pem'])
+        spec=importlib.util.spec_from_file_location('fleet5_owned_pinned_fixture',ROOT/'tests/proofs/fleet5_settled_pinned_fixture.py')
+        pinned_fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(pinned_fixture)
+        pinned_fixture.prove_default_settled(temporary,args.runtime_dir,fixture.worker,daemon,env,args.settled_proof_output)
         result=validate_result(dict(schemaVersion='saintvision-leaf-rotation-standalone-lifecycle:3',fixtureOnly=True,actualGoAcceptanceAssessed=False,
             completedNormalCycles=2,installRestartReceipt=True,finalized=True,finalizedAttestationVerified=True,rollbackRejected=True,rolledBack=False,
             restartCount=json.loads((daemon/'status.json').read_bytes())['count'],bytecodeCacheCount=len(list(args.runtime_dir.rglob('__pycache__')))))

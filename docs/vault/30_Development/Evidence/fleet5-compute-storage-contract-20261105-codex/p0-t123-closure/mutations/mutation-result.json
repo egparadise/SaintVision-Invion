@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "fleet5-t1-t2-guard-mutations:1",
+  "fixtureOnly": true,
+  "productionSourceModified": false,
+  "actualGoDockerAcceptanceAssessed": false,
+  "recordedAtUTC": "2026-11-05T15:28:59.191563+00:00",
+  "originalSourceSHA256": {
+    "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+    "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c"
+  },
+  "baseline": {
+    "name": "baseline",
+    "exitCode": 0,
+    "total": 13,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failingCases": [],
+    "log": "baseline.log",
+    "logSHA256": "e3fde66c600453cf1c36e72d74d8493f0f54eef913ea97cadfafb495f3490b1a"
+  },
+  "mutants": [
+    {
+      "name": "rs1-no-post-ack-match",
+      "exitCode": 1,
+      "total": 13,
+      "failed": 3,
+      "errors": 0,
+      "skipped": 0,
+      "failingCases": [
+        "test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[phase]",
+        "test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[hash]",
+        "test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[executable]"
+      ],
+      "log": "rs1-no-post-ack-match.log",
+      "logSHA256": "221b31276934c68d022bc41a1f4df5d3886b7d4ddcce54b54e9ba15c903b3b2e",
+      "source": "worker_plain_rotation.py",
+      "mutatedSourceSHA256": "ce3d75001f1c114c82b98361d22506e49dbb122cbbe524af59b380be9be7374d",
+      "expectedKilledTest": "test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack",
+      "killed": true
+    },
+    {
+      "name": "rs1-skip-stopped-reread",
+      "exitCode": 1,
+      "total": 13,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0,
+      "failingCases": [
+        "test_rs1_rechecks_stopped_volume_and_context_before_any_start[volume]",
+        "test_rs1_rechecks_stopped_volume_and_context_before_any_start[context]"
+      ],
+      "log": "rs1-skip-stopped-reread.log",
+      "logSHA256": "123b88c18d30a89a4ac35790cd6772329399f324110a5a51ffad3e8d8e27c861",
+      "source": "worker_plain_rotation.py",
+      "mutatedSourceSHA256": "323fdece9104ac947e6400f999994c039e7cfbbf838005075776b2be1fd6462d",
+      "expectedKilledTest": "test_rs1_rechecks_stopped_volume_and_context_before_any_start",
+      "killed": true
+    },
+    {
+      "name": "rs1-allow-current-in-final",
+      "exitCode": 1,
+      "total": 13,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failingCases": [
+        "test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor[current]"
+      ],
+      "log": "rs1-allow-current-in-final.log",
+      "logSHA256": "5596b5e375512125aabd15d9e3da57755caf1887935f9d413a0d1a4a3032c396",
+      "source": "worker_plain_rotation.py",
+      "mutatedSourceSHA256": "b554905e844288b938731b598065996f9fa1ce9cd97084a29670c20e91956011",
+      "expectedKilledTest": "test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor",
+      "killed": true
+    },
+    {
+      "name": "guard-no-post-recheck",
+      "exitCode": 1,
+      "total": 13,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failingCases": [
+        "test_generic_guard_rechecks_settled_state_after_operation_and_never_restores"
+      ],
+      "log": "guard-no-post-recheck.log",
+      "logSHA256": "c7e60610b2e62e4c4b7b88f6b6f48ed8c124d010a5bd04dc46ca9feaa5ad517a",
+      "source": "worker_config.py",
+      "mutatedSourceSHA256": "b85952ebed52780f4ff0b0998f0b7c37c4e53f693a95b93fd352840914cb6598",
+      "expectedKilledTest": "test_generic_guard_rechecks_settled_state_after_operation_and_never_restores",
+      "killed": true
+    },
+    {
+      "name": "exec-field-optional",
+      "exitCode": 1,
+      "total": 13,
+      "failed": 4,
+      "errors": 0,
+      "skipped": 0,
+      "failingCases": [
+        "test_signed_malformed_executable_digest_is_rejected_independently[gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg]",
+        "test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]",
+        "test_signed_malformed_executable_digest_is_rejected_independently[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]",
+        "test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"
+      ],
+      "log": "exec-field-optional.log",
+      "logSHA256": "1d280f438539d3f03c5754e5df76ce2e453eb5c378a1933414ff672ee16bec5f",
+      "source": "peer_policy_phase.py",
+      "mutatedSourceSHA256": "8ec5381db495f5d737982ee88a4f2a1f9b2f78c3c0aeba39d6e4cb3d4da089bf",
+      "expectedKilledTest": "test_signed_malformed_executable_digest_is_rejected_independently",
+      "killed": true
+    }
+  ],
+  "proofValid": true
+}

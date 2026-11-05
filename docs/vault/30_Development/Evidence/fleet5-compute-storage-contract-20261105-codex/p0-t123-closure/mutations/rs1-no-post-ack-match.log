@@ -1,0 +1,22 @@
+FFF..........                                                            [100%]
+================================== FAILURES ===================================
+_____ test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[phase] _____
+tests\test_fleet5_reentry_guard_negatives.py:34: in test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack
+    with pytest.raises(ValueError,match='phase|executable'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_____ test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[hash] ______
+tests\test_fleet5_reentry_guard_negatives.py:34: in test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack
+    with pytest.raises(ValueError,match='phase|executable'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+__ test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[executable] ___
+tests\test_fleet5_reentry_guard_negatives.py:34: in test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack
+    with pytest.raises(ValueError,match='phase|executable'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[phase]
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[hash]
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack[executable]
+3 failed, 10 passed in 3.05s

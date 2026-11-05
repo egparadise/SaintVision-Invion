@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "fleet5-t123-review-closure:1",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude delta review via root pending",
+  "recordedAtKST": "2026-11-06T00:43:09+09:00",
+  "baseSHA": "46b4573f2b333dfbb3d37f695c19df9ae805a364",
+  "runtimeSourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "actualOriginalReviewSHA": "8baaa6b568f1e467a76272faa6d7f2084545c525",
+  "actualOriginalVerdict": "NOT ACCEPTED: CI-B1/C2-V1/T1/T2/T3 require closure; no runtime correctness defect found in reviewed source",
+  "rootDirection": [
+    "msg_620855c76519",
+    "msg_70add7c29003"
+  ],
+  "t1t2": {
+    "baselinePassed": 13,
+    "specifiedMutantsKilled": 5,
+    "driverExit": 0,
+    "errors": 0,
+    "skips": 0,
+    "productionOriginalsUnchanged": true,
+    "proof": "mutations/mutation-result.json"
+  },
+  "t3": {
+    "defaultDispatchFramingUnits": "local green; supplemental only",
+    "actualInstalledDefaultPinnedCrypto": "PENDING new exact-head Backend CI",
+    "defaultVerifierCallbackBypassImplemented": false,
+    "realGoDockerAcceptanceClaimed": false,
+    "hostPackageInstallation": false
+  },
+  "unchangedOriginalInventorySurfaces": [
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8"
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "sha256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec"
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "sha256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998"
+    },
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "sha256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1"
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "sha256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f"
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "sha256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665"
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    {
+      "path": "tools/lan_workspace.py",
+      "sha256": "c767f4e9f96a8f174e8bc2f7ead9558101a9f1faf2e414a2e2a93922c276ebb3"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "sha256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "sha256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical.go",
+      "sha256": "5b7731eb0d499f12b130830b5c2fe2553d5c3b18886907e74db9ca923cea0661"
+    },
+    {
+      "path": "tests/proofs/run_fleet5_peer_phase_fixed_probe.py",
+      "sha256": "d0c0e64657b4d9d9e4eaf9695ef326d4e92b5c184b673b04841ae4f87c0e8ccb"
+    },
+    {
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "sha256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba"
+    }
+  ],
+  "changedFixtureProducerAndWorkflowOnly": [
+    "tools/check_leaf_rotation_standalone_lifecycle.py",
+    ".github/workflows/backend.yml"
+  ],
+  "core4aTerminal": {
+    "runId": 42047390811,
+    "jobId": 127313967305,
+    "conclusion": "failure",
+    "failed": 5,
+    "passed": 9075,
+    "skipped": 46,
+    "deselected": 2,
+    "installerCases": 17,
+    "installerFailures": 0,
+    "installerSkips": 0,
+    "artifactId": 13427633755,
+    "artifactZipSHA256": "82685c759b9fd997c406dc64edd4335001294ba3247a7599f3e46d0593137fd1",
+    "rawApiJobLogSHA256": "ca391e6c017168a7962f4be1d7e6697a3bfa5f53bab044e72ca67d48d8debe38",
+    "defaultPinnedVerifierPathAssessedByOldDockerFixture": false
+  },
+  "correction": {
+    "incorrectHistorySHA": "46b4573f2b333dfbb3d37f695c19df9ae805a364",
+    "incorrectStatement": "Neither 4a Backend matrix reached installed standalone verification",
+    "actualTerminalJobsApi": "Both Exercise the pinned venvless leaf-rotation runtime steps SUCCESS; 3.12 standalone guard mutations SUCCESS; 3.14 mutation step expected SKIP; later Tests failed5 in both",
+    "reportedToRoot": "msg_f665968bb86c"
+  },
+  "beforeCopyRecoveryImplemented": false,
+  "restartedPhaseReentryImplemented": false,
+  "wholeRecoveryAcceptance": false,
+  "fullCompoundBImplemented": false,
+  "bootstrapConsumerClassImplemented": false,
+  "physicalAcceptance": false,
+  "codeAcceptance": false,
+  "localFinalRelevantSuites": {
+    "passed": 338,
+    "existingWindowsPlatformSkips": 20,
+    "exit": 0,
+    "suiteFiles": 17,
+    "interpreter": "main repository .venv Python3.14.7 -B",
+    "gates": "local-final-gates.json; all eight checks exit0"
+  },
+  "backend46Terminal": {
+    "runId": 42053207929,
+    "conclusion": "success",
+    "python312": "success",
+    "python314": "success",
+    "mlflow": "success"
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "fleet5-t123-test-source-surface:1",
+  "recordedAtKST": "2026-11-06T00:48:08.130652+09:00",
+  "baseSHA": "46b4573f2b333dfbb3d37f695c19df9ae805a364",
+  "scope": "Test fixtures and CI proof only; production14 runtime interfaces unchanged",
+  "surfaces": [
+    {
+      "path": "tests/test_fleet5_plain_reentry.py",
+      "sha256": "53b54781df5263340c6eaa8801848b4d84174bcdcfc60385dd9300e56a2a3003",
+      "gitBlobSHA1": "009b03ad17a57f1581f357976f259aa23adc7faf",
+      "anchors": [
+        {
+          "line": 21,
+          "text": "def finish(f, tmp_path):"
+        },
+        {
+          "line": 30,
+          "text": "def snapshot(root):"
+        },
+        {
+          "line": 34,
+          "text": "def stopped_fixture(tmp_path,monkeypatch,phase_name='overlap'):"
+        },
+        {
+          "line": 83,
+          "text": "def test_rs1_same_cid_start_requires_fresh_expected_ack_and_running_retry_does_not_start(tmp_path,monkeypatch,name):"
+        },
+        {
+          "line": 95,
+          "text": "def test_rs1_unknown_or_old_state_never_starts_or_edits_journal(tmp_path,monkeypatch,fault):"
+        },
+        {
+          "line": 113,
+          "text": "def test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression(tmp_path,monkeypatch,kind):"
+        },
+        {
+          "line": 138,
+          "text": "def test_sf1_read_only_verifier_and_idempotent_guard_preserve_original_archive(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 151,
+          "text": "def test_sf1_refuses_even_equal_staging_residue_without_deleting_it(tmp_path,monkeypatch):"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_fleet5_reentry_guard_negatives.py",
+      "sha256": "79df4b0e69a087beea653086e76c89bf39f40eb7e525db08b8070bd5e88a0352",
+      "gitBlobSHA1": "1a266720803ee2c0c27086f633b1154a705b10d8",
+      "anchors": [
+        {
+          "line": 15,
+          "text": "def test_rs1_rejects_fresh_correctly_signed_wrong_post_start_ack(tmp_path,monkeypatch,fault):"
+        },
+        {
+          "line": 42,
+          "text": "def test_rs1_rechecks_stopped_volume_and_context_before_any_start(tmp_path,monkeypatch,fault):"
+        },
+        {
+          "line": 62,
+          "text": "def test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor(tmp_path,monkeypatch,floor_phase):"
+        },
+        {
+          "line": 77,
+          "text": "def test_generic_guard_rechecks_settled_state_after_operation_and_never_restores(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 90,
+          "text": "def test_signed_malformed_executable_digest_is_rejected_independently(tmp_path,malformed):"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_fleet5_settled_launcher.py",
+      "sha256": "f2b3d80d249a2a31ed2193b7f5968fb875f7d3d9d05fae9be299d00917b94635",
+      "gitBlobSHA1": "3c2c20cc1f5dadc7d2dde14e4d85adb2c645e51b",
+      "anchors": [
+        {
+          "line": 17,
+          "text": "def test_ci_pinned_fixture_refuses_non_ci_execution_before_writes(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 28,
+          "text": "def test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed(tmp_path,monkeypatch,fault):"
+        }
+      ]
+    },
+    {
+      "path": "tests/proofs/run_fleet5_reentry_guard_mutations.py",
+      "sha256": "1b7f1c8f434dbada080b3c7b24e2c2ceb053cccf359a422517e3fe5ebd44fda8",
+      "gitBlobSHA1": "84c1965bdc985a6d0f85a0908e1932ed3a8ddb56",
+      "anchors": [
+        {
+          "line": 40,
+          "text": "def digest(raw):return hashlib.sha256(raw).hexdigest()"
+        },
+        {
+          "line": 43,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tests/proofs/fleet5_settled_pinned_fixture.py",
+      "sha256": "1e39c3f4debb76b7478905cbe2fe6c5b23e09c6e657eeceea6024c931acb1c3b",
+      "gitBlobSHA1": "98465be51745fa01df88aee86ef3cd7c6a83521a",
+      "anchors": [
+        {
+          "line": 36,
+          "text": "def _snapshot(root):"
+        },
+        {
+          "line": 40,
+          "text": "def prove_default_settled(temporary,runtime,worker,daemon,environment,output):"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+      "sha256": "f7a4afaa6f7bb5b814a05dfbd82700bfab34fe2bed80c6f72783686a88da278d",
+      "gitBlobSHA1": "a0db02175f62aecb1b4efd1b338201dda356b327",
+      "anchors": [
+        {
+          "line": 34,
+          "text": "def status():return json.loads((root/'status.json').read_bytes())"
+        },
+        {
+          "line": 35,
+          "text": "def put(value):(root/'status.json').write_bytes(canonical(value))"
+        },
+        {
+          "line": 36,
+          "text": "def inspected():"
+        },
+        {
+          "line": 81,
+          "text": "def _run(runtime,arguments,env,*,rejected=False):"
+        },
+        {
+          "line": 91,
+          "text": "def validate_result(value):"
+        },
+        {
+          "line": 100,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/backend.yml",
+      "sha256": "9dce4c1b17991aa4e6c8e29b1e42f8a24efc9b1548b4e49b19a45802f38d7e56",
+      "gitBlobSHA1": "5f095baf6b95c84a7175d5fd5d0c7cb07ef4a067",
+      "anchors": [
+        {
+          "line": 197,
+          "text": "- name: Kill FLEET5 RS1/SF1 guard mutations"
+        },
+        {
+          "line": 201,
+          "text": "- name: Publish FLEET5 installed pinned verifier and mutation proof"
+        }
+      ]
+    }
+  ]
+}
