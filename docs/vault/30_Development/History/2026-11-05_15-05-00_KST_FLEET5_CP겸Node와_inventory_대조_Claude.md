@@ -6,7 +6,7 @@ status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T15:25:00+09:00"
+updated: "2026-11-05T15:22:10+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9b9061ed"
@@ -20,7 +20,7 @@ tags: ["fleet5", "five-node", "control-plane", "co-location", "inventory", "dock
 
 - base `9b9061ed`(부모 coordinator branch와 같은 tip), product source `59f0a3c2`, report `f020a664`.
 - 읽은 문서: AGENTS.md, INDEX-PROGRESS-001 v1.0.393, WORKBOARD-CLAUDE-001 v1.2.126, GUIDE v1.1.0, ADR 정정 v1.37.0, GOV-AGENT-001 v1.1.3, GOV-GIT-001 v1.1.4, 연속 실행 정책 v1.1.0, agent-delivery 1.1.0, [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]] v1.0.0, `deploy/lan/README.md`, `tools/five_node_lab_preflight.py`, `tools/s01_readiness_preflight.py`.
-- 관측 시각: 2026-11-05 14:40~15:05 KST, Windows PowerShell 5.1과 Git Bash. 기계 판독용 결과는 `Evidence/fleet5-20261105-claude/cp-inventory-readiness.json`이다. 원래 주소·hostname·컴퓨터 이름은 비공개 `.work/fleet5-20261105-claude/cp-inventory-private.json`에만 있다(sha256 `a7fe8615…712e`).
+- 관측 시각: 2026-11-05 14:40~14:56 KST(v1.0.1 정정: 파일명의 15-05는 표지일 뿐 관측 시각이 아니다), Windows PowerShell 5.1과 Git Bash. 기계 판독용 결과는 `Evidence/fleet5-20261105-claude/cp-inventory-readiness.json`이다. 원래 주소·hostname·컴퓨터 이름은 비공개 `.work/fleet5-20261105-claude/cp-inventory-private.json`에만 있다(sha256 `a7fe8615…712e`).
 
 ## 1. inventory 대조
 

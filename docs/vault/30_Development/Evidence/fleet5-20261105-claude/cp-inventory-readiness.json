@@ -4,7 +4,7 @@
   "owner": "Claude",
   "reviewer": "Codex root",
   "mode": "read-only discovery and plan; no live mutation",
-  "observedWindowKST": ["2026-11-05T14:40:00+09:00", "2026-11-05T15:05:00+09:00"],
+  "observedWindowKST": ["2026-11-05T14:40:00+09:00", "2026-11-05T14:56:33+09:00"],
   "baseSHA": "9b9061ed1b7bbc5b91ea2a035ea2a54fac6f010f",
   "productSource": "59f0a3c2",
   "parentReport": "f020a664",
