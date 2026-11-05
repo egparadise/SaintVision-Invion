@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "fleet5-low-token-mutations:1",
+  "baseSourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "mainFrozenReportSHA": "3af3334ec7577f96b1d377164675e544504407ad",
+  "scope": "Provisional test-only L-T3-1/L-T3-2; no whole Core rerun or CI reassignment",
+  "productionSourceModified": false,
+  "variants": [
+    {
+      "name": "baseline",
+      "exitCode": 0,
+      "executed": 10,
+      "failed": [],
+      "errors": 0,
+      "skipped": 0,
+      "logSHA256": "8e60b4b04a28d5892fb2318f93b506859760d530ca5384838a182ba3165ea36c"
+    },
+    {
+      "name": "remove-stdout-bound",
+      "exitCode": 1,
+      "executed": 10,
+      "failed": [
+        "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[oversize]"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "logSHA256": "720e94495ab3ffbfffa84811dcf1bbb3df42cffc814569f1c94831fdf0478981",
+      "killed": true
+    },
+    {
+      "name": "strict-json-to-json-loads",
+      "exitCode": 1,
+      "executed": 10,
+      "failed": [
+        "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[duplicate]"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "logSHA256": "6a438c21ac3c57aedc39790d67a2ee316ba8d2f3628cc81ed04a94edc79dfa32",
+      "killed": true
+    }
+  ],
+  "proofValid": true,
+  "productionSourceSHA256": {
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+    "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+    "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665"
+  },
+  "taskId": "task_a8fd2969f0b3",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude Low-delta review pending via root",
+  "recordedAtKST": "2026-11-06T01:43:00+09:00",
+  "branch": "agent/codex/fleet5-p0-low-token-tests-20261106",
+  "productionRuntimeChanged": false,
+  "patchFullCI": "NOT RUN; source4f CI not reassigned; final combined CI owns collection",
+  "focusTests": {
+    "command": "main .venv Python3.14.7 -B -m pytest -q tests/test_fleet5_settled_launcher.py --tb=short -p no:cacheprovider",
+    "passed": 11,
+    "skipped": 0,
+    "exit": 0
+  },
+  "mutantConstruction": {
+    "remove-stdout-bound": "remove exactly the 0 < len(stdout) <= 65536 rejection block from an owned worker_config.py copy",
+    "strict-json-to-json-loads": "replace only value = strict_json(result.stdout) with value = json.loads(result.stdout) in an owned copy",
+    "childHarness": "Preload actual test_fleet5_settled_launcher, replace only its ROOT with a disposable tree containing the owned config/launcher/entry copies; pytest only its ten default-dispatch cases; originals never modified"
+  }
+}

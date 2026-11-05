@@ -1,0 +1,9 @@
+.......F..                                                               [100%]
+================================== FAILURES ===================================
+_ test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[duplicate] _
+tests\test_fleet5_settled_launcher.py:68: in test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed
+    pytest.fail('Invalid default verifier dispatch admitted an operation')
+E   Failed: Invalid default verifier dispatch admitted an operation
+=========================== short test summary info ===========================
+FAILED tests/test_fleet5_settled_launcher.py::test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[duplicate]
+1 failed, 9 passed in 3.26s

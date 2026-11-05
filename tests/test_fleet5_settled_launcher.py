@@ -52,8 +52,9 @@ def test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed(tmp_pa
         if fault=='unverified':value['verified']=False
         raw=json.dumps(value).encode()
         if fault=='empty':raw=b''
-        if fault=='oversize':raw=b'x'*65537
-        if fault=='duplicate':raw=b'{"verified":true,"verified":true}'
+        if fault=='oversize':raw=b' '*65537+raw  # valid JSON; only the byte bound rejects it
+        if fault=='duplicate':raw=raw[:-1]+b',"verified":true}'  # otherwise exact valid token
+        if fault in ('oversize','duplicate'):assert json.loads(raw)==value
         return subprocess.CompletedProcess(command,0,stdout=raw,stderr=b'')
     monkeypatch.setattr(module.subprocess,'run',invoke)
     before=snapshot(f.worker)
