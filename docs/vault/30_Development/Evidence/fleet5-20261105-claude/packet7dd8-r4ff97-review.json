@@ -1,0 +1,101 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_5fd9ea4e3779 / ctx_ac008a621cfe (coordinator relay: corrected packet 7dd8fa95, R4 source ff97cd9e, supplement 6cbb2b98)",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T15:43:09+09:00", "2026-11-05T15:53:00+09:00"],
+  "correctionToPriorReport": {
+    "priorCommit": "300f4bca",
+    "wrongStatement": "engine restart stops 7 other-product running containers including clinical Saintview",
+    "measuredFact": "running other-product containers = coco-annotator 2 + saint-control 5; saintview running 0 / exited 3 (cp-inventory-readiness.json); plus 1 running old node1 pilot DB carrying project label",
+    "priorEvidenceOverwritten": false,
+    "noDownloadScopeNote": "prior no-download was that task's scope, not a user prohibition or new blanket approval requirement"
+  },
+  "packet": {
+    "commit": "7dd8fa95cd1683780b2b1c713366290e9aeb180c",
+    "integrity": {
+      "publicPlanSHA256": {"value": "5121cb834016ebf86fd7433bcca3c3c89446374965a05f71a069158afe44d35f", "matched": true},
+      "privateVectorsSHA256": {"value": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7", "matched": true},
+      "privateParametersSHA256": {"value": "a806685a72b3ad6c5f43206d4f2619309d2f76403a3db7fe0b574b44aba04984", "matched": true},
+      "sourceArchive59fUnchanged": true,
+      "capProbeDockerfileSHA256": {"value": "f9f6424c6bde6cdd92357975ac9dd020f9c4fb44e27de84107ac97e3c4574c1f", "matched": true},
+      "vectorSteps": 13,
+      "vectorStepsExecuted": 0
+    },
+    "findings": [
+      {"id": "P1", "planStatus": "RESOLVED", "evidence": "init-node-mtls exists at 59f (root 3650d, intermediate 1095d); init/enroll/renewal pass --ca-key/--ca-key-password-file/--ca-chain; ensure_pilot_pki sets external-intermediate, refuses key copy and chain mismatch; no self-signed fallback", "executionCheckpoint": "generated hashes/NotAfter; root key encrypted in online CA dir (rootOffline=false acknowledged)"},
+      {"id": "P2", "planStatus": "VECTORS_RESOLVED", "installStatus": "BLOCKED", "evidence": "DOCKER-USER RETURN/REJECT scoped by --ctorigdst Node IP and --ctorigdstport 18515, comment-tagged, -C precheck, no flush, exact rollback; publish bound to IPv4 Node IP (start-node.sh:45) so no IPv6 bypass; sudo -n auth-required is Codex-measured, not re-attempted by Claude", "newLow": "rules not shown to persist across host reboot/firewall reload; require re-proof after reboot or reviewed persistence"},
+      {"id": "P3", "planStatus": "RESOLVED", "evidence": "probe checks cgroup v1/v2 memory 1073741824 and cpu 200000/100000 plus live RUN HostConfig; daemon-ownership timeout contract; GOPROXY/GOSUMDB recorded"},
+      {"id": "P4", "planStatus": "RESOLVED", "evidence": "PG_MAJOR=16 (Codex-measured); server_version_num 160000-169999 gate before migrations, password via stdin"},
+      {"id": "P5", "planStatus": "RESOLVED", "residualLow": "SSH steps still read r5 known_hosts.pinned read-only (StrictHostKeyChecking=yes, UpdateHostKeys=no); pin an F5 copy by hash or hash before/after", "evidence": "0 r5-reviewed-source paths in vectors; all Windows python steps use -B"},
+      {"id": "P6", "planStatus": "RESOLVED"},
+      {"id": "P7", "planStatus": "RESOLVED", "evidence": "0 workspaces occurrences in vectors"},
+      {"id": "P8", "planStatus": "RESOLVED", "evidence": "slot+600s+14520s=+4h12m verified for all three windows"},
+      {"id": "H1", "severity": "Low", "summary": "History step 4 still says existing pinned Python; step 5 bundle command lacks -B (vectors correct)"}
+    ],
+    "stageClassification": {
+      "acceptableNow": "nonexecuting plan",
+      "safePreparationClockFree": ["01-02 staging and archive SCP", "03 loopback-only new PG16 plus server_version gate", "07 cap-probe and image build on worker1", "04b fresh external CA generation"],
+      "clockStarting": {"steps": ["05 init (CP control leaf and peer policy 6 days)", "09 enroll (Node leaf 6 days)"], "source": "lan_pki.issue default 6 days; lan_pilot.py:844", "advice": "run only once the P2 operator date is fixed within about 4 days (renewal at NotAfter-48h needs active Node CSRs)"},
+      "blocked": ["finish-worker/start-node publishing 18515 to LAN", "acceptance observe"]
+    },
+    "twoToFivePath": {
+      "membershipImmutable": false,
+      "newNamespaceOrReinitRequired": false,
+      "supportedMechanism": "repeated init on the same F5 state; add_requested_nodes appends new IDs and preserves existing IDs/keys/channels/CA/DB/epoch",
+      "sources": ["59f tools/lan_pilot.py init + add_requested_nodes", "59f deploy/lan/README.md lines 27-30", "59f tests/test_lan_pilot_multinode.py::test_legacy_single_node_state_normalizes_and_addition_preserves_identity"],
+      "constraints": ["same serverIP", "same --node-port 18515 for every added Node", "same external chain if CA args given", "CP Node needs --allow-server-node-colocation and Docker API >= 1.45", "rerun bundle after all active Nodes provisioned and restart serve", "renewal batch must include every active Node"],
+      "unverified": ["live end-to-end extension on external-CA state", "adding Nodes while a leaf-rotation batch is uncommitted"],
+      "namespaceNamingNote": "-w12 name stays when holding five; cosmetic"
+    }
+  },
+  "supplement": {
+    "commit": "6cbb2b9801dc5040b5a5ad70bf7b5434130d8ccc",
+    "extensionContractSHA256": {"value": "747c513670ee71180320ec0c0cc53e424fcc5de252197a05d81d8ea4a1876228", "matched": true},
+    "frozenCorePlanUnchangedAtCommit": true,
+    "claimsVerifiedAgainst59f": {
+      "appendOnlySamePort": true,
+      "killSwitchVersionIncrement": "lan_pilot.py:925",
+      "insertOnConflictDoNothing": "lan_pilot.py:915,919",
+      "chainMismatchRefusedKeysPreserved": "ensure_pilot_pki",
+      "alembicChildInheritsEnvNotDashB": "lan_pilot.py:1117-1119 env=dict(os.environ, ...)"
+    },
+    "resolvesMissingExtensionPathLow": true,
+    "residualLow": "define the settled-rotation gate exactly (zero prepared/staged uncommitted batches) when converting it to an execution check",
+    "codexMultinode39Pass3SkipRerunByClaude": false
+  },
+  "r4Source": {
+    "commit": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+    "base": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "delta": {"deploy/lan/worker_workspace.py": "+25/-1", "tests/core/test_lan_workspace_upgrade.py": "+182"},
+    "verdict": "ACCEPT",
+    "highOrMediumFindings": 0,
+    "checks": {
+      "rejectionBeforeAnyMutationOrImageLoad": true,
+      "flagVariantsCovered": ["--storage-policy", "-storage-policy", "--storage-policy=value", "-storage-policy=value", "empty value"],
+      "goFlagDeclaration": "services/node-agent/cmd/inv-node/main.go:51",
+      "onlyStateAndOneExactSocketAllowed": true,
+      "plainStartNodeShapeNoSocketPasses": true,
+      "rollbackAndValidateTargetUnchanged": true,
+      "noCombinedSupportClaim": true
+    },
+    "independentRun": {
+      "atKST": "2026-11-05T15:48:49+09:00",
+      "scope": "exported ff97 deploy/lan + new test file in scratchpad; main .venv Python 3.14.7 -B -p no:cacheprovider",
+      "passed": 34,
+      "ownerTests": 30,
+      "claudeProbes": 4,
+      "probes": ["plain no-socket shape passes", "two sockets rejected", "socket as volume rejected", "socket other source rejected"],
+      "broadSuiteRerun": false,
+      "untouchedSourceRedReproduced": false
+    },
+    "lowFindings": ["fixture current always includes socket; add a no-socket plain start-node case"],
+    "outOfScopePreexisting": "recreated container does not carry non-mount HostConfig (device/GPU requests, env); unchanged from 59f"
+  },
+  "currentTaskMutations": {"remote": 0, "docker": 0, "sudo": 0, "installs": 0, "authenticationAttempts": 0, "r5PinsAutomationsRegistryBoards": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "accept 7dd8 as nonexecuting plan plus listed safe preparation; keep P2 install BLOCKED until scoped operator rules/proof; decide R4 ff97 landing with required hosted Core/Docs"},
+    {"owner": "Codex", "action": "fix History Low x2, F5-pinned known_hosts, firewall persistence/re-proof gate, exact settled-rotation gate, no-socket R4 test case"},
+    {"owner": "Claude", "action": "re-review on new hashes"}
+  ]
+}
