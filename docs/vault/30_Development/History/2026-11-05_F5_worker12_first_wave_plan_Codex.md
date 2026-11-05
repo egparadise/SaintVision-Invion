@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-F5-20261105-WORKER12-FIRST-WAVE-PLAN-CODEX"
 title: "2026-11-05 F5 worker1/2 first-wave plan and Docker API floor correction"
-version: "1.1.1"
+version: "1.1.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-05T15:38:00+09:00"
+updated: "2026-11-05T16:13:52+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,8 @@ Task FLEET5-FIRST-WAVE-PLAN-20261105, Orca task `task_05d9dcda1dca`, dispatch `c
 Branch `agent/codex/fleet5-first-wave-plan-20261105`, actual worktree `D:/Project/SaintVisionI-Invion/fleet5-worker-readiness-20261105`, base `6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e`; runtime product pin `59f0a3c2ff41ba1ae99a38515a2cdc65b2144067`. Read current local Index1.0.393/Codex1.0.354, agent-delivery1.1.0/core-reliability1.0.0, the unchanged required governance versions recorded in [[2026-11-05_FLEET5_worker_readiness_Codex]], and Claude's **published138ece54** CP Evidence and History directly from Git. Common boards/registry and Obsidian apply remain untouched.
 
 ## Decision and smallest next gate
+
+Current Low-closure override (task_26607075f612): root verified Claude087aaf and Docs41983434951, accepting P1–P8 and the append-only supplement **as a nonexecuting plan**, while P2 installation remains blocked. Stage03 actual PG/bootstrap is now **HOLD** pending root's separate Core41982378091 failed-job retry/source investigation; its specific cause is unproved. Init/enroll also wait for an actual P2 operator date, because they start six-day leaf clocks. The F5-owned known_hosts copy, firewall re-proof rule and precise measured-before-append gate supersede the former generic conditions in this page; their effective hashes and later stage contract are in [[2026-11-05_F5_low_closure_Codex]]. No frozen old packet, source59f archive, bootstrap or R4 guard source is changed by this Low closure.
 
 **A short attended worker1/2 connection phase is not barred by a Nov10 date, but execution is currently blocked by real host-firewall authority and outstanding proof gates.** Both authorized sudo-n firewall reads returned1/authentication-required. An actual authorized operator must install and prove the narrowly scoped rules; no privileged Docker helper or socket-group grant may bypass this. There is no measured shared-resource conflict requiring blanket postponement. CP-colocated Node installation remains blocked by API1.41/no Ubuntu and its own policy/upgrade requirements; phase1 does not require local Docker, a CP upgrade or the CP Node.
 
@@ -88,7 +90,7 @@ The helper refuses old-name/ownership mismatches, creates the new volume/network
 The selected worker2 digest's image metadata **PG_MAJOR=16** was read successfully; no worker1 alternate PostgreSQL digest is selected. After future startup, query `SHOW server_version_num` inside only the new owned container using its new password file on stdin (never printed), and require160000–169999 **before migrations**. A tag or image-major field alone is not actual server-version proof.
 
 3. In a dedicated attended owner context, start only the **new** SSH `-N -o ExitOnForwardFailure=yes -L 127.0.0.1:55458:127.0.0.1:55458` to established worker2; keep existing55448 untouched. Securely SCP only the new DB's two passfiles into a new owner-only Windows private directory. Construct admin/runtime DSN files with `psycopg.conninfo.make_conninfo`, localhost55458/new database/appropriate new role/absolute protected passfile; **omit password fields** and never print file contents.
-4. On Windows use the existing pinned Python and the tracked-clean exact59f tool path:
+4. On Windows use the non-r5 main repository `.venv` Python3.14.7 with `-B`, inherited `PYTHONDONTWRITEBYTECODE=1`, no pip, and the tracked-clean exact59f tool path:
 
 ```text
 python -B <source59f>/tools/intranet_pki.py --ca-dir <fresh-F5-node-CA> init-node-mtls --root-password-file <new-path-outside-online-CA>
@@ -110,7 +112,7 @@ timeout 90 docker save --output "$F5_ROOT/node-agent.tar" "$F5_AGENT_TAG"
 sha256sum "$F5_ROOT/node-agent.tar" "$F5_ROOT/node-image-inspect.json"
 ```
 
-`DOCKER_BUILDKIT=0` is scoped to this operator build invocation, not a global daemon change; verify the selected bounded builder actually works and stop otherwise. Source `go.sum` pins dependencies. No source cache, r5 tag or unrelated images are pruned. SCP the new archive/inspect to CP, verify actual hashes/size (reject archive>128MiB), then run `python <source59f>/tools/lan_pilot.py --state <fresh-f5-state> bundle --prebuilt-image <new-node-agent.tar> --prebuilt-inspect <new-inspect.json>`. The tool validates tag, configuration/layers/content IDs without local Docker.
+`DOCKER_BUILDKIT=0` is scoped to this operator build invocation, not a global daemon change; verify the selected bounded builder actually works and stop otherwise. Source `go.sum` pins dependencies. No source cache, r5 tag or unrelated images are pruned. SCP the new archive/inspect to CP, verify actual hashes/size (reject archive>128MiB), then run `python -B <source59f>/tools/lan_pilot.py --state <fresh-f5-state> bundle --prebuilt-image <new-node-agent.tar> --prebuilt-inspect <new-inspect.json>`. The tool validates tag, configuration/layers/content IDs without local Docker.
 6. SCP each own `public/nodes/<new ID>/worker.zip` and separately pinned hash to its assigned worker, verify before extraction, run shipped `bash prepare-worker.sh`; return **CSR only**. CP enrolls only that CSR with `python -B <source59f>/tools/lan_pilot.py --state <fresh-f5-state> enroll --csr <assigned-public-CSR> --ca-key <fresh-encrypted-intermediate-key> --ca-key-password-file <fresh-intermediate-password-file> --ca-chain <fresh-chain>`. SCP its own leaf plus independently pinned hash back, verify, then `bash finish-worker.sh` from that assigned extraction. Do not call start-node directly, move existing keys, reuse an old ID or mount the Docker socket. The private packet now contains exact **authorized-host-root** DOCKER-USER allow/deny vectors scoped to each verified Node IP and `-m conntrack --ctorigdstport 18515` (Docker DNAT's container port18443 is not the original destination). It never flushes unrelated rules. Both sudo-n capability queries were1/auth-required, so this is a real external operator gate. Require simultaneous successful fresh-CA CP observation, failed worker3 TCP connection and rule-counter/exit evidence; an absent listener alone cannot prove filtering. No privileged Docker, ACL or socket-group workaround is allowed.
 7. Run `observe --once`, wait12s, run `observe --once`, then `status` against only new state. Bind exact KST/exit/source SHA, actual new2 Node IDs, fresh advancing mTLS heartbeat/snapshot and safety gates to Evidence while separately checking old r5 is still healthy and byte-identical. No `lan-workspace-v1` upgrade, project grant or offer is part of connection acceptance. No persistent F5 observer/web/console/schedule is claimed by this attended phase.
 

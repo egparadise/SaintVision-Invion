@@ -1,0 +1,37 @@
+{
+  "id": "zero-prepared-or-staged-uncommitted-batches-before-append",
+  "measurementStatus": "NOT_EXECUTED; planned F5 state does not yet exist; no DB/SSH query in this task",
+  "queryExecuted": false,
+  "preparedOrStagedUncommittedBatchCount": null,
+  "unfinalizedCommittedBatchCount": null,
+  "sourceStorageModel": "59f has filesystem batch manifests/journal, not an invented SQL rotation-batches table",
+  "authoritativeInputs": [
+    "exact current F5 private-state/tenant/epoch/active Node set and current public CA/control/node leaves/policies",
+    "F5 state leaf-rotation-batch.json plus leaf-rotation.lock",
+    "complete F5-owned append-only registry of every prepare/recovery output path and its batch.json, per-Node rotation.json and hashes; include .next or orphan outputs",
+    "registered CP signed commit receipt directories and verified per-Node finalization receipts/journals; include recovery/abandonment evidence",
+    "tenant-scoped actual channels and epoch from one READ ONLY REPEATABLE READ database snapshot"
+  ],
+  "boundedOutputRoot": "D:\\Project\\SaintVisionI-Invion\\.work\\lan-5node\\f5-59f0a3c2-20261105-w12-private\\leaf-rotation-batches",
+  "completenessRule": "all batch outputs must be registered before use; an unregistered output, inaccessible root, unsafe path, parse/digest/signature mismatch, missing receipt, unknown lifecycle or concurrent writer makes the result BLOCKED/UNKNOWN, never zero",
+  "classification": {
+    "journalAbsent": "only candidate no-active-batch; still enumerate complete registered artifacts and validate actual current channel/public-policy consistency",
+    "prepared": "count as uncommitted even stagedNodeIds is empty or overlap expired; no automatic abandonment",
+    "staging": "count as uncommitted regardless number of staged Nodes",
+    "staged": "count as uncommitted even every Node is staged; shared CP switch/commit is still missing",
+    "switched": "candidate committed only; require digest/tenant/epoch/set binding, actual CP next-leaf fingerprint, all target channel versions/certificates/enabled bits, valid CP-signed per-Node committed receipts, and finalized same-batch Node journals with restartRequired=false and final one-CP peer policies; otherwise block",
+    "historicalClosed": "only a hash-bound verified terminal commit/finalization evidence chain or repository-verified expired-entirely-unstaged abandonment record with matching batch digest may close a historical output; a prepared archive filename alone is not proof",
+    "orphansOrOtherPhases": "block and preserve, including .next, unknown/malformed journal, missing registered root or standalone unresolved rotation; do not delete/recover/force to obtain zero"
+  },
+  "acceptancePredicate": "snapshotComplete AND readOnly=on AND exactF5Context AND preparedOrStagedUncommittedBatchCount==0 AND unfinalizedCommittedBatchCount==0 AND unknownCount==0 AND liveRotationWriterCount==0 AND CP/Node locksAbsent AND valid current final policies AND pre/post input hashes stable",
+  "concurrency": "admit append only under a reviewed single-owner F5 execution exclusion; do not claim 59f init atomically fences rotation; a concurrent writer invalidates snapshot and blocks append",
+  "queryReceiptRequired": [
+    "start/end KST and exact F5 source/state/DB namespace hashes, requested tenant/epoch",
+    "read-only transaction and every command direct exit",
+    "complete registry and before/after file hashes, all counts and unknowns",
+    "actual channel/CP/Node proof digests and signed terminal/finalization bindings",
+    "append decision and owner; never label a planned query as measured"
+  ],
+  "appendAllowedNow": false,
+  "plannedSQLSHA256": "bf0ef949a34ce7a7c58ef3f5595300e730057ef97c496b426121eb987133ce6e"
+}

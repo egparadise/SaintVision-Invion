@@ -1,0 +1,15 @@
+{
+  "task": "task_26607075f612",
+  "observedKST": "2026-11-05T16:16:21.732304+09:00",
+  "operation": "local F5-owned exact-byte known_hosts copy and owner-only ACL; no SSH invocation",
+  "sourceReference": "existing protected pinned known_hosts, original path private",
+  "originalSHA256Before": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "originalSHA256After": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "f5CopySHA256": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "bytesCopied": 8807,
+  "exactBytesEqual": true,
+  "originalBytesUnchanged": true,
+  "newCopyACLExit": 0,
+  "sshOrScpExecuted": false,
+  "sourceArchiveSHA256": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9"
+}

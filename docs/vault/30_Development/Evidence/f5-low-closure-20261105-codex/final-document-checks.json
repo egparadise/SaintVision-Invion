@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "tool": "final-docs",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "observedKST": "2026-11-05T16:18:33.536085+09:00",
+      "exit": 0
+    },
+    {
+      "tool": "final-duplicates",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "observedKST": "2026-11-05T16:18:33.947997+09:00",
+      "exit": 0
+    },
+    {
+      "tool": "final-paths",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "HEAD"
+      ],
+      "observedKST": "2026-11-05T16:18:38.740298+09:00",
+      "exit": 0
+    }
+  ],
+  "priorLocalReceiptWrapperFailure": {
+    "exit": 1,
+    "error": "datetime name typo in inline receipt generator",
+    "effect": "PowerShell stopped before staging/commit; corrected local wrapper, no product or operational change"
+  }
+}

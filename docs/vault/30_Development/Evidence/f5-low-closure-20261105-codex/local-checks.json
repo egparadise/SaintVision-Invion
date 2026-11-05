@@ -1,0 +1,122 @@
+{
+  "task": "task_26607075f612",
+  "environment": "Windows main non-r5 Python3.14.7 -B/no pip; local mocked/tmp_path existing tests, no live F5 CA/DB/Node",
+  "checks": [
+    {
+      "name": "focused-existing-rotation",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/test_lan_leaf_rotation.py::test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes",
+        "tests/test_lan_leaf_rotation.py::test_batch_manifest_rejects_per_node_cp_leaf_mutation",
+        "tests/test_lan_leaf_rotation.py::test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "startKST": "2026-11-05T16:15:10.339097+09:00",
+      "endKST": "2026-11-05T16:15:17.534728+09:00",
+      "exit": 0,
+      "stdoutSHA256": "fe5bcb6b553602ed40c6bde7969b2c3ba7001016e8c1681253bfe33a21fac3ee"
+    },
+    {
+      "name": "docs",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-05T16:15:17.535352+09:00",
+      "endKST": "2026-11-05T16:15:24.338261+09:00",
+      "exit": 0,
+      "stdoutSHA256": "4e35cd7b40cd6967d2a966b7b8cb7d112845550099df29541eb72d340c765dfd"
+    },
+    {
+      "name": "ontology",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startKST": "2026-11-05T16:15:24.338261+09:00",
+      "endKST": "2026-11-05T16:15:26.935175+09:00",
+      "exit": 0,
+      "stdoutSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+    },
+    {
+      "name": "sync-check",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startKST": "2026-11-05T16:15:26.936179+09:00",
+      "endKST": "2026-11-05T16:15:32.192930+09:00",
+      "exit": 0,
+      "stdoutSHA256": "abbfcda2c8216ba9e3169d2a2305b16ae27060d96f8e65270cf84fe9607573fd"
+    },
+    {
+      "name": "single-source",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-05T16:15:32.192930+09:00",
+      "endKST": "2026-11-05T16:15:32.623609+09:00",
+      "exit": 0,
+      "stdoutSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+    },
+    {
+      "name": "path-citations",
+      "command": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "HEAD"
+      ],
+      "startKST": "2026-11-05T16:15:32.624609+09:00",
+      "endKST": "2026-11-05T16:15:38.248555+09:00",
+      "exit": 0,
+      "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startKST": "2026-11-05T16:15:38.248555+09:00",
+      "endKST": "2026-11-05T16:15:38.418056+09:00",
+      "exit": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "protected-source-diff",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "6cbb2b98",
+        "--",
+        "deploy/lan/prepare-pilot-database.sh",
+        "deploy/lan/worker_workspace.py",
+        "tools/lan_pilot.py"
+      ],
+      "startKST": "2026-11-05T16:15:38.418056+09:00",
+      "endKST": "2026-11-05T16:15:38.508614+09:00",
+      "exit": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "appendQueryExecuted": false,
+  "obsidianApply": false,
+  "CoreRetryExecutedByThisWorker": false
+}
