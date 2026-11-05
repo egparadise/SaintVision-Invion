@@ -146,6 +146,7 @@ Orca `task_5627222e0f59`, dispatch `ctx_0918954c585c`. owner는 Codex `task_3839
   - headSha c6f0d95e이고 아직 in_progress다.
   - job 127548012850의 step `Test Linux Node concurrency and crash boundaries`는 06:36:46–06:40:07 KST success다. job 127548013352 s01도 success다.
   - Linux race는 보조 증거로만 쓴다. local race는 NOT RUN이다. 전체 Core·installer·kernel·Python 승인은 PENDING이며 주장하지 않는다.
+- **reviewer Docs:** 07:12:15–07:12:57 KST에 필수 gate 7개(docs, ontology, contract-bindings, frontend, path-ratchet `--base-ref c6f0d95e`, single-source-ratchet, sync-check)가 모두 exit 0이었다. 검토 commit `61738ee3`의 Documentation Build `42119666316`(workflow_dispatch)은 job 127568409389 docs=success다(07:14:16 KST 확인). 이 기록 commit의 run은 worker_done으로 Root에 보고한다.
 - **비밀 정보:** 공개 vector와 owner fixture의 메모리 내 ephemeral TEST key만 썼다. production key는 읽거나 만들지 않았다. scratch 경로 prefix는 commit하지 않았다.
 
 ## 하지 않은 것

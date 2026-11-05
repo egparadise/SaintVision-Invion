@@ -45,7 +45,7 @@
      "fix": "Update the History counts and the 'final' label to attempt 4."}
   ],
   "tests": {"reviewerK1": "30 top-level / 124 PASS events", "reviewerNodeAll": "61 top-level / 238 PASS events, 0 fail, 0 test skip, 6 no-test-files packages", "build": 0, "vet": 0, "localRace": "NOT RUN (Windows CGO_ENABLED=0)", "counts": "test-counts.json"},
-  "ci": {"sourceCore": "42113810160 IN_PROGRESS at 07:07:58 KST; Linux race step SUCCESS (supporting only); full Core/installer/kernel/Python acceptance PENDING and not claimed", "reviewerDocs": "recorded in History after push"},
+  "ci": {"sourceCore": "42113810160 IN_PROGRESS at 07:07:58 KST; Linux race step SUCCESS (supporting only); full Core/installer/kernel/Python acceptance PENDING and not claimed", "reviewerDocs": "Documentation Build 42119666316 workflow_dispatch headSha 61738ee3 (review commit), job 127568409389 docs=success, read 07:14:16 KST; the run for this follow-up record commit is reported to Root in worker_done"},
   "notRun": ["K2 adapters/trust installation", "40 future runtime effects", "OS locks", "Engine", "DB", "PKI", "physical/remote", "whole product", "live registry/keys (NULL/HOLD)"],
   "privacy": "public vectors only; ephemeral in-memory TEST keys created by the owner fixture; no private production key read or generated; private scratch prefix absent from committed files"
 }
