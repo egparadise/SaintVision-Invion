@@ -17,6 +17,8 @@
     {"id":"D11","patch":[{"op":"replace","path":"/status","value":"READY"}],"expectedSchemaValid":false,"executionAllowed":false},
     {"id":"D12","patch":[{"op":"replace","path":"/barriers/oldBackupRestartAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
     {"id":"D13","patch":[{"op":"replace","path":"/stateMachineScope/rootOrderDecision","value":"silently-approved"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D14","patch":[{"op":"replace","path":"/members/0/bindings","value":{"peerFloorVersion":1}}],"expectedSchemaValid":false,"executionAllowed":false}
+    {"id":"D14","patch":[{"op":"replace","path":"/members/0/bindings","value":{"peerFloorVersion":1}}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D15","patch":[{"op":"replace","path":"/targetBindings/p0DockerImageId","value":"UNPUBLISHED"}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D16","patch":[{"op":"replace","path":"/g2Proposal/rootPlanningChoice/operationalAcceptance","value":true}],"expectedSchemaValid":false,"executionAllowed":false}
   ]
 }

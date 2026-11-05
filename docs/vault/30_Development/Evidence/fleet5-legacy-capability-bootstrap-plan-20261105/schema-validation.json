@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fleet5-bootstrap-document-schema-validation:1",
-  "observedKST": "2026-11-05T21:40:40.964752+09:00",
+  "observedKST": "2026-11-05T21:59:13.870411+09:00",
   "scope": "Document only; no product/Go/Engine test",
   "results": [
     {
@@ -100,10 +100,27 @@
       "expected": false,
       "matched": true,
       "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D15",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D16",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
     }
   ],
-  "passed": 14,
+  "passed": 16,
   "failed": 0,
   "productAcceptanceCasesRun": 0,
-  "allTargetRootMemberBindingsRemainNull": true
+  "productAcceptanceCasesRequiredNotRun": 28,
+  "all30Target18RootAndMemberBindingsNull": true,
+  "parameterNameClosure": true,
+  "rootPlanningSelectionDoesNotAuthorizeOperation": true
 }

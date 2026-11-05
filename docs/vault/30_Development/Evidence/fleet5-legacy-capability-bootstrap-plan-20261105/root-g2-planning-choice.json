@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "fleet5-root-g2-planning-choice:1",
+  "task": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "messageId": "msg_f517e89d6a16",
+  "basePlanCommit": "1057e0ed2e3c75d02e8ed342208fd78109cec2cd",
+  "source": "Root coordinator message, read after plan1057 publication",
+  "selection": "Preserve EXACT observe Cmd including --image as permit/workload allowlist; runtime Go image change only, separate versioned authenticated immutable per-Node runtime inventory/receipt and reader closure",
+  "legacyGlobalAgentImageAndManifests": "Historical/default observations, no silent semantic rewrite or channel CAS",
+  "architecturePlanningOnly": true,
+  "operationalOrCodeAcceptance": false,
+  "sourceImplementationAuthorizedOnThisCard": false,
+  "actualIndependentBootstrapArchitectureReviewRequired": true,
+  "targetProductBindingsMustRemainNull": true,
+  "actualWireSourceArtifactOrOperationBinding": null
+}

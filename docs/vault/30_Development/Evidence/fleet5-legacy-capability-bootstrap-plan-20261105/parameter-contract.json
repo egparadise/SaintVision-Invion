@@ -9,7 +9,7 @@
     "verdict": "Actual independent reviewer identity, scope, exact target SHA/digests, verdict and evidence; no self-review/inherited architecture/audit ACCEPT",
     "identity": "Exact existing registered tenant/Node/epoch and physical-to-logical binding, validated by frozen contracts and current scoped authority; never generated/remapped",
     "container": "Actual daemon-bound 64-hex immutable ID plus exact name/Node label/inspect hash; no name-only, historical-container or foreign-daemon match",
-    "imageSemantics": "Old runtime digest, preserved allowed permit digest and new actual runtime digest are separate mandatory fields; preserve old Cmd --image exact under reviewed choice A",
+    "imageSemantics": "Docker image Id, repository manifest/index RepoDigest, platform manifest/config, ordered RootFS diffIDs, archive hash, executable bytes hash and Git source SHA are distinct typed fields; preserve old Cmd --image permit digest; verified offline absence needs actual authenticated archive/build mapping",
     "volume": "Existing owned volume name/driver/labels/options/mountpoint identity and metadata digest, exact state mount type/name/source/RW/propagation and complete consumer ID set; no new/empty substitute volume",
     "path": "Exact canonical existing owned path in actual scope; reject symlink/hardlink/parent/ownership/type ambiguity; journal identity and floors must already exist, never OpenJournal to observe/create",
     "protectedState": "Bounded private read-only full tree digest over paths/types/content/modes/UID/GID; credentials and identity/floor exact; no key/archive/private bytes in public receipts; atime/process telemetry excluded explicitly only",
@@ -20,7 +20,9 @@
     "scheduleProof": "Fresh exact three IDs disabled with current target/config digest, all-launch-surface inventory and no overlapping attempt/descendant evidence; disabling alone is not quiescence",
     "ownership": "Root-authorized fixed cohort reservation and held OS/logical fence; immutable plan/prior-event digests and exact token; never age/PID-based stale reclamation",
     "preCutoverProof": "Fresh fenced unsigned double read, bound to exact stopped old IDs/volume/journal/identity/P/H/C/private metadata; explicitly not production M2",
-    "postStartProof": "Actual signed nonce-bound M2 from newly running pinned same executable UID/PID1 and real journal matching pre-cutover P/H/scope/hash; unchanged authority actual mTLS proof required too",
+    "postStartProof": "Signed actual process executable SHA256/nonce/same-executable UID/PID1/journal/scope from reviewed M2 PLUS trusted owned-daemon image/container/process inspection before/after, both joined to actual published source/build; M2 process hash alone is not image proof; unchanged actual mTLS required",
+    "argumentAuthorityEquality": "Canonical ordered Cmd argv hash AND exact arrays before/after equal, Entrypoint/live PID1 argv checked; cert DER hashes, key public SPKI hash, CA/signer raw hashes, raw policy hash, actual P/H/raw floor file identity and protected journal/state scope unchanged",
+    "rootG2Decision": "Future independently reviewed contract/operational binding, NOT merely Root's real planning selection msg_f517e89d6a16; planning selection does not fill source/artifact/CI/verdict or authorize code/operation",
     "inventoryProof": "Authenticated typed runtime inventory receipt binding both members, old expected inventory/global-state digest and unchanged channels; atomic metadata compare-and-publish, not leaf/channel CAS"
   },
   "proposedMethods": {

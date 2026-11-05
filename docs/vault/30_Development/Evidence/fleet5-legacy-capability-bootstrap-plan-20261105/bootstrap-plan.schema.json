@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:saintvision:nonexecuting:legacy-bootstrap-plan:1",
-  "$comment": "Closed document-only HOLD draft; never execution readiness",
+  "$comment": "Closed document-only HOLD draft; actual Root planning selection is not operational acceptance",
   "type": "object",
   "properties": {
     "schemaVersion": {
@@ -15,6 +15,30 @@
     },
     "base": {
       "const": "f0278daffa616cae4485e4b1d4c07671715892dc"
+    },
+    "priorPlanPublication": {
+      "type": "object",
+      "properties": {
+        "commit": {
+          "const": "1057e0ed2e3c75d02e8ed342208fd78109cec2cd"
+        },
+        "docsRun": {
+          "const": 42029683097
+        },
+        "docsConclusion": {
+          "const": "success"
+        },
+        "productOrOperationalAcceptance": {
+          "const": false
+        }
+      },
+      "required": [
+        "commit",
+        "docsRun",
+        "docsConclusion",
+        "productOrOperationalAcceptance"
+      ],
+      "additionalProperties": false
     },
     "owner": {
       "const": "Codex"
@@ -188,13 +212,22 @@
         "p0ExecutableSHA256": {
           "type": "null"
         },
+        "p0DockerImageId": {
+          "type": "null"
+        },
+        "p0RepositoryDigestOrOfflineProof": {
+          "type": "null"
+        },
+        "p0ImageArchiveDigest": {
+          "type": "null"
+        },
         "p0ImageManifestDigest": {
           "type": "null"
         },
         "p0ImageConfigDigest": {
           "type": "null"
         },
-        "p0ImageLayers": {
+        "p0ImageRootFSDiffIDs": {
           "type": "null"
         },
         "p0BuildProvenance": {
@@ -267,9 +300,12 @@
       "required": [
         "p0SourceSHA",
         "p0ExecutableSHA256",
+        "p0DockerImageId",
+        "p0RepositoryDigestOrOfflineProof",
+        "p0ImageArchiveDigest",
         "p0ImageManifestDigest",
         "p0ImageConfigDigest",
-        "p0ImageLayers",
+        "p0ImageRootFSDiffIDs",
         "p0BuildProvenance",
         "p0CIrunId",
         "p0NativeTwoCompletedCyclesReceipt",
@@ -406,7 +442,7 @@
           "const": "preservedConfigDigest"
         },
         {
-          "const": "oldRuntimeImageDigest"
+          "const": "oldRuntimeDockerImageId"
         },
         {
           "const": "preservedPermitImageDigest"
@@ -442,25 +478,25 @@
           "const": "activePeerPolicyHash"
         },
         {
-          "const": "nodePublicKeyHash"
+          "const": "nodeKeyPublicSPKISHA256"
         },
         {
-          "const": "nodeLeafHash"
+          "const": "nodeLeafDERSHA256"
         },
         {
-          "const": "controlLeafHash"
+          "const": "controlLeafDERSHA256"
         },
         {
-          "const": "caHash"
+          "const": "caBundleRawSHA256"
         },
         {
-          "const": "signerPublicHash"
+          "const": "signerPublicRawSHA256"
         },
         {
           "const": "channelVersion"
         },
         {
-          "const": "channelCertHash"
+          "const": "channelCertificateDERSHA256"
         },
         {
           "const": "channelEnabled"
@@ -494,10 +530,49 @@
         },
         {
           "const": "runtimeInventoryReceipt"
+        },
+        {
+          "const": "oldCmdArgvSHA256"
+        },
+        {
+          "const": "newCmdArgvSHA256"
+        },
+        {
+          "const": "oldEntrypointSHA256"
+        },
+        {
+          "const": "newEntrypointSHA256"
+        },
+        {
+          "const": "livePID1ArgvSHA256"
+        },
+        {
+          "const": "ownedRuntimeInspectionBeforeM2"
+        },
+        {
+          "const": "ownedRuntimeInspectionAfterM2"
+        },
+        {
+          "const": "newRuntimeDockerImageId"
+        },
+        {
+          "const": "newRuntimeRepositoryOrOfflineProof"
+        },
+        {
+          "const": "newRuntimePlatformManifestDigest"
+        },
+        {
+          "const": "newRuntimeConfigDigest"
+        },
+        {
+          "const": "newRuntimeRootFSDiffIDs"
+        },
+        {
+          "const": "newRuntimeExecutableSHA256"
         }
       ],
-      "minItems": 39,
-      "maxItems": 39,
+      "minItems": 52,
+      "maxItems": 52,
       "items": false
     },
     "members": {
@@ -557,8 +632,37 @@
         "choice": {
           "const": "A-preserve-permit-separate-runtime-inventory"
         },
-        "rootChoice": {
-          "type": "null"
+        "rootPlanningChoice": {
+          "type": "object",
+          "properties": {
+            "messageId": {
+              "const": "msg_f517e89d6a16"
+            },
+            "selectedBy": {
+              "const": "Root"
+            },
+            "scope": {
+              "const": "NONEXECUTING architecture/planning direction only"
+            },
+            "operationalAcceptance": {
+              "const": false
+            },
+            "implementationAuthorizedOnThisCard": {
+              "const": false
+            },
+            "reviewedContractBinding": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "messageId",
+            "selectedBy",
+            "scope",
+            "operationalAcceptance",
+            "implementationAuthorizedOnThisCard",
+            "reviewedContractBinding"
+          ],
+          "additionalProperties": false
         },
         "preserveExactOldCmdIncludingImageFlag": {
           "const": true
@@ -590,7 +694,7 @@
       },
       "required": [
         "choice",
-        "rootChoice",
+        "rootPlanningChoice",
         "preserveExactOldCmdIncludingImageFlag",
         "permitImageSemantic",
         "runtimeImageSemantic",
@@ -905,6 +1009,12 @@
     "gateMatrix": {
       "const": "parameter-gates.json"
     },
+    "runtimeBindingContract": {
+      "const": "runtime-inventory-contract.json"
+    },
+    "consumerClosure": {
+      "const": "legacy-consumer-closure.json"
+    },
     "futureProductAcceptance": {
       "const": "acceptance-matrix.json"
     },
@@ -912,7 +1022,7 @@
       "const": "Closed schema checks this exact nonexecuting HOLD draft, not future runtime readiness; bindings require a new actually published and reviewed successor revision"
     },
     "nextRootAction": {
-      "const": "Actual independent plan review and explicit G2 choice; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"
+      "const": "Planning direction A selected by Root; actual independent bootstrap architecture review and reviewed contract binding still required; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"
     }
   },
   "required": [
@@ -920,6 +1030,7 @@
     "task",
     "dispatch",
     "base",
+    "priorPlanPublication",
     "owner",
     "reviewer",
     "status",
@@ -941,6 +1052,8 @@
     "stateNames",
     "stateMachineScope",
     "gateMatrix",
+    "runtimeBindingContract",
+    "consumerClosure",
     "futureProductAcceptance",
     "schemaMeaning",
     "nextRootAction"

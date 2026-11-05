@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-LEGACY-CAPABILITY-BOOTSTRAP-PLAN-20261105-CODEX"
 title: "FLEET5 legacy capability bootstrap and replacement renewal plan"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T21:41:54+09:00"
+updated: "2026-11-05T22:01:30+09:00"
 source_of_truth: "Git"
 ---
 
@@ -96,14 +96,59 @@ reads rather than treating a partial display as a source or test gate.
    physical cutover stays in explicit per-Node migration states, not a false
    all-member inventory commit.
 
-Root's G2 choice is **null** pending independent review. This requires new helper,
+**Root selected choice A FOR THIS NONEXECUTING PLAN** in `msg_f517e89d6a16`
+after publication1057. This is a real architecture/planning selection, not code,
+contract, independent-review or operational acceptance. Its message is bound in
+`root-g2-planning-choice.json`. The future reviewed contract/operation binding
+`rootBindings.rootG2Decision` remains null, along with every product binding;
+it cannot be populated merely with that planning message. This requires new helper,
 inventory/API and consumer contracts; the old bundle builder is not an updater
 for this purpose. Alternative B, rewriting `--image` to the new runtime image and
 changing CP `agentImage`, changes permit policy/Cmd and violates literal G1
 image-only scope. It needs a separate scope decision and cannot happen silently.
 Neither the allowed workload image nor CP's old global field is rewritten here.
 Early G2 analysis was delivered to root `msg_a2ae896bbfb8` and P0 owner
-`msg_a5740d259671`; it is a proposal, not root's approval.
+`msg_a5740d259671`; at that point it was only a proposal. The later Root planning
+selection above is not operational approval.
+
+The versioned proposed record is explicit in `runtime-inventory-contract.json`:
+Docker local **image ID**, repository manifest/index **RepoDigest**, selected
+platform manifest/config digest, ordered RootFS diffIDs, archive digest, executable
+byte SHA256 and Git source SHA are distinct. RepoDigest is not image ID, binary
+hash or source SHA. An authenticated offline publication may explicitly have no
+RepoDigest only with its real archive/config/layer/build mapping proof; never
+invent a repository digest from an image ID or accept unsigned absence. Current
+target values remain null, including the added Docker-ID/repository-or-offline/
+archive bindings.
+
+M2 supplies a signed **actual process executable hash**, nonce and live
+same-executable UID/PID1/journal/scope binding. This alone does not prove a Docker
+image. Root's trusted owned-daemon inspection separately binds the same exact
+container ID and stable live PID/start/restart observations to its `.Image`,
+resolved `.Config.Image`, published config/layers/platform and no executable
+mount/overlay substitution. Cross-read before/after M2 and join both proofs to
+the published executable/source build. Inventory publication requires that join;
+neither an image label nor Node's image claim nor an old Node key alone can stand
+in for it. Proposed receipt has an authenticated immutable versioned cohort
+envelope and per-Node typed records; actual M2 wire/signature contract is still
+unpublished and must be mapped from the reviewed compiled implementation.
+
+Before/after canonical ordered Cmd argv hashes and exact argv arrays must match,
+including the preserved permit-image value; Entrypoint and actual live PID1 argv
+are checked separately. Protected tree equality plus typed Node/CP cert DER
+hashes, Node key public SPKI hash, CA/signer raw hashes, policy raw hash, floor
+P/H/raw-file identity and journal tenant/Node/epoch scope bind the unchanged
+authority. Private key bytes stay local inside protected-state comparison.
+
+`legacy-consumer-closure.json` enumerates the source03 code readers/producers
+and their disposition. In particular old `bundle/manifest_for_node`, start/repair
+credential paths, runtime validation against old image descriptors, execution/
+workspace installers and storage replacement paths cannot be used as a migrated
+cohort updater. New runtime/guard/renewal readers must require the typed record;
+out-of-scope helpers stay blocked. Test/report fields using the old ambiguous
+name remain historical and cannot become bootstrap provenance. Any newly
+discovered/private consumer must be added and independently closed or BLOCK;
+there is no fallback to old global `agentImage` after typed migration.
 
 ## Closed G1–G10 gates
 
@@ -247,8 +292,9 @@ config/image semantics, stale schedule/precheck attempt, forged observer, metada
 write, unknown stop, archive collision, each crash seam and downgrade attempts.
 Docs/schema GREEN cannot substitute for any runtime GREEN.
 
-All implementation and operational inputs remain HOLD. Root next chooses G2
-after actual independent plan review, waits for P0 source/binary/proof/CI/verdict,
+All implementation and operational inputs remain HOLD. Root's planning direction
+is recorded; actual independent bootstrap architecture review is next, followed
+by published P0 source/binary/proof/CI/verdict and reviewed contract binding. Root
 then assigns the new storage-free migration helper/inventory/guard work with
 these acceptance seams. No migration, schedule, guard, private config, key, PKI,
 SSH/WSL/Docker, state, claim/pin/window/clock or hardware action was performed;
@@ -278,3 +324,20 @@ the main Python3.14.7 `-B`, and `plan-validation.json` records full commands,
 actual KST intervals/exits/output plus canonical Git artifact hashes. Exact final
 Docs and actual independent plan review are required before this task's delivery
 receipt; neither grants operational approval.
+
+Root's subsequent G2 planning direction is recorded in this1.0.1 revision without
+changing source2fb or filling product provenance. The revised draft has **30**
+null target bindings and18 null root operational bindings; both member envelopes
+remain null. Image/process/source/argv/authority distinctions and explicit legacy
+consumer closure add four future product acceptance cases (**28 NOT RUN**) and
+two document refusal fixtures (**16** total). Final schema/closure validation,
+document gates, actual Git artifact digests and exact revised Docs are recorded
+for this revision; the initial1057 receipts remain true for that initial revision.
+
+Revised document-schema validation actually matched **16/16** (1 valid HOLD,
+15 rejected,0 failures), confirmed the30/18/member null bindings and parameter
+closure, and parsed every JSON with duplicate-key rejection. The28 product cases
+remain NOT RUN. Eight further public consumer blobs and the B5 executor/launcher
+were hash-bound with checked complete Git reads; an additional PowerShell literal
+scan had expected no-match exit1, not a failed CI/test. No unlisted/private
+consumer is presumed safe and no compiled product proof is inferred.
