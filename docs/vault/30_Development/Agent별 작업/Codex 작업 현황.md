@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.361"
+version: "1.0.362"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T18:48:52+09:00"
+updated: "2026-11-05T19:03:32+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
 active_card_status: "Physical PC map corrected; actual PC4 read-only share and fresh issuer prepared; source2 fixes delivered; successor Low closure/integration and hardware prerequisites remain"
 active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
 ---
+
+## 2026-11-05 통합 실제 착수·독립 검토 후속
+
+작업한 것: root142b517f exact Docs 성공과2300 managed 파일 동기화를 확인하고 별도 통합 owner task_78064fb4b7ff/ctx_ed7ec73163d6를 시작했다. 확인한 것:8b Core42001883513은 실제 두 job 성공이며6fce는 별도 Core42006923070 진행 중이다. 실제 Claude7fe0701f는6fce 안전성 수락/잔여 LowL1b를 보고했다. 다음 첫 행동/담당: S1 owner가 predecessor.next가 남으면 다음 갱신을 거부하고 기존의 검증된 replay로 먼저 정리하게 하는 최소 교정·Node/CP 회귀를 수행한다. 통합 owner는 다른 소스 결합을 계속하며 수정/실제 검토/CI 뒤에만 최종 pin·새 archive/8lane을 확정한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-05 물리 PC 재대조·실제 준비·완료 판정
 

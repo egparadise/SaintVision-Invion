@@ -1,0 +1,52 @@
+{
+  "schema": "fleet5-supervision-handoff:1",
+  "recordedAtKST": "2026-11-05T19:03:32+09:00",
+  "baseReport": "142b517fb21e4dde1191d4df7a09b0c72c12382f",
+  "docsRun": 42006909276,
+  "docsExactHeadAndJobVerified": true,
+  "sync": {
+    "checkApplyCheckExit": [
+      0,
+      0,
+      0
+    ],
+    "exports": 7,
+    "allDestinationHashesMatch": 2300,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "integration": {
+    "task": "task_78064fb4b7ff",
+    "dispatch": "ctx_ed7ec73163d6",
+    "actualState": "ready with first merge reported",
+    "finalSourcePin": null
+  },
+  "lowReview": {
+    "task": "task_da78a1ae6d7b",
+    "dispatch": "ctx_607df2b15a4b",
+    "report": "7fe0701f2d58669ad4f72c0e60db5d0756df42ce",
+    "docsRun": 42007108908,
+    "verdict": "safety ACCEPT; liveness LowL1b still open",
+    "independentPassed": 162,
+    "platformSkipped": 20,
+    "probeCount": 6,
+    "rootDirective": "refuse successor until fully verified predecessor replay cleans residue; do not clean in preflight",
+    "sourceAcceptedForPhysicalDeployment": false
+  },
+  "successorMilestone": {
+    "source": "8b53fbfef107837602b1b2f700e1f8e7bae28638",
+    "Core": 42001883513,
+    "rootVerifiedWorkflowAndTwoJobsSuccess": true
+  },
+  "successorNext": {
+    "source": "6fcedbbdba24e43e3917adb07f080a683dedfefe",
+    "Core": 42006923070,
+    "CoreStatus": "pending",
+    "Docs": 42006174091,
+    "L1bFixAndNewReviewRequired": true
+  },
+  "allEightCandidateCIPassed": false,
+  "newF5Initialized": false,
+  "allFiveOperationallyAccepted": false,
+  "wholeProduct100Percent": false
+}
