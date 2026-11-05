@@ -102,5 +102,28 @@
     ],
     "overallFiveNodeComplete": false,
     "currentHeadCIAndFinalSync": "checked externally after this receipt commit to avoid self-SHA recursion"
+  },
+  "latestVerifiedCheckpoint": {
+    "sha": "54199d1c5dbd9c59838182857e8682be6bc42437",
+    "exactDocs": 41985793830,
+    "conclusion": "success",
+    "normalCommitPushExit": 0,
+    "sync": {
+      "preCheckExit": 0,
+      "applyExit": 0,
+      "postCheckExit": 0,
+      "exported": 15,
+      "managed": 2297,
+      "allDestinationHashesMatch": true,
+      "pending": 0,
+      "conflicts": 0,
+      "logSHA256": {
+        "final-pre-apply": "a7d7db5d932596d322452e24594e673758cade5d2b7935bf248d86d49e0af69c",
+        "final-apply": "98965edbbb1b82086792e1d4fc97e367c3c153925b9c0a9b221200a52547b9a1",
+        "final-post-apply": "56bdfb2aa5fa1e2d4b9d24434f25d3e0e6edfd94a28afa53b2daf514599784d8"
+      }
+    },
+    "overallFiveComplete": false,
+    "currentReceiptSelfCIAndSync": "external final status, no recursive self-SHA edit"
   }
 }
