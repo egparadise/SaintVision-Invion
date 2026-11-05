@@ -1,0 +1,32 @@
+{
+  "status": "PROPOSED_HOLD",
+  "authenticationOrder": [
+    "load externally installed reviewed immutable trust policy/anchor set/verifier registry by trusted worker-root and CP registration",
+    "verify external registration/build/CI/independent review, key role/scope grants and exact verifier bytes; unavailable/mismatch BLOCK BEFORE plan, reserve or lease",
+    "strict parse bytes, schema-check closed plan, verify root-plan using EXTERNAL anchor",
+    "require plan canonicalContractSHA256 to select an already allowed exact external registry digest; never register/replace anchors or weaken slot/verifier rules",
+    "verify every proof slot against external slot table, role/domain/typed subject/bytes/freshness; then plan approvals and final-envelope execution decision",
+    "only after all gates, reserve BOTH scopes and ownership"
+  ],
+  "forbidden": [
+    "bundle trust root",
+    "plan-selected new signer registration",
+    "caller-provided verifier code",
+    "plan author self-certification",
+    "missing registry fallback"
+  ],
+  "deploymentBindings": {
+    "rootPlanAnchors": null,
+    "rootFenceAnchors": null,
+    "rootSealAnchors": null,
+    "cpInventoryAnchors": null,
+    "hostHelperAnchors": null,
+    "nodeCohortCAAndIdentityScope": null,
+    "reviewerAnchorsAndGrants": null,
+    "reviewedVerifierRegistrySHA256": null,
+    "installedHelperSourceArtifactCIReview": null,
+    "CPTrustRegistration": null,
+    "workerRootTrustRegistration": null
+  },
+  "actualAcceptance": false
+}

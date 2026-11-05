@@ -1,0 +1,180 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "saintvision-derived-cohort-projection-set:1"
+    },
+    "classification": {
+      "const": "DERIVED_DIGEST"
+    },
+    "planEnvelopeSHA256": {
+      "$ref": "../v2/common.schema.json#/$defs/sha256"
+    },
+    "migrationId": {
+      "$ref": "../v2/common.schema.json#/$defs/name"
+    },
+    "cohortId": {
+      "$ref": "../v2/common.schema.json#/$defs/name"
+    },
+    "operationId": {
+      "$ref": "../v2/common.schema.json#/$defs/name"
+    },
+    "fenceEpoch": {
+      "$ref": "../v2/common.schema.json#/$defs/positive"
+    },
+    "leaseEnvelopeSHA256": {
+      "$ref": "../v2/common.schema.json#/$defs/sha256"
+    },
+    "inventoryHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "presence": {
+          "enum": [
+            "ABSENT",
+            "PRESENT"
+          ]
+        },
+        "envelopeSHA256": {
+          "anyOf": [
+            {
+              "$ref": "../v2/common.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "presence",
+        "envelopeSHA256"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "presence": {
+                "const": "ABSENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "envelopeSHA256": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "envelopeSHA256": {
+                "$ref": "../v2/common.schema.json#/$defs/sha256"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "inventoryHeadReadbackSHA256": {
+      "$ref": "../v2/common.schema.json#/$defs/sha256"
+    },
+    "sequence": {
+      "$ref": "../v2/common.schema.json#/$defs/positive"
+    },
+    "members": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "slot": {
+                  "enum": [
+                    "PC2",
+                    "PC4"
+                  ]
+                },
+                "scope": {
+                  "$ref": "../v2/common.schema.json#/$defs/scope"
+                },
+                "projectionEnvelopeSHA256": {
+                  "$ref": "../v2/common.schema.json#/$defs/sha256"
+                }
+              },
+              "required": [
+                "slot",
+                "scope",
+                "projectionEnvelopeSHA256"
+              ]
+            },
+            {
+              "properties": {
+                "slot": {
+                  "const": "PC2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "slot": {
+                  "enum": [
+                    "PC2",
+                    "PC4"
+                  ]
+                },
+                "scope": {
+                  "$ref": "../v2/common.schema.json#/$defs/scope"
+                },
+                "projectionEnvelopeSHA256": {
+                  "$ref": "../v2/common.schema.json#/$defs/sha256"
+                }
+              },
+              "required": [
+                "slot",
+                "scope",
+                "projectionEnvelopeSHA256"
+              ]
+            },
+            {
+              "properties": {
+                "slot": {
+                  "const": "PC4"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "classification",
+    "planEnvelopeSHA256",
+    "migrationId",
+    "cohortId",
+    "operationId",
+    "fenceEpoch",
+    "leaseEnvelopeSHA256",
+    "inventoryHead",
+    "inventoryHeadReadbackSHA256",
+    "sequence",
+    "members"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v5/cohort-projection-set.schema.json",
+  "$comment": "UNSIGNED DERIVED record, no signer/key/grant/signature/producerRole fields. Recompute only after independent verification of both current Node projections and exact operation/lease/head/readback context. Never evidence or authority."
+}

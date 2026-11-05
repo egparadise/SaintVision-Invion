@@ -1,0 +1,4076 @@
+{
+  "fixtureOnly": true,
+  "digestClassSelection": "PINNED contract kind determines algorithm; supplied classification never selects trust/digest mode",
+  "all195KindsVerified": true,
+  "rejectedSignedV4Shape": true,
+  "historicalSignedAggregateRegisteredAsResource": false,
+  "cases": [
+    {
+      "node": "plan",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "plan",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "lease-migration",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "lease-migration",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-01-inspectAndValidate",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-01-inspectAndValidate",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-01",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-01",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-01-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-01-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-01-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-01-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-01",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-01",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-01-inspectAndValidate",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-01-inspectAndValidate",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-01-inspectAndValidate",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "b949d8db911ef5f5b47cdf0830f1d80040830dc7adeb0daf3acfb341ae2b962e",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "cad7c73a430030e8d39f22d39ad39bf237300babad91d15c5b3da0667e46bd6a",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "24925b2428bcbd4e336a68b703891104700b7530e203e5543c718c52cba26e7e",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": "e69e11e4ac88f5ed3f98a7b2a0d63c8df39237c9247d03f35c7b6c9ab21203ca",
+        "cohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-02-reserve",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-02-reserve",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-02-reserve",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "reserve",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "88fabd19c6414843fe36f1bec6f52fb7f97708954a3e2469468816900ae2b40f",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "expectedNoPriorMigration": true,
+          "rootExecutionDecision": {
+            "contractSHA256": "f15a5f1e944580de5f893dae7e44c18c78bc8058a5611988994255fec34c8c85",
+            "artifactSHA256": "d09841ca7959546543a2d9e11ec45970738cfa2834c9b0139643537b4de573b7",
+            "scopeSHA256": "5429af508dee0d054e55a8ea685625560bae6a9f5e9691a608564d904b281545",
+            "signerKeySPKISHA256": "c38b4e397c3e5b0d8e00a93b0bb84b50b67c626d40e176eeb99541de1f58c49b",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+            "contractId": "saintvision-proof-root-execution-decision:1",
+            "signatureDomainASCII": "saintvision/proof/root-execution-decision/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-execution",
+            "typedSubject": {
+              "kind": "root-execution-decision",
+              "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+              "operationId": "fixture-operation-migration",
+              "migrationId": "fixture-first-migration"
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": "e69e11e4ac88f5ed3f98a7b2a0d63c8df39237c9247d03f35c7b6c9ab21203ca",
+        "expectedCohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-02",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-02",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-02-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-02-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-02-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-02-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-02",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-02",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "setOldRestartNo",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "6d7ad7ae987ec71b2ee5461e173c78fa7af72fa0edfd733967773ba63d2f8c86",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "7512c782ea1d4024d1541188a53cc63293dfba3917670393e3294384a30a72b3"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "response-request-02-reserve",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-02-reserve",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-02-reserve",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "fcb9418f83ea5fc52ac235b361e1cdaaf62cac997442b0b6144c3015a81db641",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "88fabd19c6414843fe36f1bec6f52fb7f97708954a3e2469468816900ae2b40f",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "c74021b89e83306d9e9d5da88be247b9e733fd5e8a59e5aaaf7d5432b970831f",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": "e828dbaa5f90b4d5f77e7b38560abbc4dfaaf3589cad1478950531466a05ddf5",
+        "cohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "event-03",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-03",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-03-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-03-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-03-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-03-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-04",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-04",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-03",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-03",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-04-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-04-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-04-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-04-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-04",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-04",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-03-setOldRestartNo-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-03-setOldRestartNo-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-03-setOldRestartNo-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "a81cd0e8c9b145b3bfa049191f2545d9efae901fed789e2a46780e1cbd35fac8",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "6d7ad7ae987ec71b2ee5461e173c78fa7af72fa0edfd733967773ba63d2f8c86",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "5d4aa9900f5bd8048621b55b07dafd50d26945fb5aedadd4a3c70212044e1b2b",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "91c24cd936e07d96e221b3db61d4cbcbb6890d3fabc6422a2a38238bcf5f957f"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "setOldRestartNo",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "5c9f60ec351ecf85e4f08532ff4f328d61a088c9b390d0ea545539826f5e07f0",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "2e357ed555f345973f7f94488fe7e91320d64ab124a730cfffe995ba04ec0c02"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-05",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-05",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-05-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-05-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-05-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-05-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-06",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-06",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-05",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-05",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-06-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-06-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-06-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-06-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-06",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-06",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-04-setOldRestartNo-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-04-setOldRestartNo-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-04-setOldRestartNo-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "ab62e513f40003518bc584754fcfb8fac737c3503421369c227e1933aea31c45",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "5c9f60ec351ecf85e4f08532ff4f328d61a088c9b390d0ea545539826f5e07f0",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "8fefa16eaf9ff3f34aa05a571c6d914b54b83d2303521dbb5ad418aab093ef68",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "c0043736bff3d4147e8ccd5d40cc739225ffb3734286771be393844b8d4112b7"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "stopOld",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "efb327a678d6e6ffbbe57236e1a8b3edfb045f56c2332b2101080519caa6f328",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "4d096fb75ff9169c03d26be1fea0e110c0956fccc767d251f7735280393245cd"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-07",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-07",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-07-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-07-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-07-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-07-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-08",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-08",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-07",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-07",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-08-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-08-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-08-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-08-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-08",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-08",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-05-stopOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-05-stopOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-05-stopOld-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "74727fe433c25378ac096b7a623e137d2ac675a82c6c060e21ca1aaf3c1eac4c",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "efb327a678d6e6ffbbe57236e1a8b3edfb045f56c2332b2101080519caa6f328",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "de3b07e4ce068d88132c948cd904a6368dac0a465ecdf5f7d0ea41fc85391944",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "a1fd00f4e421db14fd462736cd39d8258f4dc1ff8993ab89fd60639a29431d40"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "captureFenced",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "0c19b781411cda260d77384affa423cdb07be1cfa5c189a250652202d099e1f4",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+          "quiescence": {
+            "contractSHA256": "e018fcd5f21f0ec0dcf585dbb1b739a2d281639922b4b3ba04a0a49eda6ba1c1",
+            "artifactSHA256": "4899fbc9b4463464bba21ffbfc766bc5a0dc28c88f921dce58d069443b615a6f",
+            "scopeSHA256": "4aeb7bcafee125e961334ecf5bc953355298fc167e49b2c3fa41e046d8229c2b",
+            "signerKeySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/arguments/quiescence",
+            "contractId": "saintvision-proof-process-quiescence:1",
+            "signatureDomainASCII": "saintvision/proof/process-quiescence/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "process-quiescence",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+              "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+              "volumeMetadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+              "operationId": "fixture-operation-migration",
+              "fenceEpoch": 1,
+              "allProcessesStopped": true
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "a1fd00f4e421db14fd462736cd39d8258f4dc1ff8993ab89fd60639a29431d40"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-09",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-09",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-09-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-09-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-09-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-09-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-09",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-09",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-06-captureFenced-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-06-captureFenced-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-06-captureFenced-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "1f8ebcf906961cad05d483a39fa31beafa22b204fdb6b57fc7d26c9a404c0bbd",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "0c19b781411cda260d77384affa423cdb07be1cfa5c189a250652202d099e1f4",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "01534e24e75675630cf134c08391df8e57b03c1d483e5c2b49aa10a0d3d119c5",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "4837f51a6b5216b27af343f91809f7005affc991e1da9fc7c147461f307b5770"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "preserveOld",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "dc3b0c40ed114dda36779e37693445e3eb0d30de9f7255bd1608fb70ac7a5941",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+          "reservedName": "/fixture-backupReservedName"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "4837f51a6b5216b27af343f91809f7005affc991e1da9fc7c147461f307b5770"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-10",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-10",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-10-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-10-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-10-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-10-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-11",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-11",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-10",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-10",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-11-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-11-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-11-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-11-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-11",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-11",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-07-preserveOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-07-preserveOld-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-07-preserveOld-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "a5eaaaca2d5b863e99ffa59570950eeae97cccf4c3596a4d3dd42e319b9fddd0",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "dc3b0c40ed114dda36779e37693445e3eb0d30de9f7255bd1608fb70ac7a5941",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "59ff7243438dfe36a303a236bed3dc37b8e9a86a40e6e388ca8351ce034e5f0c",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "a2b51261517a05e8cb99d56b805d01f492578961f5045326fd20bca4e59b9de8"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "createNew",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "7dc226a5f5e6f5a245a3bd08459c76167a087fc1580d5591211e7018247a452a",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "captureEventSHA256": "01534e24e75675630cf134c08391df8e57b03c1d483e5c2b49aa10a0d3d119c5"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "a2b51261517a05e8cb99d56b805d01f492578961f5045326fd20bca4e59b9de8"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-12",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-12",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-12-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-12-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-12-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-12-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-13",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-13",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-12",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-12",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-13-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-13-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-13-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-13-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-13",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-13",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-08-createNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-08-createNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-08-createNew-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "dfb18c3c465176615183c5d9e55d7b06d7b3cd40676060aa15c10565acabe8a6",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "7dc226a5f5e6f5a245a3bd08459c76167a087fc1580d5591211e7018247a452a",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "90dac56685036e4df83988f9abc4d461b2c2d83f99980d01ced0c3189dd519fe",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "715afff79eec16c037df385aa18eeb378858a53ddfc23b3635a3893e1ef87509"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "startNew",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "a92455e93232d2f77de03880fa132aeedda85805210c0b22693eb4120a517f7a",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "715afff79eec16c037df385aa18eeb378858a53ddfc23b3635a3893e1ef87509"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-14",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-14",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-14-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-14-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-14-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-14-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-15",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-15",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-14",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-14",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-15-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-15-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-15-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-15-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-15",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-15",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-09-startNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-09-startNew-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-09-startNew-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "4187c33a2d3daba13cc8224eade4d0b0c29b4d66108ed1e8ceb3551c95b42e45",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "a92455e93232d2f77de03880fa132aeedda85805210c0b22693eb4120a517f7a",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "5f83e36ed3c31a615d0e3457502c7d814387f9d4e22448b4ffa24204b031c522",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "49f627bc9abafc6098b70fb59aa8517e8de1f6938ce71c03936186ad27b4586f"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "verifyBootstrap",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "04894aec3b29fa2dea6e8445960b574c055a7a932d32800b3764d753105c7c2b",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+          "signedM2": {
+            "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+            "artifactSHA256": "6b5f140c2279629f34186e6d7937b8241e209d2b412d0c41e409300cec094b01",
+            "scopeSHA256": "4e1a37bf94307bd74f42f4264fb6ea616e1415ce773e5f35e67b2c9d04b6ff61",
+            "signerKeySPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+            "contractId": "saintvision-proof-node-floor-v2:1",
+            "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+            "producerRole": "actual-serving-node",
+            "signerRole": "node-leaf",
+            "typedSubject": {
+              "kind": "node-floor-v2",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "nonce": "5cd00104e9ea494286ae5f43cc36cb826a5b80c4d9f9370d74de4d62e4bc31a3",
+              "certificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "peerPolicyVersion": 11,
+              "peerPolicySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+              "floorSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+              "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+              "journalUID": 1,
+              "servingPID": 1,
+              "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+              "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+            }
+          },
+          "mtls": {
+            "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+            "artifactSHA256": "83eb7d1a9c68ff328cee893f54035c3241c2ca09ff5aead65f0962178dba1457",
+            "scopeSHA256": "18fb3f33d22ff4c5a1a75108c56e0672b99a18fc719c4249ea763737ded32095",
+            "signerKeySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+            "contractId": "saintvision-proof-unchanged-mtls:1",
+            "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+            "producerRole": "owned-mtls-client",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "unchanged-mtls",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "channelVersion": 3,
+              "nodeCertificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "controlCertificateDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+              "endpoint": "fixture-endpoint",
+              "authoritySHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d"
+            }
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "abceb18136747c6202090decd80e37359152824aad3ba6b0fb4bdfad864e06c3",
+            "artifactSHA256": "928d55c52831fd6d4fb5e40e6f336d4d067832bc8d40a754801c8e9de773ee9c",
+            "scopeSHA256": "29acb61a6fe387546fbb64d1a34dac7c26ff2da1e499ebfbcc75db225adafe40",
+            "signerKeySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+            "contractId": "saintvision-proof-protected-tree-equality:1",
+            "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "protected-tree-equality",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "volumeMetadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+              "beforeTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "afterTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "operationId": "fixture-operation-migration"
+            }
+          },
+          "execReceipt": {
+            "contractSHA256": "e5afd0d36a78148791a1aa3cccc8619715a3a595f118186a92406f17335f078f",
+            "artifactSHA256": "b6247fd3b40e8fdd7d9d6e7cccae6ae8d41605b0037f760d18725ad8a67fa588",
+            "scopeSHA256": "b05dff7b2849476cb4b16a7204c570265cbfedc81ca46c4dfef368c92ebe4c5a",
+            "signerKeySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+            "contractId": "saintvision-proof-owned-engine-exec:1",
+            "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "owned-engine-exec",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+              "containerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+              "execId": "19951afa96c893fd6275b713942993be3b62169e2fefe34d0647366368d0a002",
+              "commandSHA256": "188cfe7a97458fad3cab6eeefbe4126d48b9d7aaa9483bd714d34fe7b8af298a",
+              "uid": 1,
+              "exitCode": 0
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "49f627bc9abafc6098b70fb59aa8517e8de1f6938ce71c03936186ad27b4586f"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-16",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-16",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-16-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-16-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-16-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-16-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-16",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-16",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-10-verifyBootstrap-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-10-verifyBootstrap-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-10-verifyBootstrap-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "5dff4ef55caf6f29163eaa7ccca9e6ba852de31a01daaa3658f521eee84d5e1b",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "04894aec3b29fa2dea6e8445960b574c055a7a932d32800b3764d753105c7c2b",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "62e2ce1ec6bfb87b55e8c2e75c2c8c286b1eb01f58b4a9f7e7f488dacafa1fd2",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "e34513b27e581400f9a23787ae8f5c6cd6174a8ff54c5a2112ab02dbc1073993"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "stopOld",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "e08189bfef4c4f6360f0543bf4a76eceed71251a388ea44e65a3b411613bc4bb",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "8e4f1217ee751408818a4f0d14d92dddfea8d9a20a772c4cd1e2372c7161f89d"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-17",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-17",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-17-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-17-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-17-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-17-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-18",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-18",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-17",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-17",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-18-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-18-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-18-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-18-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-18",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-18",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-11-stopOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-11-stopOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-11-stopOld-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "54ddee1173c1d43085e1d6a342125482c05296cb36f6179a21955c5572e544b4",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "e08189bfef4c4f6360f0543bf4a76eceed71251a388ea44e65a3b411613bc4bb",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "3d9ae065a1129a38af39796048a12245e1f6d0f5c2e49360b3815089fb3d2208",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "39c8a214badce5a2ccbd3572a0140e613cc3c174af04f86bc17e99ad58816df9"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "captureFenced",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "b3e8098f4cd48e8e287a9fe947ff2c4f1d5fbc91e5f1b19f667f25e6aea1b3a4",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+          "quiescence": {
+            "contractSHA256": "e018fcd5f21f0ec0dcf585dbb1b739a2d281639922b4b3ba04a0a49eda6ba1c1",
+            "artifactSHA256": "7e3123db993b300400e1ef0ca40cce428754ce756ab581ce812f289dd3135116",
+            "scopeSHA256": "ca0ae3de3671681137656c6efd7159f26e15cc7e18a99d484ec8f0bad78a33f8",
+            "signerKeySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/arguments/quiescence",
+            "contractId": "saintvision-proof-process-quiescence:1",
+            "signatureDomainASCII": "saintvision/proof/process-quiescence/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "process-quiescence",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+              "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+              "volumeMetadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+              "operationId": "fixture-operation-migration",
+              "fenceEpoch": 1,
+              "allProcessesStopped": true
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "39c8a214badce5a2ccbd3572a0140e613cc3c174af04f86bc17e99ad58816df9"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-19",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-19",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-19-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-19-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-19-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-19-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-19",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-19",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-12-captureFenced-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-12-captureFenced-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-12-captureFenced-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "0cdadeb98ec961cdd751beca50ddb6badf4df9f384cbe2ffd1f474c1fc396f28",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "b3e8098f4cd48e8e287a9fe947ff2c4f1d5fbc91e5f1b19f667f25e6aea1b3a4",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "cf9edcb6ac5f3607c8aebf0f85ce34edb2f9152e5643210fdd88bc55ddcdcdd4",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "afba36464de54e9d62b5daa64e9ce919d384732b1da13f1186e9b77d7829ef1a"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "preserveOld",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "07fa3df00c1319edd7f8e250800a8a40b867cec4b68286916edb5fb6e3244859",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+          "reservedName": "/fixture-backupReservedName"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "afba36464de54e9d62b5daa64e9ce919d384732b1da13f1186e9b77d7829ef1a"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-20",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-20",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-20-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-20-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-20-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-20-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-21",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-21",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-20",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-20",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-21-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-21-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-21-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-21-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-21",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-21",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-13-preserveOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-13-preserveOld-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-13-preserveOld-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "20395d59334a9620f71880694b70181bdb7224098ddedc40aeb5739074c937f4",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "07fa3df00c1319edd7f8e250800a8a40b867cec4b68286916edb5fb6e3244859",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "933f39232b3f2d921cc4f8dd89b8cd6ebe3fee3324007035984a8aa9a9dec665",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "8761ba5f5fd0738c71a7e1b51da294b60584c026d700861162982dada01e6c6d"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "createNew",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "206f09fb79e7eca2781db52d299a32a59984d20806ab0f7672491367e3594ffb",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "captureEventSHA256": "cf9edcb6ac5f3607c8aebf0f85ce34edb2f9152e5643210fdd88bc55ddcdcdd4"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "8761ba5f5fd0738c71a7e1b51da294b60584c026d700861162982dada01e6c6d"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-22",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-22",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-22-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-22-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-22-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-22-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-23",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-23",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-22",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-22",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-23-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-23-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-23-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-23-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-23",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-23",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-14-createNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-14-createNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-14-createNew-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "f5621e3c401da714be0ecf9d224c129f98fb50776d909f0f1e27f4ff8b729af2",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "206f09fb79e7eca2781db52d299a32a59984d20806ab0f7672491367e3594ffb",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "f73575d127464bebdde5ebf0439f5c17433faf1dc42865562e5cb9b32fc2a607",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "1a0b50f211f732e512ccb0cef13ced82bcedc452b0c4ab95508306d0056cb660"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "startNew",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "cf182b52318429b059e07dcca6eeda30cf740605bbd040b343ca5598730de882",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "newContainerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423"
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "1a0b50f211f732e512ccb0cef13ced82bcedc452b0c4ab95508306d0056cb660"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-24",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-24",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-24-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-24-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-24-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-24-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-25",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-25",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-24",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-24",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-25-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-25-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-25-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-25-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-25",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-25",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-15-startNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-15-startNew-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-15-startNew-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "888ba7e8f24bd0e3c4466e910e0091e122dd91ad2110f6846ba5f9549fe73ce1",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "cf182b52318429b059e07dcca6eeda30cf740605bbd040b343ca5598730de882",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "253fbfee65ac2a8a7529d2e1f624f4b807314f9e2b3065cce160077d5c5b1d73",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "f69e1399054fa908c5ce2ba136745cd13de45c8d87472e672ca0f52d6456abe4"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "verifyBootstrap",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "b545790b7ae86e30b77b8a6c2120280e864da3c1cf6523c7504dac9838fd63d7",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "newContainerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+          "signedM2": {
+            "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+            "artifactSHA256": "670bf4e7261bdb6c020dcb6a326fb968d1766316c8616d8ad809c16900de4bee",
+            "scopeSHA256": "4dfd85207706dc813823e1bab515053c90b207ba108da5ebe5324528a62d498f",
+            "signerKeySPKISHA256": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+            "contractId": "saintvision-proof-node-floor-v2:1",
+            "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+            "producerRole": "actual-serving-node",
+            "signerRole": "node-leaf",
+            "typedSubject": {
+              "kind": "node-floor-v2",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "nonce": "ef77a56438c9922245bebe5de6ac148857ffc308c882e7b21bf244266e6ab7ac",
+              "certificateDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+              "peerPolicyVersion": 11,
+              "peerPolicySHA256": "9e480f2bafcfde6a8206821a0b26e2ab250acb443e99197673bacc673baa809f",
+              "floorSHA256": "076f019c902e3c79d25fb4309826d2684b724f2f7bad79e10f073151d445e383",
+              "journalIdentitySHA256": "687bc05375671ea5e91cbc86adf1170b970b904dd9ccb16726b0697dd5b0994f",
+              "journalUID": 1,
+              "servingPID": 1,
+              "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+              "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+            }
+          },
+          "mtls": {
+            "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+            "artifactSHA256": "2a2923b05cb5995778688d7867bb367349ec6a8a1d19be00266d6466436e2088",
+            "scopeSHA256": "a808fe5e6d0eb575458e7f272c1d9135f37dc49b834909d9bf3842de83efd620",
+            "signerKeySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+            "contractId": "saintvision-proof-unchanged-mtls:1",
+            "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+            "producerRole": "owned-mtls-client",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "unchanged-mtls",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "channelVersion": 3,
+              "nodeCertificateDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+              "controlCertificateDERSHA256": "b22c528e1e1803f63170865874979a6096bf8403c802827f000e31532039f071",
+              "endpoint": "fixture-endpoint",
+              "authoritySHA256": "cccfec6ccb0316895cfcbcabd5e38bf776483a7cf14042efbf1283244a54b453"
+            }
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "abceb18136747c6202090decd80e37359152824aad3ba6b0fb4bdfad864e06c3",
+            "artifactSHA256": "4af492afcd847adab2104b26dfb688f104dc54e15a4b5e803f81f80679105aa3",
+            "scopeSHA256": "2c36dafaed37489f8209521b9b1a5c433d4abfa56e895ae885ca0d6085d12757",
+            "signerKeySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+            "contractId": "saintvision-proof-protected-tree-equality:1",
+            "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "protected-tree-equality",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "volumeMetadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+              "beforeTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+              "afterTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+              "operationId": "fixture-operation-migration"
+            }
+          },
+          "execReceipt": {
+            "contractSHA256": "e5afd0d36a78148791a1aa3cccc8619715a3a595f118186a92406f17335f078f",
+            "artifactSHA256": "77e31f88efc88ce9fdb156da5bbf228a9b6caf98b2af66d5aa694581e3e639af",
+            "scopeSHA256": "6b7c5a81ebacdf26c96efc42eaf68e1e4e036bd9da803ab7b20f459876ec5f92",
+            "signerKeySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+            "contractId": "saintvision-proof-owned-engine-exec:1",
+            "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "owned-engine-exec",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+              "containerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+              "execId": "f2a1a4ecce940896ac94d888cfaceb3ff085ffc84ecb98d70135992eb63a0ba1",
+              "commandSHA256": "86afff0ff5e0f1ea74dd4f12944a625b2c52d99db0907a166495965e901f7719",
+              "uid": 1,
+              "exitCode": 0
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "f69e1399054fa908c5ce2ba136745cd13de45c8d87472e672ca0f52d6456abe4"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-26",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-26",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-26-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-26-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-26-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-26-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "inventory",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "inventory",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-26",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-26",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-16-verifyBootstrap-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-16-verifyBootstrap-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-16-verifyBootstrap-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "0be14c0116f5cb13cd3cd7531a7bb00344a93afea6bec99d9fcf3cc454f1dbc1",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "b545790b7ae86e30b77b8a6c2120280e864da3c1cf6523c7504dac9838fd63d7",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "9ebc985ca50a9d3322a6f6b5b4c935c1848d33fc4ef444355e502e63d6ad08bc",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": null,
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "11e7aabbd8f46eeb0b232643e1bbd306b48ea4d1bffc7ff9df3b0067e25547e5"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "fence-released",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "fence-released",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "publishInventory",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "0c92b5776c513b62162ac89f6061b2901315d36200062ce2e87b67858460169c",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+            "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "candidateInventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "expectedPriorInventoryHead": {
+            "presence": "ABSENT",
+            "envelopeSHA256": null,
+            "readbackProof": {
+              "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+              "artifactSHA256": "143aeef2405ca80253c004bdafc8467f7eea58af1e6cba145b7d533d684ea408",
+              "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+              "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+              "observedAt": "2030-01-01T00:00:00Z",
+              "validUntil": "2030-01-01T00:01:00Z",
+              "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+              "contractId": "saintvision-proof-inventory-head-readback:1",
+              "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+              "producerRole": "cp-inventory-reader",
+              "signerRole": "cp-inventory",
+              "typedSubject": {
+                "kind": "inventory-head-readback",
+                "cohortId": "fixture-cohortId",
+                "presence": "ABSENT",
+                "envelopeSHA256": null,
+                "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+              }
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": "a368f38f4891d9f282d0ef9b818c9f34f52d446c39bcfbb5871be652fb3cc1d3",
+        "expectedCohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "lease-restore",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "lease-restore",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-27",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-27",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-27-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-27-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-27-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-27-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-28",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-28",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-27",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-27",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-28-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-28-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-28-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-28-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-28",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-28",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "seal",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "3912d7536b7840f87b110bb7f4437025dfcf03a6baa125a2af289967f96d9239",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "PRESENT",
+          "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "183e7b71dd4172ddd3e2206452f760de1c9703b885aab4cc77bf0f1edbd2bde5",
+            "scopeSHA256": "83626e7906ec26c07778f885be221986edb3f1a6bbf99734aeb234ae77d6d00b",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "PRESENT",
+              "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "rootSealDecision": {
+            "contractSHA256": "f624cb87142d0905fd654f2167b66313b396b9055838e7648bf70a703cea71ca",
+            "artifactSHA256": "a777e9b005208418ea46af9dc88e00f4e53e727616f789b9fbd14d74407b1d4a",
+            "scopeSHA256": "875a87dae9f20dc130d3f44f09d6bd83e1b7a07203054eb6e94f3216e612e871",
+            "signerKeySPKISHA256": "6ba69d2ce842abe4b8d1a197d1ed497e07a2ef3c7a9ebf4c72dfddaa5df9d8b3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/arguments/rootSealDecision",
+            "contractId": "saintvision-proof-root-seal-decision:1",
+            "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-seal",
+            "typedSubject": {
+              "kind": "root-seal-decision",
+              "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+              "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "migrationId": "fixture-first-migration"
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "b6272bb2db01970740407e10e63b797278e0ef873da5d461575af481bdd59679"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "response-request-17-publishInventory",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-17-publishInventory",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-17-publishInventory",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "59e0afb8c01a4f769ebb77e818a5bff30eb68cd4f85eb5a552deabdf0adef966",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "0c92b5776c513b62162ac89f6061b2901315d36200062ce2e87b67858460169c",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "13d836fb1ace328d018d615a42ebbd2d2aee34d2807f556f0e380b461c75528b",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": "53390cf8efaebe9c9a16ac13089c36cc58d1cbbd89e5a4c646cb5c8ee1d8f5f7",
+        "cohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "event-29",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-29",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-29-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-29-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-29-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-29-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-30",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-30",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-29",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-29",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-30-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-30-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-30-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-30-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-30",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-30",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-18-seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-18-seal-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-18-seal-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "d52c47ba428a9eb33236681d6a9445090bae98838b3af953201e0dff06ed6197",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "3912d7536b7840f87b110bb7f4437025dfcf03a6baa125a2af289967f96d9239",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "9e473d994349d7ab0c19d096cf8354d529e8cf8841c60939297992fdd8f31a8d",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "9dec5da45dcd949ab7cab559940f3d38f6482bedee6b126a5dd200a45ecab95d"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "seal",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "81572363a47e5a3ce1bcec0c5af148942efd530c9fb8283c84e6ba76c4aae4b7",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "PRESENT",
+          "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "183e7b71dd4172ddd3e2206452f760de1c9703b885aab4cc77bf0f1edbd2bde5",
+            "scopeSHA256": "83626e7906ec26c07778f885be221986edb3f1a6bbf99734aeb234ae77d6d00b",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "PRESENT",
+              "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC4",
+          "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "rootSealDecision": {
+            "contractSHA256": "f624cb87142d0905fd654f2167b66313b396b9055838e7648bf70a703cea71ca",
+            "artifactSHA256": "8b013c218eaf3b619fb4454b5b692b733694ea226e282db66e3634de9f779ead",
+            "scopeSHA256": "e02e04b99633a7c7eb54eb743aaffe3413655a6851376c2c86915409a345180a",
+            "signerKeySPKISHA256": "ffd1d669a33a135f0b8587b6944ec15083c92e282f09d79f20f2dc27b6bca29d",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/arguments/rootSealDecision",
+            "contractId": "saintvision-proof-root-seal-decision:1",
+            "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-seal",
+            "typedSubject": {
+              "kind": "root-seal-decision",
+              "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+              "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "migrationId": "fixture-first-migration"
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "beedd1868df706ec6b27bb0fa2c0a6da387bdb1b0bd2935a150654d2751b6775"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-31",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-31",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-31-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-31-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-31-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-31-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-32",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-32",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-31",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-31",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-32-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-32-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-32-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-32-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-32",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-32",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-19-seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-19-seal-PC4",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-19-seal-PC4",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "8e5c1dd24f07c90dfad6c70c9a5ca0d4ab3da56c2ea9a76508b7bc954d84ad66",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "81572363a47e5a3ce1bcec0c5af148942efd530c9fb8283c84e6ba76c4aae4b7",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "3c2693b6e5aae328bb07a3143cf93d8bc80f60154da97f3b01c7577ec73ebc41",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "49264e7072357380e0b3398495dd85d41a61247bf7dfb7b44da6150b9d2e1a54"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-20-readState",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-20-readState",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-20-readState",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "readState",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "5ba23becddd9a5dd2953c683d7f354b622558eb76e9921a158386e7a1c516ab1",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "PRESENT",
+          "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "183e7b71dd4172ddd3e2206452f760de1c9703b885aab4cc77bf0f1edbd2bde5",
+            "scopeSHA256": "83626e7906ec26c07778f885be221986edb3f1a6bbf99734aeb234ae77d6d00b",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "PRESENT",
+              "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {},
+        "expectedNodeProjectionEnvelopeSHA256": "2b5225cd2b6cdedde9628583f9dc02666b82a737d5cc2e0208f96c7470842aac",
+        "expectedCohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-33",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-33",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-33-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-33-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-33-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-33-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-33",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-33",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-20-readState",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-20-readState",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-20-readState",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "0d09f6e25196edb065a5fb119ec8be3c2a16d7eb784c032b5df433440043db68",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "5ba23becddd9a5dd2953c683d7f354b622558eb76e9921a158386e7a1c516ab1",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "8a13b5491c0a78417b4843bdffc83cb9af232f2ca4865642b18aa96132dcb64e",
+        "leaseEnvelopeSHA256": "ed3c9d991f0be91ed47187033c833a6d009a74cf9f43d2f6fa6e3cefc43445bc",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": "d741cb8360a0229acbb6ed5fae3b5a6eeeb49180c018a0044bb0cc490a71e3f9",
+        "cohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "request-21-release",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-21-release",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-21-release",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "release",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "576ddd8337e54a5e20485e62bb6b3874ac2fcc01a7f888b0a1630b431afeba1f",
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "PRESENT",
+          "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "183e7b71dd4172ddd3e2206452f760de1c9703b885aab4cc77bf0f1edbd2bde5",
+            "scopeSHA256": "83626e7906ec26c07778f885be221986edb3f1a6bbf99734aeb234ae77d6d00b",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "PRESENT",
+              "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "allDescendantsQuiescent": {
+            "contractSHA256": "78ec197d2757fc8bb8abd0d0574e632220a0b9c1a7991610d13879c439bf70c1",
+            "artifactSHA256": "ab257d26f8b246305a5d4509b2ece58c3edba8b3ad4d72bf00052c5a4ebbf25b",
+            "scopeSHA256": "11924c1ba46273bceef39b3962ba70d65d064aaaf5386b12c3b208ae48eae411",
+            "signerKeySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+            "contractId": "saintvision-proof-descendant-quiescence:1",
+            "signatureDomainASCII": "saintvision/proof/descendant-quiescence/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "descendant-quiescence",
+              "operationId": "fixture-operation-migration",
+              "fenceEpoch": 1,
+              "descendantSetSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "allQuiescent": true
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": "d741cb8360a0229acbb6ed5fae3b5a6eeeb49180c018a0044bb0cc490a71e3f9",
+        "expectedCohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "event-34",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-34",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-34-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-34-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-34-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-34-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-34",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-34",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-request:2",
+        "method": "restoreNewRestartPolicy",
+        "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+        "operationId": "fixture-operation-restore",
+        "idempotencyKey": "fd2913006b8ac0de3c21de72d781257734f13b026008a1002b24613e6b21c9ec",
+        "expectedFenceEpoch": 2,
+        "expectedInventoryHead": {
+          "presence": "PRESENT",
+          "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "e587334f42e7795a261abe613a5c127ca5aa920d06e30346937eb2eb97d33df1",
+            "scopeSHA256": "83626e7906ec26c07778f885be221986edb3f1a6bbf99734aeb234ae77d6d00b",
+            "signerKeySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "fixture-cohortId",
+              "presence": "PRESENT",
+              "envelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+              "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+          "rootRestoreDecision": {
+            "contractSHA256": "de863ee37fe1ef39e2556485ccbae03b4f7420fb0fdddb97137c8fba2c6efdb7",
+            "artifactSHA256": "59d061738bafd967736565b918d0215abe2797c6a681b802412810669cbe57cf",
+            "scopeSHA256": "0d9fd625d12df28ec5a59ccbc48943d664b5722df2025c4882535b076f3dc070",
+            "signerKeySPKISHA256": "1126e8d5e524bfc44f0f97415f6a33fd41b3d76a355ca653599214e978c94e0e",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+            "contractId": "saintvision-proof-root-restart-restore:1",
+            "signatureDomainASCII": "saintvision/proof/root-restart-restore/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-execution",
+            "typedSubject": {
+              "kind": "root-restart-restore",
+              "planEnvelopeSHA256": "ffa9c58486663becde4a6ea1deb5616a7e239b4622176b4000f9d038c70b769f",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "newContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+              "terminalSealEnvelopeSHA256": "531275ca510ee01f91589ea8263195b1788336470018d56b03f8ede336d86056",
+              "operationId": "fixture-operation-restore",
+              "restartPolicy": "unless-stopped"
+            }
+          }
+        },
+        "expectedNodeProjectionEnvelopeSHA256": null,
+        "expectedCohortProjectionSetDigestSHA256": "6ea7a0be6beda5ba33cbf894ba917d740517a66e1c850c135db2e8fc54d8fc6c"
+      },
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "node": "response-request-21-release",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-21-release",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-21-release",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "1c9932c3fe3a9b95ba8f0f4b83242eeefd84f2425662759b42eb02186b1b6aae",
+        "operationId": "fixture-operation-migration",
+        "idempotencyKey": "576ddd8337e54a5e20485e62bb6b3874ac2fcc01a7f888b0a1630b431afeba1f",
+        "status": "RECORDED",
+        "eventEnvelopeSHA256": "3ac73c55d9f9f5635f7cd7ef01fc314d1078785996d87fdc0960d48668b06cf5",
+        "leaseEnvelopeSHA256": "667826ced59ba27e8f5395c4c56c1fbf2d6a210440a96994ed03cd420f3d645a",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "none",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": "3ff3b0d7018f5d9ca57dc4a2ed56d9cb1acb2cef2ab742df46521c53df77d892",
+        "cohortProjectionSetDigestSHA256": null
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    },
+    {
+      "node": "event-35",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-35",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-35-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-35-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-35-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-35-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-36",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "event-36",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-35",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-35",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-36-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-36-PC2",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-36-PC4",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "projection-36-PC4",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-36",
+      "mutation": "caller digest classification",
+      "value": "TRANSPORT_DATA",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "cohort-36",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "caller digest classification",
+      "value": "DERIVED_DIGEST",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "caller digest classification",
+      "value": "SIGNED_ENVELOPE",
+      "expected": "REJECT_BEFORE_DIGEST_BY_PINNED_SCHEMA_KIND"
+    },
+    {
+      "node": "response-request-22-restoreNewRestartPolicy-PC2",
+      "mutation": "swap explicit Node versus cohort reference",
+      "candidate": {
+        "schemaVersion": "saintvision-bootstrap-api-response:2",
+        "requestSHA256": "3f262b82aede322ada5a4291f8f2a388829019eb8f1adf40fce060de7591c2ea",
+        "operationId": "fixture-operation-restore",
+        "idempotencyKey": "fd2913006b8ac0de3c21de72d781257734f13b026008a1002b24613e6b21c9ec",
+        "status": "UNKNOWN",
+        "eventEnvelopeSHA256": "2274987cde7c867af74f4a536afca600bee6687d13fdb49244c3533507bb0c1b",
+        "leaseEnvelopeSHA256": "c186c27387b7349f7004719cc3ce658467f4fd9a65d75169addc7d88cd2bf2a1",
+        "inventoryEnvelopeSHA256": "2ead29307f39b9636f96c85f0bc63175dc79c27601cca972ab1230d066b98403",
+        "errorCode": "engine-unknown",
+        "sideEffectPermitted": false,
+        "nodeProjectionEnvelopeSHA256": null,
+        "cohortProjectionSetDigestSHA256": "7f621ba6c201ff59a3ed522786f2d15ff9d3f2600e72f6f5b26274ab2336a60e"
+      },
+      "expected": "REJECT_AUTHENTICATED_REQUEST_SCOPE_AND_GRAPH"
+    }
+  ],
+  "actualSignatureVerification": 0,
+  "exitCode": 0
+}

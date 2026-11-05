@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "fleet5-v5-full-git-path-audit:1",
+  "argv": [
+    "git",
+    "diff",
+    "--no-ext-diff",
+    "--no-renames",
+    "--name-status",
+    "-z",
+    "eed826e7fb066193d3a2d9d28abda15216264f77"
+  ],
+  "startKST": "2026-11-06T04:41:00.023166+09:00",
+  "endKST": "2026-11-06T04:41:00.974533+09:00",
+  "exitCode": 0,
+  "pathspecUsed": false,
+  "encoding": "strict UTF8 actual NUL Git fields",
+  "rawOutputSHA256": "273774b7dfcf4a2094ebb0942dad2d5933525dcc32b2cb2033872d039f6a3a4f",
+  "actualNameStatus": [
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/actual-bindings-HOLD.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/actual-git-path-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/api-request.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/api-response.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/artifact-reference-graph.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/cohort-projection-set.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/derived-byte-ordering-vectors.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/derived-context-rehash-negative-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/derived-digest-contract.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/document-authoring-provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/document-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/dummy-signer-policy.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/dummy-signer-swap-negative-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/effective-schema-document-dependencies.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/explicit-prior-reference-negative-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/preprune-equivalence.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/preprune-recovery-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/proof-slot-registry.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/proposal-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/recipe-definitions.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/recovered-original-preprune-seed.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/reference-graph-coverage.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/review-response.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/scenario-inputs.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/scenario-objects.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/trust-bootstrap-contract.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/type-separation-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/unsigned-derived-contract.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_contracts_v5_unsigned_context_Codex.md"
+    }
+  ],
+  "changedPaths": 29,
+  "allUniqueV5Additions": true,
+  "oldModifiedDeletedRenamed": 0
+}

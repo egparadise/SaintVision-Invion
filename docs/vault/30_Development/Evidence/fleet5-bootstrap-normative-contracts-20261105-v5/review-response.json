@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "fleet5-v5-author-response:1",
+  "actualPriorReview": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+  "priorVerdictsPreserved": "v4 Low delta design ACCEPT; signed aggregate ABI NOT ACCEPTED for registration",
+  "priorReviewDocsRootVerified": 42088999346,
+  "RootDecision": "UNSIGNED domain-separated DERIVED_DIGEST, never signing aggregator authority",
+  "currentVerdict": null,
+  "responses": {
+    "V4-M1": "Closed flat unsigned record; no signer/key/grant/producerRole or signing-policy assignment; unique derived domain; independent source verification required before local comparison",
+    "V4-I1": "Exact plan/cohort/order/migration/op/epoch/lease/currenthead/readback/both current Node refs; API2 fields explicitly distinguish Node envelopes and cohort derived digests; all dependent hashes regenerated",
+    "V4-I2": "115 CURRENT signed-SHAPE envelopes and112 structured reference keys map to explicit role/Node/code dummy policy; Node-specific keys/signature bytes distinct;36 unsigned sets have no assignment; actual signatures verified0",
+    "V4-I3": "Original staged synthetic Git blob actually recovered and published unchanged;61973 bytes match recorded rawSHA256;102 pointers reproduce v4 preprune-to-final equivalence; archive not a v5 positive"
+  },
+  "staticResults": {
+    "schemaVersion": "fleet5-v5-document-validation:1",
+    "observedAtKST": "2026-11-06T04:33:23.489988+09:00",
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "objects": 195,
+    "bindingRules": 3469,
+    "nonProofLeaves": 6671,
+    "unclassified": 0,
+    "digestClassifications": {
+      "SIGNED_ENVELOPE": 115,
+      "TRANSPORT_DATA": 44,
+      "DERIVED_DIGEST": 36
+    },
+    "actualSignatureVerification": 0,
+    "structuredUntrustedReferenceCount": 112,
+    "derivedContextRehashNegatives": 432,
+    "dummySignerMetadataRehashNegatives": 342,
+    "explicitPriorOldFieldRejects": 44,
+    "byteVectors": 4,
+    "orderingAndSignatureFieldRejects": 7,
+    "originalPrepruneBytesRecovered": true,
+    "originalV4PointerEquivalence": 102,
+    "actualGoOSLockEngineAtomicityEquipment": 0,
+    "all40FutureProductCases": "NOT RUN",
+    "actualBindings": "NULL/HOLD",
+    "registrationImplementationAuthorization": false,
+    "exitCode": 0,
+    "pinnedDigestKindChecks": 195,
+    "digestKindAndExplicitReferenceConfusionCases": 433,
+    "historicalSignedV4ShapeRejected": true
+  },
+  "effectiveSchemaDocuments": 17,
+  "rejectedSignedAggregateRegistered": false,
+  "actualRegistrationImplementationOperations": false
+}
