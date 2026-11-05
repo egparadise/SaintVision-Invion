@@ -1,10 +1,12 @@
 {
   "task": "task_05d9dcda1dca",
-  "publicPlanSHA256": "846a5b5c14049048a63cdfa062330d9ac7b27f6b4ad5410cf1c667617e19182c",
+  "revision": 2,
+  "supersedesPublicPlan22faSHA256": "846a5b5c14049048a63cdfa062330d9ac7b27f6b4ad5410cf1c667617e19182c",
+  "publicPlanSHA256": "5121cb834016ebf86fd7433bcca3c3c89446374965a05f71a069158afe44d35f",
   "sourceArchiveSHA256": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9",
-  "privateParametersSHA256": "629584cc62209d4a4752ff68b964eb594fa8eb8ffbaac24dbdf6bca3800b7286",
-  "privateExecutionVectorsSHA256": "a9c6d1e353f1e42fe80423f614625fe8f6ab97ac78722c0c3b71f85a91008c4f",
+  "privateParametersSHA256": "a806685a72b3ad6c5f43206d4f2619309d2f76403a3db7fe0b574b44aba04984",
+  "privateExecutionVectorsSHA256": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7",
   "privatePacketDirectory": "D:\\Project\\SaintVisionI-Invion\\fleet5-worker-readiness-20261105\\.work\\f5-first-wave-plan",
-  "hashDomain": "exact UTF-8 LF public JSON / raw private file bytes",
+  "hashDomain": "exact UTF-8 LF public JSON / raw private files",
   "executed": false
 }

@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "f5-first-wave-plan:1",
+  "schemaVersion": "f5-first-wave-plan:2",
   "task": "FLEET5-FIRST-WAVE-PLAN-20261105",
   "orcaTask": "task_05d9dcda1dca",
   "dispatch": "ctx_faa86b318dd8",
   "owner": "Codex",
   "reviewer": "Claude",
-  "status": "nonexecuting; ready for independent plan review; runtime gates remain",
+  "status": "nonexecuting P1-P8 corrected proposal; OS firewall authority blocked and actual build/runtime proofs pending",
   "branch": "agent/codex/fleet5-first-wave-plan-20261105",
   "base": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
   "productSource": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
@@ -15,7 +15,7 @@
   "database": "saintvision_lan_f5_59f0a3c2_20261105_w12",
   "postgresImage": "postgres@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54",
   "goImage": "golang@sha256:60deed95d3888cc5e4d9ff8a10c54e5edc008c6ae3fba6187be6fb592e19e8c0",
-  "newCAPolicy": "fresh development pilot self-signed, no reuse/import/system trust change; actual leaf expiry/renewal ownership bound after init",
+  "newCAPolicy": "fresh distinct external Ed25519 root/intermediate via source59f intranet_pki init-node-mtls; encrypted issuer key/password-file/chain/revocations bound at first init; never r5 issuer; generated hashes/NotAfter only after reviewed generation",
   "partialTopology": {
     "plannedTotal": 5,
     "phaseOneActualTargets": 2,
@@ -152,11 +152,12 @@
       "newProjectRoot": "$HOME/.local/share/saintvision/f5-59f0a3c2-20261105-w12",
       "newNodePrivateRoot": "$HOME/.local/share/saintvision/<new assigned Node ID>",
       "permissions": "0700 directories/0600 key or credential files; only new owned paths",
-      "workspaceMounts": false,
       "storageHardQuotaConfigured": false,
-      "storageAdmission": "20GiB ceiling includes new namespace image/artifacts/DB volume; record per-stage owned usage and stop new phase before ceiling, never prune old data",
+      "storageAdmission": "policy ceiling20GiB only for owned namespace artifacts/DB; no hard quota or Workspace/storage combination is claimed",
       "declaredExistingCeiling": "9000m CPU; inventory RAM11953892352/12360480768B; GPU1; storage187344098304B",
-      "steadyNewAllocation": "Node0.5CPU/256MiB"
+      "steadyNewAllocation": "Node0.5CPU/256MiB",
+      "newFolders": "input/artifact and worker2 DB-credential directories only; unused workspaces omitted",
+      "workspaceOrStorageContribution": false
     },
     {
       "slot": "worker2",
@@ -171,11 +172,12 @@
       "newProjectRoot": "$HOME/.local/share/saintvision/f5-59f0a3c2-20261105-w12",
       "newNodePrivateRoot": "$HOME/.local/share/saintvision/<new assigned Node ID>",
       "permissions": "0700 directories/0600 key or credential files; only new owned paths",
-      "workspaceMounts": false,
       "storageHardQuotaConfigured": false,
-      "storageAdmission": "20GiB ceiling includes new namespace image/artifacts/DB volume; record per-stage owned usage and stop new phase before ceiling, never prune old data",
+      "storageAdmission": "policy ceiling20GiB only for owned namespace artifacts/DB; no hard quota or Workspace/storage combination is claimed",
       "declaredExistingCeiling": "9000m CPU; inventory RAM11953892352/12360480768B; GPU1; storage187344098304B",
-      "steadyNewAllocation": "Node0.5CPU/256MiB plus DB1CPU/768MiB"
+      "steadyNewAllocation": "Node0.5CPU/256MiB plus DB1CPU/768MiB",
+      "newFolders": "input/artifact and worker2 DB-credential directories only; unused workspaces omitted",
+      "workspaceOrStorageContribution": false
     }
   ],
   "cpImpact": {
@@ -191,7 +193,7 @@
     "noLocalDockerOrWSLChange": true,
     "noNewWindowsInboundListener": true,
     "noNewWebOrConsole": true,
-    "newProcesses": "one attended SSH tunnel plus sequential transient existing Python3.14.7",
+    "newProcesses": "one attended SSH tunnel and sequential transient non-r5 main-repo Python3.14.7 with -B; tunnel closed at session end/before excluded windows",
     "requirementsClosureUnchangedBetweenSource03And59f": true
   },
   "timing": {
@@ -206,13 +208,15 @@
     ]
   },
   "nextTechnicalGates": [
-    "Claude exact packet review",
-    "fresh prebind collision/headroom check and old-r5 hash/live comparison",
-    "new DB/name/port/digest and SCRAM rejection proof in isolated namespace only",
-    "hash newly generated identity/CA/epoch outputs before any per-Node preparation",
-    "bounded source59f image build and actual artifact digest/size proof; stop on nonzero",
-    "Linux18515 CP-only ingress and unauthorized-source denial proof by authorized operator",
-    "two real fresh advancing mTLS observations, zero offers/runs and old r5 healthy"
+    "Claude exact corrected packet review",
+    "actual already-authorized worker1/2 root firewall operator: current sudo-n queries both failed; no privileged Docker bypass",
+    "fresh external issuer generation and new hash/notAfter receipt before first init; identity disjointness against all old catalog",
+    "main non-r5 interpreter -B/no pip and complete pre/post tree hash equality",
+    "PG_MAJOR16 and actual new server_version_num160000..169999 before migrations",
+    "actual classic probe+source RUN caps/legacy-path proof and daemon completion/ownership, otherwise abort",
+    "CP authenticated success plus live worker3 TCP-denial/rule-counter proof at18515",
+    "outside excluded r5 windows, close attended tunnel/stop only new idle f5 resources before window",
+    "two real2-of5 fresh advancing mTLS observations, zero offers/runs, preserve oldr5"
   ],
   "rollback": {
     "trigger": "any nonzero, r5 regression, scope/hash mismatch or headroom/space threshold breach",
@@ -228,12 +232,16 @@
   },
   "inputSHA256": {
     "sourceArchive": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9",
-    "parameters": "629584cc62209d4a4752ff68b964eb594fa8eb8ffbaac24dbdf6bca3800b7286",
-    "executionVectors": "a9c6d1e353f1e42fe80423f614625fe8f6ab97ac78722c0c3b71f85a91008c4f",
+    "parameters": "a806685a72b3ad6c5f43206d4f2619309d2f76403a3db7fe0b574b44aba04984",
+    "executionVectors": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7",
     "collisionRaw1": "7461ef28d099a42fdf5c60659c06a5aca755724434e9e43f21002149d0ecf064",
     "collisionRaw2": "72654782c0f39ef794f86b8ab7c871498afc1a939bafb8238aaf8cccd6e0f3fb",
     "allBindings1": "389bc1dd98c71ea7d87e927ac8572fb4d394858344ea3875eb5970be64966ace",
-    "allBindings2": "bf98f6c069a5fed3bf4108b7f74fd6668da44fc7afe7a385894968887b88215e"
+    "allBindings2": "bf98f6c069a5fed3bf4108b7f74fd6668da44fc7afe7a385894968887b88215e",
+    "oldIdentityCatalog": "2462dd139859df5cf58e28a83b3c9d75ee14e49faa4ef5e30470b7300f880a99",
+    "buildProbeDockerfile": "f9f6424c6bde6cdd92357975ac9dd020f9c4fb44e27de84107ac97e3c4574c1f",
+    "mainVenvBefore": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750",
+    "mainVenvAfter": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750"
   },
   "sourceFileSHA256": {
     "tools/lan_pilot.py": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
@@ -247,7 +255,10 @@
     "services/node-agent/go.mod": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990",
     "services/node-agent/go.sum": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
     "requirements-core.txt": "a6bbe231c4b68e7a3315b6e46057cfa94915f10006b8cc7f419fe483a66b6ce6",
-    "requirements-backend.txt": "135e7f972b2f0c204ebf6147ad38793472930cec8d2ea0de3e5c641d289d46ae"
+    "requirements-backend.txt": "135e7f972b2f0c204ebf6147ad38793472930cec8d2ea0de3e5c641d289d46ae",
+    "tools/intranet_pki.py": "13774a637ccfa8d3ae10f1a996a0d5334e7b0a7a0d19248910a245de53189f01",
+    "deploy/lan/worker_leaf_rotation.py": "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4",
+    "deploy/lan/leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
   },
   "generatedRuntimeHashes": "not fabricated; mandatory post-init/pre-install checkpoint",
   "currentTaskMutations": {
@@ -257,7 +268,8 @@
     "enrollment": false,
     "container": false,
     "automation": false,
-    "adminAuthenticationAttempt": false
+    "adminPasswordAttempt": false,
+    "authorizedReadOnlySudoQueriesPerWorker": 1
   },
   "sharedResourceAssessment": {
     "existingR5DatabaseHost": "worker1; SSH tunnel15408 mapped read-only to established worker1",
@@ -266,5 +278,118 @@
     "observedResourceConflictRequiringNov10Delay": false,
     "newF5DBNodeFailureCorrelation": "worker2 loss affects both its new Node and the new F5 control-plane database; this is not independent-host recovery acceptance",
     "recoveryAcceptance": "must explicitly model correlated database/worker loss or separate storage before later failure-domain claims"
-  }
+  },
+  "reviewSource": "Claude53f5722f, root instruction msg_b60a7280993f",
+  "issuerExpiryOwner": "Codex root",
+  "interpreter": {
+    "observedAtKST": "2026-11-05T15:30:52.224623+09:00",
+    "nonR5Interpreter": "existing main-repository .venv/Scripts/python.exe",
+    "executableSHA256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+    "importCommandExit": 0,
+    "source59fCLIHelpExit": 0,
+    "runtimeAndPackages": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]\r\n{'cryptography': '50.0.1', 'psycopg': '3.3.5', 'SQLAlchemy': '2.0.52', 'alembic': '1.19.2', 'PyYAML': '6.0.3', 'rdflib': '7.1.4', 'pyshacl': '0.30.1', 'pytest': '9.1.1'}",
+    "beforeFileCount": 7333,
+    "afterFileCount": 7333,
+    "treeBytesUnchanged": true,
+    "beforeManifestSHA256": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750",
+    "afterManifestSHA256": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750",
+    "bytecodeDisabled": true,
+    "pipInvoked": false,
+    "source03To59fRequirementsDiff": "empty, checked earlier"
+  },
+  "oldIdentityCatalog": {
+    "stateCount": 10,
+    "uniqueOldTenantCount": 9,
+    "uniqueOldEpochCount": 9,
+    "uniqueOldNodeCount": 20,
+    "uniqueOldCACertificateCount": 4,
+    "privateCatalogSHA256": "2462dd139859df5cf58e28a83b3c9d75ee14e49faa4ef5e30470b7300f880a99",
+    "comparisonGate": "new F5 tenant/epoch/Node IDs/CA certs must be disjoint against this complete bounded old-state catalog before install; actual generated NotAfter recorded",
+    "generatedNewValues": "not yet created"
+  },
+  "firewallCapability": {
+    "task": "task_05d9dcda1dca",
+    "authorizationMessage": "msg_b60a7280993f",
+    "oneNoninteractiveReadOnlySudoQueryPerKnownEndpoint": true,
+    "results": [
+      {
+        "worker": 1,
+        "sshExit": 0,
+        "firewallQueryExit": 1,
+        "firewallAuthority": "unavailable; authorized operator gate remains",
+        "interactiveAuthenticationRequired": true,
+        "passwordOrRetryAttempted": false,
+        "ruleMutationExecuted": false,
+        "selectedPostgresMetadata": null,
+        "startKST": "2026-11-05T15:29:59.977335+09:00",
+        "endKST": "2026-11-05T15:30:00.458681+09:00",
+        "rawReceiptSHA256": "5d1178aca68a4a34c1037cc0275dd331c05a0ec692990bce3d7aa0f99eb53e5d"
+      },
+      {
+        "worker": 2,
+        "sshExit": 0,
+        "firewallQueryExit": 1,
+        "firewallAuthority": "unavailable; authorized operator gate remains",
+        "interactiveAuthenticationRequired": true,
+        "passwordOrRetryAttempted": false,
+        "ruleMutationExecuted": false,
+        "selectedPostgresMetadata": {
+          "exit": 0,
+          "PG_MAJOR": [
+            "16"
+          ],
+          "stderr": ""
+        },
+        "startKST": "2026-11-05T15:30:00.459683+09:00",
+        "endKST": "2026-11-05T15:30:00.783397+09:00",
+        "rawReceiptSHA256": "13d0195753bb5b1157bf5c84cc26bac1a3adaa64fcff0b60e04032cbf9fa5787"
+      }
+    ]
+  },
+  "runtimeExecutionAccepted": false,
+  "excludedRenewalWindowsKST": [
+    [
+      "2026-11-08T14:20:00+09:00",
+      "2026-11-08T18:32:00+09:00"
+    ],
+    [
+      "2026-11-09T12:15:00+09:00",
+      "2026-11-09T16:27:00+09:00"
+    ],
+    [
+      "2026-11-10T08:00:00+09:00",
+      "2026-11-10T12:12:00+09:00"
+    ]
+  ],
+  "tunnelLifetime": {
+    "excludedKST": [
+      [
+        "2026-11-08T14:20:00+09:00",
+        "2026-11-08T18:32:00+09:00"
+      ],
+      [
+        "2026-11-09T12:15:00+09:00",
+        "2026-11-09T16:27:00+09:00"
+      ],
+      [
+        "2026-11-10T08:00:00+09:00",
+        "2026-11-10T12:12:00+09:00"
+      ]
+    ],
+    "rule": "do not start f5 subprocess/registration/build in these windows; finish/settle each command and detach no unknown children before entry; wait longer if real r5 completion is unknown",
+    "tunnelLifetime": "attended session only; close new55458 tunnel by recorded PID/creation/command identity at session end and before excluded window; never old15408/55448",
+    "idleF5Containers": "after time-bounded connection evidence, stop only owned new F5 Nodes and PG before an excluded window; retain keys/epochs/volumes/state; no persistence or online claim while stopped",
+    "noAutomationChanges": true
+  },
+  "buildProofAndTimeout": {
+    "currentCapsStatus": "unproved; best-effort proposals only until actual classic RUN/cgroup and HostConfig evidence",
+    "plannedProbeDockerfileSHA256": "f9f6424c6bde6cdd92357975ac9dd020f9c4fb44e27de84107ac97e3c4574c1f",
+    "probe": "future worker1 classic docker build with the same2CPU/1GiB flags and unique f5 probe tag; do not execute product build unless cgroup checks and live RUN HostConfig show CpuQuota200000/CpuPeriod100000/Memory1073741824",
+    "sourceBuild": "retain exact59f Dockerfile; record legacy builder output and every Running in <CID>; inspect actual owned RUN caps while live; abort on missing cap proof",
+    "egress": "record actual go env GOPROXY/GOSUMDB from pinned Go probe; jsonschema/v6@v6.0.2 and x/text@v0.14.0 retrieved via configured Go proxy/sumdb, with any direct fallback/module origin recorded and reviewed; Go go.sum validation stays enabled, no GOSUMDB=off or TLS bypass",
+    "daemonOwnership": "client timeout never proves daemon exit; append classic Running in CIDs and creation time/source-step command/parent-image/labels to fresh owned journal; inspect and stop only matching new RUN containers, otherwise mark completion-unknown and block further work",
+    "timeoutCleanup": "after timeout require owned RUN containers exited/absent and build completion settled; preserve source/image/logs, do not prune or touch unknown/r5 containers; no new steps or renewal-window entry with unresolved build ownership",
+    "executed": false
+  },
+  "freshIssuerPathsCreated": false
 }

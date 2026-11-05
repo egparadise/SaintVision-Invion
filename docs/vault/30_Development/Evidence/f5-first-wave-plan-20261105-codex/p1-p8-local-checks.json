@@ -1,0 +1,94 @@
+{
+  "checks": [
+    {
+      "name": "preferred-runtime-existing-worker-tests",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/core/test_lan_worker_config.py",
+        "-q"
+      ],
+      "startKST": "2026-11-05T15:39:02.360243+09:00",
+      "endKST": "2026-11-05T15:39:04.988474+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-docs",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-05T15:39:04.988474+09:00",
+      "endKST": "2026-11-05T15:39:19.666735+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-ontology",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startKST": "2026-11-05T15:39:19.666735+09:00",
+      "endKST": "2026-11-05T15:39:21.989796+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-sync-check",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startKST": "2026-11-05T15:39:21.989796+09:00",
+      "endKST": "2026-11-05T15:39:28.181130+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-duplicates",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-05T15:39:28.181130+09:00",
+      "endKST": "2026-11-05T15:39:28.654830+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-paths",
+      "argv": [
+        "<main non-r5 Python3.14.7>",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "HEAD"
+      ],
+      "startKST": "2026-11-05T15:39:28.654830+09:00",
+      "endKST": "2026-11-05T15:39:38.196301+09:00",
+      "exit": 0
+    },
+    {
+      "name": "corrected-diff",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startKST": "2026-11-05T15:39:38.196301+09:00",
+      "endKST": "2026-11-05T15:39:38.287668+09:00",
+      "exit": 0
+    }
+  ],
+  "noPip": true,
+  "noR5InterpreterSelected": true,
+  "remoteMutations": false,
+  "independentPlanReview": "pending corrected exact commit",
+  "actualP2OperatorAuthority": "BLOCKED both sudo-n queries1"
+}

@@ -1,0 +1,39 @@
+{
+  "task": "task_05d9dcda1dca",
+  "authorizationMessage": "msg_b60a7280993f",
+  "oneNoninteractiveReadOnlySudoQueryPerKnownEndpoint": true,
+  "results": [
+    {
+      "worker": 1,
+      "sshExit": 0,
+      "firewallQueryExit": 1,
+      "firewallAuthority": "unavailable; authorized operator gate remains",
+      "interactiveAuthenticationRequired": true,
+      "passwordOrRetryAttempted": false,
+      "ruleMutationExecuted": false,
+      "selectedPostgresMetadata": null,
+      "startKST": "2026-11-05T15:29:59.977335+09:00",
+      "endKST": "2026-11-05T15:30:00.458681+09:00",
+      "rawReceiptSHA256": "5d1178aca68a4a34c1037cc0275dd331c05a0ec692990bce3d7aa0f99eb53e5d"
+    },
+    {
+      "worker": 2,
+      "sshExit": 0,
+      "firewallQueryExit": 1,
+      "firewallAuthority": "unavailable; authorized operator gate remains",
+      "interactiveAuthenticationRequired": true,
+      "passwordOrRetryAttempted": false,
+      "ruleMutationExecuted": false,
+      "selectedPostgresMetadata": {
+        "exit": 0,
+        "PG_MAJOR": [
+          "16"
+        ],
+        "stderr": ""
+      },
+      "startKST": "2026-11-05T15:30:00.459683+09:00",
+      "endKST": "2026-11-05T15:30:00.783397+09:00",
+      "rawReceiptSHA256": "13d0195753bb5b1157bf5c84cc26bac1a3adaa64fcff0b60e04032cbf9fa5787"
+    }
+  ]
+}
