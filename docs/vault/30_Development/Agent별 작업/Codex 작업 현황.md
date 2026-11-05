@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.377"
+version: "1.0.378"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T03:45:20+09:00"
+updated: "2026-11-06T04:06:14+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "72028 all8/12/source packet ACCEPT and C-L1 CLOSED; v4 review65 active; e50 review6b pending dependency65; physical and final source choice pending"
-active_card_next: "Root handles actualv4 verdict then starts ready e50 task6b with proven/released worker lifecycle; bootstrap registration only after acceptance; B revision continues; PC1/PC3 local OS setup feedback needed"
+active_card_status: "72028 bounded delivery accepted; v4Low closed but auxM1 v5 docs revision; e50review6b active; B02cf reviewd4 pending after6b; OS setup feedback pending"
+active_card_next: "Handle e50 actual verdict/source choice then start readyB taskd4; bootstrapCodex v5 unsigned aggregate M1/I1-I3; actual reviews before registration/code/physical actions"
 ---
+
+## 2026-11-06 v4 판정·e50 실제 착수·B 개정 검토 대기
+
+작업한 것/확인: 전환v4는실제d2fab4a2/Docs42088999346에서기존Low3건과I1을닫았지만새cohort집계서명의V4-M1Medium은미수락이다. Root는서명권한없는domain-separated파생hash로v5를수정하도록replymsg_c12b3f544036로지시했다. 완료검토Task65의종료/자원해제를확인한뒤ready e50 Task6b를ctx_0e847a7f4af8에서실제착수시켰다. BroadB개정02cfd260은제품변경0/33문서추가·exactDocs42087817282성공을확인했으며새Node요청서명wire를포함해Taskd4c4c809ed4e를e50뒤검토대기로등록했다. 다음첫행동/담당: Claude가e50판정후Root는최종source선택과ready B검토를배정한다. 전환Codex는v5파생digest/fixturekey/seed증거정합성을보완한다. 별도서명role·코드·장비권한은아직부여하지않았고실제OS설정반영피드백도대기다.
 
 ## 2026-11-06 C-L1 수락과 v4/e50 순차 검토
 

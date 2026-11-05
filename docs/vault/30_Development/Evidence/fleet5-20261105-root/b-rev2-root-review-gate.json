@@ -1,0 +1,19 @@
+{
+  "source": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+  "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "Docs": 42087817282,
+  "rootVerifiedExactHeadAllJobsSuccess": true,
+  "docsFiles": 33,
+  "scopeIncludesProposedNewNodeRoleUseWire": true,
+  "reviewTask": "task_d4c4c809ed4e",
+  "actualReviewStarted": false,
+  "dependencyTask": "task_6baccbb465af",
+  "pendingOwnerQuestion": "msg_cc0b988ce5b2",
+  "implementationAuthorized": false,
+  "observedAtKST": "2026-11-06T03:54:41+09:00",
+  "taskStatus": "pending",
+  "resourceSequence": "after e50 task6b; one reviewer at a time",
+  "newNodeRoleUseTokenABI": "explicit proposed broader wire; requires actual architecture review, not ordinary CRUD",
+  "realGoPGDockerPhysical": 0,
+  "realBindings": null
+}

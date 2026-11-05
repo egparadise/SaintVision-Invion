@@ -1,0 +1,87 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_65f5ad416040 / ctx_f5268654ce53",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-06T03:38:04+09:00", "2026-11-06T03:53:13+09:00"],
+  "observedWindowSource": "own shell `date` outputs: first command of this review and the last check before writing; publication times are separate",
+  "reviewKind": "independent delta review of nonexecuting v4 document revision plus explicit review of the NEW proposed cohort-projection-set ABI; design verdict only; not registration, implementation authorization, runtime CI, physical or operational acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105 (remote head still eed826e7 at 03:49:15 KST)",
+    "commit": "eed826e7fb066193d3a2d9d28abda15216264f77",
+    "base": "5d0753e561149f1c4dface08583c232f10be15fc",
+    "priorReview": "a81f73309a43ced0f777b10b3c0781c98aa54e96 (my v3 report; read in full; its design acceptance is NOT borrowed as v4 closure)",
+    "delta": "22 added (21 under v4 Evidence + owner History), 0 modified/deleted/renamed; v1/v2/v3 dirs unchanged",
+    "docs": {"run": 42084619690, "headSHA": "eed826e7fb066193d3a2d9d28abda15216264f77", "event": "workflow_dispatch", "conclusion": "success", "jobs": "docs 1/1 success", "checkedByClaude": "GitHub API read only"},
+    "readFrom": "git archive of eed826e7 v4 dir + History into private scratch, plus my earlier extracts of 5d07 v3 and cb3 v2; author checkout untouched"
+  },
+  "hostNote": "constrained host (Root note: 16 GB, ~98% load); all checks ran sequentially in one Python process at a time; Bash tool used (PowerShell not needed); no process killed, no pagefile/security change",
+  "interpreter": "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe -B -I (3.14.7), jsonschema Draft 2020-12, referencing Registry without retrieve; own Go Marshal C2 emulator",
+  "reviewerPrograms": {
+    "note": "private scratch, not committed (no helper code authorized)",
+    "check_v4.py": "34648200e4ef586b9eb4ef22f99110bf7792e848bebb69f90d3c61876b897aa2",
+    "v4extra.py": "88ec6814c9cb34c71a5e9716ef149b2ba16ade178f37f8518b18159661f5a9eb",
+    "v4probe2.py": "06292c7579124ef5b7bf82d0efa4f742213d300fe091de1e80ad32fbcfa6f856",
+    "v4git.py": "e5f2f76f966f5dd795187c09303006e0b1531ec547670c61e33710501e4bc6a0",
+    "v4seed.py": "f17145a8b27365b6cdef352642656e78d2753cfb58d876cea8c54681ead5f466",
+    "rawOutput": "bootstrap-normative-contracts-v4-eed8-review-raw.json (LF; sha256 d5fee15bc5691a793951ceb9a86382ac38346a827bc11622c34add39f149af21; synthetic values only)",
+    "runs": [
+      {"startKST": "2026-11-06T03:44:17+09:00", "exit": 1, "note": "MY bug: looked for a verifyBootstrap 'outcome' record but the scenario records verify as readback; fixed lookup"},
+      {"startKST": "2026-11-06T03:44:41+09:00", "exit": 0, "note": "MY harness compared rule values without stripping typed proof objects (contract says strip only proofs) -> 61 false rule failures and regeneration mismatch; fixed"},
+      {"startKST": "2026-11-06T03:46:15+09:00", "endKST": "2026-11-06T03:46:31+09:00", "exit": 0, "note": "final main run"},
+      {"startKST": "2026-11-06T03:47:05+09:00", "endKST": "2026-11-06T03:47:50+09:00", "exit": 0, "note": "broad own mutants and probes; 2 'accepted' field swaps were MY artifact (alternative differed only in proof metadata; stripped values equal), confirmed by v4probe2"},
+      {"program": "v4git.py", "exit": 0}, {"program": "v4seed.py", "exit": 0}
+    ]
+  },
+  "independentChecks": {
+    "gitAudit": "own `git diff --no-ext-diff --no-renames --name-status -z 5d07 eed8` strict-UTF8 decoded: 22 pairs all A, list equals owner actual-git-path-audit, raw sha256 0047e0a1... equals owner's; all under unique v4 dir or owner History; v1/v2/v3 dirs 0 changes",
+    "ownerHashes": "20/20 artifactHashes equal committed blobs; historySHA256 equal",
+    "V3-I1": "historic v3 proposal-validation blob sha256 fab17377... equal; the faulty pathspec gate entry is quoted byte-for-byte (argv incl. 'Agent? ??', exit 0) and left unchanged; replacement is the no-pathspec NUL name-status audit above",
+    "dependencies": "18/18 effective schema documents (v2 9, v3 7, v4 2) equal declared bytes/sha256 and pass check_schema; unknown $ref fails closed; no network",
+    "objects": "195 nodes: plan 1, leases/fences 3, api-request 22, api-response 22, event 36, journal 72 (36 per Node), cohort set 36, inventory 1, seal 2; 195/195 schema-valid under the effective overlays; 195/195 node sha256 = SHA256(C2(payload))",
+    "rules": "own interpreter of the 9-operator grammar: 3173/3173 rules hold (proof objects stripped on both sides as specified); only self-reference is planSubject over its own plan (formula excludes its own field); no forward reference",
+    "coverage": "6411 non-proof leaves (incl. null/empty containers), each covered by exactly one rule (6411 x 1, 0 uncovered, 0 double); no rule points into a proof object; 112 proof objects",
+    "regeneration": "re-materializing every node from scenario-inputs in graph order with fresh digests reproduces all 195 published payloads and sha256 byte-for-byte",
+    "proofs": "112/112 embedded proofs derive under my v3-style recipe interpreter with graph context (plan, containing product/CI/head, member input, inventory current or input current container, per-Node dummy facts, recomputed final plan envelope / cohort scope vector / seal by slot); 75 distinct slots present (optional event-note slots absent, catalog unchanged: registry, recipes, trust contract and HOLD bindings byte-identical to v3)",
+    "ownerMutants341": "all 341 reproduced exactly (my candidate node sha256 = owner's 341/341); 341/341 rejected and in every case ONLY the selected rule fails; 159/341 are also schema-rejected, 182 only at the graph layer",
+    "ownMutants": "1221 generated own mutants with all dependents rebound and rehashed; 2 field swaps were my artifact (values equal after proof strip), leaving 1219 real: 377 digest swaps to another same-kind node, 339 field swaps, 398 PC2<->PC4 input swaps, 75 integer/add +1, 30 member event target swaps: 1219/1219 rejected, only the mutated rule fails in each; 1130 of the 1221 generated cases pass the schema after mutation (digest/input swaps 775/775), so the graph layer is what rejects them. Plus 16/16 same-shape swap mutants in the main run (14 schema-valid) rejected",
+    "V3-L1": "v4 overlay nulls top and effect target for all 5 cohort methods; owner 324 Cartesian cases agree 324/324 (66 valid/258 reject); my own 324 sweep finds no schema-accepted cohort target or member top/effect mismatch; member slot identity (PC2 vs PC4) is bound at the graph layer (30/30 swaps rejected)",
+    "V3-L2": "inventory.leaseEnvelopeSHA256 = env(lease-migration); inventory previousInventoryHead ABSENT; all 72 journals carry their member's plan scope/daemon/workerRoot/volume (0 deviations); both seals = inventory + own member current/backup/volume + the actual verifyBootstrap event of that Node",
+    "V3-L3": "trace admission replay: every request's expectedPriorProjection equals the then-current Node projection (member) or cohort set (cohort), expectedFenceEpoch equals the active lease, expectedInventoryHead ABSENT before / PRESENT env(inventory) after publication; released fence = same leaseId/op/token/owner, epoch 1, RELEASED, priorFence = migration lease; restore lease epoch 2, priorFence = released fence, new leaseId/op/token/ownerGeneration, both seals, PRESENT head; restore request epoch 2 and prior projection = released sealed PC2 projection (SEALED/RELEASED/NONE)",
+    "lifecycle": "36 events replayed: sequence and previousEvent chain exact; event request/idempotency/operation/lease/epoch exact; intent/outcome reuse the same request bytes; per-Node prior phase = that Node's current phase; both restart=no before first stop; serial PC2 chain then PC4; both verifies before publish; both seals before release; seals never dropped once present; responses bind request/event/projection/inventory with sideEffectPermitted false; last event 36 PC2 restore failure QUIESCENCE_UNKNOWN under HELD restore lease, PC4 SEALED, no later event",
+    "responseNote": "release response leaseEnvelopeSHA256 = env(fence-released) while its event records the active migration lease; consistent (response returns the post-release record), recorded as semantics not defect",
+    "inputs": "102 distinct input pointers used by rules, all resolve; plan seeds equal the immutable v3 plan body minus proofs and the old planSubject; policy equals v3 policy; facts = v3 facts + registeredFenceIdentitySHA256 + allowedManagedEntrypoints; 113 unused input leaves are proof-context facts/policy plus flags and plan.canonicalContractSHA256 (that field is bound to policy instead). fixtureOnly true / actualTrust false. The pre-prune seed 51c03704... is not published, so the owner's 'unchanged' claim about it is not independently verifiable",
+    "cohortSet": {
+      "schema": "closed; members exactly [PC2, PC4] in order; reversed order, slot relabel, third member, other signer role and extra field all schema-rejected",
+      "bindings": "36 sets, 36 distinct digests; each = plan envelope, event sequence, both current Node projection digests and plan scopes; a stale same-slot member projection is schema-valid but graph-rejected",
+      "use": "referenced by 4 cohort requests (expectedPriorProjection) and 5 cohort responses (projectionEnvelopeSHA256); Node methods keep their own projection",
+      "context": "body has no migrationId/operationId/lease/epoch/head; lease is bound only indirectly via each member projection's ownerLease (null in released projections); head and epoch are bound by the request, not the set",
+      "signer": "role root-fence with the same fixture key as the leases; trust contract, registry and policy roles unchanged (no root-fence grant, verifier, or anchor for this domain; deployment anchors null)"
+    },
+    "signerShapes": "fixture signer keys equal none of the fixture policy role keys; all 72 Node projections share one host-helper key and one identical signatureHex; declared UNTRUSTED_SIGNATURE_SHAPE (151 rules), so role/Node key binding is not exercised",
+    "notRun": "real signatures/RFC8032, Go readers/verifier, OS locks, Engine, atomicity/CAS, full signed history, equipment: 0; 40 future product cases NOT RUN; all target30/Root18/member/deployment bindings null/HOLD"
+  },
+  "findings": [
+    {"id": "V3-L1", "severity": "Low", "status": "closed", "summary": "cohort targets schema-null for all cohort methods; member equality retained"},
+    {"id": "V3-L2", "severity": "Low", "status": "closed", "summary": "inventory publishing lease and every journal member value exact; exhaustive graph"},
+    {"id": "V3-L3", "severity": "Low", "status": "closed", "summary": "post-publication PRESENT heads, released epoch1 -> held restore epoch2, exact prior projection, both seals retained"},
+    {"id": "V3-I1", "severity": "Info", "status": "closed", "summary": "original faulty record preserved; full no-pathspec strict-UTF8 audit independently reproduced"},
+    {"id": "V4-M1", "severity": "Medium", "status": "open (aux ABI only)", "summary": "the proposed cohort-projection-set is signed by root-fence, once per event (36 per migration). That gives the mutation-fence key a new, frequent attestation duty over Node-produced state it does not author, and pulls it onto the per-event path, while the set is fully derivable from the two Node-signed projections, the plan and the sequence. Producer, timing and key custody are unspecified", "requiredRevision": "before registration, make the set an unsigned domain-separated derived digest (SHA256 of domain || 00 || C2 body) that verifiers recompute from both authenticated projections, or a separately registered aggregator role with no fence authority; state producer, verifier and failure behavior"},
+    {"id": "V4-I1", "severity": "Info", "status": "open", "summary": "cohort set binds no migrationId/operationId/lease/epoch/head itself; anti-swap rests on plan + sequence + member projection digests, lease only via member ownerLease (null when released), head/epoch only via the request. State this explicitly in the aux contract"},
+    {"id": "V4-I2", "severity": "Info", "status": "open", "summary": "fixture signer keys match no fixture policy role key; one host-helper key and one identical signature across both Nodes' 72 projections; per-role and per-Node signer binding stays untested future verifier work"},
+    {"id": "V4-I3", "severity": "Info", "status": "open", "summary": "pre-prune seed 51c03704... is unpublished; I verified the published seed against v3 fixtures instead"}
+  ],
+  "verdicts": {
+    "v4LowDelta": "ACCEPT at proposal/design level: V3-L1, V3-L2, V3-L3 and V3-I1 are actually closed, and the closed graph claims (195/36/22+22/72+36, 3173 rules, 6411 leaves, 112 proofs, 341 and 324 cases) are independently reproduced",
+    "cohortProjectionSetABI": "NOT ACCEPTED for registration as proposed (V4-M1 Medium); the shape and bindings are sound, the root-fence signing grant is an unsupported trust expansion. Root should resolve it before registering this schema/domain/role",
+    "registrationImplementation": "none by this review; Root decides",
+    "runtime": "0; 40 product cases NOT RUN",
+    "physical": "HOLD; all bindings null"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperCodeCommitted": 0, "registryADRBoardsObsidian": 0, "nodeOpsSSHWSLDockerSchedulesClock": 0, "privateKeysConfigState": 0, "otherWorkspacesTouched": 0, "subagents": 0, "processesKilled": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record v4 closure ACCEPT; decide V4-M1 (signer/role of the cohort set) before registering the aux schema/domain; then registration and implementation scope"},
+    {"owner": "Codex", "action": "if Root keeps the aggregate: small aux-only delta for V4-M1/V4-I1"},
+    {"owner": "Claude", "action": "review that delta when assigned"}
+  ]
+}

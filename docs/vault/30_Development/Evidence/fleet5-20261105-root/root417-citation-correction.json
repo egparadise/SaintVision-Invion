@@ -1,0 +1,11 @@
+{
+  "schema": "fleet5-root417-citation-correction:1",
+  "source": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+  "path": "docs/vault/30_Development/History/2026-11-06_03-54-00_KST_FLEET5_bootstrap_contracts_v4_eed8_검토_Claude.md",
+  "originalSHA256": "13cfa52977d1ea843dec18bb6426580d1ab2256f7ce2a33e6142f38945a62e99",
+  "aggregateSHA256": "21ce9414e5552c58f8c537427a4252e2ea8de817b79589cf3d6f919223d7168f",
+  "gateExit": 1,
+  "reason": "imported v4 reviewer History wiki-linked an earlier History withheld for connection-like fixture bytes",
+  "boundedCorrection": "one wiki target -> verified immutable a81f GitHub link; wrapper1.0.1, no source/semantic/baseline change",
+  "actualTarget": "a81f73309a43ced0f777b10b3c0781c98aa54e96:docs/vault/30_Development/History/2026-11-06_02-37-00_KST_FLEET5_bootstrap_contracts_v3_5d07_검토_Claude.md"
+}

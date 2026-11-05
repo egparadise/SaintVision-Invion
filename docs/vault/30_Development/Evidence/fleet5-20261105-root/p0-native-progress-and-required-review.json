@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "ee1e8057c1185674735970c7e6c2a35b81df9b5a",
-    "Docs": 42080998122,
+    "SHA": "c6efea65a665d080a6c2bb74615249b1dbd472a0",
+    "Docs": 42087463981,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,24 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2642,
+    "independentlyMatchedNormalizedDestinationHashes": 2651,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
-    "localGatesExit0": [
-      "check_docs",
-      "check_ontology",
-      "doc_path_ratchet(base0bed4f23)",
-      "doc_single_source_ratchet",
-      "sync_check",
-      "staged_diff_check"
-    ],
-    "source72028AllEightAndTwelveJobsSuccess": true,
-    "actualSourceAndPacketReviewAccepted": true,
-    "landingOrOperationalAcceptance": false,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T03:08:00+09:00"
+    "verifiedAtKST": "2026-11-06T03:47:44+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1496,6 +1485,21 @@
       "source": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
       "path": "docs/vault/30_Development/History/2026-11-06_03-26-24_KST_FLEET5_C-L1_closure_a527_검토_Claude.md",
       "SHA256": "200290d219dfa5806f49a4b79a9c3b2fd88137b4bec318fa35ec54c1d75f9160"
+    },
+    {
+      "source": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/bootstrap-normative-contracts-v4-eed8-review-raw.json",
+      "SHA256": "d5fee15bc5691a793951ceb9a86382ac38346a827bc11622c34add39f149af21"
+    },
+    {
+      "source": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/bootstrap-normative-contracts-v4-eed8-review.json",
+      "SHA256": "2dfb9319fccc689a9ee6159a4a8e3dc7411a2b06156c25f7f98a83bce2f227db"
+    },
+    {
+      "source": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+      "path": "docs/vault/30_Development/History/2026-11-06_03-54-00_KST_FLEET5_bootstrap_contracts_v4_eed8_검토_Claude.md",
+      "SHA256": "13cfa52977d1ea843dec18bb6426580d1ab2256f7ce2a33e6142f38945a62e99"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2080,7 +2084,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T03:45:20+09:00",
+  "latestRecordAtKST": "2026-11-06T04:06:14+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2157,6 +2161,17 @@
       "sourceSHA256": "6e3759827e72efbdf0ed9950d83a9229a3d04b389507c72e9606d5dbea3e79f4",
       "aggregatedSHA256": "916f6d6ba3f6542feca0e16db2cfdd7bc5891b356f0a29ae39df2e8b6fe1e7ab",
       "change": "two table cells link to verified immutable4f Git source lines142/192 and144/149; Root report product remains older; wrapper metadata1.0.1; no proposal/code/baseline mutation"
+    },
+    {
+      "schema": "fleet5-root417-citation-correction:1",
+      "source": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+      "path": "docs/vault/30_Development/History/2026-11-06_03-54-00_KST_FLEET5_bootstrap_contracts_v4_eed8_검토_Claude.md",
+      "originalSHA256": "13cfa52977d1ea843dec18bb6426580d1ab2256f7ce2a33e6142f38945a62e99",
+      "aggregateSHA256": "21ce9414e5552c58f8c537427a4252e2ea8de817b79589cf3d6f919223d7168f",
+      "gateExit": 1,
+      "reason": "imported v4 reviewer History wiki-linked an earlier History withheld for connection-like fixture bytes",
+      "boundedCorrection": "one wiki target -> verified immutable a81f GitHub link; wrapper1.0.1, no source/semantic/baseline change",
+      "actualTarget": "a81f73309a43ced0f777b10b3c0781c98aa54e96:docs/vault/30_Development/History/2026-11-06_02-37-00_KST_FLEET5_bootstrap_contracts_v3_5d07_검토_Claude.md"
     }
   ],
   "root414InitialPathGate": {
@@ -2169,19 +2184,18 @@
   "previousPhysicalRefreshPreserved": "physical-readiness-refresh-20261106.json",
   "pendingUserInput": "actual local OS setup results PC1/PC3; no generic approval",
   "bootstrapV4ActualReview": {
-    "schema": "fleet5-bootstrap-v4-root-review-gate:1",
-    "atKST": "2026-11-06T03:45:20+09:00",
+    "reviewSHA": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+    "reviewDocs": 42088999346,
+    "rootVerifiedExactHeadAllJobsSuccess": true,
     "source": "eed826e7fb066193d3a2d9d28abda15216264f77",
-    "sourceDocs": 42084619690,
-    "rootVerifiedSourceExactHeadAllJobsSuccess": true,
-    "sourceDocsOnlyAdds": 22,
-    "reviewTask": "task_65f5ad416040",
-    "reviewDispatch": "ctx_f5268654ce53",
-    "actualDispatchReceipt": "ready",
-    "verdict": null,
-    "scope": "V3-L1/L2/L3/I1 and NEW proposed cohort-projection-set schema/domain/root-fence role; no registration until actual review",
-    "runtimeAndEquipmentCases": 0,
-    "realBindings": null
+    "lowDeltaAccepted": true,
+    "newCohortSetABIRegisteredOrAccepted": false,
+    "decision": "unsigned domain-separated derived digest; v5 docs/schema/fixtures before registration",
+    "currentCodeAuthorization": false,
+    "atKST": "2026-11-06T04:01:35+09:00",
+    "rootReply": "msg_c12b3f544036",
+    "newCohortABIStatus": "V4-M1 Medium NOT ACCEPTED for registration; V4-I1/I2/I3 Info",
+    "nextOwnerAction": "v5 unsigned domain-separated derived digest with independently validated both-node context; no new signing role or code authorization"
   },
   "e50TestOnlyReview": {
     "schema": "fleet5-e50-root-test-review-gate:1",
@@ -2200,13 +2214,36 @@
     "productionDelta": 0,
     "a527AncestorVerified": true,
     "reviewTask": "task_6baccbb465af",
-    "actualReviewStarted": false,
-    "taskStatus": "pending",
+    "actualReviewStarted": true,
+    "taskStatus": "in_progress",
     "dependencyTask": "task_65f5ad416040",
     "dependencyReason": "host memory sequencing; no missing generic approval",
     "verdict": null,
     "finalSourceChosen": false,
-    "newAll8OrArchiveAuthorized": false
+    "newAll8OrArchiveAuthorized": false,
+    "actualReviewDispatch": "ctx_0e847a7f4af8",
+    "actualReviewTask": "task_6baccbb465af",
+    "actualReviewReceipt": "ready after dependency settled/exited/released"
   },
-  "hostResourceRecovery": "host-resource-recovery-20261106.json"
+  "hostResourceRecovery": "host-resource-recovery-20261106.json",
+  "broadBRevision2ActualReview": {
+    "source": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+    "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "Docs": 42087817282,
+    "rootVerifiedExactHeadAllJobsSuccess": true,
+    "docsFiles": 33,
+    "scopeIncludesProposedNewNodeRoleUseWire": true,
+    "reviewTask": "task_d4c4c809ed4e",
+    "actualReviewStarted": false,
+    "dependencyTask": "task_6baccbb465af",
+    "pendingOwnerQuestion": "msg_cc0b988ce5b2",
+    "implementationAuthorized": false,
+    "observedAtKST": "2026-11-06T03:54:41+09:00",
+    "taskStatus": "pending",
+    "resourceSequence": "after e50 task6b; one reviewer at a time",
+    "newNodeRoleUseTokenABI": "explicit proposed broader wire; requires actual architecture review, not ordinary CRUD",
+    "realGoPGDockerPhysical": 0,
+    "realBindings": null
+  },
+  "reviewQueue": "review-queue-20261106.json"
 }

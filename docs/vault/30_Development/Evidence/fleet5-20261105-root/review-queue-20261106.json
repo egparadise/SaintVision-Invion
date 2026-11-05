@@ -1,0 +1,24 @@
+{
+  "schema": "fleet5-root-review-resource-sequence:1",
+  "atKST": "2026-11-06T04:06:14+09:00",
+  "completed": {
+    "task": "task_65f5ad416040",
+    "review": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+    "actualSourceLowClosure": true,
+    "newABIRegistrationAccepted": false
+  },
+  "active": {
+    "task": "task_6baccbb465af",
+    "dispatch": "ctx_0e847a7f4af8",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "scope": "four tests only"
+  },
+  "pending": {
+    "task": "task_d4c4c809ed4e",
+    "dependency": "task_6baccbb465af",
+    "source": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+    "scope": "B1-B5/L1-L4 and proposed NEW role-use token wire"
+  },
+  "reason": "measured host memory98percent; prior PS startup0x800705AF; released worker reused through guarded lifecycle",
+  "genericApprovalMissing": false
+}

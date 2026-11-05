@@ -1,0 +1,566 @@
+{
+ "mainRun": {
+  "dependencies": "18/18 bytes+sha256 match and metaschema-valid; networkRetrievalAllowed=False",
+  "unknownRef": "fails closed: _WrappedReferencingError",
+  "nodeKinds": {
+   "successor-plan": 1,
+   "operation-lease": 3,
+   "api-request": 22,
+   "migration-event": 36,
+   "migration-journal": 72,
+   "cohort-projection-set": 36,
+   "api-response": 22,
+   "runtime-inventory": 1,
+   "terminal-seal": 2
+  },
+  "schemaInvalid": [],
+  "nodeShaMismatch": [],
+  "rules": {
+   "total": 3173,
+   "fail": 0,
+   "forwardOrSelfDigestRefs": 1,
+   "fwd": [
+    [
+     "plan",
+     "/body/planSubjectSHA256",
+     "plan",
+     "planSubject"
+    ]
+   ],
+   "failSample": []
+  },
+  "coverage": {
+   "nonProofLeaves": 6411,
+   "coverCounts": {
+    "1": 6411
+   },
+   "notExactlyOnce": [],
+   "rulesPointingIntoProofs": [],
+   "proofObjects": 112
+  },
+  "regenerationReproducesPublished": true,
+  "owner341": {
+   "total": 341,
+   "candidateShaReproduced": 341,
+   "rejected": 341,
+   "onlySelectedRuleFails": 341,
+   "schemaAlsoRejects": 159,
+   "notRejected": [],
+   "families": 341,
+   "ruleFamilies": 151,
+   "ruleFamiliesWithoutMutant": [
+    "api-request:arguments",
+    "api-request:expectedFenceEpoch",
+    "api-request:expectedInventoryHead",
+    "api-request:expectedPriorProjectionSHA256",
+    "api-request:idempotencyKey",
+    "api-request:method",
+    "api-request:operationId",
+    "api-request:planEnvelopeSHA256",
+    "api-request:schemaVersion",
+    "migration-journal:daemonIdentitySHA256"
+   ]
+  },
+  "ownSameShapeSwapMutants": {
+   "tested": 16,
+   "rejected": 16,
+   "schemaValid": 14,
+   "notRejected": [],
+   "byOp": {
+    "field": 15,
+    "digest": 1
+   }
+  },
+  "trace": {
+   "events": 36,
+   "problems": [
+    [
+     34,
+     "response lease"
+    ]
+   ],
+   "finalPhase": {
+    "PC2": "QUIESCENCE_UNKNOWN",
+    "PC4": "SEALED"
+   },
+   "lastEvent": [
+    36,
+    "restoreNewRestartPolicy",
+    "PC2",
+    "failure",
+    "QUIESCENCE_UNKNOWN"
+   ],
+   "eventsAfterUnknown": [],
+   "responsesTotal": 22,
+   "requestsTotal": 22,
+   "requestsWithoutEvents": [],
+   "responsesWithoutRequest": [],
+   "bothRestartNoBeforeFirstStop": true,
+   "bothVerifiedBeforePublish": true,
+   "PC2ChainBeforePC4Stop": true,
+   "bothSealsBeforeRelease": true,
+   "methodSequence": [
+    "1:inspectAndValidate:-:readback:PROVENANCE_LOCKED",
+    "2:reserve:-:outcome:RESERVED",
+    "3:setOldRestartNo:PC2:intent:FENCE_INTENT",
+    "4:setOldRestartNo:PC2:outcome:OLD_RESTART_NO",
+    "5:setOldRestartNo:PC4:intent:FENCE_INTENT",
+    "6:setOldRestartNo:PC4:outcome:OLD_RESTART_NO",
+    "7:stopOld:PC2:intent:OLD_STOP_INTENT",
+    "8:stopOld:PC2:outcome:OLD_STOPPED_QUIESCENT",
+    "9:captureFenced:PC2:readback:CAPTURED",
+    "10:preserveOld:PC2:intent:PUBLICATION_INTENT",
+    "11:preserveOld:PC2:outcome:OLD_PRESERVED",
+    "12:createNew:PC2:intent:NEW_CREATE_INTENT",
+    "13:createNew:PC2:outcome:NEW_CREATED",
+    "14:startNew:PC2:intent:NEW_START_INTENT",
+    "15:startNew:PC2:outcome:NEW_STARTED_UNVERIFIED",
+    "16:verifyBootstrap:PC2:readback:BOOTSTRAP_VERIFIED_RESTART_NO",
+    "17:stopOld:PC4:intent:OLD_STOP_INTENT",
+    "18:stopOld:PC4:outcome:OLD_STOPPED_QUIESCENT",
+    "19:captureFenced:PC4:readback:CAPTURED",
+    "20:preserveOld:PC4:intent:PUBLICATION_INTENT",
+    "21:preserveOld:PC4:outcome:OLD_PRESERVED",
+    "22:createNew:PC4:intent:NEW_CREATE_INTENT",
+    "23:createNew:PC4:outcome:NEW_CREATED",
+    "24:startNew:PC4:intent:NEW_START_INTENT",
+    "25:startNew:PC4:outcome:NEW_STARTED_UNVERIFIED",
+    "26:verifyBootstrap:PC4:readback:BOOTSTRAP_VERIFIED_RESTART_NO",
+    "27:publishInventory:-:intent:INVENTORY_PUBLICATION_INTENT",
+    "28:publishInventory:-:outcome:INVENTORY_PUBLISHED",
+    "29:seal:PC2:intent:SEAL_INTENT",
+    "30:seal:PC2:outcome:SEALED",
+    "31:seal:PC4:intent:SEAL_INTENT",
+    "32:seal:PC4:outcome:SEALED",
+    "33:readState:-:readback:SEALED",
+    "34:release:-:outcome:SEALED",
+    "35:restoreNewRestartPolicy:PC2:intent:RESTART_RESTORE_INTENT",
+    "36:restoreNewRestartPolicy:PC2:failure:QUIESCENCE_UNKNOWN"
+   ]
+  },
+  "leaseSealRestore": {
+   "fenceNodes": [
+    "lease-migration",
+    "fence-released",
+    "lease-restore"
+   ],
+   "released same leaseId/op/token/owner/epoch1": true,
+   "released priorFence == migration lease": true,
+   "restore epoch 2, priorFence == released": true,
+   "restore new leaseId/op/token/ownerGeneration": true,
+   "restore terminalSeals == both seals": true,
+   "restore/released head PRESENT inventory": true,
+   "migration lease head ABSENT": true,
+   "inventory lease == migration lease": true,
+   "inventory previousHead ABSENT": true,
+   "seal-PC2 inventory/current/backup/volume/event": true,
+   "seal-PC2 verified event is the actual verify outcome": true,
+   "seal-PC4 inventory/current/backup/volume/event": true,
+   "seal-PC4 verified event is the actual verify outcome": true,
+   "restore request epoch 2": true,
+   "restore request priorProjection == released PC2 projection": true,
+   "released projection phase/lease": [
+    "SEALED",
+    "RELEASED"
+   ],
+   "final PC2": [
+    "QUIESCENCE_UNKNOWN",
+    "HELD",
+    "RESTART_RESTORE",
+    true,
+    true,
+    {
+     "sequence": 30,
+     "envelopeSHA256": "dc601675f661e1fa0b814ee6cb7a6d595568161ad7aba5b7a3b200ba5b4f346d"
+    }
+   ],
+   "final PC4": [
+    "SEALED",
+    "HELD",
+    "RESTART_RESTORE",
+    true,
+    true,
+    {
+     "sequence": 32,
+     "envelopeSHA256": "72066e1d082f237d0ca1789fb9cfa4203d41d3e273740bd7da3140899250a94f"
+    }
+   ],
+   "journals with non-member scope/daemon/root/volume": [],
+   "seal dropped after sealing": []
+  },
+  "cohortSet": {
+   "count": 36,
+   "distinctDigests": 36,
+   "signer role/key": [
+    [
+     "root-fence",
+     "fedce441937296da"
+    ]
+   ],
+   "leaseSignerKey": "fedce441937296da",
+   "bodyFields": [
+    "members",
+    "planEnvelopeSHA256",
+    "schemaVersion",
+    "sequence"
+   ],
+   "memberOrderSwapSchemaValid": false,
+   "slotRelabelSchemaValid": false,
+   "threeMembersSchemaValid": false,
+   "otherRoleSchemaValid": false,
+   "extraFieldSchemaValid": false,
+   "staleMemberProjectionSchemaValid": true,
+   "staleMemberProjectionGraphRejected": true,
+   "referencedBy": {
+    "api-response/projectionEnvelopeSHA256": 5,
+    "api-request/expectedPriorProjectionSHA256": 4
+   }
+  },
+  "proofs": {
+   "present": 112,
+   "derived": 112,
+   "problems": [],
+   "problemCount": 0,
+   "distinctSlots": 75
+  },
+  "targets": {
+   "ownerCases": 324,
+   "agree": 324,
+   "disagree": [],
+   "ownerExpected": {
+    "VALID_SCHEMA": 66,
+    "REJECT_SCHEMA": 258
+   },
+   "ownSweep": {
+    "tested": 324,
+    "violations": [
+     [
+      3,
+      "setOldRestartNo",
+      "PC4",
+      "PC4"
+     ],
+     [
+      4,
+      "setOldRestartNo",
+      "PC4",
+      "PC4"
+     ],
+     [
+      5,
+      "setOldRestartNo",
+      "PC2",
+      "PC2"
+     ],
+     [
+      6,
+      "setOldRestartNo",
+      "PC2",
+      "PC2"
+     ],
+     [
+      7,
+      "stopOld",
+      "PC4",
+      "PC4"
+     ],
+     [
+      8,
+      "stopOld",
+      "PC4",
+      "PC4"
+     ],
+     [
+      9,
+      "captureFenced",
+      "PC4",
+      null
+     ],
+     [
+      10,
+      "preserveOld",
+      "PC4",
+      "PC4"
+     ],
+     [
+      11,
+      "preserveOld",
+      "PC4",
+      "PC4"
+     ],
+     [
+      12,
+      "createNew",
+      "PC4",
+      "PC4"
+     ],
+     [
+      13,
+      "createNew",
+      "PC4",
+      "PC4"
+     ],
+     [
+      14,
+      "startNew",
+      "PC4",
+      "PC4"
+     ],
+     [
+      15,
+      "startNew",
+      "PC4",
+      "PC4"
+     ],
+     [
+      16,
+      "verifyBootstrap",
+      "PC4",
+      null
+     ],
+     [
+      17,
+      "stopOld",
+      "PC2",
+      "PC2"
+     ],
+     [
+      18,
+      "stopOld",
+      "PC2",
+      "PC2"
+     ],
+     [
+      19,
+      "captureFenced",
+      "PC2",
+      null
+     ],
+     [
+      20,
+      "preserveOld",
+      "PC2",
+      "PC2"
+     ],
+     [
+      21,
+      "preserveOld",
+      "PC2",
+      "PC2"
+     ],
+     [
+      22,
+      "createNew",
+      "PC2",
+      "PC2"
+     ],
+     [
+      23,
+      "createNew",
+      "PC2",
+      "PC2"
+     ],
+     [
+      24,
+      "startNew",
+      "PC2",
+      "PC2"
+     ],
+     [
+      25,
+      "startNew",
+      "PC2",
+      "PC2"
+     ],
+     [
+      26,
+      "verifyBootstrap",
+      "PC2",
+      null
+     ],
+     [
+      29,
+      "seal",
+      "PC4",
+      "PC4"
+     ],
+     [
+      30,
+      "seal",
+      "PC4",
+      "PC4"
+     ],
+     [
+      31,
+      "seal",
+      "PC2",
+      "PC2"
+     ],
+     [
+      32,
+      "seal",
+      "PC2",
+      "PC2"
+     ],
+     [
+      35,
+      "restoreNewRestartPolicy",
+      "PC4",
+      "PC4"
+     ],
+     [
+      36,
+      "restoreNewRestartPolicy",
+      "PC4",
+      "PC4"
+     ]
+    ]
+   }
+  },
+  "inputs": {
+   "distinctInputPointersInRules": 102,
+   "unresolvable": [],
+   "inputLeavesNotUsedByRules": 113,
+   "unusedTopNamespaces": {
+    "fixtureOnly": 1,
+    "actualTrust": 1,
+    "plan": 1,
+    "facts": 58,
+    "policy": 52
+   },
+   "fixtureFlags": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ]
+  }
+ },
+ "extraRun": {
+  "ownerFamilySample": [
+   "api-request:arguments:captureFenced:ABSENT",
+   "api-request:arguments:createNew:ABSENT",
+   "api-request:arguments:inspectAndValidate:ABSENT",
+   "api-request:arguments:preserveOld:ABSENT",
+   "api-request:arguments:publishInventory:ABSENT",
+   "api-request:arguments:readState:PRESENT",
+   "api-request:arguments:reserve:ABSENT",
+   "api-request:arguments:restoreNewRestartPolicy:PRESENT"
+  ],
+  "ownerFamilyPrefixes": {
+   "successor-plan": 24,
+   "operation-lease": 66,
+   "api-request": 125,
+   "migration-event": 25,
+   "migration-journal": 51,
+   "cohort-projection-set": 5,
+   "api-response": 11,
+   "runtime-inventory": 17,
+   "terminal-seal": 17
+  },
+  "ruleFamiliesNotMutatedByOwner": 37,
+  "rulesHitByOwnerMutants": 341,
+  "ownerMutantRuleOps": {
+   "input": 82,
+   "planSubject": 1,
+   "const": 93,
+   "digest": 53,
+   "field": 56,
+   "array": 10,
+   "canonicalSHA256": 7,
+   "object": 38,
+   "add": 1
+  },
+  "releaseResponseLease": {
+   "lease-migration": false,
+   "fence-released": true,
+   "lease-restore": false
+  },
+  "candidateCounts": {
+   "int+1": 74,
+   "field-swap": 341,
+   "digest-swap": 377,
+   "input-node-swap": 398,
+   "add+1": 1
+  },
+  "ownMutants": {
+   "total": 1221,
+   "result": {
+    "int+1:rejected": 74,
+    "field-swap:rejected": 339,
+    "digest-swap:rejected": 377,
+    "input-node-swap:rejected": 398,
+    "field-swap:ACCEPTED": 2,
+    "add+1:rejected": 1,
+    "event-target-swap:rejected": 30
+   },
+   "onlySelectedRuleFails": 1219,
+   "schemaValidAfterMutation": {
+    "int+1": 73,
+    "field-swap": 277,
+    "digest-swap": 377,
+    "input-node-swap": 398,
+    "add+1": 1,
+    "event-target-swap": 4
+   },
+   "notRejected": [
+    [
+     "field-swap",
+     "inventory",
+     "/body/target"
+    ],
+    [
+     "field-swap",
+     "inventory",
+     "/body/image"
+    ]
+   ]
+  },
+  "unusedPlanInputLeaves": [
+   "/plan/canonicalContractSHA256"
+  ],
+  "unusedFactsLeavesSample": [
+   "/facts/fixtureOnly",
+   "/facts/productionTrust",
+   "/facts/nativeFixtureCohortSHA256",
+   "/facts/compatibilityFixtureSHA256",
+   "/facts/scheduleIds/0",
+   "/facts/scheduleIds/1"
+  ],
+  "signerKeysVsPolicyRoles": {
+   "successor-plan": [
+    "root-plan",
+    false
+   ],
+   "migration-event": [
+    "host-helper",
+    false
+   ],
+   "migration-journal": [
+    "host-helper",
+    false
+   ],
+   "operation-lease": [
+    "root-fence",
+    false
+   ],
+   "runtime-inventory": [
+    "cp-inventory",
+    false
+   ],
+   "terminal-seal": [
+    "root-seal",
+    false
+   ],
+   "cohort-projection-set": [
+    "root-fence",
+    false
+   ]
+  },
+  "projectionSignerKeysDistinctPerNode": 1,
+  "distinctSignatureHexAcrossProjections": 1,
+  "journalBindsLease": true,
+  "journalBindsHeadOrEpoch": []
+ }
+}

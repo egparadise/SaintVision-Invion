@@ -1,15 +1,14 @@
 {
-  "schema": "fleet5-bootstrap-v4-root-review-gate:1",
-  "atKST": "2026-11-06T03:45:20+09:00",
+  "reviewSHA": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
+  "reviewDocs": 42088999346,
+  "rootVerifiedExactHeadAllJobsSuccess": true,
   "source": "eed826e7fb066193d3a2d9d28abda15216264f77",
-  "sourceDocs": 42084619690,
-  "rootVerifiedSourceExactHeadAllJobsSuccess": true,
-  "sourceDocsOnlyAdds": 22,
-  "reviewTask": "task_65f5ad416040",
-  "reviewDispatch": "ctx_f5268654ce53",
-  "actualDispatchReceipt": "ready",
-  "verdict": null,
-  "scope": "V3-L1/L2/L3/I1 and NEW proposed cohort-projection-set schema/domain/root-fence role; no registration until actual review",
-  "runtimeAndEquipmentCases": 0,
-  "realBindings": null
+  "lowDeltaAccepted": true,
+  "newCohortSetABIRegisteredOrAccepted": false,
+  "decision": "unsigned domain-separated derived digest; v5 docs/schema/fixtures before registration",
+  "currentCodeAuthorization": false,
+  "atKST": "2026-11-06T04:01:35+09:00",
+  "rootReply": "msg_c12b3f544036",
+  "newCohortABIStatus": "V4-M1 Medium NOT ACCEPTED for registration; V4-I1/I2/I3 Info",
+  "nextOwnerAction": "v5 unsigned domain-separated derived digest with independently validated both-node context; no new signing role or code authorization"
 }

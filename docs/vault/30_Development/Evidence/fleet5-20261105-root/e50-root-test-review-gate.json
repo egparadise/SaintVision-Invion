@@ -15,11 +15,14 @@
   "productionDelta": 0,
   "a527AncestorVerified": true,
   "reviewTask": "task_6baccbb465af",
-  "actualReviewStarted": false,
-  "taskStatus": "pending",
+  "actualReviewStarted": true,
+  "taskStatus": "in_progress",
   "dependencyTask": "task_65f5ad416040",
   "dependencyReason": "host memory sequencing; no missing generic approval",
   "verdict": null,
   "finalSourceChosen": false,
-  "newAll8OrArchiveAuthorized": false
+  "newAll8OrArchiveAuthorized": false,
+  "actualReviewDispatch": "ctx_0e847a7f4af8",
+  "actualReviewTask": "task_6baccbb465af",
+  "actualReviewReceipt": "ready after dependency settled/exited/released"
 }
