@@ -1,0 +1,44 @@
+{
+  "scope": "ROOT_REQUESTED_INTERMEDIATE_STRICT_BOOLEAN_REVIEW_PACKET_ONLY",
+  "sourceCommit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "request": "msg_f14675de90a7 asks exact new source/packet/hash",
+  "observedAtKST": "2026-11-05T20:04:02.498524+09:00",
+  "finalCandidateFreeze": false,
+  "nativeGoHold": true,
+  "newLongCoreOrFullEightRepeat": false,
+  "executionAuthorizedByThisPacket": false,
+  "sourceArchive": {
+    "bytes": 18085963,
+    "name": "fleet5-candidate-source-1e6491468dd0ba72f57e7fc807be1e57b307024c.zip",
+    "sha256": "c45bba26c2da1a783c14af8d8b43dbbbf95288494c6a12a4197bb4a365bcad55"
+  },
+  "inventory": {
+    "entries": 4290,
+    "everyGitBlobCompared": true,
+    "name": "source-inventory.json",
+    "sha256": "608e74a10cea60b9647984dda7f52201d064d08ab90237e957ab9fefa656c00a"
+  },
+  "manifestSHA256": "c1389e4dd8c0b347058cd2cf5235cb8585e97eaa79f42bd308d5d46fa92a5933",
+  "packetSHA256": "a17531b052d4fc757708cbb2463d4cce75c428acf46b6ba7e6903ed57eceb71e",
+  "targetedCI": {
+    "backend": {
+      "run": 42015010474,
+      "status": "in_progress",
+      "actualLifecycleStep3_12": "success",
+      "actualLifecycleStep3_14": "success"
+    },
+    "docs": {
+      "run": 42015020044,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "portalExactPush": {
+      "run": 42014916223,
+      "status": "completed",
+      "conclusion": "success",
+      "manualDuplicateDispatched": false
+    }
+  },
+  "independentCombinedReview": "root arranging baseline9a8 review and explicit strict-boolean delta; no later-SHA acceptance fabricated",
+  "physicalAcceptance": false
+}

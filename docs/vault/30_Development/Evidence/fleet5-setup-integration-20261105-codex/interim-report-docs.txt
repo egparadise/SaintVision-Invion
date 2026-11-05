@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 157, in <module>
+    validate()
+    ~~~~~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 152, in validate
+    raise ValueError('\n'.join(errors))
+ValueError: Password-bearing PostgreSQL DSN must be redacted (2 occurrence(s)): 30_Development\Evidence\fleet5-setup-integration-20261105-codex\d073-core-tests.xml

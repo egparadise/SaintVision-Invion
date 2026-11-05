@@ -1,0 +1,119 @@
+{
+  "scope": "INTERMEDIATE_EXACT_PUSH_PORTAL_ONLY",
+  "observedAtKST": "2026-11-05T20:02:49.090439+09:00",
+  "runId": 42014916223,
+  "raw": {
+    "conclusion": "success",
+    "event": "push",
+    "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+    "headSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+    "jobs": [
+      {
+        "completedAt": "2026-11-05T10:58:22Z",
+        "conclusion": "success",
+        "databaseId": 127202924180,
+        "name": "portal-login-harness",
+        "startedAt": "2026-11-05T10:57:09Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-11-05T10:57:11Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-11-05T10:57:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:57:14Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-11-05T10:57:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:57:15Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-11-05T10:57:14Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:57:18Z",
+            "conclusion": "success",
+            "name": "Install system dependencies (certutil)",
+            "number": 4,
+            "startedAt": "2026-11-05T10:57:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:04Z",
+            "conclusion": "success",
+            "name": "Install Python dependencies",
+            "number": 5,
+            "startedAt": "2026-11-05T10:57:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:19Z",
+            "conclusion": "success",
+            "name": "Run Portal Login Journey Harness test suite",
+            "number": 6,
+            "startedAt": "2026-11-05T10:58:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:19Z",
+            "conclusion": "success",
+            "name": "Assert 0 skipped tests and 100% pass rate",
+            "number": 7,
+            "startedAt": "2026-11-05T10:58:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:19Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "startedAt": "2026-11-05T10:58:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:19Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "startedAt": "2026-11-05T10:58:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-05T10:58:20Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-11-05T10:58:19Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42014916223/job/127202924180"
+      }
+    ],
+    "status": "completed"
+  },
+  "judgment": {
+    "status": "MEASURED_PASS",
+    "workflow": "portal-login-harness.yml",
+    "runId": 42014916223,
+    "headSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+    "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+    "event": "push",
+    "runConclusion": "success",
+    "jobCount": 1,
+    "jobConclusions": {
+      "portal-login-harness": "success"
+    }
+  },
+  "fullCandidateAcceptanceHeld": "Native Go sequence proof pending"
+}

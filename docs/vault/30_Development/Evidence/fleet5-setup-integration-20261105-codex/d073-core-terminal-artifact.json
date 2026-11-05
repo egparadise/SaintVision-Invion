@@ -1,0 +1,70 @@
+{
+  "sourceCommit": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "runId": 42011559707,
+  "artifactId": 13410250193,
+  "artifactName": "saintvision-core-evidence",
+  "artifactSHA256": "369d2cdba59169ff80e34552ed4ccab5e32cc64f541deb22f18d2a003cf997e5",
+  "artifactDigestMatched": true,
+  "observedAtKST": "2026-11-05T20:13:38.272053+09:00",
+  "workflowConclusion": "success",
+  "physicalAcceptance": false,
+  "nativeGoNormalRenewalAcceptance": false,
+  "suiteResults": {
+    "core-tests.xml": {
+      "total": 9071,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 46,
+      "sha256": "b50c5e0611bc7125a67e71c4201c62f71725aba42125080bc30e143a7c4c52a4",
+      "passed": 9025,
+      "sha256Scope": "Original unredacted downloaded artifact entry bytes; public derivative has its own hash",
+      "publicDerivative": "d073-core-tests.redacted.xml",
+      "publicDerivativeSHA256": "6d00a3a098c70867f88c61f5f680450d0e5f6ea1424fba58bcccc1213619f51f",
+      "passwordBearingDsnReplacements": 2
+    },
+    "lan-installer-tests.xml": {
+      "total": 15,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "e839abcc25b5600ba93c339d05115a9722cb4cba4ec53d4703d7eb1bcaccb7a1",
+      "passed": 15
+    },
+    "lan-pilot-database-real-pg.xml": {
+      "total": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "a044fdade15e94badeb788662d1aa3c7254b8c66e671d96ceb173bb51e9c02c6",
+      "passed": 2
+    }
+  },
+  "selectedRegressionResults": {
+    "test_fleet5_setup_packet": {
+      "total": 20,
+      "skipped": 0,
+      "failedOrError": 0
+    },
+    "test_rotation_predecessor_residue": {
+      "total": 2,
+      "skipped": 0,
+      "failedOrError": 0
+    },
+    "test_leaf_rotation_archive_residue": {
+      "total": 14,
+      "skipped": 0,
+      "failedOrError": 0
+    },
+    "test_lan_leaf_rotation_batch_successor": {
+      "total": 46,
+      "skipped": 0,
+      "failedOrError": 0
+    },
+    "test_lan_workspace_upgrade": {
+      "total": 33,
+      "skipped": 0,
+      "failedOrError": 0
+    }
+  },
+  "readinessPhaseEvidenceSHA256": "01f9cce1736d38bd9abe73cca2aa20b01add4632d5eca124d7053c3ce0333588"
+}

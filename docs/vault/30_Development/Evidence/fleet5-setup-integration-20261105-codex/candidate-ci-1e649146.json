@@ -1,0 +1,103 @@
+{
+  "sourceCommit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "branch": "agent/codex/fleet5-setup-integration-20261105",
+  "workflows": {
+    "backend": {
+      "workflow": "backend.yml",
+      "correlationId": "post-landing-verify/5848e85e890348da895c7bc9033652f9",
+      "dispatchRequestedAtKST": "2026-11-05T19:57:46.710769+09:00",
+      "dispatchReturnedSuccess": true,
+      "observation": {
+        "status": "NOT_OBSERVED",
+        "reason": "Run not terminal; never count in-progress or unscheduled/skipped tests as pass"
+      },
+      "runId": 42015010474,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015010474",
+      "headSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+      "status": "in_progress",
+      "conclusion": "",
+      "jobs": [
+        {
+          "databaseId": 127203257920,
+          "name": "backend (3.12)",
+          "status": "in_progress",
+          "conclusion": "",
+          "startedAt": "2026-11-05T10:57:52Z",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015010474/job/127203257920"
+        },
+        {
+          "databaseId": 127203258516,
+          "name": "mlflow-live",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T10:57:53Z",
+          "completedAt": "2026-11-05T10:58:36Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015010474/job/127203258516"
+        },
+        {
+          "databaseId": 127203258873,
+          "name": "backend (3.14)",
+          "status": "in_progress",
+          "conclusion": "",
+          "startedAt": "2026-11-05T10:57:52Z",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015010474/job/127203258873"
+        }
+      ],
+      "rawObservation": "ci-42015010474-20261105T202050.json"
+    },
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/5ccc414d48014793abe5a36722b9685d",
+      "dispatchRequestedAtKST": "2026-11-05T19:57:50.849412+09:00",
+      "dispatchReturnedSuccess": true,
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42015020044,
+        "headSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+        "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42015020044,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015020044",
+      "headSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127203292442,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T10:57:57Z",
+          "completedAt": "2026-11-05T10:58:25Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42015020044/job/127203292442"
+        }
+      ],
+      "rawObservation": "ci-42015020044-20261105T202053.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-setup-integration-20261105",
+    "refTipSha": "1e6491468dd0ba72f57e7fc807be1e57b307024c"
+  },
+  "observedAtKST": "2026-11-05T20:20:46.924080+09:00",
+  "intermediateScope": [
+    "backend",
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Native Go sequence proof/resolution/review pending root",
+  "jobCountObserved": 4
+}

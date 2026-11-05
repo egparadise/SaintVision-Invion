@@ -1,0 +1,132 @@
+{
+  "conclusion": "success",
+  "event": "workflow_dispatch",
+  "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+  "headSha": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T10:35:49Z",
+      "conclusion": "success",
+      "databaseId": 127191790655,
+      "name": "accessibility-e2e",
+      "startedAt": "2026-11-05T10:32:59Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T10:33:00Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T10:32:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:33:05Z",
+          "conclusion": "success",
+          "name": "Checkout exact source head",
+          "number": 2,
+          "startedAt": "2026-11-05T10:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:33:07Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "startedAt": "2026-11-05T10:33:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:33:10Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v4",
+          "number": 4,
+          "startedAt": "2026-11-05T10:33:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:34:30Z",
+          "conclusion": "success",
+          "name": "Install browser lane dependencies",
+          "number": 5,
+          "startedAt": "2026-11-05T10:33:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:13Z",
+          "conclusion": "success",
+          "name": "Run six browser cases for five canonical journeys",
+          "number": 6,
+          "startedAt": "2026-11-05T10:34:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:45Z",
+          "conclusion": "success",
+          "name": "Run desktop accessibility invariants in real Chrome",
+          "number": 7,
+          "startedAt": "2026-11-05T10:35:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:45Z",
+          "conclusion": "success",
+          "name": "Normalize fail-closed AC-11 evidence",
+          "number": 8,
+          "startedAt": "2026-11-05T10:35:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:45Z",
+          "conclusion": "success",
+          "name": "Validate redacted evidence shape",
+          "number": 9,
+          "startedAt": "2026-11-05T10:35:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:46Z",
+          "conclusion": "success",
+          "name": "Upload accessibility E2E evidence",
+          "number": 10,
+          "startedAt": "2026-11-05T10:35:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v4",
+          "number": 18,
+          "startedAt": "2026-11-05T10:35:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 19,
+          "startedAt": "2026-11-05T10:35:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:47Z",
+          "conclusion": "success",
+          "name": "Post Checkout exact source head",
+          "number": 20,
+          "startedAt": "2026-11-05T10:35:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T10:35:48Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-05T10:35:47Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42011613479/job/127191790655"
+    }
+  ],
+  "status": "completed"
+}

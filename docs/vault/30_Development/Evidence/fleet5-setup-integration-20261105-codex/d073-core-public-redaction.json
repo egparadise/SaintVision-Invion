@@ -1,0 +1,14 @@
+{
+  "scope": "PUBLIC_DERIVATIVE_ONLY_CI_TEST_DSN_REDACTION",
+  "originalArtifactId": 13410250193,
+  "originalRunId": 42011559707,
+  "rawArtifactEntry": "core-tests.xml",
+  "rawEntrySHA256": "b50c5e0611bc7125a67e71c4201c62f71725aba42125080bc30e143a7c4c52a4",
+  "rawBytesPreservedInIgnoredDownloadedArtifactAndRawFile": true,
+  "publicDerivative": "d073-core-tests.redacted.xml",
+  "publicDerivativeSHA256": "6d00a3a098c70867f88c61f5f680450d0e5f6ea1424fba58bcccc1213619f51f",
+  "passwordBearingDsnReplacements": 2,
+  "reusedCanonicalDocsRedactionPattern": true,
+  "testCountsAndResultsUnchanged": true,
+  "observedAtKST": "2026-11-05T20:18:35.764905+09:00"
+}

@@ -1,0 +1,62 @@
+{
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "sourceCommit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "status": "INTERMEDIATE_CONSUMER_FIX_VALIDATION; FULL_SOURCE_BLOCKED_BY_CONFIRMED_NATIVE_GO_P0",
+  "observedAtKST": "2026-11-05T20:23:26.767279+09:00",
+  "originalCandidate": {
+    "source": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+    "allEightTerminal": true,
+    "workflowsSuccess": 7,
+    "workflowsFailed": 1,
+    "jobsObserved": 12,
+    "failedBackendMatrixJobs": 2,
+    "coreRun": 42011559707,
+    "coreConclusion": "success",
+    "coreArtifactSHA256": "369d2cdba59169ff80e34552ed4ccab5e32cc64f541deb22f18d2a003cf997e5",
+    "mainPassed": 9025,
+    "mainSkipped": 46,
+    "installerPassed": 15,
+    "installerSkipped": 0,
+    "actualPgPassed": 2,
+    "actualPgSkipped": 0
+  },
+  "intermediateTargeted": {
+    "backend": 42015010474,
+    "backendConclusion": "PENDING",
+    "docs": 42015020044,
+    "docsConclusion": "success",
+    "exactPushPortal": 42014916223,
+    "portalConclusion": "success",
+    "newCoreOrAllEightRepeat": false
+  },
+  "nativeGoSourceBlocker": {
+    "proofCode": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+    "proofReport": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+    "actualLinuxRun": 42014770700,
+    "completedNormalCycles": 0,
+    "sameVersionDifferentHashFinalRejections": 2,
+    "expiredPhasePinsFloorBeforeRejection": true,
+    "actualReviewedProductionRepair": "NOT_YET_RECEIVED",
+    "boundedArchitecture": "ACCEPT relayed by root msg_9f9735b4ea74 / actualClaude msg_ab9e13adf7dd; broadB NOT accepted",
+    "implementation": "IN_PROGRESS ownerctx_6f0f8253b8a7; no published source/implementation verdict received"
+  },
+  "combinedReview": {
+    "actualTask": "task_3529eefa626c",
+    "actualDispatch": "ctx_ba275b06ce0c",
+    "status": "PENDING_VERDICT; no later-SHA acceptance inferred"
+  },
+  "nextOwnerAction": "root relay actual concrete P0 contract/implementation/verdict; Codex integrate exact selected source then regenerate final packet and full8CI on approved immutable ci2 if appropriate",
+  "physicalAcceptance": false,
+  "wholeProductAcceptance": false,
+  "queryExecuted": false,
+  "counts": null,
+  "sharedBoardsRegistryChanged": false,
+  "obsidianApply": false,
+  "reportDocs": {
+    "firstExit": 1,
+    "reason": "two CI test DSNs in uncommitted raw downloaded JUnit",
+    "correctedExit": 0,
+    "rawPreservedPrivately": true,
+    "publicDerivativeNamedSeparately": true
+  }
+}

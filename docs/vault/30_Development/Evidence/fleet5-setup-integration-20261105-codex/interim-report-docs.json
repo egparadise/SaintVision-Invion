@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_docs.py"
+  ],
+  "startedAtKST": "2026-11-05T20:15:01.333434+09:00",
+  "finishedAtKST": "2026-11-05T20:15:42.387069+09:00",
+  "exit": 1,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "interim-report-docs.txt",
+  "sourceAtStart": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

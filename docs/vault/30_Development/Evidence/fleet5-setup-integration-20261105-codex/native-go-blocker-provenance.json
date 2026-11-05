@@ -1,0 +1,13 @@
+{
+  "observedAtKST": "2026-11-05T20:12:14.147414+09:00",
+  "codeCommit": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+  "originalReportCommit": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+  "originalPath": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-native-peer-phase/native-go-result.json",
+  "originalBlobSHA1": "b26d69f21639d71851306ed9a3c6272092158b6b",
+  "originalBytesSHA256": "d5c62571e08bb57e89924179d390aab21fba479eb484bfe8633283e092174c6b",
+  "rootVerifiedRun": 42014770700,
+  "classification": "CONFIRMED_SOURCE_BLOCKER_NATIVE_GO_FINAL_PEER_POLICY",
+  "productionFixWrittenOrAccepted": false,
+  "fullCandidateArchiveAndAllEightRepeatHeld": true,
+  "rootRepairDirectionOnly": "new normal leaf/batch schema3, actual peer floor/hash, P+1 overlap/P+2 final independent of C+1 channel, no floor reset/weakening, CAS/forward-only/canonical closure; concrete contract/implementation/review pending"
+}
