@@ -1,5 +1,8 @@
 """Validate portable image content and preserve identity across installer retries."""
 import json
+import hashlib
+from contextlib import contextmanager
+import os
 import io
 from pathlib import Path
 import re
@@ -15,6 +18,7 @@ IDENTITY = ('nodeId','tenantId','epoch','serverIP','nodeIP','nodePort')
 CONFIG = ('User','Env','Cmd','WorkingDir','Entrypoint','OnBuild','Volumes','Labels',
           'Healthcheck','StopSignal','Shell','ExposedPorts','StopTimeout')
 CREDENTIAL_FILES = ('node-cert.pem','node-key.pem','ca.pem','signer.pub','peer-policy.json')
+_rotation_guard_depth = {}
 
 
 def validate_topology(manifest):
@@ -59,8 +63,61 @@ def credential_archive(directory):
     return archive.getvalue(), files
 
 
-def install_files(container, directory):
+def no_rotation_mutation(directory):
+    """Legacy installers cannot resume or undo an owned leaf publication."""
+    root = Path(directory)
+    for name in ('leaf-rotation.json', 'leaf-rotation.json.next', 'leaf-rotation-finalized'):
+        path = root / name
+        if path.exists() or path.is_symlink():
+            raise ValueError('Leaf rotation state requires its exact forward-only protocol; legacy repair/upgrade/rollback is blocked')
+
+
+@contextmanager
+def rotation_mutation_guard(directory):
+    """Serialize generic mutation with leaf publication; never steal stale intent."""
+    root = Path(directory)
+    key = os.path.abspath(root)
+    if key in _rotation_guard_depth:
+        no_rotation_mutation(root)
+        yield
+        return
+    path = root / 'leaf-rotation.lock'
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        raise ValueError('Another leaf rotation writer owns the Node lock; preserve state') from None
+    try:
+        os.close(fd)
+        _rotation_guard_depth[key] = True
+        no_rotation_mutation(root)
+        yield
+    finally:
+        _rotation_guard_depth.pop(key, None)
+        path.unlink(missing_ok=True)
+
+
+def install_files(container, directory, *, rotation_publication=False):
+    if rotation_publication:
+        return _install_files(container, directory, rotation_publication=True)
+    with rotation_mutation_guard(directory):
+        return _install_files(container, directory)
+
+
+def _install_files(container, directory, *, rotation_publication=False):
+    if not rotation_publication:
+        no_rotation_mutation(directory)
     archive, files = credential_archive(directory)
+    if rotation_publication:
+        root = Path(directory)
+        record = json.loads((root / 'leaf-rotation.json').read_bytes())
+        binding = record.get('peerPhaseBinding', {})
+        name = {'installed': 'overlap', 'finalizing': 'final'}.get(record.get('phase'))
+        policy = json.loads(files['peer-policy.json'])
+        if (record.get('peerSchemaVersion') != 3 or record.get('publicationIntent') is not True
+                or name is None or type(policy.get('version')) is not int
+                or policy['version'] != binding.get(name+'PeerPolicyVersion')
+                or hashlib.sha256(files['peer-policy.json']).hexdigest() != binding.get(name+'PeerPolicySHA256')):
+            raise ValueError('Credential publication does not match the frozen forward-only phase')
     subprocess.run(['docker','cp','-a','-',container+':/state'], input=archive,
                    capture_output=True, check=True, timeout=30)
     # Keep private contents in memory; never write an archive or log its bytes.

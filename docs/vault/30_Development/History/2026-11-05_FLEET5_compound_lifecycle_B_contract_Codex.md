@@ -1,11 +1,11 @@
 ---
 doc_id: "CONTRACT-FLEET5-COMPOUND-LIFECYCLE-B-001"
 title: "FLEET5 B compound compute storage and leaf lifecycle proposal"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude architecture review through root pending"
-updated: "2026-11-05T19:40:00+09:00"
+updated: "2026-11-05T20:12:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -306,23 +306,13 @@ still checks actual floors, not that intention. Backup and replacement share the
 same state volume, so backup container preservation is not a journal backup.
 Automatic downgrade after ready or any new work remains refused.
 
-**Expired/unusable next generation:** exact-plan replay requires valid approved
-certificates. A new reviewed recovery generation may advance beyond the highest
-durable observed peer/storage floor; it may not mutate hashes at those versions.
-DB channel trigger still advances by one. For an installed C+1 generation whose
-certificate expires before DB CAS, a superseding target C+2 requires an explicitly
-bound **CAS ladder** C→C+1→C+2 inside the same outer transaction, using valid
-superseding leaf DER at each audited step; no intermediate channel is committed
-or usable for a storage challenge. The Node advances directly from its existing
-floor to the reviewed higher target, preserving all old pins/archive evidence.
-This is normal forward operator CAS repeated, not a trigger bypass/version jump.
-The recovery manifest must name every intermediate version, superseded proposal,
-old DB vector and highest observed local floors. Any gap/unobserved floor refuses.
-This ladder is an **architecture-review decision point**, required before claiming
-expired-partial recovery support; if rejected, those states remain explicitly
-blocked under existing offline-recovery ownership, never silently reset.
-Fresh trust/keys/epoch changes remain outside this worker's authority and use the
-existing separately authorized offline recovery contract.
+**Expired/unusable next generation:** root `msg_4a1bc0c5516e` selected **BLOCKED
+under separately reviewed offline recovery**. Exact-plan replay still requires
+valid approved certificates. This staged contract and urgent P0 introduce no CAS
+ladder, channel-trigger bypass, version jump, hash exception or floor reset.
+The earlier v1.0.0 ladder proposal remains historical at fixed report 5023 and is
+not the selected scope. Fresh trust/keys/epoch changes or a later recovery design
+remain outside this worker's authority and require their own reviewed contract.
 
 ## Exact 2fb archives, successors and retirement
 
@@ -410,7 +400,7 @@ pilot/r5 state and existing 48-task/VF-CL statuses are untouched.
 | B09 | Missing/stale one-member preflight, partial local install, CAS conflict, kill before/after DB commit and CP switch; all-old/all-next/mixed vector reconciliation and no subset CAS |
 | B10 | Exact old restoration only with all-old floors/channels and valid unchanged root/work; first peer pin alone or unknown forbids it; no decrement/reseed/reset/older binary |
 | B11 | Final/drop-old barrier, second successor, exact original-byte archives, canonical CP retirement, verified signed finalization, `.next` residue exact replay and unrelated residue rejection |
-| B12 | Recovery-generation/CAS-ladder decision and real PostgreSQL proof against +1 trigger, immutable audits, stale supersession and expired-partial negatives; no version jumps |
+| B12 | Expired-partial refusal under separate offline-recovery ownership; actual no-ladder/no-trigger-bypass/no-version-jump/no-reset negatives |
 | B13 | Existing storage signed wire: current mTLS DER, nonce/expiry/catalog/root/channel checks, tamper/replay/channel mismatch refusal and atomic Evidence/StorageCheck with authenticated readback |
 | B14 | Hosted exact-SHA Linux CI plus actual architecture/code reviews, then separate root-authorized physical all-five storage/execution and ADR-100 four-independent-worker S05/S07 |
 
@@ -471,8 +461,10 @@ verified with `git hash-object --no-filters`; their original wording is unchange
 Receipt `scoped-dependency-restoration.json` binds source blobs and actual hashes.
 No shared-board edit, broad old-document merge or Obsidian apply is authorized.
 
-This stage ends with a structured ask to root for **actual B architecture review**
-and the CAS-ladder decision. It does not send worker_done or authorize production
+The bounded P0 field/ownership/failed-start/fault addendum is
+[[2026-11-05_FLEET5_P0_plain_peer_phase_contract_detail_Codex]]. Root has actually
+requested Claude review of fixed 5023 and has blocked expired-partial ladder work.
+This stage awaits **actual P0 architecture review**. It does not send worker_done or authorize production
 implementation. Next owner root/S1/Claude: assess tuple transaction, floor/CAS
 ordering, plain compatibility, independent peer phases, recovery and exact archive
 extension. Next Codex action follows the concrete review verdict in this branch.

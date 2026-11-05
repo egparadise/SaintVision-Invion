@@ -24,6 +24,11 @@ on:
         required: false
         type: boolean
         default: false
+      run_fleet5_peer_phase_fixed_proof:
+        description: 'Require two actual Go plain renewals and negative cases before the main Core suites'
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -109,6 +114,20 @@ jobs:
         with:
           name: fleet5-native-peer-phase-proof-${{ github.sha }}
           path: dist/fleet5-peer-phase-proof/
+          if-no-files-found: error
+          retention-days: 30
+      - name: FLEET5 fixed native Go two-cycle proof
+        if: github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof
+        timeout-minutes: 7
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -B tests/proofs/run_fleet5_peer_phase_fixed_probe.py --output dist/fleet5-peer-phase-fixed-proof
+      - name: Publish FLEET5 fixed native proof
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-native-peer-phase-fixed-proof-${{ github.sha }}
+          path: dist/fleet5-peer-phase-fixed-proof/
           if-no-files-found: error
           retention-days: 30
       - name: Start digest-pinned product ObjectStore service

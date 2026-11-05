@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:proposed:plain-peer-phase:3",
+  "title": "P0 proposed plain peer-phase schema; independent architecture verdict pending",
+  "$comment": "Review artifact only, not production schema or proof of observation origin. Cross-field arithmetic, exact bytes, trust/provenance, nonce freshness, normal unexpired authority and rollback/CAS checks in the companion contract are mandatory. No storage or expired-partial recovery is authorized.",
+  "$defs": {
+    "PlainNormalProposal": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-lan-leaf-rotation:3"
+        },
+        "rotationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nodeId": {
+          "type": "string",
+          "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nodeIP": {
+          "type": "string",
+          "format": "ipv4"
+        },
+        "currentChannelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "targetChannelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "currentNodeCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nextNodeCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "currentControlCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nextControlCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "caBundleSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "overlapExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "certificateNotAfter": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "files": {
+          "type": "object",
+          "properties": {
+            "ca.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "node-cert.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "control-cert.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "peer-policy-overlap.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "peer-policy-final.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "ca.pem",
+            "node-cert.pem",
+            "control-cert.pem",
+            "peer-policy-overlap.json",
+            "peer-policy-final.json"
+          ],
+          "additionalProperties": false
+        },
+        "currentPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "overlapPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "finalPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "overlapPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finalPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "floorObservationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "predecessorArchiveSHA256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "predecessorJournalRawSHA256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "rotationId",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "nodeIP",
+        "currentChannelVersion",
+        "targetChannelVersion",
+        "currentNodeCertificateSHA256",
+        "nextNodeCertificateSHA256",
+        "currentControlCertificateSHA256",
+        "nextControlCertificateSHA256",
+        "caBundleSHA256",
+        "createdAt",
+        "overlapExpiresAt",
+        "certificateNotAfter",
+        "files",
+        "currentPeerPolicyVersion",
+        "overlapPeerPolicyVersion",
+        "finalPeerPolicyVersion",
+        "currentPeerPolicySHA256",
+        "overlapPeerPolicySHA256",
+        "finalPeerPolicySHA256",
+        "floorObservationSHA256",
+        "predecessorArchiveSHA256",
+        "predecessorJournalRawSHA256"
+      ],
+      "additionalProperties": false
+    },
+    "LocalFloorObservation": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-local-peer-floor-observation:1"
+        },
+        "writerKind": {
+          "const": "local-operator-container-state-observation"
+        },
+        "nodeAttestationClaimed": {
+          "const": false
+        },
+        "requestNonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observerSourceSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nodeId": {
+          "type": "string",
+          "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "containerId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "containerConfigSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "stateVolumeName": {
+          "type": "string",
+          "pattern": "^saintvision-nod_[0-9a-hjkmnp-tv-z]{26}-state$"
+        },
+        "stateVolumeMetadataSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "stateVolumeNodeLabel": {
+          "type": "string",
+          "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "consumerIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true
+        },
+        "journalIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "peerFloorRawSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "peerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "peerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "currentNodeCertificateDER_SHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "quiescent": {
+          "const": true
+        },
+        "captureCount": {
+          "const": 2
+        },
+        "capturesMatched": {
+          "const": true
+        },
+        "journalDirectoryOwner": {
+          "const": "0:0"
+        },
+        "journalDirectoryMode": {
+          "const": "0700"
+        },
+        "floorOwner": {
+          "const": "0:0"
+        },
+        "floorMode": {
+          "const": "0600"
+        },
+        "capturedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "operationalAcceptanceAssessed": {
+          "const": false
+        },
+        "preparationRequestSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "writerKind",
+        "nodeAttestationClaimed",
+        "requestNonce",
+        "observerSourceSHA256",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "containerId",
+        "containerConfigSHA256",
+        "stateVolumeName",
+        "stateVolumeMetadataSHA256",
+        "stateVolumeNodeLabel",
+        "consumerIds",
+        "journalIdentitySHA256",
+        "peerFloorRawSHA256",
+        "peerPolicyVersion",
+        "peerPolicySHA256",
+        "currentNodeCertificateDER_SHA256",
+        "quiescent",
+        "captureCount",
+        "capturesMatched",
+        "journalDirectoryOwner",
+        "journalDirectoryMode",
+        "floorOwner",
+        "floorMode",
+        "capturedAt",
+        "operationalAcceptanceAssessed",
+        "preparationRequestSHA256"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/PlainNormalProposal"
+    },
+    {
+      "$ref": "#/$defs/LocalFloorObservation"
+    }
+  ]
+}

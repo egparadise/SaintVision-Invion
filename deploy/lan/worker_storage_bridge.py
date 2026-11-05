@@ -13,7 +13,7 @@ from uuid import uuid4
 import worker_storage as storage
 import worker_replacement as preflight
 import worker_replace as replacement
-from worker_config import same_identity, image_id
+from worker_config import same_identity, image_id, no_rotation_mutation, rotation_mutation_guard
 
 
 def bridge(mode, bundle, source, policy_hash, request_hash=None):
@@ -27,6 +27,7 @@ def bridge(mode, bundle, source, policy_hash, request_hash=None):
     if not re.fullmatch(r"nod_[0-9A-HJKMNP-TV-Z]{26}", node):
         storage.reject()
     root = Path.home() / ".local/share/saintvision" / node
+    no_rotation_mutation(root)
     # Existing identity is authoritative; no enrollment or key copying here.
     same_identity(storage.strict(storage.regular(root / "manifest.json")), manifest)
     raw = storage.regular(bundle / "storage-policy.json")
@@ -37,7 +38,7 @@ def bridge(mode, bundle, source, policy_hash, request_hash=None):
         manifest, bundle / "storage-policy.json", source, policy_hash, manifest["agentImage"]
     )
     storage.source_identity(source, root)
-    with replacement.locked(root):
+    with replacement.locked(root), rotation_mutation_guard(root):
         stage = root / "storage-replacement-input"
         if not stage.exists():
             if mode != "prepare":

@@ -1,0 +1,15 @@
+{
+  "taskId": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "recordedAtKST": "2026-11-05T20:17:02.300516+09:00",
+  "rootDirection": "msg_4a1bc0c5516e",
+  "proofSourceSHA": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+  "proofReportSHA": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+  "scope": "P0 field/state/floor-provenance/automatic-failed-start-rollback/native-fault-matrix preparation only",
+  "actualArchitectureReview": "Claude task_3529eefa626c / ctx_ba275b06ce0c pending; S1 feedback not independent verdict",
+  "productionImplementationAuthored": false,
+  "expiredPartialDisposition": "BLOCKED under separately reviewed offline recovery; no CAS ladder/version jump/trigger bypass/reset",
+  "localSchemaShapeExit": 0,
+  "futureNativeGreenTests": "not-run; production implementation not authorized yet",
+  "floorObservationTrust": "trusted local operator and pinned local daemon/observer, explicitly not Node remote attestation",
+  "oldPilotOrPhysicalActions": false
+}

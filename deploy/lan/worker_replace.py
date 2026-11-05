@@ -15,7 +15,7 @@ from uuid import uuid4
 
 import worker_replacement as preflight
 import worker_storage as storage
-from worker_config import image_id, check_running
+from worker_config import image_id, check_running, no_rotation_mutation, rotation_mutation_guard
 
 
 def sync_directory(path):
@@ -190,7 +190,10 @@ def new_target(plan, record, value):
 def run(plan, receipt, *, checkpoint=lambda phase: None):
     """checkpoint is a test fault seam, never a CLI argument or environment option."""
     directory = Path(plan["policyPath"]).parent
-    with locked(directory):
+    no_rotation_mutation(directory)
+    no_rotation_mutation(directory.parent)
+    root = directory.parent if directory.name == 'storage-replacement-input' else directory
+    with locked(directory), rotation_mutation_guard(root):
         storage.current(plan)
         if (
             image_id(

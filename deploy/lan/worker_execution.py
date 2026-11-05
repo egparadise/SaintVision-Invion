@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 from uuid import uuid4
-from worker_config import same_identity, image_id, repair_target, install_files, check_running
+from worker_config import same_identity, image_id, repair_target, install_files, check_running, no_rotation_mutation, rotation_mutation_guard
 
 
 def run(*args, **kwargs):
@@ -19,6 +19,12 @@ def main():
     manifest=json.loads((folder/'manifest.json').read_text())
     node=manifest['nodeId']
     state=Path.home()/'.local/share/saintvision'/node
+    with rotation_mutation_guard(state):
+        return configure(folder, manifest, node, state)
+
+
+def configure(folder, manifest, node, state):
+    no_rotation_mutation(state)
     same_identity(json.loads((state/'manifest.json').read_text()),manifest)
     name='saintvision-'+node.lower()
     inspect=json.loads(run('inspect',name))[0]

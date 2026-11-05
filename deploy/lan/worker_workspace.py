@@ -11,7 +11,7 @@ import subprocess
 import sys
 from uuid import uuid4
 
-from worker_config import same_identity, image_id, repair_target, install_files, check_running, credential_archive
+from worker_config import same_identity, image_id, repair_target, install_files, check_running, credential_archive, no_rotation_mutation, rotation_mutation_guard
 
 PROFILE = 'lan-workspace-v1'
 EXECUTABLE = '/usr/local/bin/python3'
@@ -139,6 +139,7 @@ def load_image(folder, spec, archive):
 
 
 def rollback(manifest, state, record):
+    no_rotation_mutation(state)
     name = 'saintvision-'+manifest['nodeId'].lower()
     if record.get('phase') == 'ready':
         raise ValueError('Successful upgrade may contain new work; automatic downgrade is refused')
@@ -183,7 +184,8 @@ def install(folder, state, *, undo=False):
     if state.is_symlink() or not state.is_dir():
         raise ValueError('Existing private Node state directory is required')
     same_identity(json.loads((state/'manifest.json').read_text('utf-8')), manifest)
-    with exclusive_lock(state/'workspace-upgrade.lock'):
+    with exclusive_lock(state/'workspace-upgrade.lock'), rotation_mutation_guard(state):
+        no_rotation_mutation(state)
         record_path = state/'workspace-upgrade.json'
         record = json.loads(record_path.read_text('utf-8')) if record_path.exists() else None
         if undo:

@@ -129,7 +129,7 @@ jobs:
           second = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))
           lifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))
           assert build['wheelCount'] == 4
-          assert build['workerModuleCount'] == 2
+          assert build['workerModuleCount'] == 5
           assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'
           assert install['platformKey'] in {
               'cpython-312-x86_64-linux-gnu',
