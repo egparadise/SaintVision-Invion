@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T05:46:54+09:00",
+  "atKST": "2026-11-06T06:01:04+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -20,7 +20,7 @@
     "state": "ready actual worker receipt; verdict pending"
   },
   "pending": null,
-  "authorParallelWork": "Codex K1 implementation continues; B owner waits actual whole review at msg_e269bdd34436; Integrator final qualified e50 report",
+  "authorParallelWork": "Codex K1 real offline verifier/new proof codecs/crypto/CI; B owner waits one actual e993 whole review",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,5 +28,16 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "K1 code+new proof-wire published SHA/actual CI; sequence after current B review, no duplicate launch"
+  "nextActualReviewTrigger": "K1 code+new proof-wire published SHA/actual CI; sequence after current B review, no duplicate launch",
+  "completedIntegration": {
+    "task": "task_78064fb4b7ff",
+    "dispatch": "ctx_ed7ec73163d6",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "report": "a7d8e68ccf0a9b2b268d7cddb37cd63d7264ff8a",
+    "Docs": 42107166287,
+    "workerDone": "msg_f7375feab0e4",
+    "scope": "bounded source/packet/report only",
+    "taskOutcome": "succeeded"
+  },
+  "sourceIntegratorActive": false
 }

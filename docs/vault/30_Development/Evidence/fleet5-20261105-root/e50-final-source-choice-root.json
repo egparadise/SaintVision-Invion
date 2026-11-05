@@ -59,5 +59,13 @@
   "rootCIObservation": "05:25 API ALL8/ALL12 SUCCESS; previous04:32 snapshot retained as historical only",
   "sourceAllEightAndTwelveJobsRootVerified": true,
   "coreArtifactActualRootAudit": "e50-root-core-artifact-audit.json",
-  "finalQualifiedReportOwnDocsPending": true
+  "finalQualifiedReportOwnDocsPending": false,
+  "finalQualifiedReport": "a7d8e68ccf0a9b2b268d7cddb37cd63d7264ff8a",
+  "finalQualifiedReportDocs": 42107166287,
+  "rootVerifiedFinalQualifiedReportHeadRefAllJobs": true,
+  "boundedDeliveryComplete": true,
+  "finalHandoffReply": "msg_c24ffcdc7a99",
+  "singleWorkerDoneReceived": true,
+  "singleWorkerDoneMessage": "msg_f7375feab0e4",
+  "productionOrLandingAccepted": false
 }

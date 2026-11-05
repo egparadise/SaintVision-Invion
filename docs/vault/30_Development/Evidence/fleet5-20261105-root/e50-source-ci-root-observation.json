@@ -168,5 +168,8 @@
   "wholeProgramComplete": false,
   "artifactAudit": "e50-root-core-artifact-audit.json",
   "newSourceCIBoundedAccepted": true,
-  "finalQualifiedReportOwnDocsPending": true
+  "finalQualifiedReportOwnDocsPending": false,
+  "laterQualifiedReport": "a7d8e68ccf0a9b2b268d7cddb37cd63d7264ff8a",
+  "laterQualifiedReportDocs": 42107166287,
+  "boundedFinalHandoff": "e50-final-bounded-handoff-root.json"
 }

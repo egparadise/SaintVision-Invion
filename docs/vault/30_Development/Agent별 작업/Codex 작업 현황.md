@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.381"
+version: "1.0.382"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T05:46:54+09:00"
+updated: "2026-11-06T06:01:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B rev3 final e993 exactDocs/source verified/Claude review pending; K1 real implementation and new fixed proof-codec proposal; e50 accepted/final report pending; physical incomplete"
-active_card_next: "Claude actual e993 whole coupled R1-R7/new ARM/key-delivery/ObservationScope review; K1 Codex code/crypto/CI; Integrator final report; Root concrete decision only after actual verdict"
+active_card_status: "e50 bounded integration delivery COMPLETE/actual worker_done; K1 real code+crypto and B e993 Claude review pending; physical/whole incomplete"
+active_card_next: "K1 Codex published code/crypto/CI then one wire+code review; Claude B e993 whole verdict then Root concrete design/code decision; Root aggregate/production gate; no duplicate e50 CI/report"
 ---
+
+## 2026-11-06T06:01:04+09:00 e50 최종 납품 수락과 실제 완료 신호
+
+작업한 것과 확인: e50 소스·비실행 패킷·최종 보고 a7d8e68c/Docs42107166287을 Root가 검증해 reply msg_c24ffcdc7a99로 납품 수락했다. 실제 worker_done msg_f7375feab0e4/outcome succeeded를 수신해 통합 작업을 해당 범위에서 완료했다. 8CI/12job·106명명 Core case·installer17/PG2·추가 build-runtime PG13와 패킷6개97,652,411bytes 보존 사본의 hash도 대조했다. root coordinator의 ignored private 폴더에 패킷 원본6개를 복사해 각각 크기와 SHA256을 확인했다. 기존 source는 삭제·이동하지 않았다. 다음 첫 행동/담당은 K1 Codex의 실제 코드/서명시험·CI와 Claude의 B e993 판정이며, 완료한 통합 Agent를 다시 열거나 같은 CI를 반복하지 않는다. 운영 인수와 기존48-task/VFCL은 유지한다.
 
 ## 2026-11-06T05:46:54+09:00 B rev3 최종본 검토 배정
 
