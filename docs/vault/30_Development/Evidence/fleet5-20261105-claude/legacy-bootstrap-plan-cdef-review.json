@@ -1,0 +1,57 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_03867932b2f0 / ctx_37e3f120fac0 (superseding revision per msg_7b5f8be7e2ba)",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-05T22:12:00+09:00", "2026-11-05T22:25:00+09:00"],
+  "reviewKind": "bounded independent architecture/plan review only; not corrected-P0 code, contract or operational acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+    "supersedes": "1057e0ed2e3c75d02e8ed342208fd78109cec2cd",
+    "delta": {"files": 13, "insertions": 608, "deletions": 74, "nonDocsFiles": 0, "newFiles": ["legacy-consumer-closure.json", "root-g2-planning-choice.json", "runtime-inventory-contract.json"], "inspectComparisonContractChanged": false},
+    "priorClaudeReviewOf1057": "830efd93 legacy-bootstrap-plan-1057-review.json (retained unchanged)",
+    "readFrom": "Git objects only; author checkout not read or edited"
+  },
+  "documentChecks": {
+    "ownerSchemaCases": {"matched": 16, "total": 16, "rerunBy": "Claude, main .venv 3.14.7 -B -I, jsonschema draft 2020-12"},
+    "claudeAdversarialMutations": {"total": 20, "rejected": 20, "newOnCde": ["reviewedContractBinding filled with msg_f517e89d6a16", "rootBindings.rootG2Decision filled with msg_f517e89d6a16", "implementationAuthorizedOnThisCard true"]},
+    "bindingCounts": {"targetBindings": 30, "rootBindings": 18, "memberBindingNames": 52, "allNull": true},
+    "acceptanceCases": {"count": 28, "added": ["A25", "A26", "A27", "A28"], "status": "FUTURE NOT RUN"},
+    "publicSourceBindings": {"recomputed": 27, "matched": 27},
+    "planDocs": {"run": 42032726002, "headSha": "cdeffee7", "conclusion": "success", "jobs": "all success", "checkedByClaude": true, "scope": "document gate only"}
+  },
+  "deltaAssessment": {
+    "rootG2PlanningChoice": "msg_f517e89d6a16 recorded as planning-only; schema keeps operationalAcceptance/implementationAuthorized false and reviewedContractBinding/rootG2Decision null; consistent with Root direction A for plan",
+    "typedImageFields": "Docker image Id, RepoDigest, platform manifest, config digest, ordered diffIDs, archive SHA256, executable SHA256 and source Git SHA kept distinct; 'image Id often config digest' matches 6c0fc4ad:tools/lan_pilot.py:564-600 handling of classic vs containerd store; offline absence requires authenticated archive/build mapping; sound",
+    "ownedInspectionJoin": "owned-daemon inspection before/after M2 joined to signed M2 and published build; process hash alone not image proof; sound",
+    "argvAuthorityEquality": "exact arrays plus ordered hash, Entrypoint and live PID1 argv separately; typed DER/SPKI/raw hashes; private key only by local protected-tree equality; sound",
+    "legacyConsumerClosure": "source03 readers/producers enumerated with BLOCK/EXCLUDED/PRESERVE dispositions and no global agentImage fallback; closes 1057 R3 for source03 scope"
+  },
+  "priorFindingsStatus": {
+    "R1": {"status": "OPEN", "detail": "6c0fc4ad:deploy/lan/worker_peer_floor.py target() still accepts a second volume consumer only as the labelled workspace predecessor; closure is source03-scoped and does not list worker_peer_floor or worker_plain_rotation; post-start M2 via the 6c host observer and every later schema3 renewal BLOCK with the retained backup"},
+    "R2": {"status": "PARTIAL", "detail": "closure now requires a new coded guard fencing legacy mutators from reservation onward; still does not name the mechanism existing helpers actually consult (6c no_rotation_mutation knows only leaf-rotation markers) nor list repair-node.sh/Repair-Worker.ps1/prepare-worker.sh/finish-worker.sh in the JSON"},
+    "R3": {"status": "CLOSED for source03 scope", "residual": "6c-added consumers (worker_peer_floor.py:111 workspace agentImage, worker_plain_rotation) folded into R1"},
+    "R4": {"status": "OPEN", "detail": "inspect-comparison-contract.json unchanged; ExecIDs created by the 6c docker-exec M2 observation not enumerated although the join now requires stable after-M2 inspection; image-inherited Config equality covered only indirectly by config digest"}
+  },
+  "newFindings": [
+    {"id": "N1", "severity": "Medium", "summary": "The join requires 'signed actual process executable SHA256 equals published executable hash', but 6c0fc4ad M2 (peer_policy_phase.py FLOOR_KEYS) signs servingProcessSHA256 = sha256 of raw /proc/<pid>/cmdline (peer_floor_linux.go PeerFloorServingProcess), and proves executable identity only by SameFile(/proc/<pid>/exe, /proc/self/exe); no executable-bytes hash exists", "requiredRevision": "Either require corrected P0 to sign sha256 of /proc/<pid>/exe bytes, or define the join as SameFile proof plus owned inspection of the read-only image rootfs /inv-node; map explicitly when m2WireContractSHA is bound"},
+    {"id": "N2", "severity": "Low", "summary": "Two argv hash definitions: plan proposes SHA256 of canonical UTF-8 JSON argv array, 6c signs SHA256 of raw NUL-separated cmdline", "requiredRevision": "Name both and the exact mapping; never compare one to the other directly"}
+  ],
+  "verdicts": {
+    "plan": "cdeffee7: REVISION REQUIRED (bounded): R1 open (required), N1 required mapping; R2 partial, R4 and N2 additions; R3 closed for source03. G2-A direction, typed image semantics, owned-inspection join, argv/authority equality, consumer closure structure and G1-G10 acceptable",
+    "implementation": "none exists; unaccepted",
+    "p0": "6c0fc4ad NOT ACCEPTED (c2102592)",
+    "contract": "runtime inventory/M2 wire/authentication contracts unbound (null); unaccepted",
+    "ci": "Docs 42032726002 document gate only; no runtime CI accepted",
+    "operations": "HOLD; 30 target + 18 root + both member envelopes null; Root direction A is planning only",
+    "physicalAcceptance": "none"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerPrivateKeyGuardPrecheckAutomation": 0, "sharedBoardsRegistryObsidian": 0, "authorCheckoutWrites": 0},
+  "nextFirstAction": [
+    {"owner": "Codex (plan owner)", "action": "revise: R1 typed migration-predecessor consumer rule (journal-bound, no label) in 6c observer/renewal scope, N1 executable proof mapping, R2 named helper-fence mechanism and helper list, R4 ExecIDs/image Config, N2 argv hash mapping; add acceptance cases"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "fix P0 B1/B2/F1-F3; decide with plan owner whether M2 adds executable-bytes hash (N1) and migration-predecessor rule (R1)"},
+    {"owner": "root", "action": "keep HOLD and contract/operational G2 binding null"},
+    {"owner": "Claude", "action": "review next plan revision and corrected P0 when assigned"}
+  ]
+}
