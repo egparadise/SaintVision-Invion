@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "exit": 0,
+    "log": "report-gate-1.txt",
+    "recordedAtKST": "2026-11-05T19:59:42.777112+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "exit": 0,
+    "log": "report-gate-2.txt",
+    "recordedAtKST": "2026-11-05T19:59:45.564365+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "log": "report-gate-3.txt",
+    "recordedAtKST": "2026-11-05T19:59:54.041895+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7"
+    ],
+    "exit": 0,
+    "log": "report-gate-4.txt",
+    "recordedAtKST": "2026-11-05T19:59:58.284709+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "exit": 0,
+    "log": "report-gate-5.txt",
+    "recordedAtKST": "2026-11-05T19:59:58.789696+09:00"
+  }
+]

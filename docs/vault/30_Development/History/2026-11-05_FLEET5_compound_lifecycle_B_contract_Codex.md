@@ -421,6 +421,49 @@ Resource policy proposals remain distinct from measured/enforced quotas.
 
 ## Publication and next owner
 
+### Actual P0 native Linux proof and publication, 19:56 KST
+
+Proof/contract merge publication **`fe7ebeff1f695e0744a7f25eace52c7321dcc1d7`**
+normally inherits accepted 2fb and retains the combined DB preparation/current
+lan-pilot tooling bindings. No new production lifecycle fix was authored. The
+sole merge conflict was those two metadata pairs; both actual SHA256/Git-blob
+pairs were verified after resolution. Shared boards and task/VF-CL statuses are
+unchanged. Local CPython 3.14.7 main-repo interpreter was used with `-B`, at the
+exact path stated in `publication-stage-v1.json`; no local fixture PKI was run.
+
+- Hosted Docs **42014765588**, head fe7ebeff, **SUCCESS**, including bundle build.
+- Hosted Core **42014770700**, same head, **FAILURE intentionally retained**.
+  The early native Go proof exited **1**, validated as an actual baseline mismatch.
+  The proof artifact upload succeeded; expensive main Core suite did not run.
+  The existing separate S01-storage-roundtrip job succeeded; this is not eight
+  canonical jobs passing. Workflow job names/counts and ordinary gates are intact.
+- Actual Linux OpenJournal/NewAuthority/TLS accepted initial peer version 7 and
+  generated overlap versions 8 and 9. Both generated final files had the same
+  respective version but different raw hash, and failed specifically with
+  `NODE-0041: peer policy rollback rejected`; each durable floor stayed at its
+  accepted overlap hash. **Two cycles attempted, zero complete normal cycles**.
+- The separate expired-after-pin negative at version 10 failed with
+  `NODE-0041: peer policy expired or unbounded`, yet durable floor 10 and its exact
+  raw hash persisted. This directly confirms that failed startup is not a
+  rollback permission or proof of unchanged journal state.
+- Exact Go/runtime/helper source bytes were checked against accepted 2fb before
+  execution. No GOOS, lock, mode or floor bypass; no mocked restart, replacement
+  runtime or alternative module. Fixture-only keys stayed in an owned CI temporary
+  directory and were not uploaded.
+- Artifact **13409265588**, name `fleet5-native-peer-phase-proof-fe7ebeff1f695e0744a7f25eace52c7321dcc1d7`.
+  Downloaded ZIP SHA256 **dc273e5069aca4d62d0a22cb2736ff745fdd98a75ba3c72d687439e7e86e9901**
+  matches GitHub's artifact digest. Its exactly three members match extracted
+  bytes: `go-events.jsonl`, `native-go-result.json`, `publication-receipt.json`.
+  Source, head, runtime platform, exit and exact rejection cause were verified.
+
+The authoritative local receipt is
+`docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-proof-receipt.json`;
+the raw ZIP and members are preserved beside it. The actual result elevates the
+plain-phase problem from source observation to a reproduced native journal
+failure, while remaining fixture evidence rather than live equipment acceptance.
+The minimal standalone plain repair above is now the recommended first production
+change **after** root's actual independent contract/source review.
+
 The initial docs gate exit 1 is retained. Root explicitly authorized restoring
 only the exact missing Low-closure History and its Evidence from
 `d254fc6a511db108be351a3ba82645341748fea3`. Both were restored byte-for-byte and

@@ -30,5 +30,7 @@
   "contributedStorageAccepted": false,
   "physicalAcceptance": "not-performed",
   "sharedBoardsChanged": false,
-  "commit": "next; this pre-publication receipt does not self-reference its future SHA"
+  "commit": "next; this pre-publication receipt does not self-reference its future SHA",
+  "historicalPrePublicationSnapshot": true,
+  "subsequentActualHostedProof": "hosted-proof-receipt.json"
 }
