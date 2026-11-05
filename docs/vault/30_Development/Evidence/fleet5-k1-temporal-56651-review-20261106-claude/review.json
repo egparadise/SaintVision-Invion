@@ -151,7 +151,7 @@
   "retime-results.jsonl": "33aa0831324029f901036550e8b15c64fbfdb2e62a671451a8a1ed52abc3b7f1",
   "semantic-root-field-nil-results.txt": "b24df74c5ec4272c4f34f6a748ab42835b26daca6b45e97880bd553a8cf2fa20",
   "zz_claude_review_planbind_test.go.txt": "dbbf0a9c10e94335afc1affbb2f57f8f377ab9d607c1736cb33298ca6d10f73d",
-  "zz_claude_review_probe_test.go.txt": "3ba4673ec6e63e75be6c7bceaf01c3ba6eed119c8f57c03b370cbf077c736943",
+  "zz_claude_review_probe_test.go.txt": "08b3b9ce3b080009874083b9c8e9b805199d866c394979e7e242a0b0feb6478a",
   "zz_claude_review_retime_test.go.txt": "33fa7c403e2246b9a7f70342a456355be30c7a1af290f3a77a64df9168db53b5"
  }
 }
