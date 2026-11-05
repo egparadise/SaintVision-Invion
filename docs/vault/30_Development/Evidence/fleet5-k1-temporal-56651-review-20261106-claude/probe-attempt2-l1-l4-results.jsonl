@@ -1,0 +1,13 @@
+{"Group":"L1","Name":"semantic-type-confusion paths=365 ctorDeny=16 verifyDeny=370 accepted=444","Expect":"no panic","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"L1-nil","Name":"nil-current-head","Expect":"DENY no panic","Got":"DENY","Error":"current:current set inventoryHead mismatch","OK":true}
+{"Group":"L1-nil","Name":"string-current-head","Expect":"DENY no panic","Got":"DENY","Error":"current:current set inventoryHead mismatch","OK":true}
+{"Group":"L1-nil","Name":"head-presence-number","Expect":"DENY no panic","Got":"DENY","Error":"current:current set inventoryHead mismatch","OK":true}
+{"Group":"L1-nil","Name":"nil-member-projections","Expect":"DENY no panic","Got":"DENY","Error":"current:current plan/member binding absent","OK":true}
+{"Group":"L1-nil","Name":"nil-current","Expect":"DENY no panic","Got":"DENY","Error":"current:no trusted current set context","OK":true}
+{"Group":"L1-nil","Name":"nil-history-maps","Expect":"DENY no panic","Got":"DENY","Error":"verify:plan/body/expectedInventoryHead/readbackProof: missing trusted operation/lease binding current:plan/body/allLaunchSurfaces: missing trusted operation/lease binding","OK":true}
+{"Group":"L1-nil","Name":"nil-certificates","Expect":"DENY no panic","Got":"DENY","Error":"verify:request-10-verifyBootstrap-PC2/arguments/signedM2: native current certificate nonrevocation state unavailable current:request-10-verifyBootstrap-PC2/arguments/signedM2: native current certificate nonrevocation state unavailable","OK":true}
+{"Group":"L1-nil","Name":"nil-publications","Expect":"DENY no panic","Got":"DENY","Error":"verify:plan/body/image/distributionProof: missing current authenticated publication/nonrevocation state current:plan/body/commonFence/coreCI/attestation: missing current authenticated publication/nonrevocation state","OK":true}
+{"Group":"L1-nil","Name":"nil-verifier-current","Expect":"DENY no panic","Got":"DENY","Error":"missing installed verifier","OK":true}
+{"Group":"L1-nil","Name":"empty-packet","Expect":"DENY no panic","Got":"DENY","Error":"missing or extra packet records","OK":true}
+{"Group":"L4","Name":"post-constructor-caller-mutation-history","Expect":"ACCEPT unaffected","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"L4","Name":"post-constructor-caller-mutation-current+returned-digests","Expect":"ACCEPT unaffected","Got":"ACCEPT","Error":"","OK":true}

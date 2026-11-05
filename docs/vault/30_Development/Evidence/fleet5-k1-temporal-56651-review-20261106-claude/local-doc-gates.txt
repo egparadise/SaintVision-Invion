@@ -1,0 +1,11 @@
+2026-11-06 KST, argv: D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B <gate>, PYTHONUTF8=1, cwd repo root, check-only (no Obsidian apply)
+08:50:22 rc=0 tools/check_docs.py :: PASS: 24 original hashes, 1253 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+08:50:47 rc=0 tools/check_ontology_generation.py :: PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+08:50:50 rc=0 tools/check_ontology.py :: PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidi
+08:50:52 rc=0 tools/check_contract_bindings.py ::   (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class 
+08:51:06 rc=0 tools/check_frontend_integrity.py :: PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+08:51:08 rc=0 tools/check_doc_path_citations.py --ratchet --base-ref 56651cba697f2ab6fcd7166ca4e6ea11eac28113 :: PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+08:51:12 rc=0 tools/check_doc_single_source.py --ratchet :: PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+08:51:13 rc=0 tools/test_sync.py :: CHECK: 2 managed files, 0 pending exports, 0 conflicts. No writes.
+08:51:18 rc=0 tools/build_docs.py :: BUILT: saintvision-guidelines.zip, 42695466 bytes. Documentation only.
+08:51:28 rc=0 tools/sync_obsidian.py --check :: CHECK: 3276 managed files, 824 pending exports, 0 conflicts. No writes.

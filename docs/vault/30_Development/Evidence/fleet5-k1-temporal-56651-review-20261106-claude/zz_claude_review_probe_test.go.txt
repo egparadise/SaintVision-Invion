@@ -1,0 +1,491 @@
+package migrationverify
+
+// CLAUDE REVIEW PROBES (scratch only, never committed). Records each probe result
+// as a JSON line in $PROBE_OUT; the test itself fails only on harness errors or
+// on a probe that contradicts its stated expectation.
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"testing"
+	"time"
+)
+
+type probeLine struct {
+	Group, Name, Expect, Got, Error string
+	OK                              bool
+}
+
+func record(t *testing.T, group, name, expect string, e error, wantErr bool, gate string) {
+	t.Helper()
+	got := "ACCEPT"
+	msg := ""
+	if e != nil {
+		got, msg = "DENY", e.Error()
+	}
+	ok := (e != nil) == wantErr
+	if ok && wantErr && gate != "" && !strings.Contains(msg, gate) {
+		ok = false
+	}
+	if out := os.Getenv("PROBE_OUT"); out != "" {
+		fh, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+		if err == nil {
+			b, _ := json.Marshal(probeLine{group, name, expect, got, msg, ok})
+			fh.Write(append(b, '\n'))
+			fh.Close()
+		}
+	}
+	if !ok {
+		t.Errorf("%s/%s expect %s got %s: %s", group, name, expect, got, msg)
+	}
+}
+
+func protect(f func() error) (e error) {
+	defer func() {
+		if r := recover(); r != nil {
+			e = fmt.Errorf("PANIC: %v", r)
+		}
+	}()
+	return f()
+}
+
+// liveContextFor makes a fully consistent, live current context for any set:
+// its own op is supplied as current, new current challenges are issued at Now,
+// and both native witnesses are re-signed at Now with those nonces.
+func liveContextFor(t *testing.T, f *cryptoFixture, p map[string]any, id string) TrustedContext {
+	ctx := f.context
+	b, _ := json.Marshal(ctx)
+	var c TrustedContext
+	if e := json.Unmarshal(b, &c); e != nil {
+		t.Fatal(e)
+	}
+	c.SemanticInputs = copyJSON(f.context.SemanticInputs)
+	c.Current = currentFromSet(t, p, id)
+	op := c.History.Operations[c.Current.OperationID]
+	c.Operations = map[string]OperationBinding{op.OperationID: op}
+	c.Challenges = map[string]NativeChallenge{}
+	for i, m := range f.installed.Members {
+		sh, _ := canonicalHash(m.Scope)
+		nonce := shaHex([]byte("CLAUDE PROBE nonce " + id + m.Slot))
+		c.Challenges[op.OperationID+"\x00"+sh] = NativeChallenge{nonce, op.MigrationID, op.OperationID, sh, op.FenceEpoch, c.Now.Add(-time.Second), c.Now.Add(time.Minute)}
+		c.Current.NativeWitnesses = append(c.Current.NativeWitnesses, CurrentNativeWitness{m.Slot, signedNativeAt(t, f, f.context.Current.NativeWitnesses[i].Raw, c.Now, nonce)})
+	}
+	return c
+}
+
+func TestZZM1ConsistentObsoleteViews(t *testing.T) {
+	for _, durable := range []bool{false, true} {
+		var f *cryptoFixture
+		label := "single-instant"
+		if durable {
+			label = "durable"
+			f = newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+		} else {
+			f = newCryptoFixture(t)
+		}
+		p := parsedPacket(t, f.packet)
+		gates := map[string][]string{"cohort-33": {"RELEASED in authenticated history", "superseded by authenticated higher", "not latest"}, "cohort-34": {"current lease is RELEASED or not HELD"}, "cohort-35": {"not latest authenticated operation sequence"}}
+		for _, id := range []string{"cohort-33", "cohort-34", "cohort-35", "cohort-36"} {
+			for i := 0; i < 8; i++ { // repeat: map iteration order varies
+				ctx := liveContextFor(t, f, p, id)
+				v, e := NewVerifier(f.installed, ctx)
+				if e != nil {
+					t.Fatal(e)
+				}
+				_, e = v.VerifyCurrentProjectionSet(f.packet, id)
+				if id == "cohort-36" {
+					record(t, "M1-"+label, id, "ACCEPT", e, false, "")
+					continue
+				}
+				gate := ""
+				if e != nil {
+					for _, g := range gates[id] {
+						if strings.Contains(e.Error(), g) {
+							gate = g
+						}
+					}
+				}
+				if gate == "" && e != nil {
+					gate = "<<unexpected gate>>"
+				}
+				record(t, "M1-"+label, fmt.Sprintf("%s#%d", id, i), "DENY intended M1 gate", e, true, gate)
+			}
+		}
+	}
+}
+
+func TestZZM2HistoricalAttacks(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	mig := f.context.MigrationOperationID
+	base := f.context.Now.Add(-630 * time.Second)
+	run := func(name string, wantErr bool, gate string, change func(v *Verifier)) {
+		v, e := NewVerifier(f.installed, f.context)
+		if e != nil {
+			t.Fatal(e)
+		}
+		change(v)
+		_, e = v.Verify(f.packet)
+		exp := "ACCEPT"
+		if wantErr {
+			exp = "DENY"
+		}
+		record(t, "M2-history", name, exp, e, wantErr, gate)
+	}
+	run("control", false, "", func(v *Verifier) {})
+	run("no-current-inputs-at-all", false, "", func(v *Verifier) {
+		v.ctx.Operations, v.ctx.Challenges, v.ctx.Current = nil, nil, nil
+	})
+	run("epoch1-missing-from-history", true, "", func(v *Verifier) { delete(v.ctx.History.Operations, mig) })
+	run("epoch1-moved-to-current-only", true, "", func(v *Verifier) {
+		v.ctx.Operations[mig] = v.ctx.History.Operations[mig]
+		delete(v.ctx.History.Operations, mig)
+	})
+	run("restore-missing-from-history-kept-current", true, "", func(v *Verifier) { delete(v.ctx.History.Operations, v.ctx.Current.OperationID) })
+	run("epoch1-history-window-widened", true, "historical operation differs", func(v *Verifier) {
+		o := v.ctx.History.Operations[mig]
+		o.ExpiresAt = o.ExpiresAt.Add(time.Hour)
+		v.ctx.History.Operations[mig] = o
+	})
+	run("epoch1-history-epoch2", true, "historical operation differs", func(v *Verifier) {
+		o := v.ctx.History.Operations[mig]
+		o.FenceEpoch = 2
+		v.ctx.History.Operations[mig] = o
+	})
+	run("epoch1-history-lease-is-released-hash", true, "", func(v *Verifier) {
+		o := v.ctx.History.Operations[mig]
+		d, _ := ArtifactDigest("operation-lease", parsedPacket(t, f.packet)["fence-released"])
+		o.LeaseEnvelopeSHA256 = d
+		v.ctx.History.Operations[mig] = o
+	})
+	chal := func(name, gate string, mut func(*NativeChallenge)) {
+		run("history-challenge-"+name, true, gate, func(v *Verifier) {
+			for k, c := range v.ctx.History.Challenges {
+				mut(&c)
+				v.ctx.History.Challenges[k] = c
+			}
+		})
+	}
+	chal("issued-31s-after-PC4-observation", "matching operation challenge", func(c *NativeChallenge) { c.IssuedAt = base.Add(83 * time.Second) })
+	chal("expires-at-PC2-observation", "matching operation challenge", func(c *NativeChallenge) { c.ExpiresAt = base.Add(32 * time.Second) })
+	chal("nonce", "matching operation challenge", func(c *NativeChallenge) { c.Nonce = strings.Repeat("e", 64) })
+	chal("epoch2", "matching operation challenge", func(c *NativeChallenge) { c.FenceEpoch = 2 })
+	run("history-challenges-in-current-map-only", true, "matching operation challenge", func(v *Verifier) {
+		for k, c := range v.ctx.History.Challenges {
+			v.ctx.Challenges[k] = c
+		}
+		v.ctx.History.Challenges = nil
+	})
+	keys := func(name, prefix string, wantErr bool, mut func(*verifierKey)) {
+		run("key-"+name, wantErr, "", func(v *Verifier) {
+			n := 0
+			for k, g := range v.keys {
+				if strings.HasPrefix(k, prefix+"\x00") {
+					mut(&g)
+					v.keys[k] = g
+					n++
+				}
+			}
+			if n == 0 {
+				t.Fatal("no keys for", prefix)
+			}
+		})
+	}
+	keys("host-helper-expired-before-release-event68", "host-helper", true, func(g *verifierKey) { g.after = base.Add(65 * time.Second) })
+	keys("host-helper-expired-after-last-event620-before-Now", "host-helper", false, func(g *verifierKey) { g.after = base.Add(625 * time.Second) })
+	keys("node-leaf-starts-after-PC2-observation32", "node-leaf", true, func(g *verifierKey) { g.before = base.Add(33 * time.Second) })
+	keys("node-leaf-expires-before-PC4-observation52", "node-leaf", true, func(g *verifierKey) { g.after = base.Add(50 * time.Second) })
+	keys("root-fence-expired-before-restore-acquire600", "root-fence", true, func(g *verifierKey) { g.after = base.Add(590 * time.Second) })
+	run("now-before-last-signed-event620", true, "", func(v *Verifier) {
+		v.ctx.Now = base.Add(615 * time.Second)
+		for k, c := range v.ctx.Certificates {
+			c.CheckedAt = v.ctx.Now
+			v.ctx.Certificates[k] = c
+		}
+		for k, p := range v.ctx.Publications {
+			p.CheckedAt = v.ctx.Now
+			v.ctx.Publications[k] = p
+		}
+	})
+	run("cert-revoked-now", true, "nonrevocation", func(v *Verifier) {
+		for k, c := range v.ctx.Certificates {
+			c.Status = "REVOKED"
+			v.ctx.Certificates[k] = c
+		}
+	})
+	run("cert-status-stale-121s", true, "nonrevocation", func(v *Verifier) {
+		for k, c := range v.ctx.Certificates {
+			c.CheckedAt = v.ctx.Now.Add(-121 * time.Second)
+			v.ctx.Certificates[k] = c
+		}
+	})
+	run("one-publication-revoked-now", true, "publication/nonrevocation", func(v *Verifier) {
+		for k, p := range v.ctx.Publications {
+			p.Status = "REVOKED"
+			v.ctx.Publications[k] = p
+			break
+		}
+	})
+	run("publication-published-after-Now", true, "publication/nonrevocation", func(v *Verifier) {
+		for k, p := range v.ctx.Publications {
+			p.PublishedAt = v.ctx.Now.Add(time.Second)
+			v.ctx.Publications[k] = p
+		}
+	})
+}
+
+func TestZZCurrentAttacks(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	run := func(name string, wantErr bool, gate string, change func(c *TrustedContext)) {
+		b, _ := json.Marshal(f.context)
+		var c TrustedContext
+		json.Unmarshal(b, &c)
+		c.SemanticInputs = copyJSON(f.context.SemanticInputs)
+		c.Current.InventoryHead = copyJSON(f.context.Current.InventoryHead)
+		change(&c)
+		v, e := NewVerifier(f.installed, c)
+		if e == nil {
+			e = protect(func() error { _, err := v.VerifyCurrentProjectionSet(f.packet, c.Current.SetID); return err })
+		}
+		exp := "ACCEPT"
+		if wantErr {
+			exp = "DENY"
+		}
+		record(t, "current", name, exp, e, wantErr, gate)
+	}
+	refresh := func(c *TrustedContext) {
+		for k, x := range c.Certificates {
+			x.CheckedAt, x.ExpiresAt = c.Now, c.Now.Add(time.Minute)
+			c.Certificates[k] = x
+		}
+		for k, x := range c.Publications {
+			x.CheckedAt, x.ExpiresAt = c.Now, c.Now.Add(time.Minute)
+			c.Publications[k] = x
+		}
+		for k, x := range c.Challenges {
+			x.IssuedAt, x.ExpiresAt = c.Now.Add(-time.Second), c.Now.Add(time.Minute)
+			c.Challenges[k] = x
+		}
+		for i := range c.Current.NativeWitnesses {
+			v, _ := ParseJSON(c.Current.NativeWitnesses[i].Raw)
+			c.Current.NativeWitnesses[i].Raw = signedNativeAt(t, f, c.Current.NativeWitnesses[i].Raw, c.Now, v.(map[string]any)["nonce"].(string))
+		}
+	}
+	run("control-36", false, "", func(c *TrustedContext) {})
+	run("restore-missing-from-current-operations", true, "missing trusted operation", func(c *TrustedContext) { delete(c.Operations, c.Current.OperationID) })
+	run("readback-stale-now+91(=121s after 600)", true, "readback", func(c *TrustedContext) { c.Now = c.Now.Add(91 * time.Second); refresh(c) })
+	run("now-at-restore-lease-expiry1200", true, "", func(c *TrustedContext) { c.Now = c.Now.Add(570 * time.Second); refresh(c) })
+	run("refreshed-now+60-still-fresh", false, "", func(c *TrustedContext) { c.Now = c.Now.Add(60 * time.Second); refresh(c) })
+	run("witness-PC2-bytes-in-PC4-slot", true, "", func(c *TrustedContext) {
+		c.Current.NativeWitnesses[1].Raw = c.Current.NativeWitnesses[0].Raw
+	})
+	run("witness-three-entries", true, "absent or incomplete", func(c *TrustedContext) {
+		c.Current.NativeWitnesses = append(c.Current.NativeWitnesses, c.Current.NativeWitnesses[0])
+	})
+	run("witness-nil-raw", true, "", func(c *TrustedContext) { c.Current.NativeWitnesses[0].Raw = nil })
+	live := func(name string, delta time.Duration, wantErr bool) {
+		run("live-L3-"+name, wantErr, "matching operation challenge", func(c *TrustedContext) {
+			for i := range c.Current.NativeWitnesses {
+				v, _ := ParseJSON(c.Current.NativeWitnesses[i].Raw)
+				c.Current.NativeWitnesses[i].Raw = signedNativeAt(t, f, c.Current.NativeWitnesses[i].Raw, c.Now.Add(delta), v.(map[string]any)["nonce"].(string))
+			}
+			for k, x := range c.Challenges {
+				x.IssuedAt = c.Now
+				c.Challenges[k] = x
+			}
+		})
+	}
+	live("observed-30s-before-issue", -30*time.Second, false)
+	live("observed-31s-before-issue", -31*time.Second, true)
+	run("live-challenge-expires-at-Now", true, "matching operation challenge", func(c *TrustedContext) {
+		for k, x := range c.Challenges {
+			x.ExpiresAt = c.Now
+			c.Challenges[k] = x
+		}
+	})
+	run("current-challenge-moved-to-history-only", true, "", func(c *TrustedContext) {
+		for k, x := range c.Challenges {
+			c.History.Challenges[k] = x
+		}
+		c.Challenges = nil
+	})
+	run("historical-epoch1-challenge-relabelled-as-current", true, "", func(c *TrustedContext) {
+		c.Challenges = map[string]NativeChallenge{}
+		for k, x := range c.History.Challenges {
+			x.OperationID, x.FenceEpoch = c.Current.OperationID, 2
+			c.Challenges[c.Current.OperationID+k[strings.Index(k, "\x00"):]] = x
+		}
+	})
+	run("inventory-head-mutated-ABSENT", true, "", func(c *TrustedContext) {
+		c.Current.InventoryHead.(map[string]any)["presence"] = "ABSENT"
+	})
+	run("member-projection-swapped", true, "", func(c *TrustedContext) {
+		m := c.Current.MemberProjectionSHA256
+		m[0], m[1] = m[1], m[0]
+	})
+	run("sequence-35-for-set-36", true, "", func(c *TrustedContext) { c.Current.Sequence = 35 })
+	// Unit-level: ABSENT current head fails closed at the native gate itself.
+	v, e := NewVerifier(f.installed, f.context)
+	if e != nil {
+		t.Fatal(e)
+	}
+	x, e := v.verify(f.packet)
+	if e != nil {
+		t.Fatal(e)
+	}
+	c := *v.ctx.Current
+	c.InventoryHead = map[string]any{"presence": "ABSENT"}
+	record(t, "current", "unit-native-gate-ABSENT-head", "DENY", v.currentNativeWitnesses(&c, x), true, "lacks authenticated inventory head declaration")
+}
+
+func TestZZL1L4Edges(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	// L1: every SemanticInputs node replaced by type-confused values.
+	var paths []string
+	var walk func(any, string, int)
+	walk = func(x any, path string, depth int) {
+		if path != "" && (depth <= 2 || (depth == 3 && (strings.HasPrefix(path, "/plan/") || strings.HasPrefix(path, "/facts/")))) {
+			paths = append(paths, path)
+		}
+		if depth >= 3 {
+			return
+		}
+		switch m := x.(type) {
+		case map[string]any:
+			for k, v := range m {
+				walk(v, path+"/"+strings.ReplaceAll(strings.ReplaceAll(k, "~", "~0"), "/", "~1"), depth+1)
+			}
+		case []any:
+			for i, v := range m {
+				walk(v, fmt.Sprintf("%s/%d", path, i), depth+1)
+			}
+		}
+	}
+	walk(f.context.SemanticInputs, "", 0)
+	panics, ctorDeny, verifyDeny, accepted := 0, 0, 0, 0
+	panicPaths := []string{}
+	for _, path := range paths {
+		for _, bad := range []any{nil, json.Number("7"), map[string]any{}} {
+			if strings.Count(path, "/") == 3 && bad != nil {
+				if _, isMap := bad.(map[string]any); isMap {
+					continue
+				}
+			}
+			ctx := f.context
+			si := copyJSON(f.context.SemanticInputs)
+			i := strings.LastIndex(path, "/")
+			parent, e := pointer(si, path[:i])
+			if e != nil {
+				continue
+			}
+			key := strings.ReplaceAll(strings.ReplaceAll(path[i+1:], "~1", "/"), "~0", "~")
+			switch pm := parent.(type) {
+			case map[string]any:
+				pm[key] = bad
+			case []any:
+				var n int
+				fmt.Sscan(key, &n)
+				pm[n] = bad
+			}
+			ctx.SemanticInputs = si
+			e = protect(func() error {
+				v, err := NewVerifier(f.installed, ctx)
+				if err != nil {
+					ctorDeny++
+					return nil
+				}
+				if _, err = v.Verify(f.packet); err != nil {
+					verifyDeny++
+					return nil
+				}
+				if _, err = v.VerifyCurrentProjectionSet(f.packet, "cohort-36"); err != nil {
+					verifyDeny++
+					return nil
+				}
+				accepted++
+				return nil
+			})
+			if e != nil {
+				panics++
+				if len(panicPaths) < 20 {
+					panicPaths = append(panicPaths, fmt.Sprintf("%s=%T:%v", path, bad, e))
+				}
+			}
+		}
+	}
+	var pe error
+	if panics > 0 {
+		pe = fmt.Errorf("%d panics: %s", panics, strings.Join(panicPaths, " | "))
+	}
+	record(t, "L1", fmt.Sprintf("semantic-type-confusion paths=%d ctorDeny=%d verifyDeny=%d accepted=%d", len(paths), ctorDeny, verifyDeny, accepted), "no panic", pe, false, "")
+	// Nil/missing edges.
+	nilCases := map[string]func(*TrustedContext){
+		"nil-history-maps":    func(c *TrustedContext) { c.History = HistoricalContext{} },
+		"nil-certificates":    func(c *TrustedContext) { c.Certificates = nil },
+		"nil-publications":    func(c *TrustedContext) { c.Publications = nil },
+		"nil-current-head":    func(c *TrustedContext) { c.Current.InventoryHead = nil },
+		"string-current-head": func(c *TrustedContext) { c.Current.InventoryHead = "PRESENT" },
+		"head-presence-number": func(c *TrustedContext) {
+			c.Current.InventoryHead = map[string]any{"presence": json.Number("1"), "envelopeSHA256": json.Number("2")}
+		},
+		"nil-member-projections": func(c *TrustedContext) { c.Current.MemberProjectionSHA256 = nil },
+		"nil-current":            func(c *TrustedContext) { c.Current = nil },
+	}
+	for name, change := range nilCases {
+		b, _ := json.Marshal(f.context)
+		var c TrustedContext
+		json.Unmarshal(b, &c)
+		c.SemanticInputs = copyJSON(f.context.SemanticInputs)
+		c.Current.InventoryHead = copyJSON(f.context.Current.InventoryHead)
+		change(&c)
+		e := protect(func() error {
+			v, err := NewVerifier(f.installed, c)
+			if err != nil {
+				return err
+			}
+			_, err1 := v.Verify(f.packet)
+			_, err2 := v.VerifyCurrentProjectionSet(f.packet, "cohort-36")
+			if err2 == nil {
+				return nil
+			}
+			if err1 != nil {
+				return fmt.Errorf("verify:%v current:%v", err1, err2)
+			}
+			return fmt.Errorf("current:%v", err2)
+		})
+		if e != nil && strings.HasPrefix(e.Error(), "PANIC") {
+			record(t, "L1-nil", name, "no panic", e, false, "")
+		} else {
+			record(t, "L1-nil", name, "DENY no panic", e, true, "")
+		}
+	}
+	var nilv *Verifier
+	record(t, "L1-nil", "nil-verifier-current", "DENY no panic", protect(func() error { _, e := nilv.VerifyCurrentProjectionSet(f.packet, "cohort-36"); return e }), true, "")
+	v, _ := NewVerifier(f.installed, f.context)
+	record(t, "L1-nil", "empty-packet", "DENY no panic", protect(func() error { _, e := v.Verify(Packet{}); return e }), true, "")
+	// L4: post-entry isolation of constructor inputs and returned values.
+	v, e := NewVerifier(f.installed, f.context)
+	if e != nil {
+		t.Fatal(e)
+	}
+	saved, _ := json.Marshal(f.context)
+	for k, o := range f.context.History.Operations {
+		o.ExpiresAt = o.ExpiresAt.Add(time.Hour)
+		f.context.History.Operations[k] = o
+	}
+	for k, c := range f.context.History.Challenges {
+		c.Nonce = strings.Repeat("d", 64)
+		f.context.History.Challenges[k] = c
+	}
+	f.context.Current.NativeWitnesses[1].Raw[3] ^= 1
+	f.context.Current.MemberProjectionSHA256[0] = strings.Repeat("c", 64)
+	f.installed.Members[0].CertificateDER[10] ^= 1
+	r, e := v.Verify(f.packet)
+	record(t, "L4", "post-constructor-caller-mutation-history", "ACCEPT unaffected", e, false, "")
+	for k := range r.Digests {
+		r.Digests[k] = "tampered"
+	}
+	_, e = v.VerifyCurrentProjectionSet(f.packet, "cohort-36")
+	record(t, "L4", "post-constructor-caller-mutation-current+returned-digests", "ACCEPT unaffected", e, false, "")
+	_ = saved
+}

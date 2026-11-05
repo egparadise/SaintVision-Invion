@@ -1,0 +1,74 @@
+{
+ "reviewer": "Claude",
+ "reviewedCommit": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+ "workspace": "own docs branch agent/claude/fleet5-k1-temporal-56651-review-20261106 from 56651 (product files read-only); probes ran only in scratch copies of services/node-agent go.mod/go.sum/migrationverify outside the repository",
+ "toolchain": "go1.27.0 windows/amd64 CGO_ENABLED=0",
+ "runs": [
+  {
+   "atKST": "2026-11-06T08:13:45+09:00..08:14:27",
+   "cwd": "services/node-agent",
+   "argv": "go test -count=1 -json ./migrationverify/",
+   "exit": 0,
+   "output": "k1-pkg.jsonl"
+  },
+  {
+   "atKST": "2026-11-06T08:14:42+09:00..08:15:30",
+   "cwd": "services/node-agent",
+   "argv": "go build ./... ; go vet ./... ; go test -count=1 -json ./...",
+   "exit": [
+    0,
+    0,
+    0
+   ],
+   "output": "node-all.jsonl"
+  },
+  {
+   "atKST": "2026-11-06T08:19:17+09:00..08:29:21",
+   "cwd": "scratch mod",
+   "argv": "PROBE_OUT=... go test -count=1 -run TestZZ -v ./migrationverify/",
+   "exit": 1,
+   "note": "L1 fuzz hit the 10m default timeout after the M1/M2/current tests passed; results probe-attempt1-m1-m2-current-results.jsonl (104 rows)",
+   "logSha256": "1aa011117c4f8591e95ef06cae2f3fab1e426f4077b6d97478fe0eff89ad391d"
+  },
+  {
+   "atKST": "2026-11-06T08:30:41+09:00..08:31:35",
+   "cwd": "scratch modstub (latestCurrent returns nil; scratch-only mutant)",
+   "argv": "go test -count=1 -run TestZZM1ConsistentObsoleteViews -v ./migrationverify/",
+   "exit": 1,
+   "note": "expected: the mutant lets 33/35 through",
+   "logSha256": "047dc13a22ae97b294a8d2b903acc9196a921d73d8c5373304312ccfc8123319"
+  },
+  {
+   "atKST": "2026-11-06T08:30:41+09:00..08:45:03",
+   "cwd": "scratch mod",
+   "argv": "go test -count=1 -timeout 40m -run TestZZL1L4Edges -v ./migrationverify/",
+   "exit": 0,
+   "logSha256": "6f9ef0219ff45110bdbf447f0a45ce84656a19f600ddc2b1246f39864353aa05"
+  },
+  {
+   "atKST": "2026-11-06T08:43:39+09:00..08:43:42",
+   "cwd": "scratch modcrypto",
+   "argv": "K1REV_VECTORS=ed25519-vectors.json(from c2b) K1REV_OUT=... go test -count=1 -run TestZZReviewerCryptoProbe -v ./migrationverify/",
+   "exit": 0,
+   "output": "ed25519-go-results-56651.json identical to c2b ed25519-go-results.json"
+  },
+  {
+   "atKST": "2026-11-06T08:44:40+09:00..08:44:46",
+   "cwd": "scratch modtime",
+   "argv": "go test -count=1 -run TestZZRetimedSignedRecord -v ./migrationverify/",
+   "exit": 0
+  },
+  {
+   "atKST": "2026-11-06T08:45:30+09:00..08:46:28",
+   "cwd": "scratch modtime",
+   "argv": "go test -count=1 -timeout 30m -run TestZZPlanFieldBinding ./migrationverify/",
+   "exit": 0
+  },
+  {
+   "atKST": "2026-11-06T08:41..08:43",
+   "argv": "gh api runs/42126222201, runs/42126225708, their jobs, jobs/127591007221/logs (read-only)",
+   "exit": 0,
+   "note": "log hashed and parsed only; not committed"
+  }
+ ]
+}

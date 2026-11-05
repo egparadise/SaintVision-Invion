@@ -1,0 +1,12 @@
+import json,sys,collections
+c=collections.Counter(); top=collections.Counter(); pk=collections.Counter()
+for line in open(sys.argv[1],encoding='utf-8'):
+    try: e=json.loads(line)
+    except: continue
+    a=e.get('Action')
+    if a not in('pass','fail','skip'): continue
+    t=e.get('Test')
+    if not t: pk[a]+=1; continue
+    c[a]+=1
+    if '/' not in t: top[a]+=1
+print('events',dict(c),'top',dict(top),'packages',dict(pk))

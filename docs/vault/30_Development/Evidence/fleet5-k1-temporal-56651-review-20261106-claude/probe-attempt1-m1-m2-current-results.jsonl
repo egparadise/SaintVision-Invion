@@ -1,0 +1,104 @@
+{"Group":"M1-single-instant","Name":"cohort-33#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-33#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current fence superseded by authenticated higher cohort epoch","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation is RELEASED in authenticated history","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current set is not latest authenticated operation sequence","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M2-history","Name":"control","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M2-history","Name":"no-current-inputs-at-all","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M2-history","Name":"epoch1-missing-from-history","Expect":"DENY","Got":"DENY","Error":"plan/body/scheduleDisabledReadback: missing trusted operation/lease binding","OK":true}
+{"Group":"M2-history","Name":"epoch1-moved-to-current-only","Expect":"DENY","Got":"DENY","Error":"plan/body/allLaunchSurfaces: missing trusted operation/lease binding","OK":true}
+{"Group":"M2-history","Name":"restore-missing-from-history-kept-current","Expect":"DENY","Got":"DENY","Error":"lease-restore/body/expectedInventoryHead/readbackProof: missing trusted operation/lease binding","OK":true}
+{"Group":"M2-history","Name":"epoch1-history-window-widened","Expect":"DENY","Got":"DENY","Error":"historical operation differs from authenticated original lease","OK":true}
+{"Group":"M2-history","Name":"epoch1-history-epoch2","Expect":"DENY","Got":"DENY","Error":"historical operation differs from authenticated original lease","OK":true}
+{"Group":"M2-history","Name":"epoch1-history-lease-is-released-hash","Expect":"DENY","Got":"DENY","Error":"historical operation differs from authenticated original lease","OK":true}
+{"Group":"M2-history","Name":"history-challenge-issued-31s-after-PC4-observation","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"M2-history","Name":"history-challenge-expires-at-PC2-observation","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"M2-history","Name":"history-challenge-nonce","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"M2-history","Name":"history-challenge-epoch2","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"M2-history","Name":"history-challenges-in-current-map-only","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"M2-history","Name":"key-host-helper-expired-before-release-event68","Expect":"DENY","Got":"DENY","Error":"key not authorized for exact role/scope at authenticated use time","OK":true}
+{"Group":"M2-history","Name":"key-host-helper-expired-after-last-event620-before-Now","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M2-history","Name":"key-node-leaf-starts-after-PC2-observation32","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: key not authorized for exact role/scope at authenticated use time","OK":true}
+{"Group":"M2-history","Name":"key-node-leaf-expires-before-PC4-observation52","Expect":"DENY","Got":"DENY","Error":"request-16-verifyBootstrap-PC4/arguments/signedM2: key not authorized for exact role/scope at authenticated use time","OK":true}
+{"Group":"M2-history","Name":"key-root-fence-expired-before-restore-acquire600","Expect":"DENY","Got":"DENY","Error":"key not authorized for exact role/scope at authenticated use time","OK":true}
+{"Group":"M2-history","Name":"now-before-last-signed-event620","Expect":"DENY","Got":"DENY","Error":"consuming record is after trusted Now","OK":true}
+{"Group":"M2-history","Name":"cert-revoked-now","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native current certificate nonrevocation state unavailable","OK":true}
+{"Group":"M2-history","Name":"cert-status-stale-121s","Expect":"DENY","Got":"DENY","Error":"request-10-verifyBootstrap-PC2/arguments/signedM2: native current certificate nonrevocation state unavailable","OK":true}
+{"Group":"M2-history","Name":"one-publication-revoked-now","Expect":"DENY","Got":"DENY","Error":"plan/body/newRenewalGuard/coreCI/attestation: missing current authenticated publication/nonrevocation state","OK":true}
+{"Group":"M2-history","Name":"publication-published-after-Now","Expect":"DENY","Got":"DENY","Error":"plan/body/nativeTwoCycleProof: missing current authenticated publication/nonrevocation state","OK":true}
+{"Group":"current","Name":"control-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"current","Name":"restore-missing-from-current-operations","Expect":"DENY","Got":"DENY","Error":"missing trusted operation/lease binding","OK":true}
+{"Group":"current","Name":"readback-stale-now+91(=121s after 600)","Expect":"DENY","Got":"DENY","Error":"current genuine CP head readback absent","OK":true}
+{"Group":"current","Name":"now-at-restore-lease-expiry1200","Expect":"DENY","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":true}
+{"Group":"current","Name":"refreshed-now+60-still-fresh","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"current","Name":"witness-PC2-bytes-in-PC4-slot","Expect":"DENY","Got":"DENY","Error":"native signed identity mismatch","OK":true}
+{"Group":"current","Name":"witness-three-entries","Expect":"DENY","Got":"DENY","Error":"current signed native witnesses absent or incomplete","OK":true}
+{"Group":"current","Name":"witness-nil-raw","Expect":"DENY","Got":"DENY","Error":"EOF","OK":true}
+{"Group":"current","Name":"live-L3-observed-30s-before-issue","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"current","Name":"live-L3-observed-31s-before-issue","Expect":"DENY","Got":"DENY","Error":"native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"current","Name":"live-challenge-expires-at-Now","Expect":"DENY","Got":"DENY","Error":"native nonce/observation lacks matching operation challenge","OK":true}
+{"Group":"current","Name":"current-challenge-moved-to-history-only","Expect":"DENY","Got":"DENY","Error":"current native challenge absent","OK":true}
+{"Group":"current","Name":"historical-epoch1-challenge-relabelled-as-current","Expect":"DENY","Got":"DENY","Error":"native original fields/certificate differ from expected reference subject","OK":true}
+{"Group":"current","Name":"inventory-head-mutated-ABSENT","Expect":"DENY","Got":"DENY","Error":"current set inventoryHead mismatch","OK":true}
+{"Group":"current","Name":"member-projection-swapped","Expect":"DENY","Got":"DENY","Error":"current exact ordered member mismatch","OK":true}
+{"Group":"current","Name":"sequence-35-for-set-36","Expect":"DENY","Got":"DENY","Error":"current set sequence mismatch","OK":true}
+{"Group":"current","Name":"unit-native-gate-ABSENT-head","Expect":"DENY","Got":"DENY","Error":"current native state lacks authenticated inventory head declaration","OK":true}

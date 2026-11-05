@@ -1,0 +1,40 @@
+package migrationverify
+
+import (
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"testing"
+)
+
+// Which trusted /plan and /facts top-level fields, set to nil, leave Verify+current ACCEPT.
+func TestZZPlanFieldBinding(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	out := []string{}
+	for _, root := range []string{"plan", "facts", "policy", "containers"} {
+		m := f.context.SemanticInputs.(map[string]any)[root].(map[string]any)
+		keys := []string{}
+		for k := range m {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			ctx := f.context
+			si := copyJSON(f.context.SemanticInputs).(map[string]any)
+			si[root].(map[string]any)[k] = nil
+			ctx.SemanticInputs = si
+			res := "ctorDENY"
+			if v, e := NewVerifier(f.installed, ctx); e == nil {
+				res = "ACCEPT"
+				if _, e = v.Verify(f.packet); e != nil {
+					res = "verifyDENY"
+				} else if _, e = v.VerifyCurrentProjectionSet(f.packet, "cohort-36"); e != nil {
+					res = "currentDENY"
+				}
+			}
+			out = append(out, fmt.Sprintf("/%s/%s=%s", root, k, res))
+		}
+	}
+	os.WriteFile(os.Getenv("PROBE_OUT"), []byte(strings.Join(out, "\n")+"\n"), 0o600)
+}

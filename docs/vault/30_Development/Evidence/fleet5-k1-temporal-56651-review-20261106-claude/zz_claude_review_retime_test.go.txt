@@ -1,0 +1,47 @@
+package migrationverify
+
+import (
+	"crypto/ed25519"
+	"encoding/hex"
+	"testing"
+	"time"
+)
+
+// Forged/retimed signed consuming time: unsigned edit and legitimate-key re-sign.
+func TestZZRetimedSignedRecord(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	for _, id := range []string{"event-36", "event-28", "inventory"} {
+		for _, resign := range []bool{false, true} {
+			p := parsedPacket(t, f.packet)
+			m := p[id].(map[string]any)
+			b := m["body"].(map[string]any)
+			field := "recordedAt"
+			if id == "inventory" {
+				field = "publishedAt"
+			}
+			at, _ := strictTime(b[field].(string))
+			b[field] = at.Add(-5 * time.Second).Format(time.RFC3339)
+			if resign {
+				s := m["signer"].(map[string]any)
+				key := f.keys[s["keySPKISHA256"].(string)]
+				c, _ := CanonicalJSON(b)
+				s["signatureHex"] = hex.EncodeToString(ed25519.Sign(key, append([]byte(outerDomains[f.installed.NodeKinds[id]]+"\x00"), c...)))
+			}
+			pk := Packet{Records: map[string][]byte{}, Referents: f.packet.Referents}
+			for k, v := range p {
+				raw, _ := CanonicalJSON(v)
+				pk.Records[k] = raw
+			}
+			v, e := NewVerifier(f.installed, f.context)
+			if e != nil {
+				t.Fatal(e)
+			}
+			_, e = v.Verify(pk)
+			name := id + "-retimed-5s-unsigned"
+			if resign {
+				name = id + "-retimed-5s-resigned-by-legit-key"
+			}
+			record(t, "M2-retime", name, "DENY", e, true, "")
+		}
+	}
+}

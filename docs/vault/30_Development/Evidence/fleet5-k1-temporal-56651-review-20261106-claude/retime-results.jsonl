@@ -1,0 +1,6 @@
+{"Group":"M2-retime","Name":"event-36-retimed-5s-unsigned","Expect":"DENY","Got":"DENY","Error":"record event-36: Ed25519 verification failed","OK":true}
+{"Group":"M2-retime","Name":"event-36-retimed-5s-resigned-by-legit-key","Expect":"DENY","Got":"DENY","Error":"projection-36-PC2 lacks exact signed consuming event","OK":true}
+{"Group":"M2-retime","Name":"event-28-retimed-5s-unsigned","Expect":"DENY","Got":"DENY","Error":"record event-28: Ed25519 verification failed","OK":true}
+{"Group":"M2-retime","Name":"event-28-retimed-5s-resigned-by-legit-key","Expect":"DENY","Got":"DENY","Error":"projection-28-PC2 lacks exact signed consuming event","OK":true}
+{"Group":"M2-retime","Name":"inventory-retimed-5s-unsigned","Expect":"DENY","Got":"DENY","Error":"record inventory: Ed25519 verification failed","OK":true}
+{"Group":"M2-retime","Name":"inventory-retimed-5s-resigned-by-legit-key","Expect":"DENY","Got":"DENY","Error":"binding mismatch inventory/body/publishedAt","OK":true}

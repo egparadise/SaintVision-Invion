@@ -1,0 +1,64 @@
+{"Group":"M1-single-instant","Name":"cohort-33#0","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#1","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#2","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#3","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#4","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#5","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#6","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-33#7","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-34#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-34#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-35#0","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#1","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#2","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#3","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#4","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#5","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#6","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-35#7","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-single-instant","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-33#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-33#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current operation/epoch expired or mismatched","OK":false}
+{"Group":"M1-durable","Name":"cohort-34#0","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#1","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#2","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#3","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#4","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#5","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#6","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-34#7","Expect":"DENY intended M1 gate","Got":"DENY","Error":"current lease is RELEASED or not HELD","OK":true}
+{"Group":"M1-durable","Name":"cohort-35#0","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#1","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#2","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#3","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#4","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#5","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#6","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-35#7","Expect":"DENY intended M1 gate","Got":"ACCEPT","Error":"","OK":false}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
+{"Group":"M1-durable","Name":"cohort-36","Expect":"ACCEPT","Got":"ACCEPT","Error":"","OK":true}
