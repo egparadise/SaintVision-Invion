@@ -3,7 +3,7 @@
   "task": "task_e1b499632366 (independent review of Codex 6ba9ee46 and CP offline plan)",
   "reviewer": "Claude",
   "author": "Codex",
-  "observedWindowKST": ["2026-11-05T15:06:00+09:00", "2026-11-05T15:25:00+09:00"],
+  "observedWindowKST": ["2026-11-05T15:06:00+09:00", "2026-11-05T15:22:10+09:00"],
   "reviewedCommit": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
   "reviewedReportCommit": "e1afa49c13d4ed5a2beb272823889bff0c8271d6",
   "reviewedUncommittedWordingFix": "worktree fleet5-worker-readiness-20261105 on agent/codex/fleet5-first-wave-plan-20261105: README.md, prepare-worker.sh, tests/core/test_lan_worker_config.py (not committed at review time)",
@@ -122,6 +122,26 @@
     "result": "usable rollback asset not established"
   },
   "upgradeTargetPinning": "required before action: official release notes naming the Engine version, server API max >= 1.45 and MinAPIVersion <= 1.45 (node-agent negotiation cap), data-distro migration notes, and published installer checksum",
+  "firstWavePacketReview": {
+    "planSHA256": "b1bacdd3f2330ef586d62e8fa8bb9f67639fd335b8c5ba589f935b19d06cd39b",
+    "executionVectorsSHA256": "ae509f8c960fd391d544f37d85e78c413e95c50bb0760e0dc38d61ea785f00ed",
+    "sourceArchiveSHA256": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9",
+    "hashesMatched": 3,
+    "planSourceFileHashes": {"files": 12, "matched": 12},
+    "portsResolveR1": true,
+    "findings": [
+      {"id": "P1", "severity": "High", "summary": "default init yields pilot-self-signed CA (7 days) and <=6-day leaves; prepare-leaf-rotation requires --ca-key-password-file/--ca-chain/--revocations; external CA only at first init: namespace is a disposable ~6-day rehearsal without a rotation path", "fix": "name CA-expiry owner (Codex root) and label as expiring 2/5 rehearsal, or use the external intermediate at first init if the namespace must carry the five-node campaign"},
+      {"id": "P2", "severity": "High", "summary": "no vector creates CP-only ingress for 18515; Docker-published ports need DOCKER-USER rules (root on w1/w2, an OS capability not held by this session) matched with conntrack ctorigdstport because DNAT targets container port 18443", "fix": "authorized operator applies rule; denial proof needs no admin: from worker3 a TCP connect to w1/w2:18515 must fail while CP succeeds"},
+      {"id": "P3", "severity": "Medium", "summary": "build limits apply only under the classic builder; help output proves flag parsing only; legacy builder availability on Docker 29 unverified; Go modules not vendored so build fetches from network; client timeout may not stop daemon step", "fix": "record legacy-builder path from build output or abort; call limits best-effort until shown; record module egress"},
+      {"id": "P4", "severity": "Medium", "summary": "migrations need no extension, but lan_pilot does not check server major and plan lacks PG_MAJOR evidence", "fix": "record image PG_MAJOR=16 before step 03 and server_version_num 160000-169999 after start"},
+      {"id": "P5", "severity": "Medium", "summary": "steps 05/08/09/10 use the r5-guard-pinned venv python", "fix": "-B / PYTHONDONTWRITEBYTECODE=1, no pip, pre/post venv tree hash; prefer a non-r5 interpreter with identical closure; avoid -I (breaks sibling imports)"},
+      {"id": "P6", "severity": "Low", "summary": "identity distinctness checked only against r5", "fix": "compare against node1, r2-r5 and legacy inventory IDs; record CA/leaf notAfter"},
+      {"id": "P7", "severity": "Low", "summary": "step 02 creates an unused workspaces directory (see R2)", "fix": "omit"},
+      {"id": "P8", "severity": "Low", "summary": "vectors do not exclude the r5 follow-up execution windows; tunnel 55458 is persistent", "fix": "no new step inside the windows; decide tunnel handling"}
+    ],
+    "verdict": "not execution acceptance; with P1/P2 resolved and P3-P5 evidence the 2/5 observation phase can proceed without calendar delay",
+    "realUnavailableOSPermission": "root on worker1/worker2 for DOCKER-USER ingress rule"
+  },
   "rootDeltaReview": {
     "range": "70dcb699..8585b61b on agent/codex/fleet-five-orchestration-20261105",
     "files": 5,

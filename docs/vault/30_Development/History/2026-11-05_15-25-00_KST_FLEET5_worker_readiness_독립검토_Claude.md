@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-FLEET5-20261105-WORKER-REVIEW-CLAUDE"
 title: "2026-11-05 FLEET5 Codex worker readiness 6ba9ee46 독립 검토와 CP 오프라인 계획 보정"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T15:25:00+09:00"
+updated: "2026-11-05T15:22:10+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "138ece54"
@@ -16,7 +16,7 @@ tags: ["fleet5", "independent-review", "five-node", "control-plane", "docker", "
 
 # Codex worker readiness 독립 검토
 
-Orca task `task_e1b499632366`. 이 문서는 Claude가 Codex의 `6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e`(보고 `e1afa49c`)를 독립 검토한 결과다. Codex가 아직 commit하지 않은 Docker 하한 문구 수정도 함께 검토했다. 이 검토는 실제로 수행한 정적 검토와 읽기 전용 관측만 적는다. 시험이나 live health는 다시 실행하지 않았다. Codex의 첫 wave 요약은 검토 시점(15:06~15:25 KST)에 아직 게시되지 않아 검토하지 못했다. 기계 판독 결과는 `Evidence/fleet5-20261105-claude/worker-readiness-review.json`에 있다. 앞선 CP 기록은 [[2026-11-05_15-05-00_KST_FLEET5_CP겸Node와_inventory_대조_Claude]], Codex 원문은 `agent/codex/fleet5-worker-readiness-20261105`의 `History/2026-11-05_FLEET5_worker_readiness_Codex.md`다.
+Orca task `task_e1b499632366`. 이 문서는 Claude가 Codex의 `6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e`(보고 `e1afa49c`)를 독립 검토한 결과다. Codex가 아직 commit하지 않은 Docker 하한 문구 수정도 함께 검토했다. 이 검토는 실제로 수행한 정적 검토와 읽기 전용 관측만 적는다. 시험이나 live health는 다시 실행하지 않았다. Codex의 첫 wave 요약은 검토 시점(15:06~15:22 KST)에 아직 게시되지 않아 검토하지 못했다. 기계 판독 결과는 `Evidence/fleet5-20261105-claude/worker-readiness-review.json`에 있다. 앞선 CP 기록은 [[2026-11-05_15-05-00_KST_FLEET5_CP겸Node와_inventory_대조_Claude]], Codex 원문은 `agent/codex/fleet5-worker-readiness-20261105`의 `History/2026-11-05_FLEET5_worker_readiness_Codex.md`다.
 
 ## 무결성 확인
 
@@ -82,6 +82,23 @@ resource 상한과 GPU0 제안은 R2·R3·R5 문구를 보정한다는 조건으
 다음 경로만 범위를 정해 찾았다: Downloads/Desktop/Documents, `C:/Program Files/Docker/Docker`, `C:/ProgramData/DockerDesktop`, `%LOCALAPPDATA%`·`%APPDATA%` Docker, `C:/ProgramData/Package Cache`, D:의 installer/backup 후보 폴더(모두 없음). 찾은 것은 설치 폴더 안의 `Docker Desktop Installer.exe` 하나다. 버전 4.16.3.96739, 7,408,976 bytes, sha256 `991dc4bc…5cdc`이고, Authenticode는 Valid(CN=Docker Inc, timestamp 있음; 서명 인증서 notAfter 2023-10-04)다. 그러나 이 파일은 업그레이드가 교체하는 폴더 안에 있고, 전체 설치 파일보다 훨씬 작아 오프라인 재설치가 되는지 증명되지 않았다. 전체 오프라인 설치 파일과 vhdx 백업이나 manifest는 **없다**. 결론적으로 쓸 수 있는 rollback 자산은 아직 없다.
 
 업그레이드 전 필요한 준비는 다음과 같다. 공식 4.16.3 설치 파일을 게시된 checksum과 함께 보관하고, vhdx 백업 manifest를 만든다. target 버전은 공식 release note로 고정한다. 그 release note에서 Engine 버전, server API 최대가 1.45 이상이고 MinAPIVersion이 1.45 이하인지(node-agent 협상 상한), data-distro migration 내용, 설치 파일 checksum을 확인한다. 다운로드·실행·정지·export는 하지 않았다.
+
+## Codex 첫 wave packet `b1bacdd3` exact-vector 검토
+
+대상은 Codex(`task_05d9dcda1dca`)의 public `first-wave-plan.json`(sha256 `b1bacdd3…d39b`), private `execution-vectors.private.json`(`ae509f8c…00ed`), source archive(`a9f0a3b8…11a9`)다. 세 hash는 모두 일치했고, plan의 source 파일 12개도 `59f0a3c2` blob과 모두 일치했다. 새 port 18515/18115/55458은 과거 port 집합 밖에 있어 R1을 해소한다. 측정 범위도 CP, 두 worker, 모든 container의 PortBindings, 과거 state를 덮는다. 대상은 2/5로 한정했고, 로컬 Docker·WSL·새 web·bootstrap listener를 쓰지 않으며, 날짜만 보는 gate도 없다. 이 범위는 일관된다. 다만 아래 항목이 남는다.
+
+| ID | 심각도 | 판정 | 내용 | 필요한 조치 |
+|---|---|---|---|---|
+| P1 | High | 확인 | step 05의 init은 외부 CA 인자 없이 실행되므로 `caMode=pilot-self-signed`가 된다. 이 CA는 `lan_pki.ca_pair` 기준 7일, leaf는 6일 이하다. 회전 명령 `prepare-leaf-rotation`은 `--ca-key-password-file`, `--ca-chain`, `--revocations`를 필수로 요구하므로 외부 intermediate용 경로다. 외부 CA는 첫 init에서만 지정할 수 있다. 따라서 이 namespace는 회전 경로 없이 약 6일 안에 끝나는 일회성 namespace이며, CP와 3·4번이 합류하기 전에 만료될 가능성이 크다. | CA 만료 owner를 Codex root로 명시하고 namespace 이름과 결과를 "2/5 rehearsal, 만료 예정"으로 표기한다. 5Node까지 이어 쓸 namespace라면 첫 init에 r5와 같은 외부 intermediate 경로를 지정한다. |
+| P2 | High | 확인(OS 권한) | step 09는 "TCP 18515 CP-only ingress, 운영자가 차단 증명"을 전제로 하지만, 그 규칙을 만드는 vector가 없다. Docker가 게시한 port는 ufw/INPUT보다 먼저 처리되므로 `DOCKER-USER` chain에 규칙을 넣어야 하고, 이는 w1/w2의 root 권한이 필요하다(현재 session에 없는 OS 능력). DNAT 이후에는 container port가 18443이므로 `-m conntrack --ctorigdstport 18515 ! -s <CP>`처럼 원래 목적지 port로 맞춰야 한다. | 권한을 가진 운영자가 정확한 규칙을 넣는다. 차단 증명은 관리자 권한 없이 할 수 있다: worker3에서 `timeout 5 bash -c '</dev/tcp/<w1>/18515'`가 실패하고, CP에서는 TLS 연결이 성공하는지 본다. |
+| P3 | Medium | 확인 | build 자원 강제: step 07의 `DOCKER_BUILDKIT=0`와 `--cpu-quota/--memory`는 classic builder일 때만 RUN container에 적용된다. help 출력 확인은 flag가 parse된다는 것만 증명한다. Docker 29에서 legacy builder를 쓸 수 있는지는 미확인이다. Go module 두 개(jsonschema/v6, x/text)는 vendor가 없어 build가 network에서 받는다. `timeout 300`이 client를 끊어도 daemon 쪽 step이 계속될 수 있다. | build 출력에서 legacy builder 경로를 증거로 남긴다. 사용할 수 없으면 계획대로 중단한다. 자원 상한은 실제로 적용됐다고 증명되기 전까지 "best-effort"로 표기한다. 외부 module fetch는 go.sum으로 검증된다는 점과 함께 egress를 기록한다. |
+| P4 | Medium | 확인 | PG16 digest/major: migration은 extension이 필요 없어 일반 postgres image로 충분하다. 그러나 `lan_pilot`은 server major를 검사하지 않고, plan에는 PG_MAJOR 기록이 없다. 과거에 PG18 client와 PG16 server 호환 결함이 있었다. | step 03 전에 `docker image inspect`의 `PG_MAJOR=16`를, 시작 후에는 `server_version_num` 160000~169999를 기록한다. node-1의 다른 postgres digest는 쓰지 않는다. |
+| P5 | Medium | 확인 | step 05/08/09/10은 r5 guard가 pin한 venv(`r5-reviewed-source-03e17c31\.venv`)의 python.exe로 59f tool을 실행한다. 실행만 하면 pin hash는 그대로지만, bytecode 쓰기나 package 변경이 일어나면 r5 venv가 변한다. | `-B`(`PYTHONDONTWRITEBYTECODE=1`)를 쓰고, pip를 실행하지 않으며, 실행 전후로 venv tree hash를 비교한다. 같은 closure를 가진 비-r5 interpreter가 있으면 그것을 우선한다. `-I`는 tools 폴더의 sibling import를 깨뜨릴 수 있으니 쓰지 않는다. |
+| P6 | Low | 확인 | step 06의 identity hash는 r5와 다른지만 비교한다. | 과거 state 전부(node1, r2~r5)와 inventory의 옛 ID와도 tenant/epoch/nodeId/CA fingerprint가 다른지 확인하고, CA·leaf notAfter도 receipt에 넣는다. |
+| P7 | Low | 확인 | step 02가 `workspaces` 폴더를 만든다. R2에 따라 이 폴더를 쓰는 code가 없다. | mount하지 않는다는 표기는 유지하되, 쓰지 않는 폴더는 만들지 않는 편이 낫다. |
+| P8 | Low | 확인 | 순서 문제: 전체 vector에 r5 후속 실행 구간(11-08 14:20~18:32, 11-09 12:15~16:27, 11-10 08:00~12:12 KST)을 피하라는 명시가 없다. tunnel(55458)은 계속 살아 있는 process다. | 구간 안에서는 새 step을 시작하지 않는다. tunnel을 유지할지, 구간 전에 닫을지 정한다. CP 메모리 기준(512 MiB 진입, 256 MiB 중단)은 적절하다. |
+
+판정: 실행 수락이 아니다. P1·P2를 해소하고 P3~P5의 증거를 붙이면, worker1·2의 2/5 관측 단계는 날짜 지연 없이 진행할 수 있다고 본다. 진짜로 없는 OS 권한은 P2의 w1/w2 root다. 차단 증명 자체는 관리자 권한 없이 가능하다.
 
 ## root 통합 문서 delta `70dcb699..8585b61b` 범위 검토
 
