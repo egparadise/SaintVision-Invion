@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "fleet5-k1-root-code-wire-review-gate:1",
+  "atKST": "2026-11-06T06:49:38+09:00",
+  "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "sourceObservation": "k1-root-code-source-observation.json",
+  "actualAuthorTask": "task_38393b5d1865",
+  "actualAuthorDispatch": "ctx_ceecb3824e33",
+  "ownerQuestion": "msg_156100bffaf0",
+  "rootReply": "msg_65ab78489a8e",
+  "actualIndependentReviewer": "Claude",
+  "reviewTask": "task_5627222e0f59",
+  "reviewDispatch": "ctx_0918954c585c",
+  "reviewTerminal": "term_4de2f264870af2b01e2ba5d447449acb",
+  "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+  "reviewDispatchState": "ready",
+  "state": "CODE_AND_NEW_WIRE_REVIEW_DISPATCHED_WITH_FULL_CORE_PENDING",
+  "actualVerdict": null,
+  "fullCoreAccepted": false,
+  "reviewScope": [
+    "strict parser/schema/C2",
+    "external InstalledTrust/TrustedContext input boundary vs untrusted Packet",
+    "new27normalized+1native exact proof codecs",
+    "strict actual Ed25519 points/scalars/signatures",
+    "all77slots/112references policy+recipes",
+    "authenticated original195objects before DAG/derived/currentprojection checks",
+    "native raw M2/history vs fresh context/cert/challenge/derived expiry",
+    "source/test/actualCI fidelity"
+  ],
+  "ownerReportedRealCryptoTests": {
+    "regeneratedObjects": 195,
+    "newOuterSignatures": 115,
+    "proofReferenceVerifications": 112,
+    "perContractPublicVectors": 28,
+    "PythonTamperRefusals": 56,
+    "originalDummySignatureVerifications": 0
+  },
+  "ownerCountsRequireReview": "question latest61top/238PASS, K130top/124; historical History235/121 and earlierattempts remain scoped; actual final logs need reviewer check",
+  "reviewMayProceedInParallelWithCore": true,
+  "finalK1AcceptanceRequires": [
+    "actual independent code+wire verdict",
+    "actual fullCore terminal result/artifact/qualified report",
+    "Root scoped handoff decision"
+  ],
+  "K2ProductionBoundary": "actual installed artifacts/CI/review/current producers/trust installation and40runtimecases remain future; no operational adapter/CLI/runtime integration here",
+  "actualLiveBindings": "NULL/HOLD",
+  "wholeProductAcceptance": false,
+  "actualOwnerHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/c6f0d95ecbcd79fac96673c194e2368b510ad827/docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_offline_verifier_Codex.md"
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "fleet5-k1-root-code-source-ci-observation:1",
+  "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "base": "e50c148287779add421265868ef16909ed984650",
+  "sourceRef": "agent/codex/fleet5-bootstrap-v5-k1-offline-verifier-20261106",
+  "packageGitTree": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+  "packageRegularGitBlobs": 107,
+  "all139ChangesOnlyAddsInAuthorizedPaths": true,
+  "existingProductPathsChanged": false,
+  "sourceRemoteFrozenExact": true,
+  "observedAtKST": "2026-11-06T06:43:42+09:00",
+  "Docs": {
+    "id": 42113815556,
+    "exactHeadRefAllJobsSuccess": true
+  },
+  "Core": {
+    "id": 42113810160,
+    "exactHeadRefVerified": true,
+    "status": "in_progress",
+    "conclusion": null,
+    "coreJob": 127548012850,
+    "raceStep": {
+      "name": "Test Linux Node concurrency and crash boundaries",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-05T21:36:46Z",
+      "completedAt": "2026-11-05T21:40:07Z"
+    },
+    "raceCommandFromActualSourceWorkflow": "working-directory services/node-agent; go test -race -json ./... to dist/node-unit.jsonl, nonzero stops step",
+    "s01Job": 127548013352,
+    "s01Status": "completed",
+    "s01Conclusion": "success",
+    "fullRunAccepted": false,
+    "currentStepAtObservation": "Run provisioned LAN installer acceptance in progress; later fullPython/build/artifact pending",
+    "fixedNativeProofOptionalSteps": "skipped; not counted PASS or attributed e50 proofs as c6f evidence"
+  },
+  "sourceCodeAcceptance": false,
+  "wholeProductAcceptance": false
+}

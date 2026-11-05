@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.383"
+version: "1.0.384"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T06:13:36+09:00"
+updated: "2026-11-06T06:49:38+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "e50 bounded COMPLETE; B actual638 review revision required3M6L/rev4 docs; K1 real code+crypto; completed owned workers released; physical incomplete"
-active_card_next: "B Codex rev4 perNode protected approval renewal/full lock census/closed gate and delivery proofs; K1 Codex real crypto/codeCI; Root one actual new source review after publication"
+active_card_status: "K1 c6f actual code+new wire/Docs+Linuxrace verified/Claude review pending/fullCore active; B rev4; e50 bounded complete; physical incomplete"
+active_card_next: "Claude actual c6f code+wire/strictcrypto/native review; K1 Codex currentCore terminal/artifact/qualifiedreport separatebranch; B Codex rev4; Root accepts only after both actual gates"
 ---
+
+## 2026-11-06T06:49:38+09:00 K1 실제 코드 검토와 full Core 병행
+
+작업한 것과 확인: K1 실제 코드 c6f0d95e는 e50 parent·허용 경로139개 추가·package tree378a3230/107regularblob과 remote를 Root가 대조했다. Docs42113815556/전체 job 및 exactCore42113810160의 Linux go test -race -json ./... step 성공을 확인하고 Claude task task_5627222e0f59/ctx ctx_0918954c585c에 코드·새 wire·strict crypto/native 검토를 배정했다. 전체 Core는 진행 중이며 reply msg_65ab78489a8e로 저자가 같은 run을 마무리하도록 했다. 독립 검토와 full Core가 모두 충족되기 전 code/wire를 수락하지 않는다. 다음 첫 행동/담당: Claude는 실제 Go/공격 검토, K1 Codex는 source ref를 고정한 채 현재 run과 원본 artifact를 수집한다. B rev4는 별도 보완 중이며 새 runtime 등록/장비 완료는 아니다.
 
 ## 2026-11-06T06:13:36+09:00 실제 B 판정과 rev4 구체 지시
 

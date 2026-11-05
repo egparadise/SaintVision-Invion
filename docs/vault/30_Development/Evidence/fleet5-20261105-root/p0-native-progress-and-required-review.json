@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "e4fcff360122a59e3f51cbaf8e9b203b05e81eb4",
-    "Docs": 42108874876,
+    "SHA": "f71fdea276b64988ea3fa5f774d0b369f00bd0f2",
+    "Docs": 42110766523,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2723,
+    "independentlyMatchedNormalizedDestinationHashes": 2728,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T06:03:08+09:00"
+    "verifiedAtKST": "2026-11-06T06:15:12+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2420,7 +2420,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T06:13:36+09:00",
+  "latestRecordAtKST": "2026-11-06T06:49:38+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2716,13 +2716,25 @@
     ],
     "concreteGapQuestion": "msg_45aaff1c9662",
     "decision": "k1-proof-wire-gap-decision-root.json",
-    "actualDecisionReply": "msg_b005ebff62ab",
+    "actualDecisionReply": "msg_65ab78489a8e",
     "newProofWireAcceptedForProduction": false,
     "newProofWireProposalCodeAuthorized": true,
     "actualCodeReview": null,
-    "currentCodeAndWireReview": "pending published implementation SHA; one actual independent review after source/CI",
+    "currentCodeAndWireReview": "actual dispatched/ready, verdict pending; fullCore pending",
     "realBindings": "NULL/HOLD",
-    "future40Cases": "NOT RUN except separately demonstrated K1 cases; no aggregate completion"
+    "future40Cases": "NOT RUN except separately demonstrated K1 cases; no aggregate completion",
+    "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+    "packageGitTree": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+    "packageRegularGitBlobs": 107,
+    "all139PathsOnlyAllowedAdds": true,
+    "ownerActualCodePublished": true,
+    "exactDocsAllJobsSuccess": 42113815556,
+    "sourceCoreRun": 42113810160,
+    "sourceLinuxRaceStepRootVerifiedSuccess": true,
+    "sourceFullCoreAccepted": false,
+    "actualCodeReviewTask": "task_5627222e0f59",
+    "actualCodeReviewDispatch": "ctx_0918954c585c",
+    "currentAuthorization": "capture current fullCore/report; no source advance/cancel/rerun; package-code acceptance pending"
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -2784,5 +2796,7 @@
   },
   "broadBRevision4Decision": "b-rev4-root-decision.json",
   "completedKnownWorkerResources": "completed-worker-resource-release-20261106.json",
-  "knownCompletedMainAndBReviewerExitedReleased": true
+  "knownCompletedMainAndBReviewerExitedReleased": true,
+  "K1ActualCodeSourceObservation": "k1-root-code-source-observation.json",
+  "K1ActualCodeAndWireReviewGate": "k1-root-code-wire-review-gate.json"
 }

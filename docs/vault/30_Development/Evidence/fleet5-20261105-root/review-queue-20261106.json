@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T06:13:36+09:00",
+  "atKST": "2026-11-06T06:49:38+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,15 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "task": "task_5627222e0f59",
+    "dispatch": "ctx_0918954c585c",
+    "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+    "scope": "real Go K1 code + new proof wire + strict crypto/native adapter",
+    "state": "actual ready receipt; independent verdict pending; fullCore parallel"
+  },
   "pending": null,
-  "authorParallelWork": "Codex K1 real verifier/proofwire/crypto/codeCI; Codex B rev4 specific M1-M3/L1-L6 correction",
+  "authorParallelWork": "K1 Codex freezesc6f and captures currentCore/finalreport on separate docs branch; B Codex rev4 contracts",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "published final K1 code+CI or B rev4 contracts+Docs; one actual Claude reviewer sequentially, not launched on unpublished drafts",
+  "nextActualReviewTrigger": "B rev4 final immutableDocs source/ownDocs, sequence after current K1 actual review",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
