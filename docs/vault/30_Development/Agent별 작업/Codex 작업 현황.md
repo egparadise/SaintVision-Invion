@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.375"
+version: "1.0.376"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T02:31:21+09:00"
+updated: "2026-11-06T03:03:02+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Combined72028 immutable and6of8 CI success; three separate actual Claude reviews cover combined packet/source, bootstrapv3 Low closure and BroadB architecture; real operations HOLD"
-active_card_next: "Integrator preserves72028 and collects terminalBackend/Core; Claude tasks_ba0ee0a71106/eaa694171f31/3516267fa05f return actual verdicts; Root replies pending18c3 and2259 with concrete design/ownership decision after review"
+active_card_status: "72028 all8/12 SUCCESS and source/packet ACCEPT; C-L1 finalreport and separate test followup; bootstrapv4/B revised contracts active; landing/physical HOLD"
+active_card_next: "Integrator C-L1 finalreport then test-only followup; bootstrapCodex V3L1-L3; BCodex D1-D6/B1-B5; Root actual small delta reviews before registration/code"
 ---
+
+## 2026-11-06 전체CI·실제 판정과 구체 owner 결정
+
+작업한 것: 세 실제 검토와 exact reportDocs를 대조했다. 확인한 것: 통합72028은 Root가 정확한8개CI/12job SUCCESS와 실제255cfa37 source/packet ACCEPT를 확인했다. C-L1 정정 reviewer 문서를 포함한 납품·독립 확인과 별도 시험 보완은 남는다. 전환 a81f7330의 새Low3개와 BroadB2bb959a3의 High/Medium은 owner에게 구체 수정·후속 구현 책임을 지시했다. 현재 B/전환은 DOCS수정이며 ABI등록·구현·guest준비·5대운영 수락은 아니다. 다음 첫 행동/담당: 통합 Codex는C-L1 finalreport 후 별도시험 보완, 전환 Codex는v4 reference graph/Low3개, B Codex는D1~D6 아래High/Medium revised contract를 작성한다. Root는 실제 작은 delta검토 뒤 canonical등록과 다음 구현을 구체 지시한다. [[FLEET5 B 병행 역할과 전환 구현 범위 결정]]
 
 ## 2026-11-06 통합72028과 전환·BroadB 실제 검토 담당
 

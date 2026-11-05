@@ -13,12 +13,23 @@
   "reviewerAgent": "Claude",
   "separateWorkspace": "fleet5-bootstrap-v3-review-20261106",
   "dispatchReceipt": "ready",
-  "pendingOwnerQuestion": "msg_18c3e56963c1",
-  "verdict": null,
+  "pendingOwnerQuestion": false,
+  "verdict": "design ACCEPT N-L4/N-L5/N-I1-I3 closed; new V3-L1/L2/L3 conditions before registration",
   "registeredProductContracts": false,
   "implementationAuthorized": false,
   "runtimeEquipmentCasesExecutedByProposal": 0,
   "futureProductCasesNotRun": 40,
   "realBindings": null,
-  "physicalOperations": "HOLD"
+  "physicalOperations": "HOLD",
+  "actualReview": "a81f73309a43ced0f777b10b3c0781c98aa54e96",
+  "reviewDocs": 42077316603,
+  "rootVerifiedReviewExactHeadAllJobsSuccess": true,
+  "newConditions": [
+    "cohort effect.targetSlot null",
+    "all nonproof lease/member/seal/projection joins",
+    "postpublication head PRESENT and restore epoch/priorProjection coherence"
+  ],
+  "ownerReply": "msg_c208f3951f0f",
+  "implementationOwner": "Codex bootstrap owner, designated for later gated implementation",
+  "currentAuthorization": "v4 docs/schema/fixture correction only; registration/runtime HOLD"
 }

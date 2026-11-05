@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-combined-root-early-supervision:1",
-  "observedAtKST": "2026-11-06T02:25:08+09:00",
+  "observedAtKST": "2026-11-06T02:46:14+09:00",
   "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
   "remoteAndTreeVerified": true,
   "nonDocsDeltaVs4f": [
@@ -22,8 +22,8 @@
     {
       "workflow": "Backend",
       "run": 42071344810,
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "jobs": [
         {
           "id": 127399796732,
@@ -34,33 +34,31 @@
         {
           "id": 127399797373,
           "name": "backend (3.14)",
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "id": 127399797694,
           "name": "backend (3.12)",
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       ]
     },
     {
       "workflow": "Core",
       "run": 42071358669,
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "jobs": [
         {
           "id": 127399847230,
           "name": "core",
-          "status": "in_progress",
-          "conclusion": null
+          "conclusion": "success"
         },
         {
           "id": 127399847818,
           "name": "s01-storage-roundtrip",
-          "status": "completed",
           "conclusion": "success"
         }
       ]
@@ -156,20 +154,69 @@
       ]
     }
   ],
-  "allEightTerminalSuccess": false,
-  "combinedReviewVerdict": null,
+  "allEightTerminalSuccess": true,
+  "combinedReviewVerdict": "source and packet ACCEPT255cfa37 with C-L1/C-L2 Low and Info; not landing",
   "operations": "HOLD",
   "wholeProgramComplete": false,
-  "archiveAndPacketOwnerReported": {
-    "sourceArchiveBytes": 46895143,
-    "sourceArchiveSHA256": "28a784282c5a121aba0eacef0299e638a239e22dbc913d0b2cce2c9b3872fbd8",
-    "sourceInventoryMembers": 4757,
-    "sourceInventorySHA256": "aa9667ce80ae4d7b59bd1ae86c22dc7fc674a98ee41953799bf6288b8e93b66e",
-    "packetBytes": 48259331,
-    "packetSHA256": "dedd5571cabb36811a113f14b9c59227fcdba9dad162edf9ca89d89e6452262f",
-    "manifestSHA256": "0d03e5c1a06bed083a0e223bada1281fea470ada6fdc901e6d7fa1f0cdb1186c",
-    "planSHA256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81",
-    "rootHasRehashedTheseRawArtifacts": false,
-    "actualIndependentCombinedReviewPending": true
+  "interimReport": {
+    "source": "3a30a0c934cef0eab95097df488c1ce36a55cd14",
+    "Docs": {
+      "workflow": "interimReportDocs",
+      "run": 42074025043,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127409282335,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "rootVerifiedNonDocsDiffCount": 0
+  },
+  "pendingIntegratorQuestion": "msg_cd733f1eadb4",
+  "actualCombinedReview": "255cfa373c5c71a0938686dde5e449eb52514111",
+  "reviewDocs": 42077075754,
+  "rootVerifiedReviewDocsExactHeadAllJobsSuccess": true,
+  "sourceAndPacketVerdict": "ACCEPT with C-L1/C-L2 Low; C-L1 documentation correction before landing",
+  "requiredDeliveryCorrection": {
+    "finding": "C-L1",
+    "correctionSources": [
+      "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "c2e63982ee29c498ef173b2bb1de5cf46e025f06"
+    ],
+    "ownerRelay": "msg_05758f476db1",
+    "scope": "docs-only report productdiff0; immutable72028/archive preserved",
+    "actualClosureReview": null
+  },
+  "testOnlyFollowup": {
+    "scope": "C-L2 SF1 currentpeer negative, C-I1 isolated import, C-I3 real160000 fixture plus acceptedf0af; optional exact65536",
+    "sourceSHA": null,
+    "runtimeChangeAuthorized": false,
+    "attributedTo72028CI": false
+  },
+  "coreOwnerReported": {
+    "passed": 9213,
+    "skipped": 46,
+    "deselected": 2,
+    "observedGo": "go1.27.1 linux/amd64",
+    "completedLogSHA256": "317fe010c067989599ef89ab416aede90c697589d9505e38d133efc594041159",
+    "provisionedInstallerNoSkip": 17,
+    "realPGNoSkip": 2,
+    "rootReranTestsOrFetchedRawCompletedLog": false
+  },
+  "backendEachMatrixOwnerReported": {
+    "passed": 8855,
+    "skipped": 75,
+    "deselected": 2,
+    "uniqueSumAcrossMatricesNotClaimed": true
+  },
+  "coreArtifactRootVerifiedMetadata": {
+    "id": 13439715507,
+    "ZIP_SHA256": "11a21f64f7adcc7efa82fccad02ffc12b07518ef5472e181d6e2c80287e27937",
+    "sourceRunHeadDigestNotExpiredVerified": true,
+    "rootDownloadedZIP": false
   }
 }
