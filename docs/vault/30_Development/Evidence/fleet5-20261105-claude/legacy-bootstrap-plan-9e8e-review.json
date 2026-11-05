@@ -1,0 +1,67 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_3c24efc159b8 / ctx_9fe3a9741db8",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-05T23:00:43+09:00", "2026-11-05T23:03:41+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch call and the last source check before writing; publication times are separate",
+  "reviewKind": "bounded independent NONEXECUTING plan review only; not P0 code, contract, runtime CI or operational acceptance; f027/architecture/code verdicts not inherited",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+    "priorReviewed": "cdeffee72f0480dc2df543bb3b49c87ebc95a570 (Claude eace0e2d, timing corrected in c2e63982)",
+    "delta": {"files": 20, "insertions": 1236, "deletions": 79, "nonDocsFiles": 0, "historyVersion": "1.0.2"},
+    "readFrom": "Git objects only (private scratch copy); author checkout untouched",
+    "comparedAgainst": {"source03": "03e17c31", "executorB5": "b5b8ca68", "p0Candidate6c": "6c0fc4ad (NOT ACCEPTED)"}
+  },
+  "documentChecks": {
+    "interpreter": "main .venv Python 3.14.7 -B -I, jsonschema draft 2020-12",
+    "artifactHashes": {"claimed": 20, "recomputed": 20, "matched": 20},
+    "ownerSchemaCases": {"matched": 26, "total": 26},
+    "claudeMutations": {"booleanLeafFlips": "39/39 rejected", "nullLeafFilledWithDigest": "53/53 rejected", "extraKeyAtObjectLevels": "6/6 rejected", "total": "98/98 rejected"},
+    "bindingCounts": {"targetBindings": 30, "rootBindings": 18, "memberBindingNames": 60, "memberEnvelopes": [null, null]},
+    "encoding": {
+      "publishedVectors": "E01-E03: canonical JSON hex, raw NUL hex, both SHA256, strict roundtrip and distinct hash domains all reproduced",
+      "ownerNegativesE04toE07": "receipt only; inputs not published, so not independently reproducible from the fixture",
+      "claudeNegatives": {"loneSurrogate": "rejected", "embeddedNUL": "rejected", "invalidUTF8Raw": "rejected", "missingTerminator": "rejected", "overlongUTF8": "rejected", "trailingEmptyArgPreserved": true, "noNFCNormalization": true}
+    },
+    "sourceCases": {"claimed": 9, "independentlyConfirmed": ["S02/S03/S05: 6c FLOOR_KEYS lack servingExecutableSHA256; domain v1 in peer_policy_phase.py:29 and transport/peer_floor.go:18", "S04: PeerFloorServingProcess returns sha256(raw cmdline) with SameFile", "S06: worker_peer_floor.target admits second consumer only via workspace-upgrade.json + upgrade label", "S07: worker_leaf_rotation.py:90/94/1042/1087 reach worker_peer_floor observe/context/target", "S08: no_rotation_mutation/rotation_mutation_guard know leaf-rotation markers only", "S09: shell/PS wrappers (repair-node, prepare-worker, finish-worker, start-node, Start/Prepare-Worker.ps1) call no guard directly"]},
+    "futureProductCases": {"count": 36, "status": "NOT RUN"},
+    "planDocs": {"run": 42040204454, "verifiedBy": "Root (reported)", "checkedByClaude": false}
+  },
+  "priorFindingClosure": {
+    "R1": {"status": "CLOSED at plan level", "detail": "typed journal-bound predecessor (exact backup ID/name, stopped, restart=no, frozen post-stop/rename inspect, same volume); exactly current + one predecessor; label-only, workspace-only, unrecorded or third consumer BLOCK; bootstrap M2 under still-held migration lease with start intent; later normal:3 under terminal seal + NEW common-fence lease; static backup binding fixed while current cert/policy/P/H/C are checked against fresh signed M2 and the current normal:3 generation, never the migration baseline; worker_peer_floor/worker_plain_rotation/worker_leaf_rotation named in scope; GREEN requires two later completed normal:3 cycles with backup retained"},
+    "R2": {"status": "CLOSED at plan level with Low residual C1", "detail": "named agent_mutation_fence API and persistent markers; terminal and nonterminal deny generic mutators; whole-operation logical+OS ownership; supported Python functions and shell/PS entrypoints adapted; honest boundary that raw/unpatched/privileged invocations are outside the managed interface and keep G9 HOLD"},
+    "R3": {"status": "CLOSED (source03, prior review); 6c consumers carried under R1"},
+    "R4": {"status": "CLOSED at plan level", "detail": "actual ExecCreate ID recorded before start, initial ExecIDs empty, only that ID across phases under frozen Engine fixture, ExecInspect exit0 binding; inherited Entrypoint/Env/Labels/User/WorkingDir and all other image Config equal, container overrides cannot mask"},
+    "N1": {"status": "CLOSED at plan level", "detail": "required signed servingExecutableSHA256 over /proc/<pid>/exe bytes in schema :2 and domain v2; v1 meaning preserved and never satisfies the new proof; no missing-field fallback"},
+    "N2": {"status": "CLOSED at plan level with Low residual C2", "detail": "separate Cmd/Entrypoint/full-argv JSON hashes and raw NUL cmdline hash with exact one-terminator mapping, strict UTF-8, no normalization; domains never compared directly"}
+  },
+  "p0CompatibilityReply": {"message": "msg_03604b3e6bed", "relayedBy": "Root", "verifiedByClaude": false, "postDates9e8": true, "note": "9e8 review-findings-closure correctly records actualCompatibilityReply null at publication; the reply states in-progress v2 executable field and only future-compatible R1/fence, no published code"},
+  "remainingCorrections": [
+    {"id": "C1", "severity": "Low", "summary": "Fence mandatory entrypoints omit the legacy scheduler surfaces deploy/lan/Register-LeafRenewalTask.ps1 (Register-ScheduledTask at :102), deploy/lan/Invoke-ScheduledLeafRenewal.ps1 and tools/scheduled_leaf_renewal.py, present in b5b8ca68 and 6c0fc4ad; closure marks the executor EXCLUDED/disabled, but a re-registration creates a new launch surface outside the three disabled IDs", "carryForward": "name them DENIED in the fence matrix and G9 launch-surface inventory"},
+    {"id": "C2", "severity": "Low", "summary": "v2 'retains existing sorted compact ASCII-escaped JSON body rule' is not byte-identical across sides today: Go json.Marshal(map) (transport/peer_floor.go:72-73) sorts keys but HTML-escapes <>& and emits raw UTF-8, while Python verifies json.dumps(sort_keys, ensure_ascii=True) (peer_policy_phase.py:34); fail-closed for non-ASCII or <>& values", "carryForward": "v2 contract pins one byte-exact canonical form for both producer and verifier (or restricts every signed string to a charset where they coincide) with a cross-language fixture"},
+    {"id": "C3", "severity": "Low", "summary": "Re-entry is unstated: with exactly one admitted predecessor and no deletion, a later second binary migration on a sealed Node has no path", "carryForward": "state that any second migration is BLOCK until a separately reviewed design; no predecessor replacement or rotation"}
+  ],
+  "info": [
+    "R4 initial-empty ExecIDs is consistent with an Engine that drops exited execs from the container list while keeping ExecInspect; the plan correctly defers this to the frozen Engine-version fixture (not verified here)",
+    "Root RS1/SF1 plain direction msg_87edde1811d5 is separate; 9e8 adds no migration consumer class to it",
+    "G2-A remains planning-only; old Cmd --image permit and global CP agentImage semantics preserved"
+  ],
+  "verdicts": {
+    "plan": "9e8e8c2f: ACCEPT as NONEXECUTING plan (R1/R2/R4/N1/N2 closed at plan level) with Low carry-forward conditions C1-C3 for the implementation contracts",
+    "implementation": "none exists (Root-relayed P0 reply confirms no published bootstrap/fence/v2 code); unaccepted",
+    "contract": "M2 v2 wire, migration journal, common fence and runtime inventory contracts are proposals with null bindings; unaccepted",
+    "p0": "6c0fc4ad NOT ACCEPTED (c2102592); corrected P0 review separate",
+    "runtimeCI": "none accepted; 36 future product cases NOT RUN",
+    "operations": "HOLD; 30 target + 18 Root + member envelopes null",
+    "physicalAcceptance": "none"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerPrivateGuardPrecheckScheduler": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "apply plan ACCEPT with C1-C3 as conditions; keep all bindings null and HOLD"},
+    {"owner": "Codex (plan owner)", "action": "carry C1-C3 into the next contract revision or implementation card"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "publish corrected P0 (B1/B2/F1-F3 plus v2 executable field, C2 canonical form)"},
+    {"owner": "Claude", "action": "review corrected P0 when assigned"}
+  ]
+}
