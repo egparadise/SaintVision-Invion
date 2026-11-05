@@ -1,0 +1,2627 @@
+{
+  "fixtureOnly": true,
+  "actualSignatureVerification": false,
+  "cases": [
+    {
+      "node": "plan",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c27f100fd2381a4b55e0807fdb4cb4eb70ae181a1a77aee98d105062dacfe760"
+    },
+    {
+      "node": "plan",
+      "pointer": "/signer/role",
+      "value": "cp-inventory",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "bf63b18d5a5f70ed3af7aa5a685dba5172e02edfa056750b77641eab6b345a74"
+    },
+    {
+      "node": "lease-migration",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "0596c6ff52e51a1f1a24980fb229493cec88f8612aeaf5a391ebda4a51e25ae2"
+    },
+    {
+      "node": "lease-migration",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "06c06be67ba522fddf04b882886490d81cd03598ea73ffae45a7f0cc06675c72"
+    },
+    {
+      "node": "event-01",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "6be4792851247da7982f86377e017e09baf182d1a151c9ba7f4982e0f4c8240c"
+    },
+    {
+      "node": "event-01",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "2093fe81db2fffe18c9bfb9cead81b8ccac4534661f1f9e3063098de89b0f2e1"
+    },
+    {
+      "node": "projection-01-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "e5a385637ec7d313baa497df5178eec13ab31cf885036a0029a40fc2ca8502e2"
+    },
+    {
+      "node": "projection-01-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "139007b502ba44e05a911330aaeb1095ad907b41ef76ee4a245e5838dc84b261"
+    },
+    {
+      "node": "projection-01-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "22a7a5c1817d13139a440a08389244b1eb85545e48a1267217dacddbd24a1891"
+    },
+    {
+      "node": "projection-01-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "269e10827c92ab4fd74f3b04816feff672291c386a816e21e3c0f3ee59bf71bc"
+    },
+    {
+      "node": "event-02",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "e578c4f9f4cfaf46685d8d692248dee56e4b300914d2e9da809d515abe42892a"
+    },
+    {
+      "node": "event-02",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "944272fa0ed6a46a707edace31753ababd9aac4ade352dfd030ae44907b8493a"
+    },
+    {
+      "node": "projection-02-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "2d9b1d31a274bf067179a7a3cf9a73a306a5dbc9dc0bfe05772d4e7f126f5d19"
+    },
+    {
+      "node": "projection-02-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "8828bdb95b352cb2527837f309c5cfab82e94fac6ac2d2c8072abd08755fdaf4"
+    },
+    {
+      "node": "projection-02-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "5a8bd5d8c2e37c247df0d24e1621dd333ca8831acd0fa704d5301f105e1e973c"
+    },
+    {
+      "node": "projection-02-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "fee5e7483ec22529f598e9d68f26b4a79e291c0197bdb7e09be04c1ea24886e0"
+    },
+    {
+      "node": "event-03",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "821593589393bc85c26168bf02fb96837bae06b241b8168b4ac074fec15d75b9"
+    },
+    {
+      "node": "event-03",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "d8380412a1bd75ee7c08a9c15ef74cd8de1d6dbec592fefa2be7ff2437724797"
+    },
+    {
+      "node": "projection-03-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c811ae147cd8aa35dfdf2606d967f65899ef2646ba46de3be3748c94e26e987a"
+    },
+    {
+      "node": "projection-03-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "242a109e5c52679c47db901599d90e98e9c7ef46c0253cfdf3bc33e4cd57e460"
+    },
+    {
+      "node": "projection-03-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "09e3eff7ed8e51309586f9d98d8d3e13d7cde73be067211feba446131adb3378"
+    },
+    {
+      "node": "projection-03-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "05c2111f8f9c5b551b637127a4f7acf037caf553fc368449dfc31688b1cf7dfd"
+    },
+    {
+      "node": "event-04",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "09dcb7d733ddd40532c90175314453b61474db8f0443eb1ffb4678afbb3c5cb3"
+    },
+    {
+      "node": "event-04",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "72d982dd922eea13b42a062a6951c36c9ee262a77c862e0f0bba39fea33261f1"
+    },
+    {
+      "node": "projection-04-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "77b4d41855056b21ef8bb878efb7a4d59f8c5df9fc62797ac8da962179d7f45e"
+    },
+    {
+      "node": "projection-04-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "b821fe45d3343d280cff9abe02b0ddb58e69def49d0a408e240fdf295c9fd674"
+    },
+    {
+      "node": "projection-04-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "873f352d9b61802e6fe279cd5807c4b3ea7bb4d543228b3f826b3b307ae045b7"
+    },
+    {
+      "node": "projection-04-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "77c0d1f8334945a34eb5bf5cbb73c5f8e55fe13ce3335d4fbdd1397c99aa0d72"
+    },
+    {
+      "node": "event-05",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "9577c07d9cdf82806a1da6ed7d41422e5ea692570d660f5eb1db88a68bfd1319"
+    },
+    {
+      "node": "event-05",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "6684d15732ccbd8434518bac20d4c5e8214993662219a54b48a247e4056ec572"
+    },
+    {
+      "node": "projection-05-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "3d3525929d114c046b860bb4af1dc4aebcebd2428e62990b89bba4fa6c558420"
+    },
+    {
+      "node": "projection-05-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "cfacc09ea0d65796db934d2f3ca7f466228a8d23a4b270008fbd7212155f9ddb"
+    },
+    {
+      "node": "projection-05-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "33b9ec3b7cd755c119522b53d2afe8259b146e01a4b11e0761a1c68f598980e7"
+    },
+    {
+      "node": "projection-05-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "971a5e377d90f1e29a9e870535c1ad21a0f3378ebceaa1c095053667da38e044"
+    },
+    {
+      "node": "event-06",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "0640d4b0998e892af71bdc40c54757d9e71c6ecdfb21d1e02d007df4d0ba7f3f"
+    },
+    {
+      "node": "event-06",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "d7930fe95151cf7a85ce97d6f0764d19953e9bd018bce568cabb463952413c5c"
+    },
+    {
+      "node": "projection-06-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "cf17ce9888f2a1f112ba7e8a942455f181665814342847baf1ee55cb38d5b03b"
+    },
+    {
+      "node": "projection-06-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "e28c8c38afa4906fa2faf9f981dc64f8f16a30d9bcfffcd9b79d0a4c615832fe"
+    },
+    {
+      "node": "projection-06-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "6d60a7872cb55d522be8b6992cbfdc2b76f793976a94ed79609265edd220a6f4"
+    },
+    {
+      "node": "projection-06-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "7c6152db2bcdd1ca23098a612f9024e817403cf83492dc22e18522790fcb7172"
+    },
+    {
+      "node": "event-07",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "db00d5376055486621f553c4e1ee6a9beffd32ebfc3e9ea731941ae0dbc8ee80"
+    },
+    {
+      "node": "event-07",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "50d01d31a0f83e20e12f1894fc7834d251878a1fddd04f515c10303a2721873b"
+    },
+    {
+      "node": "projection-07-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "ec5b0507417156630613aaf56435dc4034a1e381fc97b8cf2de7be8ed45dba71"
+    },
+    {
+      "node": "projection-07-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "46b9aa3c49174488f7f44161ca484c22f0b430495b5e660cee7b48cba999cb60"
+    },
+    {
+      "node": "projection-07-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "054a84509e31c2ef685f84d7d8c7cf4e6724aa216769f29ad123c1886460bcf6"
+    },
+    {
+      "node": "projection-07-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "0598704e713f20fb7cd1f93735a26e9ac0e74f7120ec074958208f87e7d344fa"
+    },
+    {
+      "node": "event-08",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "be23065fe92dbd0035a24697057fae6d7a5a64bdb11da13e87274e2cd18e271f"
+    },
+    {
+      "node": "event-08",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "b18aca98232c99ac2ca5e013a8492f923ea128d2452c5681a8a3483a201c1a54"
+    },
+    {
+      "node": "projection-08-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "97ab6deadf34b9f5f860786288bd5a4619d74d4b8b0ad99fdbb974218274388c"
+    },
+    {
+      "node": "projection-08-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "379901ba3aa2af224b0aac38444def2d5937df0aa952226c12e47c88fed7915e"
+    },
+    {
+      "node": "projection-08-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "1ed13f5c8c611f0f9853da40d0d7dad5326dbd8a06dcbdf55c17b883da9949a1"
+    },
+    {
+      "node": "projection-08-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "1d28f2a8925b61fcd4b1143bf04f13b305ddfdafb0cf77935d4dbbd17ec2afbe"
+    },
+    {
+      "node": "event-09",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "38c8c63f36bd89ce07760fb33e24ed8eb2256168bd253f58b7095704e0edca38"
+    },
+    {
+      "node": "event-09",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3b95c2913fae232f522ae42f2e756748b1e49e8ee8b1db25004d08eb61fc43e8"
+    },
+    {
+      "node": "projection-09-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "3fb0e8f69eebc1b0e21cbf2ea28994af7c6f041d74f8d8e20d8b20fde1c50209"
+    },
+    {
+      "node": "projection-09-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3e4b20597518a23d5b40aa8a23a95dacf04b1aebf301e2fc948572088449c42d"
+    },
+    {
+      "node": "projection-09-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c3cc02d67447c9e3092e896122653024a341d602561c6942d8c9d745ec080de9"
+    },
+    {
+      "node": "projection-09-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "497d81af39d7e8df549e7e060081cb7176826f1e5c52199700794ee062ace9e3"
+    },
+    {
+      "node": "event-10",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "f5e667c490e126c9a6e75e8fa03b4df00c67b8a9ddbbace822f2c392c142e1d4"
+    },
+    {
+      "node": "event-10",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "6c5cce110a969168d1f0daab860a8baf236ccad36af097a309f52830523eecba"
+    },
+    {
+      "node": "projection-10-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "1456701ef2022498e550d88d732a8c298675b8f3921e07a79be5d9f75f740d56"
+    },
+    {
+      "node": "projection-10-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "376ac67416f60a2311b752623481b20eb685ab4abbedd5373b0fa697923c96dc"
+    },
+    {
+      "node": "projection-10-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "e69b04ded88b6a9089b6a420529c8d7fa066d06c4e29d80dc22e092fbf7e84af"
+    },
+    {
+      "node": "projection-10-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a834cb6b4a3853f7483bd134ed231d8e933288fb0ff50666d57c963edfa0d780"
+    },
+    {
+      "node": "event-11",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "ea865ec546805a88eea84ece9100603b0b3464723d0d4ffc3b9b7a25814b2135"
+    },
+    {
+      "node": "event-11",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "97bb13f6baeec5e677af45fb5c0a61ebf93f671033d4a43e3ee8b096d4901186"
+    },
+    {
+      "node": "projection-11-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "45779651a1dba0d5e81b81d315525feff5734e2921d50fce7513ef2b4acd4288"
+    },
+    {
+      "node": "projection-11-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "22af856013a98e39e9416fa10df9415366f429a061e05995f9bce294523a8bad"
+    },
+    {
+      "node": "projection-11-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "5a059ba4bcc72e2d378b11ce241839bad21ea7df84c7a7ebcb1165d70621b8da"
+    },
+    {
+      "node": "projection-11-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "78c34bb83eb3979b07cacffa09a474b75030b73df6b3b37213f838f9fef748bd"
+    },
+    {
+      "node": "event-12",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "ae926e0d96525cc639153bb46d60d13908a10971c40f42b6e56002a8ad852d20"
+    },
+    {
+      "node": "event-12",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a67b4971afd19a04c6aa63540672bf5f44d292bf4a3560308c8d64f7fdd0c572"
+    },
+    {
+      "node": "projection-12-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "ce1f1e7b0debcf4fb37a5ed918b1dc2439b2278c9972a2ddf1463f3acc2d4fd7"
+    },
+    {
+      "node": "projection-12-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "b5ea5ad354cd65e262d4a4af437b57e264449f1e9c8aca755231529af00b5cea"
+    },
+    {
+      "node": "projection-12-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "5be372c65e5fbaa135eb66e8649c5c0a26b4516cff96bd528246030dda0771a0"
+    },
+    {
+      "node": "projection-12-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "8ec5eee1a34a57a7f3ff62eeb84964884671f43ab4ec9df9298454a8f48d7791"
+    },
+    {
+      "node": "event-13",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "9298601fb318c6e0dae57e3d3f1921ca182e36b4918199497d12514bc65ee2dc"
+    },
+    {
+      "node": "event-13",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "fb45ec2010e4680232a83a3b7b17c0e5d6cd1ca3b1e60964f1eab96f9f451316"
+    },
+    {
+      "node": "projection-13-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "70e5682c9e95c632cad4b660adf00a59510ee6bef04ef0ac8e3f66461373598b"
+    },
+    {
+      "node": "projection-13-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "49160f7758bf99b4a7455e1a446b143b6e8c542de6d1d7677e651ded124a33db"
+    },
+    {
+      "node": "projection-13-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "10149bbecafec562a7708c464c28af3385f434af89eb20f7df436b92f0d7ee1a"
+    },
+    {
+      "node": "projection-13-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "5af34ce839282ba32cae4bf8900fd582f6cb89f3b3cf092658555d2f73734b67"
+    },
+    {
+      "node": "event-14",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "672de045551a86e237660a2205e95282e2a23ef98a8085bb5b390db277ec4430"
+    },
+    {
+      "node": "event-14",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "4b374a0be77425928059380c78f74c6561514461692da588017ba04bccbc8838"
+    },
+    {
+      "node": "projection-14-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "3b7a7358775a8669518ed3973ceb33e798ca569c59f089589642635e20b587a7"
+    },
+    {
+      "node": "projection-14-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "205bfe551cef73b4e45c97e03b95c471731bffee4b58e24a706d85b615154a57"
+    },
+    {
+      "node": "projection-14-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "681c01017ebb4df133f4cea807b323668502c7b792bdcdd079788682d8d55380"
+    },
+    {
+      "node": "projection-14-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "154f9354823b91708f4505a99525e3db4c313f49e9b5b91d12332027ff081ede"
+    },
+    {
+      "node": "event-15",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "64d0af49738c53f917d1fe3e42a9d7f7c9af96be1ab1151dea8bd38afc925761"
+    },
+    {
+      "node": "event-15",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "0239c66898ffb19a59579ac2e4a41c6988bc7af7e10df20ff38be60e0d84e0bf"
+    },
+    {
+      "node": "projection-15-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "776e07043fcbcc742935966de384d9bf29d9de408cfa666d975c94e4e3d4b882"
+    },
+    {
+      "node": "projection-15-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "455d5788577e6c1449ec3adbfdc0aa99d7746566e7e739be709a409256ee1ca7"
+    },
+    {
+      "node": "projection-15-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "fe89f6b5073854d01b9281a91b58c035ed76299a2a9336e03c14af8fbb7aae95"
+    },
+    {
+      "node": "projection-15-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "281f99307fea844466c0e3ede222be456f6ad06c1347c53bf1f84b38a7849b02"
+    },
+    {
+      "node": "event-16",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "139c67ac27474765f993fc0fbbbbf79487a16309a05c60bf1fd3a40a669c20a9"
+    },
+    {
+      "node": "event-16",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a091a51a5f19408b262b2b6115d4cceb5a748c49e9fb60cea7c7b1e42d3f6d4e"
+    },
+    {
+      "node": "projection-16-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "908a237f57555186c054d0e508ffbb28ed10ccfdc03e6da16837cbe551e842d4"
+    },
+    {
+      "node": "projection-16-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "ef018de0b212eb63b3597fc3e92cc783504afab282f07a2186527726d5f410e4"
+    },
+    {
+      "node": "projection-16-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "88a9e97d2103c41f7f02bb6e6065e95c1d6bb60cd8f5eb4b50d899c78e151df9"
+    },
+    {
+      "node": "projection-16-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "05526cb92a13f5574e846208b1eaea21934927d5971384fdf3c6cb4c2c415173"
+    },
+    {
+      "node": "event-17",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "084e206d44a2cb95fe7bcbc75d7ef196b1e420fb95751b249d7dbf465bda0b34"
+    },
+    {
+      "node": "event-17",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "dedf0345a5e51d1f102cc929d14324d60be02ffecba555e6144ec2baee567be2"
+    },
+    {
+      "node": "projection-17-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "6afc7ffbcf3e69c0ea67649261ff423aea36963e3188cda32c49b3d05b1049b8"
+    },
+    {
+      "node": "projection-17-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "1626f4b8e65969be34ecd57c8fdea5eb5724ca2bd72f6b12b559f4641c5caf92"
+    },
+    {
+      "node": "projection-17-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "59c030f359ca8d2f49d0166909d91b6fda385e6653bcde84d1ca1f7269f2c77f"
+    },
+    {
+      "node": "projection-17-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "d10256b63d8f34cff03f1edad10afd49d1ed71103c80201bbad365c03e4f6a7e"
+    },
+    {
+      "node": "event-18",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "4706fbfce822864fb2c4e412b7a632dfb0ed5556eef5eab005ac909ebfa8e7e9"
+    },
+    {
+      "node": "event-18",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "11732dc476b828324bb3a8a8fff9a0151cec2e0a4c0765382327d0b043461192"
+    },
+    {
+      "node": "projection-18-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "5ff7efcf16bced8d2611b44050c2d2a76da61b28d75e98693c56612c001b5c58"
+    },
+    {
+      "node": "projection-18-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "101ca3db31367a753b8bdb578873d988401153c37c556c454ced30382f0923eb"
+    },
+    {
+      "node": "projection-18-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "f4c09244c6d234fb4727067b1832f7385ce8d06dda2897e4aaeaa8ef1625ea60"
+    },
+    {
+      "node": "projection-18-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "b2c48c3a36315209b4463aecf53499465b63f2a7d605dcb451b0e2e516b04257"
+    },
+    {
+      "node": "event-19",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "7174d2fd063ac7d040b41e98f47bbf0ec816f1a011eb477ebbe472e88418ff3a"
+    },
+    {
+      "node": "event-19",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3d2a236f779f15d50d55e80a06b10bb4c665047eb079571dd18a0e5e825f0b7f"
+    },
+    {
+      "node": "projection-19-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "0062a6d03e3d67681de29b5d7922be07fdb8e13562067e250a326ff4a4f3e952"
+    },
+    {
+      "node": "projection-19-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "4b78495e3666866b5c4a107366da7aeb76d6273794e402d96cc6e646102e7035"
+    },
+    {
+      "node": "projection-19-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "68a4a0d3970fc0d36beeedd82a3afca9747a207c839cc95037c738a0682fd9d0"
+    },
+    {
+      "node": "projection-19-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "701acdcb59ea5af8f942af1c653ca3dd65743f41949420873f4e045bd51d39cc"
+    },
+    {
+      "node": "event-20",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "769ce4faea7a2357da727678ec4899105b58b66293cfe126bfd8f7bcae6cbc74"
+    },
+    {
+      "node": "event-20",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "0b983bad2398c05b14c8475536043253890fe0b46bbb97c92678e41803ce2750"
+    },
+    {
+      "node": "projection-20-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "b4687500957efde5e19970d1d9bc16cd871a379355ca26a6b127e195d8a4e15a"
+    },
+    {
+      "node": "projection-20-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "dfac25f281d438b7da1b48a803494bc6c806e4ad0b658fa2a6a3d98db2f81911"
+    },
+    {
+      "node": "projection-20-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "63428a682c2e2017ab1988bbebc819fa26b9ea16c4c97b016175f81677feec29"
+    },
+    {
+      "node": "projection-20-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "5773642245132c30018de4d56a4d46f8826a24b3d842502e8d03c2a8b7aa4dfb"
+    },
+    {
+      "node": "event-21",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "55a6fd1fd1f2507560815af0ddef8fbee166b14fb56723b3ce032f292b5d1cf3"
+    },
+    {
+      "node": "event-21",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3e50879f5a10737e4e1c6ea952ac3cfa47e035f701c88bb9b584d93ddd0055f3"
+    },
+    {
+      "node": "projection-21-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "557379d4ea47a2c4bdaeebddd98629325dc5470bbb5e25e3d8d825d0c87c8e29"
+    },
+    {
+      "node": "projection-21-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "95988ff356096f443bc9b666bebc5b826d07df7b2dc37849da1d79ccbcb88ceb"
+    },
+    {
+      "node": "projection-21-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "f2f153a6951f605389905057acfc8e1553724faa6a3603e5850df66349f69d75"
+    },
+    {
+      "node": "projection-21-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "13d8a71b10b54513fb4679cf624311d1b0e316302355167269958536ba568170"
+    },
+    {
+      "node": "event-22",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "266940b19ad6b9607407699739607e60b279139e5dd2430071572955df0dcf2c"
+    },
+    {
+      "node": "event-22",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "f52673f6cb78ee87d7dceb5797f2e50cbd325858efad4c6f9b498398f95a2bc6"
+    },
+    {
+      "node": "projection-22-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "d25d305cd2636a964d77bba5472c6e3574d42adc64842c8d06985c1bb6425935"
+    },
+    {
+      "node": "projection-22-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "96c1762990f2667d6af33648e2d8fded09769402398e00a9990fd101db5cd851"
+    },
+    {
+      "node": "projection-22-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "45b7fac65299ce2ebf1f4f719b0a3fc241d816b4ec61c68c28aeb5895f7607d8"
+    },
+    {
+      "node": "projection-22-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "8e3f70d2a62aabe9de0a0dc911d70d864d5cade2f2b96e67c55958c78991ca78"
+    },
+    {
+      "node": "event-23",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "41d4977548fcc14803abfae1cc0c0a0defdfa512de9af9d69d7ea1f15527f64c"
+    },
+    {
+      "node": "event-23",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "6610cdabec2a2b119a231196d1c7c511f385f74f0a964a23043744a030a33ae1"
+    },
+    {
+      "node": "projection-23-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "a05b4f0e66078732c041f2eb40a402c42e3c60f7740685cbc831b24a01febdc0"
+    },
+    {
+      "node": "projection-23-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "5c44a27d10745ee2b24d6cce874b338b184401b129d15ac871d33aaf268c7206"
+    },
+    {
+      "node": "projection-23-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "cccae252f8cb444ee07f42135633a5b1eaf3e4b1ef0b9eec27b83cbfcb371d13"
+    },
+    {
+      "node": "projection-23-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "7a9eab9046206884ed54aa42513b076c327332b284d4f2d8b6103d75b3b32a71"
+    },
+    {
+      "node": "event-24",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "a5170574f129457748987ab40673806bac9eee52653774fd097bd91a149a5ee7"
+    },
+    {
+      "node": "event-24",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3d69961733d4fac2fae2e5147236da2c496f66c563bdb2b2c6eed310043f42ac"
+    },
+    {
+      "node": "projection-24-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "21be4c303673037819ff68f9f3cbc7a03ad2721514fbb71559728d568e065887"
+    },
+    {
+      "node": "projection-24-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "f0dc9a407c0fb3572b074d4cc46244bb2c642e5f8ba2bb5f6078c5d95f1579c2"
+    },
+    {
+      "node": "projection-24-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "42c69ac0cfa9c4ca403ed534832bb5f12ae8020d8a876104b6ccf0d2e21c49ef"
+    },
+    {
+      "node": "projection-24-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "369bbe1b21e1294a616d7bf2b919104a12a53b14677f65fcce2fc2d252056b53"
+    },
+    {
+      "node": "event-25",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "3f9e9f514dab5929ae56b7395632b907372dd018b91d812572cafb353aba17ea"
+    },
+    {
+      "node": "event-25",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "9cd58fc6bc067a1c049e98b1126e3e0b373619c7fe4fd891490bf45b263545a0"
+    },
+    {
+      "node": "projection-25-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "3671e697e9e41e84e316ac9a50ee7c1f78a992eed9564b490898255f45d2dc83"
+    },
+    {
+      "node": "projection-25-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "bdc8e9bb432196df9f4da4d9a0b5e66f78abd258839626e73deaf2b4855f5999"
+    },
+    {
+      "node": "projection-25-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "2ed0d3785e919722dec3e9082665efb84ca5c1be7d9a07d520598c32a9b78405"
+    },
+    {
+      "node": "projection-25-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "518afbfad77ab4cfb030730774daf386430eb4e725ebba1931a07170696faba8"
+    },
+    {
+      "node": "event-26",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "70a46e660263de9030512db3b5462cec7d0f64168e25b7f20043ee363818acc1"
+    },
+    {
+      "node": "event-26",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "bb74bec2b11b517e793637dadfdf1e588c162fc0f2f2cba44132b0be2e00f652"
+    },
+    {
+      "node": "projection-26-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c1cf3d3c0e22c520db1c96c8a0710450ffb6a290ce860a2f6d2ac49bbe884c40"
+    },
+    {
+      "node": "projection-26-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "c6e8f1a909ecee8f69e4f7edf9e9442b6c4058f26de9cec9b8f8a4a17593a111"
+    },
+    {
+      "node": "projection-26-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "eac48d749655987487a8ef7a2a9f61c973b88e45b29ebe5ec7669c0efb0e73a6"
+    },
+    {
+      "node": "projection-26-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "42cd88260dda422954c638764386259934df2baee3ccca063be370e7e0ba7be4"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c26b8b3b8187e13148dd762faa456b6f8f2793f3d84819748442b375b4e8314e"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "c3661cf73db2ff07305bc431fba817a892453fb097798e59ae8610876f9afd76"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffd1d669a33a135f0b8587b6944ec15083c92e282f09d79f20f2dc27b6bca29d",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "b300219a9529fbc9a4ca4d0a18b36cf789d370cfd45a44efc64a7fcb02418771"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "e0ce326ea5ffe6ce30ed4bd33d548e7407c44283800986cd6ebf122871a6bc19"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "6ba69d2ce842abe4b8d1a197d1ed497e07a2ef3c7a9ebf4c72dfddaa5df9d8b3",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "a55669cfb4daae4f8ffdf3c61ddeaea52ae02ef6e1a981dac2aaaa58516443cb"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "4feee7aec27eac06289d857520fd7febe7e74b1431836e0beda427c42ae0fac7"
+    },
+    {
+      "node": "fence-released",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "bba79dd81b364b9b5fce6844b3c4ac2c61efffeabaee106ff6976cce3c7a6751"
+    },
+    {
+      "node": "fence-released",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "cad5a17b47d736dfa5e1a345dc64caa76d17741ced9f0ac588ecb1324edc3474"
+    },
+    {
+      "node": "lease-restore",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "03e6287887954f1b9541c17fec43b276e9266ac6ae5fd9fb6c23f7da01115512"
+    },
+    {
+      "node": "lease-restore",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a64318c522a51b7f4fec570377924a38c4d7f8a0df10c701312a7837654955c4"
+    },
+    {
+      "node": "event-27",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "79e21f45e909837f50ce85d62cf5179c298bb5d0d59fb4d92b079664343ed315"
+    },
+    {
+      "node": "event-27",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "9aa408fa97b101d6aa8ea6dcccd170e9c00640e007373ba4e460c857a28bee96"
+    },
+    {
+      "node": "projection-27-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "2bb4ba810cc194bfc6847055aa59fae56564276e730b9171e9e685fb567200f0"
+    },
+    {
+      "node": "projection-27-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "1c63189a4ca30f92e03d19964df5dcc4d89e2bce38b0918539389bbc2c09de97"
+    },
+    {
+      "node": "projection-27-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "1cbc9fd504898291ab70081796b5ae3d206e6964edcd8f3ca3d6079b6a44f487"
+    },
+    {
+      "node": "projection-27-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "de91e5354482a73413079170b9bea373cfa054188c3b6f87d4129e21665220bc"
+    },
+    {
+      "node": "event-28",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "6ef92849861c247f33ac2a020e8c81ebb8d5e57575af0c42531afd46886791d8"
+    },
+    {
+      "node": "event-28",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "86b0d6427d7dc280b8f33d07156a2de96dbd1e763a91268d2489099ae7fc4489"
+    },
+    {
+      "node": "projection-28-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c58541e29ebdecd3bc0ea854c78064d76f3e67dd409f2c1cad45484eeabe079f"
+    },
+    {
+      "node": "projection-28-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "568bbe06b4390ae18d7074fd788f7d2cb1acc306b7fd3a15dd6a001d6f277486"
+    },
+    {
+      "node": "projection-28-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "400ce8ec616a50630606cd944abf6d34eb383c2c79daa2f6438c45e9b421d671"
+    },
+    {
+      "node": "projection-28-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "277e548ace0236e8792a820fc3554a9af704bc4211a6d67c9be0f1a9341a6a5c"
+    },
+    {
+      "node": "event-29",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "2ee6473bf973ad52dfeff66e9182ce219aff81c0a086145569b3f2def850882f"
+    },
+    {
+      "node": "event-29",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "314d57b01454b6c4bccca2eb21ca5f3709ec962e79ff590aad99c804c0e362dd"
+    },
+    {
+      "node": "projection-29-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "fa9a8303388933967c212e764731fc36d0db67a22ccf1e27536282544f621277"
+    },
+    {
+      "node": "projection-29-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a54d4460172e4cc507c8e6d4051a5d150bc9d71741fb4b37302400a00160699c"
+    },
+    {
+      "node": "projection-29-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "84cd6df452b4ae994ab2bf4cd1013eee632c1719712e8b610e9e6f469a12fdc2"
+    },
+    {
+      "node": "projection-29-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "fe5c7eac461aeff7c69c708b972ee5dbc99c3f300e604afccf6248dba57a8f1c"
+    },
+    {
+      "node": "event-30",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "2e3c8e0086bff70b15c0ce49f12699b056a07524b0d085a992abcd911ad48e53"
+    },
+    {
+      "node": "event-30",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "7e3ae35204d569d6acc997ef893b6b874427bf6b07dc709c406c51e6c6628c17"
+    },
+    {
+      "node": "projection-30-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "692b70bd48f66d36cf6eb3903c1532c12c5a26fe422c0053c1867ba26597b46a"
+    },
+    {
+      "node": "projection-30-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "f4db85a27fd788a28ee3ba8a57269e6db404a75ebceba12069fef93953287085"
+    },
+    {
+      "node": "projection-30-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "36be3da2bd40304c73a163d846113ddc72ad4bbf3f7afc186be934252f349725"
+    },
+    {
+      "node": "projection-30-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "96ce19750fd140647a48a2c62914b4de62c59e290547ddeebc44d77fdea17c90"
+    },
+    {
+      "node": "event-31",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "e295db7e2f2d81711547669c0dc1f75377d12551bf7928ab31bfff8749d46ac6"
+    },
+    {
+      "node": "event-31",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "4aac9d48bfb6c7051abe3f25c77180d8d8f09f4a04bd706c050e9112b99167ba"
+    },
+    {
+      "node": "projection-31-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "0604ca9a87fc8e7121163053e411e25e7ec4b890c4240f58869bb0bd10583999"
+    },
+    {
+      "node": "projection-31-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "2c25a5c5ac2e373d30310d462327794dc98cf57a56009aa9bb6bab6334631d2a"
+    },
+    {
+      "node": "projection-31-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "d2834ae0c7b6fda871429708205505ed2367083da1fcd8fb61c5166d645d4c35"
+    },
+    {
+      "node": "projection-31-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "4c197631721bab9566587f7d772d88ac80f94e0a60b0fc44176f731c4afeed65"
+    },
+    {
+      "node": "event-32",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "a88e95688b3fe0596cf3c9c52aabf2f5318c08fa2347b07017f28be857e163fc"
+    },
+    {
+      "node": "event-32",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "3571c9712d9507acead8b878c8c153195941f8087e2ee28267301ea09fd61319"
+    },
+    {
+      "node": "projection-32-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "816dc735b0aff26539ab58b62e36cee73ae30200e7111ac256f6d6e56c23f561"
+    },
+    {
+      "node": "projection-32-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "06a5da7d088fc128b0d803a43c76ab15e9f16795fbf4039fb893c4d5d768bd94"
+    },
+    {
+      "node": "projection-32-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "adcb02b7edda1193ab5bb12ea2e694cf0867be7440553add034a7fcd932de1eb"
+    },
+    {
+      "node": "projection-32-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "b9e49893ee036142eabba6271354c902fdcd88be5e0338c0b33e7da65970dd07"
+    },
+    {
+      "node": "event-33",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "5292978f7dfcd3232bc0557c85c841a1cc99d9bbbfd2a8c539fa83392e85a2fd"
+    },
+    {
+      "node": "event-33",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "6755b1afbc2e0942a799ff49da091c8389dd8af45cf2ac5a38987506b0b41100"
+    },
+    {
+      "node": "projection-33-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "43559b02c89a38d015766ecb06a4caec78d3906c8730e96d03ebaddd13b4c50e"
+    },
+    {
+      "node": "projection-33-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "c971b00514e188baf20886f962bf87ab03fa4df1b35e440911cff9041da55f6f"
+    },
+    {
+      "node": "projection-33-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "e54bc12009d219ff0c322b1f8d061c3c9f8625e0c4928a2212c9aab21b1a18e7"
+    },
+    {
+      "node": "projection-33-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "e646e20f93a18a9d3f2d10fae587d478c9a1a2262136fd06b0d93fcb17d128e0"
+    },
+    {
+      "node": "event-34",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "82dadb467aad910f5e916d1726799d1f09b7622e3f624d8d3cbe1d47040b7477"
+    },
+    {
+      "node": "event-34",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "73a2b3cf9fd04cdb4d58ecd52de930ec8e9465170683effe86b3532416e50655"
+    },
+    {
+      "node": "projection-34-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "c7466cd6633c71b7d1f7fc6867262ec26b6a7dd2f71c5606655bcca44e1516b2"
+    },
+    {
+      "node": "projection-34-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "57cb522a9d903a2390101d4e2939271078f3fcf214b2bc331af70c2053d3e42a"
+    },
+    {
+      "node": "projection-34-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "386c13ed0035b8261b86dd7d54a5ac25712bc1bee798fe2f3e980953a1f4aba8"
+    },
+    {
+      "node": "projection-34-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "51746e30dc25deeb9cdd06efa3f545c1e0dda9fd3237acc4446a7df103545960"
+    },
+    {
+      "node": "event-35",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "d49639054195d329c3a1eee00b613791bb78791b77e11c617e21ca2ef4618be1"
+    },
+    {
+      "node": "event-35",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "c13a871a233700152e617b188efacb332fb0ecc42c6cd4a7d0108f786db21732"
+    },
+    {
+      "node": "projection-35-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "0fb9323839e0751943924b7697f663bc590c6bf83a93e1583ceeea93a1473b72"
+    },
+    {
+      "node": "projection-35-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "6a9a8c4717b00a1d9425a499a5a6fd26c9e57cc0403280a7288781de9ce0b84d"
+    },
+    {
+      "node": "projection-35-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "70a495d5929b9285e4ca4c0ec871563d25fa68553d74c550c770ff39c261a6fe"
+    },
+    {
+      "node": "projection-35-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "36eb13c44de60a4a59762ab36d48c42cd10ac8a57470e2b8f2800aa22c55dc04"
+    },
+    {
+      "node": "event-36",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "97572a59449fea24c130bcb0e8869f66e0089cf02c7950c2af7bbeb785a6b1fa"
+    },
+    {
+      "node": "event-36",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "a93c5dc9109955b1c807ae3a3a84ece54a7042bd6cafb86606fcc6db171912a5"
+    },
+    {
+      "node": "projection-36-PC2",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "6b8e66ff90d20be0d267d1cb63d96384e441368bf404ab1303c232b9e4ee2277"
+    },
+    {
+      "node": "projection-36-PC2",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "c653ab1321da1502fef163febd73526ba44ed15177189605fa37e661a90f8869"
+    },
+    {
+      "node": "projection-36-PC4",
+      "pointer": "/signer/keySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_DUMMY_ROLE_SCOPE_MAPPING_AFTER_REHASH",
+      "candidateNodeDigest": "7dfc9217010a0407c23ae3155e75862a9a7fe175d0d1a6ec9d7cae871a9e7515"
+    },
+    {
+      "node": "projection-36-PC4",
+      "pointer": "/signer/role",
+      "value": "root-plan",
+      "expected": "REJECT_ROLE_AFTER_REHASH",
+      "candidateNodeDigest": "602154f65f9ccc714604c02f12c66af416a89c50ed301b49aa84da6bab0868e0"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "50b4e57a61eb07c1058920eb057ac3b53481ca55438e95f8b22d4b7f9bec982e"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "af92a61adb57cd6f48b7594e8f4dd8044097ca5e0b211bd59cb2501f9e569111"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "4bb886e53b6134c8ad032b5a250f8d862daada8c4c0220d906ed7276e4b48e37"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "d7b00d388f58092c039e54969de7c3f99da82025795a8ea91650dca43ea3369b"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/image/distributionProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "070d662b4e9abeaa7946b3ec8eec2c0177a2c00c8eb084ded4503dd5564248d2"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:plain-migration-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "1cd533202ba6b12c2f6b97a0fd41bd3774f0d4924f7c7d7e9c842c1666e461c4"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:plain-migration-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "1913b490da698612caee5d325c2da09e184bdbbe9329c6ed6d4b84c21dff50a1"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:plain-migration-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "98917621a551d9754b226149f756296756a0be2105e6a128110ddb9bb4767b46"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:plain-migration-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "88993478654103cc3da9c7ebdda73756e5d3495cad2a5877413681b53de94625"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:agent-mutation-fence",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "919b766f475dfbb8d5be111234c4df4a118a1215ca8abe95d42e1df70b1438a7"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:agent-mutation-fence",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "488adcf05aef9698b5a61d7f73ad3932a92fb749f0d3216d39abddcd327ddb5c"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:agent-mutation-fence",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "734a5b625eed142e345695f89f7850645a7a9db7d4a5b6bf3d95a99eb78b6e83"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:agent-mutation-fence",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "2862005da5d7eb14a936e2c7d74db48ce5cd67157c9c11d75f39d5d76a808f46"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:runtime-inventory-api",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "147de416c69231d6054d77941fba5d7aa723430c367562b0fcd4bf0acedc915e"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:runtime-inventory-api",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "9d45eb5717a176f355b651b7e7a846abd67731426c40e8efdabaccb6a6f57172"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:runtime-inventory-api",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "cfa078b56393898fce9078bf7deacadfbb407472a69695d6cb594ee5c1491b9c"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:runtime-inventory-api",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "f13bf46c8620ba32c0c625587ab8e41fc423cf55a8ecd0ffacbd5b21497ae940"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:schema3-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "8461415976a2876b807c1155df70336feb89093ca32b398c1c468c3ce301529c"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:schema3-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "697727824bd3c68dc7667432f35d796c06236b53d29705fafe781b4b7d07ec40"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:schema3-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "16e1976d380278d167bffb6106cad9722ff1f60c9c497b9c982cd978f62d31d3"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:schema3-helper",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "2eb25b0deb1f8fed9342ae9a889cc1d036baf74ba42501e13e51687e382883ed"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:renewal-guard",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "acc8e5de355217d403418037d21f57c3fd0d68d22bd5faee67ffc163da5c3420"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:renewal-guard",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "22ae068d2304ffb25b7fc32f01249b8250955a4a5c7eee0f8f6c7fecc0234c96"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:renewal-guard",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "088fb38ddc8cc3c586b14032c36dc3ba9bfc53475288b239ca6d70a0320f8192"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:renewal-guard",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "e66036ba08b5ba08c0d60ea5b536242711d6aa8274aa4ff0d3b314c72061bffc"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/nativeTwoCycleProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "f71c16c22be21f0258671bb7096c5c67b293cbc08aca8131a7b6668c4e760442"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/oldNewNoWriteCompatibility/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "7d9c09ded8055b56a56967409a9ce6b11ff93871c707fd7164bfca2b3d47f49d"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/m2CapabilityProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "a850d29056fcb2db4b9b211f9e348b087feba08a024c84fa3e49322e83403745"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/rootG2Decision/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "e72928282ad2d7e8c73e2ced20391e4ac2d034c282e31d354f6c4e79f32186ba"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/independentPlanReview/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "7fcf9949a230075cd52656dd998948ebc74dcc371cfc7fef061a7923fde73410"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/rootPublicationIntent/signerKeySPKISHA256",
+      "value": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b7e24e716b28411d84754975f6e006b79636ae5cd570d8ba2995b749fa6f9945"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/scheduleDisabledReadback/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "f3556038b31476238b892e191d789751a4cf8f355f7f2ebe1eb2e848545659ba"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/allLaunchSurfaces/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "0422b1eef48aa7acde28e9456b182a2970cf435c9bfc93524e037f6b5ab1907b"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/noOverlap/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "17688c7dd0adc5d55c405b6a3579ce881126531e9f39fd7592430e55bc11ee0f"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "50942b97e79d86ab24c9915d891ee4e36127cf57f7f96436e11f0f6cf35d8184"
+    },
+    {
+      "node": "lease-migration",
+      "pointer": "/body/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b1156896d546e6da91efdf4c2f674d5aefecf01aaef4bd2a56c3ac948bb41b21"
+    },
+    {
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "f60c52404b9c80875558f6b3e44d91c036dea0d34b2bda8780ff96dee20443cb"
+    },
+    {
+      "node": "request-02-reserve",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b4fb68b0deff67067d63400a97e8209abd06d48fc8272493925993caa04cc10f"
+    },
+    {
+      "node": "request-02-reserve",
+      "pointer": "/arguments/rootExecutionDecision/signerKeySPKISHA256",
+      "value": "1126e8d5e524bfc44f0f97415f6a33fd41b3d76a355ca653599214e978c94e0e",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "8f4276471b6f0b0efc0c7fedf2b67e0e2493716608b093c09b47ff1ef45f0961"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "7361204356d1b9a7afb7f2dee9869a739f67befea7e7808b89c91ab5131cc50a"
+    },
+    {
+      "node": "event-04",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "40fedc011ee335cdd639d11e149d26d3671da0daaa2fc387294fac520cfcf752"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "821b8bf049aed5e4f480a166d12f3b15a7d61de46c85ecbf52f99f1d054d9a7d"
+    },
+    {
+      "node": "event-06",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b939105db52dc99a8b2aebc2864ec68f73c8c67a402278f94ac48d7f89b70620"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "321dfc6013a173edf3a032b86fab6497f4eddb783a01a9f424a2d5738b7412cc"
+    },
+    {
+      "node": "event-08",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "257a746a0b769ac0869f02131d02e9aef28e06826a5f7eb2fe89c6ac2e48f70d"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "58addd70214c43e048595087baa8c64656669333426c246759b904ed969a59fe"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/arguments/quiescence/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "e2b9da105ddd26554cdb570f2890a68164c1fb6a4bceb0a40587ebd2ab5b2a3b"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "9e790cde61c607023380e9050f6570847ca8f50ee27466856902e29eae47c932"
+    },
+    {
+      "node": "event-11",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "0c0ad6cbca23c50867c5942a6a1a902ce775e74c824175ab270956ca2644b612"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "211dfeaa10de69babf2dbae24b7271f48f37e1c3bbe17b658f013e9a7667febe"
+    },
+    {
+      "node": "event-13",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "3506d6f2d131e9866b34bd2472be372b777d879a6dea3bad819d8184a3e20fc1"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "e308788486084f55c32a4cddefdfe688049a47b4968da3c820da5918af437d42"
+    },
+    {
+      "node": "event-15",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "72fbff220bb6d1ae7e6f84d88143d5e5b222b34a42e8a89ff1c877e0d5381696"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "0f8fa0baf4cb39324dbced97de5ef166abff18b01e47a47aec8c6809e7d66755"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/signedM2/signerKeySPKISHA256",
+      "value": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "c55142c906142c0a2cc242591b3b2b40198aa62662b6c2c735f74b08c258d640"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/mtls/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "c06b69d76cf6fb1f6c4b75235d6687b12b238a2529ad8fe9efca015f8e56ea69"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/protectedStateEquality/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "130df1a3f483455f1bf6d34e15b23804f5da66e95d0c54cc50fa02998f525615"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/execReceipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "5b1568f1a9c242838329aad6f7f1c0b8aee8cb8beb5b48033cb4adc49f859638"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b253bc038fd655093fd12369f04f91b358d12159dc772001b45ec48cfef4e8b9"
+    },
+    {
+      "node": "event-18",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "7b88a00cb53f161be3f17d7b753ad8470c7129db782aaf89d2d81c351b50ff6a"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "eb530a26c835ec2b3baee4ef7023227f351abeef4817354909e75f7e77906f8c"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "pointer": "/arguments/quiescence/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "1e005f78a6f3de746ba23bbf794e4f8972528933241cbebc6b1d32e62835d4f1"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "b076e1229086bf2d2003052ad48ac60869f48f2eb3243df6b975c8f3f2806ad5"
+    },
+    {
+      "node": "event-21",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "45d9fa5d45bccd3d8177442e69a4837cf8814599e86c3da8547b94b1b3463030"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "3ce44342177088b5199a861a646e028c5c802b46d106b2b71003737e42db78e8"
+    },
+    {
+      "node": "event-23",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "9add98a7fbda1969396adca591c0a016c8ce1bd0bf41b09cb4326babb29ba479"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "c4c72e2c189934d67752b7d5c627f31a1c27a64aca1eea731b7525a43259f7b9"
+    },
+    {
+      "node": "event-25",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "ce033c1ce73ba2762a05cbdbd99fd26fa10beb00f161cd19dc4f4d3e9f7c1cf5"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "365073cba0c2372ee6dd68873ffb4fb9a81e8fad6623b03ef0f4a6eb2f0fc0a1"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/signedM2/signerKeySPKISHA256",
+      "value": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "279a97270588e4e121a1371ab0fccd2e19c0888ae5882b306541221017488e02"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/mtls/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "cfced50c55257c37ba5ba24428e39371d6348cdf48eb04a2fff2baead7f85368"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/protectedStateEquality/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "abc161dee92357f19829cfae49f999540ae9c9c3049d83d54672e9e522ca80e4"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/execReceipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "3e47a8a91217bcfbb4bdcf91acd4e44d088ff55f258dbc75d95046301b5c23fb"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/coreCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "5ed100c5b8cfb9a46733daf2524fd7aafaf6a1f41832f4d4bb555d33094982b5"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/backendCI/attestation/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "ba5629981bd829dc1a2624f7a20d0a428ca583ae7deb2b3082cb23b2ca0f2a73"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/independentReview/receipt/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "69346f44a64fbe68fbd3e2ace2994cc7ceabbe2f3b7ee62404ade541a7b72e86"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/buildProvenance/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "CODE:node-agent",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "4d2ddcd8a2947a64d7baa7077e0e3a69b74a74866da2fbc37c54500087fb2f67"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/image/distributionProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "943ffbb7a5771557ccac50a7db9a742e92882b7f28cc168ebd0dd8079f938e83"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/signedM2/signerKeySPKISHA256",
+      "value": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "e2a3007fda243094995685c211802aaa7e5ebfd39df7ef1a8982d9edbc3e9301"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/mtls/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "de406b1f7b02caaee657c9def637e502e424b9d79e2a4400f13a1e65598fc266"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/protectedStateEquality/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "d393d14a476090366d9a5a5283458aff07435357203d3c8110def1d569add44b"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/execReceipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "693b5098f4aa9999ba2c458d7a11c6805e533ef7386fff3cfc74ce24b0763693"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/runtimeInspectionBeforeM2/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "c2617957e48e04ded881d965b3fa95da4730b53a0b0535d1fd0d5e0db533beac"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/runtimeInspectionAfterM2/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "671038feccf48ae0710de7063f240453ab2eda63e759fd4be5e7ce90680914bb"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/signedM2/signerKeySPKISHA256",
+      "value": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "9d289c887cd551a7cb4ac732aa8fc1344deed04124d35487e13dc37b562e3f48"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/mtls/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "398091e636f7322cbf44a43a68ce1e783c0c868fc4aebbe226b9fd5db96b197e"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/protectedStateEquality/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "1fcd648c6c8bfa3e6aba2b0d9435f18474a4654107d28c8091d22ad740c54b5d"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/execReceipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "3c656ab8672ddfeffaec22770de764fbcafa1350aa2bc28cf19be3a4a9207321"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/runtimeInspectionBeforeM2/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "5f35b839790f8496d909446dbb88e15349822013b3be71ba56a04f959d8c93c1"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/runtimeInspectionAfterM2/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "6ab45cd39ed394713824184746488e6fa58e33a93ca570d5a1f118dbfa38a6db"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/previousInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "6e77b7c3f45c27b42a45179f21152ce50e42b1ba851a51776c25010b4e764afa"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/body/bootstrapM2/signerKeySPKISHA256",
+      "value": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "429ec0a2c839a7ce6d4d8abe4262abab5a1765e050a9352ea3ccc70405d4e2fc"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/body/bootstrapMTLS/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "a6e142855db52feef83c9d8482d66a6d60f34ac2d476b155e4796219351a3793"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/body/bootstrapM2/signerKeySPKISHA256",
+      "value": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "9eeff084397ea7a7bf4eb42f6cb21db1b50be260ad31d5bcf4f08da2b8e50973"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/body/bootstrapMTLS/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "06c0762c3b04a32755d5b998479bb83ee8f08c39a6830fa061fcb496ebf2eba7"
+    },
+    {
+      "node": "fence-released",
+      "pointer": "/body/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "81e8d65a174c023df15e20bdbc64a60535a45d3e5a206efedb7f19d87e92d38f"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "10b994fbbfc176fab8588669c30b34bda9f9afdcd43849046b8da3a8603f57a8"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "pointer": "/arguments/expectedPriorInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "669d7f58e2231af73dc83a6e86db0bec27b29b9334ff177c57f0214088fb3852"
+    },
+    {
+      "node": "lease-restore",
+      "pointer": "/body/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "40eae2c54f96f9fafab7f6bdbe229d09f9e7fd0b15d6c457ba5a56e17d61a61a"
+    },
+    {
+      "node": "event-28",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "08dab739095e983dff3e8d6cb2dc7e468e17d66a5e2fe8fce1f9fb1c11bde37a"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "616f7e31cd8bc592e4ffb2f1f946bf6844abc718330cfe7c8a4c8fe947ac0988"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "pointer": "/arguments/rootSealDecision/signerKeySPKISHA256",
+      "value": "ffd1d669a33a135f0b8587b6944ec15083c92e282f09d79f20f2dc27b6bca29d",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "205c9cd44a08d2f23f9860538c068a7e8d9a9ac7cd4490dd703b96f0db0c249c"
+    },
+    {
+      "node": "event-30",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "13738d997d303b30a280ac3bed559f5083eb6a39d973c05fc988fa60235a80ba"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "294dea948669fba4073d3301f357a4c0e4b668e1d98a081ce0ddf8e5fb484e7d"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "pointer": "/arguments/rootSealDecision/signerKeySPKISHA256",
+      "value": "6ba69d2ce842abe4b8d1a197d1ed497e07a2ef3c7a9ebf4c72dfddaa5df9d8b3",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "ab0f9ee6de9752e7e29611b2d675d3aa62e530a9e013dfb48aecc8446aea5364"
+    },
+    {
+      "node": "event-32",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "PC4",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "bf29e300eb8654df80b158ff29bf56112fdd6676835089f7219f4f4bdbb44c81"
+    },
+    {
+      "node": "request-20-readState",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "8b67af1a5311693ea75cbf09cb168e9716eb1f11ffdae2dfe72fb9ed203b5250"
+    },
+    {
+      "node": "request-21-release",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "cc687c2e849117c622464e15bc0a1b883585ddb3c746d793828892c31c85a0d7"
+    },
+    {
+      "node": "request-21-release",
+      "pointer": "/arguments/allDescendantsQuiescent/signerKeySPKISHA256",
+      "value": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "cdcfe5a9e78a60348ff6568754f56d2ef4430eacf8d1f11ba50aec53fae9381b"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "COHORT",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "1885a94f7514248ae20ee1f4667d07db4745a4d6ca7a220934e65cf3d9aeb3f0"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/arguments/rootRestoreDecision/signerKeySPKISHA256",
+      "value": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "f23a2128de4606b45bcb314da1441435ab0a0ce92400c6e49e8e587392d927ec"
+    },
+    {
+      "node": "event-36",
+      "pointer": "/body/effect/receipt/signerKeySPKISHA256",
+      "value": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "scope": "PC2",
+      "expected": "REJECT_STRUCTURED_REFERENCE_ROLE_SCOPE_KEY_AFTER_REHASH",
+      "candidateNodeDigest": "5a22552c0b8b58c0b8a018ef1d581a56e0252453a23d104c0e88d95fec4e8bf9"
+    }
+  ]
+}

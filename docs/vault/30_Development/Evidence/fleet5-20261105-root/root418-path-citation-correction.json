@@ -1,0 +1,18 @@
+{
+  "schema": "fleet5-root418-path-citation-correction:1",
+  "atKST": "2026-11-06T05:25:06+09:00",
+  "path": "docs/vault/30_Development/History/2026-11-06_04-13-00_KST_FLEET5_test_followup_e50c_검토_Claude.md",
+  "originalReview": "b9db061a1add77e862193589336fe2b19f5a270e",
+  "originalSHA256": "f336af1cb47f360960aa38395ad945aeb06ca678ab24215fa7548916e51ef405",
+  "aggregateSHA256": "ada97b362a5d312ed26d676c957ee7f807d255e117e00e2a7bf66fdc06b084c5",
+  "initialGateExit": 1,
+  "missingCitations": [
+    "tests/test_backend_leaf_runtime_contract.py",
+    "tests/test_build_fleet5_setup_packet.py",
+    "tests/test_fleet5_plain_reentry.py",
+    "tests/test_fleet5_settled_launcher.py"
+  ],
+  "sourceVerified": "e50c148287779add421265868ef16909ed984650",
+  "replacements": 4,
+  "correction": "aggregate wrapper1.0.1 immutable source links, no code/semantic/baseline change"
+}

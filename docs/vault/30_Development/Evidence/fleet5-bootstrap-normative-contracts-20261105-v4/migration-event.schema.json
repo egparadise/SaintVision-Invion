@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v4/migration-event.schema.json",
+  "$comment": "NONEXECUTING v4 overlay; all cohort methods have null top/effect targets. Member equality and every v3/v2 condition remain inherited.",
+  "allOf": [
+    { "$ref": "../v3/migration-event.schema.json" },
+    {
+      "if": { "properties": { "body": { "properties": { "method": { "enum": ["inspectAndValidate", "reserve", "publishInventory", "readState", "release"] } } } } },
+      "then": { "properties": { "body": { "properties": { "targetSlot": { "const": null }, "effect": { "properties": { "targetSlot": { "const": null } } } } } } }
+    }
+  ]
+}

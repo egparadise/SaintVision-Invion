@@ -1,0 +1,527 @@
+{
+ "target": "8874b2dfe0dda9a019bd5f334636668290702e13",
+ "parent": "eed826e7fb066193d3a2d9d28abda15216264f77",
+ "gitAudit": {
+  "exit": 0,
+  "pairs": 29,
+  "allA": true,
+  "rawSha256": "273774b7dfcf4a2094ebb0942dad2d5933525dcc32b2cb2033872d039f6a3a4f",
+  "ownerRawSha256": "273774b7dfcf4a2094ebb0942dad2d5933525dcc32b2cb2033872d039f6a3a4f",
+  "pathsEqualOwner": true,
+  "ownerChangedPaths": 29,
+  "ownerArgvHasNoSecondRev": true
+ },
+ "artifactHashes": {
+  "count": 27,
+  "mismatch": [],
+  "historyMatches": true
+ },
+ "objects": {
+  "total": 195,
+  "kinds": {
+   "successor-plan": 1,
+   "operation-lease": 3,
+   "api-request": 22,
+   "migration-event": 36,
+   "migration-journal": 72,
+   "cohort-projection-set": 36,
+   "api-response": 22,
+   "runtime-inventory": 1,
+   "terminal-seal": 2
+  },
+  "digestKinds": {
+   "SIGNED_ENVELOPE": 115,
+   "TRANSPORT_DATA": 44,
+   "DERIVED_DIGEST": 36
+  },
+  "digestMismatch": [],
+  "labelVsPinnedMismatch": [],
+  "derivedForbiddenKeys": [],
+  "derivedDigestEqualsPlainSha": [],
+  "derivedBodyTrailingLF": [],
+  "distinctDerivedDigests": 36
+ },
+ "graph": {
+  "rules": 3469,
+  "cycles": [],
+  "ruleListFirstForwardRef": [
+   "response-request-01-inspectAndValidate",
+   "cohort-01"
+  ],
+  "dependencyEdges": 803,
+  "relations": {
+   "semantic-source": 2922,
+   "UNTRUSTED_SCOPED_SIGNER_MAPPING_NOT_CRYPTO": 115,
+   "DERIVED_CONTEXT_COMPARISON_NOT_AUTHORITY": 432
+  },
+  "ops": {
+   "input": 1088,
+   "planSubject": 1,
+   "const": 1754,
+   "digest": 797,
+   "field": 689,
+   "array": 188,
+   "object": 362,
+   "canonicalSHA256": 7,
+   "add": 2
+  },
+  "failingRules": [],
+  "failingCount": 0,
+  "regenerationDigestDiffs": [],
+  "proofObjects": 112,
+  "ownerStructuredRefs": 112,
+  "nonProofLeaves": 6671,
+  "uncovered": 0,
+  "multiplyCovered": 0
+ },
+ "derivedSemantics": {
+  "records": 36,
+  "withErrors": [],
+  "epochs": {
+   "1": 34,
+   "2": 2
+  },
+  "leases": {
+   "lease-migration": 33,
+   "fence-released": 1,
+   "lease-restore": 2
+  }
+ },
+ "signers": {
+  "signedEnvelopes": 115,
+  "distinctSignatureHex": 115,
+  "assignmentOrScopeMismatch": [
+   [
+    "event-03",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-04",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-05",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-06",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-07",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-08",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-09",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-10",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-11",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-12",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-13",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-14",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-15",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-16",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-17",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-18",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-19",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-20",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-21",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-22",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-23",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-24",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-25",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-26",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-29",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-30",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-31",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-32",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-35",
+    "host-helper",
+    "COHORT"
+   ],
+   [
+    "event-36",
+    "host-helper",
+    "COHORT"
+   ]
+  ],
+  "rootFenceSigned": [
+   "fence-released",
+   "lease-migration",
+   "lease-restore"
+  ],
+  "derivedInAssignments": [],
+  "policyFileEqualsInput": true,
+  "keysAreReal": false,
+  "distinctNodeScopedKeys": {
+   "host-helper": 2,
+   "node-leaf": 2,
+   "root-execution": 1,
+   "root-seal": 2
+  },
+  "proofRefKeyNotInPolicy": 0
+ },
+ "negatives": {
+  "derivedContext": {
+   "cases": 432,
+   "candidateDigestMatch": 432,
+   "rejected": 432,
+   "onlyTargetRuleFails": 432,
+   "errors": [],
+   "byKind": {
+    "context": [
+     432,
+     432,
+     432
+    ]
+   }
+  },
+  "dummySigner": {
+   "cases": 342,
+   "candidateDigestMatch": 342,
+   "rejected": 230,
+   "onlyTargetRuleFails": 230,
+   "errors": [],
+   "byKind": {
+    "outer": [
+     230,
+     230,
+     230
+    ],
+    "proof": [
+     112,
+     112,
+     0
+    ]
+   }
+  },
+  "contextCaseNodes": {
+   "cohort": 432
+  },
+  "signerCasePointers": {
+   "/signer/keySPKISHA256": 115,
+   "/signer/role": 115,
+   "/body/acceptedP0/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/acceptedP0/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/acceptedP0/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/acceptedP0/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/image/distributionProof/signerKeySPKISHA256": 2,
+   "/body/migrationHelper/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/migrationHelper/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/migrationHelper/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/migrationHelper/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/commonFence/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/commonFence/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/commonFence/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/commonFence/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/runtimeInventoryAPI/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/runtimeInventoryAPI/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/runtimeInventoryAPI/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/runtimeInventoryAPI/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/schema3Helper/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/schema3Helper/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/schema3Helper/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/schema3Helper/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/newRenewalGuard/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/newRenewalGuard/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/newRenewalGuard/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/newRenewalGuard/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/nativeTwoCycleProof/signerKeySPKISHA256": 1,
+   "/body/oldNewNoWriteCompatibility/signerKeySPKISHA256": 1,
+   "/body/m2CapabilityProof/signerKeySPKISHA256": 1,
+   "/body/rootG2Decision/signerKeySPKISHA256": 1,
+   "/body/independentPlanReview/signerKeySPKISHA256": 1,
+   "/body/rootPublicationIntent/signerKeySPKISHA256": 1,
+   "/body/scheduleDisabledReadback/signerKeySPKISHA256": 1,
+   "/body/allLaunchSurfaces/signerKeySPKISHA256": 1,
+   "/body/noOverlap/signerKeySPKISHA256": 1,
+   "/body/expectedInventoryHead/readbackProof/signerKeySPKISHA256": 4,
+   "/expectedInventoryHead/readbackProof/signerKeySPKISHA256": 22,
+   "/arguments/rootExecutionDecision/signerKeySPKISHA256": 1,
+   "/body/effect/receipt/signerKeySPKISHA256": 14,
+   "/arguments/quiescence/signerKeySPKISHA256": 2,
+   "/arguments/signedM2/signerKeySPKISHA256": 2,
+   "/arguments/mtls/signerKeySPKISHA256": 2,
+   "/arguments/protectedStateEquality/signerKeySPKISHA256": 2,
+   "/arguments/execReceipt/signerKeySPKISHA256": 2,
+   "/body/target/coreCI/attestation/signerKeySPKISHA256": 1,
+   "/body/target/backendCI/attestation/signerKeySPKISHA256": 1,
+   "/body/target/independentReview/receipt/signerKeySPKISHA256": 1,
+   "/body/target/buildProvenance/signerKeySPKISHA256": 1,
+   "/body/members/0/signedM2/signerKeySPKISHA256": 1,
+   "/body/members/0/mtls/signerKeySPKISHA256": 1,
+   "/body/members/0/protectedStateEquality/signerKeySPKISHA256": 1,
+   "/body/members/0/execReceipt/signerKeySPKISHA256": 1,
+   "/body/members/0/runtimeInspectionBeforeM2/signerKeySPKISHA256": 1,
+   "/body/members/0/runtimeInspectionAfterM2/signerKeySPKISHA256": 1,
+   "/body/members/1/signedM2/signerKeySPKISHA256": 1,
+   "/body/members/1/mtls/signerKeySPKISHA256": 1,
+   "/body/members/1/protectedStateEquality/signerKeySPKISHA256": 1,
+   "/body/members/1/execReceipt/signerKeySPKISHA256": 1,
+   "/body/members/1/runtimeInspectionBeforeM2/signerKeySPKISHA256": 1,
+   "/body/members/1/runtimeInspectionAfterM2/signerKeySPKISHA256": 1,
+   "/body/previousInventoryHead/readbackProof/signerKeySPKISHA256": 1,
+   "/body/bootstrapM2/signerKeySPKISHA256": 2,
+   "/body/bootstrapMTLS/signerKeySPKISHA256": 2,
+   "/arguments/expectedPriorInventoryHead/readbackProof/signerKeySPKISHA256": 1,
+   "/arguments/rootSealDecision/signerKeySPKISHA256": 2,
+   "/arguments/allDescendantsQuiescent/signerKeySPKISHA256": 1,
+   "/arguments/rootRestoreDecision/signerKeySPKISHA256": 1
+  }
+ },
+ "schemas": {
+  "documents": 17,
+  "idSources": {
+   "reviewer-assigned-from-path": 7,
+   "declared": 10
+  },
+  "depMismatch": [],
+  "v4SignedAggregateInClosure": false,
+  "nodesSchemaInvalid": [],
+  "oldFieldCases": 44,
+  "oldFieldAccepted": [],
+  "v4SignedSetsAcceptedByV5Schema": "0/36",
+  "requestVariants": {
+   "memberWithCohortRef": 0,
+   "cohortWithNodeRef": 0,
+   "bothNull": [
+    "request-01-inspectAndValidate"
+   ]
+  },
+  "swapCases": 43,
+  "swapSchemaWronglyAccepted": [],
+  "swapGraphRejected": 22,
+  "labelCases": 390,
+  "labelRejectedByPinnedKind": 390
+ },
+ "vectors": {
+  "positive": [
+   {
+    "id": "cohort-01",
+    "bodyHex": true,
+    "bodySha": true,
+    "domainHex": true,
+    "messageHex": true,
+    "digest": true,
+    "noLF": true,
+    "schemaValid": true,
+    "equalsScenario": true
+   },
+   {
+    "id": "cohort-28",
+    "bodyHex": true,
+    "bodySha": true,
+    "domainHex": true,
+    "messageHex": true,
+    "digest": true,
+    "noLF": true,
+    "schemaValid": true,
+    "equalsScenario": true
+   },
+   {
+    "id": "cohort-34",
+    "bodyHex": true,
+    "bodySha": true,
+    "domainHex": true,
+    "messageHex": true,
+    "digest": true,
+    "noLF": true,
+    "schemaValid": true,
+    "equalsScenario": true
+   },
+   {
+    "id": "cohort-35",
+    "bodyHex": true,
+    "bodySha": true,
+    "domainHex": true,
+    "messageHex": true,
+    "digest": true,
+    "noLF": true,
+    "schemaValid": true,
+    "equalsScenario": true
+   }
+  ],
+  "negative": [
+   {
+    "label": "reordered-members",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "duplicate-members",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "omitted-member",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "signer-field",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "signature-field",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "key-field",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   },
+   {
+    "label": "grant-field",
+    "expected": "REJECT_SCHEMA_BEFORE_DERIVATION",
+    "schemaRejects": true,
+    "recomputedDigestMatches": true
+   }
+  ],
+  "vectorKeys": [
+   "body",
+   "canonicalBodyHex",
+   "canonicalBodySHA256",
+   "classification",
+   "derivedDigestSHA256",
+   "derivedDomainHex",
+   "domainPlusBodyHex",
+   "id",
+   "objectKeyPermutationSameBytes",
+   "transportNewlineIncluded"
+  ]
+ },
+ "I3": {
+  "typeExit": 0,
+  "type": "blob",
+  "blobExit": 0,
+  "bytes": 61973,
+  "sha256": "51c0370462d40b021d46f906dbe362dcf5ac2ebdc4c1117083c402619d744c3e",
+  "publishedFileByteIdentical": true,
+  "v4InputPointers": 102,
+  "unequal": [],
+  "unresolved": [],
+  "ownerPointersEqualSet": true,
+  "finalV4SeedSha256": "d40a7486193e36781bbe5c3a1102e198f61159b8b38084ef440fc96e5e690a18",
+  "ownerFinalV4SeedSha256": "d40a7486193e36781bbe5c3a1102e198f61159b8b38084ef440fc96e5e690a18"
+ },
+ "hold": {
+  "topKeys": [
+   "acceptedSourceFrozen",
+   "candidateABIIsAccepted",
+   "contractAcceptance",
+   "executionAuthorized",
+   "implementationAssignment",
+   "members",
+   "rootBindings",
+   "schemaVersion",
+   "status",
+   "syntheticExamplesAreProvenance",
+   "targetBindings"
+  ]
+ }
+}

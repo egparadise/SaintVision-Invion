@@ -1,0 +1,24 @@
+{
+  "documentOnly": true,
+  "temporaryPrograms": {
+    "_author_v5_docs.py": "d05f4d77a04e40da2749250bf96bb56c7a0c97db098bf0cceeb7d962061c5067",
+    "_check_v5_docs.py": "96a2671f271675be887c53bdd29235ddb7bf217aff97068a47e826a7d5e96ee7"
+  },
+  "failuresPreserved": [
+    {
+      "step": "first v5 checker JSON read function shadowed by readback label",
+      "exitCode": 1,
+      "correction": "rename label; remove self-comparison; rerun exact checks exit0"
+    }
+  ],
+  "actualSignatureKeyGenerationOrVerification": 0,
+  "GoOSLockEngineAtomicityEquipment": 0,
+  "recoveryScope": "Targeted self-authored synthetic staged Git blob, no broad object/private material scan; actual retrieved bytes SHA matches recorded pre-prune hash",
+  "retrievedOriginalGitBlob": "b8c66b46bf4c431c0d59b79941d2da868f2c523d",
+  "originalFileClassification": "HISTORICAL_ORIGINAL_V4_BYTES_NOT_V5_SCENARIO",
+  "temporaryProgramsRemovedBeforeCommit": true,
+  "additionalTypeCheck": {
+    "command": "main .venv Python -B stdin; verify195 pinned digest kinds,433 type/reference confusion vectors and rejected old signed v4 shape",
+    "exitCode": 0
+  }
+}

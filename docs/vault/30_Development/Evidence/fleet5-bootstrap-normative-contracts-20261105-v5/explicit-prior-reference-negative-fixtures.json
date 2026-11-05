@@ -1,0 +1,269 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "node": "request-01-inspectAndValidate",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-01-inspectAndValidate",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-02-reserve",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-02-reserve",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-03-setOldRestartNo-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-04-setOldRestartNo-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-05-stopOld-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-06-captureFenced-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-07-preserveOld-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-08-createNew-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-09-startNew-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-10-verifyBootstrap-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-11-stopOld-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-12-captureFenced-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-13-preserveOld-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-14-createNew-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-15-startNew-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-16-verifyBootstrap-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-17-publishInventory",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-18-seal-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-19-seal-PC4",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-20-readState",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-20-readState",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-21-release",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "field": "expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-21-release",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    },
+    {
+      "node": "response-request-22-restoreNewRestartPolicy-PC2",
+      "field": "projectionEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_SCHEMA_NO_FALLBACK"
+    }
+  ]
+}

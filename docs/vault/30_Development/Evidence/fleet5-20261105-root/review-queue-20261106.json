@@ -1,24 +1,25 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T04:06:14+09:00",
-  "completed": {
-    "task": "task_65f5ad416040",
-    "review": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
-    "actualSourceLowClosure": true,
-    "newABIRegistrationAccepted": false
-  },
-  "active": {
-    "task": "task_6baccbb465af",
-    "dispatch": "ctx_0e847a7f4af8",
-    "source": "e50c148287779add421265868ef16909ed984650",
-    "scope": "four tests only"
-  },
-  "pending": {
+  "atKST": "2026-11-06T05:27:23+09:00",
+  "completedB": {
     "task": "task_d4c4c809ed4e",
-    "dependency": "task_6baccbb465af",
-    "source": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
-    "scope": "B1-B5/L1-L4 and proposed NEW role-use token wire"
+    "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
+    "verdict": "REVISION REQUIRED R1-R7 Medium and L-a..h; no partial freeze"
   },
-  "reason": "measured host memory98percent; prior PS startup0x800705AF; released worker reused through guarded lifecycle",
-  "genericApprovalMissing": false
+  "completedV5": {
+    "task": "task_48bd227e309c",
+    "review": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+    "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
+    "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
+  },
+  "active": null,
+  "pending": null,
+  "authorParallelWork": "Codex K1 real offline verifier on new e50 branch; Codex B rev3; Integrator final qualified e50 report/ownDocs",
+  "reason": "one active Claude review under measured host memory pressure; completed settled reviewer reopened with actual ready receipt",
+  "genericApprovalMissing": false,
+  "completedRL1": {
+    "task": "task_9cd71aa339ff",
+    "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+    "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
+  }
 }

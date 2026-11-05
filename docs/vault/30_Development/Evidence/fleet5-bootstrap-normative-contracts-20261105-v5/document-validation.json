@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "fleet5-v5-document-validation:1",
+  "observedAtKST": "2026-11-06T04:33:23.489988+09:00",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "objects": 195,
+  "bindingRules": 3469,
+  "nonProofLeaves": 6671,
+  "unclassified": 0,
+  "digestClassifications": {
+    "SIGNED_ENVELOPE": 115,
+    "TRANSPORT_DATA": 44,
+    "DERIVED_DIGEST": 36
+  },
+  "actualSignatureVerification": 0,
+  "structuredUntrustedReferenceCount": 112,
+  "derivedContextRehashNegatives": 432,
+  "dummySignerMetadataRehashNegatives": 342,
+  "explicitPriorOldFieldRejects": 44,
+  "byteVectors": 4,
+  "orderingAndSignatureFieldRejects": 7,
+  "originalPrepruneBytesRecovered": true,
+  "originalV4PointerEquivalence": 102,
+  "actualGoOSLockEngineAtomicityEquipment": 0,
+  "all40FutureProductCases": "NOT RUN",
+  "actualBindings": "NULL/HOLD",
+  "registrationImplementationAuthorization": false,
+  "exitCode": 0,
+  "pinnedDigestKindChecks": 195,
+  "digestKindAndExplicitReferenceConfusionCases": 433,
+  "historicalSignedV4ShapeRejected": true
+}

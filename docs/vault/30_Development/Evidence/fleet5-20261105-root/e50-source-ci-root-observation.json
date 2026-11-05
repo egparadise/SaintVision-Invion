@@ -1,0 +1,172 @@
+{
+  "schema": "fleet5-e50-root-source-ci-observation:1",
+  "observedAtKST": "2026-11-06T05:25:21+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "frozenRef": "agent/codex/fleet5-test-followup-20261106",
+  "tree": "793c5db25147dd75f7bf496c2015aa969fc3dbae",
+  "rootVerifiedAllRunAndJobHeadsAndRemoteRef": true,
+  "runs": [
+    {
+      "workflow": "Backend",
+      "id": 42093699470,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478106742,
+          "name": "backend (3.14)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127478107338,
+          "name": "mlflow-live",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127478107423,
+          "name": "backend (3.12)",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Core",
+      "id": 42093714198,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478148501,
+          "name": "core",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127478149168,
+          "name": "s01-storage-roundtrip",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend",
+      "id": 42093726119,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478192075,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127478192917,
+          "name": "frontend",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Desktop",
+      "id": 42093738328,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478229436,
+          "name": "desktop-browser",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Docs",
+      "id": 42084668698,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127446456588,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Portal",
+      "id": 42084627956,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127446304063,
+          "name": "portal-login-harness",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Security",
+      "id": 42093764277,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478326251,
+          "name": "security-critical-high",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "A11y",
+      "id": 42093775632,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127478358879,
+          "name": "accessibility-e2e",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "allEightTerminalSuccess": true,
+  "packetOwnerReported": {
+    "archiveBytes": 47428827,
+    "archiveSHA256": "acdbd6669956cf49d2e38163c5af99d51e886a5bb9209df78fa7549758ad3f07",
+    "sourceEntries": 4864,
+    "inventorySHA256": "d92d86c4ed68eb3f5d684f3aee0fdb04a1e82fe7141f0bf584402591a98e7d5d",
+    "packetBytes": 48826426,
+    "packetSHA256": "63ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b",
+    "manifestSHA256": "ae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146",
+    "rootRehashedActualArtifacts": true,
+    "exactPublishedPacketReportNotYetReceived": false,
+    "actualReport": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+    "actualRootPacketVerdict": "e50-packet-independent-root-review.json"
+  },
+  "wholeProgramComplete": false,
+  "artifactAudit": "e50-root-core-artifact-audit.json",
+  "newSourceCIBoundedAccepted": true,
+  "finalQualifiedReportOwnDocsPending": true
+}

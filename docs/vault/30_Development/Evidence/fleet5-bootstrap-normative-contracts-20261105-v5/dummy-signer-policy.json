@@ -1,0 +1,634 @@
+{
+  "classification": "UNTRUSTED_SYNTHETIC_TEST_MAPPING",
+  "actualTrust": false,
+  "keysAreReal": false,
+  "signaturesCryptographicallyVerified": false,
+  "roleKeys": {
+    "root-plan@COHORT": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+    "root-fence@COHORT": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+    "host-helper@COHORT": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+    "host-helper@PC2": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+    "host-helper@PC4": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+    "cp-inventory@COHORT": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+    "root-seal@PC2": "6ba69d2ce842abe4b8d1a197d1ed497e07a2ef3c7a9ebf4c72dfddaa5df9d8b3",
+    "root-seal@PC4": "ffd1d669a33a135f0b8587b6944ec15083c92e282f09d79f20f2dc27b6bca29d",
+    "ci-attestor@CODE:node-agent": "dd500e96d9513da4f224a197ba9d8cf4d06d1b81ab357b7908d3963e86b97520",
+    "independent-reviewer@CODE:node-agent": "c7a0f293e647f7e3570768d2a7e5a7959d9974a0a80ecce306204c9d91323599",
+    "build-attestor@CODE:node-agent": "e889a90de76e185dbd0ad30bca70b3b5e0bab55418a802a02757eceeb0428506",
+    "build-attestor@COHORT": "3419e45e40fb5ae928e85db86625f205f79983a54c0f459b2c0e745d7871ca98",
+    "ci-attestor@CODE:plain-migration-helper": "b8131bb185bc0d9c6e56160a326f79cd6205b4a4768b9647af1dd5ff4c8c0a1b",
+    "independent-reviewer@CODE:plain-migration-helper": "baad3c7cd0c865600b818a139a1387b67905d71a48abd3234670de74493d0d61",
+    "build-attestor@CODE:plain-migration-helper": "e65460bf8c6d043ef2f6d5fcf7df0560e18e8cb60dcf01cbb29f438065750201",
+    "ci-attestor@CODE:agent-mutation-fence": "45a83f888f5b69500ebd7387359655218b76cbac5e8d8b9329ce049ff209fc89",
+    "independent-reviewer@CODE:agent-mutation-fence": "5137d63b239eb8f520893c509049190359d302efc45a5b2031a55f554965e056",
+    "build-attestor@CODE:agent-mutation-fence": "a9f7f4872169db7b6f41c678882cf072459e1939d2fd4318733dea962ec0fd58",
+    "ci-attestor@CODE:runtime-inventory-api": "3a8008e409decc62ddc6341a13c31890a1a88547e4ef2631daff6e1c2463a344",
+    "independent-reviewer@CODE:runtime-inventory-api": "71263a17c12cef986969555dba3c4e95d7d8d58543c1787a2995d9651e06baba",
+    "build-attestor@CODE:runtime-inventory-api": "ce9967a5237b196eddb3f106822f6413713abe1bfe7e2cb4aa36f3647cd8f386",
+    "ci-attestor@CODE:schema3-helper": "ea00b65c190ee70ee1712af7e518bb6fab1dfda5d49759840c9a511cfe7cf0c7",
+    "independent-reviewer@CODE:schema3-helper": "b6ac18cfa106251a25b2b9dcc7d2568cdece5e6c3cdeb86575bf4e563669d269",
+    "build-attestor@CODE:schema3-helper": "0281d151d53f511ff159dbd2003a89093bce94d0e017479a6db2aa87e05e925d",
+    "ci-attestor@CODE:renewal-guard": "5da4ac84f290a7e3f2b0ed9582c2a93f5920ecb66fec9e1b4850e448cce81399",
+    "independent-reviewer@CODE:renewal-guard": "f6a3d14ef61f37516a6429de1774f340dc2d6c481c03fed609e4439d7c2823ba",
+    "build-attestor@CODE:renewal-guard": "4ee45960de18a91d361aaf0d93b5a5a7d8504c7f7cef9bc24e0d50cd89867cea",
+    "ci-attestor@COHORT": "b5fe1c2b65ffcd9ff6e19f4b5d09c2cc04ebcc9cf02ceaeedbe60e13211b9b67",
+    "root-policy@COHORT": "4d10fd3b371199e63f6a8bba43cd3cd00e1d2196194736895959c1d45ff6c204",
+    "independent-reviewer@COHORT": "6a4297755f71441a8123a60a914ab88339cdd3bade157b4c01b0b0022e104784",
+    "root-observer@COHORT": "a741dfc0682bc1cc3e1175f7dd25fb05979e88fd2c621ea69ae4f4b8dadd5386",
+    "root-execution@COHORT": "c38b4e397c3e5b0d8e00a93b0bb84b50b67c626d40e176eeb99541de1f58c49b",
+    "node-leaf@PC2": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+    "node-leaf@PC4": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+    "root-execution@PC2": "1126e8d5e524bfc44f0f97415f6a33fd41b3d76a355ca653599214e978c94e0e"
+  },
+  "artifactAssignments": {
+    "plan": {
+      "role": "root-plan",
+      "keySPKISHA256": "1ee6a14079ac3091aa4e98aeb613dd1b5051accb79f03a10b5474f04233d853f",
+      "signatureHex": "8d13e6627f936861c9e5ff72ebcfa62846725f58eccf0bd26bc1e545da767a818c9b333e33e423db2736a1643903c1f23db966f44830938970f7ea40c6ee2819"
+    },
+    "lease-migration": {
+      "role": "root-fence",
+      "keySPKISHA256": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+      "signatureHex": "8b1e8af742f58dadf9ecc6b604fa2e8915030f4b27d916c5323d13c0d556a68f34481ed70c714e7601c6930767e830a6072006a69fed9ee29d35263d556566fe"
+    },
+    "event-01": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "7be4aae7079d6641a15a7188f73885fd36e5bebe69a25661606ce98b6cb1f7d13934c391cd222380551570a7a04643649ab0dfaf1cb18351eed485bdf72f5558"
+    },
+    "projection-01-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "445d3566fc1cebea01ceba10e8dfb7790755acf500798ba9da4a0f0c59b84d7733819044677521879c0fb8da3968fe54647921991d65f06711eb34b268533faf"
+    },
+    "projection-01-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "7e5256163b5c05da62e5c2d36f5a6ec666fae4cb0d2ca36f673d459f220f4c5e53e58d0f50774b4fe6fb8f44fb1e5802743c7b54824dfc5b98a9e0948809f8f8"
+    },
+    "event-02": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "82f18c84dbadf614e06583db6adf9adc01e8a39b3b14fd26796e1a4ca018e0f4aae2b238ce19241caedf8228384c5e8cc461e7dcc7977b37fd4582284800fe36"
+    },
+    "projection-02-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "16fad3c0c259e992a6c3573a0c74b01a455f4bc07700acf8d691a54c01e44671e8c248b4973b2b0289ff39126ef26de22b57ead9f51d11a8012cde5c0a69170a"
+    },
+    "projection-02-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "2e4437f25f0cb76983112b39bd4c539901f77e42747163fec245f2ac9a6aed8fe869d608efa302116233302e7f1f943ececb451a3a0e38cc6607c57c5c2cb480"
+    },
+    "event-03": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "8d12068b9a8129bb8cce58a77ffe71592ba1fbf080af83dec680c773a4f6b99fe38788f206ce99a818527764a9d8b0a995009ded8294d151aafdc177327da82b"
+    },
+    "projection-03-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "5cb407e65983a7727618e65d4093c8138ddc49feeec931f1d2f5aca4e9dff4dfd51a788a7c0b47f529c3f9563fffed705b8b242bf259183be1a94241f7b91f6f"
+    },
+    "projection-03-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "77410e4c670a380089b7fe094bff45b1857543f11ae3d0e51ad8ba560c3b1f6120ff5a159c90377b81a8d3223d9fb036f7967e9ce5511d3a96c24cd78c41b202"
+    },
+    "event-04": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "0cd6ee710802490de0bf0087c0470fc76b1a6e1150964faa97f113eddf127bc403ef573d4d8cbaea231e525e9d68b4bd8b70ca534e2266d7628db298046bed2c"
+    },
+    "projection-04-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "4753c7c2982e2b161fc619a2ecce08d9559c1a73442f515cf5f0a252ac51c18e5b239ae8a0921537ab53f1c2f839bcc7d2efc2d47403e1669d3687631f1d5478"
+    },
+    "projection-04-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "40bc204097ecb2a8b22bcc45414c4f0bfbadbff1c1d6d526a40dcc7addda485cd972bf620373f88fee7165f175ed1e6628c08d006bb4160ca63cd92ce0f2764f"
+    },
+    "event-05": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "a7eb441dfaed82b25a97be6a630fde1451441800ac80f72f9b8fbc6ba7645ed1cbe2f971eb05b99b511af64a338571d6e8f5326b92b6534a17b4cd450c7c45a8"
+    },
+    "projection-05-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "e382618dda7f2b8577750ab467a12899fe84f7402b2d6593aca351106fea4c2bb2836893f9fd02de0aed16234cac0eecca14ffcb3f43f756c5aaebda80be292c"
+    },
+    "projection-05-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "c1ce6710697c3dfff45aab54eba6a3931291d2684679f13b61625a9bc89845780bbef13aec790c2488d54cbd6a032c49178a33f75969ba37af48f929caa67fb9"
+    },
+    "event-06": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "82112be7d84c6a2cc82033cb6d7e4df12262986eac77c1e08ecbe683330d66bf6c7aba567ae7923578609656cf03072a18278d4f3ea4fa60fb12b4a8e22414b2"
+    },
+    "projection-06-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "b5646e9f97f3e92b8ab6ba432c162c246d4175f20a9ae9de7f7e0136aa74581a8c08e909f25761ef3cda26c4ce33c63f6a74ba724c6501c2ee056664a7d1feaa"
+    },
+    "projection-06-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "271175907c7c2779d99ab44bee5a3c85b997ce7b49552f01a6336f93de55ea4c02e1e08c49413aac2eb7ae41472e32d83c0b3879f98a78ce0ea61d7374e5eca7"
+    },
+    "event-07": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "2bdbf20b4fe0120a630a940592dab3d8103c1115139d2d93b1b6125cda0d1af409bd5b0b1eb0a6ecb21886d6fa1023cead6bbb4398ebc76b247f3222d67687d9"
+    },
+    "projection-07-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "b58b90594e21c1e4897ffc17a69d46f3df93494c97af672d5fd9e4b632ef9d01197b068ae3056f5e5148c79bdb7dfbf3815b47933718b4134bb194389637efe2"
+    },
+    "projection-07-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "59152ef9e403bc8357e3137bf7f740c744d40ade3ff7c78781c2a5edfd6363dc6d5acdade208cdd12e94c382efda3c23c3d1ae72b3cfadaad467e0cf4116f5ef"
+    },
+    "event-08": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "33b44ea24be78561405737257134378bd7e7d1ceb0a22166ac257b8ab791eabfa57ea4f1c421a6ca48ba45c182bfeeed166356bb8919239ff7ce58aae5d5c53a"
+    },
+    "projection-08-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "76d7891dbb4a40f11fea497a84b7f96bd87294b411db8de2598ba0236a55c62c45643f8e2ec71c3e080f5116d38f6fb812fbd0e639c8622a71a73b67705cebaf"
+    },
+    "projection-08-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "5e2a253bcf25ddacde9bd94f176c91156b627c0a4bc12c82a064aa63a7b941c3c1d0a427d9b542505e0bd1bb09d0e741e7372a310b9c444f9f1ca9017145d4a1"
+    },
+    "event-09": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "50843e30fda13814c87bafb40581f0abfaf30255f87652775f13647365d79823719c33ca458ccd1b745d37b16fcda27233b8c0a963696996942b2325e308b14b"
+    },
+    "projection-09-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "3db7b0c8b458bc83e1809147c52f82121c22fa2ce6b40c0fb8d9f7c76830a7992808513061ce76cfc82fb3495ef58d96068ef8a2b12820ebd472109005f562d7"
+    },
+    "projection-09-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "54d72a88251e23e6f1e8df70879d4cd0d18de7ccb0296184463b560eec921729346573cef31421d6618028edec311dcd715d75616d9fe1a1c9d602ab678ef3e8"
+    },
+    "event-10": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "d37cce224f86d6fc237562c1a99510340b8e51cbc4949c7708abb0a1202661158a51236855857103b695296c110fac577d63924fd02f8e18da697d9b5d33efa8"
+    },
+    "projection-10-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "fd7024723217ba8d087323e988941dd33fc25470d13c7ececd0f342496bbaa3e432978da04ee8fdab342c951286c517af25376a8e70ab5d95b36cb35f75b5ee7"
+    },
+    "projection-10-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "4b1dde7c92f43067de2783c6e0fab7ff59c5f7ecc2deeb6c432485093e53f34586c61d30b908d5afeb8b5ced88a462af89c87ac2805d112bf13069d17e39cf38"
+    },
+    "event-11": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "53bdd5817d2767478acf9b763aa62e22313fe36b4f13703166307815bfa2c533c5b6dcfaa2802e0d7d438cbd85edec643d60b6d397f36992605fe988916a32cd"
+    },
+    "projection-11-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "10ee6cbbce341d726a1f26ac0e2e1d7606bd4d48625a11790219d534fda9c5fda73a26b056a79a3b349d8bdd29bfd1cfb907d41c91cdd544ca9fdd9e89e94ee5"
+    },
+    "projection-11-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "7ac60079386b622e33080744e8c1a30cda1b0fee2f68cc783f436b3e184e1a8ec9f1d1a5a88460e2464d45d933414c6d1aaee737112cdebc16fb91a3fa9028a6"
+    },
+    "event-12": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "7248cdd9ed3dc68aba570cac6c05f5e393ed0b09af51e943ba08ff68efda0f9624fe40e1707d280c7286f7336a16ba039b0de4b734a5809c3dc519442e305fe1"
+    },
+    "projection-12-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "3dad529f3317f0d1e6a9b5aa7f5e37e54d26d8452fb77792b6fbe13fe3f046298aaa4e2927bed6d894db8c9ef19f81f0fe5997c18cba6e90ed907b0f89938469"
+    },
+    "projection-12-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "52caf5f2e282966a14de3e9981eb4d69ba05cb47650f2d3690c1154bd9de3dc655317ac2bd7b304a411055baae1e070fd346b964b4b53b338985d1dcc350d491"
+    },
+    "event-13": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "7130a3d4174389674dc7a5ed1638dde0988a02280fbd73fe106c673d80ae3e401ede9b7cf3f387f621e3271e350433c6deedd15e23e1c9e194fe0e17d0ffdbc0"
+    },
+    "projection-13-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "514a57d2d6a93027e170fb7e8f92e6ea96435b28d7662f03f61d54b282d56af93f1fafede96ad47aabf78e578b412f7a349866f03f150f94af17818a895fd41d"
+    },
+    "projection-13-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "1449abafbc5343de34d0963b3831ad96fd0cba27531434799a7be0b26da0297d45ddf5987d77eb87662ce406743e1caeef385510848d1b62a7c29bf629025e2a"
+    },
+    "event-14": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "98aeee0035c915885fab932b6e109245e07c80d7586437458e695a344862e4e7f59d399d153490bbf3a3020c28a9107b3e838526439bbaa7f70d024478450a09"
+    },
+    "projection-14-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "46169ec9981a7cd6248473ecda813b359aed385f2f36bbfa33168d055ad1ee3b8fe5f37d59d6685bc77458e7580aa3e0efa308233680a66dd0c142fac43916c8"
+    },
+    "projection-14-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "9958bc33531b9025d7c65e8a78c6191b1d71fd7b43638e3f32e4cf995e9dc4fc7d4341beba2df63b52dbe11372baa9f39bf8b5c447e21b5f110af2a2a2864dba"
+    },
+    "event-15": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "e5a77d0401c1940cfaf7d62910aad7ce8f226fbedfadf5899f72d80ee86ff2365519e937e3dd56629cc2b03fe621d46cb7707d945adc4a61779438db2806809d"
+    },
+    "projection-15-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "a69884b0650019b26dc86550e0062e05e7b38262f5a812e2936095b72b2dcea5e85f7d8f4e268c4fddc0a99a2ef67e5a0fc9bf3846ebbe1bef52ec8204f66440"
+    },
+    "projection-15-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "c9821f05643447121776626b35fa1b0bd06c8ad80364867c8c65ffd4cc16823fd845a5a319692509d53d0d0b904451541299a946e022b82306ff7562c80fb79c"
+    },
+    "event-16": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "b21e77ac1913ef0f7fdd31e63907e42e0dc31f008159d3c77a84ccdd4e9fb8f5456febb38adc2105a8f91a577739fb79d5ec6331102a3a79eefcaed8313d7650"
+    },
+    "projection-16-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "ee85577d537f61262601499d1708071dd3638b516045ab10b049a34d2d3a97c5c3a9739b506d12a17235a74508192bd6baddc5d989412a8a4b61694ccebba6a9"
+    },
+    "projection-16-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "504b3b52a3bf8f090fd17beb05fca0a50df2ddeb25346c6166fc79a3c562036ca2678d45a0d669f59b8e899813d09a8bb95bdd51450e0defb7f4bc0ee840da02"
+    },
+    "event-17": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "527d0291f84ca3127c2abea827824ecdfca7a83fb46f53986ef5f3b37e1ddd4c1f44ef18389329a67a1742f7c4532d6a4801836d4362717e465809ae7c3ed58f"
+    },
+    "projection-17-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "0f484de864cab26221f883ede1c6475acff7cad44555e47cf3a86abc7246d82bb6265e71660c34da9b988b6b55234da74b1962e3f41568f726c026695d376554"
+    },
+    "projection-17-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "baa14b008c9b3ea03a7b2ed984d0b28423cb9a8abed4863378762b0f2c291cc318fa84eb8be8ace2c5bec7c87027a94e66d7dd3f6ba74fbec38e447923dd995a"
+    },
+    "event-18": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "3675354d05e5e2ea9ccb6288ab73eb2dafec9ceecf3cd793b8bf3d2a40aa0a4ca5c43d291194e97cb7dc3b548bd793df828acd592fac1c5dd448421bb8b56fca"
+    },
+    "projection-18-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "c084e21fcadf8518b4609f9429f1b7ce7bdf3391bd9e21d16457fb20df50c2eb1b0e3daaa2de4d59301b8c3840b40808e59c6709b2477224bd2468cc89556ed9"
+    },
+    "projection-18-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "6850454e71e247b30ecfb865e0770364a6880c610bb17ffb2bc11e04261a4c0a4bb8141707b1c27aad4be50f186dc703475f91bc4244aab9c69cd8d50ed30677"
+    },
+    "event-19": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "9789e099e098b19a68584e2df13d3f299f1834e21ec3d9349410f5e5c000bd179b9e77aa8f66c6fb4c77eca4a04f4d2f6b8c9e5c10a8473b0a339b90ac755d61"
+    },
+    "projection-19-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "220a9fe67c0d3c17976197375d983ce642559e022ff313e10a5b5335c3a2bff79448992991db389ac159038f01d55419e456e45405d5c9bad45220f91444aaab"
+    },
+    "projection-19-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "4f0e2d9879d0821de55fa92877a6afbe927de0b7466ec7d6ba65efd02fd3fbe5a9f19363b05e6b7a6858c4f249dc5d97792ab9781ccd816f6066c353145bea02"
+    },
+    "event-20": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "d13516d0de33beb51bfb1050f801defb6b8b3afa01ba2f7a5f3a3b5b15701d85cb5f780e2cea19acea7766b90a61ffae20a95911a306b9658e515ea1e2a64e6c"
+    },
+    "projection-20-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "f7f1dac8b043a3c91ee0f008157fd44a97b92bba2f010bfb3dcfd3beee58af35642a435962c90ee90c823d6f9dc6755fd549ea4b0328dd49d9ec1d988d3b6c00"
+    },
+    "projection-20-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "716661df74bf54dc845fa240de869acdf1de1e7648c4ee17a5b992165065a7e3e26cb31fea3012696d2418e343e946a7d69692b6e4ecdc247d3c9ee44116f9e1"
+    },
+    "event-21": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "59f89a293a4834ffb83d6f34e1f0d9c98d79bd4a597060b1533399111e487c4df31a72683821fe06aa2f4211e1ff59e06d54b3e099daf45d4a36ad81c9ecbe56"
+    },
+    "projection-21-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "9d856c65fac77d84c54245780959040cb6536fe67458be2da7c0d9808e763f0eab72a5d44e0eb0000b05fc237973c582dabbdad7e9b9c8252512e8b7c631f65b"
+    },
+    "projection-21-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "50537aa95704975c125feb133cbba00f32e5c1a59164fbcba859285d4b3a3b65590ead3f677d07e8cfc6e7ba7cdc3f77bbcc76c845ad0acd2f558b044d175d71"
+    },
+    "event-22": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "00f8774f57a327226ab3b593bf223f3098123d9aefd330b5db9a9ea6401b67d5a484728f03624f84ca42632b55d387de7e724d9806a661079a9c9dac48888956"
+    },
+    "projection-22-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "511e100642b9e1f72911384d69b13a30511959cb5858fba2525a8221f32d9803fdfff4c8ed2ada6fa7f43c868750f3651fba497b7fcca8f1cf5d56e5f41a3839"
+    },
+    "projection-22-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "fe930a02fb54aff321eb1670f7996c7e7dee591e14434fd13ebe54b6cf66edbae5ee2274de72329a8b605325cea6e93a8e3f6719e13bf679545dc02dc147dff2"
+    },
+    "event-23": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "f4383f4769fce058c3eccc9cdbab1780966a3af1af5c58675f581973b8605e1175123735c924fecaa73fc3fb410915e5c608b1e732cebeb0ac98456cc68540a8"
+    },
+    "projection-23-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "51a8c5cbd3069d58a145bea6597eaea2ff99aa5da614f196eac14332bbd49ace7d520a4c984ca27bb95d3d6f435be114496e394d3bb77588a0a902aafc57b0c9"
+    },
+    "projection-23-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "93ba9f66c1d7a21672fd97d7be4edac9c9c26942cf2e502c16910bdb61bfcabb7839887afbd61c4f4fdbe9962025445f48b3208915902bfef3a169279950b2e0"
+    },
+    "event-24": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "f36008c6915d4e7b7caa486a0106405e0af3bf7637519afd70ea816ef10680c9d85d296153193f257885ef3c746c76431f7ee2e5eb4fd5cd4b0815bafe7c23f9"
+    },
+    "projection-24-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "a3adce558e3e84fb9bccc9ccb8d0c2fbbcd2e0fbee337f225684e2467498773ff6a33bb3057bf0987bca38f6bae625a8bc9cedb43ed7dea39aeb8f367947ad8b"
+    },
+    "projection-24-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "81deeedb23da16092d9e142324354d289b50cf2767123e38253cd333ba6bcbae7cc4c7c1ac89e5c7046f4c23eb7b2ac80a14c3650cc086e948750ef45230ebf2"
+    },
+    "event-25": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "be6ab75998bf80094d5f745617de3c90fa60dfff7e60861c1c47c12c8290a7811849d4dbdac037fa17690d72dbb4cb6f57a2ef9c802a7dc1bf6ebb0481f5548d"
+    },
+    "projection-25-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "201f7664371ec5c7714e04fbc11d33561794eb6ddadeb105e5f4597fcaf9919a023f8cf4fd0857ab1ab57e0901113ce2b14bc5b6d5c21a7eafffda0bc5291808"
+    },
+    "projection-25-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "281685a1fb57ddb7d18c8af560b78fd3f51d58531c34a3809f7e04ea03324e117b9962fafdf549f51c6c8bc0cbde5d2dd4d12c81545990478d10f2eafb82e9ef"
+    },
+    "event-26": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "50a6b472198f7bc9790958fefe25d3cf58c0f6918b6ac4e42bcff480e4ce0721f179a2ca7e2f4faa86304d0c3e58f595a44a0d4b633e7f7fcaf0d2f2ce93a2e9"
+    },
+    "projection-26-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "d2a6bc5f5fd19ca12af67c8ca57388e8d8287e1b771f8ae21aa2f89cf5ed26c01e81d55ae59ea1fa97412ef9e76b9fd9719ec2e7720fba48c379a800294c9796"
+    },
+    "projection-26-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "c6d9b1e4128117a926f36799b1c8067923b76187785151873e4a76f7c87aeb9d8021b23a04aa7e8424e34eb553798d0a028bbe76754d2080a71c2a1eace1ab95"
+    },
+    "inventory": {
+      "role": "cp-inventory",
+      "keySPKISHA256": "67fd0ad93806598d53bcee9631cd247930dcd81b828f24c187ed10b6e685a448",
+      "signatureHex": "a3c5181bcc555e30fb5ad49002073915d3101abd7007f842cd7dbd1046eb6a7d7df23d2babd697a9ac7858aaedbeda705e5509af5a001f15c9c038936c120648"
+    },
+    "event-27": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "6771df9cc5820c23f9c9760059803611638833752c2a2e0dc5f02fe31585f107904f09f293851676d41e29884d5eb1a53949ab65d5e4c0e7927f5ffe868b5799"
+    },
+    "projection-27-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "b9da56be80ecb956f2f3b0d0fccaee58ea8a1d997e4a5707ddbd5a62047131fd0bee9969d1a43eebf4f0d5aed6861b18802cde4b02a0d8240d9a9a5333122597"
+    },
+    "projection-27-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "de15f1d52dcd51df80ee22d3b4132d97122027c2577e263ffd59e5cd58342ebb04d496fd0e059a2f8b3cd819ad6a6063fb27845497961f229d329a52f6886511"
+    },
+    "event-28": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "8f401e7f1257bf595081898ffd8c5f07a0806f8c7081f486399e4baac4d69e07bccc145953c92ba9cbe7a22967554664dc0f7675c7fedaa8a0fbe4c8fdb8f5e8"
+    },
+    "projection-28-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "1c9eb46419853325b6faaec06acc3f1497f0898b038b62f92bc6701401a9d2884bfe4154022ce865587983b5cb1bec63abe8a330582e90db97ffe6143ceea2be"
+    },
+    "projection-28-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "5717f0a2e28af909cfe6ae9a802e5119d00a944295121c9039d1991b0725461e4afd3f5198d95df3f08ae4177ec146891c68921452e8e16cb8fc5dec590e1e17"
+    },
+    "seal-PC2": {
+      "role": "root-seal",
+      "keySPKISHA256": "6ba69d2ce842abe4b8d1a197d1ed497e07a2ef3c7a9ebf4c72dfddaa5df9d8b3",
+      "signatureHex": "882c781f08a855ae923e86890018ad385abdd1b3813cb63d35f53be1ccbbdd6aba27d7b0df870ac0a091ac1e7e0a0ccf7d4dce47062a00ad9465757f357010ce"
+    },
+    "event-29": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "709e59756de8d5b119619aba3a9d0b7e153c060f9b578e9ee3038d9b72216894ae7ce4ec4519dfb2d47a49d1916bd4a7f5e1dc23b1d9dbab5ff510847af479fd"
+    },
+    "projection-29-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "cb249a23bf0c56866e15c33a86300c4a505b533c70c40415c398cd3dcd1ec2721ff2a30cabc9707f67cb19e965b673c3eeade86f2f354ea97400244de14da377"
+    },
+    "projection-29-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "42d88a4a3ac88f893f28cc9f6f8a3582237397d850af69cd109c20941d82a8d416ef036075bfb10d710225d9dd6b5faea1c0d30afe70ca668b8d30fcfab54543"
+    },
+    "event-30": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "fb1d32c13ac4520496c93d79289b4f99c1ebea437bcd05939bc7bdb5f3e599095f39f623679b20ce2067cfa14f2f8fe141cd55b7418b2772c0043b9550246da0"
+    },
+    "projection-30-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "fbf88ed6beb76f98acbf95734f06e334a745934ec92d6910fd4ddf73c664cf1f06548adeb586b06551dc0e63bc1f646d3f9a7f6aa649363a8f2f32a9442e20c0"
+    },
+    "projection-30-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "1a9082bb00483c7a31ca807503ac5f2045df79861b98816e2cef333c91f2cd97f47a735a7162e084d2a30a5fbdcdd67b8d14e2f5390d1e7c8fa51c68ae7cf016"
+    },
+    "seal-PC4": {
+      "role": "root-seal",
+      "keySPKISHA256": "ffd1d669a33a135f0b8587b6944ec15083c92e282f09d79f20f2dc27b6bca29d",
+      "signatureHex": "cc24b5bd00d4e86b62e19c954d395e74a2959cb202ed66e18e6f70ad7ff06e109e2b9ec2250ff07a46face651b6a72df9b7d10e9c1608a5a0165873b78b4d219"
+    },
+    "event-31": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "b3004442ba33686d202fd5489cd5ed47f7f87ebfd46e27566076202a77b216a933a85627ed4fd0953519b1c79820c0e17201d3b16f72f557e2e516acac19ebfb"
+    },
+    "projection-31-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "f2e1124081d75dfdab2014eb5069ce26eba4cdf1e36cd63e5910d01c7219acb187fc4428873d141cbdb56c236b594c43fda29249b47ac071085bb97010c12de9"
+    },
+    "projection-31-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "4af51aa48bb374cd5008453e431ebbc38f5ebb348df2698ef16a8a6a73d66ce0d4ae176cfef93aaa4c98538f3e5653c5ee000b8b8ba3e49ae333919f4f2baaee"
+    },
+    "event-32": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "fcaef34cff50edee4a5a99a7445e7fa4ddd9923fb3d675e9bf4d9c188156052d63584e6f713026b4f2785e4e4a1c2fd223c9593ddcf8c5c530ce0c801aed875c"
+    },
+    "projection-32-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "0bb04ee74bbbc3459e625340e88313c7c9a4d5a3150bb6e3f6466c69f8ab15602e859f7010e21ab7783e37ec5af4aeedd39d14341b4d5f18e8b5a0636bc0ee77"
+    },
+    "projection-32-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "a77e6bc532e30fddc126717f460d567d0e1b4d78c198973b461d940f3f6ea5307920619014dcefaecb168a7405b15d00b979503af6b62658321475c02138b913"
+    },
+    "event-33": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "785688737e349312324b789c28d05066540b2bf8fac0ec9d89a0a560c58ebe7187000806f85cce7731158906b1a03c93befb35ad179254b038af2da1884fafe0"
+    },
+    "projection-33-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "408f1a8de05bf5c9c95b60fd8159a814d87e0f39b9643e88baa914ade8807936b05955c4588ad718a6c238f0ed419cace4ec34798cac83276800569503d58d71"
+    },
+    "projection-33-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "173e7f29abd408a2ebae13a4a7157d059aee5dc9e7e211b134884ca28f7174e18c82625b66ea82ea405136cbf39da82793d54e6552df7f2121153f2f992cd6df"
+    },
+    "event-34": {
+      "role": "host-helper",
+      "keySPKISHA256": "39ae871c571e59915b8979d8eb29396da69b5abd3a588ddbc5ce60449ce10740",
+      "signatureHex": "177ec2be44254f382d0cace5d26b18ccd69ea1ac1a0af5fc25d2c26522c67c0478076b2124893080e015008423ff504e6bc0ebc9cd368e78d173d714633a2648"
+    },
+    "projection-34-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "aefb65e6bdddd5bbcd66a02beb2e97e53f3000acb485c97a5b7b02156f7474ae4ac1bda9930b879dd464672b5381201a202c2de465434345dfe28a0c343c8722"
+    },
+    "projection-34-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "855fad5c1caa7db0cb8e8d1bed9508f7cd8502eb8d8dcccd63800756dc98f100e9b6e9d547294b7047b0fe11dda48eea92cc6b439c642fc0a1e9adbe3208d952"
+    },
+    "fence-released": {
+      "role": "root-fence",
+      "keySPKISHA256": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+      "signatureHex": "4b7e51a95d9b968e66b68107ba2ee389366c1ca6e36cd23deaf786dfe7823b17f4b00cb566fc42da95dfbcf4ef209de0f54e2ec3e488aa4f632630963c502291"
+    },
+    "lease-restore": {
+      "role": "root-fence",
+      "keySPKISHA256": "f6ae83afc3c8f6f0ed7a998d53749b095f1f35e7db37c543fc1a1a3260a0aa95",
+      "signatureHex": "824dccc5e79a76a8531f860c98eeaaadc4ee96435b37fcc05c23eeadf7afc2935e11898ae0609c4874518ef2bff47762147d95a78fd766312150a1d0d9448ee8"
+    },
+    "event-35": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "9600597002acb9b372028dd948c099c9e1fa83cdefb85c7bd2b7f0a59fe55ff163ce013490a4db6922b49b8482c2b7451a7cd554aa3db2f413ddc8f69bb0ea2a"
+    },
+    "projection-35-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "71d376ceb41bf31f1b0d35d566439aca6670ce9602127fb12e9ab635b7684d5e4a6c7d3db30de41261baf68b20c7ea94e98cd87286f2db510f99d6b57c57761f"
+    },
+    "projection-35-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "63e9caaaaceba13f6d2f9900d1ec34d41bf1065bde480cfdcba75b1242b1d1c5dbf298cf5d851401809a35ba555bb6572c8d70e86c7fb4ac2a95a213ee87ece6"
+    },
+    "event-36": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "3924d2370a14adc78252a488207f9e871fc6f54effb69d03e39538720b903870c36aed2410775e0145708c62bd55437d9b4ba97404c5d7a93201b177d2d3b68d"
+    },
+    "projection-36-PC2": {
+      "role": "host-helper",
+      "keySPKISHA256": "8b2a037282067c73f98c0d2192ecc16efab57d872a4f53d8d2af908642acf043",
+      "signatureHex": "a8af8fa4097a11e05eedd592c97d7036bf987e120803c11ca0e556b988aaadb17fb9bc41b9b1964b8e187a61bfccb5fc938d6e835e135a199d7ddb772cb06f58"
+    },
+    "projection-36-PC4": {
+      "role": "host-helper",
+      "keySPKISHA256": "ffdd7249522e3927285997ed6652220e16796315d3f1af26088e7cf7d7c5e9dc",
+      "signatureHex": "007df4a3a76527ac18d4dc6075b872ebb44f9f847bf7216b77c49e8002b62ed5d3af2e48bd2d0b0a05b2164a53d6bf01f1b8804718decf110b1e98cabeb0b6df"
+    }
+  },
+  "scopeDefinitions": {
+    "COHORT": "Exact fixed ordered registered cohort",
+    "PC2": {
+      "tenantId": "fixture-tenant",
+      "nodeId": "fixture-node-0",
+      "recoveryEpoch": "fixture-existing-epoch"
+    },
+    "PC4": {
+      "tenantId": "fixture-tenant",
+      "nodeId": "fixture-node-1",
+      "recoveryEpoch": "fixture-existing-epoch"
+    }
+  },
+  "signatureBytes": "Deterministic labelled SHA256 concatenation, NOT an Ed25519 signature or production provenance"
+}

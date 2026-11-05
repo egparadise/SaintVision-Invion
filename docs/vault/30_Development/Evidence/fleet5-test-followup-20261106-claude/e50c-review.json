@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "saintvision-independent-review:1",
+  "reviewer": "Claude",
+  "owner": "Codex",
+  "orcaTask": "task_6baccbb465af",
+  "dispatch": "ctx_0e847a7f4af8",
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "scope": "TEST-ONLY followup delta review; not code/runtime/physical/whole-product acceptance",
+  "target": {
+    "commit": "e50c148287779add421265868ef16909ed984650",
+    "branch": "agent/codex/fleet5-test-followup-20261106",
+    "parent": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+    "parentIsAncestor": true,
+    "frozenRuntimeSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "nonDocNonTestPathsDifferingFrom72028": 0,
+    "nonDocPathsChangedVsParent": [
+      "tests/test_backend_leaf_runtime_contract.py",
+      "tests/test_build_fleet5_setup_packet.py",
+      "tests/test_fleet5_plain_reentry.py",
+      "tests/test_fleet5_settled_launcher.py"
+    ],
+    "changeTypes": "M only for the four tests; all other paths are added docs",
+    "fourFileBlobsAndLFSHA256MatchOwnerStaticClosure": true,
+    "launcherBlobEqualsF0af": {
+      "e50c": "2b99768f5dac8396dd034ab44140fc11643c2456",
+      "f0af307705b4923ebc3e231db5238af4c70aa389": "2b99768f5dac8396dd034ab44140fc11643c2456"
+    },
+    "productionSF1SourceSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "productionSF1GitBlobAtE50cAnd72028": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4"
+  },
+  "hostedRunsReadOnly": [
+    {"id": 42084668698, "workflow": "Documentation Build", "event": "workflow_dispatch", "headSha": "e50c148287779add421265868ef16909ed984650", "jobs": {"docs": "success"}},
+    {"id": 42084627956, "workflow": "Portal Login Journey Harness", "event": "push", "headSha": "e50c148287779add421265868ef16909ed984650", "jobs": {"portal-login-harness": "success"}},
+    {"id": 42084583685, "workflow": "Documentation Build", "event": "workflow_dispatch", "headSha": "97edf991c4d96a2ba08c8817be2e249d45c053eb", "jobs": {"docs": "success"}, "note": "C-L1 closure, separate scope"}
+  ],
+  "hostedPytestCoverageOfTheFourFilesAtE50c": "none; neither hosted run executes these tests. Backend/Core/all8 not run at e50c and not claimed",
+  "environment": {
+    "python": "3.14.7 (shared .venv, read-only use)",
+    "platform": "win32",
+    "checkout": "disposable detached git worktree at e50c in private scratch; removed after review",
+    "sequential": "one Python process at a time"
+  },
+  "observedKST": {"first": "2026-11-06T04:02:26+09:00", "rawRerunStart": "2026-11-06T04:05:29+09:00", "rawRerunEnd": "2026-11-06T04:12:00+09:00"},
+  "checks": {
+    "CI1_standalone": {"command": "python -m pytest -q -p no:cacheprovider tests/test_backend_leaf_runtime_contract.py (alone, fresh process, path probe plugin)", "passed": 72, "skipped": 0, "exit": 0, "toolsDirOnSysPathAfterCollection": [], "toolsDirOnSysPathAtEnd": [], "bareModuleLoaded": false, "resolvedModule": "<checkout>/tools/check_leaf_rotation_standalone_lifecycle.py", "resolutionMechanism": "repo root on sys.path from python -m pytest cwd, same as hosted backend.yml/core.yml invocations; namespace package tools"},
+    "CI1_parentImportAlone": {"exit": 1, "failed": 1, "passed": 71, "diagnostic": "ModuleNotFoundError: No module named 'check_leaf_rotation_standalone_lifecycle'", "restoredAfter": true},
+    "owningSuitesSeparately": {"tests/test_build_fleet5_setup_packet.py": {"passed": 4, "exit": 0}, "tests/test_fleet5_plain_reentry.py": {"passed": 19, "exit": 0}, "tests/test_fleet5_settled_launcher.py": {"passed": 11, "exit": 0}},
+    "combinedReverseOrder": {"passed": 106, "skipped": 0, "exit": 0},
+    "SF1_peerPolicyGuardRemovedMutant": {"removedOnly": "or legacy._regular(root/'peer-policy.json') != files['peer-policy-final.json']", "newOwningTest": {"exit": 1, "diagnostic": "DID NOT RAISE ValueError"}, "wholePlainReentrySuite": {"failed": 1, "passed": 18, "onlyKiller": "test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift"}, "restoredSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5"},
+    "SF1_unheldObservationContext": {"meaning": "same mutant, same whitespace drift, autouse synthetic floor adapter not held", "result": "ValueError 'Actual durable peer floor differs from the frozen phase'", "interpretation": "a later floor recheck in the fixture masks the guard; holding the valid signed final observation is what isolates the owning guard; _floor signature/match and archive checks stay active"},
+    "B1_gitlink160000": {"fixture": "real commit object + 160000 index entry, not cloned", "lsTreeKindAsserted": "commit", "refusedBeforeOutput": true, "noWorkDir": true, "mutantAdmitting160000": {"result": "test fails: regex '160000' not matched, actual 'Source archive omits, adds or duplicates Git tree paths' (raised after output dir creation)", "killed": true}, "restored": true},
+    "isolation": "all new state via function-scoped monkeypatch/tmp_path; builder.ROOT, env and observe_actual_floor restored by monkeypatch; no sys.modules or global sys.path edits in the delta",
+    "assertionWeakening": "none found; 120000 case strengthened from substring to exact mode/kind/cat-file type; launcher oversize/duplicate inputs now valid JSON so only the byte bound / duplicate-key rule can reject; freshness uses fixture now as before"
+  },
+  "verdict": "ACCEPT (TEST-ONLY delta e50c1482)",
+  "findingsBlockingThisDelta": [],
+  "newObservationsSeparateScope": [
+    {"id": "R-L1", "severity": "Low", "blocking": false, "summary": "The sibling SF1 current-credential terms node-cert.pem and ca.pem each survive a term->False mutant across every test file that references verify_settled/verify-settled/'current credentials differ' (72 passed, 5 opt-in Linux Docker skips each). Production guard is present and unchanged; this is a test-gap outside the C-L2 peer-policy scope of e50c. Root decides whether it rides a later test followup."}
+  ],
+  "remainingInfo": [
+    {"id": "R-I1", "summary": "All 106 passes (owner and reviewer) are Windows Python 3.14.7 local; no hosted Linux pytest ran these four files at e50c. Root's final-source CI must provide that."},
+    {"id": "R-I2", "summary": "Launcher fault cases accept a broad exception tuple, not a pinned diagnostic. Bytes are f0af-approved (prior 70f7502b review); no launcher mutant was re-run here."},
+    {"id": "R-I3", "summary": "Owner-deferred C-I2 partial-output fail-closed and optional exact-65536 acceptance remain Info, carried, not reviewed here."}
+  ],
+  "notDone": ["no runtime/source72028/packet/artifact mutation outside the disposable checkout", "no new all8/archive", "no boards/registry/Obsidian apply/landing", "no remote/NodeOps/WSL/SSH/keys/config", "no whole-product or physical acceptance"],
+  "rawLog": "e50c-review-raw.txt",
+  "rawLogLFSHA256": "80925edda6af3a816e07d22f342874448418fc37c8363bcad928cc381884b1b3",
+  "rawLogRedaction": "private scratch path prefix replaced by <private-scratch>; CRLF normalized to LF; trailing whitespace stripped",
+  "nextOwner": "Root selects the final frozen test source; any new source CI/archive only after that choice"
+}

@@ -1,0 +1,66 @@
+{
+  "recordedAtKST": "2026-11-06T03:28:06.791558+09:00",
+  "base": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+  "frozenRuntimeSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "exactlyFourTestFiles": [
+    {
+      "path": "tests/test_backend_leaf_runtime_contract.py",
+      "gitBlob": "44f9a0424ac71c80fc2c76b678d7a41badb04170",
+      "gitLFBytesSHA256": "0c05b34489ea18a0f7ae6c19b955c06ec44819f930412a0d6ed6f7e2966dafb8"
+    },
+    {
+      "path": "tests/test_build_fleet5_setup_packet.py",
+      "gitBlob": "2a2d2a68145c097bd47a2864e5724af579d09c78",
+      "gitLFBytesSHA256": "a1816166d02801b7b19ebbb2a8b7f752b932777b553b0a509f6bff902e8624a6"
+    },
+    {
+      "path": "tests/test_fleet5_plain_reentry.py",
+      "gitBlob": "ffe7839f14fd723b5e4fde8edfa0edf8c1b3a647",
+      "gitLFBytesSHA256": "c9a7fbca005f4a537a1c7c2ffad4046a9d2396561839776f5fc4b909bf0a0f05"
+    },
+    {
+      "path": "tests/test_fleet5_settled_launcher.py",
+      "gitBlob": "2b99768f5dac8396dd034ab44140fc11643c2456",
+      "gitLFBytesSHA256": "ad3a01e761729a18f7c8d194c176a5a69c5257ba298c944bc47bee538d93dd81"
+    }
+  ],
+  "runtimeWorkflowsToolsProductDiff": [],
+  "f0afTestBlobExact": true,
+  "priorReviewGitBytesExact": true,
+  "literalRedDiagnosticGitBytesExact": true,
+  "meaningfulFocusedTests": {
+    "standaloneCaller": 72,
+    "owningPacketSf1Launcher": 34,
+    "passed": 106,
+    "skipped": 0,
+    "exit": 0
+  },
+  "expectedRedControls": {
+    "ci1PriorImport": {
+      "exit": 1,
+      "diagnostic": "ModuleNotFoundError"
+    },
+    "cl2RemovedPolicyGuard": {
+      "exit": 1,
+      "diagnostic": "DID NOT RAISE ValueError",
+      "killed": true
+    }
+  },
+  "localGateExits": {
+    "followup-docs": 0,
+    "followup-ontology": 0,
+    "followup-contracts": 0,
+    "followup-frontend": 0,
+    "followup-paths": 0,
+    "followup-ratchet": 0,
+    "followup-sync": 0
+  },
+  "allEightNotRunForFollowup": true,
+  "allEight72028NotAttributedToFollowup": true,
+  "newArchiveNotCreated": true,
+  "independentFollowupReview": "PENDING; no verdict borrowed",
+  "rootFinalSourceChoice": "PENDING",
+  "physicalAcceptance": false,
+  "queryExecuted": false,
+  "counts": null
+}

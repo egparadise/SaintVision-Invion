@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "fleet5-b-rev2-review-commands:1",
+  "host": "Windows 11, Git Bash; venv D:/Project/SaintVisionI-Invion/.venv Python 3.14.7; PYTHONUTF8=1; all scripts run with -I -B",
+  "memory": "Get-CimInstance Win32_OperatingSystem: 125 MB free of 16151 MB (99.2% used) before checks; checks run sequentially; no process kills or pagefile changes",
+  "timesUTC": "git date -u; KST = UTC+9",
+  "checks": [
+    {"name": "exact target and diff", "command": "git cat-file -t 02cfd260...; git diff --name-status 72028cba 02cfd260", "exit": 0, "result": "33 added (A), 0 modified; 32 Evidence + 1 History under docs/vault"},
+    {"name": "exact-SHA CI (context)", "command": "gh run view 42087817282 --json ...; gh run list --commit 02cfd260...", "exit": 0, "result": "Documentation Build success, job docs 127457567268 success, headSha 02cfd260; Portal Login Journey Harness 42087784021 success"},
+    {"name": "independent source audit", "command": "python -I -B audit_sources.py <repo> <owner-evidence-copy> audit-sources-result.json", "startUTC": "2026-11-05T19:23:09Z", "endUTC": "2026-11-05T19:23:32Z", "exit": 0, "resultSha256": "a1c24fad47a747494423584c8d40b6cbc0698f0c043d55331eec9e6d9613df87",
+     "result": "46/46 surface blobs at 72028 equal recorded sha256, equal 4f97ba71, equal 100f, unchanged at 02cfd260; anchors 341 = 329 exact + 12 whitespace-only, 0 bad; 11/11 bindings match, 0 overlap with 46; graph 90 files / 32 DIRECT_CHANNEL equal reviewer git grep with owner regexes restricted to source suffixes; reviewer grep additionally hits non-source tools/baselines/doc_path_citations.txt, tools/rls-table-census.json, deploy/CONFIGURED-SERVER.md, services/control-plane/README.md; 0 graph sha mismatch; 0 unclassified hits; narrow census 29 files all in graph; original 2bb B2 callers all present and classified"},
+    {"name": "owner fixture rerun (scratch copy)", "command": "python -I -B ownerrun/validate_revision_fixtures.py", "startUTC": "2026-11-05T19:29:11Z", "exit": 0, "expectedExit": 0,
+     "result": "181 passed / 0 failed; stdout sha256 3d3d039b3b259fdea9072521509015eb88e057c65998fe7a7a83f2f703723f77 = owner schema-predicate.log; synthetic-fixture-results.json 903512ce... and inputs f9298a0d... byte-identical to owner"},
+    {"name": "reviewer adversarial checks", "command": "python -I -B adversarial.py <owner-evidence-copy> adversarial-result.json", "startUTC": "2026-11-05T19:29:13Z", "exit": 0, "resultSha256": "2e4dd6a4a957d3ce29451138306c7b579fbe19d6a9cd26f7576b8c41d2d28305",
+     "result": "30 cases: 15 agree with contract, 15 gaps (schema/mock-level only)"},
+    {"name": "unchanged guard default (72028 archive of deploy/lan + probe)", "command": "python -I -B tests/proofs/fleet5_compute_storage_contract_probe.py", "startUTC": "2026-11-05T19:29:52Z", "exit": 0, "expectedExit": 0, "logSha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7", "equalsOwnerLog": true},
+    {"name": "unchanged guard coexistence expected red", "command": "... --require-coexistence", "endUTC": "2026-11-05T19:29:53Z", "exit": 1, "expectedExit": 1, "logSha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b", "equalsOwnerLog": true, "meaning": "R4 still refuses coexistence; gap evidence only"},
+    {"name": "lock statement scan", "command": "git grep -n -E 'FOR (UPDATE|SHARE|NO KEY UPDATE|KEY SHARE)' 72028 -- services/control-plane/src/inv/*.py tools/lan_pilot.py", "exit": 0, "result": "basis for R6 (leases.py:25->44, containment.py:23->109, observation.py:141, db.py:202)"},
+    {"name": "Node route and inspection scan", "command": "git grep 72028 server.go / node_transport.py / dispatch.py / docker.go", "exit": 0, "result": "server.go:67 POST-only, RawQuery/RawPath empty; receipts = observe path (node_transport.py:83, dispatch.py:339); docker.go 0 refs to CapAdd/UsernsMode/Sysctls/Runtime/VolumeDriver/CgroupParent/Mounts/VolumesFrom"}
+  ],
+  "scriptSha256": {
+    "audit_sources.py": "1e95e75c0f08ac36c8426f9775fe5aad0a739fa906ad319a394659e0742aff81",
+    "adversarial.py": "98ead6c6e5e3d8785d89c90fa92594a8b6c6b897e45fcaf34c987e064b3cf4e2"
+  },
+  "committedBlobSha256": {
+    "note": "resultSha256 values above are the CRLF files as produced on Windows; Git normalized them to LF at commit 523b130c. Both are recorded; content is otherwise identical.",
+    "audit-sources-result.json": "e6c85d8be66a07ae872c7002b780cecceecc4fa08cb65977568a5c1dcaeeeabb",
+    "adversarial-result.json": "36e993dc52879e5c6595007e4a9ba0f080e53450bb74feeb770acc29f4a4f6fa"
+  },
+  "failuresPreserved": "No required check returned an unexpected exit. Adversarial gaps are recorded as findings, not hidden."
+}

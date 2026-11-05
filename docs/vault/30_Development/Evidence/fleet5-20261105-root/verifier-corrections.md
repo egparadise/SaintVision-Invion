@@ -1,11 +1,11 @@
 ---
 doc_id: "EVIDENCE-FLEET5-20261105-ROOT-VERIFIER-CORRECTIONS"
 title: "FLEET5 운영 검증기 정정과 실패 보존"
-version: "1.0.5"
+version: "1.0.6"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T04:08:12+09:00"
+updated: "2026-11-06T05:25:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -38,3 +38,5 @@ source_of_truth: "Git"
 - Root414 첫 path ratchet은 집계한 B History의4f source 경로2개가 구59f 제품 checkout에 없어 exit1이었다. 원래100f는4f 계열 source에서 유효하다.4f Git object의 실제142/192·144/149행을 읽고 집계 사본만 immutable GitHub 링크로 정정했으며 source bytes hash와 wrapper hash/1.0.1을 기록했다. 제품 파일을 보고 branch로 복사하거나 baseline을 올리지 않았고 원래 제안과 검토 대상100f는 그대로다.
 
 - Root417 첫 docs검사는 새 v4 reviewer History가 집계하지 않은 v3 History를 wiki로 가리켜 exit1이었다. 원래 v3 source는 connection-like fixture를 포함해 별도 immutable source에 보존했다. a81f Git객체 존재를 확인한 고정 링크로 집계 wrapper1.0.1의 참조 하나만 바꾸고 원본/집계hash를 기록했다. 실제 검토판정·원본d2fa/a81f·제품·baseline은 바꾸지 않았다.
+
+- Root418 path-ratchet는 old59f 관리 branch에 없는 e50 시험4개를 새 review History가 local path로 인용해 exit1이었다. 실제 e50 Git 객체를 확인해 집계 wrapper1.0.1의 인용4개를 immutable source 링크로만 바꿨다. 최초 실패log와 원본/집계hash를 보존했고 제품·검토 원문·baseline은 변경하지 않았다.

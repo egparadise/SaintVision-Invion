@@ -1,0 +1,2757 @@
+{
+  "nodes": 195,
+  "bindingRules": 3469,
+  "nonProofLeaves": 6671,
+  "unclassified": 0,
+  "coverage": [
+    {
+      "node": "plan",
+      "kind": "successor-plan",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 302,
+      "rules": 24,
+      "unclassified": 0
+    },
+    {
+      "node": "lease-migration",
+      "kind": "operation-lease",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 42,
+      "rules": 22,
+      "unclassified": 0
+    },
+    {
+      "node": "request-01-inspectAndValidate",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 11,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-01",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-01-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-01-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-01",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-01-inspectAndValidate",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-02-reserve",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 11,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-02",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-02-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-02-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-02",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-02-reserve",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "event-03",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-03-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-03-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-04",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-03",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-04-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-04-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-04",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-03-setOldRestartNo-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-05",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-05-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-05-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-06",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-05",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-06-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-06-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-06",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-04-setOldRestartNo-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-07",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-07-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-07-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-08",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-07",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-08-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-08-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-08",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-05-stopOld-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-09",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-09-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-09-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-09",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-06-captureFenced-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 13,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-10",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-10-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-10-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-11",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-10",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-11-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-11-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-11",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-07-preserveOld-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-12",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-12-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-12-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-13",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-12",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-13-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-13-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-13",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-08-createNew-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-14",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-14-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-14-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-15",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-14",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-15-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-15-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-15",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-09-startNew-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-16",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-16-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-16-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-16",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-10-verifyBootstrap-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-17",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-17-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-17-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-18",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-17",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-18-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-18-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-18",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-11-stopOld-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-19",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-19-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-19-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-19",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-12-captureFenced-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 13,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-20",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-20-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-20-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-21",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-20",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-21-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-21-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-21",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-13-preserveOld-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-22",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-22-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-22-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 38,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-23",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-22",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-23-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-23-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-23",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-14-createNew-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-24",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-24-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-24-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-25",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-24",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-25-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-25-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-25",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-15-startNew-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-26",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-26-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-26-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "inventory",
+      "kind": "runtime-inventory",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 150,
+      "rules": 17,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-26",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-16-verifyBootstrap-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "seal-PC2",
+      "kind": "terminal-seal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 41,
+      "rules": 17,
+      "unclassified": 0
+    },
+    {
+      "node": "seal-PC4",
+      "kind": "terminal-seal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 41,
+      "rules": 17,
+      "unclassified": 0
+    },
+    {
+      "node": "fence-released",
+      "kind": "operation-lease",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 42,
+      "rules": 22,
+      "unclassified": 0
+    },
+    {
+      "node": "request-17-publishInventory",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 13,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "lease-restore",
+      "kind": "operation-lease",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 43,
+      "rules": 22,
+      "unclassified": 0
+    },
+    {
+      "node": "event-27",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-27-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-27-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-28",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-27",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-28-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-28-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-28",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-17-publishInventory",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "event-29",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-29-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-29-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-30",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-29",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-30-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-30-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-30",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-18-seal-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-31",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-31-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-31-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 45,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-32",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-31",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-32-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-32-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-32",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-19-seal-PC4",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-20-readState",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 11,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-33",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-33-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-33-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-33",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-20-readState",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-21-release",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 10,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "event-34",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-34-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-34-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-34",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "kind": "api-request",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 10,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-21-release",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "event-35",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 47,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-35-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-35-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "event-36",
+      "kind": "migration-event",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 25,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-35",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-36-PC2",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "projection-36-PC4",
+      "kind": "migration-journal",
+      "digestKind": "SIGNED_ENVELOPE",
+      "nonProofLeaves": 46,
+      "rules": 21,
+      "unclassified": 0
+    },
+    {
+      "node": "cohort-36",
+      "kind": "cohort-projection-set",
+      "digestKind": "DERIVED_DIGEST",
+      "nonProofLeaves": 22,
+      "rules": 12,
+      "unclassified": 0
+    },
+    {
+      "node": "response-request-22-restoreNewRestartPolicy-PC2",
+      "kind": "api-response",
+      "digestKind": "TRANSPORT_DATA",
+      "nonProofLeaves": 12,
+      "rules": 12,
+      "unclassified": 0
+    }
+  ],
+  "derivedRecords": [
+    {
+      "node": "cohort-01",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-02",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-03",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-04",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-05",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-06",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-07",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-08",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-09",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1013,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-10",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-11",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-12",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-13",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-14",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-15",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-16",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-17",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-18",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-19",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-20",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-21",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-22",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-23",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-24",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-25",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-26",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-27",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1014,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-28",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-29",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-30",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-31",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-32",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-33",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "lease-migration",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-34",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1077,
+      "sourceLease": "fence-released",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-35",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1075,
+      "sourceLease": "lease-restore",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    },
+    {
+      "node": "cohort-36",
+      "classification": "DERIVED_DIGEST",
+      "bodyBytes": 1075,
+      "sourceLease": "lease-restore",
+      "memberProjectionChecks": "BOTH independently schema/policy/context checked; actual RFC8032/runtime not run",
+      "trustOrAuthority": false
+    }
+  ],
+  "structuredProofReferences": [
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/acceptedP0/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/image/distributionProof",
+      "kind": "image-distribution",
+      "role": "build-attestor",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:plain-migration-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:plain-migration-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:plain-migration-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/migrationHelper/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:plain-migration-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:agent-mutation-fence",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:agent-mutation-fence",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:agent-mutation-fence",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/commonFence/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:agent-mutation-fence",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:runtime-inventory-api",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:runtime-inventory-api",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:runtime-inventory-api",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:runtime-inventory-api",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:schema3-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:schema3-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:schema3-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/schema3Helper/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:schema3-helper",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:renewal-guard",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:renewal-guard",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:renewal-guard",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:renewal-guard",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/nativeTwoCycleProof",
+      "kind": "native-two-cycle",
+      "role": "ci-attestor",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/oldNewNoWriteCompatibility",
+      "kind": "old-new-no-write",
+      "role": "ci-attestor",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/m2CapabilityProof",
+      "kind": "m2-capability",
+      "role": "ci-attestor",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/rootG2Decision",
+      "kind": "g2-planning-policy",
+      "role": "root-policy",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/independentPlanReview",
+      "kind": "independent-plan-review",
+      "role": "independent-reviewer",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/rootPublicationIntent",
+      "kind": "root-publication-intent",
+      "role": "root-plan",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/scheduleDisabledReadback",
+      "kind": "schedule-disabled-readback",
+      "role": "root-observer",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/allLaunchSurfaces",
+      "kind": "launch-surface-inventory",
+      "role": "root-observer",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/noOverlap",
+      "kind": "no-overlap",
+      "role": "root-observer",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "plan",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "lease-migration",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-02-reserve",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-02-reserve",
+      "pointer": "/arguments/rootExecutionDecision",
+      "kind": "root-execution-decision",
+      "role": "root-execution",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-04",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-04-setOldRestartNo-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-06",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-08",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/arguments/quiescence",
+      "kind": "process-quiescence",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-11",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-08-createNew-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-13",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-09-startNew-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-15",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/signedM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/mtls",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/protectedStateEquality",
+      "kind": "protected-tree-equality",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/execReceipt",
+      "kind": "owned-engine-exec",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-11-stopOld-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-18",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-12-captureFenced-PC4",
+      "pointer": "/arguments/quiescence",
+      "kind": "process-quiescence",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-13-preserveOld-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-21",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-14-createNew-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-23",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-15-startNew-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-25",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/signedM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/mtls",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/protectedStateEquality",
+      "kind": "protected-tree-equality",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-16-verifyBootstrap-PC4",
+      "pointer": "/arguments/execReceipt",
+      "kind": "owned-engine-exec",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/coreCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/backendCI/attestation",
+      "kind": "ci-attestation",
+      "role": "ci-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/independentReview/receipt",
+      "kind": "independent-code-review",
+      "role": "independent-reviewer",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/target/buildProvenance",
+      "kind": "build-provenance",
+      "role": "build-attestor",
+      "scope": "CODE:node-agent",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/image/distributionProof",
+      "kind": "image-distribution",
+      "role": "build-attestor",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/signedM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/mtls",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/protectedStateEquality",
+      "kind": "protected-tree-equality",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/execReceipt",
+      "kind": "owned-engine-exec",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "kind": "runtime-inspection-before",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/0/runtimeInspectionAfterM2",
+      "kind": "runtime-inspection-after",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/signedM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/mtls",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/protectedStateEquality",
+      "kind": "protected-tree-equality",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/execReceipt",
+      "kind": "owned-engine-exec",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "kind": "runtime-inspection-before",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/members/1/runtimeInspectionAfterM2",
+      "kind": "runtime-inspection-after",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "inventory",
+      "pointer": "/body/previousInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/body/bootstrapM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "seal-PC2",
+      "pointer": "/body/bootstrapMTLS",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/body/bootstrapM2",
+      "kind": "node-floor-v2",
+      "role": "node-leaf",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "seal-PC4",
+      "pointer": "/body/bootstrapMTLS",
+      "kind": "unchanged-mtls",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "fence-released",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-17-publishInventory",
+      "pointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "lease-restore",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-28",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-18-seal-PC2",
+      "pointer": "/arguments/rootSealDecision",
+      "kind": "root-seal-decision",
+      "role": "root-seal",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-30",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-19-seal-PC4",
+      "pointer": "/arguments/rootSealDecision",
+      "kind": "root-seal-decision",
+      "role": "root-seal",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-32",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC4",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-20-readState",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-21-release",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-21-release",
+      "pointer": "/arguments/allDescendantsQuiescent",
+      "kind": "descendant-quiescence",
+      "role": "host-helper",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "kind": "inventory-head-readback",
+      "role": "cp-inventory",
+      "scope": "COHORT",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/arguments/rootRestoreDecision",
+      "kind": "root-restart-restore",
+      "role": "root-execution",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    },
+    {
+      "node": "event-36",
+      "pointer": "/body/effect/receipt",
+      "kind": "migration-effect-readback",
+      "role": "host-helper",
+      "scope": "PC2",
+      "result": "STRUCTURED_REFERENCE_POLICY_AND_RECIPE_MATCH_NOT_SIGNATURE_VERIFY"
+    }
+  ],
+  "actualSignatureVerification": 0
+}

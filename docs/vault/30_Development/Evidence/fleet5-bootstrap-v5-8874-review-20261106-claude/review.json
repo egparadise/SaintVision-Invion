@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "fleet5-bootstrap-v5-auxiliary-delta-review:1",
+  "reviewer": "Claude",
+  "orcaTask": "task_48bd227e309c",
+  "dispatchId": "ctx_6b1494bf1d33",
+  "recordedAtKST": "2026-11-06T05:15:00+09:00",
+  "target": {"sha": "8874b2dfe0dda9a019bd5f334636668290702e13", "parent": "eed826e7fb066193d3a2d9d28abda15216264f77",
+             "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105", "addedFiles": 29, "otherChanges": 0},
+  "inputsRead": ["actual review d2fab4a2 (History + JSON)", "Root bootstrap-v4-derived-digest-decision-root.json (msg_c12b3f544036) at e840937b",
+                 "owner History 2026-11-06_FLEET5_bootstrap_contracts_v5_unsigned_context_Codex.md", "all 28 files of Evidence/fleet5-bootstrap-normative-contracts-20261105-v5"],
+  "contextOnly": "source Docs run 42096953590 job 127489386393 success at 8874b2df (2026-11-05T19:45:40Z-19:46:18Z), re-read with gh run view; not counted as review evidence",
+  "verdict": "ACCEPT (auxiliary delta, proposal/design level). No remaining auxiliary blocker.",
+  "closures": {
+    "V4-M1": "CLOSED. Closed flat unsigned DERIVED_DIGEST record; 0 signature/signer/key/grant/producerRole keys in 36 records; schema rejects signer/signature/key/grant fields (7/7 negatives); digest = SHA256(ASCII domain||00||C2 record), 36/36 recomputed, no body LF, never equal to plain SHA256(C2); root-fence signs exactly lease-migration, fence-released, lease-restore; 0 derived records in signing assignments; policy/trust/slot/recipe registries mention the derived type 0 times; derivedSetsAreTrustAnchors=false; v4 signed set 0/36 accepted by v5 schema; v4 cohort schema not in the 17-document closure.",
+    "V4-I1": "CLOSED. Every record binds plan, migrationId, cohortId, operationId, fenceEpoch, lease envelope, inventory head + readback, sequence and complete ordered [PC2,PC4] journal envelope refs. Reviewer trace-driven check 36/36 without using the rules: epoch1 x34 (33 lease-migration + 1 fence-released after release), epoch2 x2 lease-restore. 432/432 context swaps rejected after full rebind, candidate digests 432/432 equal owner, only the targeted rule fails.",
+    "V4-I2": "CLOSED (synthetic only). 115 distinct dummy signature byte strings; 115/115 outer signers equal policy role@scope with scope from Node suffix or trace slot; 112/112 proof refs equal role@scope policy; PC2/PC4 host-helper, node-leaf and root-seal keys distinct. 342/342 swap candidate digests equal owner; 230 outer swaps rejected by graph signer-mapping rules, 112 proof-key swaps rejected by reviewer role@scope policy check (graph strips proofs). keysAreReal=false, no crypto.",
+    "V4-I3": "CLOSED. git cat-file -t b8c66b46... = blob (exit 0); 61973 bytes; sha256 51c03704...c3e; published recovered file byte-identical to the blob; 102 input pointers used by v4 graph rules all resolve and are C2-equal between recovered pre-prune seed and final v4 seed (d40a7486...); owner pointer set equals reviewer set. Labelled historical v4, not v5 positive."
+  },
+  "regenerated": {"objects": 195, "signedShapeEnvelopes": 115, "transportMessages": 44, "derivedRecords": 36, "rules": 3469, "failingRules": 0,
+                  "dependencyEdges": 803, "cycles": 0, "regenerationDigestDiffs": 0, "nonProofLeaves": 6671, "uncovered": 0, "multiplyCovered": 0,
+                  "untrustedStructuredReferences": 112, "schemaInvalidNodes": 0, "schemaDocuments": 17, "dependencyHashMismatch": 0},
+  "api2": {"requests": 22, "member": 17, "cohort": 5, "genesisWithoutPrior": "request-01-inspectAndValidate only", "priorRefErrorsVsTrace": 0,
+           "responses": 22, "responseNodeRefs": 17, "responseCohortRefs": 5, "sideEffectPermittedFalse": "22/22",
+           "oldAmbiguousFieldCases": 44, "oldFieldAccepted": 0, "nodeVsCohortSwapCases": 43, "schemaRejected": "21/21", "graphRejected": "22/22",
+           "pinnedKindLabelCases": "390/390 rejected", "derivedDigestReferencedOnlyBy": "4 api-request + 5 api-response (no journal)"},
+  "gitAndHashes": {"nameStatusPairs": 29, "allA": true, "rawSha256": "273774b7dfcf4a2094ebb0942dad2d5933525dcc32b2cb2033872d039f6a3a4f (equals owner)",
+                   "strictUTF8": true, "artifactHashes": "27/27", "historyHash": "match",
+                   "unchangedFromV4AndV3": ["trust-bootstrap-contract.json", "proof-slot-registry.json", "recipe-definitions.json", "actual-bindings-HOLD.json"],
+                   "staleV4DigestsInProofSubjects": 0},
+  "info": [
+    {"id": "I-a", "summary": "The graph comparison strips typed proofs, so the 112 proof-key swaps are rejected only by the role@scope policy layer. A future verifier must implement that layer; graph equality alone is not enough."},
+    {"id": "I-b", "summary": "7 v2 schema documents have no $id and resolve only via the v3 relative-path convention (unchanged from accepted v4). Canonical registration should pin explicit ids."},
+    {"id": "I-c", "summary": "artifact-reference-graph rules are grouped, not topologically listed (first forward reference: response-request-01 -> cohort-01). Published object order has 0 forward refs and the DAG is acyclic, so evaluators must order by dependency, not by rule-list position."},
+    {"id": "I-d", "summary": "Owner path audit argv is the working tree vs eed826e7 (no second rev); its raw hash equals the reviewer commit-range output, so the results are equivalent."},
+    {"id": "I-e", "summary": "Not re-run here: full v3 recipe derivation of the 112 proof subjects. Substituted with a staleness check (235 typed-subject hex values: 0 v4-only digests, 42 current v5 node digests). Recipe/registry files are byte-identical to the accepted v3/v4 ones."}
+  ],
+  "reviewerHarnessErrors": [
+    "run1 exit1: read changedPaths as a list (it is a count)",
+    "run2 exit1: my patch wrote a literal NUL into the vector block",
+    "run3 exit1: evaluated in rule-list order instead of dependency order",
+    "run4 exit1: v2 schemas lack $id; registry needed path-derived ids and a Draft2020-12 default",
+    "run5 exit0 but artifact: rebound planSubject before the bad field, giving 33 false candidate-digest mismatches; fixed in run6",
+    "signer scope heuristic first treated events as COHORT; trace-slot scope gave 0 mismatches"
+  ],
+  "notRun": {"actualGo": 0, "signatures": 0, "OSLock": 0, "Engine": 0, "atomicity": 0, "equipment": 0, "futureProductCases": "40 NOT RUN"},
+  "realBindings": "NULL/HOLD (0 non-null target/root/member binding leaves)",
+  "authority": "Design acceptance only. Canonical registration, ADR, helper/runtime code and NodeOps remain Root decisions and separate gates.",
+  "notDone": "No helper/runtime/ADR/registry/shared board/NodeOps/WSL/SSH/Docker/private keys/configs/clock/schedules/Obsidian apply; no process kills."
+}

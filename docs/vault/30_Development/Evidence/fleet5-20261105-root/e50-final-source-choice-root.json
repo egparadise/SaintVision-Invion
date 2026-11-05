@@ -1,0 +1,63 @@
+{
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "frozenRef": "agent/codex/fleet5-test-followup-20261106",
+  "testReviewSHA": "b9db061a1add77e862193589336fe2b19f5a270e",
+  "testReviewDocs": 42091970736,
+  "rootVerifiedProofs": [
+    {
+      "run": 42091970736,
+      "SHA": "b9db061a1add77e862193589336fe2b19f5a270e",
+      "branch": "agent/claude/fleet5-test-followup-e50c-review-20261106",
+      "event": "workflow_dispatch",
+      "exactHeadAllJobsSuccess": true
+    },
+    {
+      "run": 42084668698,
+      "SHA": "e50c148287779add421265868ef16909ed984650",
+      "branch": "agent/codex/fleet5-test-followup-20261106",
+      "event": "workflow_dispatch",
+      "exactHeadAllJobsSuccess": true
+    },
+    {
+      "run": 42084627956,
+      "SHA": "e50c148287779add421265868ef16909ed984650",
+      "branch": "agent/codex/fleet5-test-followup-20261106",
+      "event": "push",
+      "exactHeadAllJobsSuccess": true
+    }
+  ],
+  "selected": true,
+  "newAll8AndNewPacketAuthorized": true,
+  "old72028Preserved": true,
+  "nonblockingSeparateFollowup": "R-L1 two SF1 certificate equality owning negatives; no e50 source change",
+  "landingOrPhysicalAuthorized": false,
+  "atKST": "2026-11-06T04:22:11+09:00",
+  "reply": "msg_93007a9642f1",
+  "decisionBody": "Root read ACTUAL test-only review b9db061a1add77e862193589336fe2b19f5a270e and independently verified exact reviewerDocs42091970736/alljobs SUCCESS. ACCEPT for e50c148287779add421265868ef16909ed984650 four-test delta, no blocking finding. Root rechecked sourcebranchagent/codex/fleet5-test-followup-20261106 remote EXACTe50 and a527ancestor, sourceDocs42084668698 and automaticPortal42084627956 exacte50/ref/alljobs SUCCESS. C-L1 reporta527 is independently CLOSED97edf991/Docs42084583685.\nFINAL SOURCE CHOICE: SELECT e50c148287779add421265868ef16909ed984650, FREEZE EXISTING agent/codex/fleet5-test-followup-20261106 ref at that SHA. Do not move72028/ci2/842/c913 or original source/archive/packet. Keep e50 branch immutable; subsequent report/reviewer/CI-terminal evidence on DISTINCT docs-only report branch. Adopt already SUCCESS Portal42084627956 and sourceDocs42084668698 at this EXACT intended ref; do not duplicate/cancel those. Create NEW separately named Gitblob sourcearchive/inventory/source-manifest/plain-v3 nonexecuting packet/plan/receipt from ACTUAL e50, never reuse72028 digest/filecount. Actual operational/image/executable/Node/lease bindings NULL/HOLD and current approved scope fourLinux plain independent workers+CPcolocated, no storage/guest/realNode init inferred.\nRun remaining required source workflows ONCE at e50/frozenref with unique correlation, Core run_fleet5_peer_phase_fixed_proof=true explicitly; adopt a unique existing exacthead/ref/event run instead of duplicate. Required all8/12jobs exacthead/ref, no unknown/pending PASS. Core and bothBackend must ACTUALLY COLLECT all four changed test files on hostedLinux: Docs/Portal never execute them. Require no-skip owned families and original installer/realPG/native2cycles/Unicode/defaultpinned stages/mutants where required. Record actual counts/runtime/toolchain/logs/artifactdigests/attempts without summing matrices unique. Local bounded preflight/newpacket/CLI/gates as necessary, no broad redundant localCore repeats. No code/spec weakening forCI; failure retained and corrected on NEW source, never force/move thisref.\nAfter all8 terminal publish source-vs-report qualified delivery preserving original b9db review scope, actual97 C-L1 closure and255 original combined scope. Old72028CI is not e50CI. New packet needs actual immutable artifact/blob verification: request bounded newpacket/provenance delta review at real source/report, not full duplicate runtime-code review absent change. No landing/deploy/issuance/old3/physical/Obsidian until Root sees actual newsourceCI+packetreview.\nSeparate R-L1 Low NONBLOCKING for selectedsource: SF1 node-cert.pem and ca.pem equality terms lack owning tests. AFTER sourcefreeze/CI dispatch prepare ONE separate TEST-ONLY followup branch with owning negatives and each guard-only term->False mutant causal red/green, runtime unchanged; do not merge intoe50 or respin for it. Carry R-I1 actualLinux requirement and R-I2 broadexception/R-I3 exact65536/C-I2 honestly, no false fixes. B/bootstrap outsidee50. Hostmemory98percent: sequential low-memory checks/cmd+Python FILE fallback, hostedCI, no unrelated kills. This source/packet work is approved; no generic user confirmation.",
+  "actualNewCIOrPacketIDsNotYetReceived": false,
+  "newAllEightAccepted": true,
+  "actualNewCIIDs": {
+    "Backend": 42093699470,
+    "Core": 42093714198,
+    "Frontend": 42093726119,
+    "Desktop": 42093738328,
+    "Docs": 42084668698,
+    "Portal": 42084627956,
+    "Security": 42093764277,
+    "A11y": 42093775632
+  },
+  "rootVerifiedAllRunAndJobHeadsAndRef": true,
+  "CIObservationKST": "2026-11-06T05:25:21+09:00",
+  "packetRawArtifactsIndependentlyVerified": true,
+  "packetActualReview": "e50-packet-independent-root-review.json",
+  "packetReviewScope": "Codex Root vs separate author Codex worker; not Claude; not all-source CI or physical",
+  "packetReviewVerdict": "ACCEPT bounded packet/source/provenance",
+  "packetReport": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "packetReportDocs": 42095253246,
+  "packetReply": "msg_a919081a1e47",
+  "latestOwnerCIReport": "ALL8 workflows/ALL12 jobs SUCCESS; Root API independently verified exactsource/ref/alljobs",
+  "rootCIObservation": "05:25 API ALL8/ALL12 SUCCESS; previous04:32 snapshot retained as historical only",
+  "sourceAllEightAndTwelveJobsRootVerified": true,
+  "coreArtifactActualRootAudit": "e50-root-core-artifact-audit.json",
+  "finalQualifiedReportOwnDocsPending": true
+}

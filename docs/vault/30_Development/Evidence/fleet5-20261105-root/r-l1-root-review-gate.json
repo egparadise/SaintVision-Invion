@@ -1,0 +1,20 @@
+{
+  "source": "542b48f996344563424228fb9fc454f5970bbd18",
+  "Docs": 42096385358,
+  "rootVerifiedExactSourceDocsAllJobs": true,
+  "nonblockingSeparateTestOnlyScope": true,
+  "excludedFromFrozenE50": true,
+  "actualReviewStarted": true,
+  "reviewTask": "task_9cd71aa339ff",
+  "reviewDispatch": "ctx_8fa6addadbda",
+  "terminal": "term_d0132a215e83537d7ffbe383443c8789",
+  "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings",
+  "noNewE50AllEightOrArchive": true,
+  "taskStatus": "succeeded",
+  "actualReview": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+  "reviewDocs": 42102780830,
+  "rootVerifiedReviewExactHeadRefAllJobs": true,
+  "actualReviewScope": "WindowsPy3.14.7 new2/2 and21/21 integration, eachguard andbothguard actual causal mutants; actual archive/signature/CA pin retained",
+  "LinuxCoverageOfNewFile": "NOT_RUN; not inherited from e50 source CI",
+  "nextSourceDecision": "retain separate542b; later integration may adopt after its own Linux evidence; frozene50 unchanged; no duplicateall8/archive now"
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "fleet5-e50-root-core-artifact-audit:1",
+  "observedAtKST": "2026-11-06T05:27:23+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "run": 42093714198,
+  "artifactId": 13448697056,
+  "artifactBytes": 13959999,
+  "artifactSHA256": "95f8d6da5ef9738902fc0809d6d628b9657109947cf46b311559a2332c2e76b3",
+  "metadataExactSourceRunNotExpiredAndDigestVerified": true,
+  "downloadedActualArtifact": true,
+  "archiveReadOnlyNoExtractionOrExecution": true,
+  "CoreMain": {
+    "passed": 9215,
+    "skipped": 46,
+    "testcases": 9261
+  },
+  "changedFourFiles": [
+    {
+      "classname": "tests.test_backend_leaf_runtime_contract",
+      "passed": 72,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "classname": "tests.test_build_fleet5_setup_packet",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "classname": "tests.test_fleet5_plain_reentry",
+      "passed": 19,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "classname": "tests.test_fleet5_settled_launcher",
+      "passed": 11,
+      "skipped": 0,
+      "failed": 0
+    }
+  ],
+  "changedFourTotal": 106,
+  "installer": {
+    "passed": 17,
+    "skipped": 0
+  },
+  "authenticatedPG": {
+    "passed": 2,
+    "skipped": 0
+  },
+  "memberSHA256": {
+    "core-tests.xml": "ed7134aaccccb90e2f9d8772f0f9216966918886118e8f20088b11266890e9f5",
+    "lan-installer-tests.xml": "237fbf8d0782971e45a76323705676ffa0f494199cd503d57e04e911e28029c4",
+    "lan-pilot-database-real-pg.xml": "b0962544e073a21ef6273f750c716a2a572cf7013f48cb4e036386731ce10c0b",
+    "fleet5-peer-phase-fixed-proof/native-fixed-result.json": "fddc265c46bed61cbdf6487de104c279f43b2802707fcfcd7686022b72066bb3",
+    "fleet5-peer-phase-fixed-proof/canonical-go-results.json": "265f1c8d8c7883a275a9b6dbffcd00a0fef5e2839972e87476eb8abf528814cd",
+    "fleet5-peer-phase-fixed-proof/go-guard-events.jsonl": "73f0577f4213791b6890e4a10f16d529dc1d9d622cb93dbd608a76d67d08b972",
+    "p0-owned-docker-floor.json": "c165fdff9a16296fa1616727510246a60bf1946bd3c113b2ed3cbcc4a1abfa97",
+    "p0-real-stopped-reentry-settled.json": "3ceb9b071f814546b30428b54fcf82aba50bd7069a0d389f8ee3a9d455cb367f"
+  },
+  "actualRawEmbeddedProofFilesRead": true,
+  "notClaimed": "Root did not reexecute Go/pytest, inspect Backend per-case XML (not retained), or infer physical acceptance",
+  "backendOwnerReport": {
+    "eachMatrixPassed": 8857,
+    "eachMatrixSkipped": 75,
+    "eachMatrixDeselected": 2,
+    "proof": "owner read actual fullsuite command,27 exclusions and strict skipgate; no Backend per-case XML retained",
+    "uniqueCountsMustNotBeSummed": true
+  },
+  "physicalAcceptance": false,
+  "wholeProductAcceptance": false
+}

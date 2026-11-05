@@ -1,0 +1,621 @@
+{
+  "scope": "Recovered original pre-prune v4 seed -> published final v4 seed ONLY; v5 intentionally changes policy and contexts",
+  "recoveredOriginalRawSHA256": "51c0370462d40b021d46f906dbe362dcf5ac2ebdc4c1117083c402619d744c3e",
+  "recoveredOriginalGitBlob": "b8c66b46bf4c431c0d59b79941d2da868f2c523d",
+  "finalPublishedV4SeedSHA256": "d40a7486193e36781bbe5c3a1102e198f61159b8b38084ef440fc96e5e690a18",
+  "pointers": [
+    {
+      "pointer": "/containers/PC2/backup",
+      "prePruneValueSHA256": "bc395864d385381e02599cdd773b072bfc1096e22ce8f0293c0e3b4857894ade",
+      "finalV4ValueSHA256": "bc395864d385381e02599cdd773b072bfc1096e22ce8f0293c0e3b4857894ade",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/backup/id",
+      "prePruneValueSHA256": "69808c539ca574dd5d102381808abc1d8760be1f8427d0292f92181c497abe1a",
+      "finalV4ValueSHA256": "69808c539ca574dd5d102381808abc1d8760be1f8427d0292f92181c497abe1a",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/created",
+      "prePruneValueSHA256": "d6b0264ef31b4bfa4643c815376db77430dce768cf416f4bce280ea7825a6c3b",
+      "finalV4ValueSHA256": "d6b0264ef31b4bfa4643c815376db77430dce768cf416f4bce280ea7825a6c3b",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/current",
+      "prePruneValueSHA256": "83e257dcef179aafbf6e615a35eb08c8286e208197a5b0195d01c87935942e3a",
+      "finalV4ValueSHA256": "83e257dcef179aafbf6e615a35eb08c8286e208197a5b0195d01c87935942e3a",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/current/id",
+      "prePruneValueSHA256": "deb07e91ddc93d4eca0af743efae7212f4a5c4c7a696e84e6e26332f773ce55c",
+      "finalV4ValueSHA256": "deb07e91ddc93d4eca0af743efae7212f4a5c4c7a696e84e6e26332f773ce55c",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/fenced",
+      "prePruneValueSHA256": "a57bbfcd480c8123ae88aa61c89d22dd38bcc5075810c82eb1c43aa1c38ba4fc",
+      "finalV4ValueSHA256": "a57bbfcd480c8123ae88aa61c89d22dd38bcc5075810c82eb1c43aa1c38ba4fc",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/old",
+      "prePruneValueSHA256": "09dda14b044dde19af8725049f7d1d7535881f412b260b759f1a75a54ee1dfae",
+      "finalV4ValueSHA256": "09dda14b044dde19af8725049f7d1d7535881f412b260b759f1a75a54ee1dfae",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC2/stopped",
+      "prePruneValueSHA256": "952240ad1f4fd1cf1a1d7fcb530f4766b39ed1c04d22c1e86b1bf9698be293db",
+      "finalV4ValueSHA256": "952240ad1f4fd1cf1a1d7fcb530f4766b39ed1c04d22c1e86b1bf9698be293db",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/backup",
+      "prePruneValueSHA256": "c675b26faf8f3d14747060ed36162641845cb2a5c3bb1158d61ee05c4e2a3d72",
+      "finalV4ValueSHA256": "c675b26faf8f3d14747060ed36162641845cb2a5c3bb1158d61ee05c4e2a3d72",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/backup/id",
+      "prePruneValueSHA256": "e7f000a856f9d7b471244a377d902725d5472cd6e182af8ee8a97c2b10c6e79b",
+      "finalV4ValueSHA256": "e7f000a856f9d7b471244a377d902725d5472cd6e182af8ee8a97c2b10c6e79b",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/created",
+      "prePruneValueSHA256": "0a2a1b77488424210746b5603f0add543bfceb6fa25f05ebd72670217fb84dd1",
+      "finalV4ValueSHA256": "0a2a1b77488424210746b5603f0add543bfceb6fa25f05ebd72670217fb84dd1",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/current",
+      "prePruneValueSHA256": "ef9b0fa8c33798bffd92b1019786221f2c619e031856fcb06c8dab14879b773c",
+      "finalV4ValueSHA256": "ef9b0fa8c33798bffd92b1019786221f2c619e031856fcb06c8dab14879b773c",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/current/id",
+      "prePruneValueSHA256": "2e32afc106d862d4df2e4faffcab59b448802dc637e3b51919c37a4f23affc50",
+      "finalV4ValueSHA256": "2e32afc106d862d4df2e4faffcab59b448802dc637e3b51919c37a4f23affc50",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/fenced",
+      "prePruneValueSHA256": "a7923d6d4c60ed57151538a076db582b2a15f01f9c189a2eea5d23add7e35f2b",
+      "finalV4ValueSHA256": "a7923d6d4c60ed57151538a076db582b2a15f01f9c189a2eea5d23add7e35f2b",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/old",
+      "prePruneValueSHA256": "652b4eb0a35a7568c256e9ed80298bace30c1c44814f233b9282297cc136b74c",
+      "finalV4ValueSHA256": "652b4eb0a35a7568c256e9ed80298bace30c1c44814f233b9282297cc136b74c",
+      "equal": true
+    },
+    {
+      "pointer": "/containers/PC4/stopped",
+      "prePruneValueSHA256": "126ce9f814dd13f37e5615783716dedd3254e0ba4506a87d1fb632c1a93daaf4",
+      "finalV4ValueSHA256": "126ce9f814dd13f37e5615783716dedd3254e0ba4506a87d1fb632c1a93daaf4",
+      "equal": true
+    },
+    {
+      "pointer": "/facts/allowedManagedEntrypoints",
+      "prePruneValueSHA256": "3e91e5ad471fed6b3def2f4fc34428320b10fecb6eeaff73760d96569a044205",
+      "finalV4ValueSHA256": "3e91e5ad471fed6b3def2f4fc34428320b10fecb6eeaff73760d96569a044205",
+      "equal": true
+    },
+    {
+      "pointer": "/facts/cohortId",
+      "prePruneValueSHA256": "f8fa820d76805c80809fb45478b4e55d44902ecc95d1ed56a8944cf2c6352631",
+      "finalV4ValueSHA256": "f8fa820d76805c80809fb45478b4e55d44902ecc95d1ed56a8944cf2c6352631",
+      "equal": true
+    },
+    {
+      "pointer": "/facts/registeredFenceIdentitySHA256",
+      "prePruneValueSHA256": "d391b1007e78b1af80e933f68fd1abbff770448ab52813c0846f42b99e13ed18",
+      "finalV4ValueSHA256": "d391b1007e78b1af80e933f68fd1abbff770448ab52813c0846f42b99e13ed18",
+      "equal": true
+    },
+    {
+      "pointer": "/inventory/channelMutationAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/inventory/legacyAgentImageFallbackAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/inventory/publishedAt",
+      "prePruneValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "finalV4ValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "equal": true
+    },
+    {
+      "pointer": "/inventory/schemaVersion",
+      "prePruneValueSHA256": "71a856270e07441a099ae1f3e51c148f151772569f6785e072510e5ab036da18",
+      "finalV4ValueSHA256": "71a856270e07441a099ae1f3e51c148f151772569f6785e072510e5ab036da18",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/acquiredAt",
+      "prePruneValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "finalV4ValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/expiresAt",
+      "prePruneValueSHA256": "51b68b59d083adf1b3c34ccf9c4b99c8331805a0ce90995083c05fab4147085b",
+      "finalV4ValueSHA256": "51b68b59d083adf1b3c34ccf9c4b99c8331805a0ce90995083c05fab4147085b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner",
+      "prePruneValueSHA256": "98a588e17ba4833a9d7d14c2a1b5d7f49d93b79d3529369f1e0f7f52136d2eb9",
+      "finalV4ValueSHA256": "98a588e17ba4833a9d7d14c2a1b5d7f49d93b79d3529369f1e0f7f52136d2eb9",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/gid",
+      "prePruneValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "finalV4ValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/hostBootIdentitySHA256",
+      "prePruneValueSHA256": "94a8e03f5496cf0800aedfdd7e31cdd592716272c8f2c870c0fea2dee6b72c70",
+      "finalV4ValueSHA256": "94a8e03f5496cf0800aedfdd7e31cdd592716272c8f2c870c0fea2dee6b72c70",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/ownerGeneration",
+      "prePruneValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "finalV4ValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/pid",
+      "prePruneValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "finalV4ValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/principal",
+      "prePruneValueSHA256": "ec28e43990175de6616abe24efe04d65ece4186de671d6d3e8450cb8e6400172",
+      "finalV4ValueSHA256": "ec28e43990175de6616abe24efe04d65ece4186de671d6d3e8450cb8e6400172",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/processStartIdentitySHA256",
+      "prePruneValueSHA256": "6944cab9bcbf793a1f45f8433ef4bb051904cb66789473df77f306fcc26d4e79",
+      "finalV4ValueSHA256": "6944cab9bcbf793a1f45f8433ef4bb051904cb66789473df77f306fcc26d4e79",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/owner/uid",
+      "prePruneValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "finalV4ValueSHA256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/rawTokenPublished",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/requiresHeldOSLocks",
+      "prePruneValueSHA256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "finalV4ValueSHA256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/schemaVersion",
+      "prePruneValueSHA256": "75f3b8ba7bc3c9f636d57918ca016c2ec03c119479cb5026830600be3badc9b6",
+      "finalV4ValueSHA256": "75f3b8ba7bc3c9f636d57918ca016c2ec03c119479cb5026830600be3badc9b6",
+      "equal": true
+    },
+    {
+      "pointer": "/lease/staleAgeReclaimAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/acceptedP0",
+      "prePruneValueSHA256": "59cb6935d74a443d16fae7435f3e60e91aedd19104e74069e7e039e71b184168",
+      "finalV4ValueSHA256": "59cb6935d74a443d16fae7435f3e60e91aedd19104e74069e7e039e71b184168",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/commonFence",
+      "prePruneValueSHA256": "c17071b57517c0443fc9bdfc30b28a99636c127a8e233118f0db126914c8f06d",
+      "finalV4ValueSHA256": "c17071b57517c0443fc9bdfc30b28a99636c127a8e233118f0db126914c8f06d",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/createdAt",
+      "prePruneValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "finalV4ValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/credentialRecopyAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/expectedInventoryHead",
+      "prePruneValueSHA256": "e8281a6cd16438a40d0e474a0eb055a2c75a58bcc9380284dd2bdbeff1495909",
+      "finalV4ValueSHA256": "e8281a6cd16438a40d0e474a0eb055a2c75a58bcc9380284dd2bdbeff1495909",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/expiresAt",
+      "prePruneValueSHA256": "51b68b59d083adf1b3c34ccf9c4b99c8331805a0ce90995083c05fab4147085b",
+      "finalV4ValueSHA256": "51b68b59d083adf1b3c34ccf9c4b99c8331805a0ce90995083c05fab4147085b",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/image",
+      "prePruneValueSHA256": "9957126ce37424bdaf8000107f76f1526cc18cef2c87b8ecfe6d3f2c80391ca7",
+      "finalV4ValueSHA256": "9957126ce37424bdaf8000107f76f1526cc18cef2c87b8ecfe6d3f2c80391ca7",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/legacyCPStateSHA256",
+      "prePruneValueSHA256": "58ae4edb0fbf1070feb254b9b6c48f91a26847a5d01f7ed0e2103792166a8a5a",
+      "finalV4ValueSHA256": "58ae4edb0fbf1070feb254b9b6c48f91a26847a5d01f7ed0e2103792166a8a5a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs",
+      "prePruneValueSHA256": "f3c9f020be4c442fc43bea50b128713c5ddef34a928fb7cd8a4a9d201f85a1ce",
+      "finalV4ValueSHA256": "f3c9f020be4c442fc43bea50b128713c5ddef34a928fb7cd8a4a9d201f85a1ce",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/authority",
+      "prePruneValueSHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d",
+      "finalV4ValueSHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/backupReservedName",
+      "prePruneValueSHA256": "083125ce29de69cd3609f7a512bb09af0f17386e753312f2eeb2a7c4a739c4a9",
+      "finalV4ValueSHA256": "083125ce29de69cd3609f7a512bb09af0f17386e753312f2eeb2a7c4a739c4a9",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/channel",
+      "prePruneValueSHA256": "9141f8e04a4a7dcb76fc055c2c4fbf4edf5a709f2273ac79d49d0f52b2879afd",
+      "finalV4ValueSHA256": "9141f8e04a4a7dcb76fc055c2c4fbf4edf5a709f2273ac79d49d0f52b2879afd",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/cmdArgvCanonicalSHA256",
+      "prePruneValueSHA256": "a5eb19cf1141d49c38d095a17e4f7516ac7916ebc5f154bd74068ea0200d45a1",
+      "finalV4ValueSHA256": "a5eb19cf1141d49c38d095a17e4f7516ac7916ebc5f154bd74068ea0200d45a1",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/entrypointCanonicalSHA256",
+      "prePruneValueSHA256": "6377f469f740fcea05c7ab00e8ea469feb156808c4c62c6c8bd4423e652404ce",
+      "finalV4ValueSHA256": "6377f469f740fcea05c7ab00e8ea469feb156808c4c62c6c8bd4423e652404ce",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/floor",
+      "prePruneValueSHA256": "a4cdb00dce6605b91a69cfe6ce208bab6a3dc29911abb253c4ecfa4749634b25",
+      "finalV4ValueSHA256": "a4cdb00dce6605b91a69cfe6ce208bab6a3dc29911abb253c4ecfa4749634b25",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/oldContainer/daemonIdentitySHA256",
+      "prePruneValueSHA256": "902286c2186984545d245c60a21b2949a864ee45db699f81b63d0bd822e58b89",
+      "finalV4ValueSHA256": "902286c2186984545d245c60a21b2949a864ee45db699f81b63d0bd822e58b89",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/oldContainer/id",
+      "prePruneValueSHA256": "69808c539ca574dd5d102381808abc1d8760be1f8427d0292f92181c497abe1a",
+      "finalV4ValueSHA256": "69808c539ca574dd5d102381808abc1d8760be1f8427d0292f92181c497abe1a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/preservedPermitImageDigest",
+      "prePruneValueSHA256": "fb6a4812604efc06e0e70af9d4a5d8e04148a1c32f118fca20913a64b6b04816",
+      "finalV4ValueSHA256": "fb6a4812604efc06e0e70af9d4a5d8e04148a1c32f118fca20913a64b6b04816",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/rawServingCmdlineSHA256",
+      "prePruneValueSHA256": "79b0ff2db96263b54e65e1ba1b42c9a43384ab5fd4e49b4e6365e5d74c71206a",
+      "finalV4ValueSHA256": "79b0ff2db96263b54e65e1ba1b42c9a43384ab5fd4e49b4e6365e5d74c71206a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/scope",
+      "prePruneValueSHA256": "76aa1d6b01ac96a6da151399bd1002fe8a34fff82c561bec832dbc5f6c66cb29",
+      "finalV4ValueSHA256": "76aa1d6b01ac96a6da151399bd1002fe8a34fff82c561bec832dbc5f6c66cb29",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/servingArgvCanonicalSHA256",
+      "prePruneValueSHA256": "c33320f7d2da893ecf4fda6226d593abf0baa6fee00d92c902cb2df0c65c3445",
+      "finalV4ValueSHA256": "c33320f7d2da893ecf4fda6226d593abf0baa6fee00d92c902cb2df0c65c3445",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/volume",
+      "prePruneValueSHA256": "e341db6015009d2a9b0b43437e1989e1db600a4845870ef9756d48c782222dd1",
+      "finalV4ValueSHA256": "e341db6015009d2a9b0b43437e1989e1db600a4845870ef9756d48c782222dd1",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/volume/metadataSHA256",
+      "prePruneValueSHA256": "1d9e1fd14c48b9503ce77bcd017ee2f5b162ff34bd1cae8d5ebf884fdf02a518",
+      "finalV4ValueSHA256": "1d9e1fd14c48b9503ce77bcd017ee2f5b162ff34bd1cae8d5ebf884fdf02a518",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/0/workerRootRegistrationSHA256",
+      "prePruneValueSHA256": "59b4f86b9bf72bba9d1deca8c1e67d4b7523ae5e9555aff976ca5336ef3e13cb",
+      "finalV4ValueSHA256": "59b4f86b9bf72bba9d1deca8c1e67d4b7523ae5e9555aff976ca5336ef3e13cb",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/authority",
+      "prePruneValueSHA256": "cccfec6ccb0316895cfcbcabd5e38bf776483a7cf14042efbf1283244a54b453",
+      "finalV4ValueSHA256": "cccfec6ccb0316895cfcbcabd5e38bf776483a7cf14042efbf1283244a54b453",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/backupReservedName",
+      "prePruneValueSHA256": "083125ce29de69cd3609f7a512bb09af0f17386e753312f2eeb2a7c4a739c4a9",
+      "finalV4ValueSHA256": "083125ce29de69cd3609f7a512bb09af0f17386e753312f2eeb2a7c4a739c4a9",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/channel",
+      "prePruneValueSHA256": "160aab5dabc893839d879c700efcd1521de961d58246bc776923b2df3a791677",
+      "finalV4ValueSHA256": "160aab5dabc893839d879c700efcd1521de961d58246bc776923b2df3a791677",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/cmdArgvCanonicalSHA256",
+      "prePruneValueSHA256": "a5eb19cf1141d49c38d095a17e4f7516ac7916ebc5f154bd74068ea0200d45a1",
+      "finalV4ValueSHA256": "a5eb19cf1141d49c38d095a17e4f7516ac7916ebc5f154bd74068ea0200d45a1",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/entrypointCanonicalSHA256",
+      "prePruneValueSHA256": "6377f469f740fcea05c7ab00e8ea469feb156808c4c62c6c8bd4423e652404ce",
+      "finalV4ValueSHA256": "6377f469f740fcea05c7ab00e8ea469feb156808c4c62c6c8bd4423e652404ce",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/floor",
+      "prePruneValueSHA256": "2b2a07bce807fc090f7562dad5013aac5f4a9eceaf8886b8f5638d8c61afb1be",
+      "finalV4ValueSHA256": "2b2a07bce807fc090f7562dad5013aac5f4a9eceaf8886b8f5638d8c61afb1be",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/oldContainer/daemonIdentitySHA256",
+      "prePruneValueSHA256": "b5d4fcd3d36e87ee516cf1ad18b89cd2491d04b1adbf4d4b2b0bd88164d8cef1",
+      "finalV4ValueSHA256": "b5d4fcd3d36e87ee516cf1ad18b89cd2491d04b1adbf4d4b2b0bd88164d8cef1",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/oldContainer/id",
+      "prePruneValueSHA256": "e7f000a856f9d7b471244a377d902725d5472cd6e182af8ee8a97c2b10c6e79b",
+      "finalV4ValueSHA256": "e7f000a856f9d7b471244a377d902725d5472cd6e182af8ee8a97c2b10c6e79b",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/preservedPermitImageDigest",
+      "prePruneValueSHA256": "fb6a4812604efc06e0e70af9d4a5d8e04148a1c32f118fca20913a64b6b04816",
+      "finalV4ValueSHA256": "fb6a4812604efc06e0e70af9d4a5d8e04148a1c32f118fca20913a64b6b04816",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/rawServingCmdlineSHA256",
+      "prePruneValueSHA256": "79b0ff2db96263b54e65e1ba1b42c9a43384ab5fd4e49b4e6365e5d74c71206a",
+      "finalV4ValueSHA256": "79b0ff2db96263b54e65e1ba1b42c9a43384ab5fd4e49b4e6365e5d74c71206a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/scope",
+      "prePruneValueSHA256": "66e7e9e29c5030b727dbc305342be81a4d58634f1e8d122d23a5bec50ea32652",
+      "finalV4ValueSHA256": "66e7e9e29c5030b727dbc305342be81a4d58634f1e8d122d23a5bec50ea32652",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/servingArgvCanonicalSHA256",
+      "prePruneValueSHA256": "c33320f7d2da893ecf4fda6226d593abf0baa6fee00d92c902cb2df0c65c3445",
+      "finalV4ValueSHA256": "c33320f7d2da893ecf4fda6226d593abf0baa6fee00d92c902cb2df0c65c3445",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/volume",
+      "prePruneValueSHA256": "c6fceed205b733de2036710c59f766be10977c37c690e7cb3f72f54cc9aac308",
+      "finalV4ValueSHA256": "c6fceed205b733de2036710c59f766be10977c37c690e7cb3f72f54cc9aac308",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/volume/metadataSHA256",
+      "prePruneValueSHA256": "222bbb1f17284923b31e330e982d36d21c9dbfd2061e107045ffa894a375d809",
+      "finalV4ValueSHA256": "222bbb1f17284923b31e330e982d36d21c9dbfd2061e107045ffa894a375d809",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/memberInputs/1/workerRootRegistrationSHA256",
+      "prePruneValueSHA256": "a9e7126b60b6b09cc1c4524f712a5118ac3571fc404c4b754e2d375a8c5a8b5d",
+      "finalV4ValueSHA256": "a9e7126b60b6b09cc1c4524f712a5118ac3571fc404c4b754e2d375a8c5a8b5d",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/migrationHelper",
+      "prePruneValueSHA256": "9494caeed0aa4d85937c7de8166871869fc38265470f802fa08be4ec9578987a",
+      "finalV4ValueSHA256": "9494caeed0aa4d85937c7de8166871869fc38265470f802fa08be4ec9578987a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/migrationId",
+      "prePruneValueSHA256": "5d6a581ad7746b06227d7a3872e7c80525d635a20f335801c3a7aa5e81c2694a",
+      "finalV4ValueSHA256": "5d6a581ad7746b06227d7a3872e7c80525d635a20f335801c3a7aa5e81c2694a",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/newRenewalGuard",
+      "prePruneValueSHA256": "a03cd4c3424116d2ed4dfb8f2a9d2bd6cf24632a730d7b5a49a6de9c6727828e",
+      "finalV4ValueSHA256": "a03cd4c3424116d2ed4dfb8f2a9d2bd6cf24632a730d7b5a49a6de9c6727828e",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/oldContainerRestartAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/planId",
+      "prePruneValueSHA256": "87493b3e6c807ab4ea7678b36c6c160fa18cb7878ae36c84eb094bda39641daf",
+      "finalV4ValueSHA256": "87493b3e6c807ab4ea7678b36c6c160fa18cb7878ae36c84eb094bda39641daf",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/restartRestore",
+      "prePruneValueSHA256": "eefa638191622f387bd1e42994962ff22a5c3fd50cc66dc31d2f202236d3f71c",
+      "finalV4ValueSHA256": "eefa638191622f387bd1e42994962ff22a5c3fd50cc66dc31d2f202236d3f71c",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/runtimeInventoryAPI",
+      "prePruneValueSHA256": "22ae32e93b7b26b4ea2d114eaa3996e6867074d238bfeba1096efd248f93c273",
+      "finalV4ValueSHA256": "22ae32e93b7b26b4ea2d114eaa3996e6867074d238bfeba1096efd248f93c273",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/schema3Helper",
+      "prePruneValueSHA256": "99328955d53c6ad05dd17761088d0b96398dfcfa13b881fe03944dc2a0b831fa",
+      "finalV4ValueSHA256": "99328955d53c6ad05dd17761088d0b96398dfcfa13b881fe03944dc2a0b831fa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/schemaVersion",
+      "prePruneValueSHA256": "62b02f8dae32de395a8a9ef78d624fb6056c4b080a9da94985c32ce54a950651",
+      "finalV4ValueSHA256": "62b02f8dae32de395a8a9ef78d624fb6056c4b080a9da94985c32ce54a950651",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/secondMigrationAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/sourceOfFreshFiveIssuerAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/plan/timing",
+      "prePruneValueSHA256": "500c59f4734dc78de80f03ea3b74b7fbddde7bc34014c34e101dd10c6deda1a7",
+      "finalV4ValueSHA256": "500c59f4734dc78de80f03ea3b74b7fbddde7bc34014c34e101dd10c6deda1a7",
+      "equal": true
+    },
+    {
+      "pointer": "/policy/allowedRegistrySHA256",
+      "prePruneValueSHA256": "cb14c41a2e1fd88c893997a9dafabfe1711cce1ec9e95c68eadd5bcbd558eed3",
+      "finalV4ValueSHA256": "cb14c41a2e1fd88c893997a9dafabfe1711cce1ec9e95c68eadd5bcbd558eed3",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/backupDeletionAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/backupRestartAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/normalRenewalRequiresFreshLeaseAndM2",
+      "prePruneValueSHA256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "finalV4ValueSHA256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/schemaVersion",
+      "prePruneValueSHA256": "5c151237d24c03a7be7d958a8bba629a4bea90d935379542970030ccd301041a",
+      "finalV4ValueSHA256": "5c151237d24c03a7be7d958a8bba629a4bea90d935379542970030ccd301041a",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/sealedAt",
+      "prePruneValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "finalV4ValueSHA256": "ac12faf43199d85c41bd35b279a1116c29241752398f85926bae0d86c0a68618",
+      "equal": true
+    },
+    {
+      "pointer": "/seal/secondMigrationAllowed",
+      "prePruneValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "finalV4ValueSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/cohort-projection-set",
+      "prePruneValueSHA256": "c5f0af422e78af17c99f47990497ddbd6237ee2d59e342bb30b0e580d08b8bf6",
+      "finalV4ValueSHA256": "c5f0af422e78af17c99f47990497ddbd6237ee2d59e342bb30b0e580d08b8bf6",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/migration-event",
+      "prePruneValueSHA256": "e6d4dcac06e3816eec826f2bb8eedeef6113f8c78aaa31a89a9b70afe5663820",
+      "finalV4ValueSHA256": "e6d4dcac06e3816eec826f2bb8eedeef6113f8c78aaa31a89a9b70afe5663820",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/migration-journal",
+      "prePruneValueSHA256": "dbc1a230c9e3c4b57f911a01683f7eda33a6c2d8e6cb74960cb8adc0510afe72",
+      "finalV4ValueSHA256": "dbc1a230c9e3c4b57f911a01683f7eda33a6c2d8e6cb74960cb8adc0510afe72",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/operation-lease",
+      "prePruneValueSHA256": "c5f0af422e78af17c99f47990497ddbd6237ee2d59e342bb30b0e580d08b8bf6",
+      "finalV4ValueSHA256": "c5f0af422e78af17c99f47990497ddbd6237ee2d59e342bb30b0e580d08b8bf6",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/runtime-inventory",
+      "prePruneValueSHA256": "0c626a22e09c22f8e032a7120e8abc0d7fc717c8a220b6aba43d037868ff6298",
+      "finalV4ValueSHA256": "0c626a22e09c22f8e032a7120e8abc0d7fc717c8a220b6aba43d037868ff6298",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/successor-plan",
+      "prePruneValueSHA256": "14389cd66c47f2c191f3c7db7dd59bd51b760077edd09b31f1666f28b21fbabe",
+      "finalV4ValueSHA256": "14389cd66c47f2c191f3c7db7dd59bd51b760077edd09b31f1666f28b21fbabe",
+      "equal": true
+    },
+    {
+      "pointer": "/signers/terminal-seal",
+      "prePruneValueSHA256": "1444c468a4531be311128ffbec6234cfe416a96812d29ce6fd10120207c78ab5",
+      "finalV4ValueSHA256": "1444c468a4531be311128ffbec6234cfe416a96812d29ce6fd10120207c78ab5",
+      "equal": true
+    }
+  ],
+  "independentlyReproducible": true
+}

@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.378"
+version: "1.0.379"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T04:06:14+09:00"
+updated: "2026-11-06T05:27:23+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "72028 bounded delivery accepted; v4Low closed but auxM1 v5 docs revision; e50review6b active; B02cf reviewd4 pending after6b; OS setup feedback pending"
-active_card_next: "Handle e50 actual verdict/source choice then start readyB taskd4; bootstrapCodex v5 unsigned aggregate M1/I1-I3; actual reviews before registration/code/physical actions"
+active_card_status: "e50 ALL8/ALL12 packet ACCEPT/final qualifiedDocs pending; v5 DESIGN registered/K1 real Go code; B rev3 docs; R-L1 CLOSED/Linux notrun; physical incomplete"
+active_card_next: "Integrator final exacte50 qualified report/Docs; Codex K1 new e50 branch real verifier; B Codex rev3; Root source-qualified integration and physical holds"
 ---
+
+## 2026-11-06T05:27:23+09:00 e50 terminal CI와 R-L1 실제 판정
+
+작업한 것과 확인: e50의 8개 workflow/12개 job 성공을 Root가 exact SHA·ref로 확인했고 Core ZIP의 실제 XML에서 시험4파일106통과/0skip, installer17/PG2를 대조했다. 새 패킷4864blob 검증도 수락됐다. 전환 v5 설계는 실제 독립 검토 수락 뒤 고정하여 Codex K1 Go 구현을 지시했고 B는 R1~R7을 닫는 rev3 보완 중이다. 별도 R-L1 시험은 실제0e53fc02 검토에서 수락됐으며 새 파일의 Linux 실행은 아직 NOT RUN이다. Root는 source CI/actual artifact와 final 보고·배포·5대 인수를 구분한다. 다음 담당: 통합 Codex는 정확한 최종 보고/ownDocs, 전환 Codex는 K1, B Codex는 rev3이며 Root가 각 gate를 확인한다. 검토자는 현재 완료 상태이고 추가 review는 새 납품 뒤 한 번 진행한다.
+
+## 2026-11-06T05:22:48+09:00 실제 판정과 다음 구현
+
+작업한 것과 확인: 전환 v5는 실제 Claude 6b12d3ab 검토에서 설계 수락됐고 Root가 17개 schema를 고정해 Codex K1 offline Go verifier 구현을 지시했다. B rev2는 실제 ac9182c3의 R1~R7 수정 필요로 rev3 문서 보완 중이다. e50 새 패킷은 Root가 4,864개 Git blob과 6개 파일·중첩 ZIP·public copy를 대조해 수락했으며 전체 CI 최종 납품은 대기한다. 별도 R-L1 시험은 Claude ctx_8fa6addadbda에서 실제 검토를 시작했다. Root reply msg_a21df0511488는 live trust를 만들지 않는 K1 코드 범위를 구체화했다. 다음 첫 행동과 담당은 Codex의 e50 기반 새 verifier 구현, B owner의 rev3, 통합 owner의 남은 CI 최종 증거, Claude의 별도 R-L1 판정이다. PC1 공개키 인증·PC3 Docker 권한과 CP context 자원은 실제 확인 전 미완료다.
+
+## 2026-11-06 e50 source 선택과 B 실제 검토 착수
+
+작업한 것/확인: e50시험4파일은실제b9db061a/Docs42091970736의독립검토에서수락됐다. Root는a527조상·고정remote e50·exactDocs/Portal성공을대조하고replymsg_93007a9642f1로기존agent/codex/fleet5-test-followup-20261106을e50SHA에고정해다음최종후보로선택했다. 이전72028/all8/12/원본패킷은보존한다. 새e50의8개CI id/head/ref/job을대조한04:32관측은5성공·Backend/Core/A11y진행중이며새archive/packet hash는owner보고/독립artifact검토대기다. ready B task_d4c4c809ed4e는ctx_c7674e6e1277에서실제검토를시작했다. 다음첫행동/담당: 통합Codex는exacte50의실제Linux수집/남은전체CI와새packet을확인하고Claude는B새wire를판정한다. Root는새sourceCI·packet검토전landing을진행하지않고v5aux등록/구현도actualclosure뒤다.
 
 ## 2026-11-06 v4 판정·e50 실제 착수·B 개정 검토 대기
 

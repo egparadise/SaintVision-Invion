@@ -1,0 +1,69 @@
+{
+  "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+  "review": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+  "checks": [
+    {
+      "id": 42101121186,
+      "name": "Documentation Build",
+      "head": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+      "ref": "agent/claude/fleet5-bootstrap-v5-8874-review-20261106",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127503879926,
+          "name": "docs",
+          "head": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 42101121325,
+      "name": "Portal Login Journey Harness",
+      "head": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+      "ref": "agent/claude/fleet5-bootstrap-v5-8874-review-20261106",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127503874503,
+          "name": "portal-login-harness",
+          "head": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "verifiedAtKST": "2026-11-06T05:15:22+09:00",
+  "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
+  "closures": [
+    "V4-M1",
+    "V4-I1",
+    "V4-I2",
+    "V4-I3"
+  ],
+  "Info": [
+    "I-a",
+    "I-b",
+    "I-c",
+    "I-d",
+    "I-e"
+  ],
+  "designRegistered": true,
+  "registration": "bootstrap-v5-design-contract-registration-root.json",
+  "liveTrustRegistered": false,
+  "implementationCard": "FLEET5-BOOTSTRAP-V5-K1-OFFLINE-VERIFIER-20261106",
+  "implementationBase": "e50c148287779add421265868ef16909ed984650",
+  "implementationScope": [
+    "services/node-agent/migrationverify/**",
+    "services/node-agent/cmd/inv-migration-verify/**",
+    "services/node-agent/go.mod and go.sum only if justified by existing offline validator integration",
+    "unique owner History/Evidence and test fixtures within the new package"
+  ],
+  "reply": "msg_a21df0511488",
+  "currentAuthorization": "K1 real Go offline verifier + tests on new branch from frozen e50; no runtime/host effects",
+  "future40Cases": "NOT RUN; not complete"
+}
