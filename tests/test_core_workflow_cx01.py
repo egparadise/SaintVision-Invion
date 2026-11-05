@@ -94,7 +94,7 @@ def test_lan_database_real_pg_case_executes_once_in_a_focused_core_step():
     assert focused < gate < full
     assert 'INV_TEST_LAN_DATABASE_IMAGE="$image"' in text[focused:gate]
     assert "tests/integration/test_lan_pilot_database_real_pg.py" in text[focused:gate]
-    assert "assert len(cases) == 1" in text[gate:full]
+    assert "assert len(cases) == 2" in text[gate:full]
     assert "LAN database real-PG case must execute" in text[gate:full]
     ignore = "--ignore=tests/integration/test_lan_pilot_database_real_pg.py"
     assert ignore in text[full:]

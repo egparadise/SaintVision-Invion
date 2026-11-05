@@ -1,0 +1,62 @@
+{
+  "runID": 41987450905,
+  "headSha": "84bbec6bcf06f88a2f226972982bfad68fef5848",
+  "attempt": 1,
+  "conclusion": "failure",
+  "observedAtKST": "2026-11-05T17:08:07.627954+09:00",
+  "artifact": {
+    "id": 13398285551,
+    "node_id": "MDg6QXJ0aWZhY3QxMzM5ODI4NTU1MQ==",
+    "name": "saintvision-core-evidence",
+    "size_in_bytes": 13308103,
+    "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13398285551",
+    "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13398285551/zip",
+    "expired": false,
+    "digest": "sha256:7f3d974b46b2637984b2add9d01c1ebb6e6b1a4d82aa8fd453886c04a74e41ff",
+    "created_at": "2026-11-05T07:53:55Z",
+    "updated_at": "2026-11-05T07:53:55Z",
+    "expires_at": "2026-12-05T07:53:53Z",
+    "workflow_run": {
+      "id": 41987450905,
+      "repository_id": 1362259805,
+      "head_repository_id": 1362259805,
+      "head_branch": "agent/codex/fleet5-database-readiness-20261105",
+      "head_sha": "84bbec6bcf06f88a2f226972982bfad68fef5848"
+    }
+  },
+  "zipSha256": "7f3d974b46b2637984b2add9d01c1ebb6e6b1a4d82aa8fd453886c04a74e41ff",
+  "files": [
+    {
+      "name": "lan-pilot-database-real-pg.xml",
+      "sha256": "9b0b66b08ec6e407d7ad73032215618fbcf89116e4af207b1f360a956cf837bd",
+      "bytes": 563
+    },
+    {
+      "name": "lan-database-readiness-phases.json",
+      "sha256": "a20e89ddcbc5fa11b287d0c797d665fab70d36f1fee86d917981f403172e204a",
+      "bytes": 775
+    },
+    {
+      "name": "lan-installer-tests.xml",
+      "sha256": "7ae24aec14964ebd714e2fa3b66c43e935ec850b2ad1455cdf337cb55787cc30",
+      "bytes": 2593
+    },
+    {
+      "name": "core-tests.xml",
+      "sha256": "da9356071d87c1d5306b2d832aec1edb0fdb7714f87feee1f4c9b438c9ae2ca8",
+      "bytes": 1367672,
+      "tests": 8923,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 46
+    }
+  ],
+  "mainPytestSummary": [
+    {
+      "failed": 2,
+      "passed": 8875,
+      "skipped": 46,
+      "deselected": 2
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "status": "VERIFIED",
+  "sourceSHA": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "sameRegressionBlob": "232528b317af817462811d21f4249358ba378480",
+  "baselineRun": 41985493178,
+  "fixedCoreRun": 41993280120,
+  "fixedDocsRun": 41993283674,
+  "image": "postgres@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a",
+  "shippedEntrypointSha256": "9c440299ae04a0a79d55b8bf03307036d890a40979d2fb698073c9050d4b20a5",
+  "before": {
+    "image": "postgres@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a",
+    "prepareSha256": "200c49a9f8a7b25132c8087206cfca55736db2ad5c68bbe39c21c7f5014c5551",
+    "hookSha256": "a2859a5b0109a16b0422fab8d2a26d06b43b91c26cdc89e7ff9668193457f0a4",
+    "temporaryUnixSql": true,
+    "temporaryTcpRejected": true,
+    "targetDatabaseAbsent": true,
+    "pendingBeforeRelease": false,
+    "cleanup": "owned-resources-removed-and-reinspected",
+    "imageId": "sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a",
+    "shippedEntrypointSha256": "9c440299ae04a0a79d55b8bf03307036d890a40979d2fb698073c9050d4b20a5",
+    "prepareExitBeforeRelease": 1,
+    "prepareFinalExit": 1
+  },
+  "after": {
+    "image": "postgres@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a",
+    "prepareSha256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+    "hookSha256": "a2859a5b0109a16b0422fab8d2a26d06b43b91c26cdc89e7ff9668193457f0a4",
+    "temporaryUnixSql": true,
+    "temporaryTcpRejected": true,
+    "targetDatabaseAbsent": true,
+    "pendingBeforeRelease": true,
+    "cleanup": "owned-resources-removed-and-reinspected",
+    "imageId": "sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a",
+    "shippedEntrypointSha256": "9c440299ae04a0a79d55b8bf03307036d890a40979d2fb698073c9050d4b20a5",
+    "prepareExitBeforeRelease": null,
+    "prepareExitAfterRelease": 0,
+    "finalTargetTcpSql": true,
+    "verifyExit": 0,
+    "prepareFinalExit": 0
+  },
+  "originalGuardAttempt1Cause": "UNPROVEN",
+  "physicalAcceptance": "NOT_EXECUTED"
+}

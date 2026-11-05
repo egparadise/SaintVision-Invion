@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="8.162" timestamp="2026-11-05T07:24:29.119330+00:00" hostname="runnervmnwato"><testcase classname="tests.integration.test_lan_pilot_database_real_pg" name="test_prepare_waits_for_final_tcp_after_temporary_unix_server" time="2.545"><failure message="AssertionError: prepare crossed temporary Unix readiness before final TCP&#10;assert False is True">tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-6/test_prepare_waits_for_final_t0')
+
+    def test_prepare_waits_for_final_tcp_after_temporary_unix_server(tmp_path: Path) -&gt; None:
+        """Pause the shipped init flow before target DB creation, without faking PG."""
+        suffix = uuid.uuid4().hex[:10]
+        container = f"saintvision-readiness-{suffix}"
+        network = f"{container}-network"
+        database = f"saintvision_lan_readiness_{suffix}"
+        private_dir = tmp_path / "operator-private"
+        gate = tmp_path / "gate"
+        gate.mkdir(mode=0o777)
+        gate.chmod(0o777)  # The disposable image's postgres user writes only phase markers.
+        hook = tmp_path / "delayed-entrypoint.sh"
+        hook.write_text(
+            """#!/usr/bin/env bash
+    set -Eeo pipefail
+    source /usr/local/bin/docker-entrypoint.sh
+    if [[ "$(id -u)" == 0 ]]; then
+        docker_setup_env
+        docker_create_db_directories
+        exec gosu postgres "$0" "$@"
+    fi
+    # Retain the image's actual DB-creation implementation and intercept only its call.
+    eval "$(declare -f docker_setup_db | sed '1s/docker_setup_db/readiness_original_setup_db/')"
+    docker_setup_db() {
+        touch /readiness-gate/temporary-unix-ready
+        for ((attempt=0; attempt&lt;300; attempt++)); do
+            if [[ -f /readiness-gate/release ]]; then
+                readiness_original_setup_db "$@"
+                return
+            fi
+            sleep 0.1
+        done
+        return 98
+    }
+    _main "$@"
+    """,
+            encoding="utf-8",
+        )
+        hook.chmod(0o755)
+        real_docker = shutil.which("docker")
+        assert real_docker is not None
+        fake_bin = tmp_path / "bin"
+        fake_bin.mkdir()
+        shim = fake_bin / "docker"
+        shim.write_text(
+            """#!/usr/bin/env bash
+    set -euo pipefail
+    if [[ "$1" == run ]]; then
+        shift
+        exec "$READINESS_REAL_DOCKER" run \
+            --entrypoint /readiness-entrypoint.sh \
+            --mount "type=bind,source=$READINESS_HOOK,target=/readiness-entrypoint.sh,readonly" \
+            --mount "type=bind,source=$READINESS_GATE,target=/readiness-gate" "$@" postgres
+    fi
+    exec "$READINESS_REAL_DOCKER" "$@"
+    """,
+            encoding="utf-8",
+        )
+        shim.chmod(0o700)
+        report: dict[str, object] = {
+            "image": IMAGE,
+            "prepareSha256": hashlib.sha256(PREPARE.read_bytes()).hexdigest(),
+            "hookSha256": hashlib.sha256(hook.read_bytes()).hexdigest(),
+            "temporaryUnixSql": False,
+            "temporaryTcpRejected": False,
+            "targetDatabaseAbsent": False,
+            "pendingBeforeRelease": False,
+            "cleanup": "pending",
+        }
+        process = subprocess.Popen(
+            ["bash", str(PREPARE), IMAGE, container, str(_free_port()), str(private_dir), network, database],
+            cwd=ROOT,
+            env={
+                **os.environ,
+                "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}",
+                "READINESS_REAL_DOCKER": real_docker,
+                "READINESS_HOOK": str(hook),
+                "READINESS_GATE": str(gate),
+            },
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        def query(host: str, db: str, sql: str) -&gt; subprocess.CompletedProcess[str]:
+            return _run(
+                real_docker, "exec", container, "sh", "-ec",
+                'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; '
+                'export PGCONNECT_TIMEOUT=2; exec psql -w -h "$1" -U postgres -d "$2" -Atqc "$3"',
+                "_", host, db, sql,
+            )
+
+        try:
+            deadline = time.monotonic() + 45
+            while not (gate / "temporary-unix-ready").exists() and time.monotonic() &lt; deadline:
+                assert process.poll() is None, "prepare exited before controlled init phase"
+                time.sleep(0.1)
+            assert (gate / "temporary-unix-ready").exists(), "controlled init phase was not reached"
+            _owned(container, network)
+            image_id = _run(real_docker, "container", "inspect", "--format", "{{.Image}}", container)
+            assert image_id.returncode == 0
+            report["imageId"] = image_id.stdout.strip()
+            entrypoint = _run(real_docker, "exec", container, "sha256sum", "/usr/local/bin/docker-entrypoint.sh")
+            assert entrypoint.returncode == 0
+            report["shippedEntrypointSha256"] = entrypoint.stdout.split()[0]
+            unix = query("/var/run/postgresql", "postgres", "SELECT 1")
+            tcp = query("127.0.0.1", "postgres", "SELECT 1")
+            absent = query("/var/run/postgresql", "postgres", f"SELECT count(*) FROM pg_database WHERE datname = '{database}'")
+            report["temporaryUnixSql"] = unix.returncode == 0 and unix.stdout.strip() == "1"
+            report["temporaryTcpRejected"] = tcp.returncode != 0
+            report["targetDatabaseAbsent"] = absent.returncode == 0 and absent.stdout.strip() == "0"
+            assert report["temporaryUnixSql"] is True
+            assert report["temporaryTcpRejected"] is True
+            assert report["targetDatabaseAbsent"] is True
+            # Give the real preparation loop several opportunities to encounter this phase.
+            deadline = time.monotonic() + 4
+            while process.poll() is None and time.monotonic() &lt; deadline:
+                time.sleep(0.1)
+            report["prepareExitBeforeRelease"] = process.poll()
+            report["pendingBeforeRelease"] = process.poll() is None
+&gt;           assert report["pendingBeforeRelease"] is True, "prepare crossed temporary Unix readiness before final TCP"
+E           AssertionError: prepare crossed temporary Unix readiness before final TCP
+E           assert False is True
+
+tests/integration/test_lan_pilot_database_real_pg.py:188: AssertionError</failure></testcase><testcase classname="tests.integration.test_lan_pilot_database_real_pg" name="test_prepare_verify_roundtrip_uses_real_psql_variable_semantics" time="5.461" /></testsuite></testsuites>

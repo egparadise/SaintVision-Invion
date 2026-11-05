@@ -1,0 +1,9 @@
+.................................ss.s.....ss............................ [ 76%]
+......................                                                   [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_pilot_multinode.py:720: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:751: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:895: POSIX shell verifier runs in hosted Linux
+SKIPPED [1] tests\integration\test_lan_pilot_database_real_pg.py:69: explicit hosted Linux PostgreSQL image is required
+SKIPPED [1] tests\integration\test_lan_pilot_database_real_pg.py:233: explicit hosted Linux PostgreSQL image is required
+89 passed, 5 skipped in 6.79s

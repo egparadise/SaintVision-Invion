@@ -297,7 +297,7 @@ jobs:
           import xml.etree.ElementTree as ET
           root = ET.parse('dist/lan-pilot-database-real-pg.xml').getroot()
           cases = root.findall('.//testcase')
-          assert len(cases) == 1, f'Expected 1 LAN database case, got {len(cases)}'
+          assert len(cases) == 2, f'Expected 2 LAN database cases, got {len(cases)}'
           assert not root.findall('.//skipped'), 'LAN database real-PG case must execute'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error'))
           PY

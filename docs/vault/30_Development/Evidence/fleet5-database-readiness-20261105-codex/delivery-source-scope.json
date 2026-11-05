@@ -1,0 +1,27 @@
+{
+  "baseSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "sourceSHA": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "remoteSHA": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "sourceWorkingTreeMatchesPublished": true,
+  "allowedSourceAndMetadataPaths": [
+    ".github/workflows/core.yml",
+    "deploy/lan/prepare-pilot-database.sh",
+    "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+    "tests/integration/test_lan_pilot_database_real_pg.py",
+    "tests/test_core_workflow_cx01.py"
+  ],
+  "componentGitBlobs": {
+    ".github/workflows/core.yml": "f63a11684180b787aca6ba5d630a2656f6aba9fe",
+    "deploy/lan/prepare-pilot-database.sh": "a5695cab0a955d0aeeedf40f6459458ccef6210a",
+    "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json": "3f115f72e91aca8f473451a33aa236e8bf90bfde",
+    "tests/integration/test_lan_pilot_database_real_pg.py": "232528b317af817462811d21f4249358ba378480",
+    "tests/test_core_workflow_cx01.py": "e1b99b73bfbd38a5eb4e5cd7de1858923053b444"
+  },
+  "preparationSHA256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+  "onlyTwoCard150FieldsChanged": true,
+  "allOtherHistoricFieldsUnchanged": true,
+  "unexpectedChangedPaths": [],
+  "changedPathCount": 53,
+  "historyAndEvidenceExcludedFromProductScope": true,
+  "observedAtKST": "2026-11-05T17:36:47.576072+09:00"
+}

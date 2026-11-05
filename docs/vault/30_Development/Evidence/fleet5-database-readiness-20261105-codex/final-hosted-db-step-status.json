@@ -1,0 +1,27 @@
+{
+  "sourceSHA": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "runID": 41993280120,
+  "attempt": 1,
+  "observedAtKST": "2026-11-05T17:32:33.239250+09:00",
+  "databaseSteps": [
+    {
+      "completedAt": "2026-11-05T08:29:27Z",
+      "conclusion": "success",
+      "name": "Verify LAN pilot database scripts with real PostgreSQL",
+      "number": 27,
+      "startedAt": "2026-11-05T08:29:13Z",
+      "status": "completed"
+    },
+    {
+      "completedAt": "2026-11-05T08:29:27Z",
+      "conclusion": "success",
+      "name": "Require executed LAN pilot database evidence",
+      "number": 28,
+      "startedAt": "2026-11-05T08:29:27Z",
+      "status": "completed"
+    }
+  ],
+  "overallStatus": "in_progress",
+  "overallConclusion": "",
+  "countedAsOverallSuccess": false
+}
