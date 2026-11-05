@@ -1,0 +1,98 @@
+[
+    {
+        "name":  "docs",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_docs.py"
+                      ],
+        "startedAtKST":  "2026-11-05T17:15:43.2593019+09:00",
+        "endedAtKST":  "2026-11-05T17:15:47.5862445+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-docs.txt",
+        "logSHA256":  "ccb73231e40ead05b32a0d07c76680c527211d91dda3aa0809a9685e97ca25b3"
+    },
+    {
+        "name":  "ontology",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_ontology.py"
+                      ],
+        "startedAtKST":  "2026-11-05T17:15:47.8560611+09:00",
+        "endedAtKST":  "2026-11-05T17:15:50.9644431+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-ontology.txt",
+        "logSHA256":  "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+        "name":  "contract-bindings",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_contract_bindings.py"
+                      ],
+        "startedAtKST":  "2026-11-05T17:15:50.9755582+09:00",
+        "endedAtKST":  "2026-11-05T17:16:36.3192364+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-contract-bindings.txt",
+        "logSHA256":  "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c"
+    },
+    {
+        "name":  "frontend-integrity",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_frontend_integrity.py"
+                      ],
+        "startedAtKST":  "2026-11-05T17:16:36.3335779+09:00",
+        "endedAtKST":  "2026-11-05T17:16:39.7332731+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-frontend-integrity.txt",
+        "logSHA256":  "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353"
+    },
+    {
+        "name":  "single-source",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_doc_single_source.py",
+                          "--ratchet"
+                      ],
+        "startedAtKST":  "2026-11-05T17:16:39.7392463+09:00",
+        "endedAtKST":  "2026-11-05T17:16:42.8597998+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-single-source.txt",
+        "logSHA256":  "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+        "name":  "path-citations",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/check_doc_path_citations.py",
+                          "--ratchet",
+                          "--base-ref",
+                          "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067"
+                      ],
+        "startedAtKST":  "2026-11-05T17:16:42.8699749+09:00",
+        "endedAtKST":  "2026-11-05T17:16:59.7642888+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-path-citations.txt",
+        "logSHA256":  "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+        "name":  "sync-check",
+        "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+        "arguments":  [
+                          "-B",
+                          "tools/sync_obsidian.py",
+                          "--check"
+                      ],
+        "startedAtKST":  "2026-11-05T17:16:59.7685248+09:00",
+        "endedAtKST":  "2026-11-05T17:17:11.5100817+09:00",
+        "exitCode":  0,
+        "log":  "docs\\vault\\30_Development\\Evidence\\fleet5-storage-workspace-guard-20261105-codex\\final-sync-check.txt",
+        "logSHA256":  "370f4af61e4b503805b423751ed19db4860c687ca72b126ffb20f2e0ca34e1a9"
+    }
+]

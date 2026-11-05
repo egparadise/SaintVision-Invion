@@ -1,0 +1,39 @@
+{
+  "observedAtKST": "2026-11-05T16:34:05.326774+09:00",
+  "taskID": "FLEET5-STORAGE-WORKSPACE-GUARD-20261105",
+  "acceptedHelperSource": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-storage-workspace-guard-20261105",
+  "parentCommit": "f40c38056628ecac88afd5c6ace46b6734ec080b",
+  "interpreter": "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+  "version": "Python3.14.7",
+  "flags": [
+    "-B",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "PYTHONUTF8=1",
+    "-p no:cacheprovider"
+  ],
+  "dirtyInputs": "test-only Low plus unique History/Evidence; helper unchanged",
+  "helperUnchanged": true,
+  "fileSHA256": {
+    "deploy/lan/worker_workspace.py": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+    "tests/core/test_lan_workspace_upgrade.py": "ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d"
+  },
+  "localFocused": {
+    "command": "-B -m pytest tests/core/test_lan_workspace_upgrade.py tests/core/test_lan_worker_config.py tests/core/test_lan_storage.py tests/core/test_lan_storage_readiness.py -q -ra -p no:cacheprovider --junitxml=docs/vault/30_Development/Evidence/fleet5-storage-workspace-guard-20261105-codex/no-socket-focused.xml",
+    "exitCode": 0,
+    "passed": 104,
+    "skipped": 0,
+    "failed": 0,
+    "stateOnlyCases": [
+      "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-observe-v1]",
+      "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-test-v1]",
+      "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-workspace-v1]"
+    ]
+  },
+  "priorReviewCommit": "087aaf3521608a19fff28c8d70bacdda92697367",
+  "priorReviewAppliesToNewTestBytes": false,
+  "newReview": "pending root relay",
+  "newExactHeadCI": "pending",
+  "source59fPacketModified": false,
+  "physicalAcceptanceAssessed": false
+}

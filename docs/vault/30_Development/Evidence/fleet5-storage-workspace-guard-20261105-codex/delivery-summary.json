@@ -1,0 +1,109 @@
+{
+  "taskID": "FLEET5-STORAGE-WORKSPACE-GUARD-20261105",
+  "observedAtKST": "2026-11-05T17:14:24.167351+09:00",
+  "owner": "Codex worker",
+  "reviewer": "Actual Claude via root",
+  "baseSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "helperImplementationSHA": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+  "finalSourceAndTestsSHA": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+  "branch": "agent/codex/fleet5-storage-workspace-guard-20261105",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-storage-workspace-guard-20261105",
+  "codeFileSHA256": {
+    "deploy/lan/worker_workspace.py": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+    "tests/core/test_lan_workspace_upgrade.py": "ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d"
+  },
+  "localFocused": {
+    "passed": 104,
+    "skipped": 0,
+    "failed": 0,
+    "exitCode": 0,
+    "interpreter": "main-repo Python3.14.7 -B",
+    "environment": "Windows; PYTHONDONTWRITEBYTECODE=1; PYTHONUTF8=1; pytest cache disabled; Docker and Unix lock simulated"
+  },
+  "initialExpectedRed": {
+    "source": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "failed": 15,
+    "passed": 15,
+    "exitCode": 1,
+    "realDocker": false
+  },
+  "servingRoute": {
+    "passed": 50,
+    "exitCode": 0
+  },
+  "localProvisioned": {
+    "passed": 0,
+    "skipped": 15,
+    "exitCode": 0,
+    "reason": "Windows/explicit Linux Docker opt-in unavailable"
+  },
+  "sourceCI": {
+    "headSHA": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+    "core": {
+      "runID": 41988233523,
+      "attempt": 1,
+      "conclusion": "success",
+      "mainPassed": 8900,
+      "mainSkipped": 46,
+      "mainDeselected": 2,
+      "guardCases": 33,
+      "stateOnlyCases": 3,
+      "provisionedInstallerPassed": 15,
+      "provisionedInstallerSkipped": 0,
+      "databasePassed": 1
+    },
+    "docs": {
+      "runID": 41988236953,
+      "conclusion": "success"
+    }
+  },
+  "priorCore": {
+    "runID": 41982378091,
+    "headSHA": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+    "attempt1": "failure: LAN pilot database initial role hardening",
+    "attempt2": "success",
+    "retryCount": 1,
+    "failureRetained": true,
+    "causeProvenInThisTask": false,
+    "separateOwner": "root task_58f4ada5c2d8 / ctx_77b63db632d7"
+  },
+  "reviews": {
+    "helper": {
+      "commit": "087aaf3521608a19fff28c8d70bacdda92697367",
+      "reviewedSource": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+      "verdict": "ACCEPT",
+      "independentPassed": 34,
+      "scope": "30 owner tests + 4 Claude probes"
+    },
+    "testDelta": {
+      "commit": "822da5bce0131dea4da56c7a1aa16ff7ab3b34d8",
+      "reviewedSource": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+      "verdict": "ACCEPT",
+      "independentPassed": 33,
+      "mutantFailed": 3,
+      "mutantOtherPassed": 30,
+      "docsRunID": 41991681981,
+      "docsConclusion": "success",
+      "priorReviewReused": false
+    }
+  },
+  "sourceGatesSatisfied": true,
+  "finalLocalGateEvidence": "final-gates.json",
+  "finalReportCI": "Documentation run on report commit is recorded in GitHub Actions and worker completion receipt; report commit changes only unique History/Evidence",
+  "mutations": {
+    "source59fPacket": false,
+    "targetDevices": false,
+    "remoteRuntime": false,
+    "authenticationAttempts": false,
+    "admin": false,
+    "ACLQuotas": false,
+    "arbitraryRemounts": false,
+    "r5Source03ExecutorKeysStatePinsSchedules": false,
+    "boardsRegistrySchemaSourceOriginals": false,
+    "obsidianApply": false
+  },
+  "physicalAcceptance": false,
+  "combinedStorageWorkspaceSupport": false,
+  "wholeEightLaneClaim": false,
+  "nextOwner": "root: integrate reviewed sources with separate DB-readiness work, combined CI and latest-vault aggregation; deployment/physical acceptance outside this task"
+}

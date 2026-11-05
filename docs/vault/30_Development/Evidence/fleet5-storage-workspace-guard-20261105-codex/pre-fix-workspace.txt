@@ -1,0 +1,169 @@
+..........FFFFFFFFFFFFFFF.....                                           [100%]
+================================== FAILURES ===================================
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[storage] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-only] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-equals] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-single-dash] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-single-dash-equals] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-empty] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[contribution-only] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[nested-contribution] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[other-bind] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[other-volume] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-source] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-type] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-readonly] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-propagation] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+_ test_install_rejects_unpreserved_storage_before_any_docker_mutation[duplicate-socket] _
+tests\core\test_lan_workspace_upgrade.py:191: in test_install_rejects_unpreserved_storage_before_any_docker_mutation
+    assert p.calls == [('inspect',p.name)], 'Preflight must precede image loads and every Docker mutation'
+E   AssertionError: Preflight must precede image loads and every Docker mutation
+E   assert [('inspect', ...ge.tar'), ...] == [('inspect', ...00000000000')]
+E
+E     Left contains 14 more items, first extra item: ('docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.node=nod_00000000000000000000000000', '--filter', ...)
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"nodeId": "nod_00000000000000000000000000", "profile": "lan-workspace-v1", "agentImage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "executionImage": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "imageCodeSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067", "status": "awaiting-server-mtls-verification", "workloadLimits": {"cpuMillis": 1000, "memoryMiB": 512, "timeoutSeconds": 30, "network": "none"}, "identityPreserved": true, "journalPreserved": true}
+=========================== short test summary info ===========================
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[storage]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-only]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-equals]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-single-dash]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-single-dash-equals]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[policy-empty]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[contribution-only]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[nested-contribution]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[other-bind]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[other-volume]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-source]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-type]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-readonly]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[socket-propagation]
+FAILED tests/core/test_lan_workspace_upgrade.py::test_install_rejects_unpreserved_storage_before_any_docker_mutation[duplicate-socket]
+15 failed, 15 passed in 1.24s

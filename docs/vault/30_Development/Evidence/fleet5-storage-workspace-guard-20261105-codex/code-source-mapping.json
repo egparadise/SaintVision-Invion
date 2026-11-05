@@ -1,0 +1,33 @@
+{
+  "observedAtKST": "2026-11-05T15:50:19.170318+09:00",
+  "originalProductSource": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "futureGuardedSource": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+  "originalFirstWavePacketModified": false,
+  "deploymentPerformed": false,
+  "files": [
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "originalSource59fSHA256": "da46ab67d0220b705c54bf889c3bf63e18b3bddb327bfe5881969121d43711c3",
+      "guardedSourceSHA256": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+      "changed": true
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "originalSource59fSHA256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+      "guardedSourceSHA256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+      "changed": false
+    },
+    {
+      "path": "deploy/lan/worker_storage.py",
+      "originalSource59fSHA256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "guardedSourceSHA256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "changed": false
+    },
+    {
+      "path": "deploy/lan/Enable-Workspace.ps1",
+      "originalSource59fSHA256": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "guardedSourceSHA256": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "changed": false
+    }
+  ]
+}

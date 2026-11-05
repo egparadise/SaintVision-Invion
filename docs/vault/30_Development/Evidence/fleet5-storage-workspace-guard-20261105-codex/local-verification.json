@@ -1,0 +1,129 @@
+{
+    "taskId":  "FLEET5-STORAGE-WORKSPACE-GUARD-20261105",
+    "observedAtKST":  "2026-11-05T15:42:39.4505685+09:00",
+    "baseSHA":  "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "branch":  "agent/codex/fleet5-storage-workspace-guard-20261105",
+    "worktree":  "D:\\Project\\SaintVisionI-Invion\\fleet5-storage-workspace-guard-20261105",
+    "worktreeStatus":  "dirty: helper, regression tests and unique History/Evidence; no other paths",
+    "interpreter":  "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe",
+    "pythonVersion":  "3.14.7",
+    "operatingSystem":  "Microsoft Windows NT 10.0.26300.0",
+    "environment":  {
+                        "PYTHONDONTWRITEBYTECODE":  "1",
+                        "PYTHONUTF8":  "1",
+                        "pytestCache":  "disabled",
+                        "unixLock":  "simulated nullcontext",
+                        "Docker":  "simulated in new tests; no daemon calls",
+                        "protectedR5":  "untouched",
+                        "dependencyInstall":  "none"
+                    },
+    "pytestPrefix":  "-B -m pytest -q -ra -p no:cacheprovider",
+    "runs":  [
+                 {
+                     "selection":  "tests/core/test_lan_workspace_upgrade.py (source59f, new tests)",
+                     "exitCode":  1,
+                     "passed":  15,
+                     "failed":  15,
+                     "skipped":  0,
+                     "junit":  "pre-fix-workspace.xml",
+                     "log":  "pre-fix-workspace.txt",
+                     "kind":  "expected failure proving absent preflight"
+                 },
+                 {
+                     "selection":  "tests/core/test_lan_workspace_upgrade.py tests/core/test_lan_worker_config.py tests/core/test_lan_storage.py tests/core/test_lan_storage_readiness.py",
+                     "exitCode":  0,
+                     "passed":  101,
+                     "failed":  0,
+                     "skipped":  0,
+                     "junit":  "post-fix-focused.xml",
+                     "log":  "post-fix-focused.txt"
+                 },
+                 {
+                     "selection":  "tests/core/test_serving_anchors.py tests/test_route_coverage.py",
+                     "exitCode":  0,
+                     "passed":  50,
+                     "failed":  0,
+                     "skipped":  0,
+                     "junit":  "serving-route.xml",
+                     "log":  "serving-route.txt"
+                 },
+                 {
+                     "selection":  "tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py",
+                     "exitCode":  0,
+                     "passed":  0,
+                     "failed":  0,
+                     "skipped":  15,
+                     "reasons":  "3 Opt-in Linux Docker installer acceptance; 12 Opt-in owned Docker storage installer test",
+                     "junit":  "local-provisioned-capability.xml",
+                     "log":  "local-provisioned-capability.txt",
+                     "operationalAcceptanceAssessed":  false
+                 }
+             ],
+    "gates":  [
+                  {
+                      "command":  "-B tools/check_docs.py",
+                      "exitCode":  0,
+                      "log":  "check-docs.txt"
+                  },
+                  {
+                      "command":  "-B tools/check_ontology.py",
+                      "exitCode":  0,
+                      "log":  "check-ontology.txt"
+                  },
+                  {
+                      "command":  "-B tools/check_contract_bindings.py",
+                      "exitCode":  0,
+                      "log":  "check-contract-bindings.txt"
+                  },
+                  {
+                      "command":  "-B tools/check_frontend_integrity.py",
+                      "exitCode":  0,
+                      "log":  "check-frontend-integrity.txt"
+                  },
+                  {
+                      "command":  "-B tools/check_doc_single_source.py --ratchet",
+                      "exitCode":  0,
+                      "log":  "check-single-source.txt"
+                  },
+                  {
+                      "command":  "-B tools/check_doc_path_citations.py --ratchet --base-ref 59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+                      "exitCode":  0,
+                      "log":  "check-path-citations.txt"
+                  },
+                  {
+                      "command":  "-B tools/sync_obsidian.py --check",
+                      "exitCode":  0,
+                      "log":  "sync-check.txt",
+                      "managed":  2219,
+                      "pending":  15,
+                      "conflicts":  0,
+                      "writes":  0
+                  }
+              ],
+    "fileSHA256":  {
+                       "helper":  "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+                       "tests":  "b4b47fb1b586ff2644189788e8b00846004671e86077a1ed35591b888549041f"
+                   },
+    "artifactSHA256":  {
+                           "check-contract-bindings.txt":  "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c",
+                           "check-docs.txt":  "ccb73231e40ead05b32a0d07c76680c527211d91dda3aa0809a9685e97ca25b3",
+                           "check-frontend-integrity.txt":  "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353",
+                           "check-ontology.txt":  "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f",
+                           "check-path-citations.txt":  "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b",
+                           "check-single-source.txt":  "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a",
+                           "local-provisioned-capability.txt":  "dc06b2699b635832bde5cad420862e019bd5528487f4f4a3ea6d8602e6b39728",
+                           "local-provisioned-capability.xml":  "91f9565eda7e5e9b9aa34f379b5399208d88089e35f25c4dcf04f62d2fad0baa",
+                           "post-fix-focused.txt":  "bdfc3bbe15eac36e7ca4eb595901e15cc03c2ff00de13976ff7797f9dd5cde3a",
+                           "post-fix-focused.xml":  "36bf6981b8d4398b76a82f9e06fd368693e9695c6a57be2ac738aca9a2381d4a",
+                           "pre-fix-workspace.txt":  "7096786afa84e0d548cc316bfd0fc268a7b98c35879e1bde331e6227bbccbe4f",
+                           "pre-fix-workspace.xml":  "18a14a992282870ae8bde49d846605542cd56a7a7387531bd9c91b466b3602d7",
+                           "serving-route.txt":  "50020da137993bd741c4bb07ea92a0013680bbf70806a60fad8c108a6272e6b0",
+                           "serving-route.xml":  "2ed7b2dcd1ec3ca4a346ae8a21de5fd874dbe339b27eb7dc3d7ac7d489e32017",
+                           "sync-check.txt":  "e2b0775120507a60e5624029f7f552ea1f6c3b1f5360612070adebd1c5b1e923"
+                       },
+    "CI":  "pending exact-head Core and Documentation",
+    "independentReview":  "pending actual Claude review through root",
+    "physicalAcceptance":  "not run",
+    "source59fPacketModified":  false,
+    "evidenceNormalization":  "UTF-8 without BOM; repository LF and trailing whitespace removed from captured text/XML only; test results unchanged. Initial staged diff check exit2 for pytest traceback whitespace, corrected before commit."
+}

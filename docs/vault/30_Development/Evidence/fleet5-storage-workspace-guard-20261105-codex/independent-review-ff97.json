@@ -1,0 +1,54 @@
+{
+  "observedAtKST": "2026-11-05T15:59:52.720863+09:00",
+  "reviewer": "Claude",
+  "reviewCommit": "087aaf3521608a19fff28c8d70bacdda92697367",
+  "reviewPath": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/packet7dd8-r4ff97-review.json",
+  "reviewBlobSHA256": "217702861d5ef724602003629c92882fa296283ce18e7f512806365e4e35aa3b",
+  "reviewDocsRunID": 41983434951,
+  "coordinatorRelay": "msg_73b2a84a5445",
+  "r4Source": {
+    "commit": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+    "base": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "delta": {
+      "deploy/lan/worker_workspace.py": "+25/-1",
+      "tests/core/test_lan_workspace_upgrade.py": "+182"
+    },
+    "verdict": "ACCEPT",
+    "highOrMediumFindings": 0,
+    "checks": {
+      "rejectionBeforeAnyMutationOrImageLoad": true,
+      "flagVariantsCovered": [
+        "--storage-policy",
+        "-storage-policy",
+        "--storage-policy=value",
+        "-storage-policy=value",
+        "empty value"
+      ],
+      "goFlagDeclaration": "services/node-agent/cmd/inv-node/main.go:51",
+      "onlyStateAndOneExactSocketAllowed": true,
+      "plainStartNodeShapeNoSocketPasses": true,
+      "rollbackAndValidateTargetUnchanged": true,
+      "noCombinedSupportClaim": true
+    },
+    "independentRun": {
+      "atKST": "2026-11-05T15:48:49+09:00",
+      "scope": "exported ff97 deploy/lan + new test file in scratchpad; main .venv Python 3.14.7 -B -p no:cacheprovider",
+      "passed": 34,
+      "ownerTests": 30,
+      "claudeProbes": 4,
+      "probes": [
+        "plain no-socket shape passes",
+        "two sockets rejected",
+        "socket as volume rejected",
+        "socket other source rejected"
+      ],
+      "broadSuiteRerun": false,
+      "untouchedSourceRedReproduced": false
+    },
+    "lowFindings": [
+      "fixture current always includes socket; add a no-socket plain start-node case"
+    ],
+    "outOfScopePreexisting": "recreated container does not carry non-mount HostConfig (device/GPU requests, env); unchanged from 59f"
+  },
+  "appliesToFutureTestBytes": false
+}

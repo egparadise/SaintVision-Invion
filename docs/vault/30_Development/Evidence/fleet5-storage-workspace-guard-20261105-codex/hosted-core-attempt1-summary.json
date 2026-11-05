@@ -1,0 +1,84 @@
+{
+  "observedAtKST": "2026-11-05T15:56:48.693963+09:00",
+  "sourceSHA": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+  "runID": 41982378091,
+  "attempt": 1,
+  "conclusion": "failure",
+  "artifactID": 13395590043,
+  "artifactDigest": "sha256:88c564a142355e2830840e24546f204bac54477fc92fc97eaf05c1e8f0ec2587",
+  "junit": [
+    {
+      "file": "build-product-runtime-real-pg.xml",
+      "sha256": "dcc6b3bbc1a7306bf24505f6d83f26322d41fc2ba9c6c4a27e65019d3997d0f8",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "business-handoff-tests.xml",
+      "sha256": "e3e3e4f6117d8a240df0599496de1de7aefa58992b03ad2db9eff3450db56af3",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "containment-tests.xml",
+      "sha256": "139bdb58a3f71440ac88f49effcb7758b75d963ddac82b9ca2294c6517513594",
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "cx01-recovery-tests.xml",
+      "sha256": "bb162e1f384cfb83838f14e91f1c8a12bb81344b3f848451467bab2dba05085f",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "lan-installer-tests.xml",
+      "sha256": "8e06c1a24439723bc66a812f5f30eb73bf31c8a68e1a4d2c93ab695f3e4cb1b1",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "storedEvidenceFile": "hosted-attempt1-lan-installer-tests.xml",
+      "storedEvidenceSHA256": "8e06c1a24439723bc66a812f5f30eb73bf31c8a68e1a4d2c93ab695f3e4cb1b1",
+      "copyNormalization": "Repository copy uses LF without trailing whitespace; sha256 field is original downloaded artifact bytes"
+    },
+    {
+      "file": "lan-pilot-database-real-pg.xml",
+      "sha256": "881afb814e8099ea7615ba38fe0c44b3968ce96bbafc5d76a3917643ec3647ab",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "storedEvidenceFile": "hosted-attempt1-lan-pilot-database-real-pg.xml",
+      "storedEvidenceSHA256": "4ec8c3a5e0ec28c979736655c284c035307b9d2725a34e145b66f65178ecbb97",
+      "copyNormalization": "Repository copy uses LF without trailing whitespace; sha256 field is original downloaded artifact bytes"
+    },
+    {
+      "file": "shard-recovery-tests.xml",
+      "sha256": "3e6b36be7e446e833b687475879a0083f518b1cb5b4b63c7ac7f29186186080d",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "workspace-tests.xml",
+      "sha256": "f8c94c5be4a696d1521beac95a55b23a61b3b29cedab42919fea455149983302",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "mainCorePytestExecuted": false,
+  "localSourceChangesForDatabaseFailure": false,
+  "physicalAcceptanceAssessed": false
+}
