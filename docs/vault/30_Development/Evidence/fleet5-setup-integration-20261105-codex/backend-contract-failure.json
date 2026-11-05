@@ -1,0 +1,27 @@
+{
+  "sourceCommit": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "observedAtKST": "2026-11-05T19:41:35.951122+09:00",
+  "failure": "Backend lifecycle caller omits actual finalizedAttestationVerified field; both Python versions fail inline assertion24",
+  "failureRun": 42011550328,
+  "laterMainPytestExecuted": false,
+  "localRed": {
+    "failed": 2,
+    "passed": 1,
+    "exit": 1
+  },
+  "localGreen": {
+    "passed": 3,
+    "exit": 0
+  },
+  "repair": "Add finalizedAttestationVerified=True to exact consumer expectation; add positive and missing/false attestation negative regression",
+  "relatedIntegrationCorrection": true,
+  "producerOrToolingPinsModified": false,
+  "rootNotifiedBeforeRepair": "msg_ae96e04ac611",
+  "correctedCandidateCommit": null,
+  "allEightFinal": false,
+  "oldSourceArchiveAndPacketPreserved": true,
+  "backend-42011550328-failed.logSHA256": "ff05d630c94f0e83663008ca2e4864215aff3bcc1cbd0a8a17ea0d2dadb18290",
+  "backend-contract-red.txtSHA256": "22fe9a07e497e3e7011b4379a4fb771fca7098c51664ed256d39834c1c8fec4b",
+  "backend-contract-green.txtSHA256": "603b1a324e6a4775c6100fc0f449b04382e3c38abd43b6e0e0619ed154b34463",
+  "regressionTestSHA256": "50faa00796e1e3323bf4856a0e0676e22b2aa86c634bfa343c9de15146884518"
+}

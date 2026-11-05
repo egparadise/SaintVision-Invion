@@ -1,0 +1,35 @@
+{
+  "baseCandidate": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "observedAtKST": "2026-11-05T19:43:19.214808+09:00",
+  "productionDelta": [
+    ".github/workflows/backend.yml: require finalizedAttestationVerified=True"
+  ],
+  "regression": "tests/test_backend_leaf_runtime_contract.py: complete six-field acceptance and missing/false proof rejection",
+  "focused": {
+    "before": {
+      "failed": 2,
+      "passed": 1,
+      "exit": 1
+    },
+    "after": {
+      "passed": 3,
+      "exit": 0
+    }
+  },
+  "gates": {
+    "repair-contracts": 0,
+    "repair-docs": 0,
+    "repair-frontend": 0,
+    "repair-ontology-generation": 0,
+    "repair-ontology": 0,
+    "repair-paths": 0,
+    "repair-ratchet": 0,
+    "repair-sync": 0
+  },
+  "combinedReview": "PENDING_ROOT_DISPATCH",
+  "newAllEightCI": "NOT_DISPATCHED",
+  "sourceToolingPairsUnchanged": true,
+  "originalCandidateArtifactsAndFailuresPreserved": true,
+  "deploymentOrIntegrationRefAdvanced": false,
+  "physicalAcceptance": false
+}

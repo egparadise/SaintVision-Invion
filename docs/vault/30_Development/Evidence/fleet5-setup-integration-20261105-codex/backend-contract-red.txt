@@ -1,0 +1,60 @@
+FF.                                                                      [100%]
+================================== FAILURES ===================================
+____ test_backend_accepts_complete_verified_standalone_lifecycle_contract _____
+
+    def test_backend_accepts_complete_verified_standalone_lifecycle_contract():
+>       _validate_as_workflow(dict(VERIFIED_LIFECYCLE))
+
+tests\test_backend_leaf_runtime_contract.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_backend_leaf_runtime_contract.py:33: in _validate_as_workflow
+    exec(compile(ast.Module(body=checks, type_ignores=[]), str(WORKFLOW), "exec"),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    name: Backend Build
+    # Only a dispatch that passes `correlation_id` changes this; every other event keeps
+    # the workflow name. The value is used for the run's display name only.
+    run-name: ${{ inputs.correlation_id || github.workflow }}
+    on:
+      workflow_dispatch:
+        inputs:
+          correlation_id:
+            # Opaque id echoed into the run name, and read nowhere else, so a tool that
+            # dispatched this run can recognise it among runs other people dispatched at
+            # the same ref and commit (tools/post_landing_verify.py). The run list gives
+            # no link between a dispatch and the run it creates, and run ids and
+            # timestamps cannot tell two concurrent dispatches apart.
+            description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
+            required: false
+            default: ''
+      push:
+        branches:
+          - main
+          - integration/all-agents-unified
+      pull_request:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+>     # Keep shared evidence branches ordered, but let a PR merge ref or a manually
+E     AssertionError
+
+.github\workflows\backend.yml:24: AssertionError
+_ test_backend_refuses_absent_or_failed_node_finalization_attestation[missing] _
+
+proof = 'missing'
+
+    @pytest.mark.parametrize("proof", ["missing", False])
+    def test_backend_refuses_absent_or_failed_node_finalization_attestation(proof):
+        value = dict(VERIFIED_LIFECYCLE)
+        if proof == "missing":
+            del value["finalizedAttestationVerified"]
+        else:
+            value["finalizedAttestationVerified"] = proof
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:48: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_accepts_complete_verified_standalone_lifecycle_contract
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_refuses_absent_or_failed_node_finalization_attestation[missing]
+2 failed, 1 passed in 0.17s

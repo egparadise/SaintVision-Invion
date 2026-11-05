@@ -1,0 +1,29 @@
+{
+  "archiveInventory": {
+    "entries": 4230,
+    "everyGitBlobCompared": true,
+    "name": "source-inventory.json",
+    "sha256": "1ba43258b95500f842e1113661c7049f9f749cde5e53759e0ff45bc7479ec07e"
+  },
+  "candidateCI": "separate exact-source all-eight workflow evidence required",
+  "createdAtKST": "2026-11-05T19:32:24.674730+09:00",
+  "independentCombinedReview": "separate actual reviewer report required; this builder makes no review assertion",
+  "physicalAcceptance": false,
+  "schemaVersion": "fleet5-exact-source-packet-manifest:1",
+  "setupPlan": {
+    "executed": false,
+    "packetPath": "setup-plan.json",
+    "sha256": "c5eefcc99eadf8b79f4368135e913671c41b14102b7eecb2b646013d848a9bfd",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/setup-plan.json"
+  },
+  "source59fFrozenArchiveOpenedOrModified": false,
+  "sourceArchive": {
+    "bytes": 18018091,
+    "name": "fleet5-candidate-source-d0735809b92850e7f63f6a07fdd7cd16d27e0fc8.zip",
+    "sha256": "8bdadbdba23026ff4886141de676610ff2b0bad7fc20504a9aca2217de08bc49"
+  },
+  "sourceCommit": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "sourceTree": "2b9d87579205c05f325560dbce5ae3b4816cc559",
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "wholeProductAcceptance": false
+}

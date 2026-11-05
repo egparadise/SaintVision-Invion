@@ -143,6 +143,7 @@ jobs:
           assert lifecycle == {
               'bytecodeCacheCount': 0,
               'finalized': True,
+              'finalizedAttestationVerified': True,
               'installRestartReceipt': True,
               'restartCount': 4,
               'rolledBack': True,

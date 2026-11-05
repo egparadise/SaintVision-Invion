@@ -1,0 +1,138 @@
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	﻿2026-11-05T10:33:00.2443782Z ##[group]Run bundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2444220Z ^[[36;1mbundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2444538Z ^[[36;1mruntime="$RUNNER_TEMP/leaf-rotation-runtime-3.12"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2444988Z ^[[36;1mpython tools/build_leaf_rotation_runtime.py --output "$bundle" > "$RUNNER_TEMP/leaf-runtime-build.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2445485Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2446155Z ^[[36;1m  --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-install.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2446567Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2446871Z ^[[36;1m  --runtime-dir "$runtime" \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2447151Z ^[[36;1m  --worker-script deploy/lan/worker_leaf_rotation.py \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2447515Z ^[[36;1m  -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-preflight.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2447954Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2448385Z ^[[36;1m  --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-reinstall.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2448788Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2449081Z ^[[36;1m  --runtime-dir "$runtime" \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2449346Z ^[[36;1m  --worker-script deploy/lan/worker_leaf_rotation.py \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2449708Z ^[[36;1m  -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-second-preflight.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2450080Z ^[[36;1mpython tools/check_leaf_rotation_standalone_lifecycle.py \^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2450433Z ^[[36;1m  --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2450807Z ^[[36;1mtest -z "$(find "$runtime" -type d -name __pycache__ -print -quit)"^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2451087Z ^[[36;1mpython - <<'PY'^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2451275Z ^[[36;1mimport json^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2451617Z ^[[36;1mimport os^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2451801Z ^[[36;1mfrom pathlib import Path^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2452006Z ^[[36;1m^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2452189Z ^[[36;1mroot = Path(os.environ['RUNNER_TEMP'])^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2452516Z ^[[36;1mbuild = json.loads((root / 'leaf-runtime-build.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2452914Z ^[[36;1minstall = json.loads((root / 'leaf-runtime-install.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2453335Z ^[[36;1mpreflight = json.loads((root / 'leaf-runtime-preflight.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2453755Z ^[[36;1mreinstall = json.loads((root / 'leaf-runtime-reinstall.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2454188Z ^[[36;1msecond = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2454638Z ^[[36;1mlifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2454961Z ^[[36;1massert build['wheelCount'] == 4^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2455204Z ^[[36;1massert build['workerModuleCount'] == 2^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2455553Z ^[[36;1massert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2456036Z ^[[36;1massert install['platformKey'] in {^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2456275Z ^[[36;1m    'cpython-312-x86_64-linux-gnu',^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2456499Z ^[[36;1m    'cpython-314-x86_64-linux-gnu',^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2456697Z ^[[36;1m}^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2456883Z ^[[36;1massert preflight['compatible'] is True^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2457177Z ^[[36;1massert preflight['cryptographyVersion'] == '50.0.1'^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2457477Z ^[[36;1massert preflight['utcCertificateAPI'] is True^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2457745Z ^[[36;1massert reinstall == install^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2457957Z ^[[36;1massert second == preflight^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2458171Z ^[[36;1massert lifecycle == {^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2458372Z ^[[36;1m    'bytecodeCacheCount': 0,^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2458760Z ^[[36;1m    'finalized': True,^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2458977Z ^[[36;1m    'installRestartReceipt': True,^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2459195Z ^[[36;1m    'restartCount': 4,^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2459395Z ^[[36;1m    'rolledBack': True,^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2459580Z ^[[36;1m}^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2459728Z ^[[36;1mPY^[[0m
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2487948Z shell: /usr/bin/bash -e {0}
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2488163Z env:
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2488321Z   INV_ENV: test
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2488803Z   INV_TEST_DATABASE_URL: ***localhost:5432/invdev
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2489177Z   INV_TEST_ADMIN_DSN: ***localhost:5432/invdev
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2489416Z   INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2489642Z   INV_TEST_ARCHIVER_IMAGE: postgres:16
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2489902Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2490221Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2490546Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2490855Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2491155Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2491447Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:00.2491700Z ##[endgroup]
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:25.4221456Z Traceback (most recent call last):
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:25.4242261Z   File "<stdin>", line 24, in <module>
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:25.4242691Z AssertionError
+backend (3.12)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:25.4266810Z ##[error]Process completed with exit code 1.
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	﻿2026-11-05T10:33:10.9326735Z ##[group]Run bundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9327371Z ^[[36;1mbundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9328156Z ^[[36;1mruntime="$RUNNER_TEMP/leaf-rotation-runtime-3.14"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9328866Z ^[[36;1mpython tools/build_leaf_rotation_runtime.py --output "$bundle" > "$RUNNER_TEMP/leaf-runtime-build.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9329602Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9330251Z ^[[36;1m  --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-install.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9330883Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9331317Z ^[[36;1m  --runtime-dir "$runtime" \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9331692Z ^[[36;1m  --worker-script deploy/lan/worker_leaf_rotation.py \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9332199Z ^[[36;1m  -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-preflight.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9332825Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9333465Z ^[[36;1m  --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-reinstall.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9334085Z ^[[36;1mpython -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9334507Z ^[[36;1m  --runtime-dir "$runtime" \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9334871Z ^[[36;1m  --worker-script deploy/lan/worker_leaf_rotation.py \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9335405Z ^[[36;1m  -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-second-preflight.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9335964Z ^[[36;1mpython tools/check_leaf_rotation_standalone_lifecycle.py \^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9336497Z ^[[36;1m  --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9337062Z ^[[36;1mtest -z "$(find "$runtime" -type d -name __pycache__ -print -quit)"^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9337476Z ^[[36;1mpython - <<'PY'^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9337711Z ^[[36;1mimport json^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9338400Z ^[[36;1mimport os^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9338629Z ^[[36;1mfrom pathlib import Path^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9338885Z ^[[36;1m^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9339109Z ^[[36;1mroot = Path(os.environ['RUNNER_TEMP'])^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9339535Z ^[[36;1mbuild = json.loads((root / 'leaf-runtime-build.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9340072Z ^[[36;1minstall = json.loads((root / 'leaf-runtime-install.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9340648Z ^[[36;1mpreflight = json.loads((root / 'leaf-runtime-preflight.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9341251Z ^[[36;1mreinstall = json.loads((root / 'leaf-runtime-reinstall.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9341858Z ^[[36;1msecond = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9342465Z ^[[36;1mlifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9342903Z ^[[36;1massert build['wheelCount'] == 4^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9343222Z ^[[36;1massert build['workerModuleCount'] == 2^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9343686Z ^[[36;1massert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9344143Z ^[[36;1massert install['platformKey'] in {^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9344446Z ^[[36;1m    'cpython-312-x86_64-linux-gnu',^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9344735Z ^[[36;1m    'cpython-314-x86_64-linux-gnu',^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9344995Z ^[[36;1m}^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9345216Z ^[[36;1massert preflight['compatible'] is True^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9345585Z ^[[36;1massert preflight['cryptographyVersion'] == '50.0.1'^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9345964Z ^[[36;1massert preflight['utcCertificateAPI'] is True^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9346282Z ^[[36;1massert reinstall == install^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9346553Z ^[[36;1massert second == preflight^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9346810Z ^[[36;1massert lifecycle == {^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9347067Z ^[[36;1m    'bytecodeCacheCount': 0,^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9347563Z ^[[36;1m    'finalized': True,^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9348076Z ^[[36;1m    'installRestartReceipt': True,^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9348365Z ^[[36;1m    'restartCount': 4,^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9348605Z ^[[36;1m    'rolledBack': True,^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9348839Z ^[[36;1m}^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9349019Z ^[[36;1mPY^[[0m
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9402539Z shell: /usr/bin/bash -e {0}
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9402841Z env:
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9403048Z   INV_ENV: test
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9403719Z   INV_TEST_DATABASE_URL: ***localhost:5432/invdev
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9404217Z   INV_TEST_ADMIN_DSN: ***localhost:5432/invdev
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9404529Z   INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9404824Z   INV_TEST_ARCHIVER_IMAGE: postgres:16
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9405172Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.10/x64
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9405653Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.10/x64/lib/pkgconfig
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9406119Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.10/x64
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9406544Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.10/x64
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9406966Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.10/x64
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9407391Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.10/x64/lib
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:10.9407975Z ##[endgroup]
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:38.7680549Z Traceback (most recent call last):
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:38.7693665Z   File "<stdin>", line 24, in <module>
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:38.7694239Z AssertionError
+backend (3.14)	Exercise the pinned venvless leaf-rotation runtime	2026-11-05T10:33:38.7779672Z ##[error]Process completed with exit code 1.

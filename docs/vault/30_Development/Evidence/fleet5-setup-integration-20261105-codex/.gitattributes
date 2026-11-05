@@ -1,0 +1,8 @@
+# Preserve exact diagnostic bytes and their recorded hashes. Source still uses
+# the repository's normal whitespace checks; exceptions apply only to raw runs.
+backend-42011550328-failed.log -text -whitespace
+backend-42011550328-failure-run.json -text -whitespace
+backend-contract-red.txt -text -whitespace
+backend-contract-red.xml -text -whitespace
+backend-contract-green.txt -text -whitespace
+backend-contract-green.xml -text -whitespace
