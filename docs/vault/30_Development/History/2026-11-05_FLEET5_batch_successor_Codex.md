@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-FLEET5-BATCH-SUCCESSOR-20261105-CODEX"
 title: "FLEET5 verified public normal batch retirement and successor"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T18:06:00+09:00"
+updated: "2026-11-05T18:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,7 +30,11 @@ Initial expanded focused run: **194 passed /19 capability skips /exit0** across 
 
 New negatives include every nonterminal/unknown phase, missing/duplicate/unsigned/foreign/tampered Node proofs, uncommitted CP, wrong CP key, Node leaf/final policy, CA/epoch/member drift, DB version/enabled/endpoint/expiry drift, archive/staging collisions, stale terminal/archive signatures/bytes, locks and symlinks. Crash tests preserve publication evidence and resume through the explicit verified paths. No prior journal/backup/certificate/key/receipt is discarded or overwritten by retirement.
 
-The only affected current-tooling metadata pair is `source.toolSHA256[tools/lan_pilot.py]` and `source.toolGitBlobSHA1[tools/lan_pilot.py]` in Card150's Evidence JSON. After final tests, root received exact proposal `msg_4c0d159d6c2a`: SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9` / Git blob `502edf7b85582ad40fee1c48703787d7b87ce421`. `batch-successor/tooling-pair-proposal.json` is explicit and **not applied**: scope permits proposing the pair. Every historical observedAt/source commit/observation and every other hash is preserved. The independently repaired DB preparation pair belongs to its other card and is untouched here. The PKI test binds this current pair to HEAD, so the narrow pair must advance before final changed-source Core can pass; the197-pass precommit run correctly checked the then-current a93 HEAD pair and is not claimed as committed-head metadata validation.
+The only affected current-tooling metadata pair is `source.toolSHA256[tools/lan_pilot.py]` and `source.toolGitBlobSHA1[tools/lan_pilot.py]` in Card150's Evidence JSON. After final tests, root received exact proposal `msg_4c0d159d6c2a`: SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9` / Git blob `502edf7b85582ad40fee1c48703787d7b87ce421`. At the published `c540e4846a084401268c7e3271b55f46d8b896b5` milestone this proposal was deliberately not applied. The197-pass precommit run correctly checked the then-current a93 HEAD pair and is not claimed as c540 committed-head metadata validation.
+
+Root independently recomputed both requested source values and authorized exactly these two fields in `msg_b61483e8e0f3`. Codex applied them at18:21KST, rederived the actual source bytes/blob first, and programmatically compared every other JSON field for exact equality (`batch-successor/tooling-pair-applied.json`). Every historical observedAt/source commit/controlPlaneToolingCommit/observation/verdict and every other hash is preserved. In particular this base59f's preparation pair remains unchanged; root's integrator owns combination with DB864's separate preparation pair. The original proposal remains as historical evidence, and the application receipt records the later authorized action.
+
+At18:21KST the exact a93 Core41995694509 and Docs41995699334 were both **success**. This is Node-only milestone CI, not the extended source's CI. Exact c540 Docs41999753647 was dispatched separately. Final metadata-bound committed-head PKI check, Core/Docs and actual Claude review remain pending. No bootstrap source was changed or failed hosted run silently retried.
 
 Final source worker SHA256 `3411ba485aad6ee0cc356191759584aecfca76ce1421aef68d138fabb7ef603f`, CP SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9`; the standalone launcher pins the worker bytes. The frozen a93 source/evidence and original source59f archive remain unchanged.
 

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "fleet5-current-tooling-pair-application:1",
+  "authorizationMessage": "msg_b61483e8e0f3",
+  "observedKST": "2026-11-05T18:21:11.931067+09:00",
+  "sourceMilestone": "c540e4846a084401268c7e3271b55f46d8b896b5",
+  "applied": true,
+  "onlyPathsChanged": [
+    "source.toolSHA256[tools/lan_pilot.py]",
+    "source.toolGitBlobSHA1[tools/lan_pilot.py]"
+  ],
+  "before": {
+    "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+    "gitBlobSHA1": "35c2668690b0681ab87da86099400e83f39d098b"
+  },
+  "after": {
+    "sha256": "b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9",
+    "gitBlobSHA1": "502edf7b85582ad40fee1c48703787d7b87ce421"
+  },
+  "allOtherFieldsExactlyEqual": true
+}
