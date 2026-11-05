@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 157, in <module>
+    validate()
+    ~~~~~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 152, in validate
+    raise ValueError('\n'.join(errors))
+ValueError: Broken wiki link 30_Development\History\2026-11-05_16-36-00_KST_FLEET5_DB_readiness_84bb_source검토_Claude.md → 2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b_검토_Claude
+Broken wiki link 30_Development\History\2026-11-05_18-40-00_KST_FLEET5_연속_leaf_rotation_8b53_검토_Claude.md → 2026-11-05_16-32-00_KST_FLEET5_Low_closure_af5b_검토_Claude

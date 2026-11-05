@@ -1,0 +1,49 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_3122a97a4fef / ctx_5301317b669b (coordinator relay: Codex Low-closure package 6cbb..af5b)",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T16:26:26+09:00", "2026-11-05T16:32:00+09:00"],
+  "reviewedRange": {"base": "6cbb2b9801dc5040b5a5ad70bf7b5434130d8ccc", "head": "af5b68e62b0a9e2b724f28fda7676364efa95c31", "commits": ["095c284e3d62b92195830bddfdb5cd1c6290b364", "af5b68e62b0a9e2b724f28fda7676364efa95c31"]},
+  "integrity": {
+    "publicOverlaySHA256": {"value": "e756c5fbbbcb346198c515dab20f9a20f223a98da0b47a463e0c74b7ba6d0748", "matched": true},
+    "effectivePrivateVectorsSHA256": {"value": "b704cdca1eded05c89166da271d1c92d05715dcc14f2e7d0cbd1fc6db8e0cb5f", "matched": true},
+    "effectivePrivateParametersSHA256": {"value": "2ebfa9e35958e1eeed76f015c33e82f1034e1a942caa171613e24c5bcb2f9037", "matched": true},
+    "plannedSQLSHA256": {"value": "bf0ef949a34ce7a7c58ef3f5595300e730057ef97c496b426121eb987133ce6e", "matched": true},
+    "knownHostsOriginalAndF5CopySHA256": {"value": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2", "originalMatched": true, "copyMatched": true, "copyBytes": 8807},
+    "coreVectorsUnchanged": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7",
+    "sourceArchiveUnchanged": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9",
+    "f5StateIssuerPrivateDirsAbsentLocally": true,
+    "hostedDocsCI": {"run": 41986726559, "head": "af5b68e6", "conclusion": "success"}
+  },
+  "notConvertedToAcceptance": {"appendQueryExecuted": false, "appendPendingCount": null, "runtimeAccepted": false, "fiveNodeAccepted": false},
+  "items": [
+    {"id": "H1", "verdict": "RESOLVED", "evidence": "main History 1.1.2 step4 non-r5 main .venv -B inherited PYTHONDONTWRITEBYTECODE=1 no pip; step5 bundle has -B"},
+    {"id": "F5-known-hosts", "verdict": "RESOLVED", "evidence": "single UserKnownHostsFile = F5 copy; 0 r5 known_hosts or r5 venv refs; ssh 3 / scp 2 all StrictHostKeyChecking=yes UpdateHostKeys=no; pre/post equal"},
+    {"id": "firewall-reproof-attended", "verdict": "RESOLVED", "residualAccepted": "unplanned reboot during an attended session can auto-restart the Node (unless-stopped) and publish 18515 without rules; mTLS remains and contract treats it as invalidation/isolation"},
+    {"id": "append-classifier", "verdict": "RESOLVED_MATCHES_SOURCE", "evidence": "lan_pilot.py:1554 phases {prepared,staging,staged,switched}; abandonment schema saintvision-lan-abandoned-prepared-batch:1 keeps phase=prepared in leaf-rotation-abandoned-<batchId>.json; .next temporaries; O_EXCL locks unlinked on exit so a present lock means held or crash residue"},
+    {"id": "read-only-snapshot-gate", "verdict": "RESOLVED", "evidence": "REPEATABLE READ READ ONLY + SHOW transaction_read_only + local set_config inv.tenant_id + ROLLBACK; columns match 0001_core.sql:4 and 0005_node_channels.sql (FORCE RLS); counts from file classifier, query not executed"},
+    {"id": "CA-custody", "verdict": "RESOLVED", "evidence": "rootOnline=true rootOffline=false CAExistsNow=false"},
+    {"id": "stage-dispositions", "verdict": "CONSISTENT", "evidence": "stage03 HOLD, 05/09 HOLD, publish/observe BLOCKED, append HOLD"}
+  ],
+  "newFinding": {
+    "id": "S1-consecutive-node-rotation",
+    "severity": "Medium",
+    "verdict": "PLAUSIBLE_UNIT_PROBE_CONFIRMED_NOT_LIVE",
+    "scope": "59f source question, not a Low-closure package defect",
+    "summary": "worker_leaf_rotation.install raises 'Another leaf rotation or stale channel version is already journaled' when a finalized leaf-rotation.json of a different identity exists and no superseded bundle is given; finalize keeps the journal at phase=finalized and only the expired-supersession path removes it",
+    "sourceLines": ["deploy/lan/worker_leaf_rotation.py:568-569", "deploy/lan/worker_leaf_rotation.py:672-674", "deploy/lan/worker_leaf_rotation.py:505"],
+    "probe": {"atKST": "2026-11-05T16:30:45+09:00", "method": "59f test fixture install, journal set to phase=finalized/restartRequired=false exactly as finalize writes, then install with only rotationId changed", "result": "ValueError Another leaf rotation or stale channel version is already journaled", "interpreter": "main .venv Python 3.14.7 -B, scratchpad export of 59f"},
+    "notVerified": ["live behavior", "any separate operator procedure clearing finalized journals", "whether r5 ever performed two normal rotations on one Node"],
+    "impact": ["F5 6-day leaves imply ~4-day renewals; second normal renewal of each Node may be blocked", "historical-closed Node finalization evidence is a single overwritable journal; registry should pin a hash-bound copy at finalize time or old batches become UNKNOWN and block append"],
+    "recommendation": ["separate source investigation with a two-consecutive-normal-rotation test and, if needed, a finalized-journal archive path", "hold each F5 Node's second renewal until proved", "add finalize-time Node journal copy pinning to the snapshot registry"]
+  },
+  "verdict": {"lowClosurePackage": "ACCEPT (documentation and nonexecuting contract)", "separateSourceFinding": "S1 Medium"},
+  "relayedContextRecordedNotJudged": ["stage03 HOLD for Core failure", "init/enroll HOLD for P2 operator date", "source DB task 58f4 in progress", "guard source 30f1 Core attempt2 and no-socket test Low pending", "worker4 Computer Use Chrome read denied; no endpoint info, auth or bypass"],
+  "currentTaskMutations": {"remote": 0, "dbQueries": 0, "ssh": 0, "authenticationAttempts": 0, "sourceEdits": 0, "r5PinsAutomationsRegistryBoards": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "apply Low-closure ACCEPT; assign separate 59f source investigation for S1 and hold each F5 Node's second renewal until proved; keep stage03, init/enroll and P2 holds"},
+    {"owner": "Codex", "action": "consider finalize-time Node journal copy pinning in snapshot registry"},
+    {"owner": "Claude", "action": "review exact no-socket test, DB source and S1 investigation deltas when relayed"}
+  ]
+}
