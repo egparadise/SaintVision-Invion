@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.385"
+version: "1.0.386"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T07:14:41+09:00"
+updated: "2026-11-06T07:25:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 c6f real code review/fullCore active; B rev4 final2a08 Docs verified/queued actual review Task; e50 bounded complete; physical incomplete"
-active_card_next: "Claude K1 actual code verdict; K1 Codex currentCore/finalreport; Root start existing ready B task_72d23bdd01a8 after dependency settlement then actual verdict before any B code"
+active_card_status: "K1 actualc2b review revisionrequired temporalM1M2/5Low; Codex narrowfix; B rev4 actualClaude reviewrunning; c6f oldCore capture; physicalincomplete"
+active_card_next: "K1 Codex isolated current/history fix with causal consistent contexts and multi-time timeline; Claude B rev4 actual verdict; Root corrected sourceCI and one review gate; no staleSet/lease permission"
 ---
+
+## 2026-11-06T07:25:51+09:00 K1 판정 처리와 준비된 B 검토 시작
+
+작업한 것과 확인: K1 실제 c2b15b70/Docs42119997927 검토는 crypto·wire의 검증된 부분과 별개로 current/history M1/M2 및5Low 수정 필요다. Root는 다중 시점 역사 검증과 현재 HELD/latest 검증을 분리하는 좁은 수정 지시 msg_87002d358dbb를 보냈다. K1 reviewer의 실제 완료로 준비된 기존 B rev4 task_72d23bdd01a8을 ctx ctx_c1e01403f409에서 한 번 시작했다. next/담당: K1 Codex는 새 수정 branch·actual tests/CI, Claude는 B2a08 전체 계약 실제 판정이다. current/history를 혼용하거나 old Core 성공으로 수정을 완료 처리하지 않는다. 현행 live bindings NULL/HOLD와 실제 운영 gate는 유지한다.
 
 ## 2026-11-06T07:14:41+09:00 B rev4 검토 대기열 등록
 

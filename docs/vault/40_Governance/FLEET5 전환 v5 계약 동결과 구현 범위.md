@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.1"
+version: "1.0.2"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T05:37:50+09:00"
+updated: "2026-11-06T07:25:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -33,3 +33,16 @@ fresh 계약만 migrationId/operationId를 서명 body에 요구한다. 과거 b
 native node-floor-v2 계약은 기존 M2 바이트·domain·Unix seconds·nodeSignature를 보존한 고정 codec만 사용한다. 실제 인증된 certificate의 DER/Node identity/SPKI와 fresh operation nonce를 대조한다. 원래 M2에 없는 validUntil은 관측시각+허용age·인증서·현재 plan·lease의 최소값으로 별도 계산해 검증하며 Node가 서명한 필드라고 쓰지 않는다. daemon/container/ExecID/plan join은 별도 인증 증거로 확인하고 normalized 재서명/fallback은 금지한다.
 
 새 per-contract descriptor·schema·strict Ed25519·각 mode/native adapter·원본 바이트와 metadata attack은 실제 코드와 함께 별도 Claude 검토를 한 번 받는다. 새 wire 상태는 PROPOSED_CODE_REVIEW_REQUIRED이고 live trust·keys·설치 등록은 NULL/HOLD다. 이전 dummy 195 shape를 실제 crypto positive로 바꾸지 않으며 별도 test key로 올바르게 재생성한 fixture만 실제 서명 시험이라고 기록한다. 전체40 future case·실장비·전체 제품 완료를 뜻하지 않는다. 원문 결정은 k1-proof-wire-gap-decision-root.json에 보존한다.
+
+
+## 실제 K1 코드 검토 후 current/history 시간 분리
+
+c6f 코드와 새 proof wire는 실제 c2b15b70/Docs42119997927 검토에서 M1/M2와 L1~L5 수정 필요다. strict Ed25519·파서·C2·normalized wire·키 scope·native producer 바이트·원본 pin과 실제 테스트는 검토자가 검증했으나 전체 코드 수락이나 live 등록은 아니다. Root는 실제 원문과 exact head/ref/alljobs를 확인하고 msg msg_87002d358dbb로 좁은 수정 범위를 부여했다.
+
+K1은 서로 다른 시점의 보존 이력을 검증해야 한다. 종료된 epoch1은 현재 active operation이나 120초 안의 proof로 다시 표현하지 않는다. 역사적 fresh proof는 원래 인증된 operation/HELD lease와 enclosing signed record/event의 당시 소비 시각·phase·key scope로 인증하고, 현재 시간 검사는 current derivation의 실제 live witnesses에 별도로 적용한다. Now를 과거로 바꾸거나 age를 늘리거나 과거 proof를 현재 권한으로 재분류하지 않는다. 과거 출력은 이전 상태를 인증하는 자료이며 현재 실행 허가가 아니다.
+
+현재 projection set은 실제 trusted current operation의 정확한 HELD lease hash와 일치하고, 같은 cohort/migration의 authenticated RELEASED 종료나 더 높은 fence epoch에 의해 대체되지 않아야 하며 해당 operation의 최대 인과 sequence여야 한다. 양 Node 원본·현재 head/readback은 별도 actual current context와 일치해야 한다. 오래된 set의 모든 hash/SetID를 일관되게 맞춘 공격도 거부해야 한다. recoveryEpoch R과 fence epoch, 다른 tenant/cohort는 섞지 않는다. release된 snapshot은 역사 자료로만 읽는다.
+
+추가로 malformed trusted SemanticInputs를 panic 대신 오류로 거부하고, native leaf의 명시적 ServerAuth EKU와 DigitalSignature, challenge issue/expiry 창, bounded packet byte snapshot과 최신 actual testcount를 보완한다. challenge는 IssuedAt-30초 이내 skew가 허용되므로 5초 전 관측을 잘못된 negative로 꾸미지 않으며 범위 밖/만료 경계를 시험한다. concurrent caller가 복사 중 입력을 바꾸는 것까지 안전하다고 주장하지 않는다. 새 multi-time crypto fixture에서 과거 lease 만료·120초 경과 뒤 current epoch2만 live인 정상/거부 경계를 실제로 확인해야 한다.
+
+수정은 c6f 기반 별도 고립 branch의 migrationverify와 고유 테스트/문서로 제한한다. 기존 c6f/current Core를 취소·advance·재실행하거나 그 성공을 새 수정 SHA의 성공으로 쓰지 않는다. 수정 SHA·실제 CI·독립 delta review 전까지 K1/K2/live trust/40future runtime/실장비 수락은 보류한다.

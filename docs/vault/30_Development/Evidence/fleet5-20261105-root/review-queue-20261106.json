@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T07:14:41+09:00",
+  "atKST": "2026-11-06T07:25:51+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,20 +13,14 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "task": "task_5627222e0f59",
-    "dispatch": "ctx_0918954c585c",
-    "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
-    "scope": "real Go K1 code + new proof wire + strict crypto/native adapter",
-    "state": "actual ready receipt; independent verdict pending; fullCore parallel"
-  },
-  "pending": {
     "task": "task_72d23bdd01a8",
+    "dispatch": "ctx_c1e01403f409",
     "source": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
-    "dependency": "task_5627222e0f59",
-    "scope": "ONE actual whole coupled B rev4 contract delta",
-    "state": "pending dependency; no reviewer dispatched yet"
+    "scope": "ONE actual whole B rev4 coupled contract review",
+    "state": "ready actual dispatch"
   },
-  "authorParallelWork": "K1 author captures frozen c6f fullCore/report while Claude reviewscode; B owner waits actual rev4 verdict",
+  "pending": null,
+  "authorParallelWork": "K1 Codex isolated current/history temporal code revision plus existingCore capture; B owner waits actual verdict",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -34,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "K1 review settlement makes task_72d23bdd01a8 ready; launch exact Task once; no duplicate code or B review",
+  "nextActualReviewTrigger": "published corrected K1 code/CI, queue after current B review",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -55,5 +49,14 @@
     "workerDone": "msg_16c5daff8722",
     "resource": "exited/released"
   },
-  "knownCompletedIntegrationResource": "actual exited/released, six packets preserved at Root"
+  "knownCompletedIntegrationResource": "actual exited/released, six packets preserved at Root",
+  "completedK1FirstCodeReview": {
+    "task": "task_5627222e0f59",
+    "review": "c2b15b707d94bca001d0d63c6486cfe9fd5cbcae",
+    "Docs": 42119997927,
+    "verdict": "REVISION REQUIRED M1/M2 and L1-L5",
+    "workerDone": "msg_400b4fddfdf6",
+    "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+    "resource": "succeeded/settled thenreleased/exited"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fleet5-k1-root-code-wire-review-gate:1",
-  "atKST": "2026-11-06T06:49:38+09:00",
+  "atKST": "2026-11-06T07:25:51+09:00",
   "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
   "sourceObservation": "k1-root-code-source-observation.json",
   "actualAuthorTask": "task_38393b5d1865",
@@ -13,8 +13,8 @@
   "reviewTerminal": "term_4de2f264870af2b01e2ba5d447449acb",
   "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
   "reviewDispatchState": "ready",
-  "state": "CODE_AND_NEW_WIRE_REVIEW_DISPATCHED_WITH_FULL_CORE_PENDING",
-  "actualVerdict": null,
+  "state": "REVISION_REQUIRED",
+  "actualVerdict": "REVISION REQUIRED M1/M2 and L1-L5",
   "fullCoreAccepted": false,
   "reviewScope": [
     "strict parser/schema/C2",
@@ -44,5 +44,33 @@
   "K2ProductionBoundary": "actual installed artifacts/CI/review/current producers/trust installation and40runtimecases remain future; no operational adapter/CLI/runtime integration here",
   "actualLiveBindings": "NULL/HOLD",
   "wholeProductAcceptance": false,
-  "actualOwnerHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/c6f0d95ecbcd79fac96673c194e2368b510ad827/docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_offline_verifier_Codex.md"
+  "actualOwnerHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/c6f0d95ecbcd79fac96673c194e2368b510ad827/docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_offline_verifier_Codex.md",
+  "actualIndependentReview": "c2b15b707d94bca001d0d63c6486cfe9fd5cbcae",
+  "reviewDocs": 42119997927,
+  "rootVerifiedExactReviewHeadRefAllJobsSuccess": true,
+  "reviewWorkerDone": "msg_400b4fddfdf6",
+  "actualReviewTaskOutcome": "succeeded",
+  "reviewerVerifiedAspects": [
+    "139path/107blob/28pins",
+    "strictJSON/C2/normalizedwire",
+    "strictEd25519 independent45vectors and15forgeryrefusals",
+    "exact scopedkeys/fullrebindrefusals",
+    "nativeproducerbyteequality",
+    "61NodeTop/238PASS,K130Top/124PASS/noTestSkips"
+  ],
+  "blockingFindings": [
+    "M1 stale/released/superseded projectionsets accepted as current",
+    "M2 history requires released epoch1 operation current/unexpired atNow"
+  ],
+  "lowFindings": [
+    "L1 malformedSemanticInputs panic",
+    "L2 missing explicitServerAuth/digitalSignature leafusage",
+    "L3 nativeobservation challengewindow",
+    "L4 callerpacketbytealias",
+    "L5 stalehistoricalownerfinalcounts"
+  ],
+  "concreteRootRevision": "k1-c6f-root-revision-decision.json",
+  "concreteRootMessage": "msg_87002d358dbb",
+  "sourceCodeAccepted": false,
+  "nextAction": "Codex isolated narrow revision fromc6f; preserve active oldCore/ref; separate correctedsource actualCI+review before K1acceptance"
 }
