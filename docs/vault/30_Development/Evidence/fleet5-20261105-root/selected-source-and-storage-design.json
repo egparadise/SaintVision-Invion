@@ -1,0 +1,77 @@
+{
+  "schema": "fleet5-selected-source-handoff:1",
+  "recordedAtKST": "2026-11-05T19:30:07+09:00",
+  "selectedSource": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "rootRemoteVerified": true,
+  "sourceDocs": {
+    "run": 42009966309,
+    "exactHeadAndJobSuccessVerified": true
+  },
+  "actualIndependentReview": {
+    "task": "task_ad55d6c5ac02",
+    "dispatch": "ctx_e1eac667cf1d",
+    "SHA": "d06f93f73a211bb2d56ce2b42141c71771b7f270",
+    "Docs": 42010719443,
+    "exactHeadAndJobSuccessVerified": true,
+    "verdict": "ACCEPT source safety and liveness; L1b closed",
+    "focused": {
+      "passed": 164,
+      "platformSkipped": 20
+    },
+    "probes": {
+      "passed": 7,
+      "WindowsDanglingSymlinkSkipped": 1
+    },
+    "LinuxCapabilityCoverageStillRequired": true
+  },
+  "componentCI": {
+    "prior6fcCore": 42006923070,
+    "statusLastObserved": "in_progress",
+    "terminalNotYetVerified": true,
+    "selected2fbCore": "not yet dispatched at last observation; preserve prior terminal first"
+  },
+  "integration": {
+    "task": "task_78064fb4b7ff",
+    "dispatch": "ctx_ed7ec73163d6",
+    "preliminarySHA": "43a03a93b7696b926fc3944a3457e24a41d7cfc9",
+    "finalCandidate": null,
+    "reply": "msg_a262ff5f9093",
+    "candidateCIParallelWithComponentAllowed": true,
+    "promotionBeforeActualAllGates": false,
+    "tentativeMergedSHA": "243a8b1d8b604368f25afb7210a8bb49c6ea199a",
+    "ownerReportedFocused": {
+      "passed": 343,
+      "WindowsPlatformSkipped": 23,
+      "exit": 0,
+      "actualProductToolTestPaths": 19,
+      "totalChangedPaths": 304
+    }
+  },
+  "storageDerivative": {
+    "task": "task_a8fd2969f0b3",
+    "dispatch": "ctx_6f0f8253b8a7",
+    "rootSelection": "B staged concrete architecture contract and actual review before production implementation",
+    "scope": "nativeLinux explicit readonly contribution preservation plus coherent policy/DERleaf/channel renewal",
+    "rootReply": "msg_958ee1d13efe",
+    "implemented": false,
+    "includedInPlainNodeCandidate": false,
+    "missingReviewDependencyRestoration": "exact d254fc6a two files only; initial docs failure preserved"
+  },
+  "previousRootReport": {
+    "SHA": "94375827f09fe40d6fee585be98166e36716b861",
+    "Docs": 42008982702,
+    "exactSuccessVerified": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "destinationHashesMatched": 2302,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "allEightCandidateCIObservedSuccess": false,
+  "newF5Initialized": false,
+  "allFiveOperationallyAccepted": false,
+  "wholeProduct100Percent": false
+}

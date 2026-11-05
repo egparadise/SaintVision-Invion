@@ -1,20 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.363"
+version: "1.0.364"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:13:06+09:00"
+updated: "2026-11-05T19:30:07+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Physical PC map corrected; actual PC4 read-only share and fresh issuer prepared; source2 fixes delivered; successor Low closure/integration and hardware prerequisites remain"
-active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
+active_card_status: "2fb L1b source delta actual ACCEPT; combined candidate/all8 and component Core pending; complete storage lifecycle B contract design; hardware prerequisites remain"
+active_card_next: "Integrator merges selected2fb and actuald06 review then freezes OWN candidate/all8; S1 preserves6fc and runs2fb Core; contract owner publishes concrete B design for review before production changes"
 ---
 
-## 2026-11-05 설치 경로 공백 분리와 추가 계약 검증
+## 2026-11-05 갱신 수정분 실제 수락과 통합 재개
 
-작업한 것: 통합 preliminary0bcf9670은 최종 후보가 아님을 유지하고4 Linux plain workspace Node를 기본 구성으로 진행시켰다. 확인한 것: 현 workspace installer는 storage-policy/추가 mount를 거부하며 storage helper는 state+contribution 두 mount만 검증한다. 같은 Node의 실행+공유 동시 지원을 완료라고 쓸 수 없다. 다음 첫 행동/담당: 별도 Codex task_a8fd2969f0b3/ctx_6f0f8253b8a7가 소스·재현·명시적 opt-in 계약을 제안한 뒤 root에게 설계 판정을 요청한다. 초기 receipt는 start_unknown이나 transcript에서 실제 지침 읽기·도구 실행을 확인했으며 중복 시작하지 않았다. S1 LowL1b와 통합 owner는 계속 작업한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
-
+작업한 것: Root는2fb52bbe 원격 pin/exact Docs42009966309와 actual Claude d06f93f7/exact Docs42010719443 성공을 확인하고 통합 질문에 structured reply했다. 확인한 것: source 안전성·연속 갱신 LowL1b는 수락됐지만 component Core/합본8lane과 실제 장비 인수는 남는다. 다음 첫 행동/담당: 통합 owner가2fb와 DB tooling을 함께 결합해 자체 후보/새 archive/8lane을 만들고 실제 합본 검토를 요청한다. S1 owner는 이전6fc CI를 보존한 뒤2fb Core를 실행한다. 저장소 owner는 Root가 선택한 B(명시적 보존+정책/DER/채널 동시 갱신)의 구체 계약을 게시·독립 설계 검토받고 production 변경을 진행한다. 이 보고는 전체 완료 판정이 아니다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 
