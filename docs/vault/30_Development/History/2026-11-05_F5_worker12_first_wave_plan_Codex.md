@@ -1,7 +1,7 @@
 ---
 doc_id: "HISTORY-F5-20261105-WORKER12-FIRST-WAVE-PLAN-CODEX"
 title: "2026-11-05 F5 worker1/2 first-wave plan and Docker API floor correction"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -138,6 +138,10 @@ python -B <source59f>/tools/lan_pilot.py --state <f5> prepare-leaf-rotation-batc
 ```
 
 With verified per-worker renewal runtimes and matching generated hashes, each Node installs its assigned bundle, CP stages each matching Node receipt, CP commits the shared batch only after all active Nodes, then each Node finalizes with the new commit receipt. The exact existing `worker_leaf_rotation.py install/finalize`, `stage-leaf-rotation-batch` and `commit-leaf-rotation-batch` vectors are in the private packet. As the campaign grows, every active F5 Node must participate; existing r5 followups/configuration/runtime are not reused. This is a planned legitimate renewal path, not an executed rotation or scheduled task.
+
+The frozen core packet's public hash remains `5121cb834016ebf86fd7433bcca3c3c89446374965a05f71a069158afe44d35f`. A separate `extension-and-runtime-env-contract.json` binds supplemental context without replacing those reviewed private bytes. Set `PYTHONDONTWRITEBYTECODE=1`, `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8` in the owner process before every command, in addition to `-B`: the environment must propagate to child Alembic processes, because `-B` alone is not inherited.
+
+Later extension is an actual supported source59f contract, not an assumption of immutability. `add_requested_nodes` retains all old entries/IDs, skips known addresses and appends a fresh ID for a newly verified address; the existing Node port must remain18515. Repeat `init` on **only F5 state**, same server/DSNs/download18115 and the same external issuer options; add only the newly ready endpoint (CP later requires `--allow-server-node-colocation`). `ensure_pilot_pki` compares external chain bytes and preserves existing CA/control/signing keys; a different chain fails. Existing tenant/node INSERTs use ON CONFLICT DO NOTHING, but F5's killSwitch=true control version increments and its private-state hash changes. Thus first-init tenant/epoch/CA disjointness is not reused as an extension rule: extension preserves current F5 tenant/epoch/CA/old keys, adds new IDs and requires a new expected-state receipt. Peer policies and rotations must be settled and current leaves valid with adequate margin first. Repackage using retained prebuilt artifacts without CP Docker; public bundles may be rewritten, but do not reinstall old Nodes. None of this targets r5 or makes all-five acceptance true. Exact templates, source semantics and remaining3/4/CP gates are in the supplement. Existing multinode contract tests returned **39 passed /3 Windows platform skips /exit0**; those skips are not Linux execution proof.
 
 ## Preservation and stop/rollback contract
 
