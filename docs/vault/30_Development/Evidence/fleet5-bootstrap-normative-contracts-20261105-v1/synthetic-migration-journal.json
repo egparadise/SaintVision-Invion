@@ -1,0 +1,45 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "b84b1b44815e32bfa5348e256321d0958acc101012a3d6638ea99494ef0f9ad5",
+      "workerRootRegistrationSHA256": "47d2bf041a25c1b5665e2cd208680ffe98b9aa3d84a4f07c80eb23ff7217e5a5",
+      "scope": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "fixture-node-0",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "daemonIdentitySHA256": "f5333b90270c0e6abf9a1ee7334181e5e51547e671ad90cae3ba0e5af19c495b",
+      "ownerGeneration": 1,
+      "commonFenceIdentitySHA256": "9d9945290cfff02db0772c7a200b98a1c760a860e2de803f40ed411955ac7a04",
+      "latestEvent": {
+        "sequence": 1,
+        "envelopeSHA256": "79b0462fdd9d01cfe30afb0a8bee017d118fa05287eff01fe5a2075344f7c173"
+      },
+      "previousProjectionSHA256": null,
+      "phase": "RESERVED",
+      "ownerLeaseEnvelopeSHA256": "64235ced374681dde1c05371518c832f84fc301f3584efb6cc22555cfecf573d",
+      "terminalSealEnvelopeSHA256": null,
+      "oldBackup": null,
+      "currentContainer": null,
+      "volume": {
+        "name": "fixture-name",
+        "driver": "fixture-driver",
+        "metadataSHA256": "6a8f83ff0503be1d6072c52ed1c9eaa3b691473c6f11b9818c837ecf85955ecd",
+        "mountIdentitySHA256": "482351669a89a09a51374872c8d29e3d5bc72fea59de45faab78cd87dfd315c8",
+        "protectedTreeSHA256": "71e1946de666d30afac55c3572a3a095305950dcfb335c1b8479c7a333b841b1",
+        "goJournalPath": "/fixture-goJournalPath"
+      }
+    },
+    "signer": {
+      "role": "host-helper",
+      "keySPKISHA256": "2b3c172de5ec4e2a9493972cabd108fb708642e27763c9cc4a78d5e1faf15624",
+      "signatureHex": "873cdb5b6d345fc296634648d8eb36b08a30ef73c2f4f9dcc30277b87b4d1acbb8a3ef83119c07f71ed12a95fa19ba581f02415228922e24dbb969d0b55adcf2"
+    }
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-agent-mutation-fence:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-agent-mutation-fence:1"
+        },
+        "leaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "operation": {
+          "enum": [
+            "migration",
+            "migration-observe",
+            "normal3-renewal",
+            "normal3-observe",
+            "inventory-publish",
+            "new-restart-restore"
+          ]
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "fenceEpoch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "priorFenceEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/fenceScope"
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "owner": {
+          "$ref": "common.schema.json#/$defs/processOwner"
+        },
+        "tokenSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acquiredAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "expiresAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "mode": {
+          "enum": [
+            "HELD",
+            "RELEASED",
+            "BLOCKED_UNKNOWN"
+          ]
+        },
+        "permittedEntrypointsSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "descendantRegistrySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "terminalSeals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 0,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "requiresHeldOSLocks": {
+          "const": true
+        },
+        "staleAgeReclaimAllowed": {
+          "const": false
+        },
+        "rawTokenPublished": {
+          "const": false
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "leaseId",
+        "operationId",
+        "operation",
+        "planEnvelopeSHA256",
+        "migrationId",
+        "fenceEpoch",
+        "priorFenceEnvelopeSHA256",
+        "scopes",
+        "owner",
+        "tokenSHA256",
+        "acquiredAt",
+        "expiresAt",
+        "mode",
+        "permittedEntrypointsSHA256",
+        "descendantRegistrySHA256",
+        "terminalSeals",
+        "requiresHeldOSLocks",
+        "staleAgeReclaimAllowed",
+        "rawTokenPublished",
+        "expectedInventoryHead"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "normal3-renewal",
+                  "normal3-observe",
+                  "new-restart-restore"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalSeals": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "uniqueItems": true
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "terminalSeals": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "minItems": 0,
+                "maxItems": 0,
+                "uniqueItems": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "root-fence"
+        },
+        "keySPKISHA256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "signatureHex": {
+          "$ref": "common.schema.json#/$defs/signature"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

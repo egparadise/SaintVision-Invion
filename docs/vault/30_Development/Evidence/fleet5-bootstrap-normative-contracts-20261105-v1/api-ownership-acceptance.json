@@ -1,0 +1,240 @@
+{
+  "schemaVersion": "fleet5-bootstrap-api-task-proposal:1",
+  "status": "PROPOSAL_NOT_ASSIGNED_NOT_IMPLEMENTED",
+  "transport": "Root-authorized local authenticated IPC and authenticated CP inventory API; NOT exposed as arbitrary remote shell. JSON requests contain no token secret, clock or workerRoot. Caller credentials/held token provided by protected IPC, bound to owner generation and hash.",
+  "apiRequestSchema": "api-request.schema.json",
+  "apiResponseSchema": "api-response.schema.json",
+  "requestDigest": "SHA256 strict C2 canonical full request; journal binds it. Response reports outcomes only: sideEffectPermitted is always false, never a reusable bearer authorization.",
+  "methods": {
+    "inspectAndValidate": {
+      "fromPhase": "unreserved",
+      "toPhase": "PROVENANCE_LOCKED",
+      "effect": "read only; no journal creation until plan/authentication complete; never OpenJournal",
+      "owner": "new host-helper",
+      "gate": "G1/G2/G3/G6/G9/G10"
+    },
+    "reserve": {
+      "fromPhase": "PROVENANCE_LOCKED",
+      "toPhase": "RESERVED",
+      "effect": "reserve BOTH cohort scopes under Root common fence; append intents/leases only",
+      "owner": "Root coordinator + both host-helper fence adapters",
+      "gate": "G7/G9"
+    },
+    "setOldRestartNo": {
+      "fromPhase": "RESERVED/FENCE_INTENT",
+      "toPhase": "OLD_FENCED",
+      "effect": "exact old ID restart=no; both readback before any stop",
+      "owner": "owned Engine adapter",
+      "gate": "G7/G8"
+    },
+    "stopOld": {
+      "fromPhase": "OLD_FENCED",
+      "toPhase": "OLD_FENCED",
+      "effect": "intent, exact stop, proven process/descendant quiescence; PC2 thenPC4",
+      "owner": "owned Engine/process adapter",
+      "gate": "G1/G7"
+    },
+    "captureFenced": {
+      "fromPhase": "OLD_FENCED",
+      "toPhase": "CAPTURED",
+      "effect": "read-only bounded protected full-tree double read and exact inspect/consumer set",
+      "owner": "host-helper private reader",
+      "gate": "G3/G4/G6/G7"
+    },
+    "preserveOld": {
+      "fromPhase": "CAPTURED/PUBLICATION_INTENT",
+      "toPhase": "OLD_PRESERVED",
+      "effect": "exclusive reserved backup name, same ID stopped/restart=no, post-fence inspect",
+      "owner": "owned Engine adapter",
+      "gate": "G1/G7"
+    },
+    "createNew": {
+      "fromPhase": "OLD_PRESERVED",
+      "toPhase": "NEW_CREATED",
+      "effect": "same exact captured Config/mounts, accepted image only; no credential copy or new labels",
+      "owner": "new storage-free replacement adapter",
+      "gate": "G1/G2/G3/G5"
+    },
+    "startNew": {
+      "fromPhase": "NEW_CREATED/NEW_START_INTENT",
+      "toPhase": "NEW_STARTED_UNVERIFIED",
+      "effect": "owned exact new ID start; forward-only; no old restart",
+      "owner": "owned Engine adapter",
+      "gate": "G5/G6"
+    },
+    "verifyBootstrap": {
+      "fromPhase": "NEW_STARTED_UNVERIFIED",
+      "toPhase": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "effect": "fresh actual M2 plus mTLS/equality/image/process/ExecID receipts; no state mutation by observer",
+      "owner": "new typed worker_peer_floor/EngineExec adapter + accepted Go",
+      "gate": "G4/G6/G7"
+    },
+    "publishInventory": {
+      "fromPhase": "BOTH BOOTSTRAP_VERIFIED_RESTART_NO",
+      "toPhase": "INVENTORY_PUBLISHED",
+      "effect": "atomic two-member metadata CAS only; C and legacy agentImage unchanged",
+      "owner": "new CP runtime inventory API",
+      "gate": "G2/G7"
+    },
+    "seal": {
+      "fromPhase": "INVENTORY_PUBLISHED",
+      "toPhase": "SEALED",
+      "effect": "Root-authorized immutable per-member seal then event/projection CAS",
+      "owner": "Root-seal authority + host-helper journal adapter",
+      "gate": "G5/G7"
+    },
+    "restoreNewRestartPolicy": {
+      "fromPhase": "BOTH SEALED",
+      "toPhase": "RESTART_POLICY_RESTORED",
+      "effect": "new ID only after explicit fresh Root decision/M2/mTLS, old backup stays no",
+      "owner": "Root + owned Engine adapter",
+      "gate": "G8"
+    },
+    "readState": {
+      "fromPhase": "any known state",
+      "toPhase": "unchanged",
+      "effect": "authenticate/reconcile read-only, READY after both seals and chosen restart policy readback; no auto effects",
+      "owner": "new typed state reader",
+      "gate": "G1-G10"
+    },
+    "release": {
+      "fromPhase": "verified terminal OR proven no-effects pre-cutover abort",
+      "toPhase": "lease RELEASED only",
+      "effect": "append exact release after all child quiescence; markers retained; no new migration",
+      "owner": "Root-fence + both host adapters",
+      "gate": "G7/G9"
+    }
+  },
+  "tasks": [
+    {
+      "id": "N01",
+      "proposedOwner": "P0 source owner ctx_6f0f8253b8a7, current separate task",
+      "depends": [],
+      "deliver": "Actual accepted Go M2 v2 and normal3 source/binary/image/native two-cycle/Core/Backend/verdict publication; no bootstrap assignment implied",
+      "red": "old Go lacks flag, wrong exe/UID/PID1/journal/nonce; invalid UTF8 replacement or wrong canonical body",
+      "green": "actual frozen toolchain producer/verifier goldens and exact old/new no-write startup/replay/M2/mTLS equality; not a mock"
+    },
+    {
+      "id": "N02",
+      "proposedOwner": "Root assigns contract owner AFTER independent proposal review",
+      "depends": [
+        "N01"
+      ],
+      "deliver": "Accept or revise six primary artifact schemas plus common/API/registered closed proof-contract set and private signer/workerRoot registrations",
+      "red": "schema-only pass or unregistered proof/signing role accepted",
+      "green": "wrong trust/domain/subject/contract unavailable fails closed before effect"
+    },
+    {
+      "id": "N03",
+      "proposedOwner": "Root assigns one common fence owner",
+      "depends": [
+        "N02"
+      ],
+      "deliver": "Persistent common fence and public-function/wrapper/child integration over complete consumer closure",
+      "red": "generic mutator or scheduler/new registration runs with terminal marker, bare flag, alternate directory, expired lease or child still alive",
+      "green": "all such paths deny; exact leased path holds OS/logical ownership through every effect; no stale reclamation"
+    },
+    {
+      "id": "N04",
+      "proposedOwner": "Root assigns storage-free replacement/helper owner",
+      "depends": [
+        "N01",
+        "N02",
+        "N03"
+      ],
+      "deliver": "Private no-follow append-only journal/intent/readback/reconciliation/typed predecessor and exact Engine capture/create/start",
+      "red": "partial cohort, collision/extra consumer/unknown phase/engine timeout or symlink/hardlink/fsync/CAS failure loses evidence or starts old",
+      "green": "crash at each intent/effect/publication boundary retains all objects, resumes exact proven request once or BLOCKS forward-only; no second migration"
+    },
+    {
+      "id": "N05",
+      "proposedOwner": "Root assigns CP runtime inventory API/consumer owner",
+      "depends": [
+        "N02",
+        "N03",
+        "N04"
+      ],
+      "deliver": "Typed per-Node image-versus-permit inventory, atomic cohort CAS, all readers or BLOCK",
+      "red": "fallback global agentImage, partial publication, changed C or wrong backup accepted",
+      "green": "both or neither; exact publicationId/digest timeout readback, unchanged channels/authority; seal chain acyclic"
+    },
+    {
+      "id": "N06",
+      "proposedOwner": "Root assigns new schema3 guard/immutable plan owner",
+      "depends": [
+        "N01",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "deliver": "New guarded normal renewal plan for same old two-cohort, fresh capabilities/deadlines/windows/pins",
+      "red": "legacy v1/old receipt/old plan/new issuer/expired window or migration baseline P reused",
+      "green": "two distinct normal cycles with actual new signed M2, P+4/C+2, distinct batch/cert hashes, rollback barriers and no clock/claim reset"
+    },
+    {
+      "id": "N07",
+      "proposedOwner": "Independent Claude reviewer assigned by Root",
+      "depends": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06"
+      ],
+      "deliver": "Actual independent exact source/CI/fixture/integration verdict, not author self-review",
+      "red": "Docs or architecture ACCEPT represented as product acceptance",
+      "green": "separate source, contract, native/CI and operational verdicts with honest failures"
+    },
+    {
+      "id": "N08",
+      "proposedOwner": "Root only, later separate operational decision",
+      "depends": [
+        "N07"
+      ],
+      "deliver": "Privately remeasure physical identity, deadlines, windows, disabled schedules/no descendants and all real immutable provenance before any operation",
+      "red": "historical unsigned snapshot, missing deadline or prior enabled automation treated as authority",
+      "green": "current signed/fenced evidence and explicit execution decision; otherwise HOLD/separately reviewed offline"
+    }
+  ],
+  "readerOrBlock": [
+    {
+      "reader": "worker_peer_floor.target/observe/context",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "worker_plain_rotation.target/floor/install/finalize",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "worker_leaf_rotation.normal3 dispatch/restart",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "new guard and immutable plan loader",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "CP current-runtime inventory reader",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "supported direct Python public entrypoints",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    },
+    {
+      "reader": "hash-bound shell/PowerShell runner",
+      "requires": "authenticated typed inventory + exact journal/predecessor/seal branch + held appropriate current common-operation context; no legacy fallback",
+      "failure": "BLOCK before effect"
+    }
+  ],
+  "existingLegacy": "All generic mutators and scheduler registration/invocation denied with any marker. Root must exclude unpatched/raw privileged/inflight launch surfaces; the proposal cannot retrofit old code by documentation.",
+  "allProductCases": "FUTURE NOT RUN",
+  "implementationAssigned": false
+}

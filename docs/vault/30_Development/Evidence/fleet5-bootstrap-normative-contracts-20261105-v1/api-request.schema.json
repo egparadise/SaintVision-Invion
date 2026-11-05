@@ -1,0 +1,1031 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "inspectAndValidate"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "required": []
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "reserve"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "rootExecutionDecision": {
+              "$ref": "common.schema.json#/$defs/proof"
+            },
+            "expectedNoPriorMigration": {
+              "const": true
+            }
+          },
+          "required": [
+            "rootExecutionDecision",
+            "expectedNoPriorMigration"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "setOldRestartNo"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "oldContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "slot",
+            "oldContainerId"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "stopOld"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "oldContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "slot",
+            "oldContainerId"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "captureFenced"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "oldContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "quiescence": {
+              "$ref": "common.schema.json#/$defs/proof"
+            }
+          },
+          "required": [
+            "slot",
+            "oldContainerId",
+            "quiescence"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "preserveOld"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "oldContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "reservedName": {
+              "$ref": "common.schema.json#/$defs/name"
+            }
+          },
+          "required": [
+            "slot",
+            "oldContainerId",
+            "reservedName"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "createNew"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "captureEventSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "slot",
+            "captureEventSHA256"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "startNew"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "newContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "slot",
+            "newContainerId"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "verifyBootstrap"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "newContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signedM2": {
+              "$ref": "common.schema.json#/$defs/proof"
+            },
+            "mtls": {
+              "$ref": "common.schema.json#/$defs/proof"
+            },
+            "protectedStateEquality": {
+              "$ref": "common.schema.json#/$defs/proof"
+            },
+            "execReceipt": {
+              "$ref": "common.schema.json#/$defs/proof"
+            }
+          },
+          "required": [
+            "slot",
+            "newContainerId",
+            "signedM2",
+            "mtls",
+            "protectedStateEquality",
+            "execReceipt"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "publishInventory"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "candidateInventoryEnvelopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "expectedPriorInventoryHead": {
+              "$ref": "common.schema.json#/$defs/inventoryHead"
+            }
+          },
+          "required": [
+            "candidateInventoryEnvelopeSHA256",
+            "expectedPriorInventoryHead"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "seal"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "inventoryEnvelopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rootSealDecision": {
+              "$ref": "common.schema.json#/$defs/proof"
+            }
+          },
+          "required": [
+            "slot",
+            "inventoryEnvelopeSHA256",
+            "rootSealDecision"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "restoreNewRestartPolicy"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "$ref": "common.schema.json#/$defs/memberKey"
+            },
+            "newContainerId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rootRestoreDecision": {
+              "$ref": "common.schema.json#/$defs/proof"
+            }
+          },
+          "required": [
+            "slot",
+            "newContainerId",
+            "rootRestoreDecision"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "readState"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "required": []
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-bootstrap-api-request:1"
+        },
+        "method": {
+          "const": "release"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedPriorProjectionSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedFenceEpoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allDescendantsQuiescent": {
+              "$ref": "common.schema.json#/$defs/proof"
+            }
+          },
+          "required": [
+            "allDescendantsQuiescent"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "method",
+        "planEnvelopeSHA256",
+        "operationId",
+        "idempotencyKey",
+        "expectedPriorProjectionSHA256",
+        "expectedFenceEpoch",
+        "expectedInventoryHead",
+        "arguments"
+      ]
+    }
+  ]
+}

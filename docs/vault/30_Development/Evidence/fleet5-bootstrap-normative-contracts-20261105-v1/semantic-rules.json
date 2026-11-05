@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "fleet5-proposed-semantic-contracts:1",
+  "rules": [
+    {
+      "id": "S01",
+      "artifact": "successor-plan",
+      "predicate": "member slots exactly [PC2,PC4] and scope identities distinct",
+      "productionRequired": true
+    },
+    {
+      "id": "S02",
+      "artifact": "successor-plan",
+      "predicate": "each product Core/Backend head equals source; review subject source/artifact exact; reviewer != author",
+      "productionRequired": true
+    },
+    {
+      "id": "S03",
+      "artifact": "successor-plan",
+      "predicate": "Cmd/Entrypoint/full argv JSON hashes and raw NUL cmdline hash recomputed in distinct domains; direct /inv-node; --image value equals preserved permit",
+      "productionRequired": true
+    },
+    {
+      "id": "S04",
+      "artifact": "successor-plan",
+      "predicate": "initial exact volume consumer set equals old immutable ID; no second migration/credential recopy/old restart/new issuer",
+      "productionRequired": true
+    },
+    {
+      "id": "S05",
+      "artifact": "terminal-seal",
+      "predicate": "old backup restart=no, distinct current ID, same daemon; inventory/verified event/volume/plan bindings authenticated",
+      "productionRequired": true
+    },
+    {
+      "id": "S06",
+      "artifact": "migration-journal",
+      "predicate": "nonterminal requires held owner lease and no seal; terminal requires seal and immutable event/inventory chain; current active floor not frozen to migration baseline",
+      "productionRequired": true
+    },
+    {
+      "id": "S07",
+      "artifact": "operation-lease",
+      "predicate": "normal3 requires exactly two terminal seals and fresh common lease; both scopes unique; expires>acquired, OS locks/live owner/generation held; no stale eviction",
+      "productionRequired": true
+    },
+    {
+      "id": "S08",
+      "artifact": "migration-event",
+      "predicate": "sequence1 iff prior hash null; exact prior+1; event/method/phase/effect/target match; member progress monotonic along allowed path",
+      "productionRequired": true
+    },
+    {
+      "id": "S09",
+      "artifact": "runtime-inventory",
+      "predicate": "exact slots/scope/current IDs/image/source match plan/journal; both verified events precede publication; CP old inventory/state/channel CAS exact and atomic",
+      "productionRequired": true
+    },
+    {
+      "id": "S10",
+      "artifact": "all",
+      "predicate": "signature role/key/domain/contract/bytes/subject and proof freshness authenticated, not just structurally valid; synthetic trust always BLOCK",
+      "productionRequired": true
+    },
+    {
+      "id": "S11",
+      "artifact": "all",
+      "predicate": "persistent private no-follow/singlelink ownership, bounded bytes, immutable event no overwrite, atomic projection CAS+fsync; failure UNKNOWN no retry/reset",
+      "productionRequired": true
+    },
+    {
+      "id": "S12",
+      "artifact": "all",
+      "predicate": "any existing migration denies second migration; exact first-plan resume or separately authorized normal3 only; preserved backup never restart/delete",
+      "productionRequired": true
+    }
+  ],
+  "documentHarnessSubset": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05 restart only",
+    "S06 lease presence only",
+    "S07 seal count only",
+    "S08 prior presence only"
+  ],
+  "runtimeAuthAndAtomicityCasesRun": 0,
+  "fullSemanticsImplemented": false
+}

@@ -1,0 +1,102 @@
+{
+  "status": "PROPOSED_NOT_IMPLEMENTED",
+  "phases": [
+    "PROVENANCE_LOCKED",
+    "RESERVED",
+    "FENCE_INTENT",
+    "OLD_FENCED",
+    "CAPTURED",
+    "PUBLICATION_INTENT",
+    "OLD_PRESERVED",
+    "NEW_CREATED",
+    "NEW_START_INTENT",
+    "NEW_STARTED_UNVERIFIED",
+    "BOOTSTRAP_VERIFIED_RESTART_NO",
+    "INVENTORY_PUBLISHED",
+    "SEALED",
+    "RESTART_POLICY_RESTORED",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "BLOCKED_FORWARD_ONLY",
+    "QUIESCENCE_UNKNOWN"
+  ],
+  "normalEdges": [
+    [
+      "PROVENANCE_LOCKED",
+      "RESERVED"
+    ],
+    [
+      "RESERVED",
+      "FENCE_INTENT"
+    ],
+    [
+      "FENCE_INTENT",
+      "OLD_FENCED"
+    ],
+    [
+      "OLD_FENCED",
+      "CAPTURED"
+    ],
+    [
+      "CAPTURED",
+      "PUBLICATION_INTENT"
+    ],
+    [
+      "PUBLICATION_INTENT",
+      "OLD_PRESERVED"
+    ],
+    [
+      "OLD_PRESERVED",
+      "NEW_CREATED"
+    ],
+    [
+      "NEW_CREATED",
+      "NEW_START_INTENT"
+    ],
+    [
+      "NEW_START_INTENT",
+      "NEW_STARTED_UNVERIFIED"
+    ],
+    [
+      "NEW_STARTED_UNVERIFIED",
+      "BOOTSTRAP_VERIFIED_RESTART_NO"
+    ],
+    [
+      "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "INVENTORY_PUBLISHED"
+    ],
+    [
+      "INVENTORY_PUBLISHED",
+      "SEALED"
+    ],
+    [
+      "SEALED",
+      "RESTART_POLICY_RESTORED"
+    ],
+    [
+      "RESTART_POLICY_RESTORED",
+      "READY_FOR_NEW_RENEWAL_PLAN"
+    ]
+  ],
+  "optionalRestartEdge": [
+    "SEALED",
+    "READY_FOR_NEW_RENEWAL_PLAN"
+  ],
+  "terminalFailurePhases": [
+    "BLOCKED_FORWARD_ONLY",
+    "QUIESCENCE_UNKNOWN"
+  ],
+  "failureExits": "Every nonterminal phase may append a failure event; the next mutation is forbidden until exact same-plan reconciliation with fresh owned proof. Unknown effect or quiescence forbids later effects; age never resolves it.",
+  "samePlanResume": "Same plan/migration/scope/target/request/idempotency key only; no second migration, no replaced marker, no new generation as stale-owner recovery",
+  "terminalReentry": "Read and validate existing seal and event/inventory chain. Normal3 is a NEW lease over current mutable floor and channel; never replays migration startup.",
+  "memberOrder": [
+    "PC2",
+    "PC4"
+  ],
+  "cohortRules": [
+    "Both old restart policies read back no before first stop",
+    "Member PC2 must reach BOOTSTRAP_VERIFIED_RESTART_NO before PC4 stop",
+    "Any first-member failure blocks PC4 cutover",
+    "Both members verified before inventory publication",
+    "Per-member phases and cohort phase cannot be inferred from container running"
+  ]
+}

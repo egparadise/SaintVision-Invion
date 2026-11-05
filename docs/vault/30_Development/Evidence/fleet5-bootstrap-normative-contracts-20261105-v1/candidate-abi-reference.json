@@ -1,0 +1,57 @@
+{
+  "status": "NONBINDING_PUBLIC_CANDIDATE_ONLY",
+  "source": "4a928310e88ac336efb040c1621525fee7133f32",
+  "acceptedProductBinding": null,
+  "files": [
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "gitBlob": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8",
+      "bytes": 10466,
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "gitBlob": "b537809fb623ebc84dabc9f4b6a076948e1db3cc",
+      "bytes": 13159,
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "gitBlob": "c2551c0366cf9d4c74e4b3096937b7d142355646",
+      "bytes": 3564,
+      "sha256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical.go",
+      "gitBlob": "e2ca80ff64ed7b12cbff2199a3cd3431e1ca9f52",
+      "bytes": 1319,
+      "sha256": "5b7731eb0d499f12b130830b5c2fe2553d5c3b18886907e74db9ca923cea0661"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "gitBlob": "df8600ec30da8f9426f6bc7c18eaeb093aa80cc5",
+      "bytes": 13506,
+      "sha256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0"
+    },
+    {
+      "path": "services/node-agent/runtime/permit.go",
+      "gitBlob": "084b9113190abfaa7e0279a4eb7a4e786bd03dff",
+      "bytes": 5845,
+      "sha256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "gitBlob": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "bytes": 7307,
+      "sha256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a"
+    }
+  ],
+  "m2Schema": "saintvision-node-peer-policy-floor:2",
+  "signatureDomainHex": "7361696e74766973696f6e2f6e6f64652d706565722d706f6c6963792d666c6f6f722f763200",
+  "bodyCanonicalization": "Dedicated strict Go encoding/json.Marshal(map) semantics; no nodeSignature; no body newline; reject invalid UTF8 BEFORE Marshal; no global outer-signature change",
+  "requiredExecutableField": "servingExecutableSHA256",
+  "preservedCmdlineField": "servingProcessSHA256",
+  "migrationPredecessorBranchAccepted": false,
+  "newCommonFenceAccepted": false,
+  "newExecCreateReceiptAccepted": false
+}

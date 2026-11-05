@@ -1,0 +1,65 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-event:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "b84b1b44815e32bfa5348e256321d0958acc101012a3d6638ea99494ef0f9ad5",
+      "sequence": 1,
+      "previousEventSHA256": null,
+      "operationId": "fixture-operationId",
+      "idempotencyKey": "ff94375804bae999f1ce639dd667aa960e33a8614e4529bfeeaf97c9577cb7ed",
+      "requestSHA256": "a9953410b0ae13350f48c68046d299305c1fed6cf4dbc73cc99bd2f726bcf13a",
+      "recordedAt": "2030-01-01T00:00:00Z",
+      "phase": "PROVENANCE_LOCKED",
+      "fenceEpoch": 1,
+      "leaseEnvelopeSHA256": "a61ea9ed3e9e987704ace0fe8f15f5323994933696541a4fea3ef531550285d4",
+      "memberStates": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "PROVENANCE_LOCKED",
+          "oldContainerId": "2fd476edde31c5878311f2a891f093d8ad88d9939dafded8b13dc65ba2fdabc4",
+          "backupContainerId": null,
+          "newContainerId": null,
+          "latestEvidence": []
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "PROVENANCE_LOCKED",
+          "oldContainerId": "24edb8a30694937ad4af9b3d6a9199258626786ece3fd465f5e3d45bff989755",
+          "backupContainerId": null,
+          "newContainerId": null,
+          "latestEvidence": []
+        }
+      ],
+      "effect": {
+        "kind": "none",
+        "targetSlot": null,
+        "intentEventSHA256": null,
+        "receipt": null
+      },
+      "evidence": [],
+      "inventoryEnvelopeSHA256": null,
+      "terminalSealEnvelopeSHA256": null,
+      "failureReason": "none"
+    },
+    "signer": {
+      "role": "host-helper",
+      "keySPKISHA256": "a91319a210bd60af85c5928b01dc3ff9d9fec8ffb5768d9abc1bd3ae7ea991e1",
+      "signatureHex": "f3e9788dd38e40151f0514b462eb7b62db3d92655448c9cd4a14926435f626d9f92e44e849bb8d06c22d684d7c16589e18f5a4e4aa8474e20ed759a2c79eb0a8"
+    }
+  }
+}

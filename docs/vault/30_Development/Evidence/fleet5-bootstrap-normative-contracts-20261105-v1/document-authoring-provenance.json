@@ -1,0 +1,30 @@
+{
+  "temporaryDocumentPrograms": {
+    "_author_normative_docs.py": "729f04e6d3659af229dee0604c2ecf5c6d922c2364ded4fdca7f34086cdfaf7b",
+    "_validate_normative_docs.py": "1c0cd25de1ea9461d2373934f1d98a10e74d77670904ed85bec7db5b31edbd74"
+  },
+  "publishedCode": false,
+  "purpose": "Document fixture authoring/validation only; no product import, key generation, runtime or equipment access; temporary programs removed before commit",
+  "failuresPreserved": [
+    {
+      "action": "public source guessed peer_floor_process.go display",
+      "exitCode": 1,
+      "correction": "read actual peer_floor_linux.go Git blob"
+    },
+    {
+      "action": "Git ls-tree decoding using Windows default cp949",
+      "exitCode": 1,
+      "correction": "explicit UTF8 decode of Git bytes"
+    },
+    {
+      "action": "document fixture stale planSubject digest",
+      "exitCode": 1,
+      "correction": "compute digest after final synthetic migration fields"
+    },
+    {
+      "action": "document fixture discovery glob included body-golden container",
+      "exitCode": 1,
+      "correction": "select only artifact wrappers"
+    }
+  ]
+}
