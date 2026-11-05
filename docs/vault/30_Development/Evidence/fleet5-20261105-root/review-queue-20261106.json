@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T07:25:51+09:00",
+  "atKST": "2026-11-06T07:34:16+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -20,7 +20,7 @@
     "state": "ready actual dispatch"
   },
   "pending": null,
-  "authorParallelWork": "K1 Codex isolated current/history temporal code revision plus existingCore capture; B owner waits actual verdict",
+  "authorParallelWork": "K1 author directly received real c2b M1/M2/L1-L5 verdict and prepares isolated fix; oldc6f FULLCore completed and report37fe verified; Claude B rev4 reviewrunning",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "published corrected K1 code/CI, queue after current B review",
+  "nextActualReviewTrigger": "corrected K1 immutable source+CI; queue one delta review after current B review",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -58,5 +58,7 @@
     "workerDone": "msg_400b4fddfdf6",
     "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
     "resource": "succeeded/settled thenreleased/exited"
-  }
+  },
+  "K1OldCodeFullCore": "42113810160 SUCCESS; not corrected-code CI or codeacceptance",
+  "K1DirectReply": "msg_2a098fb1f4d3"
 }

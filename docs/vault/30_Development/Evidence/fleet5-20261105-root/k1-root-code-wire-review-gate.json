@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fleet5-k1-root-code-wire-review-gate:1",
-  "atKST": "2026-11-06T07:25:51+09:00",
+  "atKST": "2026-11-06T07:34:16+09:00",
   "source": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
   "sourceObservation": "k1-root-code-source-observation.json",
   "actualAuthorTask": "task_38393b5d1865",
@@ -13,9 +13,9 @@
   "reviewTerminal": "term_4de2f264870af2b01e2ba5d447449acb",
   "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
   "reviewDispatchState": "ready",
-  "state": "REVISION_REQUIRED",
+  "state": "OLD_C6F_CI_PASS_CODE_REVIEW_REVISION_REQUIRED",
   "actualVerdict": "REVISION REQUIRED M1/M2 and L1-L5",
-  "fullCoreAccepted": false,
+  "fullCoreAccepted": true,
   "reviewScope": [
     "strict parser/schema/C2",
     "external InstalledTrust/TrustedContext input boundary vs untrusted Packet",
@@ -72,5 +72,13 @@
   "concreteRootRevision": "k1-c6f-root-revision-decision.json",
   "concreteRootMessage": "msg_87002d358dbb",
   "sourceCodeAccepted": false,
-  "nextAction": "Codex isolated narrow revision fromc6f; preserve active oldCore/ref; separate correctedsource actualCI+review before K1acceptance"
+  "nextAction": "author reads real completed c2b verdict through DIRECT reply; isolated fixed code source/new CI/delta review; do not reopen completed reviewer",
+  "fullCoreAcceptedScope": "CI only for old rejected c6f; no actual M1/M2 or K1 code acceptance",
+  "actualFullCoreRun": 42113810160,
+  "qualifiedReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
+  "qualifiedReportDocs": 42121661622,
+  "rootVerifiedFullCoreAndReportHeadRefAllJobsSuccess": true,
+  "actualCoreArtifactAudit": "k1-c6f-full-core-root-observation.json",
+  "ownerActualQuestion": "msg_2b087b91a050",
+  "directVerdictReply": "msg_2a098fb1f4d3"
 }

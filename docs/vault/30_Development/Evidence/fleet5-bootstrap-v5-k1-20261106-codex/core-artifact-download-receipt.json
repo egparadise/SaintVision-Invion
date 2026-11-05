@@ -1,0 +1,239 @@
+{
+  "sourceSHA": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "run": 42113810160,
+  "artifactID": 13457948207,
+  "artifactName": "saintvision-core-evidence",
+  "archiveBytes": 13985995,
+  "archiveRawSHA256": "b85f829a8c04264d8d56d0ad10613eb98bed24fca3f52f7b21c21d1f7b649dfd",
+  "remoteDigest": "sha256:b85f829a8c04264d8d56d0ad10613eb98bed24fca3f52f7b21c21d1f7b649dfd",
+  "digestMatches": true,
+  "createdAt": "2026-11-05T22:15:08Z",
+  "expiresAt": "2026-12-05T22:15:06Z",
+  "atKST": "2026-11-06T07:18:22.132732+09:00",
+  "entries": [
+    {
+      "name": "build-product-runtime-real-pg.xml",
+      "bytes": 2369,
+      "compressedBytes": 660
+    },
+    {
+      "name": "business-handoff-tests.xml",
+      "bytes": 2778,
+      "compressedBytes": 727
+    },
+    {
+      "name": "api-unconfigured.log",
+      "bytes": 2745,
+      "compressedBytes": 770
+    },
+    {
+      "name": "containment-tests.xml",
+      "bytes": 4363,
+      "compressedBytes": 1038
+    },
+    {
+      "name": "core-tests.xml",
+      "bytes": 1418453,
+      "compressedBytes": 170582
+    },
+    {
+      "name": "cx01-recovery-tests.xml",
+      "bytes": 3535,
+      "compressedBytes": 992
+    },
+    {
+      "name": "developer-4a6578e3-b921-49e6-af41-6527c6c077a5.json",
+      "bytes": 1747,
+      "compressedBytes": 981
+    },
+    {
+      "name": "developer-c57f2b47-f316-4ba3-a92f-006e9ca82d1c.json",
+      "bytes": 541,
+      "compressedBytes": 361
+    },
+    {
+      "name": "developer-c9160a94-fe42-44ec-9021-372b3cb7e56d.json",
+      "bytes": 1731,
+      "compressedBytes": 966
+    },
+    {
+      "name": "developer-d1d5a3a5-1067-4942-9b72-22ae50570100.json",
+      "bytes": 1002,
+      "compressedBytes": 625
+    },
+    {
+      "name": "docker-compatibility.log",
+      "bytes": 1176,
+      "compressedBytes": 407
+    },
+    {
+      "name": "docker-host-tests.xml",
+      "bytes": 539,
+      "compressedBytes": 284
+    },
+    {
+      "name": "first-3bc5e57c-c70b-4aca-b111-c654db1b782a.json",
+      "bytes": 1489,
+      "compressedBytes": 858
+    },
+    {
+      "name": "first-9d1bcf85-85f7-4cda-b6fd-f9225cadcf8e.json",
+      "bytes": 829,
+      "compressedBytes": 535
+    },
+    {
+      "name": "first-ae4fdd7f-850f-4055-b828-2e9c76fbbb07.json",
+      "bytes": 598,
+      "compressedBytes": 385
+    },
+    {
+      "name": "first-e15f3087-bfe0-4e16-9a4c-5204f66b9809.json",
+      "bytes": 1476,
+      "compressedBytes": 850
+    },
+    {
+      "name": "inv-discover",
+      "bytes": 10212675,
+      "compressedBytes": 5802215
+    },
+    {
+      "name": "inv-node",
+      "bytes": 13387338,
+      "compressedBytes": 7346664
+    },
+    {
+      "name": "lan-database-readiness-phases.json",
+      "bytes": 775,
+      "compressedBytes": 411
+    },
+    {
+      "name": "lan-installer-tests.xml",
+      "bytes": 2914,
+      "compressedBytes": 655
+    },
+    {
+      "name": "lan-pilot-database-real-pg.xml",
+      "bytes": 563,
+      "compressedBytes": 296
+    },
+    {
+      "name": "model-cancel.json",
+      "bytes": 1429,
+      "compressedBytes": 769
+    },
+    {
+      "name": "model-node-loss.json",
+      "bytes": 1429,
+      "compressedBytes": 770
+    },
+    {
+      "name": "model-output-recovery.json",
+      "bytes": 1493,
+      "compressedBytes": 810
+    },
+    {
+      "name": "model-replacement-node.json",
+      "bytes": 1971,
+      "compressedBytes": 959
+    },
+    {
+      "name": "model-single.json",
+      "bytes": 1484,
+      "compressedBytes": 807
+    },
+    {
+      "name": "model-stale.json",
+      "bytes": 1425,
+      "compressedBytes": 768
+    },
+    {
+      "name": "node-unit.jsonl",
+      "bytes": 492787,
+      "compressedBytes": 45968
+    },
+    {
+      "name": "p0-owned-docker-floor.json",
+      "bytes": 4022,
+      "compressedBytes": 1450
+    },
+    {
+      "name": "p0-real-stopped-reentry-settled.json",
+      "bytes": 3347,
+      "compressedBytes": 1152
+    },
+    {
+      "name": "saintvision_control_plane-0.1.0-py3-none-any.whl",
+      "bytes": 335443,
+      "compressedBytes": 327422
+    },
+    {
+      "name": "saintvision_control_plane-0.1.0.tar.gz",
+      "bytes": 266267,
+      "compressedBytes": 266338
+    },
+    {
+      "name": "shard-recovery-tests.xml",
+      "bytes": 3353,
+      "compressedBytes": 827
+    },
+    {
+      "name": "subject-boundary.json",
+      "bytes": 2219,
+      "compressedBytes": 479
+    },
+    {
+      "name": "workspace-tests.xml",
+      "bytes": 3642,
+      "compressedBytes": 910
+    }
+  ],
+  "selected": [
+    {
+      "archiveEntry": "node-unit.jsonl",
+      "file": "node-unit.jsonl",
+      "bytes": 492787,
+      "rawSHA256": "a01640d2508b5e4fb50fc44f211292551cd13caae5df557811611a9c13ab3b6e",
+      "privateKeyMarkerDetected": false,
+      "rawExported": true
+    },
+    {
+      "archiveEntry": "core-tests.xml",
+      "file": "core-tests.xml",
+      "bytes": 1418453,
+      "rawSHA256": "39b74b41957e365876c6926c907e72ba7cdf2c5b15eec220b2a48a15368d161e",
+      "privateKeyMarkerDetected": true,
+      "rawExported": false
+    },
+    {
+      "archiveEntry": "docker-host-tests.xml",
+      "file": "docker-host-tests.xml",
+      "bytes": 539,
+      "rawSHA256": "054b7c02706d62d3822a3c5396f740e65b8cf35342de6088d126a2d8e07bc3ef",
+      "privateKeyMarkerDetected": false,
+      "rawExported": true
+    },
+    {
+      "archiveEntry": "build-product-runtime-real-pg.xml",
+      "file": "build-product-runtime-real-pg.xml",
+      "bytes": 2369,
+      "rawSHA256": "648b5a9a133a1bf225412bc743dbcf7ee314d13582af990e6425ac135f619239",
+      "privateKeyMarkerDetected": false,
+      "rawExported": true
+    },
+    {
+      "archiveEntry": "lan-pilot-database-real-pg.xml",
+      "file": "lan-pilot-database-real-pg.xml",
+      "bytes": 563,
+      "rawSHA256": "3f9f6315c4e2a74e4359db812cf6d0fb83b64bdf7de553f7a4a21c38f6eb6330",
+      "privateKeyMarkerDetected": false,
+      "rawExported": true
+    }
+  ],
+  "opaqueArchiveKeptInIgnoredLocalScratch": ".work\\k1-core-artifact-13457948207.zip",
+  "unselectedEntryPayloadsNotRead": true,
+  "publicationGuardInitialAttempt": {
+    "exit": 1,
+    "reason": "private key marker; raw entry export withheld; no CI rerun"
+  },
+  "wholeProductAcceptance": false
+}

@@ -1,0 +1,181 @@
+{
+  "node-unit.jsonl": {
+    "passEvents": 302,
+    "topLevelPassed": 97,
+    "k1PassEvents": 124,
+    "k1TopLevelPassed": 30,
+    "failed": [],
+    "skippedTestEvents": 1,
+    "packageResults": [
+      {
+        "Time": "2026-11-05T21:37:10.258665261Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T21:37:12.625809061Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+        "Elapsed": 1.062
+      },
+      {
+        "Time": "2026-11-05T21:37:12.66052915Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+        "Elapsed": 1.059
+      },
+      {
+        "Time": "2026-11-05T21:37:12.696508897Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+        "Elapsed": 1.033
+      },
+      {
+        "Time": "2026-11-05T21:37:13.168134515Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+        "Elapsed": 1.237
+      },
+      {
+        "Time": "2026-11-05T21:37:14.150612935Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+        "Elapsed": 1.062
+      },
+      {
+        "Time": "2026-11-05T21:37:14.152036864Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T21:37:14.152054056Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T21:37:14.335996778Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+        "Elapsed": 1.166
+      },
+      {
+        "Time": "2026-11-05T21:37:15.686074842Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+        "Elapsed": 1.349
+      },
+      {
+        "Time": "2026-11-05T21:37:16.085913053Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+        "Elapsed": 1.9340000000000002
+      },
+      {
+        "Time": "2026-11-05T21:37:17.079192313Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+        "Elapsed": 3.99
+      },
+      {
+        "Time": "2026-11-05T21:40:07.76537039Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+        "Elapsed": 175.138
+      }
+    ],
+    "skippedTests": [
+      {
+        "package": "runtime",
+        "test": "TestDockerLiveCompatibility",
+        "reason": "real Docker opt-in required"
+      }
+    ]
+  },
+  "core-tests.xml": {
+    "testcases": 9261,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 46,
+    "skipReasons": {
+      "PowerShell and csc.exe shim require Windows": 13,
+      "PowerShell parser requires Windows": 2,
+      "PowerShell required": 9,
+      "Actual Windows PowerShell launcher": 10,
+      "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+      "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+      "run only through tools/placement_benchmark.py": 1,
+      "run only through tools/placement_lock_wait_diagnostic.py": 1,
+      "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+      "claude is not installed on this machine": 1,
+      "codex is not installed on this machine": 1,
+      "gemini is not installed on this machine": 1,
+      "antigravity is not installed on this machine": 1,
+      "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+    },
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "46",
+        "tests": "9261",
+        "time": "1488.665"
+      }
+    ],
+    "passed": 9215
+  },
+  "docker-host-tests.xml": {
+    "testcases": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "2",
+        "time": "4.620"
+      }
+    ]
+  },
+  "build-product-runtime-real-pg.xml": {
+    "testcases": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "13",
+        "time": "66.260"
+      }
+    ]
+  },
+  "lan-pilot-database-real-pg.xml": {
+    "testcases": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "2",
+        "time": "12.770"
+      }
+    ]
+  }
+}

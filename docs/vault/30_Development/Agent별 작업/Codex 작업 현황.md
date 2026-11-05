@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.386"
+version: "1.0.387"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T07:25:51+09:00"
+updated: "2026-11-06T07:34:16+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 actualc2b review revisionrequired temporalM1M2/5Low; Codex narrowfix; B rev4 actualClaude reviewrunning; c6f oldCore capture; physicalincomplete"
-active_card_next: "K1 Codex isolated current/history fix with causal consistent contexts and multi-time timeline; Claude B rev4 actual verdict; Root corrected sourceCI and one review gate; no staleSet/lease permission"
+active_card_status: "oldc6f Core/report success but codeM1M2+5Low open; directactualverdictreply author; B rev4 reviewrunning/K1fix; physicalincomplete"
+active_card_next: "K1 Codex fromc6f isolated multi-time-history/current HELD/latest fixes +ownnewCI; Claude B rev4 verdict; Root one corrected-code delta review, no oldcandidateworker_done"
 ---
+
+## 2026-11-06T07:34:16+09:00 고정 K1 CI 증거와 실제 수정 판정 분리
+
+작업한 것과 확인: 고정 c6f의 전체Core42113810160 두job과 보고37fe879f/Docs42121661622 성공·productdiff0를 Root가 확인했다. 실제ZIP b85f829a를 받아 Go97상위PASS+1skip/302PASS이벤트·K1 30/124/0skip, Python9261=9215pass46skip를 대조했다. 코드 c2b 실제판정은 M1/M2·5Low 수정 필요 그대로이고 direct reply msg_2a098fb1f4d3로 저자의 새 질문에 전체 실제판정·구체수정 지시를 전달했다. Root는 완료된 reviewer를 새로 열지 않았다. 다음 첫 행동/담당은 K1 Codex의 수정 코드·새 CI와 Claude의 B rev4 판정이며, 옛 코드의 CI 성공을 새 수정이나 K1 완료로 바꾸지 않는다.
 
 ## 2026-11-06T07:25:51+09:00 K1 판정 처리와 준비된 B 검토 시작
 
