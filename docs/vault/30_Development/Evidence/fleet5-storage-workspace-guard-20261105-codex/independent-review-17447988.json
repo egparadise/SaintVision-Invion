@@ -1,0 +1,60 @@
+{
+  "observedAtKST": "2026-11-05T17:10:35.588356+09:00",
+  "reviewer": "Claude",
+  "reviewCommit": "822da5bce0131dea4da56c7a1aa16ff7ab3b34d8",
+  "reviewPath": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/no-socket-1744-cp-maintenance-review.json",
+  "reviewBlobSHA256": "845da95045f2b159369eadab726c63829a80d3668d9c338be10840a20ba4a925",
+  "reviewDocsRunID": 41991681981,
+  "reviewDocsHeadVerifiedDirectly": "822da5bce0131dea4da56c7a1aa16ff7ab3b34d8",
+  "coordinatorRelay": "msg_6044c537f4bf",
+  "partA": {
+    "reviewedCommit": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+    "branch": "agent/codex/fleet5-storage-workspace-guard-20261105",
+    "parent": "f40c3805 (docs-only vs ff97)",
+    "integrity": {
+      "testFile": {
+        "path": "tests/core/test_lan_workspace_upgrade.py",
+        "blob": "f4ccf241",
+        "sha256": "ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d",
+        "matched": true
+      },
+      "helper": {
+        "path": "deploy/lan/worker_workspace.py",
+        "blob": "c1e51ddb",
+        "sha256": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+        "unchangedSinceFf97Accept": true
+      },
+      "delta": "6 insertions / 1 deletion; socket_mounted parametrize with-socket/state-only x 3 profiles; state-only keeps state mount only and asserts backup Mounts == original"
+    },
+    "ownRun": {
+      "interpreter": "main .venv Python 3.14.7 -B",
+      "file": "33 passed",
+      "atKST": "2026-11-05T17:01:00+09:00",
+      "priorReviewReused": false
+    },
+    "mutationProbe": {
+      "mutant": "if sockets != 1: raise before return args in validate_install_target",
+      "stateOnlyFailed": 3,
+      "othersPassed": 30,
+      "restored": true
+    },
+    "hosted": {
+      "docs": {
+        "run": 41988236953,
+        "head": "17447988",
+        "conclusion": "success"
+      },
+      "core": {
+        "run": 41988233523,
+        "head": "17447988",
+        "status": "in_progress",
+        "checkedAtKST": "2026-11-05T17:00:20+09:00",
+        "countedAsSuccess": false
+      },
+      "codexReportedFocused": "104 pass 0 skip (recorded, not re-measured)"
+    },
+    "verdict": "ACCEPT (source); hosted Core pending"
+  },
+  "coreBecameSuccessAfterReview": true,
+  "physicalMaintenancePartExcluded": true
+}

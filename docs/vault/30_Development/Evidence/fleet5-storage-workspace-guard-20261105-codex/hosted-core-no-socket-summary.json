@@ -1,0 +1,129 @@
+{
+  "observedAtKST": "2026-11-05T17:10:35.462711+09:00",
+  "sourceSHA": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+  "runID": 41988233523,
+  "attempt": 1,
+  "conclusion": "success",
+  "coreJob": 127113990628,
+  "duration": "31m14s",
+  "artifactID": 13398202500,
+  "artifactDigest": "sha256:f3cd27e46b1aec5ed370b87ce0f7f51f78a2e74f32b02abca8d91e57cc8fbe1e",
+  "junit": [
+    {
+      "file": "build-product-runtime-real-pg.xml",
+      "sha256": "727a3e38baecf6e0d94eeb69f10c342d0f6077943a607617fcf08db61641ff93",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13
+    },
+    {
+      "file": "business-handoff-tests.xml",
+      "sha256": "b20316ca6fccb8e91828ff0577e2cd3e49bdff6ed8f5f453225812f3e5d91c15",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 17
+    },
+    {
+      "file": "containment-tests.xml",
+      "sha256": "f5b56ab8655531b76839486cbc2be07c9404a272f232f7aca4d44e4af143fbc7",
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 28
+    },
+    {
+      "file": "core-tests.xml",
+      "sha256": "7ca50017e33ebd1d05ef6aaad52ac0be6208f0745802bf4fdc9ca499489ca90a",
+      "tests": 8946,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 46,
+      "passed": 8900,
+      "skipReasons": {
+        "PowerShell and csc.exe shim require Windows": 13,
+        "PowerShell parser requires Windows": 2,
+        "PowerShell required": 9,
+        "Actual Windows PowerShell launcher": 10,
+        "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+        "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+        "run only through tools/placement_benchmark.py": 1,
+        "run only through tools/placement_lock_wait_diagnostic.py": 1,
+        "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+        "claude is not installed on this machine": 1,
+        "codex is not installed on this machine": 1,
+        "gemini is not installed on this machine": 1,
+        "antigravity is not installed on this machine": 1,
+        "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+      },
+      "workspaceGuardCases": 33,
+      "stateOnlyCases": [
+        "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-observe-v1]",
+        "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-test-v1]",
+        "test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts[state-only-lan-workspace-v1]"
+      ]
+    },
+    {
+      "file": "cx01-recovery-tests.xml",
+      "sha256": "707025386a28122017529cb3a04feb685f1ad31f7b7140586ecae157d168b9f2",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 20
+    },
+    {
+      "file": "docker-host-tests.xml",
+      "sha256": "c84b4c2580fa951080091fa526ddc2822805449763329cbe96b25eab55e8d5c1",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 2
+    },
+    {
+      "file": "lan-installer-tests.xml",
+      "sha256": "20ac366188298f4e1824e22f5f2887f0e67e36254bfd924d3f2150a11d6c0f6d",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15
+    },
+    {
+      "file": "lan-pilot-database-real-pg.xml",
+      "sha256": "fc25df2f0302aaf825c2e553aeec49301c3733ab977fbff11090d257eae333f5",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1
+    },
+    {
+      "file": "shard-recovery-tests.xml",
+      "sha256": "fa0fdbac928156a4edbe1c03f70ae1e167e74e5666b34dcef0f4e7c41de6a6d7",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 21
+    },
+    {
+      "file": "workspace-tests.xml",
+      "sha256": "0b5ee99670c059de0bdd36c787903d73f7276435e0adc22ddb66428d9e226fce",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 23
+    }
+  ],
+  "mainCoreDeselected": 2,
+  "deselectedEvidence": "hosted-no-socket-pytest-summary.txt",
+  "sourceFf97Attempt1FailureRetained": true,
+  "physicalAcceptanceAssessed": false
+}

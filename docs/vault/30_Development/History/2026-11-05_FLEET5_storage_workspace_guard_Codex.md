@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-STORAGE-WORKSPACE-GUARD-20261105-CODEX"
 title: "2026-11-05 FLEET5 storage workspace upgrade guard Codex"
-version: "1.0.1"
-status: "in_progress"
+version: "1.1.0"
+status: "review"
 author: "Codex"
 reviewer: "Claude via root"
-updated: "2026-11-05T16:33:00+09:00"
+updated: "2026-11-05T17:12:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "FLEET5-STORAGE-WORKSPACE-GUARD-20261105"
@@ -71,3 +71,21 @@ Attempt1's database failure remains recorded. Same-source retry success establis
 Only after attempt2 completed, the requested test-only Low was addressed: the supported-upgrade regression now exercises both socket-present and `/state`-only input shapes for observe/test/workspace profiles, checks the original backup mounts are preserved, and continues checking the actual recreated mount arguments. Related local workspace/config/storage/readiness is **104 passed / 0 skipped / exit0**, `no-socket-focused.xml` and `.txt`, same Windows/Python3.14.7 `-B` environment. This is three additional parameter cases. The helper stays byte-identical at SHA-256 **83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d**; updated tests hash **ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d**.
 
 Next owner/Codex: publish this test-only delta and run its exact-head required CI. Next owner/root: relay the actual independent delta review. Original Claude34 review applies to ff97 only and is not counted as review of these new test bytes. Source59f bundle packet and protected operational inputs remain unchanged; deployment, integration landing and physical acceptance are not performed here.
+
+## Published no-socket delta checkpoint
+
+Test-only commit **17447988d631cb575fbe7d04e28c5dd7e0e9774e** is pushed on the task branch. `git diff ff97 -- deploy/lan` is empty. Local documentation and single-source ratchet gates exit0; sync check is **2246 managed / 42 pending / 0 conflicts / no writes**, exit0. Root received actual test-only review request **msg_2c3e1d798b85** with the test-file hash and unchanged helper hash.
+
+Exact-head Docs **41988236953** is **completed/success** and its API receipt is `hosted-docs-no-socket.json`. Exact-head Core **41988233523 attempt1** has passed provisioned installer and database gates and is running main pytest; final conclusion remains pending. Independent delta review remains pending. Next first action/owner: Codex observes terminal Core and root relays the actual test-byte verdict; Codex then publishes final report/evidence and report-head Docs verification without changing accepted product bytes.
+
+## Final source handoff
+
+Source/test commit **17447988d631cb575fbe7d04e28c5dd7e0e9774e** has both required relevant workflows **completed/success**: Core **41988233523 attempt1** and Docs **41988236953**, directly verified at that full SHA. Core job **127113990628** completed in **31m14s**. Actual main JUnit is **8900 passed / 46 declared skips / 0 failures / 0 errors**, with **2 deselected** in its captured console summary; the selected workspace file contains **33 passing cases**, including all **3 state-only cases**. Separate provisioned installer **15 pass / 0 skip** and pilot database **1 pass** are not summed into main pytest. Artifact **13398202500**, archive digest `f3cd27e46b1aec5ed370b87ce0f7f51f78a2e74f32b02abca8d91e57cc8fbe1e`. `hosted-core-no-socket-summary.json` retains per-JUnit hashes, counts and skip distribution; the committed selected JUnit retains the actual guard/no-socket cases.
+
+Actual test-delta reviewer **Claude** accepted exact **17447988** at review commit **822da5bce0131dea4da56c7a1aa16ff7ab3b34d8**, root relay **msg_6044c537f4bf**. Claude independently ran **33 passed** and confirmed a `sockets != 1` mutant fails exactly the **3 state-only cases** while the other **30 pass**, then restored the scratch helper. This is new review of the new test bytes, not reuse of ff97's earlier34 result. Direct review Docs **41991681981** is success at exact **822da5bc**. `independent-review-17447988.json` extracts only the source-task part with the original review-blob digest. Core was still pending during Claude's17:01 review; its later successful conclusion is Codex's separate observation.
+
+Final behavior: unsupported storage-policy configuration or any unpreserved mount is refused before image loading or Node mutation, with a separate-plain-Node action message. Supported plain upgrades and recorded storage-enabled backup rollback remain functional. Helper remains **83930f4d…6e5b7d**, tests **ca86b49e…4273d**. Combined storage/workspace support, arbitrary host remounts, ACL/quota changes, target-device acceptance and whole eight-lane acceptance are not claimed.
+
+All final local report gates and sync **check-only** results are recorded in `final-gates.json`; no Obsidian apply is performed from this older vault. The final report commit is documentation/evidence only; its own Documentation run is bound to that report SHA by GitHub Actions and the coordinator completion receipt, avoiding a self-referential report-SHA loop. Earlier CI failure/expected-red tests and their limits remain intact in this History/Evidence.
+
+Next first action/owner **root**: consume this exact source/test handoff and both actual Claude reviews, integrate with the separately owned database-readiness work only after its own verdict/gates, then perform combined CI and latest-vault aggregation. Source59f first-wave bytes remain separately pinned; no existing bundle, logical identity, key, port/profile, r5/source03/executor/venv/pin or renewal schedule was changed by this task. Deployment and physical acceptance remain outside this source-only delivery. No additional ready card is started by this dispatched worker.
