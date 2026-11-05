@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T06:01:04+09:00",
+  "atKST": "2026-11-06T06:13:36+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,15 +12,9 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": {
-    "task": "task_deba0c63a626",
-    "dispatch": "ctx_ba55264f86fb",
-    "source": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
-    "scope": "B rev3 FINAL whole coupled contract delta including new protected ARM/key-delivery/ObservationScope",
-    "state": "ready actual worker receipt; verdict pending"
-  },
+  "active": null,
   "pending": null,
-  "authorParallelWork": "Codex K1 real offline verifier/new proof codecs/crypto/CI; B owner waits one actual e993 whole review",
+  "authorParallelWork": "Codex K1 real verifier/proofwire/crypto/codeCI; Codex B rev4 specific M1-M3/L1-L6 correction",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "K1 code+new proof-wire published SHA/actual CI; sequence after current B review, no duplicate launch",
+  "nextActualReviewTrigger": "published final K1 code+CI or B rev4 contracts+Docs; one actual Claude reviewer sequentially, not launched on unpublished drafts",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -39,5 +33,15 @@
     "scope": "bounded source/packet/report only",
     "taskOutcome": "succeeded"
   },
-  "sourceIntegratorActive": false
+  "sourceIntegratorActive": false,
+  "completedB3": {
+    "task": "task_deba0c63a626",
+    "dispatch": "ctx_ba55264f86fb",
+    "review": "638109ab211bdfab7646a07b375003a636b3a33b",
+    "Docs": 42108948613,
+    "verdict": "REVISION REQUIRED narrow rev4; B3-M1/M2/M3 and L1-L6",
+    "workerDone": "msg_16c5daff8722",
+    "resource": "exited/released"
+  },
+  "knownCompletedIntegrationResource": "actual exited/released, six packets preserved at Root"
 }

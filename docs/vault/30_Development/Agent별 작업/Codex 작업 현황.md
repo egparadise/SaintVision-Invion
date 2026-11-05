@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.382"
+version: "1.0.383"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T06:01:04+09:00"
+updated: "2026-11-06T06:13:36+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "e50 bounded integration delivery COMPLETE/actual worker_done; K1 real code+crypto and B e993 Claude review pending; physical/whole incomplete"
-active_card_next: "K1 Codex published code/crypto/CI then one wire+code review; Claude B e993 whole verdict then Root concrete design/code decision; Root aggregate/production gate; no duplicate e50 CI/report"
+active_card_status: "e50 bounded COMPLETE; B actual638 review revision required3M6L/rev4 docs; K1 real code+crypto; completed owned workers released; physical incomplete"
+active_card_next: "B Codex rev4 perNode protected approval renewal/full lock census/closed gate and delivery proofs; K1 Codex real crypto/codeCI; Root one actual new source review after publication"
 ---
+
+## 2026-11-06T06:13:36+09:00 실제 B 판정과 rev4 구체 지시
+
+작업한 것과 확인: e50 bounded 납품 완료와 Root421/Docs42108874876·2723hash 동기화를 보존했다. B e993은 실제638109ab/Docs42108948613에서3Medium·6Low 수정 필요였고 Root는 PC별 protected approval renewal/reapproval, transitive census, 닫힌 gate/PoP/ObservationScope 및 lock-only procedure를 선택해 reply msg_94ff5bb7a0e6로 rev4를 지시했다. 완료된 통합·검토 worker 두 개는 실제 succeeded/settled 확인 뒤 Orca release/exited를 확인했다. 다음 첫 행동/담당: B Codex는 e993 이후 좁은 rev4, K1 Codex는 실제 proof codec/crypto·CI를 납품하고 Root가 새 immutable source에서 독립 검토를 한 번 배정한다. 현재 reviewer 새 task를 만들거나 미확인 계약을 완료 처리하지 않는다. 이전 패킷과 source는 보존됐고 real bindings NULL/HOLD다.
 
 ## 2026-11-06T06:01:04+09:00 e50 최종 납품 수락과 실제 완료 신호
 

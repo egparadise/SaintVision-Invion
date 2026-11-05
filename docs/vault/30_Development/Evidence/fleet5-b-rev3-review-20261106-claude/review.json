@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "saintvision-independent-review:1",
+  "reviewer": "Claude",
+  "owner": "Codex",
+  "orcaTask": "task_deba0c63a626",
+  "dispatch": "ctx_ba55264f86fb",
+  "ownerTask": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105 / task_a8fd2969f0b3 / ctx_6f0f8253b8a7",
+  "scope": "whole-coupled CONTRACT DELTA review at DESIGN level; DOCS/schema/static fixtures only; not registration, code grant, freeze, runtime or product-B acceptance",
+  "target": {
+    "final": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
+    "branch": "agent/codex/fleet5-b-contract-rev3-20261106",
+    "delta": "02cfd260 -> 15823c2a -> e9932f30 (37 files all A under docs/vault; 15823->e993 10 files, 82+/9-)",
+    "productDiffVs72028": 0,
+    "docsRun": {"id": 42105739288, "job": 127519951449, "headSha": "e9932f306550a07e4893ab7a1a7dc6944b31e271", "event": "workflow_dispatch", "jobs": {"docs": "success"}, "readOnlyByReviewer": true}
+  },
+  "read": [
+    "prior review ac9182c3 History 2026-11-06_04-40-00_KST_FLEET5_B_contract_rev2_02cfd260_독립검토_Claude.md and Evidence/fleet5-b-rev2-review-20261106-claude/",
+    "Root 7ec1af26 b-rev2-root-revision3-decision.json (msg_f7caf4c96b16, atKST 2026-11-06T05:05:26+09:00)",
+    "owner History 2026-11-06_FLEET5_B_contract_revision3_Codex.md (431 lines) and all 35 Evidence files",
+    "72028 source: inv/db.py transaction 174-215, inv/leases.py 23-50, inv/build_preparations.py 218-267, node_auth.py 99-112, storage.py 330-345, node-agent transport/server.go 63-67/281, runtime/terminal.go TerminalFrameInput"
+  ],
+  "notBorrowed": "bootstrap 8874, K1, e50 all8, Root packet and R-L1 results are not B evidence",
+  "independentChecks": {
+    "ownerFixturesReproduced": {"passed": 242, "failed": 0, "exit": 0, "fixtureResultsByteIdentical": true, "syntheticPositiveByteIdentical": true, "stdoutEqualsRev3FixturesLog": true, "level": "SCHEMA_STATIC_SYMBOLIC only"},
+    "ownerSourceLedgerReproduced": {"sourceFiles": 65, "callExpressions": 602, "schemaAssets": 138, "mismatches": 0, "exit": 0, "meaning": "hash/AST/anchor fidelity of the owner's chosen set only"},
+    "recordedLogHashes": {"logs": 13, "allMatchCommittedBytes": true},
+    "initialFixtureRedPreserved": {"passed": 207, "failed": 5, "names": ["symbolic-chain-positive", "token-120-positive", "per-node-same-config-readmit", "new-protected-generation-release-positive", "raw-capability-positive-SYNTHETIC"]},
+    "keyDeliveryGrantRed15823Reproduced": {"exit": 1, "missingExecuteGrants": ["b_record_key_delivery"]},
+    "e993GrantDelta": "adds b_record_key_delivery + b_read_observation_scope to sv_b_operator and b_read_observation_scope to sv_b_safety; sv_b_runtime execute list unchanged (no runtime broadening)",
+    "reviewerCensusAudit": {"file": "census-result.json", "nonTestPythonFilesAt72028": 494, "filesOutsideLedgerWithCanonicalTableExecute": 22, "ofWhichControlPlaneModules": 10, "uncoveredOrmCallsInsideLedgerFiles": {"scalars": 22, "scalar": 15, "refresh": 1, "copy": 2}},
+    "reviewerAdversarial": {"file": "adversarial-result.json", "cases": 33, "agreeWithContract": 14, "disagree": 19, "phaseMatrixReviewerRederivation": "77/77 rows match reviewer rules after modelling revoked node0 jump; 0 mismatches"},
+    "dbGuardAt72028": "db.py transaction: control_epoch FOR SHARE then tenant_controls FOR SHARE or UPDATE chosen at entry (containment_write), 500ms lock_timeout/2s statement_timeout, non-owner/non-bypass role check -- consistent with rev3 epoch-first order"
+  },
+  "verdict": "REVISION REQUIRED (narrow rev4). Not ACCEPT, no partial freeze, no registration.",
+  "closedFromPrior": {
+    "R1": "direction accepted: distinct operator-release anchor (no CA/root-fence/TLS/use/safety reuse), per-Node/per-release delegated use key, Node verifies anchor->RELEASE->DELEGATION->ROLE_USE with full tuple incl. generation/gateId and purpose/method/path/body/nonce/expiry, issuer loads authoritative tuple; residual in M3",
+    "R2": "lane table exact raw POST paths match 72028 server.go:67/281; receipts/observe independent of business token; safety separately keyed; MODEL vs EXECUTION by authenticated caller+issuer; residual in M3",
+    "R3": "lease<=300s per-Node REFRESH_SAME_GENERATION and READMIT_SAME_CONFIG with no all-five dependency; selection rejects empty/dup/foreign/nonstring; residual in M2",
+    "R4": "named NOLOGIN owners and login principals, SECURITY DEFINER pg_catalog search_path + session_user/service binding, acyclic FKs, single closed activation transaction, non-atomic Node/key effects with receipts before eligibility; residual L3/L6",
+    "R5": "77-row grid independently re-derived, 0 mismatches; quarantine + B-FRESH1 block + distinct B-RECOVERY1; residual L1/L2",
+    "R6": "epoch-first order respects actual db.py guard; residual M1",
+    "R7": "managed separate-kernel Linux VM selected, WSL not fallback, raw measured capability schema, approved budget, planning defaults only, all actual NULL/HOLD; residual L5",
+    "L-a..h": "closed at contract level (full-string patterns+lengths, exact-int predicate, strict UTF-8/no surrogate/no NUL-C0-DEL, C2 escaping no NFC, single-NUL domain, in-memory generation-bound replay cap4096, closed HostConfig allowlist, hex8/hex16 root); Info items below"
+  },
+  "findings": [
+    {"id": "B3-M1", "severity": "Medium", "area": "R6 lock census", "summary": "The 602-expression ledger is complete only for its chosen 65 files and AST filter. (a) Ten CP modules outside the set take canonical-rank locks, nine of them via leases.lock_run/lock_resources in run-before-Node or plan->run->approval->Node order: build_preparations.py:223 lock_run -> project_resource_limits/storage_budgets FOR UPDATE -> :267 lock_resources (inv.nodes FOR UPDATE, leases.py:44); shards.py:48 shard_plans -> :53 lock_run -> :58 approval_requests SHARE -> :65 lock_resources; runs.py, workspace_start.py, output_ingestion.py, business_handoff.py, shard_completion.py, result_view.py (lock_run) and build_execution_worker.py:212 runs FOR SHARE. None has callsite rows/entry plans; currentInversions names only leases.py. (b) The filter counts only execute/executemany and session.get/add/flush/delete, excluding 40 ORM calls in ledger files, including identity/node_auth.py:108 NodeAuth.lock_current select(Node).with_for_update() (public.nodes FOR UPDATE bound to observation writes); the ledger has only node_auth.py:225.", "revision": "Derive the census from the transitive call graph of every function that reaches a canonical-rank table (all lock_run/lock_resources/require_execution callers), include every ORM execution method on any session alias (scalars/scalar/query/merge/refresh/execute), add rows+entry plans for each, and add entry plans for the new B procedures (key delivery, gate invalidation/ARM-ack recording, issuance, reconcile receipt, observation scope). Still static; actual PG trace stays future."},
+    {"id": "B3-M2", "severity": "Medium", "area": "R3 approval lifetime", "summary": "Approval is capped at 24h and bounds release/delegation; REFRESH and READMIT both need an unexpired approval, and expiry denies the Node with 'a new protected approval is an explicit external authority boundary'. No lane, writer semantics, phase row or fixture says whether re-approving the SAME frozen config is per-Node (no fresh proofs from unrelated members) or a whole-cohort fresh activation. If it is the latter, one offline unrelated worker blocks every Node at each 24h boundary, which is the ADR100 coupling R3 removed for leases. Root R3 required approval expiry/refresh writers and phase rows to be explicit.", "revision": "Define APPROVAL_RENEW_SAME_CONFIG: protected operator, b_append_approval overlap before expiry, scope rules that need no fresh proof from unrelated members, then per-Node release/delegation reissue + gate ARM + key delivery; add matrix rows and negatives (changed config, expired cert/trust, during mutation fence). Alternatively, state explicitly that approval renewal is cohort activation and put the accepted coupling to Root."},
+    {"id": "B3-M3", "severity": "Medium", "area": "R1/R2 new lanes", "summary": "The bootstrap circularity is broken in prose: ARM before commit grants no business, the use key is delivered only after the activation commit, and eligibility needs the delivery receipt. But the objects those gates depend on are not contracts. There is no schema for the key-delivery/possession receipt (what proves possession; binding to ledger ID/release hash/use-key hash/issuer service identity); no schema/table/writer/grant for the gate ARM acknowledgements that fresh activation waits on; no ObservationScope result schema (incl. AUTHORITY_UNAVAILABLE). The keyHierarchy omits ARM_EXACT_RELEASE from the release anchor's signing purposes, although the History/schema say ARM is release-authority signed. The gateControl/safety/observeInput/signedEnvelope/roleConfig schemas have zero positive or negative fixtures, and the chain model has no gate-state or delivery-receipt input, so invalidated-gate, restart-no-gate and receipt-mismatch cases are untested.", "revision": "Add closed schemas for keyDeliveryReceipt (with a proof-of-possession signature domain over a protected challenge), gateAck and observationScope; name the ARM-ack table/writer/EXECUTE; list ARM in keyHierarchy; add fixtures: ARM signed by use/safety key denied, invalidated or absent gate denies an otherwise valid chain, restart has no gate, receipt with wrong hash/issuer/ledger denied, delivery before the activation commit denied, ObservationScope cannot yield ChannelProof/admission."},
+    {"id": "B3-L1", "severity": "Low", "area": "R5 matrix", "summary": "Revocation is modelled only on node0, which is a CAS'd member for every k>=1. No row revokes a not-yet-CAS'd member at k=1..4. For such a member the revocation C+1 = 8 equals the renewal target C while DER stays A, so C alone aliases 'CAS done'.", "revision": "Add those rows and assert that the CAS refuses and that ledger+DER, not C, decide CAS state."},
+    {"id": "B3-L2", "severity": "Low", "area": "R5/R6 lost response", "summary": "All six AFTER_INTENT LOST_RESPONSE_UNKNOWN rows (all authority VALID) go to B-RECOVERY1, while History R4/R6 resolve a lost commit response by an exact ledger reread and retry.", "revision": "State that this row means 'unresolved after exact ledger reread' and add a ledger-resolved forward row."},
+    {"id": "B3-L3", "severity": "Low", "area": "R4 grants", "summary": "Runtime gets SELECT plus a 'constant lock_sentinel UPDATE' on every authority table. This contradicts 'revoke authority DML from online/runtime; protected functions only' and is a real UPDATE (new tuple version, NO KEY UPDATE lock). The key_deliveries row is worded differently ('SELECT/lock only').", "revision": "Either a trigger-enforced no-op/reject on the sentinel, or SECURITY DEFINER lock procedures so runtime needs no table UPDATE; make wording uniform."},
+    {"id": "B3-L4", "severity": "Low", "area": "R1/R2 key purpose", "summary": "The safety envelope binds no method/path (action->path mapping is implicit). The fixture context budget is signed by the release anchor under domain saintvision/context-budget/v1, which the keyHierarchy does not list.", "revision": "Make action->exact path normative or add path to safety; name the budget-approval signer/custody and add its domain to the hierarchy."},
+    {"id": "B3-L5", "severity": "Low", "area": "R7 capability", "summary": "The capability schema has no measured host/VM clock offset or sync source vs the CP, while every window relies on a 30s skew budget.", "revision": "Add raw clock offset/source/observedAt fields with an offset<=skew predicate."},
+    {"id": "B3-L6", "severity": "Low", "area": "fixture fidelity", "summary": "named-table-writer-has-explicit-execute-grant covers 1/16 tables, because only key_deliveries names a b_ procedure in its writer text. Release<=approval uses the constant NOW+4000, not an approval record. readmit(old, old) with an unchanged generation returns True.", "revision": "Explicit table->writer procedure->EXECUTE principal matrix check; model approval interval; require fresh generation for READMIT (same generation is REFRESH)."}
+  ],
+  "info": [
+    "JSON Schema 'integer' admits 2.0e9; exact-int depends on no_float/strict_json and Go decoders, which must be normative",
+    "purpose<->path coupling exists only in the predicate (correctly enforced there)",
+    "displayLabel maxLength unit (code points vs UTF-8 bytes) unstated for Go",
+    "terminal frame sequence is bound transitively via bodySha256 (72028 TerminalFrameInput carries Sequence/Nonce); make normative",
+    "Node-enforced bound on online use-key compromise is delegation expiry (<=release<=approval<=24h) plus gate invalidation, not the 300s CP lease; consider shorter delegation",
+    "BEFORE_INTENT short-lived expiries labelled 'preflight fails' (conservative)",
+    "per-restart READMIT needs protected signer availability; automation/custody of that signer is future",
+    "matrix shows P 101->102 at CAS time while prose says renewal moves P by 2; the final P+2 step is outside the matrix"
+  ],
+  "stillPending": "real Go/crypto/PG/Linux Docker/crash/concurrency/equipment B evidence 0; A1-A16 pending; all real bindings NULL/HOLD; owner 242 checks are SCHEMA/STATIC/SYMBOLIC only",
+  "notDone": ["no product/owner files/ADR/registry/shared boards/PKI/NodeOps/keys/configs/SSH/Docker/WSL/VM/clock/schedules/Obsidian apply", "no process kills"],
+  "nextOwner": "Codex: narrow rev4 for M1-M3 and L1-L6; Root: decide approval-renewal shape (M2) and keep msg_e269bdd34436 open on this verdict; Claude: one delta review of rev4"
+}

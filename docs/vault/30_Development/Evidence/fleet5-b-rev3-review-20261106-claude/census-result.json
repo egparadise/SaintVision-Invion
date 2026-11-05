@@ -1,0 +1,214 @@
+{
+ "level": "REVIEWER_STATIC_GIT_OBJECT_AUDIT_ONLY",
+ "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+ "nonTestPythonFiles": 494,
+ "ledgerFiles": 65,
+ "filesOutsideLedgerWithBTableExecute": 22,
+ "outside": [
+  {
+   "path": "migrations/versions/0001_s02_baseline.py",
+   "executeCalls": 12,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0001_s02_baseline.py:184 op.execute :: op.execute( \"CREATE UNIQUE INDEX uq_nodes_certificate_fingerprint ON nodes \" \"(certificate_fingerprint) WHERE certificate_fingerprint IS NOT"
+   ]
+  },
+  {
+   "path": "migrations/versions/0008_node_certificate_lookup.py",
+   "executeCalls": 4,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0008_node_certificate_lookup.py:42 op.execute :: op.execute( f\"\"\" CREATE OR REPLACE FUNCTION {FUNCTION}(fingerprint char(64)) RETURNS TABLE (node_id char(30), tenant_id uuid, status varchar"
+   ]
+  },
+  {
+   "path": "migrations/versions/0031_resource_offer_integrity.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0031_resource_offer_integrity.py:15 op.execute :: op.execute(\"\"\" REVOKE ALL ON FUNCTION public.apply_resource_offer(uuid,char(30),text,bigint) FROM PUBLIC,inv_app; CREATE FUNCTION public.app"
+   ]
+  },
+  {
+   "path": "migrations/versions/0032_workspace_readiness_merge.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0032_workspace_readiness_merge.py:12 op.execute :: op.execute(\"\"\" CREATE OR REPLACE FUNCTION public.workspace_input_state(p_tenant_id uuid,p_workspace_id text) RETURNS TABLE(prepared boolean,"
+   ]
+  },
+  {
+   "path": "migrations/versions/0035_credential_registry.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0035_credential_registry.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.credential_versions ( tenant_id uuid NOT NULL, project_id text NOT NULL, credential_id uuid NOT NULL, versio"
+   ]
+  },
+  {
+   "path": "migrations/versions/0037_storage_sample_commit.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0037_storage_sample_commit.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.storage_sample_requests ( tenant_id uuid NOT NULL, request_id uuid NOT NULL, project_id text NOT NULL, run_i"
+   ]
+  },
+  {
+   "path": "migrations/versions/0039_model_manifest.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0039_model_manifest.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.model_manifests ( tenant_id uuid NOT NULL, project_id text NOT NULL, model_id text NOT NULL, version text NO"
+   ]
+  },
+  {
+   "path": "migrations/versions/0040_model_run_input.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0040_model_run_input.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.model_run_inputs ( tenant_id uuid NOT NULL, project_id text NOT NULL, run_id text NOT NULL, model_id text NO"
+   ]
+  },
+  {
+   "path": "migrations/versions/0041_model_runtime_input.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0041_model_runtime_input.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.model_runtime_inputs ( tenant_id uuid NOT NULL, project_id text NOT NULL, run_id text NOT NULL, input_id uui"
+   ]
+  },
+  {
+   "path": "migrations/versions/0042_model_retry_lineage.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0042_model_retry_lineage.py:12 op.execute :: op.execute(\"\"\" CREATE TABLE inv.model_retry_lineage ( tenant_id uuid NOT NULL, project_id text NOT NULL, root_run_id text NOT NULL, parent_r"
+   ]
+  },
+  {
+   "path": "migrations/versions/0056_kernel_cancel_audit_bridge.py",
+   "executeCalls": 2,
+   "bTableExecuteCalls": 2,
+   "examples": [
+    "migrations/versions/0056_kernel_cancel_audit_bridge.py:27 op.execute :: op.execute( f\"\"\" DO $$ BEGIN CREATE ROLE {OWNER} NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS; EXCEPTION WHEN duplicate",
+    "migrations/versions/0056_kernel_cancel_audit_bridge.py:280 op.execute :: op.execute( f\"\"\" DROP FUNCTION IF EXISTS {SIGNATURE}; DROP POLICY IF EXISTS cancel_bridge_audit_read ON public.audit_events; DROP POLICY IF "
+   ]
+  },
+  {
+   "path": "migrations/versions/0058_release_acceptance_resolver.py",
+   "executeCalls": 28,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "migrations/versions/0058_release_acceptance_resolver.py:226 op.execute :: op.execute( \"\"\" CREATE FUNCTION public.release_evidence_binding_exact() RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = "
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/build_execution_worker.py",
+   "executeCalls": 13,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/build_execution_worker.py:212 conn.execute :: conn.execute( \"\"\"SELECT state FROM inv.runs WHERE tenant_id=%s AND project_id=%s AND run_id=%s FOR SHARE\"\"\", (principal.tenant_id, project_i"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/build_preparations.py",
+   "executeCalls": 26,
+   "bTableExecuteCalls": 4,
+   "examples": [
+    "services/control-plane/src/inv/build_preparations.py:448 conn.execute :: conn.execute( \"SELECT * FROM inv.runs WHERE project_id=%s AND run_id=%s\", (project_id, run_id), )",
+    "services/control-plane/src/inv/build_preparations.py:452 conn.execute :: conn.execute( \"\"\"SELECT c.*,e.revision,e.content_hash,e.snapshot, r.state AS source_state,r.attempt AS current_source_attempt FROM inv.works",
+    "services/control-plane/src/inv/build_preparations.py:679 conn.execute :: conn.execute( \"\"\"SELECT p.*,e.revision,e.content_hash,r.state AS source_state, r.attempt AS current_source_attempt,c.source_attempt AS curre"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/business_handoff.py",
+   "executeCalls": 25,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/business_handoff.py:40 conn.execute :: conn.execute( \"\"\"SELECT r.workspace_id,w.project_id,w.status,l.project_id AS workload_project, l.spec,l.spec_sha256 FROM public.runs r JOIN "
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/credential_registry.py",
+   "executeCalls": 1,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/credential_registry.py:19 conn.execute :: conn.execute( \"\"\"SELECT v.file_name,v.device,v.inode,v.content_sha256 FROM inv.credential_versions v JOIN inv.credential_grants g USING(tena"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/output_ingestion.py",
+   "executeCalls": 8,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/output_ingestion.py:68 conn.execute :: conn.execute( \"\"\"SELECT r.run_id,r.project_id,a.attempt,s.command_id,s.envelope,s.recorded_at FROM inv.node_stop_receipts s JOIN inv.executi"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/result_view.py",
+   "executeCalls": 5,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/result_view.py:42 conn.execute :: conn.execute( \"SELECT project_id FROM inv.runs WHERE run_id=%s\", (run_id,) )"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/runs.py",
+   "executeCalls": 10,
+   "bTableExecuteCalls": 3,
+   "examples": [
+    "services/control-plane/src/inv/runs.py:77 conn.execute :: conn.execute( \"\"\"UPDATE inv.runs SET state=%s,version=version+1, attempt=attempt+CASE WHEN %s='running' THEN 1 ELSE 0 END WHERE run_id=%s RE",
+    "services/control-plane/src/inv/runs.py:47 conn.execute :: conn.execute( \"INSERT INTO inv.runs(tenant_id,project_id,run_id) VALUES (%s,%s,%s) RETURNING *\", (tenant_id, project_id, run_id), )",
+    "services/control-plane/src/inv/runs.py:56 conn.execute :: conn.execute( \"SELECT * FROM inv.runs WHERE run_id=%s\", (run_id,) )"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/shard_completion.py",
+   "executeCalls": 8,
+   "bTableExecuteCalls": 3,
+   "examples": [
+    "services/control-plane/src/inv/shard_completion.py:21 conn.execute :: conn.execute( \"INSERT INTO inv.runs(tenant_id,project_id,run_id) VALUES(%s,%s,%s)\", (tenant, project, run_id), )",
+    "services/control-plane/src/inv/shard_completion.py:48 conn.execute :: conn.execute( \"\"\"SELECT p.* FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) WHERE r.state IN ('run",
+    "services/control-plane/src/inv/shard_completion.py:94 conn.execute :: conn.execute( \"\"\"SELECT s.shard_index,s.run_id,s.command_id,c.evidence_id,p.object_id, o.provider_id,o.locator,o.content_hash,o.size_bytes,o"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/shards.py",
+   "executeCalls": 24,
+   "bTableExecuteCalls": 3,
+   "examples": [
+    "services/control-plane/src/inv/shards.py:271 conn.execute :: conn.execute( \"SELECT r.run_id,r.state,r.updated_at,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.te",
+    "services/control-plane/src/inv/shards.py:275 conn.execute :: conn.execute( \"\"\"SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt, u.state,u.updated_at AS run_updated_at,",
+    "services/control-plane/src/inv/shards.py:199 conn.execute :: conn.execute( \"SELECT DISTINCT resource_id FROM inv.resource_leases WHERE run_id=ANY(%s) AND released_at IS NULL\", (runs,), )"
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/workspace_start.py",
+   "executeCalls": 8,
+   "bTableExecuteCalls": 1,
+   "examples": [
+    "services/control-plane/src/inv/workspace_start.py:64 conn.execute :: conn.execute( \"SELECT 1 FROM inv.workspace_starts s JOIN inv.runs r USING(tenant_id,run_id) WHERE s.run_id=%s AND r.attempt=0\", (run_id,), )"
+   ]
+  }
+ ],
+ "insideLedgerUncoveredDbLikeCalls": {
+  "scalars": 22,
+  "scalar": 15,
+  "refresh": 1,
+  "copy": 2
+ },
+ "insideExamples": [
+  "src/saintvision/api/v1/model_verify.py:280 session.scalars",
+  "src/saintvision/identity/node_auth.py:108 session.scalars",
+  "src/saintvision/services/locality.py:86 session.scalar",
+  "src/saintvision/services/locality.py:223 session.scalar",
+  "src/saintvision/services/locality.py:284 session.scalar",
+  "src/saintvision/services/locality.py:381 session.scalar",
+  "src/saintvision/services/locality.py:426 session.scalars",
+  "src/saintvision/services/locality.py:458 session.scalar",
+  "src/saintvision/services/locality.py:266 session.scalars",
+  "src/saintvision/services/nodes.py:220 session.refresh",
+  "src/saintvision/services/nodes.py:315 session.scalars",
+  "src/saintvision/services/nodes.py:366 session.scalars"
+ ]
+}

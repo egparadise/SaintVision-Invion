@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "fleet5-root-completed-worker-resource-release:1",
+  "atKST": "2026-11-06T06:11:41+09:00",
+  "guard": "exact worker_done+succeeded/settled per-task precheck; purpose-built Orca worker-release only; no shell process kill/worktree/setup/Node operation",
+  "records": [
+    {
+      "dispatch": "ctx_ed7ec73163d6",
+      "task": "task_78064fb4b7ff",
+      "actualWorkerDone": "msg_f7375feab0e4",
+      "before": {
+        "dispatchId": "ctx_ed7ec73163d6",
+        "taskId": "task_78064fb4b7ff",
+        "runId": "run_e57ecd84a7bc",
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "live",
+        "terminal": "term_73b11c32-3506-4086-a27b-ba3fe6d1c675",
+        "terminalState": "retained",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105"
+      },
+      "exit": 0,
+      "release": {
+        "ok": true,
+        "result": {
+          "dispatchId": "ctx_ed7ec73163d6",
+          "state": "released",
+          "processAction": "closed_agent_terminal",
+          "archive": "transcript [captured]"
+        }
+      },
+      "after": {
+        "dispatchId": "ctx_ed7ec73163d6",
+        "taskId": "task_78064fb4b7ff",
+        "runId": "run_e57ecd84a7bc",
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "exited",
+        "terminal": "term_73b11c32-3506-4086-a27b-ba3fe6d1c675",
+        "terminalState": "released",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105",
+        "waitingOnHuman": "unknown"
+      }
+    },
+    {
+      "dispatch": "ctx_ba55264f86fb",
+      "task": "task_deba0c63a626",
+      "actualWorkerDone": "msg_16c5daff8722",
+      "before": {
+        "dispatchId": "ctx_ba55264f86fb",
+        "taskId": "task_deba0c63a626",
+        "runId": "run_e57ecd84a7bc",
+        "followUpOf": "ctx_8fa6addadbda",
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "exited",
+        "terminal": "term_55b507f7a66773f45995c5ecea6bb180",
+        "terminalState": "released",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+        "waitingOnHuman": "unknown"
+      },
+      "exit": 0,
+      "release": {
+        "ok": true,
+        "result": {
+          "dispatchId": "ctx_ba55264f86fb",
+          "state": "already_released",
+          "processAction": "none",
+          "archive": "transcript [captured]"
+        }
+      },
+      "after": {
+        "dispatchId": "ctx_ba55264f86fb",
+        "taskId": "task_deba0c63a626",
+        "runId": "run_e57ecd84a7bc",
+        "followUpOf": "ctx_8fa6addadbda",
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "exited",
+        "terminal": "term_55b507f7a66773f45995c5ecea6bb180",
+        "terminalState": "released",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+        "waitingOnHuman": "unknown"
+      }
+    }
+  ]
+}

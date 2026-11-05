@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T05:22:48+09:00"
+updated: "2026-11-06T06:13:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -35,3 +35,16 @@ D5는 mandatory Database.transaction의 epoch guard를 존중하여 control_epoc
 rev3는 protected operator-release authority와 제한된 online use key 분리, Node-visible release/delegation chain, 별도 authenticated observe/reconcile/safety lane, released steady-state per-Node READMIT_SAME_CONFIG, named DB principals/grants, 부분 변경 중 revoke/epoch/expiry의 QUARANTINE, generation-bound memory replay와 닫힌 HostConfig allowlist를 명시해야 한다. 자세한 원문과 실제 reply는 b-rev2-root-revision3-decision.json이다. 기존 승인 재요청은 하지 않는다.
 
 전환 v5의 실제 6b12d3ab 독립 검토와 별도 Root 설계 등록은 [[FLEET5 전환 v5 계약 동결과 구현 범위]]에 기록한다. B 미수락 범위와 전환 K1 구현 범위를 구분하며 실제 장비·전체 제품 인수는 여전히 미완료다.
+
+
+## 실제 rev3 판정과 per-Node 승인 갱신 결정
+
+최종 e9932f30은 실제638109ab 검토/Docs42108948613의 판정에서 REVISION REQUIRED다. R1~R7의 방향과 기존 Low는 닫혔으나 누락된 transitive lock/ORM census, 24시간 승인 갱신 경로, 새 gate/key-delivery/ObservationScope 규격의3Medium과6Low를 남겼다. Root가 actual review와 exact head/ref/alljobs를 확인하고 reply msg_94ff5bb7a0e6로 좁은 rev4 DOCS/schema/static 범위를 지정했다. B 부분 동결·코드·등록·실장비 인수는 아직 허용하지 않는다.
+
+같은 고정 설정의 승인은 PC별 protected APPROVAL_RENEW_SAME_CONFIG로 갱신한다. 과거 서명 승인은 불변으로 남기고 새 priorApprovalHash·정확한 Node/cohort/config/epoch/C/R/root/image/executable/policy/floors·최대24시간 유효기간을 가진 새 승인을 current protected operator authority가 만든다. 다른 PC의 새 증거는 요구하지 않는다. 첫/cohort mutation 활성화만 전체5대 조건이다. 기존 승인 시각 만료만 발생한 경우에는 새 protected REAPPROVE_SAME_CONFIG를 별도로 정의하며 REFRESH/READMIT이 만료 승인을 재사용하지 않는다. 실제 operator grant/certificate/trust는 유효해야 하고 revoke·quarantine·부분변경·epoch/config/floor 변화·mutation fence는 이 경로로 우회하지 않는다. 계획의 역사적 설정 설명과 현재 실행 권한을 구분한다.
+
+새 PC별 release/delegation·gate 전환·activation ledger·postcommit key delivery/possession receipt의 순서와 UNKNOWN 상태를 닫는다. ARM ack와 key challenge/PoP/보호된 delivery receipt는 닫힌 schema·목적/domain·writer/grant·fixture가 필요하다. ObservationScope는 CP-local nonbusiness 결과이며 ChannelProof나 admission이 되지 않는다. 실제 key custody/crypto/원격원자성이 증명됐다는 뜻은 아니다.
+
+rev4 census는 helper/import/session alias의 transitive caller와 누락된 ORM 잠금까지 확대하고 known callsite를 빼면 실제 검사가 실패해야 한다. 권한 테이블에 runtime lock_sentinel UPDATE를 주는 방식은 철회하고 fixed-scope SECURITY DEFINER lock-only procedure로 정한다. 실제 role/RLS/search_path·canonical order와 writer별 EXECUTE matrix를 명시한다. context budget은 별도 protected context-budget-approver 역할/키/목적으로 제한하고 실제 key는 NULL이다. host·guest clockOffsetMillis와 uncertainty/source/freshness를 측정해 최대30초 skew 안인지 확인해야 하며 실제 clock은 변경하지 않는다.
+
+NOT-YET-CASed member revoke의 C target alias, exact ledger reread 전후 lost response, 모든 writer/grant 검사와 실제 approval interval, READMIT의 새 generation 조건도 닫는다. 단순 counter/boolean·없는 ledger·상징적 서명은 진척이나 운영 성공의 근거가 아니다. delegation expiry와 acknowledged gate invalidation이 Node 측 use-key 권한의 실제 한계이며 CP300초 lease와 같다고 주장하지 않는다. 자세한 원문 지시는 b-rev4-root-decision.json이고 [실제 독립 검토 원문](https://github.com/egparadise/SaintVision-Invion/blob/638109ab211bdfab7646a07b375003a636b3a33b/docs/vault/30_Development/History/2026-11-06_06-00-00_KST_FLEET5_B_contract_rev3_e9932f30_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)은 고정 Git source다.
