@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.358"
+version: "1.0.359"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T15:49:31+09:00"
+updated: "2026-11-05T16:10:01+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Corrected packet7dd and source guardff97 published, actual review/CI pending; CP installer assets verified without execution"
-active_card_next: "Consume actual Claude source/packet verdict and hosted Core/Docs; proceed only on accepted stage scope and real operator/runtime prerequisites"
+active_card_status: "Actual R4 source accepted; full Core blocked at existing DB bootstrap; separate readiness regression and coverage/plan Lows in progress"
+active_card_next: "Collect same-head attempt2 and controlled DB red/green proof; review new exact source before combined CI/landing; preserve physical ingress and no-leaf-start gates"
 ---
+
+## 2026-11-05 실제 source 수락과 DB 준비 보강
+
+작업한 것: root가 실제 Claude087/Docs41983434951 SUCCESS를 읽고 R4 source ACCEPT·High/Medium0·독립34pass를 owner에게 전달했다. 확인한 것: Core41982378091 attempt1의 PostgreSQL 역할 준비 실패로 main suite는 실행되지 않았으며 installer15pass를 전체 성공으로 쓰지 않았다. 다음 첫 행동/담당: guard owner는 단 한 번의 동일-head 실패 job 재검증과 no-socket 회귀 보강, DB owner task_58f4ada5c2d8는 임시 초기화 서버를 준비 완료로 볼 수 있는 경로의 실제 재현·수정을 맡는다. plan Low 후속 task_26607075f612는 broker start_unknown 표기였으나 bounded terminal 읽기에서 실제 조사 진행을 확인했고 재전송하지 않았다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-05 source 보강 게시와 CP 자산 실검증
 

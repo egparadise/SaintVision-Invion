@@ -144,10 +144,10 @@
       "sha": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
       "ownerReportedFocused": 101,
       "ownerReportedServingRoute": 50,
-      "independentReview": "requested ctx_ac008a621cfe, pending as of this checkpoint",
+      "independentReview": "actual Claude087 ACCEPT/34pass; no-socket test Low pending",
       "core": 41982378091,
       "docs": 41982381571,
-      "hostedStatus": "owner still completing exact Core; do not claim final success"
+      "hostedStatus": "Core41982378091 attempt1 FAILED at existing DB preparation; main suite did not run; one same-head failed-job retry attempt2 in progress"
     }
   },
   "assetsReportLocalGates": {
@@ -158,5 +158,37 @@
     "singleSourceRatchet": 0,
     "pathCitationRatchet": 0,
     "syncObservation": "2295 managed /12 pending/0 conflicts, no writes"
-  }
+  },
+  "actualLatestReview": {
+    "sha": "087aaf3521608a19fff28c8d70bacdda92697367",
+    "exactDocs": 41983434951,
+    "status": "success verified",
+    "r4Source": "ACCEPT ff97 /0HighMedium/34 independent pass",
+    "packet": "P1-P8 resolved as nonexecuting plan; P2 install BLOCKED; init/enroll leaf clocks wait fixed operator date",
+    "twoToFive": "same-state repeated init append-only; source-supported, live extension unperformed"
+  },
+  "newSourceCards": [
+    {
+      "card": "FLEET5-DATABASE-READINESS-20261105",
+      "task": "task_58f4ada5c2d8",
+      "dispatch": "ctx_77b63db632d7",
+      "stateAtStart": "ready",
+      "base": "59f0a3c2",
+      "owner": "Codex",
+      "reviewer": "Claude after publication",
+      "actualEarlyStatus": "baseline real-PG regression prepared; Windows39pass/5skip; hosted failing proof pending",
+      "originalCIFailureCause": "not proven"
+    },
+    {
+      "card": "F5 plan Low closure",
+      "task": "task_26607075f612",
+      "dispatch": "ctx_69be9896a8e3",
+      "stateAtStart": "outcome_unknown/turn_start_unobserved",
+      "restarted": false,
+      "scope": "nonexecuting Low closure only",
+      "actualLiveness": "One bounded worker-read observed actual source/rotation investigation and Working, despite broker start_unknown; no resend/restart"
+    }
+  ],
+  "preparationRuntimeExecuted": false,
+  "actualDBStageHold": "stage03 held until bootstrap readiness failure adjudication; other source cards continue"
 }

@@ -54,5 +54,53 @@
     "Claude": "review those packets, root documentation checkpoint and existing CP rollback assets",
     "root": "consume real worker outcomes and missing worker4 identity, proceed on accepted concrete execution conditions"
   },
-  "receiptPublicationPolicy": "This receipt records the completed checkpoint; receipt-commit CI and subsequent sync are external delivery status to avoid self-SHA recursion."
+  "receiptPublicationPolicy": "This receipt records the completed checkpoint; receipt-commit CI and subsequent sync are external delivery status to avoid self-SHA recursion.",
+  "continuationCheckpoint": {
+    "atKST": "2026-11-05T16:14:02+09:00",
+    "previousPublishedCheckpoint": {
+      "sha": "7ca29cf616baf82832d0b8e8c4454019827c38cb",
+      "exactDocs": 41983501973,
+      "status": "success verified"
+    },
+    "actualReview087": {
+      "sha": "087aaf3521608a19fff28c8d70bacdda92697367",
+      "exactDocs": 41983434951,
+      "status": "success verified"
+    },
+    "localGates": [
+      {
+        "command": "python tools/check_docs.py",
+        "exit": 0,
+        "logSHA256": "202664b8cbb8a34c563815063e6b5483190c4c1e77f1ee7e94874f9d7b43946e"
+      },
+      {
+        "command": "python tools/check_ontology.py",
+        "exit": 0,
+        "logSHA256": "816b17f7320f72d2fc017b990a7c62ceef2048fe53b5731be2d7f4df1f0d5f80"
+      },
+      {
+        "command": "python tools/sync_obsidian.py --check",
+        "exit": 0,
+        "logSHA256": "d6493549963010f865f584fcc0398c7f0b85362a21aeadce874179ea4765d4fe"
+      },
+      {
+        "command": "python tools/check_doc_single_source.py --ratchet",
+        "exit": 0,
+        "logSHA256": "e09b3205db8a6fb21809aee296bdb48d219d84d9a6a2ff92ae8cef1b948f9fe9"
+      },
+      {
+        "command": "python tools/check_doc_path_citations.py --ratchet --base-ref HEAD",
+        "exit": 0,
+        "logSHA256": "3df0c66852a23cc5f42cbfb2569970e2157935937e8ae3d33a5a019ab296087f"
+      }
+    ],
+    "syncBeforePublication": "2297 managed/14 pending/0 conflicts, no writes",
+    "activeWork": [
+      "guard accepted source + Core attempt2 and no-socket coverage",
+      "controlled DB readiness baseline red/green",
+      "nonexecuting plan Low closure, actual Working observed"
+    ],
+    "overallFiveNodeComplete": false,
+    "currentHeadCIAndFinalSync": "checked externally after this receipt commit to avoid self-SHA recursion"
+  }
 }
