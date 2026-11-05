@@ -1,0 +1,69 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_5ae6f7ec1457 / ctx_5e729ea765f1",
+  "reviewer": "Claude",
+  "author": "Codex (integration)",
+  "observedWindowKST": ["2026-11-05T21:05:00+09:00", "2026-11-05T21:35:00+09:00"],
+  "reviewed": {
+    "branch": "agent/codex/fleet5-setup-integration-20261105",
+    "range": "18293b54de465c351c16ed6dfb4b3a8859797117..0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+    "product": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+    "report": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+    "priorF012VerdictApplied": false,
+    "nonDocsFiles": ["tools/build_fleet5_setup_packet.py", ".github/workflows/backend.yml", "tests/test_backend_leaf_runtime_contract.py", "tests/test_build_fleet5_setup_packet.py (new)"],
+    "copiedClaudeDocsBlobEqualF012": true
+  },
+  "B1": {
+    "change": "ls-tree -rz mode/kind check moved before .work check, mkdir and git archive; only blob 100644/100755 accepted",
+    "ownerTest": "real Git index 120000 via update-index --cacheinfo, no OS symlink; no .work, no link, sentinel unchanged; 644/755 blob+packet readback",
+    "claudeProbes": {"nested120000": "refused before output", "gitlink160000": "refused before output", "unicodeSpacedPath755Plus644": "exact mode/blob roundtrip"},
+    "redAt18293": "owner symlink test and Claude nested probe fail",
+    "note": "non-UTF8 path name raises UnicodeDecodeError (not ValueError) before output; fail-closed, not a defect",
+    "status": "closed"
+  },
+  "B2": {
+    "change": "6-field exact dict == retained; is True on finalized, finalizedAttestationVerified, installRestartReceipt, rolledBack; type(x) is int on restartCount, bytecodeCacheCount",
+    "claudeProbe": "AST-exec of workflow lifecycle asserts; rejected 1, 1.0, 2, 'True', [True], None per bool; 4.0, Truthy(4), 5, '4' restartCount; False, 0.0, Truthy(0), -0.0, 1 bytecodeCacheCount; missing/extra/case-variant key; exact dict accepted",
+    "redAt18293": "12 Claude probe values accepted (gap); all rejected at bd96",
+    "status": "closed"
+  },
+  "B3": {
+    "rawFiles": [
+      {"name": "backend-42011550328-failure-run.json", "bytes": 8824, "cr": 0, "sha256": "d5e68d1c8e0ea70a74dd1974f40bf5213ebb6484b35243aec7656dd2ba729ec7", "gitBlob": "3db4241c7d1159d3b49f77cfd8cbca92ab9e7bc6"},
+      {"name": "backend-contract-red.xml", "bytes": 3195, "cr": 48, "sha256": "a44d2cb670c8f0f6d433ffd422fc2c862fb391d187747f10f1738262f8b3f317", "gitBlob": "cfcd71b31dc098becf4abaabb57da0870c6141a1"},
+      {"name": "backend-contract-green.xml", "bytes": 727, "cr": 0, "sha256": "109a5cf76bfaade6bb15415c3d8eeb3c2eee129395fecc8b3f9fff614fb96fc9", "gitBlob": "f8788326622151884a047c1ece08b2e129c7908c"}
+    ],
+    "identicalAt": ["9a8f9a50", "1e649146", "18293b54", "0136f168"],
+    "gitattributes": "d073-*.xml (from e524) narrowed to the exact 3 existing d073 XML names; added only low-b1-b2-red-corrected-fixture.txt (CR 219, 62757a5d) and low-b1-b2-green.txt (CR 2, 82c17144) whose hashes match; no broadening; root .gitattributes unchanged; 9a8f six exact names retained",
+    "summaryCorrection0136": {"committedLFSHA256": "3d49907cf85182b91e11bf8482e6f576aab9cdca7aa74d305e5e49354bc1acad", "crlfOfSameContentSHA256": "4abe8dc2898d9aa09fc0bfcf316caae76c2752f77e557fb0e51be23c5fba4d6d", "oldValueRetained": true, "newOrdinaryCommit": true},
+    "pathLimitRecord": "first fixture run 3 Windows path-length failures + 9 real B2 failures; raw ignored, hash 99c34155 + public summary; core.longpaths only in disposable fixture repo with GIT_CONFIG_GLOBAL=devnull/NOSYSTEM",
+    "status": "closed"
+  },
+  "ownRuns": {
+    "focused": {"files": ["tests/test_build_fleet5_setup_packet.py", "tests/test_backend_leaf_runtime_contract.py", "tests/test_fleet5_setup_packet.py", "tests/test_core_workflow_cx01.py", "tests/test_intranet_pki.py"], "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider", "at": "bd96479b", "result": "75 passed, 0 skipped"},
+    "probes": {"fileSHA256": "fc3a0985529ac97a3768ad21f8b76e656289dfe6a9f8548caf9f692619fb1ede", "committed": false, "bd96": "36 passed", "red18293Swap": "owner new tests 10 failed (9 type + 1 symlink), Claude probes 13 failed"},
+    "tempWorktree": "added detached at bd96 and removed"
+  },
+  "hosted": {
+    "docsBd96": {"run": 42022747087, "workflow": "Documentation Build", "headSha": "bd96479b", "conclusion": "success"},
+    "docs0136": {"run": 42023751194, "workflow": "Documentation Build", "headSha": "0136f168", "conclusion": "success"},
+    "backendBd96": {"run": 42022737571, "workflow": "Backend Build", "headSha": "bd96479b", "status": "in_progress at 21:20 KST", "countedAsSuccess": false}
+  },
+  "verdict": "ACCEPT (B1-B3 closed; source/artifact)",
+  "remainingIssues": ["info: non-UTF8 path UnicodeDecodeError (fail-closed)"],
+  "goBlocker": "CONFIRMED native Go P0 remains; ctx_6f0f8253b8a7 M1-M10 has no published accepted code; this Low ACCEPT is not renewal runtime/all-8/final archive/deploy acceptance",
+  "ci": "none accepted",
+  "physicalAcceptance": "none",
+  "operationalFactFromRoot": {
+    "verifiedByClaude": false,
+    "summary": "Root at 21:14:42 KST disabled only the exact 3 old automations via Orca edit; readback enabled=false, only enabled/updatedAt changed; no RunNow/Node/floor writes",
+    "relationToPriorReview": "after f6817f3d; its unchanged-schedules statement was true when written; C1 documentary-only HOLD is operationally superseded by actual scheduler disable; prior evidence not rewritten, nothing re-enabled",
+    "bootstrap": "G1-G10 still require concrete plan, review and P0 provenance"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "goOrP0": 0, "privateRuntimeSchedule": 0, "physical": 0, "sharedBoardsObsidian": 0, "authorWorkspaceWrites": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "apply ACCEPT; record Backend 42022737571 terminal result; keep all-8/final archive/deploy HOLD until Go P0 implementation review and native green"},
+    {"owner": "Codex", "action": "none for this delta"},
+    {"owner": "Claude", "action": "review P0 implementation delta and next candidate when assigned"}
+  ]
+}

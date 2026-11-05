@@ -1,19 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.367"
+version: "1.0.368"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T20:43:53+09:00"
+updated: "2026-11-05T22:03:31+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "NativeGo phase defect confirmed; actual bounded P0 architecture ACCEPT M1-M10 and implementation underway; 1e integration/packet ACCEPT withGo blocker; Lowclosures and hardware remain"
-active_card_next: "P0 owner implementsactualfloor/schema3/P+1P+2/forwardonly and realGo2cycle green; integrator closesB1-B3; root read-onlyr5 audit beforeanyrestart; implementationCI/review before finalall8/deploy"
+active_card_status: "P0 candidate6c NOT ACCEPTED by actual code review c210; nonce/lifecycle128 and safe liveness revisions;1057 independent plan review active; old3 disabled"
+active_card_next: "P0 owner corrects B1/B2/F1-F3 and delivers actual native/Core plus independent delta review; Claude reviews1057 plan; integrator prepares locally; Root keeps execution HOLD"
 ---
 
-## 2026-11-05 실제 Go 결함 확정과 P0 구현 인계
+## 2026-11-05 P0 코드 미수락과 별도 계획 검토 착수
 
-작업한 것: 실제 native proof Core42014770700의 실패/증거 upload/비실행 main suite와 artifact 원본3개 bytes를 독립 검증했다. 실제 Claude f012의 제한적 P0 architecture수락/M1-M10 뒤 구현을 지시했다. 확인한 것: overlap8·9수락/final8·9거부/정상완료0이며 expired10도 거부전 floor가 저장된다. 별도 helper2fb Core와9ec report는 실제 성공했고 그 성과를 realGo 수락으로 확대하지 않는다. 다음 첫 행동/담당: P0 owner는 실제floor·출판intent·P+1/P+2·signedreceipt·forward-only/2cycle시험을 구현, 통합owner는B1-B3 Low를 닫는다. Root는 r5를 재시작하지 않고 읽기 전용 상태를 점검하고 실제 구현CI·검토 뒤 새전체후보를 판정한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+작업한 것: 실제 c210 독립 검토를 읽고 담당에게 B1 nonce fixture·B2 기존128 lifecycle 검증과 F1–F3의 한정 수정을 전달했다. 확인한 것: c210/1057/69ea의 Docs는 각각 정확한 head와 모든 job 성공이며 제품 수락은 아니다. 새 계획 검토 task_03867932b2f0/ctx_37e3f120fac0는 실제 착수했으며 판정은 아직 없다. 다음 첫 행동/담당: P0 담당은 규격 완화나 skip 없이 새 source와 실제 native/Core 증거를, Claude는 비실행1057 계획의 독립 판정을 제출한다. 통합 담당은 한정 로컬 준비를 계속하고 Root는 기존3개 비활성·최종배포 보류를 유지한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
+## 2026-11-05 실제 scheduler 보류 적용과 병렬 다음 작업
+
+작업한 것: 정확한 기존 갱신 자동 항목3개의enabled를false로 바꾸고 모든 다른 저장 설정의 일치를 확인했다. 확인한 것: f027 감사/f681 독립 검토와 B1–B3의45bc 수락, bd Backend/0136 Docs 모두 실제 exacthead/jobSUCCESS다. Node·guard·claim·clock은 변경하지 않았다. 다음 첫 행동/담당: P0 owner는 실제 Go 정상2cycle/거부시험과 코드 검토를 마치고, plan owner는G1–G10·G2의 runtime/permit 분리 계획을 게시한다. Root는 [[FLEET5 기존 normal-v1 갱신 실행 보류와 재개 조건]]에 따라 새 검토된 교체 계획 전까지 구형 호출을 재활성화하지 않는다. 전체 완료/5대 인수는 아직 아니다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 

@@ -1,0 +1,53 @@
+{
+  "scope": "ACTUAL_ACCEPTED_LOW_DELTA_RECEIPT_ONLY_WHOLE_TASK_NOT_DONE",
+  "observedAtKST": "2026-11-05T21:40:01.670342+09:00",
+  "productSource": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "reviewedReport": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "reviewRange": "18293b54de465c351c16ed6dfb4b3a8859797117..0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "actualIndependentReview": "45bc23cb34d30232edf5c9f097960b1300ea1b5f",
+  "reviewerTask": "task_5ae6f7ec1457",
+  "reviewerDispatch": "ctx_5e729ea765f1",
+  "verdict": "ACCEPT B1-B3 CLOSED; informational non-UTF8 fail-closed only",
+  "reviewerFocused": {
+    "passed": 75,
+    "skipped": 0
+  },
+  "reviewerIndependentProbes": 36,
+  "reviewerOldSourceRedControls": true,
+  "reviewDocs": {
+    "run": 42026645703,
+    "conclusion": "success",
+    "rootVerified": true
+  },
+  "backend": {
+    "run": 42022737571,
+    "conclusion": "success",
+    "all3JobsSuccess": true,
+    "python3_12": {
+      "passed": 8711,
+      "skipped": 75,
+      "deselected": 2
+    },
+    "python3_14": {
+      "passed": 8711,
+      "skipped": 75,
+      "deselected": 2
+    }
+  },
+  "sourceDocs": {
+    "run": 42022747087,
+    "conclusion": "success"
+  },
+  "reportDocs": {
+    "run": 42023751194,
+    "conclusion": "success"
+  },
+  "mergeConsumerNotes": "future-p0-merge-consumer-closure-notes.json",
+  "nativeGoProductionImplementationReviewCI": "NOT_RECEIVED; ONLY_REMAINING_EXTERNAL_GATE_BEFORE_NEXT_COMPLETE_CANDIDATE",
+  "ci2": "approved/unbound; no move over different bound SHA",
+  "newFinalArchiveCoreFullEightDeployment": false,
+  "legacyAutomationChangesByThisWorker": false,
+  "physicalAcceptance": false,
+  "wholeProductAcceptance": false,
+  "sharedBoardsRegistryObsidianWrites": false
+}

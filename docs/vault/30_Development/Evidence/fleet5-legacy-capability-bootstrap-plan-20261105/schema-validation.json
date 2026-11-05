@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "fleet5-bootstrap-document-schema-validation:1",
+  "observedKST": "2026-11-05T21:40:40.964752+09:00",
+  "scope": "Document only; no product/Go/Engine test",
+  "results": [
+    {
+      "id": "D01",
+      "schemaValid": true,
+      "expected": true,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D02",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D03",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D04",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D05",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D06",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D07",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D08",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D09",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D10",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D11",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D12",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D13",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D14",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    }
+  ],
+  "passed": 14,
+  "failed": 0,
+  "productAcceptanceCasesRun": 0,
+  "allTargetRootMemberBindingsRemainNull": true
+}

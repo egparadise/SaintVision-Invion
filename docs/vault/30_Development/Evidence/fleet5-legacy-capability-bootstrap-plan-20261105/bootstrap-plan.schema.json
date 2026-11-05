@@ -1,0 +1,949 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:nonexecuting:legacy-bootstrap-plan:1",
+  "$comment": "Closed document-only HOLD draft; never execution readiness",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "fleet5-nonexecuting-legacy-bootstrap-plan:1"
+    },
+    "task": {
+      "const": "task_38393b5d1865"
+    },
+    "dispatch": {
+      "const": "ctx_ceecb3824e33"
+    },
+    "base": {
+      "const": "f0278daffa616cae4485e4b1d4c07671715892dc"
+    },
+    "owner": {
+      "const": "Codex"
+    },
+    "reviewer": {
+      "const": "Claude via root pending"
+    },
+    "status": {
+      "const": "HOLD"
+    },
+    "executionAuthorized": {
+      "const": false
+    },
+    "scope": {
+      "const": "NONEXECUTING design only; no migration helper, runtime command or permission to execute"
+    },
+    "accepted2fbSourceFrozen": {
+      "const": true
+    },
+    "priorAuditReview": {
+      "type": "object",
+      "properties": {
+        "commit": {
+          "const": "f6817f3d354bcae50f51c00c544295de3fd07662"
+        },
+        "verdict": {
+          "const": "ACCEPT f027 with C1-C4; NO existing binary-only path; G1-G10 required"
+        },
+        "docsRunReportedByRoot": {
+          "const": 42024928449
+        },
+        "docsConclusionReportedByRoot": {
+          "const": "success"
+        },
+        "thisPlanReviewInherited": {
+          "const": false
+        }
+      },
+      "required": [
+        "commit",
+        "verdict",
+        "docsRunReportedByRoot",
+        "docsConclusionReportedByRoot",
+        "thisPlanReviewInherited"
+      ],
+      "additionalProperties": false
+    },
+    "historicalContext": {
+      "type": "object",
+      "properties": {
+        "oldFloorReadbackKST": {
+          "const": "2026-11-05T20:34:00+09:00"
+        },
+        "floorVersionReported": {
+          "const": 1
+        },
+        "activeHashMatchReported": {
+          "const": true
+        },
+        "scope": {
+          "const": "Root unsigned unfenced context only; not M2 or future renewal safety; actual operation bindings remain null"
+        },
+        "earliestOldLeafExpiry": {
+          "const": "2026-11-10T14:15:35+09:00"
+        },
+        "oldRenewalWindowStarts": {
+          "const": "2026-11-08T14:15:35+09:00"
+        },
+        "useAsCurrentGateInputs": {
+          "const": false
+        },
+        "oldScheduleObservations": {
+          "const": "f027/f681 unchanged-schedule observations remain historical, not overwritten"
+        }
+      },
+      "required": [
+        "oldFloorReadbackKST",
+        "floorVersionReported",
+        "activeHashMatchReported",
+        "scope",
+        "earliestOldLeafExpiry",
+        "oldRenewalWindowStarts",
+        "useAsCurrentGateInputs",
+        "oldScheduleObservations"
+      ],
+      "additionalProperties": false
+    },
+    "rootReportedScheduleChange": {
+      "type": "object",
+      "properties": {
+        "observedKST": {
+          "const": "2026-11-05T21:14:42+09:00"
+        },
+        "reportedBy": {
+          "const": "Root"
+        },
+        "independentlyObservedByWorker": {
+          "const": false
+        },
+        "ids": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "286d975e-75e2-4e54-b1fb-2805f7d68959"
+            },
+            {
+              "const": "a3a9e396-3b48-4aaa-8b73-f8377670f968"
+            },
+            {
+              "const": "3e08faa1-4e85-4877-8b13-5645178b41b8"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "items": false
+        },
+        "enabledBefore": {
+          "const": true
+        },
+        "enabledAfter": {
+          "const": false
+        },
+        "onlyChangedFields": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "enabled"
+            },
+            {
+              "const": "updatedAt"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "items": false
+        },
+        "allOtherConfigPromptPrecheckTimezoneRruleDtstartPreserved": {
+          "const": true
+        },
+        "RunNowOrNodeAction": {
+          "const": false
+        },
+        "freshOperationReadbackRequired": {
+          "const": true
+        },
+        "reEnableOldPlanPermitted": {
+          "const": false
+        }
+      },
+      "required": [
+        "observedKST",
+        "reportedBy",
+        "independentlyObservedByWorker",
+        "ids",
+        "enabledBefore",
+        "enabledAfter",
+        "onlyChangedFields",
+        "allOtherConfigPromptPrecheckTimezoneRruleDtstartPreserved",
+        "RunNowOrNodeAction",
+        "freshOperationReadbackRequired",
+        "reEnableOldPlanPermitted"
+      ],
+      "additionalProperties": false
+    },
+    "targetBindings": {
+      "type": "object",
+      "properties": {
+        "p0SourceSHA": {
+          "type": "null"
+        },
+        "p0ExecutableSHA256": {
+          "type": "null"
+        },
+        "p0ImageManifestDigest": {
+          "type": "null"
+        },
+        "p0ImageConfigDigest": {
+          "type": "null"
+        },
+        "p0ImageLayers": {
+          "type": "null"
+        },
+        "p0BuildProvenance": {
+          "type": "null"
+        },
+        "p0CIrunId": {
+          "type": "null"
+        },
+        "p0NativeTwoCompletedCyclesReceipt": {
+          "type": "null"
+        },
+        "p0NoWriteJournalCompatibilityReceipt": {
+          "type": "null"
+        },
+        "p0M2CapabilityReceipt": {
+          "type": "null"
+        },
+        "p0IndependentVerdict": {
+          "type": "null"
+        },
+        "migrationHelperSourceSHA": {
+          "type": "null"
+        },
+        "migrationHelperArtifactDigest": {
+          "type": "null"
+        },
+        "migrationHelperCIrunId": {
+          "type": "null"
+        },
+        "migrationHelperIndependentVerdict": {
+          "type": "null"
+        },
+        "runtimeInventoryContractSHA": {
+          "type": "null"
+        },
+        "runtimeInventoryAPIArtifactDigest": {
+          "type": "null"
+        },
+        "runtimeInventoryCIVerdict": {
+          "type": "null"
+        },
+        "newGuardSourceSHA": {
+          "type": "null"
+        },
+        "newGuardArtifactDigest": {
+          "type": "null"
+        },
+        "newGuardCIrunId": {
+          "type": "null"
+        },
+        "newGuardIndependentVerdict": {
+          "type": "null"
+        },
+        "newSchema3HelperSourceSHA": {
+          "type": "null"
+        },
+        "newSchema3HelperDigest": {
+          "type": "null"
+        },
+        "newRenewalImmutablePlanSHA256": {
+          "type": "null"
+        },
+        "newRenewalPlanVerdict": {
+          "type": "null"
+        },
+        "newRenewalGuardPlanPinSet": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "p0SourceSHA",
+        "p0ExecutableSHA256",
+        "p0ImageManifestDigest",
+        "p0ImageConfigDigest",
+        "p0ImageLayers",
+        "p0BuildProvenance",
+        "p0CIrunId",
+        "p0NativeTwoCompletedCyclesReceipt",
+        "p0NoWriteJournalCompatibilityReceipt",
+        "p0M2CapabilityReceipt",
+        "p0IndependentVerdict",
+        "migrationHelperSourceSHA",
+        "migrationHelperArtifactDigest",
+        "migrationHelperCIrunId",
+        "migrationHelperIndependentVerdict",
+        "runtimeInventoryContractSHA",
+        "runtimeInventoryAPIArtifactDigest",
+        "runtimeInventoryCIVerdict",
+        "newGuardSourceSHA",
+        "newGuardArtifactDigest",
+        "newGuardCIrunId",
+        "newGuardIndependentVerdict",
+        "newSchema3HelperSourceSHA",
+        "newSchema3HelperDigest",
+        "newRenewalImmutablePlanSHA256",
+        "newRenewalPlanVerdict",
+        "newRenewalGuardPlanPinSet"
+      ],
+      "additionalProperties": false
+    },
+    "rootBindings": {
+      "type": "object",
+      "properties": {
+        "rootG2Decision": {
+          "type": "null"
+        },
+        "rootPlanReview": {
+          "type": "null"
+        },
+        "rootExecutionDecision": {
+          "type": "null"
+        },
+        "freshDisabledScheduleReadback": {
+          "type": "null"
+        },
+        "allLaunchSurfacesInventory": {
+          "type": "null"
+        },
+        "noOverlappingAttemptProof": {
+          "type": "null"
+        },
+        "cohortReservation": {
+          "type": "null"
+        },
+        "fenceOwnershipToken": {
+          "type": "null"
+        },
+        "currentRootTime": {
+          "type": "null"
+        },
+        "currentLeafDeadline": {
+          "type": "null"
+        },
+        "currentCADeadline": {
+          "type": "null"
+        },
+        "currentPolicyDeadline": {
+          "type": "null"
+        },
+        "requiredSafetyBudgetSeconds": {
+          "type": "null"
+        },
+        "maintenanceOperatorWindow": {
+          "type": "null"
+        },
+        "normalRenewalWindow": {
+          "type": "null"
+        },
+        "renewalOperatorWindow": {
+          "type": "null"
+        },
+        "inventoryCompareAndPublishToken": {
+          "type": "null"
+        },
+        "restartPolicyRestoreDecision": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "rootG2Decision",
+        "rootPlanReview",
+        "rootExecutionDecision",
+        "freshDisabledScheduleReadback",
+        "allLaunchSurfacesInventory",
+        "noOverlappingAttemptProof",
+        "cohortReservation",
+        "fenceOwnershipToken",
+        "currentRootTime",
+        "currentLeafDeadline",
+        "currentCADeadline",
+        "currentPolicyDeadline",
+        "requiredSafetyBudgetSeconds",
+        "maintenanceOperatorWindow",
+        "normalRenewalWindow",
+        "renewalOperatorWindow",
+        "inventoryCompareAndPublishToken",
+        "restartPolicyRestoreDecision"
+      ],
+      "additionalProperties": false
+    },
+    "memberBindingNames": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "tenantId"
+        },
+        {
+          "const": "nodeId"
+        },
+        {
+          "const": "epoch"
+        },
+        {
+          "const": "daemonIdentity"
+        },
+        {
+          "const": "oldContainerName"
+        },
+        {
+          "const": "oldContainerId"
+        },
+        {
+          "const": "oldNodeLabel"
+        },
+        {
+          "const": "oldInspectDigest"
+        },
+        {
+          "const": "preservedConfigDigest"
+        },
+        {
+          "const": "oldRuntimeImageDigest"
+        },
+        {
+          "const": "preservedPermitImageDigest"
+        },
+        {
+          "const": "nodeAddress"
+        },
+        {
+          "const": "nodePort"
+        },
+        {
+          "const": "volumeName"
+        },
+        {
+          "const": "volumeMetadataDigest"
+        },
+        {
+          "const": "exactVolumeConsumerIds"
+        },
+        {
+          "const": "actualJournalPath"
+        },
+        {
+          "const": "protectedStateDigest"
+        },
+        {
+          "const": "peerFloorVersion"
+        },
+        {
+          "const": "peerFloorHash"
+        },
+        {
+          "const": "activePeerPolicyHash"
+        },
+        {
+          "const": "nodePublicKeyHash"
+        },
+        {
+          "const": "nodeLeafHash"
+        },
+        {
+          "const": "controlLeafHash"
+        },
+        {
+          "const": "caHash"
+        },
+        {
+          "const": "signerPublicHash"
+        },
+        {
+          "const": "channelVersion"
+        },
+        {
+          "const": "channelCertHash"
+        },
+        {
+          "const": "channelEnabled"
+        },
+        {
+          "const": "channelEndpoint"
+        },
+        {
+          "const": "legacyCPAgentImageValueHash"
+        },
+        {
+          "const": "quiescenceProof"
+        },
+        {
+          "const": "preCutoverUnsignedDoubleRead"
+        },
+        {
+          "const": "backupReservedName"
+        },
+        {
+          "const": "newContainerId"
+        },
+        {
+          "const": "postStartProtectedStateDigest"
+        },
+        {
+          "const": "postStartSignedM2"
+        },
+        {
+          "const": "postStartMTLS"
+        },
+        {
+          "const": "runtimeInventoryReceipt"
+        }
+      ],
+      "minItems": 39,
+      "maxItems": 39,
+      "items": false
+    },
+    "members": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "physicalPC": {
+              "const": 2
+            },
+            "expectedProfile": {
+              "const": "lan-observe-v1"
+            },
+            "bindings": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "physicalPC",
+            "expectedProfile",
+            "bindings"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "physicalPC": {
+              "const": 4
+            },
+            "expectedProfile": {
+              "const": "lan-observe-v1"
+            },
+            "bindings": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "physicalPC",
+            "expectedProfile",
+            "bindings"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "memberBindingRule": {
+      "const": "All named fields required in a future reviewed populated revision; bindings null now, never inferred from physical PC labels or old unsigned context"
+    },
+    "g2Proposal": {
+      "type": "object",
+      "properties": {
+        "choice": {
+          "const": "A-preserve-permit-separate-runtime-inventory"
+        },
+        "rootChoice": {
+          "type": "null"
+        },
+        "preserveExactOldCmdIncludingImageFlag": {
+          "const": true
+        },
+        "permitImageSemantic": {
+          "const": "Allowed signed workload launch image; NOT own Node runtime identity"
+        },
+        "runtimeImageSemantic": {
+          "const": "Actual container/executable provenance; separate per-Node typed inventory"
+        },
+        "legacyCPAgentImageAndOldManifestsRemainByteFrozen": {
+          "const": true
+        },
+        "oldFieldCanServeAsCurrentRuntimeTruthAfterCutover": {
+          "const": false
+        },
+        "newRuntimeInventoryAPIRequired": {
+          "const": true
+        },
+        "inventoryCommit": {
+          "const": "Owned atomic two-member metadata compare-and-publish after both M2/mTLS; unchanged channel vector/global legacy bytes"
+        },
+        "channelCASAllowed": {
+          "const": false
+        },
+        "alternativeRewriteCmdImageAndGlobalAgentImage": {
+          "const": "OUTSIDE image-only scope; separate root decision required"
+        }
+      },
+      "required": [
+        "choice",
+        "rootChoice",
+        "preserveExactOldCmdIncludingImageFlag",
+        "permitImageSemantic",
+        "runtimeImageSemantic",
+        "legacyCPAgentImageAndOldManifestsRemainByteFrozen",
+        "oldFieldCanServeAsCurrentRuntimeTruthAfterCutover",
+        "newRuntimeInventoryAPIRequired",
+        "inventoryCommit",
+        "channelCASAllowed",
+        "alternativeRewriteCmdImageAndGlobalAgentImage"
+      ],
+      "additionalProperties": false
+    },
+    "preserve": {
+      "type": "object",
+      "properties": {
+        "containerConfiguration": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "Cmd"
+            },
+            {
+              "const": "Env"
+            },
+            {
+              "const": "Entrypoint"
+            },
+            {
+              "const": "User"
+            },
+            {
+              "const": "WorkingDir"
+            },
+            {
+              "const": "Labels"
+            },
+            {
+              "const": "resources"
+            },
+            {
+              "const": "security"
+            },
+            {
+              "const": "Mounts"
+            },
+            {
+              "const": "PortBindings"
+            },
+            {
+              "const": "host endpoint"
+            },
+            {
+              "const": "permitted workload image"
+            }
+          ],
+          "minItems": 12,
+          "maxItems": 12,
+          "items": false
+        },
+        "protectedAuthority": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "tenant"
+            },
+            {
+              "const": "Node"
+            },
+            {
+              "const": "epoch"
+            },
+            {
+              "const": "key"
+            },
+            {
+              "const": "Node certificate"
+            },
+            {
+              "const": "CP certificate"
+            },
+            {
+              "const": "CA"
+            },
+            {
+              "const": "signer public key"
+            },
+            {
+              "const": "active peer policy"
+            },
+            {
+              "const": "journal tree"
+            },
+            {
+              "const": "peer P/H"
+            },
+            {
+              "const": "channel C/hash/enabled/endpoint"
+            }
+          ],
+          "minItems": 12,
+          "maxItems": 12,
+          "items": false
+        },
+        "allowedLifecycleDeltas": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "new runtime image reference/ID"
+            },
+            {
+              "const": "exact old backup name"
+            },
+            {
+              "const": "new generated container identity and enumerated transient inspect fields"
+            },
+            {
+              "const": "restart=no fencing; explicit new-only unless-stopped restore after M2/mTLS"
+            }
+          ],
+          "minItems": 4,
+          "maxItems": 4,
+          "items": false
+        },
+        "runtimeConfigurationChange": {
+          "const": "Image only; lifecycle fields separately enumerated, no wildcard ignoring unknown fields"
+        }
+      },
+      "required": [
+        "containerConfiguration",
+        "protectedAuthority",
+        "allowedLifecycleDeltas",
+        "runtimeConfigurationChange"
+      ],
+      "additionalProperties": false
+    },
+    "barriers": {
+      "type": "object",
+      "properties": {
+        "oldBackupRestartAllowed": {
+          "const": false
+        },
+        "deleteNodeContainerVolumeOrBackupAllowed": {
+          "const": false
+        },
+        "credentialRecopyAllowed": {
+          "const": false
+        },
+        "oldPolicyRestoreAllowed": {
+          "const": false
+        },
+        "floorOrLatchOrLockResetAllowed": {
+          "const": false
+        },
+        "normalRenewalUnsignedFallbackAllowed": {
+          "const": false
+        },
+        "sideloadObserverAllowed": {
+          "const": false
+        },
+        "storageWorkspaceOrFreshFiveIssuerAllowed": {
+          "const": false
+        },
+        "unknownStopMeansQuiesced": {
+          "const": false
+        },
+        "startupOrPublicationUncertainty": {
+          "const": "BLOCKED_FORWARD_ONLY; preserve reservations and all evidence"
+        },
+        "autoRetryOrDowngradeAllowed": {
+          "const": false
+        }
+      },
+      "required": [
+        "oldBackupRestartAllowed",
+        "deleteNodeContainerVolumeOrBackupAllowed",
+        "credentialRecopyAllowed",
+        "oldPolicyRestoreAllowed",
+        "floorOrLatchOrLockResetAllowed",
+        "normalRenewalUnsignedFallbackAllowed",
+        "sideloadObserverAllowed",
+        "storageWorkspaceOrFreshFiveIssuerAllowed",
+        "unknownStopMeansQuiesced",
+        "startupOrPublicationUncertainty",
+        "autoRetryOrDowngradeAllowed"
+      ],
+      "additionalProperties": false
+    },
+    "proposedInterfaces": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "NEW storage-free LegacyBinaryMigration lifecycle; closed inspect/capture/reserve/advance/readback inputs; NOT IMPLEMENTED"
+        },
+        {
+          "const": "NEW typed authenticated CP runtime inventory atomic compare-and-publish and strict consumers; NOT IMPLEMENTED"
+        },
+        {
+          "const": "NEW schema3 renewal guard with immutable source/helper/observer/plan pins and HOLD checks; NOT IMPLEMENTED"
+        }
+      ],
+      "minItems": 3,
+      "maxItems": 3,
+      "items": false
+    },
+    "stateNames": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "DRAFT_HOLD"
+        },
+        {
+          "const": "PROVENANCE_LOCKED"
+        },
+        {
+          "const": "RESERVED"
+        },
+        {
+          "const": "FENCE_INTENT"
+        },
+        {
+          "const": "OLD_FENCED"
+        },
+        {
+          "const": "CAPTURED"
+        },
+        {
+          "const": "PUBLICATION_INTENT"
+        },
+        {
+          "const": "OLD_PRESERVED"
+        },
+        {
+          "const": "NEW_CREATED"
+        },
+        {
+          "const": "NEW_START_INTENT"
+        },
+        {
+          "const": "NEW_STARTED_UNVERIFIED"
+        },
+        {
+          "const": "BOOTSTRAP_VERIFIED_RESTART_NO"
+        },
+        {
+          "const": "RESTART_POLICY_RESTORED"
+        },
+        {
+          "const": "READY_FOR_NEW_RENEWAL_PLAN"
+        },
+        {
+          "const": "BLOCKED_FORWARD_ONLY"
+        },
+        {
+          "const": "QUIESCENCE_UNKNOWN"
+        }
+      ],
+      "minItems": 16,
+      "maxItems": 16,
+      "items": false
+    },
+    "stateMachineScope": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "const": "Per-member phase vector plus all-member barriers"
+        },
+        "proposedOrder": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": 2
+            },
+            {
+              "const": 4
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "items": false
+        },
+        "beforeFirstLifecycleMutation": {
+          "const": "Both nonmutating preflights and shared reservations complete; durable fence intent"
+        },
+        "beforeFirstStop": {
+          "const": "Both exact old containers restart=no with readback, preventing daemon old-image recovery"
+        },
+        "memberSequence": {
+          "const": "PC2 stop/capture/replace/start/M2+mTLS+unchanged-state acceptance, then PC4; second may remain running restart=no until its turn"
+        },
+        "firstMemberFailure": {
+          "const": "BLOCK second cutover; preserve both fences, all objects and reservations; no cohort inventory commit"
+        },
+        "beforeEachMutation": {
+          "const": "Fresh shared C/authority/timing/ownership equality; no in-place rebase"
+        },
+        "rootOrderDecision": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "model",
+        "proposedOrder",
+        "beforeFirstLifecycleMutation",
+        "beforeFirstStop",
+        "memberSequence",
+        "firstMemberFailure",
+        "beforeEachMutation",
+        "rootOrderDecision"
+      ],
+      "additionalProperties": false
+    },
+    "gateMatrix": {
+      "const": "parameter-gates.json"
+    },
+    "futureProductAcceptance": {
+      "const": "acceptance-matrix.json"
+    },
+    "schemaMeaning": {
+      "const": "Closed schema checks this exact nonexecuting HOLD draft, not future runtime readiness; bindings require a new actually published and reviewed successor revision"
+    },
+    "nextRootAction": {
+      "const": "Actual independent plan review and explicit G2 choice; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "task",
+    "dispatch",
+    "base",
+    "owner",
+    "reviewer",
+    "status",
+    "executionAuthorized",
+    "scope",
+    "accepted2fbSourceFrozen",
+    "priorAuditReview",
+    "historicalContext",
+    "rootReportedScheduleChange",
+    "targetBindings",
+    "rootBindings",
+    "memberBindingNames",
+    "members",
+    "memberBindingRule",
+    "g2Proposal",
+    "preserve",
+    "barriers",
+    "proposedInterfaces",
+    "stateNames",
+    "stateMachineScope",
+    "gateMatrix",
+    "futureProductAcceptance",
+    "schemaMeaning",
+    "nextRootAction"
+  ],
+  "additionalProperties": false
+}

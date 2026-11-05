@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "fleet5-proposed-bootstrap-parameter-contract:1",
+  "nature": "NONEXECUTING proposed contract; actual wire/schema/code and every operational value unbound",
+  "closure": "Exact names in bootstrap-plan targetBindings/rootBindings/memberBindingNames; all required in a reviewed successor; reject unknown/duplicate keys and missing/null operational input before side effects",
+  "classes": {
+    "sourceSHA": "Full 40 lowercase hex Git commit, present and exact reviewed source tree; never document SHA substituted",
+    "artifactSHA256": "64 lowercase hex of exact bytes; OCI manifest/config/layer sha256 closure and actual build provenance must verify platform/OS/architecture compatible with exact old daemon and frozen source; missing or mismatch BLOCKS",
+    "CIrun": "Actual positive run ID plus repository/workflow/ref/head/event/conclusion/artifact bytes and attestation verified against target source; Docs is never product proof",
+    "verdict": "Actual independent reviewer identity, scope, exact target SHA/digests, verdict and evidence; no self-review/inherited architecture/audit ACCEPT",
+    "identity": "Exact existing registered tenant/Node/epoch and physical-to-logical binding, validated by frozen contracts and current scoped authority; never generated/remapped",
+    "container": "Actual daemon-bound 64-hex immutable ID plus exact name/Node label/inspect hash; no name-only, historical-container or foreign-daemon match",
+    "imageSemantics": "Old runtime digest, preserved allowed permit digest and new actual runtime digest are separate mandatory fields; preserve old Cmd --image exact under reviewed choice A",
+    "volume": "Existing owned volume name/driver/labels/options/mountpoint identity and metadata digest, exact state mount type/name/source/RW/propagation and complete consumer ID set; no new/empty substitute volume",
+    "path": "Exact canonical existing owned path in actual scope; reject symlink/hardlink/parent/ownership/type ambiguity; journal identity and floors must already exist, never OpenJournal to observe/create",
+    "protectedState": "Bounded private read-only full tree digest over paths/types/content/modes/UID/GID; credentials and identity/floor exact; no key/archive/private bytes in public receipts; atime/process telemetry excluded explicitly only",
+    "P_H": "Actual durable peer Version integer1..9007199254740991 and raw policy SHA256 with scope; active bytes exactly match floor hash; bootstrap preserves both, normal schema3 derives from signed fresh M2, never C",
+    "C": "Actual CP channel integer1..9007199254740991 with exact certificate hash/enabled/endpoint; bootstrap unchanged; future renewal checked C+1 overflow guard, independent of P",
+    "futurePeerArithmetic": "Schema3 P+1 overlap/P+2 final with explicit overflow checks; two-cycle fixture requires representable P+4; never increment on retry or guess from channel",
+    "time": "Fresh root-observed absolute timezone-qualified time, current validity minima and separately approved maintenance/renewal operator windows; positive measured safety budget; no historical context/default/time override",
+    "scheduleProof": "Fresh exact three IDs disabled with current target/config digest, all-launch-surface inventory and no overlapping attempt/descendant evidence; disabling alone is not quiescence",
+    "ownership": "Root-authorized fixed cohort reservation and held OS/logical fence; immutable plan/prior-event digests and exact token; never age/PID-based stale reclamation",
+    "preCutoverProof": "Fresh fenced unsigned double read, bound to exact stopped old IDs/volume/journal/identity/P/H/C/private metadata; explicitly not production M2",
+    "postStartProof": "Actual signed nonce-bound M2 from newly running pinned same executable UID/PID1 and real journal matching pre-cutover P/H/scope/hash; unchanged authority actual mTLS proof required too",
+    "inventoryProof": "Authenticated typed runtime inventory receipt binding both members, old expected inventory/global-state digest and unchanged channels; atomic metadata compare-and-publish, not leaf/channel CAS"
+  },
+  "proposedMethods": {
+    "inspectAndValidate": ["planDigest", "targetProvenance", "rootG2Decision", "rootPlanReview", "fixedCohortBindings", "operatorTiming", "freshDisabledScheduleReadback", "allLaunchSurfacesInventory", "noOverlappingAttemptProof"],
+    "reserve": ["planDigest", "rootExecutionDecision", "expectedCohortChannelVector", "expectedDaemonVolumeIdentities", "expectedNoPriorAttempt", "ownerIdentity"],
+    "captureFenced": ["planDigest", "priorEventDigest", "fenceToken", "exactStoppedContainerIds", "expectedVolumeMetadata", "expectedConsumerIds", "expectedIdentityAndAuthority"],
+    "advance": ["planDigest", "priorEventDigest", "fenceToken", "exactNextPhase", "expectedCurrentObjectIds", "expectedProtectedStateDigest", "freshTimingAndGateReceipts"],
+    "compareAndPublishInventory": ["planDigest", "fenceToken", "expectedOldRuntimeInventoryDigest", "expectedLegacyCPAgentImageDigest", "expectedUnchangedChannelVector", "bothNewRuntimeBindings", "bothSignedM2Receipts", "bothMTLSReceipts", "bothProtectedStateEqualityReceipts"],
+    "restoreNewRestartPolicy": ["planDigest", "priorEventDigest", "fenceToken", "explicitRootRestoreDecision", "exactNewContainerIds", "freshM2MTLSAndUnchangedAuthority", "expectedRestartNo"]
+  },
+  "forbiddenMethodOrParameterSemantics": ["generic shell", "force", "skip", "rollback", "old-start", "repair", "credential-install", "supersede", "clock override", "window bypass", "floor reset", "latch reset", "claim reset", "stale lock eviction", "unsigned normal fallback", "offline ladder"],
+  "implementationStatus": "NONE; minimum new helper/API and tests must be separately assigned and reviewed"
+}

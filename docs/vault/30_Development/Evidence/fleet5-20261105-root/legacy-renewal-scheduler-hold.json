@@ -1,0 +1,110 @@
+{
+  "schema": "fleet5-legacy-renewal-scheduler-hold:1",
+  "recordedAtKST": "2026-11-05T21:14:42+09:00",
+  "reason": "confirmed native peer-phase failure; documentary HOLD alone does not prevent old precheck/prompt execution",
+  "sourceProof": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+  "proofReport": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+  "rootIndependent03B52fbSourceEquivalenceVerified": true,
+  "actualLegacyReview": "f6817f3d354bcae50f51c00c544295de3fd07662",
+  "automations": [
+    {
+      "id": "286d975e-75e2-4e54-b1fb-2805f7d68959",
+      "name": "SaintVision r5 supervised primary 2026",
+      "enabledBefore": true,
+      "enabledAfter": false,
+      "changedByThisCall": true,
+      "changedKeys": [
+        "enabled",
+        "updatedAt"
+      ],
+      "originalNextRunKST": "2026-11-08T14:20:00+09:00",
+      "storedConfigurationExceptEnabledAndDerivedTimesSHA256": "c0db84ed03295d7c5eef36e064f598af1931ca91161a9f9a99062ca4ec622cc7",
+      "allOtherStoredFieldsExactlyUnchanged": true,
+      "promptSHA256": "501aecb19565807d449cf3edbc0a618a0cc44154221e92ca1b936fcae953edea",
+      "precheckSHA256": "44b7f2ddd21b1fa829564c1c0e7a71e55e87b3ebeb2117c23efc5750979210e5",
+      "rruleDTStartTimezonePreserved": true
+    },
+    {
+      "id": "a3a9e396-3b48-4aaa-8b73-f8377670f968",
+      "name": "SaintVision r5 supervised fallback1 2026",
+      "enabledBefore": true,
+      "enabledAfter": false,
+      "changedByThisCall": true,
+      "changedKeys": [
+        "enabled",
+        "updatedAt"
+      ],
+      "originalNextRunKST": "2026-11-09T12:15:00+09:00",
+      "storedConfigurationExceptEnabledAndDerivedTimesSHA256": "a368d31a78d09a8c213795068d3ea3da5fc07ead17b27e74784cb6bf5d3abf38",
+      "allOtherStoredFieldsExactlyUnchanged": true,
+      "promptSHA256": "60c59f67520f1c0519b105f0fcc9eca17d4e93fef87c3c85a822a11d4f85c68b",
+      "precheckSHA256": "170ef883cbfe069528e9fcaf356743ec7cfa17a28310b1951034ed06b5d5b06a",
+      "rruleDTStartTimezonePreserved": true
+    },
+    {
+      "id": "3e08faa1-4e85-4877-8b13-5645178b41b8",
+      "name": "SaintVision r5 supervised fallback2 2026",
+      "enabledBefore": true,
+      "enabledAfter": false,
+      "changedByThisCall": true,
+      "changedKeys": [
+        "enabled",
+        "updatedAt"
+      ],
+      "originalNextRunKST": "2026-11-10T08:00:00+09:00",
+      "storedConfigurationExceptEnabledAndDerivedTimesSHA256": "d462f7e828af3723fb250e55646b75efaae2461f0ce9457efb0dd4a9ef22c143",
+      "allOtherStoredFieldsExactlyUnchanged": true,
+      "promptSHA256": "fe1a2e66ea7c0199e64fdcdaf02d2d913691c6bfdf3fb0c2825946267ef347e1",
+      "precheckSHA256": "497cc4d80c4ed17295cfaca20c92e64d627a3d6dad0aaae197524f3c357db9ad",
+      "rruleDTStartTimezonePreserved": true
+    }
+  ],
+  "disabledCount": 3,
+  "runNowInvoked": false,
+  "automationDeleted": false,
+  "activeDevelopmentAgentsStopped": false,
+  "NodeRestartOrMutation": false,
+  "guardSourceConfigPinsClaimsLocksWindowsChanged": false,
+  "WindowsTaskSchedulerOrSecurityChanged": false,
+  "replacementPlanAndReviewedP0StillRequired": true,
+  "reEnableOldPlanAutomaticallyAllowed": false,
+  "legacyAuditSourceReport": "f0278daffa616cae4485e4b1d4c07671715892dc",
+  "legacyAuditDocs": 42023306438,
+  "actualLegacyReviewDocs": 42024928449,
+  "rootVerifiedBothExactDocsSuccess": true,
+  "promptPrecheckAndScheduleDefinitionsUnchanged": true,
+  "automationEnabledStateChanged": true,
+  "lowClosure": {
+    "source": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+    "report": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+    "actualReview": "45bc23cb34d30232edf5c9f097960b1300ea1b5f",
+    "reviewDocs": 42026645703,
+    "Backend": 42022737571,
+    "reportDocs": 42023751194,
+    "rootVerifiedExactHeadAndAllJobsSuccess": true,
+    "B1B2B3": "closed/ACCEPT",
+    "nativeGoP0ImplementationAccepted": false
+  },
+  "bootstrapPlan": {
+    "task": "task_38393b5d1865",
+    "dispatch": "ctx_ceecb3824e33",
+    "scope": "NONEXECUTING G1-G10 plan only; implementation/operations not authorized by plan",
+    "G2Direction": "preserve exact old observe Cmd/--image permit digest; new typed per-Node runtimeImage inventory/receipt; old CP field historical/default semantics preserved",
+    "targetProvenance": null,
+    "executionGate": "HOLD"
+  },
+  "priorRootCheckpoint": {
+    "SHA": "3bd48e7447a189ebd24dc89a1f17049848ae83b6",
+    "Docs": 42021404832,
+    "exactSuccessVerified": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "destinationHashesMatched": 2307,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "canonicalPolicy": "GOV-FLEET5-LEGACY-HOLD-20261105 v1.0.0"
+}
