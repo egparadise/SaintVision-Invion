@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "saintvision-independent-review:1",
+  "reviewer": "Claude",
+  "owner": "Codex",
+  "orcaTask": "task_9cd71aa339ff",
+  "dispatch": "ctx_8fa6addadbda",
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "scope": "TEST-ONLY R-L1 closure review; not code/runtime/physical/whole-product acceptance; does not alter frozen e50c selection",
+  "target": {
+    "commit": "542b48f996344563424228fb9fc454f5970bbd18",
+    "branch": "agent/codex/fleet5-sf1-credential-tests-20261106",
+    "parent": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+    "e50cIsAncestor": true,
+    "nonDocPathsVsParent": ["A tests/test_fleet5_sf1_current_credentials.py"],
+    "nonDocPathsVsE50c": ["A tests/test_fleet5_sf1_current_credentials.py"],
+    "productionSF1SourceSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "productionSF1GitBlob": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4"
+  },
+  "hostedRunsReadOnly": [
+    {"id": 42096385358, "workflow": "Documentation Build", "event": "workflow_dispatch", "headSha": "542b48f996344563424228fb9fc454f5970bbd18", "jobs": {"docs": "success"}}
+  ],
+  "hostedPytestCoverageOfNewFile": "NOT_RUN; Docs does not execute pytest; no Linux/Core/Backend run claimed",
+  "environment": {"python": "3.14.7 (shared .venv, read-only use)", "platform": "win32", "checkout": "disposable detached git worktree in private scratch, removed after review", "sequential": true},
+  "observedKST": {"rawStart": "2026-11-06T05:19:15+09:00", "rawEnd": "2026-11-06T05:19:51+09:00"},
+  "codeReading": {
+    "realPath": "test calls production plain.verify_settled; the only monkeypatch wraps rotation.validate_bundle (the module plain._legacy() returns) and calls the original with the archived public material, then appends one byte to the fixture credential in tmp_path",
+    "notAMockedComparison": "the equality terms under test are the production lines in verify_settled; the wrapper returns the real validate_bundle result unchanged",
+    "stillReal": ["validate_bundle signature/manifest/CA pin", "_verify_record", "_commit control signature", "_finalized_evidence archive binding", "_floor signature + match_floor", "validate_policy", "credential_archive", "journal/archive/target re-read"],
+    "wrapperInvokedAssertion": "len(injected) == 1 and exact injected snapshot",
+    "mutationAssertions": "snapshot before==after for the positive call; post-refusal tree equals the injected tree exactly",
+    "byteOnlyDrift": "appended newline; rotation._certificates(changed) == original, so DER-level and floor checks cannot catch it"
+  },
+  "checks": {
+    "baselineNewFileAlone": {"passed": 2, "skipped": 0, "exit": 0},
+    "baselineNewPlusPlainReentry": {"passed": 21, "skipped": 0, "exit": 0},
+    "mutantNodeCertTermFalse": {"exit": 1, "failed": ["[node-cert.pem] DID NOT RAISE ValueError"], "passed": ["[ca.pem]"]},
+    "mutantCaTermFalse": {"exit": 1, "failed": ["[ca.pem] DID NOT RAISE ValueError"], "passed": ["[node-cert.pem]"]},
+    "mutantBothTermsFalse": {"exit": 1, "failed": ["[node-cert.pem]", "[ca.pem]"]},
+    "eachTermKillsOnlyItsOwnCaseAndTheOtherTermDoesNotMaskIt": true,
+    "contextDriftBeforeValidation": {
+      "probe": "542b-context-probe.py.txt, temporary test copied into the disposable checkout and removed",
+      "guardIntact": {"node-cert.pem": "SF1 current credentials differ from the settled final bytes", "ca.pem": "Rotation issuing chain is not the pinned chain"},
+      "nodeCertTermFalse": {"node-cert.pem": "DID NOT RAISE", "ca.pem": "Rotation issuing chain is not the pinned chain"},
+      "caTermFalse": {"node-cert.pem": "SF1 current credentials differ from the settled final bytes", "ca.pem": "Rotation issuing chain is not the pinned chain"},
+      "interpretation": "the earlier validate_bundle CA pin masks pre-validation ca.pem drift, so the post-validation injection is required to isolate the ca term; node-cert drift is caught only by the final term with or without the injection"
+    },
+    "restored": "every mutant created in the disposable checkout only; SHA256 bf3754a2... re-verified after each; status clean"
+  },
+  "verdict": "ACCEPT (TEST-ONLY delta 542b48f9); R-L1 CLOSED",
+  "findings": [],
+  "remainingInfo": [
+    {"id": "R-I1", "summary": "Like e50c, these passes are local Windows Python 3.14.7. Linux/Core/Backend pytest of this new file is NOT_RUN and cannot be inherited from e50c CI."},
+    {"id": "R-I2", "summary": "Launcher broad exception tuple: unchanged, Info, not expanded."},
+    {"id": "R-I3", "summary": "Optional exact65536 and C-I2 partial-output fail-closed: unchanged, Info, not expanded."},
+    {"id": "R-I4", "summary": "The ca.pem case models a read/check race (drift after real validation). Drift before validation is already refused by the earlier CA pin; both refusals are fail-closed."}
+  ],
+  "notDone": ["no runtime/production change", "no e50 branch move/respin/all8/archive", "no boards/registry/Obsidian apply", "no NodeOps/SSH/WSL/Docker/keys/config/clock"],
+  "rawLog": "542b-review-raw.txt",
+  "rawLogLFSHA256": "2aee7835aefacca2a350f7e4d45b480b86db5ba0e2045c3e1aebe75032b30821",
+  "contextProbeSHA256": "b1f4ebaf9c2d873c901492fb827382f1770d196b0c5d2ea8de785838645c10bf",
+  "rawLogRedaction": "private scratch prefix replaced with <private-scratch>; LF; trailing whitespace stripped",
+  "nextOwner": "Root decides whether 542b48f9 joins any later frozen source and its separate Linux CI"
+}

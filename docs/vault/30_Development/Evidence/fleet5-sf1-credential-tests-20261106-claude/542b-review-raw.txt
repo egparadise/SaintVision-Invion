@@ -1,0 +1,71 @@
+### HEAD @ 2026-11-06T05:19:15+0900
+542b48f996344563424228fb9fc454f5970bbd18
+Python 3.14.7
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4
+
+### lineage @ 2026-11-06T05:19:16+0900
+e50c ancestor: yes
+non-doc diff vs parent 8624c3ee:
+A	tests/test_fleet5_sf1_current_credentials.py
+non-doc diff vs e50c:
+A	tests/test_fleet5_sf1_current_credentials.py
+
+### baseline new file alone @ 2026-11-06T05:19:17+0900
+2 passed in 4.73s
+EXIT=0
+
+### baseline new file + plain_reentry @ 2026-11-06T05:19:24+0900
+21 passed in 4.96s
+EXIT=0
+
+### mutant node-cert term(s)->False @ 2026-11-06T05:19:31+0900
+-    if (legacy._regular(root/'node-cert.pem') != files['node-cert.pem']
++    if (False
+E       Failed: DID NOT RAISE ValueError
+PASSED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[ca.pem]
+FAILED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[node-cert.pem]
+1 failed, 1 passed in 2.84s
+EXIT=1
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+
+### mutant ca term(s)->False @ 2026-11-06T05:19:36+0900
+-            or legacy._regular(root/'ca.pem') != files['ca.pem']):
++            or False):
+E       Failed: DID NOT RAISE ValueError
+PASSED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[node-cert.pem]
+FAILED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[ca.pem]
+1 failed, 1 passed in 1.51s
+EXIT=1
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+
+### mutant both term(s)->False @ 2026-11-06T05:19:40+0900
+-    if (legacy._regular(root/'node-cert.pem') != files['node-cert.pem']
++    if (False
+-            or legacy._regular(root/'ca.pem') != files['ca.pem']):
++            or False):
+E       Failed: DID NOT RAISE ValueError
+E       Failed: DID NOT RAISE ValueError
+FAILED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[node-cert.pem]
+FAILED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[ca.pem]
+2 failed in 1.72s
+EXIT=1
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+
+### context: drift BEFORE validation, guard intact @ 2026-11-06T05:19:43+0900
+CTX-PREVALIDATION node-cert.pem -> SF1 current credentials differ from the settled final bytes
+CTX-PREVALIDATION ca.pem -> Rotation issuing chain is not the pinned chain
+2 passed in 1.32s
+
+### context: drift BEFORE validation, node-cert term->False @ 2026-11-06T05:19:46+0900
+CTX-PREVALIDATION ca.pem -> Rotation issuing chain is not the pinned chain
+E       Failed: DID NOT RAISE ValueError
+1 failed, 1 passed in 1.43s
+
+### context: drift BEFORE validation, ca term->False @ 2026-11-06T05:19:48+0900
+CTX-PREVALIDATION node-cert.pem -> SF1 current credentials differ from the settled final bytes
+CTX-PREVALIDATION ca.pem -> Rotation issuing chain is not the pinned chain
+2 passed in 1.39s
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+
+### END @ 2026-11-06T05:19:51+0900
