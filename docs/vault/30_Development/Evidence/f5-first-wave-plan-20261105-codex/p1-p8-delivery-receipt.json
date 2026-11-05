@@ -1,0 +1,57 @@
+{
+  "task": "task_05d9dcda1dca",
+  "revision": "P1-P8",
+  "correctionCommit": "7dd8fa95cd1683780b2b1c713366290e9aeb180c",
+  "branch": "agent/codex/fleet5-first-wave-plan-20261105",
+  "commitExit": 0,
+  "pushExit": 0,
+  "exactDocsCI": {
+    "databaseId": 41982091023,
+    "headSha": "7dd8fa95cd1683780b2b1c713366290e9aeb180c",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41982091023",
+    "updatedAt": "2026-11-05T06:41:46Z"
+  },
+  "publicPlanSHA256": "5121cb834016ebf86fd7433bcca3c3c89446374965a05f71a069158afe44d35f",
+  "privateVectorsSHA256": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7",
+  "privateParametersSHA256": "a806685a72b3ad6c5f43206d4f2619309d2f76403a3db7fe0b574b44aba04984",
+  "frozenIgnoredPacketDirectory": "D:\\Project\\SaintVisionI-Invion\\fleet5-worker-readiness-20261105\\.work\\f5-first-wave-plan\\frozen-5121cb834016",
+  "frozenFileSHA256": {
+    "builder-cap-probe.Dockerfile.plan": "f9f6424c6bde6cdd92357975ac9dd020f9c4fb44e27de84107ac97e3c4574c1f",
+    "execution-vectors.private.json": "bee0f0f86c4fe6cca05aac476a21ce9f5693d43303dae932969ab1c35b7dc8e7",
+    "main-venv-after.private.json": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750",
+    "main-venv-before.private.json": "a918cf0f5993cf835214ffa774a1ced07cace9052049d41f3892d74f6399c750",
+    "old-identities.private.json": "2462dd139859df5cf58e28a83b3c9d75ee14e49faa4ef5e30470b7300f880a99",
+    "parameters.private.json": "a806685a72b3ad6c5f43206d4f2619309d2f76403a3db7fe0b574b44aba04984",
+    "source59f-node-inputs.tar": "a9f0a3b88c6b9f31b5133bf1bce388fa574f201832d32b324b1a08ed3d9911a9"
+  },
+  "reviewBasis": "Claude53f5722f / root msg_b60a7280993f",
+  "correctedReviewStatus": "pending coordinator exact-source relay; CI is not execution acceptance",
+  "acceptedEarlyCorrectionMessage": "msg_e0847905db9f",
+  "exactCorrectionRelay": {
+    "refusedCode": "task_not_found",
+    "effectsApplied": false,
+    "requestId": "13befe01-5321-40c6-8c1a-c5b1228e8b7d",
+    "rootRelayRequestedOnce": "msg_a6ddd10dad1f"
+  },
+  "actualOperatorBlocker": "worker1 and worker2 SSH0 / one sudo-n firewall read1 each, interactive auth required; no retry/password/Docker privilege bypass",
+  "nextGates": "actual authorized root firewall operator; corrected exact plan review; generated external CA/identity hashes/notAfter; cap/daemon proof; PG16 servermajor; authenticated CP plus worker3 denial; excluded-window and tunnel settlement",
+  "finalR5Observation": {
+    "observedKST": "2026-11-05T15:43:46.038324+09:00",
+    "HTTP": 200,
+    "source": "live-postgresql-mtls",
+    "nodes": 2,
+    "onlineFresh": 2,
+    "runs": 0,
+    "offers": 0,
+    "killSwitch": true,
+    "userWorkloadSubmission": false
+  },
+  "freshF5StateAndCAAbsent": true,
+  "deploymentPerformed": false,
+  "automationChanged": false,
+  "fiveNodePass": false,
+  "noStorageWorkspaceGuardEdit": true,
+  "finalReceiptCIPolicy": "own final commit hosted Docs CI is delivered in worker_done, avoiding self-SHA recursion"
+}
