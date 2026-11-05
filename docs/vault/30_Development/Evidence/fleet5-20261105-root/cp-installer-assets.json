@@ -1,0 +1,62 @@
+{
+  "schema": "fleet5-cp-installer-asset-verification:1",
+  "owner": "Codex root",
+  "task": "FLEET5-20261105",
+  "observedAtKST": "2026-11-05T15:46:50+09:00",
+  "method": "Python3.14.7 TLS-verified bounded streaming GET, official checksum pin, PowerShell Get-AuthenticodeSignature/Get-Item; no installer execution",
+  "assets": [
+    {
+      "version": "4.98.0",
+      "filename": "Docker-Desktop-4.98.0-245422.exe",
+      "bytes": 623748528,
+      "sha256": "cd6273d9eaa4f07fa7593fc6813d37e1004381cebc3f26047a2554fa5db24388",
+      "officialChecksumMatched": true,
+      "signatureStatus": "Valid",
+      "signerSubject": "CN=Docker Inc, O=Docker Inc, L=Palo Alto, S=California, C=US, SERIALNUMBER=4817464, OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Delaware, OID.1.3.6.1.4.1.311.60.2.1.3=US",
+      "timestampSignerSubject": "CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US",
+      "fileVersion": "4.98.0.245422",
+      "companyName": "Docker Inc.",
+      "executed": false,
+      "build": "245422",
+      "sourceURL": "https://desktop.docker.com/win/main/amd64/245422/Docker%20Desktop%20Installer.exe",
+      "checksumsURL": "https://desktop.docker.com/win/main/amd64/245422/checksums.txt",
+      "freshDownload": true,
+      "seconds": 55.405
+    },
+    {
+      "version": "4.16.3",
+      "filename": "Docker-Desktop-4.16.3-96739.exe",
+      "bytes": 623223120,
+      "sha256": "5f6db3cf5a2084fc7c584c90792f38a0caac91c4eed4f8653dde7bb8148517f1",
+      "officialChecksumMatched": true,
+      "signatureStatus": "Valid",
+      "signerSubject": "CN=Docker Inc, O=Docker Inc, L=San Francisco, S=California, C=US",
+      "timestampSignerSubject": "CN=DigiCert Timestamp 2022 - 2, O=DigiCert, C=US",
+      "fileVersion": "4.16.3.96739",
+      "companyName": "Docker Inc.",
+      "executed": false,
+      "build": "96739",
+      "sourceURL": "https://desktop.docker.com/win/main/amd64/96739/Docker%20Desktop%20Installer.exe",
+      "checksumsURL": "https://desktop.docker.com/win/main/amd64/96739/checksums.txt",
+      "freshDownload": true,
+      "seconds": 56.74
+    }
+  ],
+  "lanmanServer": {
+    "state": "Running",
+    "startMode": "Auto"
+  },
+  "currentProcessAdministrator": false,
+  "runtimeChanged": false,
+  "fullRollbackAvailable": false,
+  "remainingPrerequisites": [
+    "quiesced pre-upgrade VHDX/settings backup and restore validation",
+    "other-product maintenance impact and actual OS administrator execution",
+    "WSL compatibility/security update and post-install API measurement",
+    "r5 scheduled-attempt settlement and preservation gates",
+    "actual co-located Node resource headroom and identity/policy"
+  ],
+  "privateAssetDirectory": ".work/fleet5-cp-installers-20261105 (ignored, binaries not committed)",
+  "newTarget": "4.98.0 is the researched candidate as of2026-11-05; revalidate official support at execution time",
+  "sourceFactsVersusInference": "Installer bytes/version/hash/signature measured locally; installed Engine/API remains the old runtime and was not upgraded"
+}

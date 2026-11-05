@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.357"
+version: "1.0.358"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T15:29:10+09:00"
+updated: "2026-11-05T15:49:31+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Actual independent review received; execution packet requires P1-P8 corrections; new Claude followup ready"
-active_card_next: "Consume corrected source/hash packet; verify actual ingress authority, CA renewal and build/DB evidence; independent review before new live action"
+active_card_status: "Corrected packet7dd and source guardff97 published, actual review/CI pending; CP installer assets verified without execution"
+active_card_next: "Consume actual Claude source/packet verdict and hosted Core/Docs; proceed only on accepted stage scope and real operator/runtime prerequisites"
 ---
+
+## 2026-11-05 source 보강 게시와 CP 자산 실검증
+
+작업한 것: root가 Claude300f4bca의 게시22fa 검토/CP target 조사를 통합했고, 수정 packet7dd와 실제 소스ff97을 새 활성 Claude에게 전달했다. 확인한 것: worker의 R4 재현15fail/15pass와 수정 후101pass 보고를 수신했으며, root는 두 CP 전체 설치 파일의 공식 checksum 및 Authenticode Valid를 실제 확인했다. LanmanServer Running/Auto, 현재 프로세스 관리자false다. 다음 첫 행동/담당: Claude task_5fd9ea4e3779는 packet과source를 독립 판정하고 owner들은 exact hosted CI를 완료한다. root는 수락·실행 준비·운영 인수를 분리해 다음 단계만 진행한다. 상세 명령과 증거는 [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]다.
+
 
 별도 source 보강 FLEET5-STORAGE-WORKSPACE-GUARD-20261105를 task_30f1fb073ec1/ctx_64e306776a86에 ready 전달했다. 기존 공유 mount를 잃을 수 있는 upgrade를 재현하고 변경 전에 거절하며 rollback은 보존하는 범위다. 실제 구현/시험은 해당 owner 보고를 기다린다.
 

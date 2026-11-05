@@ -132,5 +132,31 @@
     "singleSourceRatchet": 0,
     "pathCitationRatchet": 0,
     "syncObservation": "2292 managed /9 pending/0 conflicts before latest card metadata"
+  },
+  "latestOwnerDeliveries": {
+    "plan": {
+      "sha": "6cbb2b9801dc5040b5a5ad70bf7b5434130d8ccc",
+      "exactDocs": 41983007232,
+      "status": "success verified by root",
+      "scope": "nonexecuting plan/wording, actual execution not accepted"
+    },
+    "sourceGuard": {
+      "sha": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+      "ownerReportedFocused": 101,
+      "ownerReportedServingRoute": 50,
+      "independentReview": "requested ctx_ac008a621cfe, pending as of this checkpoint",
+      "core": 41982378091,
+      "docs": 41982381571,
+      "hostedStatus": "owner still completing exact Core; do not claim final success"
+    }
+  },
+  "assetsReportLocalGates": {
+    "observedAtKST": "2026-11-05T15:53:51+09:00",
+    "docs": 0,
+    "ontology": 0,
+    "syncCheck": 0,
+    "singleSourceRatchet": 0,
+    "pathCitationRatchet": 0,
+    "syncObservation": "2295 managed /12 pending/0 conflicts, no writes"
   }
 }
