@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-LEGACY-PEER-FLOOR-COMPAT-20261105-CODEX"
 title: "FLEET5 legacy peer-floor source compatibility audit"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T20:52:00+09:00"
+updated: "2026-11-05T20:55:45+09:00"
 source_of_truth: "Git"
 ---
 
@@ -26,6 +26,50 @@ configuration, PKI, old guard parameter bodies, protected r5 working folders,
 SSH, Docker/WSL/remote actions, process restarts, schedules, pins, claims or clocks
 are accessed or changed. The root-supplied unsigned 20:34 KST observation is
 attributed context only; this worker does not independently inspect runtime.
+
+## Current root technical execution gate — HOLD
+
+Root decision `msg_996ef241a877`, received in follow-up task
+`task_d091854abaf9` / dispatch `ctx_fddffc448ce0` at20:55 KST, explicitly places
+**existing legacy v1 normal renewal on technical HOLD** while P0 implementation,
+capability bootstrap/migration and the replacement renewal/guard plan remain
+unreviewed. **Legacy v1 normal renewal is not authorized to execute under this
+condition. Future old follow-up callbacks must only read, evaluate and report
+HOLD; they must never RunNow or execute a legacy renewal phase.**
+
+This is root's technical execution gate grounded in the confirmed native failure
+and public03/B5 source equality. It is **not** a claim that the three stored
+schedules were changed or disabled: per root they remain unchanged, and this
+worker has neither inspected nor managed their definitions. No clock/window,
+claim, lock, latch, pin or floor bypass is authorized. No runtime, automation,
+private configuration or guard body is changed by this report update.
+
+**Next root action:** obtain the concrete capability bootstrap/binary-only
+migration and replacement renewal/guard plan, with exact source/binary/plan
+bindings and independent review, before the old scheduled attempt or any
+old-binary restart. Root owns that future concrete plan, review and subsequent
+execution decision. Fresh repaired source alone does not lift HOLD or update
+the frozen03/B5 guard/plan. The public-source call graph remains conditional on
+the unread private plan; no actual live renewal failure is inferred, and the
+current unsigned floor1/hash match is not future renewal safety.
+
+This documentation-only follow-up starts at
+`83ec7b8405d901b34a7fdddad9d7ea592f26de99` on the same own branch; owner Codex,
+Claude review via root pending. Coordinator Index1.0.406 / Codex1.0.367 were
+rechecked at20:55 KST (their current updated field20:43:53 KST). Existing
+agent-delivery1.1.0/core-reliability1.0.0 and AGENTS scope remain applicable.
+Exact root message and validation are appended as new evidence receipts;
+earlier source/native observations and artifact bindings are preserved.
+
+Follow-up verification uses the same main CPython3.14.7 with `-B`: source/shared
+board freeze, check_docs, path-citation ratchet, ontology, sync-check and whitespace
+checks all exit0. Sync-check observed2309 managed/106 pending/0 conflicts, no
+writes, before adding the validation receipt. `root-technical-hold-validation.json`
+records each complete command, KST start/end, direct exit, raw output and the
+root policy artifact SHA256. No source audit/native proof, Core or broad product
+test is rerun. Normal commit/push and exact Docs result are provided in this
+follow-up's coordinator completion receipt; Claude review remains pending via
+root, and operational acceptance remains unassessed.
 
 ## Source verdict and its limits
 
@@ -188,6 +232,9 @@ The public source03 tree lacks B5's scheduled executor/wrappers; source03's
 documented/helper entry points and later B5's plan executor are separate facts.
 No claim is made that source03 itself schedules a renewal. This audit supplies
 no authority to cancel or alter an existing automation.
+Root's current technical execution HOLD above still governs whether an old
+callback may execute a renewal phase; unchanged schedule storage does not imply
+authorization to run the legacy phase.
 
 ## M2 capability and bootstrap boundary
 
@@ -338,3 +385,5 @@ new observer/binary/plan identities and require authenticated actual-floor
 preflight before any renewal mutation. Fresh F5P0 source alone does not repair
 the frozen03/B5 guard/plan. This handoff does not authorize executing migration,
 changing a schedule, loosening a floor, or bypassing ordinary windows/claims.
+Root's explicit technical HOLD above is the current execution policy; callbacks
+read/evaluate/report HOLD only until root's reviewed replacement decision.

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "fleet5-root-technical-hold:1",
+  "task": "task_d091854abaf9",
+  "dispatch": "ctx_fddffc448ce0",
+  "base": "83ec7b8405d901b34a7fdddad9d7ea592f26de99",
+  "receivedKST": "2026-11-05T20:55:45+09:00",
+  "decisionMessageId": "msg_996ef241a877",
+  "decisionOwner": "Root",
+  "gate": "HOLD",
+  "target": "Existing legacy v1 normal renewal",
+  "legacyExecutionAuthorizedWhileUnreviewed": false,
+  "unreviewedDependencies": [
+    "P0 implementation",
+    "Capability bootstrap and binary-only migration",
+    "Replacement renewal and guard plan"
+  ],
+  "futureOldCallbacksAllowed": ["read", "evaluate", "report HOLD"],
+  "futureOldCallbacksForbidden": ["RunNow", "execute legacy renewal phase"],
+  "storedScheduleCountReportedByRoot": 3,
+  "storedSchedulesChangedOrDisabled": false,
+  "storedSchedulesIndependentlyInspectedByThisWorker": false,
+  "privatePlanOrGuardBodiesRead": false,
+  "liveRenewalFailureInferred": false,
+  "unsignedFloor1MatchProvesFutureSafety": false,
+  "clockWindowClaimLockLatchPinFloorBypassAllowed": false,
+  "runtimeOrAutomationChangesByThisWorker": false,
+  "accepted2fbSourceChanged": false,
+  "nextOwner": "Root",
+  "firstNextAction": "Obtain concrete capability bootstrap/binary-only migration and replacement renewal/guard plan with exact source/binary/plan bindings and independent review BEFORE old scheduled attempt or old-binary restart; root owns subsequent execution decision",
+  "originalMessageBody": "Rootoperationaldecision groundedconfirmednativefailure+public03/B5equality: existinglegacyv1normalrenewal isNOTauthorizedtoexecute whileP0/capabilitybootstrap/replacementplanunreviewed; oldfollowupcallbacksshouldonlyread-evaluateandreportHOLD, neverRunNow/executelegacyphase. Thisistechnicalexecutiongate, NOTastatementthatstored3scheduleswerechanged/disabled (theyremainunchanged), no bypassclock/claim/lock/pin. Pleaseinclude exactroottechnicalHOLD/nextreviewedbootstrap+guardreplacementaction inyourcurrentuniqueauditreportsofuturecallbacksreadlatestpolicy. Publiccallgraphconditionality/privateplanunread caveatstillapplies; no livefailure inferred,currentfloor1matchnotrenewalsafety. Noactualautomationmanagement/runtimechangesbyyou; Rootownsfutureconcreteplan/review."
+}

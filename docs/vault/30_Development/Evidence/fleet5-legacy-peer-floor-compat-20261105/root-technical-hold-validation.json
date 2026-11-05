@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "fleet5-root-technical-hold-validation:1",
+  "task": "task_d091854abaf9",
+  "dispatch": "ctx_fddffc448ce0",
+  "base": "83ec7b8405d901b34a7fdddad9d7ea592f26de99",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-consecutive-leaf-rotation-20261105",
+  "interpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+  "version": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "observedKST": "2026-11-05T20:57:59.641397+09:00",
+  "policySHA256": "74560bbda92a3f736105b470c07b4856d12312f5192888fae2297f3e40c2f7ea",
+  "policyHashScope": "raw UTF8 LF Git artifact bytes, verified after commit",
+  "gates": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "83ec7b8405d901b34a7fdddad9d7ea592f26de99",
+        "--",
+        "deploy",
+        "services",
+        "tools",
+        "tests",
+        "contracts",
+        "packages",
+        ".github",
+        "skills",
+        "docs/task-registry.json",
+        "docs/vault/00_Index",
+        "docs/vault/30_Development/Agent*"
+      ],
+      "startedKST": "2026-11-05T20:57:41.955977+09:00",
+      "finishedKST": "2026-11-05T20:57:42.169643+09:00",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startedKST": "2026-11-05T20:57:42.169727+09:00",
+      "finishedKST": "2026-11-05T20:57:46.608881+09:00",
+      "exit": 0,
+      "output": "PASS: 24 original hashes, 1210 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "83ec7b8405d901b34a7fdddad9d7ea592f26de99"
+      ],
+      "startedKST": "2026-11-05T20:57:46.608941+09:00",
+      "finishedKST": "2026-11-05T20:57:50.454784+09:00",
+      "exit": 0,
+      "output": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startedKST": "2026-11-05T20:57:50.454834+09:00",
+      "finishedKST": "2026-11-05T20:57:52.973468+09:00",
+      "exit": 0,
+      "output": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\n"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startedKST": "2026-11-05T20:57:52.973528+09:00",
+      "finishedKST": "2026-11-05T20:57:59.509396+09:00",
+      "exit": 0,
+      "output": "CHECK: 2309 managed files, 106 pending exports, 0 conflicts. No writes.\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startedKST": "2026-11-05T20:57:59.509443+09:00",
+      "finishedKST": "2026-11-05T20:57:59.641094+09:00",
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "runtimeOrAutomationChanged": false,
+  "priorAuditProofReexecuted": false,
+  "independentReview": "pending via root",
+  "exactDocsReceipt": "Supplied for publication SHA in worker_done"
+}
