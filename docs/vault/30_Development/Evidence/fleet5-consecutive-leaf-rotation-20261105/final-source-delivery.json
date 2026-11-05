@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "fleet5-source-delivery:1",
+  "task": "task_a9b68a07d157",
+  "dispatch": "ctx_4194506d5037",
+  "card": "FLEET5-CONSECUTIVE-LEAF-ROTATION-20261105",
+  "observedKST": "2026-11-05T20:05:54.509275+09:00",
+  "implementationSHA": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+  "owner": "Codex",
+  "reviewer": "Claude via root",
+  "state": "source-verified-final-report",
+  "implemented": true,
+  "locallyVerified": true,
+  "ciVerified": true,
+  "operationallyAccepted": false,
+  "sourceSHA256": {
+    "deploy/lan/worker_leaf_rotation.py": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+    "tools/lan_pilot.py": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077"
+  },
+  "currentLanPilotGitBlob": "3d205d52a377b52163240b824c1e6a092346e867",
+  "local": {
+    "focusedPassed": 164,
+    "capabilitySkipped": 20,
+    "focusedExit": 0,
+    "newWitnessesPassed": 2,
+    "nodeGuardRemovalMutantExit": 1,
+    "cpGuardRemovalMutantExit": 1,
+    "mutantsKilled": 2,
+    "committedHeadPkiPassed": 6,
+    "committedHeadPkiExit": 0,
+    "servingRoutePassed": 50,
+    "requiredGatesExit": 0
+  },
+  "review": {
+    "commit": "d06f93f73a211bb2d56ce2b42141c71771b7f270",
+    "verdict": "ACCEPT (source safety and liveness); prior L1b closed",
+    "ownFocused": "164 passed, 20 skipped in 57.33s",
+    "probes": "7 passed, 1 skipped (dangling symlink: no Windows symlink capability)",
+    "L1b": "closed"
+  },
+  "ci": {
+    "core": {
+      "run": 42011998610,
+      "head": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42011998610",
+      "artifact": {
+        "id": 13408757750,
+        "name": "saintvision-core-evidence",
+        "size_in_bytes": 13901261,
+        "digest": "sha256:a0838a71618957fa542dab8f514bffc168b21f70d18a31b3c7c9ec07346aa684",
+        "workflow_run": {
+          "id": 42011998610,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+          "head_sha": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d"
+        }
+      },
+      "observedArchiveSHA256": "sha256:a0838a71618957fa542dab8f514bffc168b21f70d18a31b3c7c9ec07346aa684",
+      "archiveDigestMatches": true,
+      "junit": {
+        "path": "core-tests.xml",
+        "sha256": "5bde533360303771fad2a0a2da8547914a0a5ab97cc25996a27dc8c9bcd3537f",
+        "total": 9028,
+        "passed": 8982,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 46
+      },
+      "rotationSuites": {
+        "test_lan_leaf_rotation_consecutive": {
+          "total": 43,
+          "passed": 43,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "test_lan_leaf_rotation_batch_successor": {
+          "total": 46,
+          "passed": 46,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "test_leaf_rotation_archive_residue": {
+          "total": 14,
+          "passed": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "test_lan_leaf_rotation_standalone_runtime": {
+          "total": 38,
+          "passed": 38,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "test_rotation_predecessor_residue": {
+          "total": 2,
+          "passed": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "docs": {
+      "run": 42009966309,
+      "head": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+      "conclusion": "success"
+    },
+    "preservedMilestones": [
+      {
+        "sha": "a93ec9f1906cf5374fa8e2de172e11be0fd7cbdf",
+        "core": 41995694509,
+        "docs": 41995699334
+      },
+      {
+        "sha": "8b53fbfef107837602b1b2f700e1f8e7bae28638",
+        "core": 42001883513,
+        "docs": 42001888497
+      },
+      {
+        "sha": "6fcedbbdba24e43e3917adb07f080a683dedfefe",
+        "core": 42006923070,
+        "docs": 42006174091
+      }
+    ]
+  },
+  "scopeLimits": [
+    "rotation cycle witnesses use real cryptography with injected restart and CAS fixtures",
+    "helper Core success is not native Go peer/storage renewal proof",
+    "native Go phase/floor proof and repair are separately owned P0",
+    "fixed cohort/keys/tenant/epoch/CA/IP only; no arbitrary append/key/cohort change",
+    "exact receipt bytes retained for retirement replay",
+    "no live/runtime/private/clock/claim/pin/schedule/hardware/first-wave59f mutation",
+    "no Obsidian apply",
+    "original48-task/VFCL and physical FIVE acceptance unchanged by this task"
+  ],
+  "nextOwner": "Root integrates accepted source with independent fixes and separately owned native Go/storage/P0 proof; physical FIVE acceptance remains separate",
+  "independentlyReviewed": true,
+  "reportDelivery": {
+    "sourceCommit": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+    "reportCommitCI": "Documentation Build bound to final report commit, supplied in coordinator worker_done receipt",
+    "obsidianApply": false,
+    "rootOwnsLatestVaultAggregation": true
+  }
+}

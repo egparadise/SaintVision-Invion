@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-FLEET5-PREDECESSOR-RESIDUE-20261105-CODEX"
 title: "FLEET5 predecessor residue refusal before successor advancement"
-version: "1.1.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:17:00+09:00"
+updated: "2026-11-05T20:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -35,3 +35,19 @@ Both witnesses now assert refusal with the full fixture file snapshot unchanged,
 Evidence directory is `docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-rotation-20261105/predecessor-residue`. Required local docs/ontology/contracts/frontend integrity/single-source and path ratchets/ontology generation/sync-check/freshness reporter all returned **exit0**; serving/route tests are **50 passed /exit0**. Sync-check:2295 managed/92 pending/0 conflicts/no writes. Normal commit/push, committed-head PKI test, actual delta review and exact final Core/Docs are next. Existing6fc Core42006923070 must reach its own terminal result before a same-ref Core dispatch could supersede it; no cancellation or silent rerun is used. Prior8b Core42001883513 is actual SUCCESS, downloaded archive digest verified, with8966 passed/46 skips and43+46+38 selected Linux tests all passing; this is preserved milestone evidence, not acceptance of this delta.
 
 Next owner Codex publishes this separate revision and sends exact hashes/evidence to root for actual review; root then integrates reviewed future source and adapts its setup classifier. Source59f first-wave archive, source03/executorB5/private r5, operator permissions, physical identities, clocks/claims/latches, keys/config/pins/schedules and original48-task/VF-CL/FIVE acceptance remain untouched. No live CA/Node/Docker/remote operation or Obsidian apply.
+
+## Actual accepted source and final CI collection
+
+Published code is `2fb52bbe5e500354b323eb8e46d5aa5066690d2d`; remote readback matches. Committed-head PKI verification is **6 passed /exit0**. Exact Docs42009966309 is **success**. Actual independent Claude task `task_ad55d6c5ac02`/dispatch `ctx_e1eac667cf1d` published review `d06f93f73a211bb2d56ce2b42141c71771b7f270`: **ACCEPT (source safety and liveness), L1b closed**,164 passed/20 Windows/POSIX skips and seven additional passing probes/one Windows symlink capability skip. Codex read the actual committed review JSON; root verified/reported its Docs42010719443 success. No accepted source code is changed after that verdict.
+
+Predecessor6fc Core42006923070 completed **success** before the next dispatch. Downloaded artifact13406529938 raw ZIP SHA256 `a27e43c2265eefe79444b0927d693342ccf90889fed77aa1c1ab4f8aa17e6de7` matches Actions metadata and exact6fc head. Full JUnit:8980 passed/46 skipped/0 failed/0 error. Selected Linux suites:43 consecutive Node,46 batch successor,14 archive residue and38 standalone tests all passed without skips. These are preserved **6fc milestone** results and do not substitute for2fb's new guard cases.
+
+Only after preserving that terminal result, exact2fb Core42011998610 was dispatched. It completed **SUCCESS**, both jobs successful, with actual `gh run watch --exit-status` **exit0**. Codex downloaded artifact13408757750 and rederived raw ZIP SHA256 `a0838a71618957fa542dab8f514bffc168b21f70d18a31b3c7c9ec07346aa684`, exactly matching Actions metadata and2fb head. Full JUnit is **8982 passed /46 skipped /0 failures /0 errors**; XML SHA256 `5bde533360303771fad2a0a2da8547914a0a5ab97cc25996a27dc8c9bcd3537f`. Selected Linux suites are **43 consecutive Node,46 batch successor,14 archive residue,38 standalone runtime and2 predecessor-residue witnesses**, all passed with **0 skips**. Counts overlap the full suite and must not be added. Both newly required witnesses actually executed. `predecessor-residue/core-2fb-terminal-artifact.json` and the preserved raw ZIP under ignored `.work/fleet5-core-artifacts/42011998610.zip` bind this proof. No CI cancellation or silent rerun was performed.
+
+Root additionally requested **design feedback only** for a separate storage/compound-policy lifecycle owner `ctx_6f0f8253b8a7`. Feedback `msg_fc7b89e943c8`/`msg_93e8d0ae072d` cites the existing exact-DER storage channel binding and current startup pin order: `NewAuthority` persists the peer floor before `NewStorageSampler` validates/pins storage; same-version changed peer bytes and decreased versions are rejected by Go. Root `msg_dc8657f825d8` independently confirmed the overlap/final peer-version question and assigned a separate native Go journal/Authority proof and concrete-contract work. This is not a live failure claim, and Python restart-callback fixture passes are **not** presented as actual Go restart or storage-enabled renewal proof. No B source/integrator/private/runtime file was modified here. The accepted2fb component remains frozen while that separately owned architecture work proceeds.
+
+## Final source handoff
+
+Implemented source2fb, local verification, exact source Core/Docs and actual independent Claude source review are verified separately above. `final-source-delivery.json` is the machine-readable source receipt and preserves the actual head/artifact/JUnit/review/scope bindings. A final read-only Git diff against2fb confirms accepted product/tool/test source unchanged. The final report commit's Documentation Build is its own report-delivery evidence; its exact SHA/run/result is supplied to root in `worker_done`, avoiding a self-referencing commit loop. No Obsidian apply is performed: root must aggregate this unique History into the latest coordinator vault and export that current combined source.
+
+Worked: Node and CP normal-generation lifecycle with immutable signed evidence, explicit all-member finalization/retirement, checked successor bindings, legacy replay, safe equal staging cleanup and refusal to strand predecessor residue. Verified: real-crypto two/five fixture batches and three-cycle liveness witnesses, both killed guard-removal mutants, local gates with exact exits, committed-head PKI, source-bound hosted artifacts and actual independent review. Remaining owner/root: combined candidate integration/all-required CI/landing, future setup classifier and separately owned native Go/storage lifecycle proof/repair, credentials/hardware/runtime and physical FIVE operational acceptance. Existing original48-task/VF-CL, frozen59f/source03/r5/private/executor/pin/schedule/clock/claim/permission state were not changed by this task. No whole-FIVE or real Go/storage renewal success is claimed.
