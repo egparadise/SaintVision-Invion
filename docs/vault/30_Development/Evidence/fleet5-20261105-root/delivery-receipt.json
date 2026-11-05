@@ -1,0 +1,58 @@
+{
+  "schema": "fleet5-root-readiness-delivery:1",
+  "observedAtKST": "2026-11-05T15:16:04+09:00",
+  "owner": "Codex root",
+  "run": "run_e57ecd84a7bc",
+  "checkpointSHA": "8585b61b2237662eeaf5b862a4ea4d4eeef19a4c",
+  "normalCommitExit": 0,
+  "normalPushExit": 0,
+  "exactHeadDocs": {
+    "id": 41978843474,
+    "status": "completed",
+    "conclusion": "success",
+    "headSha": "8585b61b2237662eeaf5b862a4ea4d4eeef19a4c",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41978843474"
+  },
+  "obsidianCheckpoint": {
+    "checkBeforeApplyExit": 0,
+    "applyExit": 0,
+    "postCheckExit": 0,
+    "exportedFiles": 15,
+    "managedFiles": 2289,
+    "allDestinationHashesMatch": true,
+    "pendingExports": 0,
+    "conflicts": 0,
+    "unmanagedFilesUntouched": true,
+    "logSHA256": {
+      "pre-apply-check": "218d11fb2e692545791cf9ae685a8e2f589de02ac24ad18fbae3a88182600e20",
+      "sync-apply": "f98bef85dcf09d2c5fc6dfb90de1baad1f048db1c4e5f343ab8d6b41597a4a19",
+      "post-apply-check": "8f57aba005f810dbcc2f2d3a321bf291180a8ff207e702b9fd0a556eb1c2667d"
+    }
+  },
+  "guiDiscovery": {
+    "method": "computer-use sky.list_apps, read-only inventory only",
+    "relevantApp": "Chrome Remote Desktop",
+    "existingTargetWindows": [
+      "SaintVision-Invion1",
+      "SaintVision-Invion2",
+      "saintvision-invion3"
+    ],
+    "worker4WindowObserved": false,
+    "worker4EndpointResolved": false,
+    "appInputOrAuthenticationPerformed": false,
+    "otherAppsInspected": false
+  },
+  "inboxCheckpoint": "orca orchestration check --run run_e57ecd84a7bc returned No messages / exit0 after checkpoint sync",
+  "activeFollowups": [
+    "task_05d9dcda1dca / ctx_faa86b318dd8",
+    "task_e1b499632366 / ctx_774596be590b"
+  ],
+  "independentReview": "requested actual Claude verdict; not claimed complete",
+  "physicalFiveNodeAcceptance": false,
+  "firstNextActions": {
+    "Codex": "publish isolated Linux1/2 exact plan and Docker floor wording delta",
+    "Claude": "review those packets, root documentation checkpoint and existing CP rollback assets",
+    "root": "consume real worker outcomes and missing worker4 identity, proceed on accepted concrete execution conditions"
+  },
+  "receiptPublicationPolicy": "This receipt records the completed checkpoint; receipt-commit CI and subsequent sync are external delivery status to avoid self-SHA recursion."
+}
