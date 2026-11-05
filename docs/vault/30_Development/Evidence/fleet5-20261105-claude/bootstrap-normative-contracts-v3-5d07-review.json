@@ -1,0 +1,93 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_eaa694171f31 / ctx_8434b4be8010",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33); pending Root question msg_18c3e56963c1",
+  "observedWindowKST": ["2026-11-06T02:24:44+09:00", "2026-11-06T02:36:46+09:00"],
+  "observedWindowSource": "own shell `date` outputs: first command of the review, and the final remote head check before writing; publication times are separate",
+  "reviewKind": "independent Low-delta review of a nonexecuting document revision; design verdict only; not registered contracts, code authorization, runtime CI, physical or operational acceptance",
+  "boardsRead": "Index 1.0.413 (updated 2026-11-06T02:10:53+09:00), Claude board 1.2.130, at Root 60bfc722ff46171af326e2a26cf8764a6dd108ef; Codex board version 1.0.374 as stated by Root",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105 (remote head still 5d0753e5 at 02:36:46 KST)",
+    "commit": "5d0753e561149f1c4dface08583c232f10be15fc",
+    "base": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+    "delta": {"files": 37, "statuses": "37 added, 0 modified, 0 deleted", "v3Dir": 36, "history": "History/2026-11-06_FLEET5_bootstrap_contracts_v3_low_delta_Codex.md", "nonDocsFiles": 0, "olderV1V2DirsTouched": 0},
+    "readFrom": "Git objects only (git archive of 5d07 v3 dir+history and cb3 v2 dir into private scratch); author checkout untouched",
+    "docs": {"run": 42073588927, "headSHA": "5d0753e561149f1c4dface08583c232f10be15fc", "event": "workflow_dispatch", "conclusion": "success", "jobs": "docs success (1/1)", "checkedByClaude": "GitHub API read only"},
+    "contextOnly": "v2 cb3b ACCEPT with Low conditions (b47371c3), f932 REVISION REQUIRED (78ae0138) and 803 plan ACCEPT retained unchanged; P0 source 4f CODE ACCEPT / full CI / native evidence is a separate scope and not bootstrap acceptance"
+  },
+  "interpreter": "D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe -B -I, Python 3.14.7, jsonschema 4.26.0 Draft 2020-12, referencing Registry without retrieve (no network); own Go encoding/json.Marshal emulator (sorted keys, compact, <>& and U+2028/9 escaped)",
+  "reviewerProgram": {
+    "note": "private scratch reviewer program, not committed (no helper code authorized); hashes recorded",
+    "check_v3.py": "f240dd33b7be62c53dad91228b78c5256604573576ca571c69bb6c46baa44a2c",
+    "probe_ni1.py": "ee4ee3e0c1e05a1b89cfbe36f563e400bc3bf9b622d82277feb8ca2e3b35ff7a",
+    "rawOutput": "bootstrap-normative-contracts-v3-5d07-review-raw.json (sha256 4007af3b5e5f8a88ff7199bba6e53a88462fca86e05090c04a7f091ac0b63f36; synthetic fixture values only)",
+    "runs": [
+      {"startKST": "2026-11-06T02:32:42+09:00", "exit": 0, "note": "first pass; two harness bugs in MY program (ignored owner topTarget field; mis-parsed api:<method> document names) produced 14 false transition accepts and 113 unhandled recipe negatives; corrected, not owner defects"},
+      {"startKST": "2026-11-06T02:33:42+09:00", "exit": 0, "note": "corrected pass"},
+      {"startKST": "2026-11-06T02:34:56+09:00", "endKST": "2026-11-06T02:35:06+09:00", "exit": 0, "note": "final pass with targeted extras (raw output committed)"},
+      {"program": "probe_ni1.py", "exit": 0, "note": "released/NONE journal representation probe"}
+    ]
+  },
+  "independentChecks": {
+    "ownerArtifactHashes": "35/35 recomputed and equal proposal-validation.json artifactHashes; historySHA256 equal; proposal-validation.json itself excluded (self-reference). Owner gate results JSON not trusted for anything below",
+    "dependencyClosure": "9/9 v2 dependency documents equal declared bytes and sha256 (cb3 blobs); 7 overlays registered by $id, v2 resources at their .invalid/v2 URIs; an unregistered $ref fails closed (referencing error); no network loading",
+    "metaschema": "7 overlays + 9 v2 dependencies pass Draft 2020-12 check_schema",
+    "structuralPositives": "10/10 artifact snapshots + failure-receipt positive VALID; 14/14 API requests VALID",
+    "envelopes": "recomputed SHA256(C2({body,signer})): plan 70574bc3..., inventory 0e187212..., migration lease 2fbecf53..., restore lease 5f987490..., seal PC2 b7fc0081..., seal PC4 f83d35b1..., post-seal predecessor 715ac10f..., post-seal current ba865d26...",
+    "planSubject": "planSubjectSHA256 recomputed (excludes exactly planSubjectSHA256, independentPlanReview, rootPublicationIntent)",
+    "N-L4": {
+      "ownerTransitionPositives": "28/28 VALID",
+      "ownerTransitionNegatives": "577/577 rejected by schema (549 priorPhase, 28 member target)",
+      "ownPriorSweep": "28 positives x 24 phase values = 672: all 123 table-legal priors accepted, 0 off-table priors accepted (effect outcome = intentPhase only; no-effect outcome = priorPhases)",
+      "ownTargetSweep": "92/92 member-effect top/effect target mismatches rejected; member effect with both targets null rejected",
+      "residual": "cohort effect publishInventory (inventory-cas): top targetSlot=null with effect.targetSlot=PC2 or PC4 accepted 4/4 (intent and outcome); top=PC2/PC4 rejected"
+    },
+    "N-L5": {
+      "ownInterpreter": "evaluated recipe-definitions.json DSL (get/const/sha256C2/sha256ArgvJSON) with MY OWN context selection from the prose (containing product/CI/head, members[i]/memberStates[i]/seal slot/arguments.slot/event targetSlot, plan input + inventory current + per-node dummy facts, finalPlanEnvelope recomputed, cohort scope vector recomputed, current seal by slot); compared every typedSubject field and recomputed scopeSHA256",
+      "embedded": "91 embedded proofs (87 excluding the failure-receipt fixture = owner count), 77/77 registered slots covered, 0 unregistered slotIds, 0 mismatches, 0 BLOCK",
+      "signerAuthority": "node-floor-v2 signer = member nodeKeyPublicSPKISHA256 5/5; independent-code-review signer = containing reviewerKeySPKISHA256 7/7",
+      "ownRehashMutations": "529/529 single-field typedSubject alterations with recomputed scopeSHA256 rejected by derivation",
+      "ownerRecipeNegatives": "501/501 rejected by MY interpreter (not by trusting the owner labels)",
+      "memberSwap": "PC2/PC4 signedM2 swap rejected by derivation",
+      "priorN-L5Items": "inventory exec/inspection containerId/daemon = that member's currentContainer (distinct per Node); exec ID distinct from container ID and per Node; observer argv hash = ordered raw-UTF8 JSON of the dummy argv, argv nonce/node/tenant/epoch equal plan scope + facts; event receipt/evidence/latestEvidence bind final plan envelope 70574bc3 (no v2 b84b1b/fc2291 or other v2 envelope hash appears in any v3 positive); captureFenced quiescence oldContainerId = arguments = plan old ID, daemon = plan old daemon; startNew/verifyBootstrap/restore newContainerId = inventory current; post-seal predecessor 21 -> current 22, current.previousProjection = env(predecessor), sealOrigin 20 retained in both, predecessor previousProjection non-null",
+      "joinsPassing": "plan envelope in all 10 artifacts + failure fixture + 14 API; inventory image/target = plan (proof metadata excluded); both seals = inventory envelope + own bootstrapVerifiedEvent/current/backup/volume/scope; publish/seal API inventory = env(inventory); event and journal lease = migration lease; restore lease terminalSeals = [seal PC2, seal PC4], new operationId, fenceEpoch 2 = 1+1, priorFence = migration lease; post-seal ownerLease = restore lease, terminalSeal = seal PC2, current/backup/scope/daemon = seal PC2; policy cohort/scopes = inventory cohort/ordered plan scopes; plan canonicalContract = policy allowedRegistry",
+      "joinsFailing": [
+        "inventory.leaseEnvelopeSHA256 1a76e856... equals the unchanged v2 inventory value and matches no published lease envelope (migration lease is 2fbecf53...)",
+        "pre-seal journal, post-seal predecessor and post-seal current: volume (metadata 6a8f83ff..., mountIdentity 48235166..., protectedTree 71e1946d...) and workerRootRegistrationSHA256 47d2bf04... are the v2 template values, not PC2's plan/lease/seal values (d8442d4f.../c768647c.../984098a6..., 132971ad...), although those projections point to seal PC2 b7fc0081...; pre-seal journal daemon f5333b90... is not PC2 daemon a309ff22...",
+        "API seal and restoreNewRestartPolicy requests and the restore lease declare expectedInventoryHead ABSENT/null although inventory 0e187212... is the published head referenced by both seals",
+        "API restoreNewRestartPolicy carries operationId fixture-operation-restore but expectedFenceEpoch 1 while the restore lease for that operation has fenceEpoch 2; its expectedPriorProjectionSHA256 is null although post-seal projections exist"
+      ]
+    },
+    "N-I1": "552 journal combinations (operationKind x 23 phases x 4 leaseStates x sealedHistory) under the overlay: 0 violations; RESTART_RESTORE requires sealedHistory and SEALED..QUIESCENCE_UNKNOWN phases, HELD at SEALED/RESTART_RESTORE_INTENT; MIGRATION only HELD/UNKNOWN and HELD outside blocked/unknown; released projections are representable only with ownerLease null (NONE or RELEASED)",
+    "N-I2": "failure receipt outcome unknown/known-failure/not-attempted accepted; known-success, success, UNKNOWN rejected even with recomputed hash; failure phase other than BLOCKED_FORWARD_ONLY/QUIESCENCE_UNKNOWN rejected (4/4 tried); outcome record with unknown receipt rejected; effect outcome with null receipt rejected; failure fixture receipt derives by recipe with observed unknown",
+    "N-I3": "156 identifier mutations (uppercase, short, long, sha256: prefix, space, non-hex for containerId/oldContainerId/newContainerId/execId; wrong-case/space/unknown point and swapped before/after; cohortId empty/257/NUL) all rejected with recomputed hash; cohortId 256 scalars and non-ASCII accepted as bounded opaque; owner Info negatives 20/20 rejected",
+    "layers": "schema-layer: N-L4, N-I1, N-I2, N-I3 and the structural positives; semantic recipe/fixture layer: N-L5 derivation, joins, signer-key equality. NOT RUN: real signatures/RFC8032, Go readers/verifier, OS locks, Engine, atomicity/CAS, full signed event-history replay, equipment",
+    "hold": "actual-bindings-HOLD target 30, Root 18, member and deployment trust bindings null/HOLD; synthetic policy and facts fixtureOnly/actualTrust false; no key or hash provenance invented by this review"
+  },
+  "findings": [
+    {"id": "N-L4", "severity": "Low", "status": "closed", "summary": "per-method/recordKind priorPhase and member effect target equality are schema constraints; own 672-phase and 92-target sweeps agree with the table"},
+    {"id": "N-L5", "severity": "Low", "status": "closed (proof subjects)", "summary": "every embedded typedSubject derives from its containing context plus explicit dummy facts under an independent interpreter; all prior N-L5 instances fixed"},
+    {"id": "N-I1", "severity": "Info", "status": "closed", "summary": "restore/migration operation-lease-phase rules schema-enforced"},
+    {"id": "N-I2", "severity": "Info", "status": "closed", "summary": "failure receipt outcome restricted and cannot advance"},
+    {"id": "N-I3", "severity": "Info", "status": "closed", "summary": "typed identifiers strict; point literal; cohortId bounded opaque"},
+    {"id": "V3-L1", "severity": "Low", "status": "open", "summary": "cohort effect target not schema-bound: publishInventory intent/outcome with targetSlot=null accepts effect.targetSlot PC2/PC4 (4/4), against 'Cohort effects remain target=null'", "requiredRevision": "add if effect.kind=inventory-cas (or method scope cohort) then targetSlot and effect.targetSlot const null, with red fixtures"},
+    {"id": "V3-L2", "severity": "Low", "status": "open", "summary": "non-proof joins still carry v2 template values: inventory lease reference is an orphan v2 value; journal/post-seal volume and workerRoot (and pre-seal journal daemon) are not PC2's although they point at seal PC2; contradicts 'exact plan/inventory/seal/lease/projection joins verify'", "requiredRevision": "set inventory.leaseEnvelopeSHA256 to the publishing lease envelope and the projection volume/workerRoot/daemon to the PC2 values, and add these artifact-level joins to the published static check"},
+    {"id": "V3-L3", "severity": "Low", "status": "open", "summary": "API/lease state coherence: post-publication seal/restore requests and restore lease declare inventory head ABSENT; restore request expects fence epoch 1 under the epoch-2 restore lease and no prior projection", "requiredRevision": "PRESENT head = env(inventory) with readback for post-publication requests/lease; restore request expectedFenceEpoch 2 and expectedPriorProjectionSHA256 = current projection, or label these API cases as isolated shape cases that are not state-coherent"},
+    {"id": "V3-I1", "severity": "Info", "status": "open", "summary": "owner frozen-boards gate pathspec is recorded as mojibake 'docs/vault/30_Development/Agent? ??', so it matched nothing; independently the delta adds 37 files and modifies no board, so no impact"}
+  ],
+  "verdicts": {
+    "lowDeltaV3": "ACCEPT at proposal/design level for the v3 Low delta: N-L4 and N-L5 (Low) and N-I1-N-I3 (Info) are actually closed. New V3-L1..V3-L3 (Low) are fixture/schema-coherence conditions to fix before canonical contract registration or implementation; they do not block Root's implementation-ownership decision. No High/Medium",
+    "priorVerdictsRetained": "v2 cb3b ACCEPT (b47371c3), f932 REVISION REQUIRED (78ae0138), 803 plan ACCEPT unchanged",
+    "registeredProductContracts": "none; not accepted and not registered by this review",
+    "implementationOrCodeAuthorization": "none",
+    "runtimeCI": "none; actual Go, signatures, OS locks, Engine, atomicity and equipment cases 0; 40 future product cases NOT RUN",
+    "physicalOperations": "HOLD; target 30, Root 18, member and deployment trust bindings null"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperCodeCommitted": 0, "sshDockerKeysClockSchedulesNodeOps": 0, "privateKeysConfigStateRead": 0, "boardsRegistryContractsObsidianApply": 0, "authorCheckoutWrites": 0, "otherClaudeWorkspaceTouched": 0, "subagents": 0, "bindingsFilled": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record v3 Low-delta ACCEPT with V3-L1..L3 conditions; then decide canonical registration and implementation ownership; bindings null, operations HOLD; answer msg_18c3e56963c1 against this verdict"},
+    {"owner": "Codex (plan owner)", "action": "small v4 fixture/schema delta for V3-L1..L3 before registration"},
+    {"owner": "Claude", "action": "review that delta when Root assigns it"}
+  ]
+}

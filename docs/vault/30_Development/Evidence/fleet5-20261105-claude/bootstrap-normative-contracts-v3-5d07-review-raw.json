@@ -1,0 +1,604 @@
+{
+ "unknownRefFailsClosed": "_WrappedReferencingError",
+ "dependencyHashes": "9/9 bytes+sha256 match v2 cb3 blobs",
+ "metaschema": "7 overlays + 9 v2 deps check_schema OK",
+ "artifactSchema": {
+  "plan": true,
+  "inv": true,
+  "event": true,
+  "journal": true,
+  "lease": true,
+  "rlease": true,
+  "seal2": true,
+  "seal4": true,
+  "pred": true,
+  "unk": true,
+  "fail": true
+ },
+ "apiSchema": {
+  "inspectAndValidate": true,
+  "reserve": true,
+  "setOldRestartNo": true,
+  "stopOld": true,
+  "captureFenced": true,
+  "preserveOld": true,
+  "createNew": true,
+  "startNew": true,
+  "verifyBootstrap": true,
+  "publishInventory": true,
+  "seal": true,
+  "restoreNewRestartPolicy": true,
+  "readState": true,
+  "release": true
+ },
+ "fixtureFlags": true,
+ "envelopes": {
+  "plan": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+  "inv": "0e187212eec575868242ee392a9c045836f8f8019ba326869e16a25ba169f771",
+  "event": "77566f706afe3af229bef4495627a2cef439392ffd28cb965b3e1242b15926c1",
+  "journal": "767e12af33704dab9ad88efd5b4fa0e409bfecd3fa2a7b2f53b2545481ff0b33",
+  "lease": "2fbecf53279796dd0b7e1721755bd77c45e435ae3e6d94bbfbe7e5db8e378a82",
+  "rlease": "5f98749008855695de78e865f67701986caff2879e64c30e060939365f72f5b8",
+  "seal2": "b7fc0081a28262382739f672b702cc4e028ed2965c7b0ef6c933a61fd95d5ab2",
+  "seal4": "f83d35b13135404f9cbf3bb24cb4fdb9b318a38e5509b09a7b394caf0dbde00d",
+  "pred": "715ac10fb93a4bb20a1bcf78b4b1c12ebb2d2ffff09c603a5572c055e548bb5d",
+  "unk": "ba865d26c2cd18fd8639e25ecac7497e5fcb30d64984ec959c0f03feb4652858",
+  "fail": "5234551cab97eb4df163d4b8f5f0389a48ce9d66fcaaf42514fee5f1830de5bb"
+ },
+ "inventoryLeaseEnvelopeCandidates": {
+  "plan": false,
+  "inv": false,
+  "event": false,
+  "journal": false,
+  "lease": false,
+  "rlease": false,
+  "seal2": false,
+  "seal4": false,
+  "pred": false,
+  "unk": false,
+  "fail": false
+ },
+ "inventoryLeaseEnvelope": "1a76e856e05eb1b956992dd09151f8b11fc739b082a1b792c595cf040f729117",
+ "joins": {
+  "planEnvelope:inv": true,
+  "planEnvelope:event": true,
+  "planEnvelope:journal": true,
+  "planEnvelope:lease": true,
+  "planEnvelope:rlease": true,
+  "planEnvelope:seal2": true,
+  "planEnvelope:seal4": true,
+  "planEnvelope:pred": true,
+  "planEnvelope:unk": true,
+  "planEnvelope:fail": true,
+  "planEnvelope:api:inspectAndValidate": true,
+  "planEnvelope:api:reserve": true,
+  "planEnvelope:api:setOldRestartNo": true,
+  "planEnvelope:api:stopOld": true,
+  "planEnvelope:api:captureFenced": true,
+  "planEnvelope:api:preserveOld": true,
+  "planEnvelope:api:createNew": true,
+  "planEnvelope:api:startNew": true,
+  "planEnvelope:api:verifyBootstrap": true,
+  "planEnvelope:api:publishInventory": true,
+  "planEnvelope:api:seal": true,
+  "planEnvelope:api:restoreNewRestartPolicy": true,
+  "planEnvelope:api:readState": true,
+  "planEnvelope:api:release": true,
+  "planSubjectSHA256 recomputed": true,
+  "distinct current IDs": true,
+  "distinct daemons": true,
+  "distinct execIds": true,
+  "PC2 facts.servingContainerId==inventory current": true,
+  "PC2 facts.servingDaemon==inventory current daemon": true,
+  "PC2 execId != currentContainer id": true,
+  "PC2 backup==plan old container": true,
+  "PC2 observerArgv nonce == observerNonce": true,
+  "PC2 observerArgv node == plan scope node": true,
+  "PC2 volume inventory==plan": true,
+  "PC2 scope inventory==plan": true,
+  "PC2 image inventory current == accepted image": true,
+  "PC4 facts.servingContainerId==inventory current": true,
+  "PC4 facts.servingDaemon==inventory current daemon": true,
+  "PC4 execId != currentContainer id": true,
+  "PC4 backup==plan old container": true,
+  "PC4 observerArgv nonce == observerNonce": true,
+  "PC4 observerArgv node == plan scope node": true,
+  "PC4 volume inventory==plan": true,
+  "PC4 scope inventory==plan": true,
+  "PC4 image inventory current == accepted image": true,
+  "inventory image == plan image (proof metadata excluded)": true,
+  "inventory target == plan acceptedP0 (proof metadata excluded)": true,
+  "inventory image non-proof leaves == plan": true,
+  "inventory target non-proof leaves == plan": true,
+  "seal2 slot": true,
+  "seal2 inventory envelope": true,
+  "seal2 bootstrapVerifiedEvent == inventory member": true,
+  "seal2 currentContainer == inventory": true,
+  "seal2 oldBackup == inventory": true,
+  "seal2 volume == inventory": true,
+  "seal2 scope == inventory": true,
+  "seal4 slot": true,
+  "seal4 inventory envelope": true,
+  "seal4 bootstrapVerifiedEvent == inventory member": true,
+  "seal4 currentContainer == inventory": true,
+  "seal4 oldBackup == inventory": true,
+  "seal4 volume == inventory": true,
+  "seal4 scope == inventory": true,
+  "API publishInventory candidate == inventory envelope": true,
+  "API seal inventory == inventory envelope": true,
+  "event lease == migration lease envelope": true,
+  "journal ownerLease == migration lease": true,
+  "inventory leaseEnvelope == migration lease": false,
+  "restore lease terminalSeals == [seal2, seal4]": true,
+  "restore lease new operationId": true,
+  "restore lease fenceEpoch == migration+1": true,
+  "restore lease priorFence == migration lease": true,
+  "lease scopes == plan scopes": true,
+  "lease scope PC2 daemon == plan old daemon": true,
+  "lease scope PC2 workerRoot == plan": true,
+  "lease scope PC2 volume == plan": true,
+  "lease scope PC4 daemon == plan old daemon": true,
+  "lease scope PC4 workerRoot == plan": true,
+  "lease scope PC4 volume == plan": true,
+  "pred ownerLease == restore lease": true,
+  "pred terminalSeal == seal PC2": true,
+  "pred sealOrigin seq 20": true,
+  "pred current == seal PC2 current": true,
+  "pred oldBackup == seal PC2 backup": true,
+  "pred scope == seal PC2 scope": true,
+  "pred daemon == PC2 daemon": true,
+  "pred volume == seal PC2 volume": false,
+  "pred workerRoot == plan PC2 workerRoot": false,
+  "unk ownerLease == restore lease": true,
+  "unk terminalSeal == seal PC2": true,
+  "unk sealOrigin seq 20": true,
+  "unk current == seal PC2 current": true,
+  "unk oldBackup == seal PC2 backup": true,
+  "unk scope == seal PC2 scope": true,
+  "unk daemon == PC2 daemon": true,
+  "unk volume == seal PC2 volume": false,
+  "unk workerRoot == plan PC2 workerRoot": false,
+  "pred seq 21 / unk seq 22": true,
+  "unk.previousProjection == env(pred)": true,
+  "unk wrapper priorProjectionEnvelope == env(pred)": true,
+  "sealOrigin envelope same in pred/unk": true,
+  "pred previousProjection non-null": true,
+  "pre-seal journal volume == plan PC2 volume": false,
+  "pre-seal journal daemon == plan PC2 daemon": false,
+  "pre-seal journal workerRoot == plan PC2": false,
+  "API inspectAndValidate operationId == migration lease op": true,
+  "API inspectAndValidate expectedFenceEpoch == migration lease epoch": true,
+  "API reserve operationId == migration lease op": true,
+  "API reserve expectedFenceEpoch == migration lease epoch": true,
+  "API setOldRestartNo operationId == migration lease op": true,
+  "API setOldRestartNo expectedFenceEpoch == migration lease epoch": true,
+  "API stopOld operationId == migration lease op": true,
+  "API stopOld expectedFenceEpoch == migration lease epoch": true,
+  "API captureFenced operationId == migration lease op": true,
+  "API captureFenced expectedFenceEpoch == migration lease epoch": true,
+  "API preserveOld operationId == migration lease op": true,
+  "API preserveOld expectedFenceEpoch == migration lease epoch": true,
+  "API createNew operationId == migration lease op": true,
+  "API createNew expectedFenceEpoch == migration lease epoch": true,
+  "API startNew operationId == migration lease op": true,
+  "API startNew expectedFenceEpoch == migration lease epoch": true,
+  "API verifyBootstrap operationId == migration lease op": true,
+  "API verifyBootstrap expectedFenceEpoch == migration lease epoch": true,
+  "API publishInventory operationId == migration lease op": true,
+  "API publishInventory expectedFenceEpoch == migration lease epoch": true,
+  "API seal expectedInventoryHead PRESENT == inventory": false,
+  "API restore operationId == restore lease op": true,
+  "API restore expectedFenceEpoch == restore lease epoch": false,
+  "API restore expectedInventoryHead PRESENT == inventory": false,
+  "API readState operationId == migration lease op": true,
+  "API readState expectedFenceEpoch == migration lease epoch": true,
+  "API release operationId == migration lease op": true,
+  "API release expectedFenceEpoch == migration lease epoch": true,
+  "restore lease expectedInventoryHead PRESENT == inventory": false,
+  "policy registeredCohortId == inventory cohort": true,
+  "policy registeredScopes == ordered plan scopes": true,
+  "plan canonicalContract == policy allowedRegistry": true
+ },
+ "recipe": {
+  "embeddedChecked": 91,
+  "mismatches": [],
+  "slotsCovered": 77,
+  "registrySlots": 77,
+  "unregisteredSlotIds": [],
+  "registrySlotsWithoutFixture": [],
+  "ownerChecks": 87,
+  "ownerAllMatchLabel": true
+ },
+ "ownRehashMutations": {
+  "total": 529,
+  "rejected": 529,
+  "missed": []
+ },
+ "memberSwapSignedM2Rejected": true,
+ "ownerRecipeNegatives": {
+  "total": 501,
+  "rejectedByReviewerInterpreter": 501,
+  "unhandled": 0,
+  "byDocument": {
+   "synthetic-successor-plan.json": 192,
+   "synthetic-migration-event.json": 28,
+   "synthetic-operation-lease.json": 4,
+   "synthetic-runtime-inventory.json": 126,
+   "synthetic-terminal-seal.json": 17,
+   "synthetic-terminal-seal-PC4.json": 17,
+   "synthetic-restore-lease.json": 4,
+   "api:inspectAndValidate": 4,
+   "api:reserve": 7,
+   "api:setOldRestartNo": 4,
+   "api:stopOld": 4,
+   "api:captureFenced": 11,
+   "api:preserveOld": 4,
+   "api:createNew": 4,
+   "api:startNew": 4,
+   "api:verifyBootstrap": 33,
+   "api:publishInventory": 8,
+   "api:seal": 8,
+   "api:restoreNewRestartPolicy": 10,
+   "api:readState": 4,
+   "api:release": 8
+  },
+  "unhandledSample": []
+ },
+ "ownerTransitionPositivesValid": 28,
+ "ownerTransitionNegativesRejected": "577/577",
+ "ownPriorSweep": {
+  "tested": 672,
+  "agree": 672,
+  "disagree": []
+ },
+ "ownTargetMismatchSweep": {
+  "tested": 96,
+  "rejected": 92,
+  "accepted": [
+   [
+    "publishInventory:intent",
+    null,
+    "PC2"
+   ],
+   [
+    "publishInventory:intent",
+    null,
+    "PC4"
+   ],
+   [
+    "publishInventory:outcome",
+    null,
+    "PC2"
+   ],
+   [
+    "publishInventory:outcome",
+    null,
+    "PC4"
+   ]
+  ]
+ },
+ "positiveCaseMethods": [
+  [
+   "captureFenced",
+   "outcome"
+  ],
+  [
+   "captureFenced",
+   "readback"
+  ],
+  [
+   "createNew",
+   "intent"
+  ],
+  [
+   "createNew",
+   "outcome"
+  ],
+  [
+   "inspectAndValidate",
+   "outcome"
+  ],
+  [
+   "inspectAndValidate",
+   "readback"
+  ],
+  [
+   "preserveOld",
+   "intent"
+  ],
+  [
+   "preserveOld",
+   "outcome"
+  ],
+  [
+   "publishInventory",
+   "intent"
+  ],
+  [
+   "publishInventory",
+   "outcome"
+  ],
+  [
+   "readState",
+   "outcome"
+  ],
+  [
+   "readState",
+   "readback"
+  ],
+  [
+   "release",
+   "outcome"
+  ],
+  [
+   "release",
+   "readback"
+  ],
+  [
+   "reserve",
+   "outcome"
+  ],
+  [
+   "reserve",
+   "readback"
+  ],
+  [
+   "restoreNewRestartPolicy",
+   "intent"
+  ],
+  [
+   "restoreNewRestartPolicy",
+   "outcome"
+  ],
+  [
+   "seal",
+   "intent"
+  ],
+  [
+   "seal",
+   "outcome"
+  ],
+  [
+   "setOldRestartNo",
+   "intent"
+  ],
+  [
+   "setOldRestartNo",
+   "outcome"
+  ],
+  [
+   "startNew",
+   "intent"
+  ],
+  [
+   "startNew",
+   "outcome"
+  ],
+  [
+   "stopOld",
+   "intent"
+  ],
+  [
+   "stopOld",
+   "outcome"
+  ],
+  [
+   "verifyBootstrap",
+   "outcome"
+  ],
+  [
+   "verifyBootstrap",
+   "readback"
+  ]
+ ],
+ "effectBothNullAccepted": {
+  "publishInventory:intent:bothNull": true,
+  "publishInventory:outcome:bothNull": true
+ },
+ "NI1": {
+  "tested": 552,
+  "violations": [],
+  "acceptedCombos": null,
+  "acceptedWithSealedHistory": [
+   [
+    "MIGRATION",
+    "SEALED",
+    "HELD"
+   ],
+   [
+    "MIGRATION",
+    "BLOCKED_FORWARD_ONLY",
+    "HELD"
+   ],
+   [
+    "MIGRATION",
+    "BLOCKED_FORWARD_ONLY",
+    "UNKNOWN"
+   ],
+   [
+    "MIGRATION",
+    "QUIESCENCE_UNKNOWN",
+    "HELD"
+   ],
+   [
+    "MIGRATION",
+    "QUIESCENCE_UNKNOWN",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "SEALED",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_RESTORE_INTENT",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_POLICY_RESTORED",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_POLICY_RESTORED",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "BLOCKED_FORWARD_ONLY",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "BLOCKED_FORWARD_ONLY",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "QUIESCENCE_UNKNOWN",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "QUIESCENCE_UNKNOWN",
+    "UNKNOWN"
+   ]
+  ]
+ },
+ "NI2": {
+  "failure outcome=unknown": true,
+  "failure outcome=known-failure": true,
+  "failure outcome=not-attempted": true,
+  "failure outcome=known-success": false,
+  "failure outcome=success": false,
+  "failure outcome=UNKNOWN": false,
+  "failure phase=NEW_STARTED_UNVERIFIED": false,
+  "failure phase=BOOTSTRAP_VERIFIED_RESTART_NO": false,
+  "failure phase=SEALED": false,
+  "failure phase=READY_FOR_NEW_RENEWAL_PLAN": false,
+  "failure receipt null": true,
+  "outcome record with unknown receipt": false,
+  "failureFixtureRecipe": []
+ },
+ "NI3": {
+  "tested": 156,
+  "accepted": []
+ },
+ "ownerInfoNegativesRejected": "20/20",
+ "extras": {
+  "embeddedExcludingFailureFixture": 87,
+  "signerChecks": {
+   "node-floor-v2": 5,
+   "independent-code-review": 7
+  },
+  "api inspectAndValidate expectedPriorProjection": null,
+  "api reserve expectedPriorProjection": null,
+  "api setOldRestartNo oldContainerId == plan old": true,
+  "api setOldRestartNo expectedPriorProjection": null,
+  "api stopOld oldContainerId == plan old": true,
+  "api stopOld expectedPriorProjection": null,
+  "api captureFenced oldContainerId == plan old": true,
+  "api captureFenced expectedPriorProjection": null,
+  "api preserveOld oldContainerId == plan old": true,
+  "api preserveOld expectedPriorProjection": null,
+  "api createNew expectedPriorProjection": null,
+  "api startNew newContainerId == inventory current": true,
+  "api startNew expectedPriorProjection": null,
+  "api verifyBootstrap newContainerId == inventory current": true,
+  "api verifyBootstrap expectedPriorProjection": null,
+  "api publishInventory expectedPriorProjection": null,
+  "api seal expectedPriorProjection": null,
+  "api restoreNewRestartPolicy newContainerId == inventory current": true,
+  "api restoreNewRestartPolicy expectedPriorProjection": null,
+  "api readState expectedPriorProjection": null,
+  "api release expectedPriorProjection": null,
+  "PC2 argv tenant/epoch == plan scope": true,
+  "PC4 argv tenant/epoch == plan scope": true,
+  "v2EnvelopesFoundInV3Positives": {},
+  "v2PlaceholderB84B1B": [],
+  "inventoryLeaseRefKnown": false,
+  "inventoryLeaseRefEqualsV2Inventory": true,
+  "effect outcome with receipt=null schema": false,
+  "publishInventory:intent top=PC2 effect=PC2": false,
+  "publishInventory:intent top=PC4 effect=PC4": false,
+  "publishInventory:intent top=None effect=PC2": true,
+  "publishInventory:outcome top=PC2 effect=PC2": false,
+  "publishInventory:outcome top=PC4 effect=PC4": false,
+  "publishInventory:outcome top=None effect=PC2": true,
+  "legalPriorsTotal/rejected": [
+   123,
+   0
+  ],
+  "offTablePriorAccepted": 0,
+  "NI1acceptedCount": 15,
+  "NI1RestoreAccepted": [
+   [
+    "RESTART_RESTORE",
+    "SEALED",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_RESTORE_INTENT",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_POLICY_RESTORED",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "RESTART_POLICY_RESTORED",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "BLOCKED_FORWARD_ONLY",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "BLOCKED_FORWARD_ONLY",
+    "UNKNOWN"
+   ],
+   [
+    "RESTART_RESTORE",
+    "QUIESCENCE_UNKNOWN",
+    "HELD"
+   ],
+   [
+    "RESTART_RESTORE",
+    "QUIESCENCE_UNKNOWN",
+    "UNKNOWN"
+   ]
+  ],
+  "NI1MigrationAcceptedLease": [
+   "HELD",
+   "UNKNOWN"
+  ],
+  "NI1NoneKindAccepted": 0
+ }
+}
