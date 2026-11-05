@@ -1,0 +1,68 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_7e9c7ba49eab / ctx_a22db97db992",
+  "reviewer": "Claude",
+  "author": "Codex (task_a8fd2969f0b3 / ctx_6f0f8253b8a7)",
+  "observedWindowKST": ["2026-11-06T00:20:16+09:00", "2026-11-06T00:26:51+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and at the last CI status check before writing; publication times are separate",
+  "reviewKind": "bounded independent review of a TEST-ONLY isolation delta for CI-B1; source fix verdict separate from future CI pass; 4a code verdict and whole candidate verdict not changed",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+    "commit": "46b4573f2b333dfbb3d37f695c19df9ae805a364",
+    "parent": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+    "delta": {"files": 34, "insertions": 16413, "deletions": 13, "nonDocsFiles": ["tests/test_lan_leaf_rotation_standalone_runtime.py"], "testFileChange": "+36/-13 (49 lines)"},
+    "readFrom": "Git objects in a private detached scratch worktree; author checkout untouched; every red-control edit restored and verified clean (0 porcelain entries)",
+    "priorClaudeReview": "8baaa6b5 (4a NOT ACCEPTED; CI-B1, C2-V1, T1, T2, T3)"
+  },
+  "scopeIdentity": {
+    "nonDocs4aTo46b": ["services/node-agent/transport/peer_floor_canonical_test.go", "tests/fixtures/fleet5-floor-v2-canonical-vectors.json", "tests/test_fleet5_floor_v2_canonical.py", "tests/test_lan_leaf_rotation_standalone_runtime.py"],
+    "treesIdenticalTo4a": ["deploy", "tools", ".github", "contracts", "tests/proofs", "src", "migrations"],
+    "servicesDiff4aTo46b": "only peer_floor_canonical_test.go (+32, from 50000697)",
+    "fileSHA256Prefix4aEquals46b": {"deploy/lan/worker_config.py": "909d1c25deb61c5c", "deploy/lan/worker_plain_rotation.py": "bf3754a27f748b1d", "deploy/lan/worker_peer_floor.py": "c73c81adaedb2a7b", "deploy/lan/peer_policy_phase.py": "8aac0c65fb2a242b", "deploy/lan/worker_leaf_rotation.py": "4e29685241a3e625", "deploy/lan/leaf_rotation_standalone_runtime.py": "76be408878d11050", "tests/proofs/run_fleet5_peer_phase_fixed_probe.py": "d0c0e64657b4d9d9", ".github/workflows/backend.yml": "2e511a6aedd2eff4", ".github/workflows/core.yml": "466532d8819ae7ec", "tests/peer_phase_unit_fixtures.py": "bcd392be87db2688"},
+    "workerModulePinsMatch": "the five worker module digests equal the WORKER_MODULES pins in the unchanged launcher",
+    "runtimeChanged": false
+  },
+  "diffReading": "test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode is parametrized worker_fails x helper_entry_state(original, absent, blocked-import) = 6 cases; it saves the three dependencies plus the five helper module stems from runtime.WORKER_MODULES with a missing sentinel distinct from None, and restores sys.path, sys.argv and every saved entry in finally on success and failure; it asserts identity, path and argv after finally; success keeps first==second==third and counter 2; failure asserts the runtime install stays equal and counter 1; no-bytecode and dont_write_bytecode assertions are kept; no assertion, freshness bound or skip was weakened; the production runner still evicts helper modules by design",
+  "ownProbes": {
+    "interpreter": "main .venv Python 3.14.7 -B; Windows host",
+    "ordered": {
+      "O1 test_lan_leaf_rotation -> standalone -> residue": "78 passed, 10 skipped (4a same order: 5 failed)",
+      "O2 standalone -> test_lan_leaf_rotation -> residue": "78 passed, 10 skipped",
+      "O3 test_fleet5_* + test_lan_* + residue": "282 passed, 23 skipped (4a: 5 failed, 272 passed, 23 skipped)",
+      "O4 standalone only": "37 passed, 6 skipped"
+    },
+    "redControls": {
+      "R1 exact 50000697 standalone test restored, O1 order": "5 failed, 68 passed (the original five return; fix is causal)",
+      "R2 saved/asserted set reduced to dependencies only": "self-test 37 passed (not detected); O1 order 5 failed",
+      "R2b finally skips helper restoration, saved set unchanged": "self-test 2 failed (blocked-import cases); O1 order 8 failed",
+      "R3 argv restoration removed": "6 failed (all six cases)",
+      "R4 blocked-import None treated as absent": "2 failed"
+    },
+    "pinnedRuntimeModuleLeak": "after the standalone file, sys.modules holds no module loaded from a pytest temp directory: []",
+    "workspaceCleanAfter": true
+  },
+  "ci": {
+    "backend46b_42053207929": "in_progress at 2026-11-06T00:26:51+09:00 (mlflow-live success; 3.12 and 3.14 running); not claimed",
+    "docs46b_42053214575": "completed success (listed via API; logs not inspected)",
+    "core4a_42047390811": "completed FAILURE: core job pytest step: 5 failed, 9075 passed, 46 skipped; same five residue/predecessor tests 'stale or clock-uncertain' (s01-storage-roundtrip success); original failure preserved",
+    "backend4a_42047403498": "completed FAILURE (3.12 and 3.14: same five; preserved)",
+    "duplicateCoreOrBackendScheduledByClaude": false
+  },
+  "findings": [
+    {"id": "I-46-1", "severity": "Info", "summary": "the self-test's identity assertion iterates the same saved set that it restores, so a change that drops helper stems from that set (R2) passes the file alone and is caught only by cross-file order; an explicit expected five-stem set would make the guard self-contained; not required for CI-B1 closure"}
+  ],
+  "verdicts": {
+    "ciB1SourceFix46b": "ACCEPT test-only source fix: the cause found in 8baaa6b5 is fixed by restoring all five helper identities, dependencies, path and argv in finally on both outcomes; causal by red control R1; no runtime, workflow, proof or freshness change",
+    "ciB1FutureCI": "not claimed; Backend 42053207929 in progress; no Core at 46b dispatched by Claude",
+    "code4a": "unchanged: NOT ACCEPTED (T1 mutants, T2, T3 open; Core and Backend 4a RED preserved)",
+    "wholeCandidate": "NOT ACCEPTED: needs the T1-T3 delta, Go canonical at 50000697 or successor, and full CI",
+    "runtimePhysical": "unaccepted; after-stop/no-copy and restarted remain guarded BLOCK; SF1 default pinned-launcher path remains distinct from the patched-verifier tests"
+  },
+  "laterTPatch": "no new T1-T3 SHA was published to the branch during this task (latest observed 46b4573f); nothing folded in",
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "scratchMutationsRestored": true},
+  "nextFirstAction": [
+    {"owner": "root", "action": "take Backend 42053207929 terminal result for 46b; keep 4a and whole candidate NOT ACCEPTED"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "publish the T1-T3 negatives and mutation kills as an exact SHA"},
+    {"owner": "Claude", "action": "review the corrected full delta when Root assigns it"}
+  ]
+}
