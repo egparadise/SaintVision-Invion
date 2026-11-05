@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "saintvision-settled-pinned-launcher-fixture:1",
+  "fixtureOnly": true,
+  "actualGoAcceptanceAssessed": false,
+  "defaultVerifierCallbackBypassed": false,
+  "actualPinnedRuntimeCryptoAssessed": true,
+  "privateFixtureKeysUploaded": false,
+  "recordedAtUTC": "2026-11-05T15:51:38.341688+00:00",
+  "installerSourceSHA256": {
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+    "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+    "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+    "worker_peer_floor.py": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+    "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+    "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+  },
+  "cases": [
+    {
+      "name": "valid",
+      "expectedRejected": false,
+      "exitCode": 0,
+      "stateUnchanged": true,
+      "expectedFailureReason": null,
+      "failureReasonMatched": true,
+      "stdoutSHA256": "661b04379313930fa18c25ce16f394e72340c5bf399cb611bd60d68428e8e9fc",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "missing-launcher",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "reviewed pinned five-module verifier is required",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "7f8fccef33f8f90b82afd20358a9a399632c5c8f67583827e48eabdbf97a545e"
+    },
+    {
+      "name": "missing-entry",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "reviewed pinned five-module verifier is required",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "7f8fccef33f8f90b82afd20358a9a399632c5c8f67583827e48eabdbf97a545e"
+    },
+    {
+      "name": "entry-hash",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Standalone leaf-rotation runtime rejected (ValueError)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "26b07ff7c98c0ec9ffa432a5c9fc95a52cc30cd450c95c376e29813e5821ab68"
+    },
+    {
+      "name": "missing-runtime",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Standalone leaf-rotation runtime rejected (FileNotFoundError)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "d9d4980290caaca46dca2db62d1db09edc417d4e0346363afc8c4a16e2bf4128"
+    },
+    {
+      "name": "runtime-module-hash",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Standalone leaf-rotation runtime rejected (ValueError)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "26b07ff7c98c0ec9ffa432a5c9fc95a52cc30cd450c95c376e29813e5821ab68"
+    },
+    {
+      "name": "crypto-package-hash",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Standalone leaf-rotation runtime rejected (ValueError)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "26b07ff7c98c0ec9ffa432a5c9fc95a52cc30cd450c95c376e29813e5821ab68"
+    },
+    {
+      "name": "node-signature",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Node leaf rotation rejected (InvalidSignature)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "c19c25271a84e65fefce768d029dae00d3fe086fad19e6fba3c9156bb9495f61"
+    },
+    {
+      "name": "runtime-receipt",
+      "expectedRejected": true,
+      "exitCode": 1,
+      "stateUnchanged": true,
+      "expectedFailureReason": "Standalone leaf-rotation runtime rejected (ValueError)",
+      "failureReasonMatched": true,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "26b07ff7c98c0ec9ffa432a5c9fc95a52cc30cd450c95c376e29813e5821ab68"
+    },
+    {
+      "name": "valid-after-negatives",
+      "expectedRejected": false,
+      "exitCode": 0,
+      "stateUnchanged": true,
+      "expectedFailureReason": null,
+      "failureReasonMatched": true,
+      "stdoutSHA256": "661b04379313930fa18c25ce16f394e72340c5bf399cb611bd60d68428e8e9fc",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceUnchanged": true,
+  "fixtureStateUnchanged": true,
+  "proofValid": true
+}

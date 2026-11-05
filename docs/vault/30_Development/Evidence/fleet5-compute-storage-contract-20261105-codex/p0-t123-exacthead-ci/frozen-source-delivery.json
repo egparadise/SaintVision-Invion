@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "fleet5-p0-frozen-source-delivery:1",
+  "recordedAtKST": "2026-11-06T01:33:15+09:00",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude task_e1a7c90d207a / ctx_0aba9fd1087f",
+  "runtimeSourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "acceptedSourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "reportCommit": "This receipt is documentation/evidence only; its containing Git commit is reported separately to root",
+  "independentReviewSHA": "2736aec1303ca6b6ed80bdc4aa6b9c23c3693985",
+  "independentVerdict": "ACCEPT at bounded P0 source level; T1/T2/T3/C2-V1 closed",
+  "observedGo": {
+    "output": "go version go1.27.1 linux/amd64",
+    "observedAtUTC": "2026-11-05T15:49:43.2135216Z",
+    "source": "core-completed-job.log",
+    "sourceSHA256": "bfe8a6f1e8cde72741e07669c14e8a261d799c0b2033fe677f191c18902598ff",
+    "configuredOnly": false
+  },
+  "requiredCI": [
+    {
+      "runId": 42058859797,
+      "workflow": "core",
+      "sourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127354634788,
+          "name": "s01-storage-roundtrip",
+          "conclusion": "success"
+        },
+        {
+          "id": 127354635414,
+          "name": "core",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "runId": 42058865926,
+      "workflow": "backend",
+      "sourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127354655149,
+          "name": "backend (3.14)",
+          "conclusion": "success"
+        },
+        {
+          "id": 127354655585,
+          "name": "mlflow-live",
+          "conclusion": "success"
+        },
+        {
+          "id": 127354655684,
+          "name": "backend (3.12)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "runId": 42058871808,
+      "workflow": "docs",
+      "sourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127354676431,
+          "name": "docs",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "testCounts": {
+    "core": {
+      "passed": 9109,
+      "skipped": 46,
+      "deselected": 2
+    },
+    "backendPython312": {
+      "passed": 8751,
+      "skipped": 75,
+      "deselected": 2
+    },
+    "backendPython314": {
+      "passed": 8751,
+      "skipped": 75,
+      "deselected": 2
+    },
+    "provisionedInstaller": {
+      "executed": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "nativeGo": {
+    "completedCycles": 2,
+    "peerFloors": [
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "controlChannels": [
+      8,
+      9
+    ],
+    "actualUnicodeVectors": 7,
+    "allGoGuardFlags": true
+  },
+  "defaultPinnedRuntime": {
+    "casesPerPython": 10,
+    "actualCrypto": true,
+    "syntheticNodeGo": true,
+    "callbackBypass": false,
+    "fiveSpecifiedMutantsKilled": true
+  },
+  "nonblockingTestStrengthFollowups": [
+    "L-T3-1: valid oversized token",
+    "L-T3-2: duplicate inside otherwise exact valid token"
+  ],
+  "rootReverificationAndComponentInclusion": "Root msg_2170d0e42ec4 independently verified all exact4f required CI and selected bounded source for candidate inclusion; combined ci2/freeze/archive/all8/review still pending; no landing or NodeOps",
+  "fullEightAcceptance": false,
+  "physicalAcceptance": false,
+  "allRealBindings": "NULL/HOLD",
+  "fullCompoundB": "OPEN; default R4 guards unchanged",
+  "bootstrapAndNodeOps": "HOLD",
+  "beforeCopyAndRestartedRecovery": "guarded BLOCK; no broader recovery claim",
+  "obsidianApply": false,
+  "syncScope": "--check only; final publication gate receipt records exact result",
+  "artifacts": [
+    {
+      "path": "core-original.zip",
+      "sha256": "06fb3dd8066ed624c1bc404d750d42a9cd4102e36094c8ce0acf17bdff92a836"
+    },
+    {
+      "path": "native-original.zip",
+      "sha256": "b1d100279ff98d0d4fb8f2948c0d303ca09f95684eaab27562b6dd0c0dc09b1c"
+    },
+    {
+      "path": "pinned312-original.zip",
+      "sha256": "c77ae65caeae757725afc3a2bc4846d7794551227d1bb3ff22c5f6df02d913d2"
+    },
+    {
+      "path": "pinned314-original.zip",
+      "sha256": "4aafbc3995e7f1606318ddd902d1000d97efe8e3295ffae9e3c24f3cdb746f39"
+    },
+    {
+      "path": "s01-original.zip",
+      "sha256": "30229271e484940c8792ae0990cf8ae5791c553fcf3c74975b2c1d1665802938"
+    }
+  ],
+  "updatedAtKST": "2026-11-06T01:37:19+09:00",
+  "rootSelectionMessage": "msg_2170d0e42ec4"
+}

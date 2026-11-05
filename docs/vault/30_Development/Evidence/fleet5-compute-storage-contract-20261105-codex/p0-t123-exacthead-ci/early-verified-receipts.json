@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "fleet5-t123-early-ci-receipts:1",
+  "recordedAtKST": "2026-11-06T00:54:26.611164+09:00",
+  "taskId": "task_a8fd2969f0b3",
+  "owner": "Codex",
+  "reviewer": "Actual independent delta review pending via root",
+  "sourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "coreRunId": 42058859797,
+  "backendRunId": 42058865926,
+  "docsRunId": 42058871808,
+  "artifacts": [
+    {
+      "artifactId": 13429894778,
+      "label": "native",
+      "zipSHA256": "b1d100279ff98d0d4fb8f2948c0d303ca09f95684eaab27562b6dd0c0dc09b1c",
+      "githubDigestVerified": true,
+      "members": [
+        "canonical-go-results.json",
+        "go-guard-events.jsonl",
+        "native-fixed-result.json",
+        "native-server.log"
+      ]
+    },
+    {
+      "artifactId": 13431055483,
+      "label": "pinned314",
+      "zipSHA256": "4aafbc3995e7f1606318ddd902d1000d97efe8e3295ffae9e3c24f3cdb746f39",
+      "githubDigestVerified": true,
+      "members": [
+        "leaf-runtime-settled-pinned.json",
+        "leaf-runtime-lifecycle.json"
+      ]
+    },
+    {
+      "artifactId": 13429399588,
+      "label": "pinned312",
+      "zipSHA256": "c77ae65caeae757725afc3a2bc4846d7794551227d1bb3ff22c5f6df02d913d2",
+      "githubDigestVerified": true,
+      "members": [
+        "leaf-runtime-settled-pinned.json",
+        "leaf-runtime-lifecycle.json",
+        "fleet5-t123-mutations/baseline.log",
+        "fleet5-t123-mutations/exec-field-optional.log",
+        "fleet5-t123-mutations/guard-no-post-recheck.log",
+        "fleet5-t123-mutations/mutation-result.json",
+        "fleet5-t123-mutations/rs1-allow-current-in-final.log",
+        "fleet5-t123-mutations/rs1-no-post-ack-match.log",
+        "fleet5-t123-mutations/rs1-skip-stopped-reread.log"
+      ]
+    }
+  ],
+  "actualNativeCompletedCycles": 2,
+  "actualGoCanonicalSignaturesVerified": 7,
+  "actualInstalledDefaultPinnedCryptoCasesPerMatrix": 10,
+  "linuxGuardMutantsKilled": 5,
+  "wholeCoreBackend": "pending full suites",
+  "independentCodeAcceptance": false,
+  "physicalAcceptance": false
+}

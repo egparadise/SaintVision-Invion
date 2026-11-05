@@ -1,0 +1,3 @@
+# Preserve original captured proof, job log and archive bytes.
+*.log binary
+*.zip binary

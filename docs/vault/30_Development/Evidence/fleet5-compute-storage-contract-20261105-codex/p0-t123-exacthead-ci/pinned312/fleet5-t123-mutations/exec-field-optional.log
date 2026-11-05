@@ -1,0 +1,28 @@
+.........FFFF                                                            [100%]
+=================================== FAILURES ===================================
+_ test_signed_malformed_executable_digest_is_rejected_independently[gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg] _
+tests/test_fleet5_reentry_guard_negatives.py:100: in test_signed_malformed_executable_digest_is_rejected_independently
+    with pytest.raises(ValueError,match='digest differs'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_ test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/test_fleet5_reentry_guard_negatives.py:100: in test_signed_malformed_executable_digest_is_rejected_independently
+    with pytest.raises(ValueError,match='digest differs'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_ test_signed_malformed_executable_digest_is_rejected_independently[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] _
+tests/test_fleet5_reentry_guard_negatives.py:100: in test_signed_malformed_executable_digest_is_rejected_independently
+    with pytest.raises(ValueError,match='digest differs'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_ test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/test_fleet5_reentry_guard_negatives.py:100: in test_signed_malformed_executable_digest_is_rejected_independently
+    with pytest.raises(ValueError,match='digest differs'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_signed_malformed_executable_digest_is_rejected_independently[gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg] - Failed: DID NOT RAISE ValueError
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] - Failed: DID NOT RAISE ValueError
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_signed_malformed_executable_digest_is_rejected_independently[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] - Failed: DID NOT RAISE ValueError
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_signed_malformed_executable_digest_is_rejected_independently[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] - Failed: DID NOT RAISE ValueError
+4 failed, 9 passed in 0.77s

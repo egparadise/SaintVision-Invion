@@ -1,0 +1,70 @@
+{
+  "scope": "isolated-linux-docker-fixture",
+  "actualGoObserver": true,
+  "actualDockerOwnership": true,
+  "before": {
+    "certificateDER_SHA256": "27a84ef9036c00336f4cf827b4000201fda8381bf477ddff7ac4c84b2c67045e",
+    "floorSHA256": "827a43329960af2e1a88e467ecc707de5e471ca38ed3be5d0a988bbb9ae802c3",
+    "journalIdentitySHA256": "7e8593af9c83f3a4c412b927f2a5fa749ef27bd641c66a0d7536af781a00648b",
+    "journalUID": 0,
+    "nodeId": "nod_01M6P6SEJYHP2JCRTKEG3CPS9J",
+    "nodeSignature": "e2aa293125fcb7e5bef55087751140781d37a43b56e822485b5519f38c4340d13174c48a7fb3837fa10ff5d22d4999b0d345efc4730971a7ad90b3b616221704",
+    "nonce": "e46c4ef9fd70461ea67dddd3079c9bcaff26c19f0e9146968c9b43ea5e78d33a",
+    "observedAt": 1793894175,
+    "peerPolicySHA256": "e734fa9738386a3600b1a78ed4c88a60c845f2c02363ef8f1d21821e19d6834f",
+    "peerPolicyVersion": 1,
+    "plainServingProcess": true,
+    "recoveryEpoch": "8750a5ba-f7a1-46c5-b862-28884c7ac6ac",
+    "schemaVersion": "saintvision-node-peer-policy-floor:2",
+    "servingExecutableSHA256": "6b7a6127d26f4209f6e0e55da7bc35d6f292c8567ca4d3fb5bcb09f7477847b7",
+    "servingPID": 1,
+    "servingProcessSHA256": "6d7d95781b831d1fc34cff7fbfb5c235174686f54726464fb78b025d65dbae63",
+    "tenantId": "aa55c71f-760d-410b-b51c-867d6c2d8adc"
+  },
+  "after": {
+    "certificateDER_SHA256": "27a84ef9036c00336f4cf827b4000201fda8381bf477ddff7ac4c84b2c67045e",
+    "floorSHA256": "827a43329960af2e1a88e467ecc707de5e471ca38ed3be5d0a988bbb9ae802c3",
+    "journalIdentitySHA256": "7e8593af9c83f3a4c412b927f2a5fa749ef27bd641c66a0d7536af781a00648b",
+    "journalUID": 0,
+    "nodeId": "nod_01M6P6SEJYHP2JCRTKEG3CPS9J",
+    "nodeSignature": "8d3168076f03793888be2fe88e4235e99777160a7bc61ec0f42cd75d4ef9a681c424d8b5b35cd9f54cf57e6e74562160fe4b801cc7407b2361229d4f1feb7e06",
+    "nonce": "07c0eb4638d1454688e0101a2489152a46738684ed7b4172acacd6117fa04849",
+    "observedAt": 1793894186,
+    "peerPolicySHA256": "e734fa9738386a3600b1a78ed4c88a60c845f2c02363ef8f1d21821e19d6834f",
+    "peerPolicyVersion": 1,
+    "plainServingProcess": true,
+    "recoveryEpoch": "8750a5ba-f7a1-46c5-b862-28884c7ac6ac",
+    "schemaVersion": "saintvision-node-peer-policy-floor:2",
+    "servingExecutableSHA256": "6b7a6127d26f4209f6e0e55da7bc35d6f292c8567ca4d3fb5bcb09f7477847b7",
+    "servingPID": 1,
+    "servingProcessSHA256": "bb026eeee1cac8c0e3a7519a63c7c766b1ce97898cb3851fbf7ba3aeeaa10f18",
+    "tenantId": "aa55c71f-760d-410b-b51c-867d6c2d8adc"
+  },
+  "beforeContext": {
+    "nodeId": "nod_01M6P6SEJYHP2JCRTKEG3CPS9J",
+    "containerId": "374b8a1bc3db7780555fbfef3e0389e03d99b7f26118062fbc6c94e0d8d2fc31",
+    "image": "sha256:cc8e1818c3311f4736059dfc4d57c99cc387cb8a9c6f6fd413e3904d9ecb695e",
+    "configSHA256": "d1bfd4edc382728aaebaf9a04f59bb81f224cca19a4be9428aa4cb76c8800ca8",
+    "hostConfigSHA256": "0b6e42eede6f66c5dba689f72635077a88d41798cfdec21ae8dc613a5523eee8",
+    "mountsSHA256": "7c5c1ff3554ec1dd3d07bf54c28fd019139e771a83e17b9664e3ca9f2844a525",
+    "volumeSHA256": "f3011661d6dce38e47d007dbde3962a217411c1652f00dd1d6b420c1edb45d70",
+    "consumers": [
+      "374b8a1bc3db7780555fbfef3e0389e03d99b7f26118062fbc6c94e0d8d2fc31"
+    ]
+  },
+  "afterContext": {
+    "nodeId": "nod_01M6P6SEJYHP2JCRTKEG3CPS9J",
+    "containerId": "36106b07de24875dc9e8809f0f5ee56aff9a0a007ddc66e458088f9c7d7f3004",
+    "image": "sha256:cc8e1818c3311f4736059dfc4d57c99cc387cb8a9c6f6fd413e3904d9ecb695e",
+    "configSHA256": "9a82d467c98781e4141ff43314ae4087738d327ff658b793b8c16fa0f8ae94bc",
+    "hostConfigSHA256": "55dd71daf470ee765672d2e2535d405ae2d3cd00b8d09de4eb55e9351660397a",
+    "mountsSHA256": "af27700ed4fdc929729a6f7c1625cbd446f6f3d9385d5d3d9ae1f170c95af549",
+    "volumeSHA256": "f3011661d6dce38e47d007dbde3962a217411c1652f00dd1d6b420c1edb45d70",
+    "consumers": [
+      "36106b07de24875dc9e8809f0f5ee56aff9a0a007ddc66e458088f9c7d7f3004",
+      "374b8a1bc3db7780555fbfef3e0389e03d99b7f26118062fbc6c94e0d8d2fc31"
+    ]
+  },
+  "storageCoexistenceAssessed": false,
+  "physicalAcceptanceAssessed": false
+}
