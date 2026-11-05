@@ -1,0 +1,395 @@
+package migrationverify
+
+// Reviewer-only probe (Claude). Copied into a private scratch worktree of the
+// reviewed commit, never committed into the product package. Every key here is an
+// in-memory ephemeral TEST key created by the owner fixture; nothing is persisted.
+import (
+	"bytes"
+	"crypto/ed25519"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"sort"
+	"strconv"
+	"testing"
+	"time"
+
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/transport"
+)
+
+type probeRow struct {
+	Case, Outcome, Detail string
+}
+
+func catch(fn func() error) (err error, panicked string) {
+	defer func() {
+		if r := recover(); r != nil {
+			panicked = fmt.Sprint(r)
+		}
+	}()
+	return fn(), ""
+}
+
+func record(rows *[]probeRow, name string, fn func() error) {
+	e, p := catch(fn)
+	switch {
+	case p != "":
+		*rows = append(*rows, probeRow{name, "PANIC", p})
+	case e != nil:
+		*rows = append(*rows, probeRow{name, "REJECT", e.Error()})
+	default:
+		*rows = append(*rows, probeRow{name, "ACCEPT", ""})
+	}
+}
+
+func cloneCtx(c TrustedContext) TrustedContext {
+	ops := map[string]OperationBinding{}
+	for k, o := range c.Operations {
+		ops[k] = o
+	}
+	ch := map[string]NativeChallenge{}
+	for k, o := range c.Challenges {
+		ch[k] = o
+	}
+	c.Operations, c.Challenges = ops, ch
+	c.SemanticInputs = copyJSON(c.SemanticInputs)
+	if c.Current != nil {
+		cur := *c.Current
+		cur.MemberProjectionSHA256 = append([]string(nil), cur.MemberProjectionSHA256...)
+		c.Current = &cur
+	}
+	return c
+}
+
+func TestZZReviewerSemanticProbe(t *testing.T) {
+	outPath := os.Getenv("K1REV_SEMANTIC_OUT")
+	if outPath == "" {
+		t.Skip("reviewer probe output not set")
+	}
+	rows := []probeRow{}
+	f := newCryptoFixture(t)
+	base, e := NewVerifier(f.installed, f.context)
+	if e != nil {
+		t.Fatal(e)
+	}
+	record(&rows, "baseline-verify", func() error { _, e := base.Verify(f.packet); return e })
+	record(&rows, "baseline-current-set", func() error { _, e := base.VerifyCurrentProjectionSet(f.packet, "cohort-36"); return e })
+
+	// A. Cross-producer native compatibility: rebuild the fixture's native receipt
+	// with the EXISTING producer's Go types, canonicalizer, domain and encoder.
+	p := parsedPacket(t, f.packet)
+	var nativeRaw []byte
+	var nativeSlot string
+	for _, l := range allLocations(t, base, p) {
+		if l.reference["contractId"] == "saintvision-proof-node-floor-v2:1" {
+			nativeRaw = f.packet.Referents[l.reference["artifactSHA256"].(string)]
+			break
+		}
+	}
+	record(&rows, "native-producer-types-transport-canonical-and-encoder", func() error {
+		value, e := ParseJSON(nativeRaw)
+		if e != nil {
+			return e
+		}
+		m := value.(map[string]any)
+		for _, mm := range base.trust.Members {
+			s := mm.Scope.(map[string]any)
+			if s["nodeId"] == m["nodeId"] {
+				nativeSlot = mm.Slot
+			}
+		}
+		num := func(k string) int64 { n, _ := m[k].(json.Number).Int64(); return n }
+		body := map[string]any{"schemaVersion": m["schemaVersion"], "tenantId": m["tenantId"], "nodeId": m["nodeId"], "recoveryEpoch": m["recoveryEpoch"], "nonce": m["nonce"],
+			"observedAt": num("observedAt"), "certificateDER_SHA256": m["certificateDER_SHA256"], "peerPolicyVersion": m["peerPolicyVersion"], "peerPolicySHA256": m["peerPolicySHA256"],
+			"floorSHA256": m["floorSHA256"], "journalIdentitySHA256": m["journalIdentitySHA256"], "journalUID": uint32(num("journalUID")), "servingPID": int(num("servingPID")),
+			"servingProcessSHA256": m["servingProcessSHA256"], "servingExecutableSHA256": m["servingExecutableSHA256"], "plainServingProcess": true}
+		if pv, ok := m["peerPolicyVersion"].(json.Number); ok {
+			n, _ := pv.Int64()
+			body["peerPolicyVersion"] = n
+		}
+		var key ed25519.PrivateKey
+		for _, mm := range base.trust.Members {
+			if mm.Slot == nativeSlot {
+				var spki string
+				for _, k := range f.keys {
+					pub := k.Public().(ed25519.PublicKey)
+					if c, e := publicSPKI(pub); e == nil {
+						for _, mm2 := range base.trust.Members {
+							if mm2.Slot == nativeSlot && bytes.Contains(mm2.CertificateDER, pub) {
+								spki, key = c, k
+							}
+						}
+					}
+				}
+				_ = spki
+			}
+		}
+		if key == nil {
+			return fmt.Errorf("no ephemeral node key for %s", nativeSlot)
+		}
+		raw, e := transport.CanonicalPeerFloorBody(body)
+		if e != nil {
+			return e
+		}
+		body["nodeSignature"] = hex.EncodeToString(ed25519.Sign(key, append([]byte(transport.PeerFloorDomain), raw...)))
+		var buf bytes.Buffer
+		if e = json.NewEncoder(&buf).Encode(body); e != nil {
+			return e
+		}
+		if !bytes.Equal(buf.Bytes(), nativeRaw) {
+			return fmt.Errorf("producer bytes differ from K1 fixture bytes (len %d vs %d)", buf.Len(), len(nativeRaw))
+		}
+		h, e := base.AuthenticateNativeHistory(buf.Bytes(), nativeSlot)
+		if e != nil {
+			return e
+		}
+		if h.Classification != "AUTHENTICATED_ORIGINAL_NATIVE_HISTORY_NOT_FRESH_PROOF" {
+			return fmt.Errorf("classification %s", h.Classification)
+		}
+		return nil
+	})
+
+	// B. Lease records and current-set lease binding.
+	leases := []string{}
+	for id, kind := range base.trust.NodeKinds {
+		if kind == "operation-lease" {
+			b := p[id].(map[string]any)["body"].(map[string]any)
+			leases = append(leases, fmt.Sprintf("%s mode=%v op=%v epoch=%v", id, b["mode"], b["operationId"], b["fenceEpoch"]))
+		}
+	}
+	sort.Strings(leases)
+	rows = append(rows, probeRow{"lease-records", "INFO", fmt.Sprint(leases)})
+	record(&rows, "current-set-for-released-epoch1-set-cohort-34", func() error { _, e := base.VerifyCurrentProjectionSet(f.packet, "cohort-34"); return e })
+	record(&rows, "current-lease-hash-differs-from-trusted-operation-lease", func() error {
+		ctx := cloneCtx(f.context)
+		o := ctx.Operations[ctx.Current.OperationID]
+		for k, x := range ctx.Operations {
+			if k != ctx.Current.OperationID {
+				o.LeaseEnvelopeSHA256 = x.LeaseEnvelopeSHA256
+			}
+		}
+		ctx.Operations[ctx.Current.OperationID] = o
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.VerifyCurrentProjectionSet(f.packet, "cohort-36")
+		return e
+	})
+
+	// C. Malformed TRUSTED inputs must fail closed, never panic.
+	record(&rows, "trusted-plan-expiresAt-wrong-type", func() error {
+		ctx := cloneCtx(f.context)
+		ctx.SemanticInputs.(map[string]any)["plan"].(map[string]any)["expiresAt"] = json.Number("1")
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(f.packet)
+		return e
+	})
+	record(&rows, "trusted-plan-missing-timing", func() error {
+		ctx := cloneCtx(f.context)
+		delete(ctx.SemanticInputs.(map[string]any)["plan"].(map[string]any), "timing")
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(f.packet)
+		return e
+	})
+	record(&rows, "trusted-semantic-inputs-nil", func() error {
+		ctx := cloneCtx(f.context)
+		ctx.SemanticInputs = nil
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(f.packet)
+		return e
+	})
+	record(&rows, "zero-verifier-Verify", func() error { _, e := (&Verifier{}).Verify(f.packet); return e })
+	record(&rows, "nil-verifier-Verify", func() error { var v *Verifier; _, e := v.Verify(f.packet); return e })
+	record(&rows, "zero-verifier-CurrentSet", func() error { _, e := (&Verifier{}).VerifyCurrentProjectionSet(f.packet, "cohort-36"); return e })
+	record(&rows, "nil-verifier-NativeHistory", func() error { var v *Verifier; _, e := v.AuthenticateNativeHistory(nativeRaw, nativeSlot); return e })
+	record(&rows, "zero-NewVerifier", func() error { _, e := NewVerifier(InstalledTrust{}, TrustedContext{}); return e })
+	record(&rows, "now-non-UTC-location", func() error {
+		ctx := cloneCtx(f.context)
+		ctx.Now = ctx.Now.In(time.FixedZone("KST", 9*3600))
+		_, e := NewVerifier(f.installed, ctx)
+		return e
+	})
+	record(&rows, "registry-all-zero", func() error {
+		in := f.installed
+		in.RegistrySHA256 = fmt.Sprintf("%064d", 0)
+		_, e := NewVerifier(in, f.context)
+		return e
+	})
+	record(&rows, "no-grants", func() error {
+		in := f.installed
+		in.Grants = nil
+		_, e := NewVerifier(in, f.context)
+		return e
+	})
+	record(&rows, "empty-packet", func() error { _, e := base.Verify(Packet{}); return e })
+
+	// D. Native receipt observed BEFORE the trusted challenge was issued.
+	record(&rows, "native-observed-before-challenge-issued", func() error {
+		ctx := cloneCtx(f.context)
+		ctx.Now = ctx.Now.Add(10 * time.Second)
+		for k, c := range ctx.Challenges {
+			c.IssuedAt = f.context.Now.Add(5 * time.Second)
+			ctx.Challenges[k] = c
+		}
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(f.packet)
+		return e
+	})
+	record(&rows, "control-now-plus-10s-unchanged-challenge", func() error {
+		ctx := cloneCtx(f.context)
+		ctx.Now = ctx.Now.Add(10 * time.Second)
+		v, e := NewVerifier(f.installed, ctx)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(f.packet)
+		return e
+	})
+
+	// E. Report output must not alias verifier state.
+	record(&rows, "report-digest-map-not-aliased", func() error {
+		r1, e := base.Verify(f.packet)
+		if e != nil {
+			return e
+		}
+		want := r1.Digests["cohort-36"]
+		r1.Digests["cohort-36"] = "tampered"
+		r2, e := base.Verify(f.packet)
+		if e != nil {
+			return e
+		}
+		if r2.Digests["cohort-36"] != want {
+			return fmt.Errorf("aliased")
+		}
+		return nil
+	})
+
+	// F. Rejection REASON for full-rebind wrong-scoped-key attacks (owner test only asserts e!=nil).
+	for _, target := range []string{"node-floor-v2", "build-provenance", "inventory-head-readback", "independent-code-review"} {
+		target := target
+		record(&rows, "wrong-key-full-rebind-reason-"+target, func() error {
+			changed := 0
+			g := newCryptoFixtureMutated(t, func(loc proofLocation, c *proofContract, raw []byte, ref map[string]any, keys map[string]ed25519.PrivateKey, grants []KeyGrant) []byte {
+				if c.kind != target || changed > 0 {
+					return raw
+				}
+				changed++
+				var wrong string
+				for _, gr := range grants {
+					pub, _ := exactHex(gr.PublicKeyHex, 32)
+					spki, _ := publicSPKI(pub)
+					if gr.Role == c.role && spki != ref["signerKeySPKISHA256"] {
+						wrong = spki
+						break
+					}
+				}
+				if wrong == "" {
+					hs := []string{}
+					for h := range keys {
+						hs = append(hs, h)
+					}
+					sort.Strings(hs)
+					for _, h := range hs {
+						if h != ref["signerKeySPKISHA256"] {
+							wrong = h
+							break
+						}
+					}
+				}
+				value, _ := ParseJSON(raw)
+				m := value.(map[string]any)
+				if c.codec == "native-m2-v2" {
+					delete(m, "nodeSignature")
+					b, _ := CanonicalJSON(m)
+					m["nodeSignature"] = hex.EncodeToString(ed25519.Sign(keys[wrong], append([]byte(c.domain+"\x00"), b...)))
+				} else {
+					body := m["body"].(map[string]any)
+					signer := m["signer"].(map[string]any)
+					signer["keySPKISHA256"] = wrong
+					msg, _ := normalizedMessage(c.domain, body, signer)
+					signer["signatureHex"] = hex.EncodeToString(ed25519.Sign(keys[wrong], msg))
+				}
+				ref["signerKeySPKISHA256"] = wrong
+				b, _ := CanonicalJSON(m)
+				return b
+			})
+			if changed == 0 {
+				return fmt.Errorf("attack did not reach target")
+			}
+			v, e := NewVerifier(g.installed, g.context)
+			if e != nil {
+				return e
+			}
+			_, e = v.Verify(g.packet)
+			return e
+		})
+	}
+
+	// G. Same-role key of the OTHER Node (PC2<->PC4) on a Node-scoped normalized proof.
+	record(&rows, "other-node-same-role-key-on-node-scoped-normalized", func() error {
+		changed := ""
+		g := newCryptoFixtureMutated(t, func(loc proofLocation, c *proofContract, raw []byte, ref map[string]any, keys map[string]ed25519.PrivateKey, grants []KeyGrant) []byte {
+			if changed != "" || c.codec != "normalized-proof-v1" {
+				return raw
+			}
+			sub, _ := ref["typedSubject"].(map[string]any)
+			scope, ok := sub["scope"]
+			if !ok {
+				return raw
+			}
+			for _, gr := range grants {
+				a, _ := gr.AuthorityScope.(map[string]any)
+				pub, _ := exactHex(gr.PublicKeyHex, 32)
+				spki, _ := publicSPKI(pub)
+				if gr.Role == c.role && a["class"] == "NODE" && !equal(a["scope"], scope) {
+					value, _ := ParseJSON(raw)
+					m := value.(map[string]any)
+					body := m["body"].(map[string]any)
+					signer := m["signer"].(map[string]any)
+					signer["keySPKISHA256"] = spki
+					msg, _ := normalizedMessage(c.domain, body, signer)
+					signer["signatureHex"] = hex.EncodeToString(ed25519.Sign(keys[spki], msg))
+					ref["signerKeySPKISHA256"] = spki
+					changed = c.kind + " at " + loc.node + loc.path
+					b, _ := CanonicalJSON(m)
+					return b
+				}
+			}
+			return raw
+		})
+		if changed == "" {
+			return fmt.Errorf("no node-scoped normalized target")
+		}
+		v, e := NewVerifier(g.installed, g.context)
+		if e != nil {
+			return e
+		}
+		_, e = v.Verify(g.packet)
+		if e != nil {
+			return fmt.Errorf("[%s] %w", changed, e)
+		}
+		return nil
+	})
+
+	b, _ := json.MarshalIndent(rows, "", " ")
+	if e = os.WriteFile(outPath, b, 0o600); e != nil {
+		t.Fatal(e)
+	}
+	for _, r := range rows {
+		t.Log(r.Case + " => " + r.Outcome + " " + strconv.Quote(r.Detail))
+	}
+}

@@ -1,0 +1,40 @@
+package migrationverify
+
+// Reviewer-only probe (Claude), scratch worktree only: how does Verify of the whole
+// authenticated history depend on the trusted clock, given that the fixture signs every
+// fresh proof of BOTH operations at one instant?
+import (
+	"encoding/json"
+	"os"
+	"testing"
+	"time"
+)
+
+func TestZZReviewerTimeProbe(t *testing.T) {
+	outPath := os.Getenv("K1REV_TIME_OUT")
+	if outPath == "" {
+		t.Skip("reviewer probe output not set")
+	}
+	rows := []probeRow{}
+	f := newCryptoFixture(t)
+	rows = append(rows, probeRow{"fixture-now", "INFO", f.context.Now.Format(time.RFC3339)})
+	for _, op := range f.context.Operations {
+		rows = append(rows, probeRow{"trusted-operation " + op.OperationID, "INFO", op.AcquiredAt.Format(time.RFC3339) + " .. " + op.ExpiresAt.Format(time.RFC3339)})
+	}
+	for _, d := range []time.Duration{0, 59 * time.Second, 61 * time.Second, 121 * time.Second} {
+		ctx := cloneCtx(f.context)
+		ctx.Now = ctx.Now.Add(d)
+		record(&rows, "verify-history-at-now+"+d.String(), func() error {
+			v, e := NewVerifier(f.installed, ctx)
+			if e != nil {
+				return e
+			}
+			_, e = v.Verify(f.packet)
+			return e
+		})
+	}
+	b, _ := json.MarshalIndent(rows, "", " ")
+	if e := os.WriteFile(outPath, b, 0o600); e != nil {
+		t.Fatal(e)
+	}
+}

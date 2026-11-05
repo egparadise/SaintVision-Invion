@@ -1,0 +1,207 @@
+[
+ {
+  "Case": "set=cohort-01 op=fixture-operation-migration epoch=1 seq=1 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-02 op=fixture-operation-migration epoch=1 seq=2 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-03 op=fixture-operation-migration epoch=1 seq=3 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-04 op=fixture-operation-migration epoch=1 seq=4 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-05 op=fixture-operation-migration epoch=1 seq=5 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-06 op=fixture-operation-migration epoch=1 seq=6 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-07 op=fixture-operation-migration epoch=1 seq=7 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-08 op=fixture-operation-migration epoch=1 seq=8 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-09 op=fixture-operation-migration epoch=1 seq=9 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-10 op=fixture-operation-migration epoch=1 seq=10 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-11 op=fixture-operation-migration epoch=1 seq=11 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-12 op=fixture-operation-migration epoch=1 seq=12 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-13 op=fixture-operation-migration epoch=1 seq=13 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-14 op=fixture-operation-migration epoch=1 seq=14 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-15 op=fixture-operation-migration epoch=1 seq=15 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-16 op=fixture-operation-migration epoch=1 seq=16 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-17 op=fixture-operation-migration epoch=1 seq=17 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-18 op=fixture-operation-migration epoch=1 seq=18 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-19 op=fixture-operation-migration epoch=1 seq=19 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-20 op=fixture-operation-migration epoch=1 seq=20 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-21 op=fixture-operation-migration epoch=1 seq=21 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-22 op=fixture-operation-migration epoch=1 seq=22 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-23 op=fixture-operation-migration epoch=1 seq=23 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-24 op=fixture-operation-migration epoch=1 seq=24 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-25 op=fixture-operation-migration epoch=1 seq=25 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-26 op=fixture-operation-migration epoch=1 seq=26 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-27 op=fixture-operation-migration epoch=1 seq=27 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-28 op=fixture-operation-migration epoch=1 seq=28 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-29 op=fixture-operation-migration epoch=1 seq=29 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-30 op=fixture-operation-migration epoch=1 seq=30 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-31 op=fixture-operation-migration epoch=1 seq=31 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-32 op=fixture-operation-migration epoch=1 seq=32 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-33 op=fixture-operation-migration epoch=1 seq=33 lease=lease-migration(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-34 op=fixture-operation-migration epoch=1 seq=34 lease=fence-released(RELEASED)",
+  "Outcome": "REJECT",
+  "Detail": "current original Node projection binding mismatch"
+ },
+ {
+  "Case": "set=cohort-35 op=fixture-operation-restore epoch=2 seq=35 lease=lease-restore(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "set=cohort-36 op=fixture-operation-restore epoch=2 seq=36 lease=lease-restore(HELD)",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "released-lease-body",
+  "Outcome": "INFO",
+  "Detail": "map[acquiredAt:2030-01-01T00:00:00Z descendantRegistrySHA256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945 expectedInventoryHead:map[envelopeSHA256:d760ab5621b91dfd6f56d9b8ef816938a36d63b8214cac63193bd1356cd727ea presence:PRESENT readbackProof:map[artifactSHA256:240bd5c0f5dcb7234a9f6fd072ce81d807d1ad00bdc32fcd42fa7a82f8617eaa contractId:saintvision-proof-inventory-head-readback:1 contractSHA256:d31962924a87403f6117cadbd1ff29569c7181b8c63f12965c88f6d17337af79 observedAt:2030-01-01T00:00:00Z producerRole:cp-inventory-reader scopeSHA256:3576844dbe3dc3ed4039095d98f92c492580163b4d6c07612900cdc3a381438a signatureDomainASCII:saintvision/proof/inventory-head-readback/v1 signerKeySPKISHA256:7a227093001e1a0d9250b45c5cfbfd7a0130989a051884d895543088de07269c signerRole:cp-inventory slotId:operation-lease:/body/expectedInventoryHead/readbackProof typedSubject:map[cohortId:fixture-cohortId envelopeSHA256:d760ab5621b91dfd6f56d9b8ef816938a36d63b8214cac63193bd1356cd727ea kind:inventory-head-readback presence:PRESENT registrationSHA256:e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472] validUntil:2030-01-01T00:01:00Z]] expiresAt:2030-01-01T00:01:00Z fenceEpoch:1 leaseId:lease-migration migrationId:fixture-first-migration mode:RELEASED operation:migration operationId:fixture-operation-migration owner:map[gid:1 hostBootIdentitySHA256:ffa245663b566495661d8c689bcb1881c454c55933164577d59748c7c54fbd6b ownerGeneration:1 pid:1 principal:fixture-principal processStartIdentitySHA256:bb33cb5c01c227ef5a68bcb1e763d4dec40b1550bfdd388908a84871d16e3ead uid:1] permittedEntrypointsSHA256:022e4ab5824bbfad860afa72e4b71d284fc15246cdb9ef156c076b78df885daf planEnvelopeSHA256:f6c029e1a697a11aa080129d702c63e9627524c3a75dcc4d884707d324f8d766 priorFenceEnvelopeSHA256:7c9c9affe0656a9eae2ff159e2d859e1aebde10e4dabd7c9951ba1307a3638e4 rawTokenPublished:false requiresHeldOSLocks:true schemaVersion:saintvision-agent-mutation-fence:1 scopes:[map[daemonIdentitySHA256:a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5 ownedVolumeMetadataSHA256:d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0 scope:map[nodeId:fixture-node-0 recoveryEpoch:fixture-existing-epoch tenantId:fixture-tenant] workerRootRegistrationSHA256:132971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61] map[daemonIdentitySHA256:3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493 ownedVolumeMetadataSHA256:8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b scope:map[nodeId:fixture-node-1 recoveryEpoch:fixture-existing-epoch tenantId:fixture-tenant] workerRootRegistrationSHA256:b6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279]] staleAgeReclaimAllowed:false terminalSeals:[] tokenSHA256:f74dfea0832c96e943ac181d4bd6822b17ad2844c63a4c41df738a749d91d131]"
+ },
+ {
+  "Case": "set-bound-to-released-lease",
+  "Outcome": "INFO",
+  "Detail": "cohort-34"
+ },
+ {
+  "Case": "x509-Verify-ServerAuth-leaf-no-EKU",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "x509-Verify-ServerAuth-leaf-clientAuth-only",
+  "Outcome": "REJECT",
+  "Detail": "x509: certificate specifies an incompatible key usage"
+ },
+ {
+  "Case": "x509-Verify-ServerAuth-leaf-serverAuth",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ }
+]

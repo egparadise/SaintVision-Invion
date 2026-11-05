@@ -1,0 +1,37 @@
+[
+ {
+  "Case": "fixture-now",
+  "Outcome": "INFO",
+  "Detail": "2030-01-01T00:00:00Z"
+ },
+ {
+  "Case": "trusted-operation fixture-operation-migration",
+  "Outcome": "INFO",
+  "Detail": "2030-01-01T00:00:00Z .. 2030-01-01T00:01:00Z"
+ },
+ {
+  "Case": "trusted-operation fixture-operation-restore",
+  "Outcome": "INFO",
+  "Detail": "2030-01-01T00:00:00Z .. 2030-01-01T00:01:00Z"
+ },
+ {
+  "Case": "verify-history-at-now+0s",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "verify-history-at-now+59s",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "verify-history-at-now+1m1s",
+  "Outcome": "REJECT",
+  "Detail": "plan/body/acceptedP0/backendCI/attestation: missing current authenticated publication/nonrevocation state"
+ },
+ {
+  "Case": "verify-history-at-now+2m1s",
+  "Outcome": "REJECT",
+  "Detail": "plan/body/rootPublicationIntent: missing current authenticated publication/nonrevocation state"
+ }
+]

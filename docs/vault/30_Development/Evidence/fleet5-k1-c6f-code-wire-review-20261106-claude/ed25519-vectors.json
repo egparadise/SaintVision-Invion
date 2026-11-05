@@ -1,0 +1,605 @@
+{
+ "torsionOrders": [
+  1,
+  8,
+  4,
+  8,
+  2,
+  8,
+  4,
+  8
+ ],
+ "rfcSignaturesReproducedBySigning": [
+  true,
+  true,
+  true
+ ],
+ "reviewerTestPublicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+ "vectors": [
+  {
+   "name": "rfc8032-test1",
+   "publicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+   "messageHex": "",
+   "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": true
+   },
+   "expectStrictAccept": true,
+   "independentSPKI": "06e3fd8fda29bb60ab59557de61edb0aecdb231134be30e75b455f8e1b792fa9"
+  },
+  {
+   "name": "rfc8032-test1-message-tamper",
+   "publicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+   "messageHex": "78",
+   "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "06e3fd8fda29bb60ab59557de61edb0aecdb231134be30e75b455f8e1b792fa9"
+  },
+  {
+   "name": "rfc8032-test1-S-plus-L",
+   "publicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+   "messageHex": "",
+   "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901554c8c7872aa064e049dbb3013fbf29380d25bf5f0595bbe24655141438e7a101b",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "06e3fd8fda29bb60ab59557de61edb0aecdb231134be30e75b455f8e1b792fa9"
+  },
+  {
+   "name": "rfc8032-test2",
+   "publicKeyHex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+   "messageHex": "72",
+   "signatureHex": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": true
+   },
+   "expectStrictAccept": true,
+   "independentSPKI": "deb2ded39dc26fce0e6085b6fc34bf6b5941913bbfe2ea614113cff9e004c170"
+  },
+  {
+   "name": "rfc8032-test2-message-tamper",
+   "publicKeyHex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+   "messageHex": "7278",
+   "signatureHex": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "deb2ded39dc26fce0e6085b6fc34bf6b5941913bbfe2ea614113cff9e004c170"
+  },
+  {
+   "name": "rfc8032-test2-S-plus-L",
+   "publicKeyHex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+   "messageHex": "72",
+   "signatureHex": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69daf52db7415978abc61b2c2eb6aeebfca0387b2eaeb4302aeeb00d291612bb0c10",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "deb2ded39dc26fce0e6085b6fc34bf6b5941913bbfe2ea614113cff9e004c170"
+  },
+  {
+   "name": "rfc8032-test3",
+   "publicKeyHex": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
+   "messageHex": "af82",
+   "signatureHex": "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": true
+   },
+   "expectStrictAccept": true,
+   "independentSPKI": "8d39ba50abe50f77b6bb8ae7b6927aff7ffbeba35ad2837c0e51e82bcbcc60d5"
+  },
+  {
+   "name": "rfc8032-test3-message-tamper",
+   "publicKeyHex": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
+   "messageHex": "af8278",
+   "signatureHex": "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "8d39ba50abe50f77b6bb8ae7b6927aff7ffbeba35ad2837c0e51e82bcbcc60d5"
+  },
+  {
+   "name": "rfc8032-test3-S-plus-L",
+   "publicKeyHex": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
+   "messageHex": "af82",
+   "signatureHex": "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac05d391b0a77904e98404ef037747a56e4a7c15e9716ed28dc027beceea1ec41a",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "8d39ba50abe50f77b6bb8ae7b6927aff7ffbeba35ad2837c0e51e82bcbcc60d5"
+  },
+  {
+   "name": "identity-A-identity-R-S0",
+   "publicKeyHex": "0100000000000000000000000000000000000000000000000000000000000000",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "d0fbfbb4f059a24b42b1b553b6d79c0586599e84d2033429b92e9b968cb39b4c"
+  },
+  {
+   "name": "identity-A-identity-R-S0-other-msg",
+   "publicKeyHex": "0100000000000000000000000000000000000000000000000000000000000000",
+   "messageHex": "616e79206d657373616765",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "d0fbfbb4f059a24b42b1b553b6d79c0586599e84d2033429b92e9b968cb39b4c"
+  },
+  {
+   "name": "small-order-A-T1-R-identity-S0",
+   "publicKeyHex": "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+   "messageHex": "736d616c6c2d6f726465722d312d32",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "0461ead0f38e7f212c4bd146ec6e952ea3f2cf3fdc7dd026cdfeb212e9c7b980"
+  },
+  {
+   "name": "small-order-A-T2-R-identity-S0",
+   "publicKeyHex": "0000000000000000000000000000000000000000000000000000000000000080",
+   "messageHex": "736d616c6c2d6f726465722d322d31",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "e9c9f39121f2133fe7d2ea0ac31eb561e5073dc70a321d2715b7dfaf760cf7ad"
+  },
+  {
+   "name": "small-order-A-T3-R-identity-S0",
+   "publicKeyHex": "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+   "messageHex": "736d616c6c2d6f726465722d332d3131",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "834adc3cb4cc12f117bf059ae0ad9eb16649dd6b5260f4c7bdeabb9ad8bdfbef"
+  },
+  {
+   "name": "small-order-A-T4-R-identity-S0",
+   "publicKeyHex": "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "736d616c6c2d6f726465722d342d30",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "850e40e446cb15394539b1e433a2c3bb9571337134b3dd73fd3c2cd1d6ce4a21"
+  },
+  {
+   "name": "small-order-A-T5-R-identity-S0",
+   "publicKeyHex": "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85",
+   "messageHex": "736d616c6c2d6f726465722d352d3133",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "3418d38a049158bd1e0a9a95338a7ca2c7c2987a62199c0be7926487230a5434"
+  },
+  {
+   "name": "small-order-A-T6-R-identity-S0",
+   "publicKeyHex": "0000000000000000000000000000000000000000000000000000000000000000",
+   "messageHex": "736d616c6c2d6f726465722d362d36",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "722abd12e99a5367f375aeb9672a8e07712e03c2add16fa8d6914d1cfa2efe0c"
+  },
+  {
+   "name": "small-order-A-T7-R-identity-S0",
+   "publicKeyHex": "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa",
+   "messageHex": "736d616c6c2d6f726465722d372d32",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "296cb2aed79e226f60cd46597151b91d3edfbefb7d94e66283d144fc825fb675"
+  },
+  {
+   "name": "mixed-order-A-plus-T1",
+   "publicKeyHex": "e249198df074ef5590afdf6075857e112aa6041b6387491128da17bdf1bdd445",
+   "messageHex": "6d697865642d412d312d37",
+   "signatureHex": "b398abf3c24ca9b6c540abc3e8627b84cbf53bc7b41eb677cf2e71756f579c7069c3ee8575aa4811eb379b5ef2fab08adbb297815c7271e2efc9e4f904695006",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "6084b7dddcaa331201d6b5b9933647d90c70b876a1ec8bd69a373fb33c337d71"
+  },
+  {
+   "name": "mixed-order-A-plus-T2",
+   "publicKeyHex": "0752f9f48a6d4b0d187b54a540f56cd8d1c0721d6c439ffe6bb2c58ef8236a85",
+   "messageHex": "6d697865642d412d322d36",
+   "signatureHex": "2d93af827f0155bf086c14549785adc815357c6fc74299f66fb6e57b2c2975df2481e3bdfbd15c289e429b30c067f6400fe247c0bba5efdbecb3a4abeb51220e",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1d92989e5a986dab7042bfce962fcc5c38a36fc6a8bfcc8d38d21c30b62d29ea"
+  },
+  {
+   "name": "mixed-order-A-plus-T4",
+   "publicKeyHex": "e93fd6fb3ad0d4dd3e7a81822a6586c608acd8943d1022fceaad3164512bf18c",
+   "messageHex": "6d697865642d412d342d35",
+   "signatureHex": "7d157323f41d2d05bda4772f7324e64972219dfef93c6bfe8cb4fe6ff4e4afb65b81e4358eb37ffc3cd16e11323baff36ec3bec49c362730f3315859dd8aa501",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "30d181a1a44f9f8d054869227681984199bcc268bb0a4678dbc9b7451bff58e0"
+  },
+  {
+   "name": "mixed-order-R-plus-T1",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "6d697865642d522d31",
+   "signatureHex": "6d88156dc3fce0e2e016da67dfed1e4b487cd88d284aebe3fb9aadf805dd656854475ef3087d08209e34bae64814ce120c7de44fe5afd8f7412c93e71ed4a408",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "mixed-order-R-plus-T4",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "6d697865642d522d34",
+   "signatureHex": "67c8f150c72308e9db97ccc1650ae7ad4e13608a8a30b2d0663b5e9030a168512e4a359e75c4e9e25d846241dd0dd3cea95c5937bc7265dde4d4a774c86ef30e",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": true,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "reviewer-valid",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "493fa560db7a257c11e6229f9a56c19b504f527735ece580d19dfdc3fcaa93a403be919491912bb20522eba9ae3b2692b7ba4f7fb67b72269f634bf174d8fd0c",
+   "independent": {
+    "cofactorless": true,
+    "cofactored": true,
+    "strictPrimeOrder": true
+   },
+   "expectStrictAccept": true,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "reviewer-S-equals-L",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "493fa560db7a257c11e6229f9a56c19b504f527735ece580d19dfdc3fcaa93a4edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "reviewer-S-plus-L",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "493fa560db7a257c11e6229f9a56c19b504f527735ece580d19dfdc3fcaa93a4f09187f1abf43d0adcbee24c8d3505a7b7ba4f7fb67b72269f634bf174d8fd1c",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "reviewer-R-sign-bit-flip",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "493fa560db7a257c11e6229f9a56c19b504f527735ece580d19dfdc3fcaa932403be919491912bb20522eba9ae3b2692b7ba4f7fb67b72269f634bf174d8fd0c",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "noncanonical-A-y-eq-p",
+   "publicKeyHex": "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "5cbea59d796508a2cd26f02a97a0b23b896e232c26050a55ad2cad28d63f8836"
+  },
+  {
+   "name": "noncanonical-R-y-eq-p",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f03be919491912bb20522eba9ae3b2692b7ba4f7fb67b72269f634bf174d8fd0c",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "noncanonical-A-y-eq-p-plus-1",
+   "publicKeyHex": "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "bf953553eae1da32c54960b5a05393b04e358d2581d332354045ec1c60715e33"
+  },
+  {
+   "name": "noncanonical-R-y-eq-p-plus-1",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f03be919491912bb20522eba9ae3b2692b7ba4f7fb67b72269f634bf174d8fd0c",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "noncanonical-A-x0-sign1-identity",
+   "publicKeyHex": "0100000000000000000000000000000000000000000000000000000000000080",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "13f4bcc5e25d5e99cb04ed45013279682b75f67544a68309e76475a8741e1569"
+  },
+  {
+   "name": "noncanonical-R-x0-sign1-identity",
+   "publicKeyHex": "04c02904c52f2b22c1857e7dd59a7939f753276bc2efdd031552ce9baed40e73",
+   "messageHex": "72657669657765722076616c6964",
+   "signatureHex": "010000000000000000000000000000000000000000000000000000000000008003be919491912bb20522eba9ae3b2692b7ba4f7fb67b72269f634bf174d8fd0c",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "1604ad68c2e2f55bc0ef476664a7880fce79340fdd14e1df94bd4262a9f28574"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y0",
+   "publicKeyHex": "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "5cbea59d796508a2cd26f02a97a0b23b896e232c26050a55ad2cad28d63f8836"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y1",
+   "publicKeyHex": "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "bf953553eae1da32c54960b5a05393b04e358d2581d332354045ec1c60715e33"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y3",
+   "publicKeyHex": "f0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "946c3a2f9d1a79875581362220f46aa6eeca5f25b31e4063e638476964b1c35f"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y4",
+   "publicKeyHex": "f1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "ae703b7ef884f6f2c77fc8e0999cec27ee4af2d018cc2b80138677184f340108"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y5",
+   "publicKeyHex": "f2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "0cebe71fae6bd59b0b04965be9548861d80bd4a4530b1b29a443febfa4318a1a"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y6",
+   "publicKeyHex": "f3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "f15bd493ae2a22249aabc3527da2496f66d11f6ae654a41b3c2f5793bea4e5c3"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y9",
+   "publicKeyHex": "f6ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "dc7e3087a23480d1dfdf48366c92912a65af3bbe470b7f5681e2c6f665d07d41"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y10",
+   "publicKeyHex": "f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "b00e30a5e0f09bab172d6210af42cb68240336c006f56e869c45f8e7f00da00c"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y14",
+   "publicKeyHex": "fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "cf2ef39a3c1f39c88722722a2aedbee7e93c552b88d23592b721a1f7b8cf5fef"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y15",
+   "publicKeyHex": "fcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "ce721bfef4519b8bef8943252f45f6e836c5e1e7ab023f1cca4a410a38f374e0"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y16",
+   "publicKeyHex": "fdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "0a838e0ab0f2f1cf7f5b5db2e33a53c941cc1509a31d235ddfb2c5acf2c4ef41"
+  },
+  {
+   "name": "noncanonical-y-plus-p-of-y18",
+   "publicKeyHex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+   "messageHex": "",
+   "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "independent": {
+    "cofactorless": false,
+    "cofactored": false,
+    "strictPrimeOrder": false
+   },
+   "expectStrictAccept": false,
+   "independentSPKI": "3574deba55760f3ea872bd6ad882fa89587aa7fe01c27ce7ee338d19d55ba60c"
+  }
+ ]
+}

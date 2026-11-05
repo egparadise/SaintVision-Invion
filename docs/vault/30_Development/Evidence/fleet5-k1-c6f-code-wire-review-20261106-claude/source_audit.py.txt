@@ -1,0 +1,79 @@
+"""Reviewer audit of K1 source manifest claims against actual Git objects (read-only).
+
+argv: repo  reviewed-commit  parent-commit
+Checks: (1) the 139 owner 'A' claims vs actual git diff parent..commit; (2) the 107
+package-file blob/sha/byte claims vs actual git tree; (3) each of the 28 source pins:
+original 8874 blob bytes == package copy bytes == pinned SHA256/rawBytes; (4) the
+proposed-contract index raw/schema hashes vs the embedded files.
+"""
+import hashlib
+import json
+import subprocess
+import sys
+
+repo, C, P = sys.argv[1:4]
+E = "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/"
+PKG = "services/node-agent/migrationverify/"
+
+
+def git(*a):
+    return subprocess.check_output(["git", *a], cwd=repo)
+
+
+def show(rev, path):
+    return git("show", rev + ":" + path)
+
+
+out = {"commit": C, "parent": P}
+actual = [x for x in git("diff", "--no-renames", "--name-status", "-z", P, C).split(b"\0") if x]
+pairs = list(zip(actual[0::2], actual[1::2]))
+out["actualDiff"] = {"files": len(pairs), "statuses": sorted({s.decode() for s, _ in pairs})}
+paths = [p.decode() for _, p in pairs]
+out["actualDiffOutsideScope"] = [p for p in paths if not (p.startswith(PKG) or p.startswith(E)
+                                 or p == "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_offline_verifier_Codex.md")]
+audit = json.loads(show(C, E + "staged-scope-audit.json"))
+out["ownerClaimedAdded"] = audit["addedFiles"]
+out["ownerAllPathsEqualActual"] = sorted(x["path"] for x in audit["allPaths"]) == sorted(paths) and all(x["status"] == "A" for x in audit["allPaths"])
+tree = {}
+for line in git("ls-tree", "-r", "-z", "--long", C, PKG).split(b"\0"):
+    if line:
+        meta, path = line.split(b"\t", 1)
+        tree[path.decode()] = meta.split()[2].decode()
+out["packageFilesActual"] = len(tree)
+bad = []
+for f in audit["packageFiles"]:
+    b = show(C, f["path"])
+    if tree.get(f["path"]) != f["gitBlob"] or hashlib.sha256(b).hexdigest() != f["rawSHA256"] or len(b) != f["rawBytes"]:
+        bad.append(f["path"])
+out["packageFilesClaimed"] = len(audit["packageFiles"])
+out["packageFileClaimMismatches"] = bad
+out["packageFilesClaimSetEqualsTree"] = sorted(f["path"] for f in audit["packageFiles"]) == sorted(tree)
+out["packageGitTreeActual"] = git("rev-parse", C + ":" + PKG.rstrip("/")).decode().strip()
+pins = json.loads(show(C, PKG + "resources/source-pins.json"))
+pinres = []
+for p in pins["pins"]:
+    orig = show(p["source"], p["path"])
+    copy = show(C, PKG + p["packagePath"])
+    pinres.append({"path": p["path"].rsplit("/", 2)[-2] + "/" + p["path"].rsplit("/", 1)[-1], "source": p["source"][:8],
+                   "origEqualsCopy": orig == copy, "shaMatches": hashlib.sha256(orig).hexdigest() == p["rawSHA256"],
+                   "bytesMatch": len(orig) == p["rawBytes"], "offlineId": p.get("offlineResourceID")})
+out["pins"] = len(pinres)
+out["pinsWithOfflineResourceID"] = sum(1 for x in pinres if x["offlineId"])
+out["pinsAllExact"] = all(x["origEqualsCopy"] and x["shaMatches"] and x["bytesMatch"] for x in pinres)
+out["pinSources"] = sorted({x["source"] for x in pinres})
+out["pinDetails"] = pinres
+idx = json.loads(show(C, PKG + "resources/proposed-contracts/index.json"))
+cres = []
+for c in idx["contracts"]:
+    raw = show(C, PKG + "resources/proposed-contracts/" + c["file"])
+    m = json.loads(raw)
+    sraw = show(C, PKG + "resources/proposed-contracts/" + m["schemaFile"])
+    cres.append({"id": c["contractId"], "codec": m["codec"], "freshness": m["freshness"],
+                 "rawOk": hashlib.sha256(raw).hexdigest() == c["rawSHA256"], "schemaOk": hashlib.sha256(sraw).hexdigest() == c["schemaSHA256"]})
+out["proposedContracts"] = len(cres)
+out["proposedContractsAllPinned"] = all(x["rawOk"] and x["schemaOk"] for x in cres)
+out["codecCounts"] = {k: sum(1 for x in cres if x["codec"] == k) for k in sorted({x["codec"] for x in cres})}
+out["freshnessCounts"] = {k: sum(1 for x in cres if x["freshness"] == k) for k in sorted({x["freshness"] for x in cres})}
+reg = json.loads(show(C, PKG + "resources/proof-slot-registry.json"))
+out["slotEntries"] = len(reg["entries"])
+print(json.dumps(out, indent=1))

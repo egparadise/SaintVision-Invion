@@ -1,0 +1,109 @@
+package migrationverify
+
+// Reviewer-only probe (Claude), scratch worktree only. Builds a trusted Current
+// context from EACH cohort-projection-set record's own fields and asks whether the
+// verifier would derive it as current. Also checks leaf-without-EKU chain handling.
+import (
+	"crypto/ed25519"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/json"
+	"fmt"
+	"math/big"
+	"os"
+	"sort"
+	"testing"
+	"time"
+)
+
+func TestZZReviewerCurrentProbe(t *testing.T) {
+	outPath := os.Getenv("K1REV_CURRENT_OUT")
+	if outPath == "" {
+		t.Skip("reviewer probe output not set")
+	}
+	rows := []probeRow{}
+	f := newCryptoFixture(t)
+	p := parsedPacket(t, f.packet)
+	digests := map[string]string{}
+	for id, x := range p {
+		if d, e := ArtifactDigest(f.installed.NodeKinds[id], x); e == nil {
+			digests[id] = d
+		}
+	}
+	byDigest := map[string]string{}
+	for id, d := range digests {
+		byDigest[d] = id
+	}
+	sets := []string{}
+	for id, k := range f.installed.NodeKinds {
+		if k == "cohort-projection-set" {
+			sets = append(sets, id)
+		}
+	}
+	sort.Strings(sets)
+	for _, id := range sets {
+		cur := p[id].(map[string]any)
+		epoch, _ := cur["fenceEpoch"].(json.Number).Int64()
+		seq, _ := cur["sequence"].(json.Number).Int64()
+		members, _ := cur["members"].([]any)
+		mp := []string{}
+		for _, m := range members {
+			mp = append(mp, fmt.Sprint(m.(map[string]any)["projectionEnvelopeSHA256"]))
+		}
+		lease := byDigest[fmt.Sprint(cur["leaseEnvelopeSHA256"])]
+		mode := ""
+		if lease != "" {
+			mode = fmt.Sprint(p[lease].(map[string]any)["body"].(map[string]any)["mode"])
+		}
+		ctx := cloneCtx(f.context)
+		ctx.Current = &CurrentProjectionContext{SetID: id, MigrationID: fmt.Sprint(cur["migrationId"]), OperationID: fmt.Sprint(cur["operationId"]), PlanEnvelopeSHA256: fmt.Sprint(cur["planEnvelopeSHA256"]), LeaseEnvelopeSHA256: fmt.Sprint(cur["leaseEnvelopeSHA256"]), FenceEpoch: epoch, Sequence: seq, InventoryHead: cur["inventoryHead"], InventoryReadbackSHA256: fmt.Sprint(cur["inventoryHeadReadbackSHA256"]), MemberProjectionSHA256: mp}
+		name := fmt.Sprintf("set=%s op=%v epoch=%d seq=%d lease=%s(%s)", id, cur["operationId"], epoch, seq, lease, mode)
+		record(&rows, name, func() error {
+			v, e := NewVerifier(f.installed, ctx)
+			if e != nil {
+				return e
+			}
+			_, e = v.VerifyCurrentProjectionSet(f.packet, id)
+			return e
+		})
+	}
+	// Same, but with the trusted clock moved inside the epoch-1 migration lease and
+	// that operation's trusted binding unchanged: does a set bound to the RELEASED
+	// epoch-1 lease envelope derive as current?
+	rel := ""
+	for id, k := range f.installed.NodeKinds {
+		if k == "operation-lease" && p[id].(map[string]any)["body"].(map[string]any)["mode"] == "RELEASED" {
+			rel = id
+		}
+	}
+	rb := p[rel].(map[string]any)["body"].(map[string]any)
+	rows = append(rows, probeRow{"released-lease-body", "INFO", fmt.Sprintf("%v", rb)})
+	for _, id := range sets {
+		if fmt.Sprint(p[id].(map[string]any)["leaseEnvelopeSHA256"]) == digests[rel] {
+			rows = append(rows, probeRow{"set-bound-to-released-lease", "INFO", id})
+		}
+	}
+	// Leaf certificate WITHOUT any EKU under a CA: does x509 Verify(ServerAuth) accept?
+	caPub, caKey, _ := ed25519.GenerateKey(rand.Reader)
+	now := time.Now().UTC()
+	caT := &x509.Certificate{SerialNumber: big.NewInt(1), Subject: pkix.Name{CommonName: "REVIEWER EPHEMERAL CA"}, NotBefore: now.Add(-time.Hour), NotAfter: now.Add(time.Hour), IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign}
+	caDER, _ := x509.CreateCertificate(rand.Reader, caT, caT, caPub, caKey)
+	ca, _ := x509.ParseCertificate(caDER)
+	for name, eku := range map[string][]x509.ExtKeyUsage{"no-EKU": nil, "clientAuth-only": {x509.ExtKeyUsageClientAuth}, "serverAuth": {x509.ExtKeyUsageServerAuth}} {
+		lp, _, _ := ed25519.GenerateKey(rand.Reader)
+		lt := &x509.Certificate{SerialNumber: big.NewInt(2), NotBefore: now.Add(-time.Hour), NotAfter: now.Add(time.Hour), BasicConstraintsValid: true, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: eku}
+		der, _ := x509.CreateCertificate(rand.Reader, lt, caT, lp, caKey)
+		leaf, _ := x509.ParseCertificate(der)
+		roots := x509.NewCertPool()
+		roots.AddCert(ca)
+		record(&rows, "x509-Verify-ServerAuth-leaf-"+name, func() error {
+			_, e := leaf.Verify(x509.VerifyOptions{Roots: roots, CurrentTime: now, KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}})
+			return e
+		})
+	}
+	b, _ := json.MarshalIndent(rows, "", " ")
+	if e := os.WriteFile(outPath, b, 0o600); e != nil {
+		t.Fatal(e)
+	}
+}

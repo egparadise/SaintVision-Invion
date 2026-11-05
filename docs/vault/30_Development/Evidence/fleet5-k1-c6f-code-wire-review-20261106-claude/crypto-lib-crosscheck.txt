@@ -1,0 +1,3 @@
+cryptography 50.0.1
+valid-accepted ['rfc8032-test1', 'rfc8032-test2', 'rfc8032-test3', 'reviewer-valid'] spkiDER [True, True, True, True]
+cryptography-accepts-adversarial ['identity-A-identity-R-S0', 'identity-A-identity-R-S0-other-msg', 'small-order-A-T1-R-identity-S0', 'small-order-A-T2-R-identity-S0', 'small-order-A-T3-R-identity-S0', 'small-order-A-T4-R-identity-S0', 'small-order-A-T5-R-identity-S0', 'small-order-A-T6-R-identity-S0', 'small-order-A-T7-R-identity-S0', 'mixed-order-A-plus-T1', 'mixed-order-A-plus-T2', 'mixed-order-A-plus-T4', 'noncanonical-A-y-eq-p-plus-1', 'noncanonical-A-x0-sign1-identity', 'noncanonical-y-plus-p-of-y1']

@@ -1,0 +1,262 @@
+{
+ "commit": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+ "parent": "e50c148287779add421265868ef16909ed984650",
+ "actualDiff": {
+  "files": 139,
+  "statuses": [
+   "A"
+  ]
+ },
+ "actualDiffOutsideScope": [],
+ "ownerClaimedAdded": 139,
+ "ownerAllPathsEqualActual": true,
+ "packageFilesActual": 107,
+ "packageFilesClaimed": 107,
+ "packageFileClaimMismatches": [],
+ "packageFilesClaimSetEqualsTree": true,
+ "packageGitTreeActual": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+ "pins": 28,
+ "pinsWithOfflineResourceID": 17,
+ "pinsAllExact": true,
+ "pinSources": [
+  "8874b2df"
+ ],
+ "pinDetails": [
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/common.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/common.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/migration-event.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/migration-event.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/migration-journal.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/migration-journal.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/operation-lease.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/operation-lease.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/runtime-inventory.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/runtime-inventory.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/successor-plan.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/successor-plan.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v2/terminal-seal.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v2/terminal-seal.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/migration-event.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/migration-event.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/migration-journal.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/migration-journal.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/operation-lease.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/operation-lease.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/runtime-inventory.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/runtime-inventory.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/successor-plan.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/successor-plan.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v3/terminal-seal.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v3/terminal-seal.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v4/migration-event.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v4/migration-event.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/api-request.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v5/api-request.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/api-response.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v5/api-response.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/cohort-projection-set.schema.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": "https://fleet5-doc-fixture.invalid/v5/cohort-projection-set.schema.json"
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/trust-bootstrap-contract.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/proof-slot-registry.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/recipe-definitions.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/derived-digest-contract.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/dummy-signer-policy.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/artifact-reference-graph.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/scenario-inputs.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/scenario-objects.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/reference-graph-coverage.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/actual-bindings-HOLD.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  },
+  {
+   "path": "fleet5-bootstrap-normative-contracts-20261105-v5/derived-byte-ordering-vectors.json",
+   "source": "8874b2df",
+   "origEqualsCopy": true,
+   "shaMatches": true,
+   "bytesMatch": true,
+   "offlineId": null
+  }
+ ],
+ "proposedContracts": 28,
+ "proposedContractsAllPinned": true,
+ "codecCounts": {
+  "native-m2-v2": 1,
+  "normalized-proof-v1": 27
+ },
+ "freshnessCounts": {
+  "fresh": 18,
+  "immutable-provenance": 7,
+  "validity-bounded-approval": 3
+ },
+ "slotEntries": 77
+}

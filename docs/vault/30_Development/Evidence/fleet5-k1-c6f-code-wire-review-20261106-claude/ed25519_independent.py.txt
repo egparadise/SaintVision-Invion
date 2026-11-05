@@ -1,0 +1,229 @@
+"""Reviewer-independent pure-Python RFC8032 Ed25519 math (no product code imported).
+
+Builds PUBLIC adversarial vectors: RFC8032 section 7.1 TEST 1-3 (public test seeds),
+torsion points, mixed-order A/R, identity forgery, S>=L, noncanonical encodings.
+For each vector it records the independent cofactorless verdict, the independent
+cofactored verdict and the independent prime-order (strict) verdict. Output JSON is
+fed to a reviewer-only Go probe that runs the product verifyEd25519 and stdlib Verify.
+Only public RFC seeds and a fixed public reviewer TEST seed are used; no production key.
+"""
+import hashlib
+import json
+import sys
+
+p = 2**255 - 19
+L = 2**252 + 27742317777372353535851937790883648493
+d = (-121665 * pow(121666, p - 2, p)) % p
+I = pow(2, (p - 1) // 4, p)
+
+
+def inv(x):
+    return pow(x, p - 2, p)
+
+
+def add(P, Q):
+    (x1, y1), (x2, y2) = P, Q
+    t = d * x1 * x2 * y1 * y2 % p
+    return ((x1 * y2 + x2 * y1) * inv(1 + t) % p, (y1 * y2 + x1 * x2) * inv(1 - t) % p)
+
+
+def mul(n, P):
+    R = (0, 1)
+    while n:
+        if n & 1:
+            R = add(R, P)
+        P = add(P, P)
+        n >>= 1
+    return R
+
+
+def enc(P):
+    x, y = P
+    b = bytearray(y.to_bytes(32, "little"))
+    b[31] |= (x & 1) << 7
+    return bytes(b)
+
+
+def dec(b, canonical=True):
+    """Return point or None. canonical=False mimics lenient y>=p reduction."""
+    y = int.from_bytes(b, "little") & ((1 << 255) - 1)
+    s = b[31] >> 7
+    if y >= p:
+        if canonical:
+            return None
+        y -= p
+    x2 = (y * y - 1) * inv(d * y * y + 1) % p
+    x = pow(x2, (p + 3) // 8, p)
+    if x * x % p != x2:
+        x = x * I % p
+    if x * x % p != x2:
+        return None
+    if x == 0 and s == 1:
+        return None if canonical else (0, y)
+    if x & 1 != s:
+        x = p - x
+    return (x, y)
+
+
+By = 4 * inv(5) % p
+B = dec(By.to_bytes(32, "little"))
+ID = (0, 1)
+
+
+def H(*parts):
+    return int.from_bytes(hashlib.sha512(b"".join(parts)).digest(), "little")
+
+
+def keypair(seed):
+    h = hashlib.sha512(seed).digest()
+    a = int.from_bytes(h[:32], "little")
+    a &= (1 << 254) - 8
+    a |= 1 << 254
+    return a, h[32:], enc(mul(a, B))
+
+
+def sign(seed, m):
+    a, prefix, A = keypair(seed)
+    r = H(prefix, m) % L
+    R = enc(mul(r, B))
+    S = (r + H(R, A, m) * a) % L
+    return A, R + S.to_bytes(32, "little")
+
+
+def verdicts(A_b, m, sig):
+    out = {"cofactorless": False, "cofactored": False, "strictPrimeOrder": False}
+    if len(A_b) != 32 or len(sig) != 64:
+        return out
+    S = int.from_bytes(sig[32:], "little")
+    A, R = dec(A_b), dec(sig[:32])
+    if S >= L or A is None or R is None:
+        return out
+    k = H(sig[:32], A_b, m) % L
+    lhs = mul(S, B)
+    negkA = mul(k, (p - A[0] if A[0] else 0, A[1]))
+    diff = add(lhs, negkA)  # [S]B - [k]A
+    out["cofactorless"] = enc(diff) == sig[:32]
+    out["cofactored"] = mul(8, add(diff, (p - R[0] if R[0] else 0, R[1]))) == ID
+    prime = lambda P: P != ID and mul(L, P) == ID
+    out["strictPrimeOrder"] = out["cofactorless"] and prime(A) and prime(R)
+    return out
+
+
+def spki(pub):
+    return hashlib.sha256(bytes.fromhex("302a300506032b6570032100") + pub).hexdigest()
+
+
+# order-8 torsion subgroup generated independently: find a point T with 8T=ID, 4T!=ID
+def torsion():
+    for y in range(2, 2000):
+        P = dec(y.to_bytes(32, "little"))
+        if P is None:
+            continue
+        T = mul(L, P)
+        if mul(4, T) != ID:
+            return T
+    raise SystemExit("no torsion")
+
+
+T8 = torsion()
+TORSION = [mul(i, T8) for i in range(8)]
+
+V = []
+
+
+def vec(name, A, m, sig, expectStrict):
+    v = verdicts(A, m, sig)
+    V.append({"name": name, "publicKeyHex": A.hex(), "messageHex": m.hex(), "signatureHex": sig.hex(),
+              "independent": v, "expectStrictAccept": expectStrict,
+              "independentSPKI": spki(A) if len(A) == 32 else None})
+
+
+RFC = [
+    ("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60", "",
+     "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"),
+    ("4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb", "72",
+     "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00"),
+    ("c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7", "af82",
+     "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a"),
+]
+rfc_reproduced = []
+for i, (seed, m, expected) in enumerate(RFC, 1):
+    A, sig = sign(bytes.fromhex(seed), bytes.fromhex(m))
+    rfc_reproduced.append(sig.hex() == expected)
+    vec("rfc8032-test%d" % i, A, bytes.fromhex(m), sig, True)
+    vec("rfc8032-test%d-message-tamper" % i, A, bytes.fromhex(m) + b"x", sig, False)
+    S = int.from_bytes(sig[32:], "little")
+    vec("rfc8032-test%d-S-plus-L" % i, A, bytes.fromhex(m), sig[:32] + (S + L).to_bytes(32, "little"), False)
+
+seed = hashlib.sha256(b"reviewer public TEST seed fleet5-k1-c6f; not a credential").digest()
+a, prefix, A = keypair(seed)
+Apt = dec(A)
+
+# identity-key forgery: A=ID, R=ID, S=0 satisfies cofactorless equation for every message
+idb = enc(ID)
+vec("identity-A-identity-R-S0", idb, b"", idb + bytes(32), False)
+vec("identity-A-identity-R-S0-other-msg", idb, b"any message", idb + bytes(32), False)
+
+# small-order A (each nonidentity torsion point) with R=ID, S=0, message chosen so k*A = ID
+for j in range(1, 8):
+    Tb = enc(TORSION[j])
+    for n in range(10000):
+        m = b"small-order-%d-%d" % (j, n)
+        if mul(H(idb, Tb, m) % L, TORSION[j]) == ID:
+            vec("small-order-A-T%d-R-identity-S0" % j, Tb, m, idb + bytes(32), False)
+            break
+
+# mixed-order A' = aB + T: craft (R,S) satisfying the cofactorless equation (k*T == ID)
+for j in (1, 2, 4):
+    Am = add(Apt, TORSION[j])
+    Amb = enc(Am)
+    for n in range(10000):
+        m = b"mixed-A-%d-%d" % (j, n)
+        r = H(prefix, m) % L
+        R = enc(mul(r, B))
+        k = H(R, Amb, m) % L
+        if mul(k, TORSION[j]) == ID:
+            S = (r + k * a) % L
+            vec("mixed-order-A-plus-T%d" % j, Amb, m, R + S.to_bytes(32, "little"), False)
+            break
+
+# mixed-order R' = rB + T: cofactored-only acceptance
+for j in (1, 4):
+    m = b"mixed-R-%d" % j
+    r = H(prefix, m) % L
+    Rm = enc(add(mul(r, B), TORSION[j]))
+    S = (r + (H(Rm, A, m) % L) * a) % L
+    vec("mixed-order-R-plus-T%d" % j, A, m, Rm + S.to_bytes(32, "little"), False)
+
+# valid reviewer signature and noncanonical R encodings
+m = b"reviewer valid"
+r = H(prefix, m) % L
+R = enc(mul(r, B))
+S = (r + (H(R, A, m) % L) * a) % L
+vec("reviewer-valid", A, m, R + S.to_bytes(32, "little"), True)
+vec("reviewer-S-equals-L", A, m, R + L.to_bytes(32, "little"), False)
+vec("reviewer-S-plus-L", A, m, R + (S + L).to_bytes(32, "little"), False)
+vec("reviewer-R-sign-bit-flip", A, m, bytes(R[:31]) + bytes([R[31] ^ 0x80]) + S.to_bytes(32, "little"), False)
+
+# noncanonical encodings: y>=p and x=0 with sign bit set
+for name, hx in [("y-eq-p", "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"),
+                 ("y-eq-p-plus-1", "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"),
+                 ("x0-sign1-identity", "0100000000000000000000000000000000000000000000000000000000000080")]:
+    vec("noncanonical-A-" + name, bytes.fromhex(hx), b"", idb + bytes(32), False)
+    vec("noncanonical-R-" + name, A, m, bytes.fromhex(hx) + S.to_bytes(32, "little"), False)
+# noncanonical y (y+p) encodings of the curve points with small y, if any exist
+for y in range(0, 19):
+    P = dec(y.to_bytes(32, "little"))
+    if P is not None:
+        b = bytearray((y + p).to_bytes(32, "little"))
+        b[31] |= (P[0] & 1) << 7
+        vec("noncanonical-y-plus-p-of-y%d" % y, bytes(b), b"", idb + bytes(32), False)
+
+json.dump({"torsionOrders": [next(n for n in range(1, 9) if mul(n, t) == ID) for t in TORSION],
+           "rfcSignaturesReproducedBySigning": rfc_reproduced,
+           "reviewerTestPublicKeyHex": A.hex(), "vectors": V}, open(sys.argv[1], "w"), indent=1)
+print(json.dumps({"vectors": len(V), "rfcReproduced": rfc_reproduced,
+                  "independentStrictAccept": sum(v["independent"]["strictPrimeOrder"] for v in V),
+                  "expectStrictAccept": sum(v["expectStrictAccept"] for v in V),
+                  "independentCofactorlessAccept": sum(v["independent"]["cofactorless"] for v in V),
+                  "independentAgreesWithExpect": all(v["independent"]["strictPrimeOrder"] == v["expectStrictAccept"] for v in V)}))

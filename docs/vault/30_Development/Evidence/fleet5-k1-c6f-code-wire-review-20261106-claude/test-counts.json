@@ -1,0 +1,138 @@
+{
+ "counter": "count_go_json.py.txt (Action pass/fail/skip events with Test; no-test-files packages listed separately, not test skips)",
+ "runs": [
+  {
+   "file": "reviewer:k1-pkg.jsonl",
+   "tests": {
+    "sub:pass": 94,
+    "top:pass": 30
+   },
+   "packages": {
+    "pass": 1
+   },
+   "noTestFilesPackages": [],
+   "topLevelPass": 30,
+   "passEvents": 124
+  },
+  {
+   "file": "reviewer:node-all.jsonl",
+   "tests": {
+    "sub:pass": 177,
+    "top:pass": 61
+   },
+   "packages": {
+    "skip": 6,
+    "pass": 7
+   },
+   "noTestFilesPackages": [
+    "inv-discover",
+    "inv-supervisor",
+    "probe",
+    "storage",
+    "telemetry",
+    "transfer"
+   ],
+   "topLevelPass": 61,
+   "passEvents": 238
+  },
+  {
+   "file": "owner-c6f-evidence:k1-final-focused.log",
+   "tests": {
+    "sub:pass": 91,
+    "top:pass": 30
+   },
+   "packages": {
+    "pass": 1
+   },
+   "noTestFilesPackages": [],
+   "topLevelPass": 30,
+   "passEvents": 121
+  },
+  {
+   "file": "owner-c6f-evidence:node-go-suite-attempt1.log",
+   "tests": {
+    "sub:pass": 174,
+    "top:fail": 1,
+    "top:pass": 59
+   },
+   "packages": {
+    "skip": 6,
+    "pass": 6,
+    "fail": 1
+   },
+   "noTestFilesPackages": [
+    "inv-discover",
+    "inv-supervisor",
+    "probe",
+    "storage",
+    "telemetry",
+    "transfer"
+   ],
+   "topLevelPass": 59,
+   "passEvents": 233
+  },
+  {
+   "file": "owner-c6f-evidence:node-go-suite-attempt2.log",
+   "tests": {
+    "sub:pass": 174,
+    "top:pass": 61
+   },
+   "packages": {
+    "skip": 6,
+    "pass": 7
+   },
+   "noTestFilesPackages": [
+    "inv-discover",
+    "inv-supervisor",
+    "probe",
+    "storage",
+    "telemetry",
+    "transfer"
+   ],
+   "topLevelPass": 61,
+   "passEvents": 235
+  },
+  {
+   "file": "owner-c6f-evidence:node-go-suite-attempt3.log",
+   "tests": {
+    "sub:pass": 177,
+    "top:pass": 61
+   },
+   "packages": {
+    "skip": 6,
+    "pass": 7
+   },
+   "noTestFilesPackages": [
+    "inv-discover",
+    "inv-supervisor",
+    "probe",
+    "storage",
+    "telemetry",
+    "transfer"
+   ],
+   "topLevelPass": 61,
+   "passEvents": 238
+  },
+  {
+   "file": "owner-c6f-evidence:node-go-suite.log",
+   "tests": {
+    "sub:pass": 177,
+    "top:pass": 61
+   },
+   "packages": {
+    "skip": 6,
+    "pass": 7
+   },
+   "noTestFilesPackages": [
+    "inv-discover",
+    "inv-supervisor",
+    "probe",
+    "storage",
+    "telemetry",
+    "transfer"
+   ],
+   "topLevelPass": 61,
+   "passEvents": 238
+  }
+ ]
+}

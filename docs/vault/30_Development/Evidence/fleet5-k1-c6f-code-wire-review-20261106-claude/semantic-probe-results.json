@@ -1,0 +1,132 @@
+[
+ {
+  "Case": "baseline-verify",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "baseline-current-set",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "native-producer-types-transport-canonical-and-encoder",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "lease-records",
+  "Outcome": "INFO",
+  "Detail": "[fence-released mode=RELEASED op=fixture-operation-migration epoch=1 lease-migration mode=HELD op=fixture-operation-migration epoch=1 lease-restore mode=HELD op=fixture-operation-restore epoch=2]"
+ },
+ {
+  "Case": "current-set-for-released-epoch1-set-cohort-34",
+  "Outcome": "REJECT",
+  "Detail": "no trusted current set context"
+ },
+ {
+  "Case": "current-lease-hash-differs-from-trusted-operation-lease",
+  "Outcome": "REJECT",
+  "Detail": "external operation differs from authenticated original lease"
+ },
+ {
+  "Case": "trusted-plan-expiresAt-wrong-type",
+  "Outcome": "PANIC",
+  "Detail": "interface conversion: interface {} is json.Number, not string"
+ },
+ {
+  "Case": "trusted-plan-missing-timing",
+  "Outcome": "REJECT",
+  "Detail": "request-10-verifyBootstrap-PC2/arguments/signedM2: missing pointer /timing/maxEvidenceAgeSeconds"
+ },
+ {
+  "Case": "trusted-semantic-inputs-nil",
+  "Outcome": "REJECT",
+  "Detail": "trusted facts cohort mismatch"
+ },
+ {
+  "Case": "zero-verifier-Verify",
+  "Outcome": "REJECT",
+  "Detail": "missing installed verifier"
+ },
+ {
+  "Case": "nil-verifier-Verify",
+  "Outcome": "REJECT",
+  "Detail": "missing installed verifier"
+ },
+ {
+  "Case": "zero-verifier-CurrentSet",
+  "Outcome": "REJECT",
+  "Detail": "missing installed verifier"
+ },
+ {
+  "Case": "nil-verifier-NativeHistory",
+  "Outcome": "REJECT",
+  "Detail": "missing installed native verifier"
+ },
+ {
+  "Case": "zero-NewVerifier",
+  "Outcome": "REJECT",
+  "Detail": "missing externally registered verifier provenance"
+ },
+ {
+  "Case": "now-non-UTC-location",
+  "Outcome": "REJECT",
+  "Detail": "missing trusted UTC observation time"
+ },
+ {
+  "Case": "registry-all-zero",
+  "Outcome": "REJECT",
+  "Detail": "missing externally registered verifier provenance"
+ },
+ {
+  "Case": "no-grants",
+  "Outcome": "REJECT",
+  "Detail": "no external key grants"
+ },
+ {
+  "Case": "empty-packet",
+  "Outcome": "REJECT",
+  "Detail": "missing or extra packet records"
+ },
+ {
+  "Case": "native-observed-before-challenge-issued",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "control-now-plus-10s-unchanged-challenge",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "report-digest-map-not-aliased",
+  "Outcome": "ACCEPT",
+  "Detail": ""
+ },
+ {
+  "Case": "wrong-key-full-rebind-reason-node-floor-v2",
+  "Outcome": "REJECT",
+  "Detail": "request-10-verifyBootstrap-PC2/arguments/signedM2: proof signer differs from exact containing Node/reviewer key"
+ },
+ {
+  "Case": "wrong-key-full-rebind-reason-build-provenance",
+  "Outcome": "REJECT",
+  "Detail": "plan/body/commonFence/buildProvenance: key not authorized for exact current role/scope"
+ },
+ {
+  "Case": "wrong-key-full-rebind-reason-inventory-head-readback",
+  "Outcome": "REJECT",
+  "Detail": "plan/body/expectedInventoryHead/readbackProof: key not authorized for exact current role/scope"
+ },
+ {
+  "Case": "wrong-key-full-rebind-reason-independent-code-review",
+  "Outcome": "REJECT",
+  "Detail": "plan/body/newRenewalGuard/independentReview/receipt: proof signer differs from exact containing Node/reviewer key"
+ },
+ {
+  "Case": "other-node-same-role-key-on-node-scoped-normalized",
+  "Outcome": "REJECT",
+  "Detail": "[process-quiescence at request-06-captureFenced-PC2/arguments/quiescence] request-06-captureFenced-PC2/arguments/quiescence: key not authorized for exact current role/scope"
+ }
+]

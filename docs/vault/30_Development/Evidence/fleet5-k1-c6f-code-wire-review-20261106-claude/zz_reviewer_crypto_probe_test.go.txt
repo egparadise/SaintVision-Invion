@@ -1,0 +1,79 @@
+package migrationverify
+
+// Reviewer-only probe (Claude). Copied into a private scratch worktree, never committed
+// to the product package. Runs product verifyEd25519/decodePrimePoint/publicSPKI and
+// stdlib ed25519.Verify on independently generated public vectors.
+import (
+	"crypto/ed25519"
+	"encoding/hex"
+	"encoding/json"
+	"os"
+	"testing"
+)
+
+func TestZZReviewerCryptoProbe(t *testing.T) {
+	in := os.Getenv("K1REV_VECTORS")
+	if in == "" {
+		t.Skip("reviewer probe input not set")
+	}
+	raw, e := os.ReadFile(in)
+	if e != nil {
+		t.Fatal(e)
+	}
+	var doc struct {
+		Vectors []struct {
+			Name, PublicKeyHex, MessageHex, SignatureHex string
+			ExpectStrictAccept                          bool
+			IndependentSPKI                             *string
+			Independent                                 map[string]bool
+		}
+	}
+	if e = json.Unmarshal(raw, &doc); e != nil {
+		t.Fatal(e)
+	}
+	type row struct {
+		Name                                         string
+		ProductStrictAccept, StdlibAccept            bool
+		ProductError                                 string
+		DecodeA, DecodeR                             string
+		SPKIMatchesIndependent                       *bool
+		ExpectStrictAccept, IndependentStrict, Agree bool
+	}
+	out := []row{}
+	for _, v := range doc.Vectors {
+		a, _ := hex.DecodeString(v.PublicKeyHex)
+		m, _ := hex.DecodeString(v.MessageHex)
+		s, _ := hex.DecodeString(v.SignatureHex)
+		r := row{Name: v.Name, ExpectStrictAccept: v.ExpectStrictAccept, IndependentStrict: v.Independent["strictPrimeOrder"]}
+		if e := verifyEd25519(a, m, s); e == nil {
+			r.ProductStrictAccept = true
+		} else {
+			r.ProductError = e.Error()
+		}
+		r.StdlibAccept = len(a) == 32 && len(s) == 64 && ed25519.Verify(a, m, s)
+		if e := decodePrimePoint(a); e != nil {
+			r.DecodeA = e.Error()
+		} else {
+			r.DecodeA = "ok"
+		}
+		if e := decodePrimePoint(s[:32]); e != nil {
+			r.DecodeR = e.Error()
+		} else {
+			r.DecodeR = "ok"
+		}
+		if v.IndependentSPKI != nil && r.DecodeA == "ok" {
+			h, e := publicSPKI(a)
+			ok := e == nil && h == *v.IndependentSPKI
+			r.SPKIMatchesIndependent = &ok
+		}
+		r.Agree = r.ProductStrictAccept == v.ExpectStrictAccept && r.ProductStrictAccept == r.IndependentStrict
+		if !r.Agree {
+			t.Errorf("disagreement %s", v.Name)
+		}
+		out = append(out, r)
+	}
+	b, _ := json.MarshalIndent(out, "", " ")
+	if e = os.WriteFile(os.Getenv("K1REV_OUT"), b, 0o600); e != nil {
+		t.Fatal(e)
+	}
+}

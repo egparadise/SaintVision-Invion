@@ -1,0 +1,22 @@
+{
+  "reviewer": "Claude (independent; single reviewer, sequential low-memory runs)",
+  "reviewedCommit": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "parent": "e50c148287779add421265868ef16909ed984650",
+  "workspace": "detached private scratch worktree of the reviewed commit (<private-scratch>/k1); reviewer probe *_test.go files copied in, run, then removed; final worktree status clean",
+  "toolchain": "go1.27.0 windows/amd64, CGO_ENABLED=0 (local -race NOT RUN); Python 3.14.7 shared .venv -I -B; cryptography 50.0.1",
+  "runs": [
+    {"atKST": "2026-11-06T06:54:15+09:00 .. 06:54:20", "cwd": "services/node-agent", "command": "GOFLAGS=-mod=mod go build ./...", "exit": 0, "note": "REVIEWER MISTAKE PRESERVED: -mod=mod rewrote go.mod in the scratch worktree (dropped the '// indirect' marker on golang.org/x/text). Reverted with git checkout before every recorded result below; this run is not used as evidence."},
+    {"atKST": "2026-11-06T06:54:30+09:00 .. 06:54:50", "command": "go test ./migrationverify -count=1 -json", "exit": 0, "note": "ran while the accidental go.mod comment change was still present; superseded by the 07:09:29 rerun on a clean tree (identical 30/124)"},
+    {"atKST": "2026-11-06T06:54:59+09:00 .. 06:55:01", "command": "go build ./... && go vet ./migrationverify (clean go.mod, default -mod)", "exit": 0, "output": "both logs empty"},
+    {"atKST": "2026-11-06T06:55:20+09:00 .. 06:55:40", "command": "go test ./... -count=1 -json", "exit": 0, "output": "node-all.jsonl: 61 top-level / 238 PASS events, 0 fail, 0 test skip; 7 packages pass; 6 no-test-files packages (package-level skip, not test skips)"},
+    {"atKST": "2026-11-06T06:58:03+09:00 .. 06:58:08", "command": "python -I -B ed25519_independent.py <out>/ed25519-vectors.json", "exit": 0, "output": "45 public vectors; RFC8032 TEST1-3 signatures reproduced by independent signing; independent strict accepts 4 (= expected)"},
+    {"atKST": "2026-11-06T06:58:35+09:00 .. 06:58:38", "command": "K1REV_VECTORS=... go test ./migrationverify -run TestZZReviewerCryptoProbe -count=1 -v", "exit": 0, "output": "ed25519-go-results.json: 45/45 product==independent; stdlib accepts 19, product 4"},
+    {"atKST": "between 06:58:38 and 07:01:04 KST (not individually timestamped)", "command": "python -I -B -c <cryptography Ed25519 cross-check of the 45 vectors>", "exit": 0, "output": "crypto-lib-crosscheck.txt"},
+    {"atKST": "2026-11-06T07:01:04+09:00", "command": "python -I -B source_audit.py <repo> c6f0d95e e50c1482", "exit": 0, "output": "source-audit.json"},
+    {"atKST": "2026-11-06T07:04:31+09:00 .. 07:04:43", "command": "K1REV_SEMANTIC_OUT=... go test ./migrationverify -run TestZZReviewerSemanticProbe -count=1", "exit": 0, "output": "semantic-probe-results.json (probe records outcomes; it does not fail on ACCEPT/PANIC)"},
+    {"atKST": "2026-11-06T07:05:56+09:00 .. 07:06:25", "command": "K1REV_CURRENT_OUT=... go test ./migrationverify -run TestZZReviewerCurrentProbe -count=1", "exit": 0, "output": "current-probe-results.json"},
+    {"atKST": "2026-11-06T07:07:31+09:00 .. 07:07:37", "command": "K1REV_TIME_OUT=... go test ./migrationverify -run TestZZReviewerTimeProbe -count=1", "exit": 0, "output": "time-probe-results.json"},
+    {"atKST": "2026-11-06T07:07:58+09:00", "command": "gh run view 42113810160 (+ gh api jobs/127548012850 steps), read-only", "exit": 0, "output": "Core Build workflow_dispatch headSha c6f0d95e status in_progress; job 127548012850 'core' in_progress with step 'Test Linux Node concurrency and crash boundaries' success 06:36:46-06:40:07 KST; job 127548013352 s01 success. Not rerun or cancelled."},
+    {"atKST": "2026-11-06T07:09:29+09:00 .. 07:09:49", "command": "go test ./migrationverify -count=1 -json (clean tree)", "exit": 0, "output": "k1-pkg.jsonl: 30 top-level / 124 PASS events"}
+  ]
+}

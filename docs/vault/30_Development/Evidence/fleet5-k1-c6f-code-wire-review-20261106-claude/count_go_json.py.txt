@@ -1,0 +1,17 @@
+import json, sys, collections
+def count(path, pkgfilter=None):
+    c = collections.Counter(); pk = collections.Counter(); nofiles=[]
+    for line in open(path, encoding="utf-8"):
+        line=line.strip()
+        if not line.startswith("{"): continue
+        e = json.loads(line)
+        a = e.get("Action"); t = e.get("Test"); p = e.get("Package","")
+        if pkgfilter and not p.endswith(pkgfilter): continue
+        if t and a in ("pass","fail","skip"):
+            c[("top" if "/" not in t else "sub", a)] += 1
+        if not t and a in ("pass","fail","skip"):
+            pk[a]+=1
+        if not t and a=="output" and "no test files" in e.get("Output",""):
+            nofiles.append(p.rsplit("/",1)[-1])
+    return {"tests": {f"{k[0]}:{k[1]}": v for k,v in sorted(c.items())}, "packages": dict(pk), "noTestFilesPackages": sorted(set(nofiles))}
+print(json.dumps({"file": sys.argv[1], **count(sys.argv[1], sys.argv[2] if len(sys.argv)>2 else None)}, indent=1))
