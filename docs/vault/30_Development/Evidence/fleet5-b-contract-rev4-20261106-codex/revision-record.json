@@ -1,0 +1,35 @@
+{
+  "version": "fleet5-b-rev4-record:1",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude whole delta review via Root PENDING",
+  "task": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "branch": "agent/codex/fleet5-b-contract-rev4-20261106",
+  "proposalBaseDocsSHA": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
+  "sourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "actualPriorReview": "638109ab211bdfab7646a07b375003a636b3a33b",
+  "priorVerdict": "REVISION REQUIRED, no partial freeze or code grant",
+  "rootDecision": "msg_94ff5bb7a0e6: one narrow REV4 DOCS/schema/static delta, M1/M2/M3 L1..L6 concrete choices",
+  "recordedAtKST": "2026-11-06T06:21:03+09:00",
+  "guidance": [
+    {
+      "id": "INDEX-PROGRESS-001",
+      "version": "1.0.421",
+      "updated": "2026-11-06T06:01:04+09:00",
+      "sha256": "cf9a6e6118b9931a2a50228b90e6b86310a9a085b7efe19c12619169f871eb99"
+    },
+    {
+      "id": "WORKBOARD-CODEX-001",
+      "version": "1.0.382",
+      "updated": "2026-11-06T06:01:04+09:00",
+      "sha256": "d549037b38bd166525136d2936606a43d5a6bfb7967c1f53f36896a54e782d68"
+    }
+  ],
+  "canonicalFirstReads": "Prior immutable initial-first-read source inventory: exact doc IDs/versions/hashes, agent-delivery1.1.0/core-reliability1.0.0",
+  "scope": "Unique History/Evidence ONLY. No source/ADR/registry/shared boards/Obsidian apply or remote/private/PKI/Node/PG/Docker/VM/clock/schedule/oldpilot/protected state actions. No helpers.",
+  "allRealBindings": null,
+  "actualNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "acceptanceMatrix": "A1-A16 real-system evidence remains PENDING; no mock freeze",
+  "otherRootWork": "e50 bounded source/packet/report ACCEPT is separate, physical/whole incomplete; no borrowed B acceptance"
+}

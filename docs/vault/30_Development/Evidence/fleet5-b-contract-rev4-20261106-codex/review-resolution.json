@@ -1,0 +1,22 @@
+{
+  "version": "fleet5-b-rev4-resolutions:1",
+  "priorReview": "638109ab211bdfab7646a07b375003a636b3a33b",
+  "priorVerdict": "REVISION REQUIRED; preserved actual33 probes and failures",
+  "rootDecision": "msg_94ff5bb7a0e6",
+  "actualDeltaReview": "PENDING",
+  "implementedProduct": false,
+  "resolutions": {
+    "M1": "494-file Git AST source scan, imported/local/self helper caller closure, per-function lexical plans, all-receiver ORM methods/aliases, all reviewer missed modules including credential_registry and node_auth108; explicit unresolved static edges, causal CLI removals exit1",
+    "M2": "protected APPEND approval renewal before expiry and REAPPROVE after only time expiry, current valid operator grant/cert/trust, per-Node old gate invalidation/drain/new gate/current CAS/postcommit delivery; unrelated offline nodes not required",
+    "M3": "closed gateAck/deliveryChallenge/keyPossession/protected keyDeliveryReceipt/ObservationScope plus method/domain/key hierarchy and typed grants; stateful actual model gate/delivery/current inputs",
+    "L1": "all not-yet-CAS nodes k1..4 revoke C+1 target alias with DER A/disabled refuses; exact full ledger/tuple",
+    "L2": "unresolved AFTER exact ledger reread vs resolved exact committed forward; no missing-ledger external-effect inference/freshness waiver",
+    "L3": "fixed SECURITY DEFINER lock-only path, NO online authority UPDATE/sentinel, no legacy role membership bypass, real PG tests future",
+    "L4": "safety exact method/raw path; distinct protected context-budget approver/key/purpose/pin",
+    "L5": "raw authenticated host+guest clock offset+uncertainty/context/nonce/producer/time and bounded skew policy",
+    "L6": "typed ALL table/writer/procedure/principal/owner/column policy causal removals, real synthetic approval intervals, READMIT old-old rejects/REFRESH unchanged"
+  },
+  "newRealGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "realBindings": null,
+  "remaining": "one whole actual Rev4 delta review, Root coupled acceptance and bounded code grant; A1-A16 actual system evidence pending"
+}

@@ -1,0 +1,239 @@
+{
+ "level": "REVIEWER_SCHEMA_STATIC_SYMBOLIC_ONLY",
+ "cases": 33,
+ "agree": 14,
+ "disagree": 19,
+ "results": [
+  {
+   "name": "schema-only-accepts-float-time",
+   "actual": true,
+   "contract": false,
+   "agrees": false,
+   "note": "JSON Schema 'integer' admits 2.0e9; only no_float()/strict_json reject"
+  },
+  {
+   "name": "owner-shape-rejects-float-time",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "time-above-2^53-rejected",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "schema-accepts-purpose-path-mismatch",
+   "actual": true,
+   "contract": false,
+   "agrees": false,
+   "note": "schema enums are independent"
+  },
+  {
+   "name": "predicate-rejects-purpose-path-mismatch",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "owner-fixtures-exercise-schema-gateControl",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "new R1/R2 lanes need positive+negative shape fixtures"
+  },
+  {
+   "name": "owner-fixtures-exercise-schema-safety",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "new R1/R2 lanes need positive+negative shape fixtures"
+  },
+  {
+   "name": "owner-fixtures-exercise-schema-observeInput",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "new R1/R2 lanes need positive+negative shape fixtures"
+  },
+  {
+   "name": "owner-fixtures-exercise-schema-signedEnvelope",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "new R1/R2 lanes need positive+negative shape fixtures"
+  },
+  {
+   "name": "owner-fixtures-exercise-schema-roleConfig",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "new R1/R2 lanes need positive+negative shape fixtures"
+  },
+  {
+   "name": "chain-model-has-gate-armed-or-invalidated-input",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "INVALIDATE_EXACT_GATE / restart-no-gate not modelled"
+  },
+  {
+   "name": "chain-model-has-key-delivery-receipt-input",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "post-activation key delivery receipt not modelled"
+  },
+  {
+   "name": "owner-defines-ObservationScope-schema",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "prose only"
+  },
+  {
+   "name": "owner-defines-key-delivery-receipt-schema",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "prose only"
+  },
+  {
+   "name": "safety-schema-binds-path",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "action->path mapping must be normative"
+  },
+  {
+   "name": "roleUse-binds-stream-or-sequence",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "frame sequence only via bodySha256 of frame body (if body carries it)"
+  },
+  {
+   "name": "chain-model-binds-approval-expiry",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "release<=approval uses constant NOW+4000"
+  },
+  {
+   "name": "readmit-same-generation-accepted",
+   "actual": true,
+   "contract": false,
+   "agrees": false,
+   "note": "contract: fresh actual generation after restart/expiry"
+  },
+  {
+   "name": "tables-whose-writer-names-a-procedure",
+   "actual": 1,
+   "contract": 17,
+   "agrees": false,
+   "note": "owner check only covers 1/17 tables: ['inv.node_role_key_deliveries']"
+  },
+  {
+   "name": "release-anchor-listed-as-ARM-signer",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "History/schema: ARM_EXACT_RELEASE signed by release authority; ABI lists only invalidation"
+  },
+  {
+   "name": "budget-signer-is-release-anchor-in-fixture",
+   "actual": true,
+   "contract": false,
+   "agrees": false,
+   "note": "budget approval uses release key in fixture; not in keyHierarchy"
+  },
+  {
+   "name": "displayLabel-128-codepoints-192-bytes-schema-valid",
+   "actual": true,
+   "contract": true,
+   "agrees": true,
+   "note": "unit (code points vs UTF-8 bytes) must be stated for Go"
+  },
+  {
+   "name": "matrix-is-exact-7x11-grid",
+   "actual": true,
+   "contract": true,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "matrix-rows-match-reviewer-rules",
+   "actual": [],
+   "contract": [],
+   "agrees": true,
+   "note": "reviewer-derived: k CP CAS done, Node P/C/DER already target, recovery vs short-lived split"
+  },
+  {
+   "name": "lost-response-always-recovery-gate-even-with-all-authority-valid",
+   "actual": true,
+   "contract": true,
+   "agrees": true,
+   "note": "History R4/R6 resolve lost commit via exact ledger reread; matrix must say this row means ledger-unresolvable"
+  },
+  {
+   "name": "before-intent-short-lived-expiry-labelled-preflight-fail",
+   "actual": true,
+   "contract": true,
+   "agrees": true,
+   "note": "conservative; reissue/re-observe would suffice"
+  },
+  {
+   "name": "matrix-has-revoke-of-not-yet-CAS-member-at-k1-4",
+   "actual": false,
+   "contract": true,
+   "agrees": false,
+   "note": "revocation C+1 equals renewal target C=8 for an un-CAS'd member (DER A); must assert CAS refuses and C alone never means CAS-done"
+  },
+  {
+   "name": "selection-reject-('node-0',)",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "selection-reject-'node-0'",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "selection-reject-['node-0', True]",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "selection-reject-['NODE-0']",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "token-noncanonical-key-order-rejected",
+   "actual": false,
+   "contract": false,
+   "agrees": true,
+   "note": ""
+  },
+  {
+   "name": "token-canonical-positive-NO_CRYPTO",
+   "actual": true,
+   "contract": true,
+   "agrees": true,
+   "note": ""
+  }
+ ]
+}

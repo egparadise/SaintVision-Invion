@@ -1,0 +1,614 @@
+{
+  "overlapP": 102,
+  "requiredFinalP": 103,
+  "CBase": 7,
+  "CTarget": 8,
+  "R": 2,
+  "revocationsAndLostResponses": [
+    {
+      "kCAS": 1,
+      "revokedUnCASNode": 1,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 1,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 1,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 1,
+      "revokedUnCASNode": 2,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 2,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 2,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 1,
+      "revokedUnCASNode": 3,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 3,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 3,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 1,
+      "revokedUnCASNode": 4,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 4,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 4,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 2,
+      "revokedUnCASNode": 2,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 2,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 2,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 2,
+      "revokedUnCASNode": 3,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 3,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 3,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 2,
+      "revokedUnCASNode": 4,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 4,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 4,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 3,
+      "revokedUnCASNode": 3,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 3,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 3,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 3,
+      "revokedUnCASNode": 4,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 4,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 4,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "kCAS": 4,
+      "revokedUnCASNode": 4,
+      "POverlap": 102,
+      "PFinalRequired": 103,
+      "R": 2,
+      "current": {
+        "node": 4,
+        "C": 8,
+        "DER": "A",
+        "enabled": false
+      },
+      "target": {
+        "node": 4,
+        "C": 8,
+        "DER": "B",
+        "enabled": true
+      },
+      "ledger": null,
+      "outcome": "REOBSERVE_OR_QUARANTINED",
+      "fenceRetained": true
+    },
+    {
+      "event": "UNRESOLVED_AFTER_EXACT_LEDGER_REREAD",
+      "outcome": "QUARANTINED",
+      "freshAuthorityDoesNotResolveUnknownEffects": true
+    },
+    {
+      "event": "RESOLVED_EXACT_COMMIT_FORWARD",
+      "requires": "matching full ledger+DER+current tuple+fresh valid frozen authority; no expiry/revoke waiver"
+    }
+  ],
+  "perNodeApprovalRows": [
+    {
+      "phase": "OBSERVE_SELECTED",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": false,
+      "computedEligible": true,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "APPEND_APPROVAL_NOT_CURRENT",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": false,
+      "computedEligible": true,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "PAUSE_SELECTED",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "INVALIDATE_OLD_ACK_AND_DRAIN",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "INVALIDATED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "ARM_NEW_ACK",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CURRENT_CAS_COMMITTED_NO_RECEIPT",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "01f74496ff9cbc65eeeb15ee343c8732a9ee10f8a11ca2ee8554c80a73a0a888",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000007200
+      },
+      "currentPointerHash": "37f4f9b9a3b39a92911d59185d7aa5f5a4d700bd08019837c22a268e5a40a249",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CHALLENGE_PREPARED_POSTCOMMIT",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "01f74496ff9cbc65eeeb15ee343c8732a9ee10f8a11ca2ee8554c80a73a0a888",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000007200
+      },
+      "currentPointerHash": "37f4f9b9a3b39a92911d59185d7aa5f5a4d700bd08019837c22a268e5a40a249",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "USE_KEY_POSSESSION_PENDING_VERIFY",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "01f74496ff9cbc65eeeb15ee343c8732a9ee10f8a11ca2ee8554c80a73a0a888",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000007200
+      },
+      "currentPointerHash": "37f4f9b9a3b39a92911d59185d7aa5f5a4d700bd08019837c22a268e5a40a249",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CHALLENGE_CONSUMED_PENDING_RECEIPT",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "01f74496ff9cbc65eeeb15ee343c8732a9ee10f8a11ca2ee8554c80a73a0a888",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000007200
+      },
+      "currentPointerHash": "37f4f9b9a3b39a92911d59185d7aa5f5a4d700bd08019837c22a268e5a40a249",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "FINAL_RECEIPT_COMMITTED",
+      "approvalMode": "APPROVAL_RENEW_BEFORE_EXPIRY",
+      "currentApprovalHash": "01f74496ff9cbc65eeeb15ee343c8732a9ee10f8a11ca2ee8554c80a73a0a888",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000007200
+      },
+      "currentPointerHash": "37f4f9b9a3b39a92911d59185d7aa5f5a4d700bd08019837c22a268e5a40a249",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-before",
+      "gateState": "ARMED",
+      "currentReceiptHash": "5cfae440b6909ebb610a37030b04aebfa61f86552b77e19df1de4c71c570f286",
+      "switchPending": false,
+      "computedEligible": true,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "OBSERVE_SELECTED",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "APPEND_APPROVAL_NOT_CURRENT",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "PAUSE_SELECTED",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "INVALIDATE_OLD_ACK_AND_DRAIN",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-old",
+      "gateState": "INVALIDATED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "ARM_NEW_ACK",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "46b74b10668684968c77dd3658ceeee7c97189c6ebf25c5b59675bf0bb38b2c3",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000600
+      },
+      "currentPointerHash": "68462944159f7af431ca2dc2abebded71047ddfc90283c5500ceab31060800e4",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": "34f94218986dac77f8f3c51a617f74c981be8729bbf00c68838d33ffdd23ba27",
+      "switchPending": true,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CURRENT_CAS_COMMITTED_NO_RECEIPT",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "8c08318495ddf60b527e328048bee30a265dd9eca5ff6c853bd7f1ea06e2fa18",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000700,
+        "expiresAt": 2000007900
+      },
+      "currentPointerHash": "10cf1cad195500311c104ba7c447e27998ad249e7253b521af9d45dca4ea9ddc",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CHALLENGE_PREPARED_POSTCOMMIT",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "8c08318495ddf60b527e328048bee30a265dd9eca5ff6c853bd7f1ea06e2fa18",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000700,
+        "expiresAt": 2000007900
+      },
+      "currentPointerHash": "10cf1cad195500311c104ba7c447e27998ad249e7253b521af9d45dca4ea9ddc",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "USE_KEY_POSSESSION_PENDING_VERIFY",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "8c08318495ddf60b527e328048bee30a265dd9eca5ff6c853bd7f1ea06e2fa18",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000700,
+        "expiresAt": 2000007900
+      },
+      "currentPointerHash": "10cf1cad195500311c104ba7c447e27998ad249e7253b521af9d45dca4ea9ddc",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "CHALLENGE_CONSUMED_PENDING_RECEIPT",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "8c08318495ddf60b527e328048bee30a265dd9eca5ff6c853bd7f1ea06e2fa18",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000700,
+        "expiresAt": 2000007900
+      },
+      "currentPointerHash": "10cf1cad195500311c104ba7c447e27998ad249e7253b521af9d45dca4ea9ddc",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": null,
+      "switchPending": false,
+      "computedEligible": false,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    },
+    {
+      "phase": "FINAL_RECEIPT_COMMITTED",
+      "approvalMode": "REAPPROVE_ONLY_TIME_EXPIRED",
+      "currentApprovalHash": "8c08318495ddf60b527e328048bee30a265dd9eca5ff6c853bd7f1ea06e2fa18",
+      "currentApprovalInterval": {
+        "issuedAt": 2000000700,
+        "expiresAt": 2000007900
+      },
+      "currentPointerHash": "10cf1cad195500311c104ba7c447e27998ad249e7253b521af9d45dca4ea9ddc",
+      "nodeGeneration": "generation-0",
+      "gateId": "gate-phase-after",
+      "gateState": "ARMED",
+      "currentReceiptHash": "4bb2bb9bb10d0322298ed11e6dcb0f0d29eb6abfbffabb5d9a312f1caaa504b3",
+      "switchPending": false,
+      "computedEligible": true,
+      "lossRule": "Stop next transition, UNKNOWN until exact committed ledger/current tuple plus fresh Node proof; no old authority restoration, no claims freed",
+      "expiryRule": "Affected Node unavailable, no silent time extension/new key/challenge. Resume exact still-valid intent or reviewed recovery."
+    }
+  ],
+  "perNodeApprovalPhases": [
+    "OBSERVE_SELECTED",
+    "APPEND_NEW_PROTECTED_APPROVAL_NOT_CURRENT",
+    "PAUSE_SELECTED_ISSUANCE",
+    "INVALIDATE_OLD_GATE_ACK_AND_DRAIN",
+    "ARM_REPLACEMENT_ACK",
+    "CANONICAL_PER_NODE_ACTIVATION_CURRENT_CAS",
+    "POSTCOMMIT_CHALLENGE",
+    "USE_KEY_POSSESSION",
+    "CONTROLLER_CONSUMPTION",
+    "PROTECTED_RECEIPT_COMMIT_AND_PUBLISH",
+    "ELIGIBLE_SELECTED_NODE"
+  ],
+  "allLossOrExpiry": "UNAVAILABLE/UNKNOWN; retain claims/monotonic evidence, exact ledger+fresh Node proof only, no old authority restore"
+}

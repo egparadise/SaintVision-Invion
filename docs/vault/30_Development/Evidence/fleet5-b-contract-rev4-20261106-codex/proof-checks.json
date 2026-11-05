@@ -1,0 +1,76 @@
+{
+  "recordedAtKST": "2026-11-06T06:56:54+09:00",
+  "sourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "checks": [
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev4-20261106-codex\\schema.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/build-schema.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev4-20261106-codex\\authority.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/build-authority.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev4-20261106-codex\\fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/stateful-fixtures.log",
+      "sha256": "dea8467e1eced7f9d1700755caa45945b37751dd204b786089fb4fb5a39cc0d3"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev4-20261106-codex\\source_census.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/source-census.log",
+      "sha256": "7248662d632c17d0c481a8eab60892b9b85e14e9b8f3530120cc0ec4df659b9a"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/unchanged-r4-positive.log",
+      "sha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/coexistence-expected-red.log",
+      "sha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    }
+  ],
+  "realNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "expectedNonzeroIsTaskFailure": false,
+  "updatedAtKST": "2026-11-06T07:03:03+09:00"
+}

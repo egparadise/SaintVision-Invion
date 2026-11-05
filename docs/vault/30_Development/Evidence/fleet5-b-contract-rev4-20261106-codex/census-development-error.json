@@ -1,0 +1,7 @@
+{
+  "actualExit": 1,
+  "stage": "initial source census, before artifact publication",
+  "error": "Decorator AST calls can precede def.lineno, leaving enclosing-function list empty",
+  "fix": "Scan all module Call nodes once, assign innermost function or explicit module scope; preindex functions by file. This also includes module-level calls.",
+  "productionChanges": false
+}

@@ -1,0 +1,1138 @@
+{
+  "version": "fleet5-b-authority-rev4:1",
+  "implemented": false,
+  "tables": {
+    "inv.node_role_approvals": [
+      {
+        "procedure": "b_append_approval",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "prior_approval_hash",
+          "candidate_ref",
+          "operator_grant_ref"
+        ]
+      }
+    ],
+    "inv.node_role_operations": [
+      {
+        "procedure": "b_begin_node_switch",
+        "verb": "INSERT",
+        "columns": [
+          "frozen_intent",
+          "expected_current_hash"
+        ]
+      },
+      {
+        "procedure": "b_plan_fresh",
+        "verb": "INSERT",
+        "columns": [
+          "frozen_intent"
+        ]
+      }
+    ],
+    "inv.node_role_current": [
+      {
+        "procedure": "b_begin_node_switch",
+        "verb": "UPDATE",
+        "columns": [
+          "switch_state",
+          "operation_ref"
+        ]
+      },
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "UPDATE",
+        "columns": [
+          "approval_ref",
+          "admission_ref",
+          "lease_ref",
+          "switch_state",
+          "activation_ledger_ref"
+        ]
+      },
+      {
+        "procedure": "b_refresh_same_generation",
+        "verb": "UPDATE",
+        "columns": [
+          "lease_ref"
+        ]
+      },
+      {
+        "procedure": "b_record_key_delivery",
+        "verb": "UPDATE",
+        "columns": [
+          "delivery_receipt_ref"
+        ]
+      }
+    ],
+    "inv.node_role_routing": [
+      {
+        "procedure": "b_plan_fresh",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "node_id",
+          "cohort_id",
+          "assignment_hash"
+        ]
+      }
+    ],
+    "inv.node_role_cohorts": [
+      {
+        "procedure": "b_fence_cohort",
+        "verb": "UPDATE",
+        "columns": [
+          "fence_state",
+          "operation_ref"
+        ]
+      },
+      {
+        "procedure": "b_commit_fresh_cohort",
+        "verb": "UPDATE",
+        "columns": [
+          "fence_state",
+          "release_evidence_ref"
+        ]
+      }
+    ],
+    "inv.node_role_candidates": [
+      {
+        "procedure": "b_append_candidate",
+        "verb": "INSERT",
+        "columns": [
+          "raw_node_proof",
+          "raw_host_proof",
+          "nonce",
+          "observed_at",
+          "static_hash"
+        ]
+      }
+    ],
+    "inv.node_role_gate_acks": [
+      {
+        "procedure": "b_record_gate_ack",
+        "verb": "INSERT",
+        "columns": [
+          "raw_node_signed_ack",
+          "command_hash",
+          "node_der_hash",
+          "candidate_ref"
+        ]
+      }
+    ],
+    "inv.node_channels": [
+      {
+        "procedure": "b_member_cas",
+        "verb": "UPDATE",
+        "columns": [
+          "version",
+          "certificate_sha256",
+          "certificate_not_after",
+          "enabled"
+        ]
+      }
+    ],
+    "inv.node_role_member_cas": [
+      {
+        "procedure": "b_member_cas",
+        "verb": "INSERT",
+        "columns": [
+          "operation_id",
+          "node_id",
+          "old_tuple",
+          "target_tuple"
+        ]
+      }
+    ],
+    "inv.node_role_releases": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "approval_ref",
+          "candidate_ref"
+        ]
+      }
+    ],
+    "inv.node_role_delegations": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "release_ref"
+        ]
+      }
+    ],
+    "inv.node_role_admissions": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "release_ref",
+          "delegation_ref",
+          "gate_ack_ref",
+          "generation"
+        ]
+      }
+    ],
+    "inv.node_role_leases": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "admission_ref",
+          "expires_at",
+          "fresh_proof_ref"
+        ]
+      },
+      {
+        "procedure": "b_refresh_same_generation",
+        "verb": "INSERT",
+        "columns": [
+          "admission_ref",
+          "expires_at",
+          "fresh_proof_ref"
+        ]
+      }
+    ],
+    "inv.node_role_activation_ledger": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "exact_result",
+          "expected_prior_pointer_hash"
+        ]
+      }
+    ],
+    "inv.node_role_delivery_challenges": [
+      {
+        "procedure": "b_prepare_key_delivery",
+        "verb": "INSERT",
+        "columns": [
+          "signed_challenge",
+          "activation_ledger_ref",
+          "nonce",
+          "expires_at",
+          "state"
+        ]
+      },
+      {
+        "procedure": "b_consume_key_challenge",
+        "verb": "UPDATE",
+        "columns": [
+          "state",
+          "consumption_ledger_ref"
+        ]
+      }
+    ],
+    "inv.node_role_key_possessions": [
+      {
+        "procedure": "b_append_key_possession",
+        "verb": "INSERT",
+        "columns": [
+          "challenge_ref",
+          "raw_use_key_signature",
+          "authenticated_issuer_tls_hash"
+        ]
+      }
+    ],
+    "inv.node_role_delivery_consumptions": [
+      {
+        "procedure": "b_consume_key_challenge",
+        "verb": "INSERT",
+        "columns": [
+          "challenge_ref",
+          "possession_ref",
+          "exact_context_hash"
+        ]
+      }
+    ],
+    "inv.node_role_key_deliveries": [
+      {
+        "procedure": "b_record_key_delivery",
+        "verb": "INSERT",
+        "columns": [
+          "protected_receipt",
+          "consumption_ref",
+          "activation_ledger_ref"
+        ]
+      }
+    ],
+    "inv.node_role_request_issuance": [
+      {
+        "procedure": "b_record_request_issuance",
+        "verb": "INSERT",
+        "columns": [
+          "node_id",
+          "request_hash",
+          "nonce",
+          "release_ref",
+          "expires_at"
+        ]
+      }
+    ],
+    "inv.node_role_request_commits": [
+      {
+        "procedure": "b_commit_business_nonce_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "issuance_ref",
+          "request_hash",
+          "verified_outcome_ref"
+        ]
+      }
+    ],
+    "inv.evidence": [
+      {
+        "procedure": "b_commit_business_nonce_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "evidence_id",
+          "record"
+        ]
+      }
+    ],
+    "inv.node_role_reconcile_evidence": [
+      {
+        "procedure": "b_commit_reconcile_receipt",
+        "verb": "INSERT",
+        "columns": [
+          "recorded_permit_hash",
+          "actual_node_outcome",
+          "authority_scope_ref"
+        ]
+      }
+    ],
+    "inv.node_role_safety_requests": [
+      {
+        "procedure": "b_record_safety_request",
+        "verb": "INSERT",
+        "columns": [
+          "scoped_request",
+          "nonce",
+          "grant_ref"
+        ]
+      }
+    ],
+    "inv.node_role_service_bindings": [
+      {
+        "procedure": "b_update_service_bindings",
+        "verb": "INSERT_OR_UPDATE",
+        "columns": [
+          "login_oid",
+          "tenant_scope",
+          "permitted_purposes",
+          "tls_identity_hash"
+        ]
+      }
+    ],
+    "inv.nodes": [
+      {
+        "procedure": "b_commit_node_observation",
+        "verb": "UPDATE",
+        "columns": [
+          "heartbeat_at",
+          "probe_started_at",
+          "clock_skew_seconds",
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_change_node_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      }
+    ],
+    "inv.tenant_controls": [
+      {
+        "procedure": "b_change_node_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "kill_switch",
+          "version"
+        ]
+      }
+    ],
+    "public.nodes": [
+      {
+        "procedure": "b_public_node_observation",
+        "verb": "UPDATE",
+        "columns": [
+          "heartbeat_sequence",
+          "last_heartbeat_at",
+          "status"
+        ]
+      }
+    ],
+    "public.storage_contributions": [
+      {
+        "procedure": "b_public_contribution_change",
+        "verb": "UPDATE",
+        "columns": [
+          "status",
+          "version",
+          "normalized_path",
+          "registered_by_user_id"
+        ]
+      }
+    ],
+    "inv.control_epoch": []
+  },
+  "procedures": {
+    "b_append_approval": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_approvals": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "prior_approval_hash",
+            "candidate_ref",
+            "operator_grant_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_begin_node_switch": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_operations": {
+          "verb": "INSERT",
+          "columns": [
+            "frozen_intent",
+            "expected_current_hash"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "switch_state",
+            "operation_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_plan_fresh": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_operations": {
+          "verb": "INSERT",
+          "columns": [
+            "frozen_intent"
+          ]
+        },
+        "inv.node_role_routing": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "node_id",
+            "cohort_id",
+            "assignment_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_fence_cohort": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_cohorts": {
+          "verb": "UPDATE",
+          "columns": [
+            "fence_state",
+            "operation_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_append_candidate": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_candidates": {
+          "verb": "INSERT",
+          "columns": [
+            "raw_node_proof",
+            "raw_host_proof",
+            "nonce",
+            "observed_at",
+            "static_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_record_gate_ack": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_gate_acks": {
+          "verb": "INSERT",
+          "columns": [
+            "raw_node_signed_ack",
+            "command_hash",
+            "node_der_hash",
+            "candidate_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_member_cas": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_channels": {
+          "verb": "UPDATE",
+          "columns": [
+            "version",
+            "certificate_sha256",
+            "certificate_not_after",
+            "enabled"
+          ]
+        },
+        "inv.node_role_member_cas": {
+          "verb": "INSERT",
+          "columns": [
+            "operation_id",
+            "node_id",
+            "old_tuple",
+            "target_tuple"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_commit_node_activation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_releases": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "approval_ref",
+            "candidate_ref"
+          ]
+        },
+        "inv.node_role_delegations": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "release_ref"
+          ]
+        },
+        "inv.node_role_admissions": {
+          "verb": "INSERT",
+          "columns": [
+            "release_ref",
+            "delegation_ref",
+            "gate_ack_ref",
+            "generation"
+          ]
+        },
+        "inv.node_role_leases": {
+          "verb": "INSERT",
+          "columns": [
+            "admission_ref",
+            "expires_at",
+            "fresh_proof_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "approval_ref",
+            "admission_ref",
+            "lease_ref",
+            "switch_state",
+            "activation_ledger_ref"
+          ]
+        },
+        "inv.node_role_activation_ledger": {
+          "verb": "INSERT",
+          "columns": [
+            "exact_result",
+            "expected_prior_pointer_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_commit_fresh_cohort": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_cohorts": {
+          "verb": "UPDATE",
+          "columns": [
+            "fence_state",
+            "release_evidence_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_refresh_same_generation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_leases": {
+          "verb": "INSERT",
+          "columns": [
+            "admission_ref",
+            "expires_at",
+            "fresh_proof_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "lease_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_prepare_key_delivery": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_delivery_challenges": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_challenge",
+            "activation_ledger_ref",
+            "nonce",
+            "expires_at",
+            "state"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_append_key_possession": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_use_issuer"
+      ],
+      "effects": {
+        "inv.node_role_key_possessions": {
+          "verb": "INSERT",
+          "columns": [
+            "challenge_ref",
+            "raw_use_key_signature",
+            "authenticated_issuer_tls_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_consume_key_challenge": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_delivery_challenges": {
+          "verb": "UPDATE",
+          "columns": [
+            "state",
+            "consumption_ledger_ref"
+          ]
+        },
+        "inv.node_role_delivery_consumptions": {
+          "verb": "INSERT",
+          "columns": [
+            "challenge_ref",
+            "possession_ref",
+            "exact_context_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_record_key_delivery": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_key_deliveries": {
+          "verb": "INSERT",
+          "columns": [
+            "protected_receipt",
+            "consumption_ref",
+            "activation_ledger_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "delivery_receipt_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_record_request_issuance": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_use_issuer"
+      ],
+      "effects": {
+        "inv.node_role_request_issuance": {
+          "verb": "INSERT",
+          "columns": [
+            "node_id",
+            "request_hash",
+            "nonce",
+            "release_ref",
+            "expires_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_commit_business_nonce_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.node_role_request_commits": {
+          "verb": "INSERT",
+          "columns": [
+            "issuance_ref",
+            "request_hash",
+            "verified_outcome_ref"
+          ]
+        },
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "evidence_id",
+            "record"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_commit_reconcile_receipt": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_reconcile_evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "recorded_permit_hash",
+            "actual_node_outcome",
+            "authority_scope_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_record_safety_request": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.node_role_safety_requests": {
+          "verb": "INSERT",
+          "columns": [
+            "scoped_request",
+            "nonce",
+            "grant_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_update_service_bindings": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_service_bindings": {
+          "verb": "INSERT_OR_UPDATE",
+          "columns": [
+            "login_oid",
+            "tenant_scope",
+            "permitted_purposes",
+            "tls_identity_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_commit_node_observation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "heartbeat_at",
+            "probe_started_at",
+            "clock_skew_seconds",
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_change_node_containment": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        },
+        "inv.tenant_controls": {
+          "verb": "UPDATE",
+          "columns": [
+            "kill_switch",
+            "version"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_public_node_observation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "heartbeat_sequence",
+            "last_heartbeat_at",
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    },
+    "b_public_contribution_change": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "public.storage_contributions": {
+          "verb": "UPDATE",
+          "columns": [
+            "status",
+            "version",
+            "normalized_path",
+            "registered_by_user_id"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false
+    }
+  },
+  "lockOnlyProcedures": {
+    "b_lock_business_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_use_issuer"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_lock_observation_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier",
+        "sv_b_runtime",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_lock_operator_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_delivery_controller",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_read_observation_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier",
+        "sv_b_runtime",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    }
+  },
+  "allOnlineDirectAuthorityDML": {
+    "INSERT": false,
+    "UPDATE": false,
+    "DELETE": false,
+    "lock_sentinel_UPDATE": false,
+    "SET_ROLE_to_owner_operator_or_legacy_inv_kernel": false
+  },
+  "principals": {
+    "sv_b_ddl_owner": "NOLOGIN owns new B tables; not pooled",
+    "sv_b_proc_owner": "NOLOGIN non-super/non-bypass leastpriv function owner; no runtime membership",
+    "sv_b_operator": "protected approval/release planner, separate credentials and purpose-restricted signing service",
+    "sv_b_delivery_controller": "protected postcommit delivery controller; no approval/plan EXECUTE",
+    "sv_b_verifier": "online authenticated evidence verifier, no approval/release signing key",
+    "sv_b_use_issuer": "online delegated use key only, raw PoP append/issuance functions only",
+    "sv_b_runtime": "dedicated ordinary B pool; no legacy inv_kernel/app membership that inherits authority DML",
+    "sv_b_safety": "typed containment only; separate safety key",
+    "sv_b_budget_approver": "distinct protected planning-budget role/key/pin, no Node release/business authority"
+  },
+  "signaturePurposes": {
+    "APPROVAL": {
+      "domain": "saintvision/node-role-approval/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "APPROVAL_RENEW_SAME_CONFIG",
+        "REAPPROVE_SAME_CONFIG",
+        "FRESH_ACTIVATE"
+      ]
+    },
+    "RELEASE": {
+      "domain": "saintvision/node-role-release/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "RELEASE"
+      ]
+    },
+    "DELEGATION": {
+      "domain": "saintvision/node-role-delegation/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "DELEGATION"
+      ]
+    },
+    "GATE_CONTROL": {
+      "domain": "saintvision/node-role-gate/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "ARM_EXACT_RELEASE",
+        "INVALIDATE_EXACT_GATE"
+      ]
+    },
+    "GATE_ACK": {
+      "domain": "saintvision/node-role-gate-ack/v1",
+      "signer": "REGISTERED_NODE_LEAF",
+      "purposes": [
+        "ACK_EXACT_DURABLE_TRANSITION"
+      ]
+    },
+    "DELIVERY_CHALLENGE": {
+      "domain": "saintvision/node-role-key-delivery-challenge/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "KEY_DELIVERY_PREPARE"
+      ]
+    },
+    "KEY_POSSESSION": {
+      "domain": "saintvision/node-role-key-possession/v1",
+      "signer": "DELEGATED_USE_KEY",
+      "purposes": [
+        "PROVE_EXACT_CHALLENGE_POSSESSION"
+      ]
+    },
+    "KEY_DELIVERY_RECEIPT": {
+      "domain": "saintvision/node-role-key-delivery-receipt/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "KEY_DELIVERY_RECEIPT"
+      ]
+    },
+    "ROLE_USE": {
+      "domain": "saintvision/node-role-use/v1",
+      "signer": "DELEGATED_USE_KEY",
+      "purposes": [
+        "BUSINESS_USE"
+      ]
+    },
+    "SAFETY": {
+      "domain": "saintvision/node-role-safety/v1",
+      "signer": "PROTECTED_SAFETY",
+      "purposes": [
+        "CANCEL_EXACT_COMMAND",
+        "QUARANTINE_EXACT_OBLIGATION"
+      ]
+    },
+    "CONTEXT_BUDGET": {
+      "domain": "saintvision/context-budget/v1",
+      "signer": "PROTECTED_BUDGET_APPROVER",
+      "purposes": [
+        "APPROVE_MEASURED_CONTEXT_BUDGET"
+      ]
+    }
+  },
+  "rls": "Every new B table ENABLE+FORCE RLS, add to actual census/collector/ratchet/aggregate pin during future migration. Procedures verify session_user/service binding, tenant/sorted Node set/purpose/current grant; GUC alone not authority. Fixed qualified SQL, no caller-supplied table or lock mode. b_guard equivalent retains mandatory epoch then tenant guard via owner lock operations before B locks.",
+  "nodeCompromiseBound": "CP 300s admission lease is NOT a Node-enforced use-key compromise bound. Node bound is delegated/release/approval/cert expiry plus acknowledged gate invalidation; future protected signer/custody availability remains prerequisite.",
+  "externalPlanningTrustPin": {
+    "contextBudgetApproverPublicKeySHA256": null,
+    "custodyRole": "sv_b_budget_approver",
+    "permittedKind": "CONTEXT_BUDGET",
+    "cannotAuthorize": [
+      "Node release",
+      "business",
+      "safety"
+    ]
+  },
+  "actualKeys": null,
+  "actualDBGrants": false
+}

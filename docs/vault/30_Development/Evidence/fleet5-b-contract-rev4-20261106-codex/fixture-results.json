@@ -1,0 +1,2934 @@
+{
+  "level": "SCHEMA_STATIC_STATEFUL_SYMBOLIC_ONLY",
+  "passed": 476,
+  "failed": 0,
+  "schemaCoverage": {
+    "approval": {
+      "positive": 1,
+      "negative": 12
+    },
+    "release": {
+      "positive": 1,
+      "negative": 14
+    },
+    "delegation": {
+      "positive": 1,
+      "negative": 14
+    },
+    "keyDeliveryReceipt": {
+      "positive": 1,
+      "negative": 27
+    },
+    "roleUse": {
+      "positive": 1,
+      "negative": 15
+    },
+    "gateAck": {
+      "positive": 1,
+      "negative": 21
+    },
+    "deliveryChallenge": {
+      "positive": 1,
+      "negative": 20
+    },
+    "keyPossession": {
+      "positive": 1,
+      "negative": 3
+    },
+    "gateControl": {
+      "positive": 1,
+      "negative": 16
+    },
+    "observationScope": {
+      "positive": 1,
+      "negative": 1
+    },
+    "observeInput": {
+      "positive": 1,
+      "negative": 2
+    },
+    "safety": {
+      "positive": 1,
+      "negative": 11
+    },
+    "roleConfig": {
+      "positive": 1,
+      "negative": 10
+    },
+    "signedEnvelope": {
+      "positive": 1,
+      "negative": 4
+    },
+    "clockMeasurement": {
+      "positive": 1,
+      "negative": 13
+    },
+    "capability": {
+      "positive": 1,
+      "negative": 41
+    },
+    "budget": {
+      "positive": 1,
+      "negative": 19
+    }
+  },
+  "realGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "cases": [
+    {
+      "name": "stateful-full-old-chain",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-approval",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-approval",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-approvalId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-priorApprovalHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-static",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-operationId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-operatorGrantHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-trustHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-candidateHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-purpose",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-approval-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-release",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-release",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-releaseId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-approvalHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-static",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-operationId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-activationLedgerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-expectedPriorCurrentPointerHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-issuerServiceId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-issuerTLSHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-release-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-delegation",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-delegation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-delegationId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-usePublicKeyHex64",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-issuerServiceId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-issuerTLSHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-purposes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-delegation-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-keyDeliveryReceipt",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-keyDeliveryReceipt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-deliveryId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-challengeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-activationLedgerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-activationLedgerHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-delegationHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-gateAckHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-cohortId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-staticHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-issuerServiceId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-issuerTLSHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-receiptId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-challengeHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-possessionHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-consumptionLedgerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-priorCurrentPointerHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-priorState",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyDeliveryReceipt-currentState",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-roleUse",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-roleUse",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-delegationHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-receiptHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-purpose",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-method",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-path",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-bodyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleUse-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-gateAck",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-gateAck",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-tenantId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-nodeCertificateSHA256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-action",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-commandHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-requestBodyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-delegationHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-priorGateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-static",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-observedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-localGateRecordId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-priorLocalGateRecordId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateAck-state",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-deliveryChallenge",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-deliveryChallenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-deliveryId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-challengeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-activationLedgerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-activationLedgerHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-delegationHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-gateAckHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-cohortId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-staticHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-issuerServiceId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-issuerTLSHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-deliveryChallenge-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-keyPossession",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-keyPossession",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyPossession-challengeHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-keyPossession-challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "before-expiry-per-node-new-approval",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "approval-prior-hash-links-immutable-current",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "old-approval-not-mutated",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-gateControl",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-gateControl",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-action",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-method",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-path",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-staticHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-gateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-expectedPriorGateId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-delegationHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-gateControl-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "cannot-ARM-over-live-old-gate",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "ARM-wrong-signer-rebound-DELEGATED_USE_KEY",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "ARM-wrong-signer-rebound-PROTECTED_SAFETY",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "same-generation-approval-renew-complete",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalidated-old-gate-token-no-overlap",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "valid-chain-NONE-gate-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "valid-chain-INVALIDATED-gate-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "restart-has-no-gate-old-chain-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "READMIT-genuinely-changed-generation",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "READMIT-old-old-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "same-generation-REFRESH-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "changed-generation-protected-readmit-complete",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "REFRESH-expired-approval-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "ordinary-renew-cannot-use-expired-approval",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "after-only-expiry-new-protected-approval",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "after-expiry-per-node-no-unrelated-refresh",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-block-cohortFence",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-block-quarantined",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-block-containment",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-block-switchPending",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-C",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-R",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-P",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-epoch",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-policySha256",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-configSha256",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-peerFloorSha256",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-drift-storageFloorSha256",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-authority-revoked",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-authority-grantExpired",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-authority-certExpired",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "REAPPROVE-authority-trustExpired",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "online-cannot-append-approval-sv_b_verifier",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "online-cannot-append-approval-sv_b_use_issuer",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "online-cannot-append-approval-sv_b_delivery_controller",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "approval-max24h",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "helper-ARMED-not-node-ack",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "no-durable-transition-no-ack",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "ack-wrong-registered-leaf",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "delivery-before-activation-commit-deny",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "no-new-approval-from-incomplete-handoff",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "ACTIVE-row-without-delivery-not-business",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "prepare-retry-SAME-frozen-challenge",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "PoP-wrong-use-key",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "PoP-wrong-domain",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "PoP-wrong-issuer-TLS",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-activationLedgerId",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-releaseHash",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-delegationHash",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-useKeyHash",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-gateId",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "rebound-challenge-context-issuerServiceId",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "expired-challenge-deny",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "consumed-challenge-replay-deny",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "issuer-cannot-record-controller-receipt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "use-key-cannot-sign-controller-receipt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "cannot-reset-consumed-challenge-by-prepare",
+      "actual": null,
+      "expected": null,
+      "passed": true
+    },
+    {
+      "name": "controller-receipt-final-chain-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-activationLedgerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-issuerTLSHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-issuerServiceId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-releaseHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-useKeyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-gateAckHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "all-dependent-hashes-rebound-receipt-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "expired-CP-lease-denies-business-issuer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "Node-role-layer-bound-is-delegation-not300s",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-observationScope",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-observationScope",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "scope-refusal-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "refusal-cannot-carry-eligible-target",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "scope-frozen-intent-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "scope-frozen-missing-intent-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "scope-missing-authoritative-intent-refusal",
+      "actual": "UNKNOWN_SCOPE",
+      "expected": "UNKNOWN_SCOPE",
+      "passed": true
+    },
+    {
+      "name": "observation-independent-business-approval-expiry",
+      "actual": "AVAILABLE",
+      "expected": "AVAILABLE",
+      "passed": true
+    },
+    {
+      "name": "ObservationScope-cannot-be-admission",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "ObservationScope-cannot-be-node-business",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "ObservationScope-cannot-be-gate-ack",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-observeInput",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-observeInput",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-observeInput-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-safety",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-nodeId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-action",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-method",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-path",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-permitHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-bodyHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-safety-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "safety-raw-binding-method-GET",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "safety-raw-binding-path-/v1/builds/quarantine",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "safety-raw-binding-path-/v1/executions/cancel?x=1",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-roleConfig",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-roleConfig",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-schemaVersion",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-role",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-operatorReleaseAnchorSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-operatorReleasePublicPath",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-safetyAnchorSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-safetyPublicPath",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-contextId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-gateProtocol",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-roleConfig-useProtocol",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-signedEnvelope",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-signedEnvelope",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-signedEnvelope-kind",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-signedEnvelope-payloadBase64url",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-signedEnvelope-signatureHex128",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "exact-hash-alphabet-'\\n'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "exact-hash-alphabet-'\\x00'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "exact-hash-alphabet-'x'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-float-time-composition",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "purpose-path-coupled-schema",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "display-128-codepoints-512bytes",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "display129-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-clockMeasurement",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-clockMeasurement",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-target",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-targetId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-contextId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-clockOffsetMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-uncertaintyMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-syncSource",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-method",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-producerId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-producerArtifactHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-evidenceHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-clockMeasurement-observedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-capability",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-capability",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-producer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-contextKind",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmUuid",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostKernelId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmKernelBootId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-nodeKernelBootId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hypervisor",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostOS",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostLogicalCpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostCpuAvailableMilliCpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostPhysicalTotalBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostPhysicalAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostCommitLimitBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostCommitAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostDiskCapacityBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostDiskAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmVcpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmRamBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmDiskBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmPhysicalAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmCommitAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-guestNativeFsAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-root",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-socketPath",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-engineApi",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-engineVersion",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-engineId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-sourceAncestry",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-routes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-ports",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-endpointTests",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmCpuCapacityMilliCpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmCpuAvailableMilliCpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostProducer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmProducer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-launcherAdapterSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-hostClock",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-guestClock",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-capability-vmSpecHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-positive-budget",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "schema-extra-deny-budget",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-contextId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-hostId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-vmUuid",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-vcpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-guestRamBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-guestDiskBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-hostMemoryHeadroomBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-hostDiskHeadroomBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-guestNativeFreeMinBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-hostCpuSpareMinMilliCpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-cohortId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-vmSpecHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-hostProbeHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-guestProbeHash",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-approvedSkewMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "schema-missing-budget-issuedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-budget-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "raw-resource-plus-clock-budget-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "host-resource-unavailable-not-a-guest-positive",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "unapproved-vm-spec-not-minimum-budget",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "release-key-cannot-approve-budget",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-clockOffsetMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-uncertaintyMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-clockOffsetMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-syncSource",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-observedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-hostClock-challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-clockOffsetMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-uncertaintyMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-clockOffsetMillis",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-syncSource",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-observedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "clock-guestClock-challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "complete-typed-policy",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_approvals-b_append_approval",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_operations-b_begin_node_switch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_operations-b_plan_fresh",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_current-b_begin_node_switch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_current-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_current-b_refresh_same_generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_current-b_record_key_delivery",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_routing-b_plan_fresh",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_cohorts-b_fence_cohort",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_cohorts-b_commit_fresh_cohort",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_candidates-b_append_candidate",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_gate_acks-b_record_gate_ack",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_channels-b_member_cas",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_member_cas-b_member_cas",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_releases-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_delegations-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_admissions-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_leases-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_leases-b_refresh_same_generation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_activation_ledger-b_commit_node_activation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_delivery_challenges-b_prepare_key_delivery",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_delivery_challenges-b_consume_key_challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_key_possessions-b_append_key_possession",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_delivery_consumptions-b_consume_key_challenge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_key_deliveries-b_record_key_delivery",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_request_issuance-b_record_request_issuance",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_request_commits-b_commit_business_nonce_evidence",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.evidence-b_commit_business_nonce_evidence",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_reconcile_evidence-b_commit_reconcile_receipt",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_safety_requests-b_record_safety_request",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.node_role_service_bindings-b_update_service_bindings",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.nodes-b_commit_node_observation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.nodes-b_change_node_containment",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-inv.tenant_controls-b_change_node_containment",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-public.nodes-b_public_node_observation",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-writer-public.storage_contributions-b_public_contribution_change",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_append_approval-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_begin_node_switch-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_plan_fresh-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_fence_cohort-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_append_candidate-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_append_candidate-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_record_gate_ack-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_record_gate_ack-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_member_cas-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_node_activation-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_fresh_cohort-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_refresh_same_generation-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_prepare_key_delivery-sv_b_delivery_controller",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_append_key_possession-sv_b_use_issuer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_consume_key_challenge-sv_b_delivery_controller",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_record_key_delivery-sv_b_delivery_controller",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_record_request_issuance-sv_b_use_issuer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_business_nonce_evidence-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_reconcile_receipt-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_reconcile_receipt-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_record_safety_request-sv_b_safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_update_service_bindings-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_commit_node_observation-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_change_node_containment-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_change_node_containment-sv_b_safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_public_node_observation-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-execute-b_public_contribution_change-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_business_scope-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_business_scope-sv_b_use_issuer",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_observation_scope-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_observation_scope-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_observation_scope-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_observation_scope-sv_b_safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_operator_scope-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_operator_scope-sv_b_delivery_controller",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_lock_operator_scope-sv_b_safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_read_observation_scope-sv_b_operator",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_read_observation_scope-sv_b_verifier",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_read_observation_scope-sv_b_runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "remove-lock-execute-b_read_observation_scope-sv_b_safety",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "add-runtime-approval-grant-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "direct-authority-UPDATE-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-1-1",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-1-2",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-1-3",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-1-4",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-2-2",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-2-3",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-2-4",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-3-3",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-3-4",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "not-yet-CAS-revoke-4-4",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "resolved-exact-commit-forward",
+      "actual": "RESOLVED_EXACT_COMMIT_FORWARD",
+      "expected": "RESOLVED_EXACT_COMMIT_FORWARD",
+      "passed": true
+    },
+    {
+      "name": "exact-ledger-no-revocation-waiver",
+      "actual": "QUARANTINED",
+      "expected": "QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "exact-ledger-no-freshness-waiver",
+      "actual": "QUARANTINED",
+      "expected": "QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "missing-ledger-no-external-effects-inference",
+      "actual": "REOBSERVE_OR_QUARANTINED",
+      "expected": "REOBSERVE_OR_QUARANTINED",
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-PAUSE_SELECTED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-INVALIDATE_OLD_ACK_AND_DRAIN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-ARM_NEW_ACK",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-CURRENT_CAS_COMMITTED_NO_RECEIPT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-CHALLENGE_PREPARED_POSTCOMMIT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-USE_KEY_POSSESSION_PENDING_VERIFY",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-False-CHALLENGE_CONSUMED_PENDING_RECEIPT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-final-selected-eligible-False",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-PAUSE_SELECTED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-INVALIDATE_OLD_ACK_AND_DRAIN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-ARM_NEW_ACK",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-CURRENT_CAS_COMMITTED_NO_RECEIPT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-CHALLENGE_PREPARED_POSTCOMMIT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-USE_KEY_POSSESSION_PENDING_VERIFY",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-no-premature-business-True-CHALLENGE_CONSUMED_PENDING_RECEIPT",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "phase-final-selected-eligible-True",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    }
+  ]
+}
