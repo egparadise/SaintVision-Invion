@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "fleet5-runtime-source-unchanged-binding:1",
+  "recordedAtKST": "2026-11-06T00:12:33+09:00",
+  "runtimeSourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "deltaBaseSHA": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "taskId": "task_a8fd2969f0b3",
+  "owner": "Codex",
+  "reviewer": "Independent implementation and test-delta review pending via root",
+  "all18SourceProofAndWorkflowSurfacesUnchanged": true,
+  "surfaces": [
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "runtime4aSHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "currentSHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "runtime4aSHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "currentSHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "runtime4aSHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "currentSHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "runtime4aSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "currentSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "runtime4aSHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "currentSHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "runtime4aSHA256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "currentSHA256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "runtime4aSHA256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "currentSHA256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "unchanged": true
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "runtime4aSHA256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "currentSHA256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "unchanged": true
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "runtime4aSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "currentSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "unchanged": true
+    },
+    {
+      "path": "tools/lan_workspace.py",
+      "runtime4aSHA256": "c767f4e9f96a8f174e8bc2f7ead9558101a9f1faf2e414a2e2a93922c276ebb3",
+      "currentSHA256": "c767f4e9f96a8f174e8bc2f7ead9558101a9f1faf2e414a2e2a93922c276ebb3",
+      "unchanged": true
+    },
+    {
+      "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+      "runtime4aSHA256": "0cfbb3beede8db22eb675546c088a3d3ae18760b8246e7d40e9771d74413675e",
+      "currentSHA256": "0cfbb3beede8db22eb675546c088a3d3ae18760b8246e7d40e9771d74413675e",
+      "unchanged": true
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "runtime4aSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "currentSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "unchanged": true
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "runtime4aSHA256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "currentSHA256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "unchanged": true
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "runtime4aSHA256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "currentSHA256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "unchanged": true
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical.go",
+      "runtime4aSHA256": "5b7731eb0d499f12b130830b5c2fe2553d5c3b18886907e74db9ca923cea0661",
+      "currentSHA256": "5b7731eb0d499f12b130830b5c2fe2553d5c3b18886907e74db9ca923cea0661",
+      "unchanged": true
+    },
+    {
+      "path": "tests/proofs/run_fleet5_peer_phase_fixed_probe.py",
+      "runtime4aSHA256": "d0c0e64657b4d9d9e4eaf9695ef326d4e92b5c184b673b04841ae4f87c0e8ccb",
+      "currentSHA256": "d0c0e64657b4d9d9e4eaf9695ef326d4e92b5c184b673b04841ae4f87c0e8ccb",
+      "unchanged": true
+    },
+    {
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "runtime4aSHA256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "currentSHA256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/backend.yml",
+      "runtime4aSHA256": "2e511a6aedd2eff44491054f7255b5bba36797d9a4c9dec1ca2c0bf32ee4b190",
+      "currentSHA256": "2e511a6aedd2eff44491054f7255b5bba36797d9a4c9dec1ca2c0bf32ee4b190",
+      "unchanged": true
+    }
+  ]
+}

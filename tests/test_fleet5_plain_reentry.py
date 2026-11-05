@@ -34,6 +34,16 @@ def snapshot(root):
 def stopped_fixture(tmp_path,monkeypatch,phase_name='overlap'):
     f = _fixture(tmp_path)
     commit = finish(f,tmp_path) if phase_name=='final' else None
+    if phase_name=='finalizing':
+        rotation.install(f.bundle,f.worker,now=f.now,restart=lambda _:None)
+        body=phase.commit_body(f.manifest,(f.bundle/'rotation.json').read_bytes())
+        commit=tmp_path/'commit.json'
+        commit.write_bytes(phase.canonical({**body,'controlSignature':f.control_key.sign(rotation._canonical(body)).hex()}))
+        def interrupted(_):
+            raise RuntimeError('fixture crash before final start')
+        with pytest.raises(RuntimeError,match='fixture crash before final start'):
+            rotation.finalize(f.bundle,f.worker,commit,now=f.now,restart=interrupted)
+        assert plain._record(f.worker)['phase']=='finalizing'
     if phase_name=='overlap':
         rotation.install(f.bundle,f.worker,now=f.now,restart=lambda _:None)
         record = phase.strict((f.worker/'leaf-rotation.json').read_bytes())
@@ -47,7 +57,8 @@ def stopped_fixture(tmp_path,monkeypatch,phase_name='overlap'):
     monkeypatch.setattr(transport,'context',lambda _:context)
     entries = {name:(f.worker/name).read_bytes() for name in config.CREDENTIAL_FILES}
     entries['journal/identity.json'] = phase.canonical(dict(Tenant=f.manifest['tenantId'],Node=f.manifest['nodeId'],Epoch=f.manifest['recoveryEpoch']))
-    entries['journal/.peer-policy'] = phase.canonical(dict(Version=f.manifest[phase_name+'PeerPolicyVersion'],Hash=f.manifest[phase_name+'PeerPolicySHA256']))
+    floor_phase='final' if phase_name=='finalizing' else phase_name
+    entries['journal/.peer-policy'] = phase.canonical(dict(Version=f.manifest[floor_phase+'PeerPolicyVersion'],Hash=f.manifest[floor_phase+'PeerPolicySHA256']))
     calls=[]
     def docker(*args):
         calls.append(args)

@@ -1,0 +1,3 @@
+# Preserve original captured job/probe bytes and archive digests.
+*.log binary
+*.zip binary

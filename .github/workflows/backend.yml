@@ -114,7 +114,8 @@ jobs:
             --worker-script deploy/lan/worker_leaf_rotation.py \
             -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-second-preflight.json"
           python tools/check_leaf_rotation_standalone_lifecycle.py \
-            --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"
+            --runtime-dir "$runtime" \
+            --settled-proof-output "$RUNNER_TEMP/leaf-runtime-settled-pinned.json" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"
           test -z "$(find "$runtime" -type d -name __pycache__ -print -quit)"
           python - <<'PY'
           import json
@@ -163,7 +164,49 @@ jobs:
           assert type(lifecycle['restartCount']) is int
           assert type(lifecycle['bytecodeCacheCount']) is int
           assert type(lifecycle['completedNormalCycles']) is int
+          settled = json.loads((root / 'leaf-runtime-settled-pinned.json').read_text('utf-8'))
+          assert set(settled) == {
+              'schemaVersion', 'fixtureOnly', 'actualGoAcceptanceAssessed',
+              'defaultVerifierCallbackBypassed', 'actualPinnedRuntimeCryptoAssessed',
+              'privateFixtureKeysUploaded', 'recordedAtUTC', 'installerSourceSHA256',
+              'cases', 'sourceUnchanged', 'fixtureStateUnchanged', 'proofValid',
+          }
+          assert settled['schemaVersion'] == 'saintvision-settled-pinned-launcher-fixture:1'
+          assert settled['proofValid'] is True
+          assert settled['fixtureOnly'] is True
+          assert settled['actualGoAcceptanceAssessed'] is False
+          assert settled['defaultVerifierCallbackBypassed'] is False
+          assert settled['actualPinnedRuntimeCryptoAssessed'] is True
+          assert settled['privateFixtureKeysUploaded'] is False
+          assert settled['sourceUnchanged'] is True and settled['fixtureStateUnchanged'] is True
+          assert [case['name'] for case in settled['cases']] == [
+              'valid', 'missing-launcher', 'missing-entry', 'entry-hash',
+              'missing-runtime', 'runtime-module-hash', 'crypto-package-hash',
+              'node-signature', 'runtime-receipt', 'valid-after-negatives',
+          ]
+          assert all(case['stateUnchanged'] is True and case['failureReasonMatched'] is True
+                     for case in settled['cases'])
+          assert all(set(case) == {'name', 'expectedRejected', 'exitCode', 'stateUnchanged',
+                                   'expectedFailureReason', 'failureReasonMatched',
+                                   'stdoutSHA256', 'stderrSHA256'} for case in settled['cases'])
+          assert all(type(case['exitCode']) is int and
+                     ((case['exitCode'] != 0) is case['expectedRejected'])
+                     for case in settled['cases'])
           PY
+
+      - name: Kill FLEET5 RS1/SF1 guard mutations
+        if: matrix.python-version == '3.12'
+        run: python -B tests/proofs/run_fleet5_reentry_guard_mutations.py --output "$RUNNER_TEMP/fleet5-t123-mutations"
+
+      - name: Publish FLEET5 installed pinned verifier and mutation proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-settled-pinned-${{ matrix.python-version }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/leaf-runtime-settled-pinned.json
+            ${{ runner.temp }}/leaf-runtime-lifecycle.json
+            ${{ runner.temp }}/fleet5-t123-mutations/
 
       - name: Kill the standalone leaf-runtime guard mutations
         if: matrix.python-version == '3.12'

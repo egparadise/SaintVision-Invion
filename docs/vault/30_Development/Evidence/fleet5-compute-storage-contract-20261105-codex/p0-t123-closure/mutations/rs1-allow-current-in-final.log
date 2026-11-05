@@ -1,0 +1,10 @@
+.....F.......                                                            [100%]
+================================== FAILURES ===================================
+__ test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor[current] ___
+tests\test_fleet5_reentry_guard_negatives.py:67: in test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor
+    with pytest.raises(ValueError,match='outside the frozen tuples'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_finalizing_accepts_only_overlap_or_final_durable_floor[current]
+1 failed, 12 passed in 3.02s
