@@ -1,0 +1,140 @@
+{
+  "schema": "fleet5-20261105-cp-inventory-readiness:1",
+  "task": "FLEET5-20261105-CP-AND-INVENTORY",
+  "owner": "Claude",
+  "reviewer": "Codex root",
+  "mode": "read-only discovery and plan; no live mutation",
+  "observedWindowKST": ["2026-11-05T14:40:00+09:00", "2026-11-05T15:05:00+09:00"],
+  "baseSHA": "9b9061ed1b7bbc5b91ea2a035ea2a54fac6f010f",
+  "productSource": "59f0a3c2",
+  "parentReport": "f020a664",
+  "privateRecord": {
+    "path": "D:/Project/SaintVisionI-Invion/.work/fleet5-20261105-claude/cp-inventory-private.json",
+    "sha256": "a7fe86158b1bb7ad07a02a9d9f7b1e2e4683ef632cef23edef0bc5c5c158712e",
+    "contains": "raw hostnames, IPs, computer name, unmapped known_hosts candidate; gitignored, not published"
+  },
+  "privateSourceHashes": {
+    ".work/intranet/inventory.json": "b8e93435e5830ceb3af06ee248ef226b97f48606ffee95b49d306482003edb1d",
+    "~/.ssh/config": "b955ad434ac59e6236be31ae25ee04ccfd6abc54e5e37ddde47ca135a8700f8e",
+    "~/.ssh/known_hosts": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+    ".work/lan-5node/r5-03e17c31-f8923863/private-state.json": "7d62c49ad0d248ccad795904e65897b6c43472cab3d93b3ee0f2e2332a32bc01",
+    ".work/lan-5node/inventory-2node.json": "b6758fc452590d924cf68e172dad1408dc53ac9fdde58cfea685b1aa41a9379d"
+  },
+  "inventoryLint": {
+    "tool": "tools/s01_readiness_preflight.py lint_inventory (offline function, repo .venv CPython 3.14.7)",
+    "exit": 0,
+    "status": "BLOCKED",
+    "code": "inventory-values-missing",
+    "nodeCount": 5,
+    "missingFieldCount": 74,
+    "invalidFieldCount": 0,
+    "perSlotMissing": {"slot1": 2, "slot2": 2, "slot3": 2, "slot4": 34, "slot5": 34},
+    "slot1to3Missing": ["certificateSHA256", "profile"],
+    "nodeIdGeneration": "slot1-3 nodeIds belong to the 2026-09-30 lan-pilot-6fc0428b-v2 state, not to the live r5 state; historical logical IDs only"
+  },
+  "sshAliases": {
+    "aliases": ["InvizMain", "DrSaint", "inviz-api", "saint_label", "webpacs"],
+    "contacted": false,
+    "hostnameIsPublicNonRFC1918": 5,
+    "matchesInventoryIpOrHostname": 0,
+    "sameSubnetAsWorkers": 0,
+    "conclusion": "not SaintVision worker endpoints; untouched"
+  },
+  "worker4Search": {
+    "searched": [".work/intranet", ".work/lan-5node (all states r2..r5, node1)", ".work/lan-pilot", "repo deploy/ and docs/vault", "Orca host list and top-level config JSON", "~/.ssh/config", "~/.ssh/known_hosts"],
+    "endpointFound": false,
+    "identityOrResourceProfileFound": false,
+    "knownHostsUnmappedLanEntries": 1,
+    "unmappedEntryIsThisPC": false,
+    "unmappedEntryReferencedByProjectState": false,
+    "unmappedEntryContacted": false,
+    "status": "UNKNOWN; candidate only, not proof of worker4"
+  },
+  "labelToSlot": {
+    "SaintVision-Invion1": "slot1 plausible (hostname shares prefix only)",
+    "SaintVision-Invion2": "slot2 unproven (OS hostname has no matching token)",
+    "saintvision-invion3": "slot3 matched by hostname",
+    "SaintVision-Invion4": "slot4 no project evidence"
+  },
+  "cpHost": {
+    "observedAsCP": true,
+    "basis": ["documented LAN server address is assigned locally", "every lan-5node state uses it as serverIP", "r5 serve 18082 / web 3000 / DB tunnel 55448 listening locally"],
+    "os": "Windows 11 Pro build 26300 x64, workgroup",
+    "cpu": "Intel i7-12700, 12 cores / 20 threads",
+    "ramBytes": 16935796736,
+    "freePhysicalMemoryGB": 0.55,
+    "gpu": "NVIDIA GeForce RTX 3080 (Windows driver; no Linux VM GPU passthrough measured)",
+    "diskFreeGB": {"C": 276.6, "D": 1506.9},
+    "timeZone": "Korea Standard Time",
+    "w32tmSource": "UNKNOWN (w32tm /query /source -> 0x80070005 access denied without elevation)",
+    "inventorySlot5": "all identity/resource fields null",
+    "cpSvLanInHostsFile": false
+  },
+  "docker": {
+    "env": {"DOCKER_HOST": false, "DOCKER_CONTEXT": false, "DOCKER_API_VERSION": false, "DOCKER_CERT_PATH": false, "DOCKER_TLS_VERIFY": false},
+    "contexts": {"default": "npipe docker_engine (current)", "desktop-linux": "npipe dockerDesktopLinuxEngine"},
+    "commands": [
+      {"cmd": "docker version --format json", "exit": 0},
+      {"cmd": "docker --context desktop-linux version", "exit": 0},
+      {"cmd": "docker info (format)", "exit": 0},
+      {"cmd": "docker ps -a (names/state/compose project only)", "exit": 0},
+      {"cmd": "docker system df", "exit": 0}
+    ],
+    "client": {"version": "20.10.22", "api": "1.41"},
+    "server": {"product": "Docker Desktop 4.16.3 (96739)", "engine": "20.10.22", "api": "1.41", "minApi": "1.12", "os": "linux", "arch": "amd64", "kernel": "5.15.167.4-microsoft-standard-WSL2", "containerd": "1.6.14", "runc": "1.1.4"},
+    "bothContextsSameServer": true,
+    "verdict": "actual server incompatibility (API 1.41 < installer minimum 1.45); not a client or environment override",
+    "info": {"NCPU": 20, "memTotalBytes": 6214234112, "storageDriver": "overlay2", "cgroup": "cgroupfs/v1", "defaultRuntime": "runc"},
+    "desktopSettings": {"wslEngineEnabled": true, "useWindowsContainers": false, "integratedWslDistros": [], "enableIntegrationWithDefaultWslDistro": true, "exposeDockerAPIOnTCP2375": false, "kubernetesEnabled": false, "autoDownloadUpdates": false},
+    "wsl": {"version": "2.4.12.0", "distros": ["docker-desktop (v2)", "docker-desktop-data (v2)"], "ubuntuDistroPresent": false, "wslconfig": {"memory": "6GB", "swap": "2GB"}},
+    "vhdxGB": {"docker-desktop-data ext4": 69.61, "docker-desktop ext4": 5.27},
+    "diskUsage": {"images": 146, "imagesGB": 52.2, "containers": 25, "running": 8, "volumes": 83, "volumesGB": 8.193, "buildCacheGB": 5.002},
+    "containersByComposeProject": {
+      "coco-annotator": {"running": 2, "exited": 2, "projectOwned": false},
+      "saint-control": {"running": 5, "exited": 1, "projectOwned": false},
+      "saint-label-workstation": {"running": 0, "exited": 4, "projectOwned": false},
+      "saintview": {"running": 0, "exited": 3, "projectOwned": false, "note": "clinical imaging stack; not inspected"},
+      "saint-vision-training-workstation": {"running": 0, "exited": 2, "projectOwned": false},
+      "single-dev-env": {"running": 0, "exited": 1, "projectOwned": false},
+      "no-compose-label": {"running": 1, "exited": 4, "projectOwned": "1 running container carries ai.saintvision.pilot label (old node1 pilot DB, 55440); 1 exited dev PG is project-named but unlabeled; 3 exited are unrelated"}
+    },
+    "payloadsInspected": false,
+    "alternativeSupportedLocalRuntime": {"podman": false, "nerdctl": false, "rancherDesktop": false, "otherWslDistroWithDocker": false, "result": "none"}
+  },
+  "cpPrerequisiteMatrix": [
+    {"item": "Linux Docker server API >= 1.45", "state": "FAIL", "observed": "1.41"},
+    {"item": "Docker Engine providing API 1.45", "state": "FAIL", "observed": "20.10.22; needs Engine 26.0+ (README/installer text says Engine 25+/Desktop 4.27+, but Engine 25 exposes API 1.44)"},
+    {"item": "Linux containers on WSL2 engine", "state": "PASS"},
+    {"item": "WSL distro named Ubuntu (Prepare-Worker.ps1 / Start-Worker.ps1 call wsl -d Ubuntu)", "state": "FAIL", "observed": "absent"},
+    {"item": "Docker Desktop WSL integration for Ubuntu", "state": "UNKNOWN", "observed": "default-distro integration on, explicit list empty; recheck after distro exists"},
+    {"item": "Server/Node address present on Windows", "state": "PASS"},
+    {"item": "Administrator PowerShell for Start-Worker firewall rule", "state": "NOT-GRANTED-IN-THIS-TASK"},
+    {"item": "Time synchronization evidence", "state": "UNKNOWN", "observed": "w32tm source access denied without elevation"},
+    {"item": "Resource headroom for co-located Node", "state": "RISK", "observed": "WSL VM 6GB cap, host free RAM 0.55GB of 15.77GB at sample time"},
+    {"item": "Slot5 allowedResources/allowedFolders/storageRole", "state": "USER-DECISION", "observed": "null"},
+    {"item": "Distinct nodeId/cert/hostId/failureDomainId; coLocatedWithControlPlane=true; measurementEligible s05=false s07=false; exclusionReason cp-host-colocation", "state": "NOT-YET-ASSIGNED"},
+    {"item": "Backup space for WSL data vhdx", "state": "PASS", "observed": "69.6GB vhdx vs >1.5TB free on D"}
+  ],
+  "fiveSlotMapping": [
+    {"slot": 1, "label": "SaintVision-Invion1 (plausible)", "os": "Ubuntu 26.04 / docker 29.1.3", "inventory": "complete except cert/profile", "live": "r5 Node active; preserve", "s05s07Eligible": true},
+    {"slot": 2, "label": "SaintVision-Invion2 (unproven)", "os": "Ubuntu 24.04 / docker 29.8.1", "inventory": "complete except cert/profile; storageRole provider", "live": "r5 Node active; preserve", "s05s07Eligible": true},
+    {"slot": 3, "label": "saintvision-invion3 (matched)", "os": "Ubuntu 26.04 / docker 29.8.1 recorded", "inventory": "complete except cert/profile", "live": "per coordinator: SSH works, Docker socket 0660 not accessible to the account, server API unmeasured", "s05s07Eligible": true},
+    {"slot": 4, "label": "SaintVision-Invion4 (label only)", "os": "UNKNOWN", "inventory": "34 fields missing", "live": "endpoint unknown", "s05s07Eligible": true},
+    {"slot": 5, "label": "this Windows PC (CP-colocated)", "os": "Windows 11 + Docker Desktop 4.16.3", "inventory": "34 fields missing", "live": "BLOCKED: API 1.41, no Ubuntu WSL distro", "s05s07Eligible": false}
+  ],
+  "counting": {"registeredNodeTarget": 5, "cpIndependentWorkerHosts": 4, "cpColocatedNodes": 1, "neverCountCPTwice": true},
+  "r5Preservation": {
+    "listening": ["18082 python", "3000 node", "55448 ssh tunnel"],
+    "databaseMode": "ssh-tunnel-external (no local r5 DB container)",
+    "followUps": [
+      {"id": "286d975e-75e2-4e54-b1fb-2805f7d68959", "enabled": true, "nextKST": "2026-11-08T14:20:00+09:00", "lastRun": null},
+      {"id": "a3a9e396-3b48-4aaa-8b73-f8377670f968", "enabled": true, "nextKST": "2026-11-09T12:15:00+09:00", "lastRun": null},
+      {"id": "3e08faa1-4e85-4877-8b13-5645178b41b8", "enabled": true, "nextKST": "2026-11-10T08:00:00+09:00", "lastRun": null}
+    ],
+    "followUpsMatchFinalEvidence": "r5-final-enabled-schedules.json sha256 779332f6a785c808bc04e965313581ec875182507d33475fd04035027a16ea57",
+    "windowsScheduledTaskForRenewal": false,
+    "usedPorts": {"download": [18081, 18084, 18085, 18086, 18105], "node": [18443, 18445, 18446, 18447, 18505], "db": [55440, 55447, 55448]},
+    "actionsTaken": "none (no Run now, Cycle, precheck bypass, edit, or pin change)"
+  },
+  "notDone": ["no node registration", "no resource grant / disk pool", "no account, trust, CA or SSH change", "no Docker upgrade, restart, download, export, stop or delete", "no remote host contact", "no clinical or customer payload access"]
+}
