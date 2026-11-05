@@ -1,8 +1,8 @@
 {
   "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
   "sourceCommit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
-  "status": "INTERMEDIATE_CONSUMER_FIX_VALIDATION; FULL_SOURCE_BLOCKED_BY_CONFIRMED_NATIVE_GO_P0",
-  "observedAtKST": "2026-11-05T20:23:26.767279+09:00",
+  "status": "BOUNDED_CONSUMER_VALIDATION_COMPLETE; FULL_SOURCE_HELD_FOR_CONFIRMED_NATIVE_GO_P0",
+  "observedAtKST": "2026-11-05T20:29:23.550464+09:00",
   "originalCandidate": {
     "source": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
     "allEightTerminal": true,
@@ -22,12 +22,26 @@
   },
   "intermediateTargeted": {
     "backend": 42015010474,
-    "backendConclusion": "PENDING",
+    "backendConclusion": "success",
     "docs": 42015020044,
     "docsConclusion": "success",
     "exactPushPortal": 42014916223,
     "portalConclusion": "success",
-    "newCoreOrAllEightRepeat": false
+    "newCoreOrAllEightRepeat": false,
+    "allThreeBackendJobsSuccess": true,
+    "matrices": {
+      "3.12": {
+        "passed": 8672,
+        "skipped": 75,
+        "deselected": 2
+      },
+      "3.14": {
+        "passed": 8672,
+        "skipped": 75,
+        "deselected": 2
+      }
+    },
+    "rawLogsZipSHA256": "f7725c5c71ac210425e3ddf544c89d05e5ca8e89a73cdf5cba07f882eceb7055"
   },
   "nativeGoSourceBlocker": {
     "proofCode": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
@@ -45,7 +59,7 @@
     "actualDispatch": "ctx_ba275b06ce0c",
     "status": "PENDING_VERDICT; no later-SHA acceptance inferred"
   },
-  "nextOwnerAction": "root relay actual concrete P0 contract/implementation/verdict; Codex integrate exact selected source then regenerate final packet and full8CI on approved immutable ci2 if appropriate",
+  "nextOwnerAction": "root relay exact published P0 implementation/CI/actual review; Codex then integrate and run fresh full candidate gates; no broad repeat while known native blocker remains",
   "physicalAcceptance": false,
   "wholeProductAcceptance": false,
   "queryExecuted": false,
@@ -58,5 +72,11 @@
     "correctedExit": 0,
     "rawPreservedPrivately": true,
     "publicDerivativeNamedSeparately": true
+  },
+  "interimReportCheckpoint": {
+    "sha": "e524e0925a30f4ff2ece07209e96514a9112bb52",
+    "docsRun": 42018718783,
+    "docsConclusion": "success",
+    "productDiffAgainst1eEmpty": true
   }
 }

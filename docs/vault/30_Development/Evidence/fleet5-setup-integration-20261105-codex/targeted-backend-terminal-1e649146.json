@@ -1,0 +1,25 @@
+{
+  "sourceCommit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "runId": 42015010474,
+  "conclusion": "success",
+  "allThreeJobsSuccess": true,
+  "observedAtKST": "2026-11-05T20:27:54.425725+09:00",
+  "rawLogsZipSHA256": "f7725c5c71ac210425e3ddf544c89d05e5ca8e89a73cdf5cba07f882eceb7055",
+  "rawLogsIgnoredPrivate": true,
+  "pythonMatrices": {
+    "3.12": {
+      "passed": 8672,
+      "summary": "2026-11-05T11:22:33.5145864Z 8672 passed, 75 skipped, 2 deselected, 2035 warnings in 1390.19s (0:23:10)",
+      "logEntry": "2_backend (3.12).txt",
+      "entrySHA256": "4cdbd9df5907bd82d8aaf3a04f957efcd4ea71d30ca31cfa6c9b9aeca550d32a"
+    },
+    "3.14": {
+      "passed": 8672,
+      "summary": "2026-11-05T11:23:01.0856644Z 8672 passed, 75 skipped, 2 deselected, 2034 warnings in 1440.65s (0:24:00)",
+      "logEntry": "0_backend (3.14).txt",
+      "entrySHA256": "7a1eb734d9b24fdeaed6aafdc1e47357428494f0be2f523c7a0ca163f93aaeb7"
+    }
+  },
+  "finalCandidateAcceptance": false,
+  "nativeGoP0Gate": "OPEN"
+}
