@@ -1,0 +1,116 @@
+{
+  "sourceCommit": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "branch": "agent/codex/fleet5-setup-integration-20261105",
+  "workflows": {
+    "backend": {
+      "workflow": "backend.yml",
+      "correlationId": "post-landing-verify/c66d9a7f20fd46e3b78b8ecc7fdea2b2",
+      "dispatchRequestedAtKST": "2026-11-05T20:54:29.986436+09:00",
+      "dispatchReturnedSuccess": true,
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "backend.yml",
+        "runId": 42022737571,
+        "headSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+        "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 3,
+        "jobConclusions": {
+          "backend (3.14)": "success",
+          "mlflow-live": "success",
+          "backend (3.12)": "success"
+        }
+      },
+      "runId": 42022737571,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022737571",
+      "headSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127229273976,
+          "name": "backend (3.14)",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T11:54:35Z",
+          "completedAt": "2026-11-05T12:20:56Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022737571/job/127229273976"
+        },
+        {
+          "databaseId": 127229274326,
+          "name": "mlflow-live",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T11:54:35Z",
+          "completedAt": "2026-11-05T11:55:16Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022737571/job/127229274326"
+        },
+        {
+          "databaseId": 127229274388,
+          "name": "backend (3.12)",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T11:54:35Z",
+          "completedAt": "2026-11-05T12:22:36Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022737571/job/127229274388"
+        }
+      ],
+      "rawObservation": "ci-42022737571-20261105T212423.json"
+    },
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/73698ee9d5d949d98a8af6d38f59d2d0",
+      "dispatchRequestedAtKST": "2026-11-05T20:54:34.513905+09:00",
+      "dispatchReturnedSuccess": true,
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42022747087,
+        "headSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+        "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42022747087,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022747087",
+      "headSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127229308263,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T11:54:39Z",
+          "completedAt": "2026-11-05T11:55:06Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022747087/job/127229308263"
+        }
+      ],
+      "rawObservation": "ci-42022747087-20261105T212425.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_FAIL",
+    "reason": "the integration ref is not at the landed SHA, so a run of it would describe another tree",
+    "ref": "agent/codex/fleet5-setup-integration-20261105",
+    "refTipSha": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+    "landedSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2"
+  },
+  "observedAtKST": "2026-11-05T21:24:19.011616+09:00",
+  "intermediateScope": [
+    "backend",
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Native Go sequence proof/resolution/review pending root",
+  "jobCountObserved": 4
+}

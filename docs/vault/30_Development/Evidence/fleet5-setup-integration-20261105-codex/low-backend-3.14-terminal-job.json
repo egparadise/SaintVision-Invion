@@ -1,0 +1,16 @@
+{
+  "scope": "COMPLETED_3_14_JOB_ONLY_NOT_WORKFLOW_TERMINAL",
+  "sourceCommit": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "runId": 42022737571,
+  "jobId": 127229273976,
+  "jobName": "backend (3.14)",
+  "observedAtKST": "2026-11-05T21:23:03.672446+09:00",
+  "jobConclusion": "success",
+  "rawLogSHA256": "c6770b165ae0b0ee06e3d88d91c08e1a4589319f3ccc48aced53356c8a757a1c",
+  "rawLogIgnoredPrivate": true,
+  "summaryLines": [
+    "backend (3.14)\tTests\t2026-11-05T12:20:48.9799409Z 8711 passed, 75 skipped, 2 deselected, 2036 warnings in 1503.13s (0:25:03)"
+  ],
+  "overallBackendNotYetCountedPassed": true,
+  "nativeGoP0Held": true
+}

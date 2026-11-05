@@ -1,0 +1,172 @@
+{
+  "conclusion": "success",
+  "event": "workflow_dispatch",
+  "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+  "headSha": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T11:55:06Z",
+      "conclusion": "success",
+      "databaseId": 127229308263,
+      "name": "docs",
+      "startedAt": "2026-11-05T11:54:39Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T11:54:41Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T11:54:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:44Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-05T11:54:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:45Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "startedAt": "2026-11-05T11:54:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:47Z",
+          "conclusion": "success",
+          "name": "Run python -m pip install -r requirements-docs.txt",
+          "number": 4,
+          "startedAt": "2026-11-05T11:54:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:47Z",
+          "conclusion": "success",
+          "name": "Run python tools/check_docs.py",
+          "number": 5,
+          "startedAt": "2026-11-05T11:54:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:48Z",
+          "conclusion": "success",
+          "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+          "number": 6,
+          "startedAt": "2026-11-05T11:54:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:55Z",
+          "conclusion": "success",
+          "name": "Run python tools/check_contract_bindings.py",
+          "number": 7,
+          "startedAt": "2026-11-05T11:54:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:55Z",
+          "conclusion": "success",
+          "name": "Run python tools/check_frontend_integrity.py",
+          "number": 8,
+          "startedAt": "2026-11-05T11:54:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:56Z",
+          "conclusion": "success",
+          "name": "Report fixture producer reachability",
+          "number": 9,
+          "startedAt": "2026-11-05T11:54:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:56Z",
+          "conclusion": "success",
+          "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+          "number": 10,
+          "startedAt": "2026-11-05T11:54:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:57Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 11,
+          "startedAt": "2026-11-05T11:54:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:58Z",
+          "conclusion": "success",
+          "name": "Run python tools/test_sync.py",
+          "number": 12,
+          "startedAt": "2026-11-05T11:54:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:54:58Z",
+          "conclusion": "success",
+          "name": "Run python tools/check_ontology_generation.py",
+          "number": 13,
+          "startedAt": "2026-11-05T11:54:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:00Z",
+          "conclusion": "success",
+          "name": "Run python tools/check_ontology.py",
+          "number": 14,
+          "startedAt": "2026-11-05T11:54:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:01Z",
+          "conclusion": "success",
+          "name": "Build documentation bundle",
+          "number": 15,
+          "startedAt": "2026-11-05T11:55:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:04Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 16,
+          "startedAt": "2026-11-05T11:55:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:04Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 31,
+          "startedAt": "2026-11-05T11:55:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:04Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 32,
+          "startedAt": "2026-11-05T11:55:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T11:55:04Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 33,
+          "startedAt": "2026-11-05T11:55:04Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42022747087/job/127229308263"
+    }
+  ],
+  "status": "completed"
+}

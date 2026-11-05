@@ -1,0 +1,49 @@
+{
+  "scope": "B1_B2_B3_TARGETED_CI_TERMINAL_REPORT_NOT_FINAL_CANDIDATE",
+  "sourceCommit": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "priorReportCommit": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "observedAtKST": "2026-11-05T21:29:43.743537+09:00",
+  "targetedBackend": {
+    "run": 42022737571,
+    "conclusion": "success",
+    "allThreeJobsSuccess": true,
+    "matrices": {
+      "3.12": {
+        "passed": 8711,
+        "skipped": 75,
+        "deselected": 2
+      },
+      "3.14": {
+        "passed": 8711,
+        "skipped": 75,
+        "deselected": 2
+      }
+    },
+    "rawLogsZipSHA256": "2b7ca4f8fb15af28fba5dc35c6cc03ef7c2616836bb7f18383bb9c92b2cf19eb",
+    "terminalWatchExit": 0
+  },
+  "sourceDocs": {
+    "run": 42022747087,
+    "conclusion": "success"
+  },
+  "priorReportDocs": {
+    "run": 42023751194,
+    "conclusion": "success"
+  },
+  "localFocused": {
+    "passed": 75,
+    "skipped": 0,
+    "exit": 0
+  },
+  "newIndependentLowReview": {
+    "task": "task_5ae6f7ec1457",
+    "dispatch": "ctx_5e729ea765f1",
+    "status": "RUNNING_NO_VERDICT_RECEIVED",
+    "reviewedRange": "18293..0136/productbd"
+  },
+  "nativeGoP0": "KNOWN_BLOCKER; architecture accepted only; no published production fix/implementation verdict received",
+  "nextFull8CoreFinalArchiveDeployment": false,
+  "ci2": "approved but unbound",
+  "originalPacketsAndFailuresPreserved": true,
+  "sharedBoardsRegistryOrObsidianChanged": false
+}

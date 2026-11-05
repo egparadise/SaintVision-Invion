@@ -1,0 +1,26 @@
+{
+  "sourceCommit": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "runId": 42022737571,
+  "conclusion": "success",
+  "allThreeJobsSuccess": true,
+  "observedAtKST": "2026-11-05T21:24:28.471827+09:00",
+  "rawLogsZipSHA256": "2b7ca4f8fb15af28fba5dc35c6cc03ef7c2616836bb7f18383bb9c92b2cf19eb",
+  "rawLogsIgnoredPrivate": true,
+  "matrices": {
+    "3.12": {
+      "passed": 8711,
+      "summary": "2026-11-05T12:22:27.0225824Z 8711 passed, 75 skipped, 2 deselected, 2037 warnings in 1582.78s (0:26:22)",
+      "entry": "2_backend (3.12).txt",
+      "entrySHA256": "b8745d6c41b50b6a7cb3ddc351c364625a9963bfc48998f3cba997da1974c64c",
+      "lowFileExecutionLines": []
+    },
+    "3.14": {
+      "passed": 8711,
+      "summary": "2026-11-05T12:20:48.9799411Z 8711 passed, 75 skipped, 2 deselected, 2036 warnings in 1503.13s (0:25:03)",
+      "entry": "1_backend (3.14).txt",
+      "entrySHA256": "08b1e59c6572bb9b5a6cfa2a63012e2a2b960ba4d02f90042b589b67779f7ddc",
+      "lowFileExecutionLines": []
+    }
+  },
+  "nativeGoP0Gate": "OPEN; this is Low Backend only, no longCore/full8/finalacceptance"
+}
