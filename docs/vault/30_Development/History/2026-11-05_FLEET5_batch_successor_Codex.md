@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-FLEET5-BATCH-SUCCESSOR-20261105-CODEX"
 title: "FLEET5 verified public normal batch retirement and successor"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T18:22:00+09:00"
+updated: "2026-11-05T18:36:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -39,3 +39,19 @@ At18:21KST the exact a93 Core41995694509 and Docs41995699334 were both **success
 Final source worker SHA256 `3411ba485aad6ee0cc356191759584aecfca76ce1421aef68d138fabb7ef603f`, CP SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9`; the standalone launcher pins the worker bytes. The frozen a93 source/evidence and original source59f archive remain unchanged.
 
 Next first action: Codex completes final focused/local gates, publishes the separate future code revision and exact Core/Docs evidence; root obtains actual independent Claude review of that SHA. The Node-only a93 hosted runs remain milestone evidence. Base59f bootstrap is unchanged; unrelated hosted failures are reported for combined integration without silent retries. No live CA/Node/Docker or remote connection, private r5/executorB5, source03, frozen first-wave archive, hardware map, permissions, board/registry, schedule/pin or Obsidian apply was changed. Existing48-task/VF-CL and physical FIVE acceptance remain unchanged.
+
+## Published final source and actual review in progress
+
+Final metadata-bound source is `8b53fbfef107837602b1b2f700e1f8e7bae28638`; committed-head `tests/test_intranet_pki.py` is **6 passed /exit0**. Exact Docs42001888497 is **success**. Exact Core42001883513 is in progress, and by18:35KST its LAN installer, recovery, build fairness and real PostgreSQL script gates had passed; the full pytest step was running. Both run heads were checked against8b. This is not terminal Core success.
+
+Actual independent Claude review is task `task_2aba347fdf39` / dispatch `ctx_7b3724557215`, reviewer terminal `term_c10f1342b1c3014f6084923a120ee960`. Claude's early `msg_abd41fa0c0d6` confirms matching hashes/exact metadata scope and reports **79 passed /10 Windows/POSIX skips** in the two new test files. Its additional probes completed three consecutive two-Node batches and refused mixed stale/duplicate proofs and attestation after a successor install. **Verdict remains pending**; these are actual reviewer measurements, not owner self-review or final acceptance.
+
+Three actual early Low findings are preserved for root's disposition under the requested source freeze:
+
+- L1: a crash between immutable `os.link` publication and temporary unlink can leave an equal `.next`; exact replay accepts it without removing it, while the external Low-closure classifier currently calls any `.next` an orphan and blocks. The private classifier/registry must understand any future terminal archive contract; no private file was edited here.
+- L2: retirement crash replay currently requires byte-identical transferred attestation JSON files. Reformatting a semantically identical file causes an archive collision and leaves `switched`, safely refusing retirement; canonicalizing inputs is a possible later improvement.
+- L3: README should state the same member set, Node/CP keys, tenant/epoch/CA/IP requirements and that add/remove/revoke/re-IP blocks retirement/succession more explicitly.
+
+Root's `msg_2da317f8afed` says to retain the same Dispatch/source, collect the actual terminal Core result/artifacts and obtain the final actual review before `worker_done`; no new source change or broad test is authorized absent further steering. The existing `gh run watch42001883513 --exit-status` is still observing that run. No Low disposition, final review acceptance, terminal CI result or FIVE acceptance is inferred.
+
+Later steering `msg_efc20b4eded2` supplies actual Claude **ACCEPT (source)** at `b852f9e089bac41fc19bd6060230aef90823f885` for8b and authorizes the narrow L1 source repair, strict L2 byte-binding documentation and L3 fixed-cohort documentation. Codex read the actual committed review JSON. The separate delta/red/green/gates/CI/review record is [[2026-11-05_FLEET5_rotation_low_closure_Codex]];8b remains a preserved milestone, and its Core result is collected separately.

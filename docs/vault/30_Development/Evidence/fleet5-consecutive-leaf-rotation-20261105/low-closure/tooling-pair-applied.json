@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "fleet5-current-tooling-pair-application:1",
+  "authorizationMessage": "msg_efc20b4eded2",
+  "observedKST": "2026-11-05T18:50:20.167934+09:00",
+  "applied": true,
+  "before": {
+    "sha256": "b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9",
+    "gitBlobSHA1": "502edf7b85582ad40fee1c48703787d7b87ce421"
+  },
+  "after": {
+    "sha256": "e1437600dad2231f40b24cb44d7c3edf1c147e42bc68d39dad2ebb0c9b51f574",
+    "gitBlobSHA1": "111922523062608efeb02f81de82f0b41a8189fe"
+  },
+  "onlyPathsChanged": [
+    "source.toolSHA256[tools/lan_pilot.py]",
+    "source.toolGitBlobSHA1[tools/lan_pilot.py]"
+  ],
+  "allOtherFieldsExactlyEqual": true,
+  "reason": "Only extra CP behavior is verified terminal retirement replay invoking shared duplicate-staging cleanup"
+}

@@ -410,6 +410,26 @@ predecessor against current authority before publishing a successor generation.
 Exact same-batch prepare/commit replay keeps the terminal phase; a complete
 successor publication interrupted before journal replacement can resume after
 revalidation. Keep old proposal directories, backups, archives and receipts.
+Transfer finalized attestation files without changing their bytes, including
+whitespace, encoding and line endings. Retirement archives the exact transferred
+bytes; a crash replay requires the original files. Reformatting or reserializing
+equivalent JSON is refused and is not a supported recovery path.
+
+Retirement and normal succession require exactly the same active member set,
+tenant, recovery epoch, pinned CA, Node addresses, and Node/CP keys. Adding,
+removing, revoking or re-IPing a member, changing an authority or rotating a key
+blocks this path. This tooling does not support arbitrary cohort/key changes.
+For a new five-PC setup, initialize the full five-member cohort only when all
+five are ready; an initial smaller cohort cannot later append members through
+normal post-rotation succession. Existing observation cohorts remain separate.
+
+After a crash between immutable archive linking and staging-file removal,
+explicit finalize/retirement replay removes only an owned, regular `.next`
+whose bytes exactly match the already verified archive. It preserves that
+archive and refuses unequal, partial, foreign or redirected residue. Read-only
+preflight does not remove staging evidence. External setup classifiers must
+verify the canonical signed archives and all member proofs before treating
+`finalized` as settled; the phase string alone is insufficient.
 This lifecycle is not permission to clear a journal or reset a scheduler latch;
 scheduled-plan changes and operational acceptance remain separate work.
 

@@ -464,11 +464,24 @@ def _history_bytes(path: Path, *, limit: int = 65536) -> bytes:
 
 def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:
     """Publish complete evidence without replacing an existing archive or staging file."""
+    temporary = path.with_name(path.name + ".next")
     if path.exists() or path.is_symlink():
         if _history_bytes(path, limit=max(65536, len(raw))) != raw:
             raise ValueError("Finalized rotation archive collision")
+        if temporary.exists() or temporary.is_symlink():
+            if _history_bytes(temporary, limit=max(65536, len(raw))) != raw:
+                raise ValueError("Finalized rotation archive staging collision")
+            if publish:
+                # A completed immutable publication already preserves these exact bytes.
+                # Only the owned, regular, verified duplicate may be retired on replay.
+                temporary.unlink()
+                if os.name != "nt":
+                    descriptor = os.open(path.parent, os.O_RDONLY)
+                    try:
+                        os.fsync(descriptor)
+                    finally:
+                        os.close(descriptor)
         return
-    temporary = path.with_name(path.name + ".next")
     if temporary.exists() or temporary.is_symlink():
         if _history_bytes(temporary, limit=max(65536, len(raw))) != raw:
             raise ValueError("Finalized rotation archive staging collision")

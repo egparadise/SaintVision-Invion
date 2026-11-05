@@ -1927,6 +1927,9 @@ def retire_leaf_rotation_batch(args):
                 )
                 if json.loads(archive_raw)["nodeFinalizations"] != finalizations:
                     raise ValueError("Finalized batch replay proof bytes differ")
+                worker_rotation._immutable(
+                    _batch_archive_path(path, batch), archive_raw, publish=True
+                )
             else:
                 terminal_raw = _canonical_json({**journal, "phase": "finalized"})
                 body = {
