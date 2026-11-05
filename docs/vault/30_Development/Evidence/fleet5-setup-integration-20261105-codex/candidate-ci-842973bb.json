@@ -1,0 +1,57 @@
+{
+  "sourceCommit": "842973bb73d53015eee77e6c4c55390c072258d0",
+  "branch": "agent/codex/fleet5-setup-integration-20261105",
+  "workflows": {
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/f5bb8b56ea2844a4aebb437b4335f0a3",
+      "dispatchRequestedAtKST": "2026-11-05T22:10:54.053859+09:00",
+      "dispatchReturnedSuccess": true,
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42033485271,
+        "headSha": "842973bb73d53015eee77e6c4c55390c072258d0",
+        "headBranch": "agent/codex/fleet5-setup-integration-20261105",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42033485271,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42033485271",
+      "headSha": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127265541510,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T13:10:59Z",
+          "completedAt": "2026-11-05T13:11:25Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42033485271/job/127265541510"
+        }
+      ],
+      "rawObservation": "ci-42033485271-20261105T221201.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-setup-integration-20261105",
+    "refTipSha": "842973bb73d53015eee77e6c4c55390c072258d0"
+  },
+  "observedAtKST": "2026-11-05T22:11:57.748801+09:00",
+  "intermediateScope": [
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Native Go sequence proof/resolution/review pending root",
+  "jobCountObserved": 1
+}

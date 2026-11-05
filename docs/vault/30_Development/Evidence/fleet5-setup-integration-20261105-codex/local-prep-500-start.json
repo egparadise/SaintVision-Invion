@@ -1,0 +1,61 @@
+{
+  "scope": "OWN_LOCAL_UNACCEPTED_PROSPECTIVE_500_PREPARATION_ONLY",
+  "startedAtKST": "2026-11-06T00:08:43.032670+09:00",
+  "task": "FLEET5-SETUP-INTEGRATION-20261105",
+  "rootAuthorization": "msg_268e2074f267",
+  "owner": "Codex integration ctx_ed7ec73163d6",
+  "reviewer": "actual task_c90b362f7470/ctx_1e0814952956 pending through root; no verdict",
+  "branch": "agent/codex/fleet5-setup-integration-local-prep-50000697-20261106",
+  "savedAcceptedReportRef": "refs/heads/agent/codex/fleet5-setup-integration-20261105",
+  "savedAcceptedReport": "842973bb73d53015eee77e6c4c55390c072258d0",
+  "acceptedLowProduct": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "runtimeSource": "4a928310e88ac336efb040c1621525fee7133f32",
+  "incomingFixtureDelta": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "runtimeEquivalenceVerified": true,
+  "allDeltaPaths": [
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/backend-jobs-first-snapshot.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/canonical-go-results.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/core-jobs-first-snapshot.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/docs-jobs-first-snapshot.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/go-guard-events.jsonl",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/native-artifact-metadata.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/native-fixed-proof.zip",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/native-fixed-result.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/native-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/native-server.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-correction.json",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-coverage-green.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-coverage-red.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-1.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-2.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-3.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-4.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-5.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-6.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gate-7.log",
+    "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-exacthead-ci/unicode-gates.json",
+    "docs/vault/30_Development/History/2026-11-05_FLEET5_P0_v2_exacthead_CI_Codex.md",
+    "services/node-agent/transport/peer_floor_canonical_test.go",
+    "tests/fixtures/fleet5-floor-v2-canonical-vectors.json",
+    "tests/test_fleet5_floor_v2_canonical.py"
+  ],
+  "productionDeltaPaths": [],
+  "docVersions": {
+    "INDEX-PROGRESS-001": "1.0.411",
+    "WORKBOARD-CODEX-001": "1.0.372",
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0"
+  },
+  "provisionalMergeConflicts": [
+    ".github/workflows/backend.yml",
+    "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json"
+  ],
+  "hold": [
+    "not selected or accepted source",
+    "actual500Go Unicode canonical coverage CI pending",
+    "4a fullCore/Backend terminal and actual implementation verdict pending per root",
+    "sourcePair/rebuilt Node binary full provenance remains an actual gate",
+    "no experimental product/packet publication, ci2 binding, finalfreeze, all8/Core, landing/deploy, physical or Obsidian actions"
+  ],
+  "allowed": "focused/predicate/nonmutation/red fixtures and static proof, own local commits only; docs-only report publication separately allowed"
+}
