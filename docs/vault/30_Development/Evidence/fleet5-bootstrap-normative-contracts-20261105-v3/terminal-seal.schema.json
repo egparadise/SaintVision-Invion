@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v3/terminal-seal.schema.json",
+  "allOf": [
+    {
+      "$ref": "../v2/terminal-seal.schema.json"
+    }
+  ],
+  "$comment": "NONEXECUTING v3 overlay; base v2 immutable. Offline resource registration required; no network schema discovery."
+}

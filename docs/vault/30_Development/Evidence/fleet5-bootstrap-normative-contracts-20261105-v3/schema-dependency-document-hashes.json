@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "fleet5-v3-schema-document-dependencies:1",
+  "documentHashesOnly": true,
+  "registeredDeploymentPins": false,
+  "baseCommit": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+  "dependencies": {
+    "api-request.schema.json": {
+      "bytes": 135698,
+      "sha256": "35f52a92055e66f0fc936dc48248967e6619627aa0bfd3fd227dd91001e61ba9"
+    },
+    "api-response.schema.json": {
+      "bytes": 2191,
+      "sha256": "278b2b489d6bc10e865b0ff1a99902a6f7e939e59ea82c0661e06d1913bb1bf6"
+    },
+    "common.schema.json": {
+      "bytes": 21464,
+      "sha256": "d056b1b1b6bbc76f562cc1123036703ceea085bbd269bf86b86367b382ae6db4"
+    },
+    "migration-event.schema.json": {
+      "bytes": 65364,
+      "sha256": "9e9a9e47ea1300799a219c9f6634bec73f40ef4a2a63deb2cab228305601456d"
+    },
+    "migration-journal.schema.json": {
+      "bytes": 18396,
+      "sha256": "d2aff35f7090b1753964c67f8f0c184c2becce207b67e40c96058c3c7e8d36b3"
+    },
+    "operation-lease.schema.json": {
+      "bytes": 13027,
+      "sha256": "f84910b33336507a243414687ca2ca48e2867880cdba652c170f17e3f2017c3a"
+    },
+    "runtime-inventory.schema.json": {
+      "bytes": 78148,
+      "sha256": "b6088bb3c8dc1255b97a5770307f442deaabba032b88cfecdc4d94f56ac5f2bd"
+    },
+    "successor-plan.schema.json": {
+      "bytes": 185917,
+      "sha256": "7cdde62b82e5af7d9162313575c814ee1135e5b1ce12a66bd86f2536bd548161"
+    },
+    "terminal-seal.schema.json": {
+      "bytes": 16725,
+      "sha256": "f8f9840cf8128d234acf2cb6b11e85a825c5737891fa1dc6db173fda5c9adab1"
+    }
+  }
+}

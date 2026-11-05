@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "fleet5-v3-static-validation:1",
+  "observedAtKST": "2026-11-06T02:12:14.070352+09:00",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "schemas": 9,
+  "artifactPositiveDocuments": 10,
+  "apiPositiveRequests": 14,
+  "uniqueRegisteredSlots": 77,
+  "embeddedRecipeChecks": 87,
+  "rehashRecipeNegatives": 501,
+  "transitionPositiveCases": 28,
+  "priorAndTargetSchemaRejects": 577,
+  "infoSchemaRejects": 20,
+  "failureUnknownPositive": 1,
+  "actualGo": 0,
+  "actualCrypto": 0,
+  "actualEngineOrLocksOrHistoryRuntime": 0,
+  "all40BootstrapRuntimeCases": "NOT RUN",
+  "actualBindings": "NULL/HOLD",
+  "recipeVerification": "evaluated source fields via published DSL; no self-template comparison",
+  "exitCode": 0
+}

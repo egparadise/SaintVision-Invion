@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "fleet5-v3-low-response:1",
+  "actualPriorReview": "b47371c386c4786223acdad08fa7bd28d2d8ddba",
+  "priorVerdict": "proposal/design ACCEPT with Low conditions; unchanged",
+  "priorDocsReportedVerifiedByRoot": 42068328658,
+  "thisRevisionVerdict": null,
+  "responses": [
+    {
+      "id": "N-L4",
+      "response": "per-method/recordKind priorPhase schemas; member top/effect target const linkage",
+      "evidence": [
+        "transition-positive-fixtures.json",
+        "transition-negative-fixtures.json"
+      ],
+      "results": "28 structural table cases,577 schema rejects"
+    },
+    {
+      "id": "N-L5",
+      "response": "published DSL derives every subject from containing documents and explicit dummy producer facts; exact crossartifact hashes/args/IDs/scopes/history and public signer joins",
+      "evidence": [
+        "recipe-definitions.json",
+        "crossartifact-recipe-results.json",
+        "recipe-negative-fixtures.json"
+      ],
+      "results": "87 embedded/77 slots,501 rehashed-subject rejects; not self-template comparisons"
+    },
+    {
+      "id": "N-I1",
+      "response": "restore requires sealed history/allowed phase/held active lease; migration cannot NONE lease",
+      "evidence": [
+        "migration-journal.schema.json",
+        "info-negative-fixtures.json"
+      ]
+    },
+    {
+      "id": "N-I2",
+      "response": "failure receipt outcome unknown/known-failure/not-attempted; no success/advance authority",
+      "evidence": [
+        "failure-receipt-positive.json",
+        "info-negative-fixtures.json"
+      ]
+    },
+    {
+      "id": "N-I3",
+      "response": "strict lowercase IDs, fixed inspection point, bounded exact registered cohort ID",
+      "evidence": [
+        "info-negative-fixtures.json",
+        "low-delta-contract.md"
+      ]
+    }
+  ],
+  "actualGoCryptoEngineLocksAtomicityRuntime": 0,
+  "all40BootstrapProductCases": "NOT RUN",
+  "targetRootMemberTrustBindings": "NULL/HOLD",
+  "registrationImplementationOperationsAccepted": false
+}

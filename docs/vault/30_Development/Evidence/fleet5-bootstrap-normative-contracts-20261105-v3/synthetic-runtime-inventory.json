@@ -1,0 +1,675 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-node-runtime-inventory:1",
+      "cohortId": "fixture-cohortId",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "revision": 1,
+      "publishedAt": "2030-01-01T00:00:00Z",
+      "publicationId": "fixture-publicationId",
+      "expectedLegacyCPStateSHA256": "1d98427f1ab1244f6e109816d20799c35668482ceedebeca82f2c2e327bd7ad9",
+      "expectedChannelVectorSHA256": "aae96be9e87c661ee574dcd9af87a8ec6e9ae8c9f28b083b71300dcacf573109",
+      "leaseEnvelopeSHA256": "1a76e856e05eb1b956992dd09151f8b11fc739b082a1b792c595cf040f729117",
+      "target": {
+        "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+        "artifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+        "buildProvenance": {
+          "contractSHA256": "8abcff89899842b94b224d9133bc3c854071de24a79d2c1a16304307fc938c9b",
+          "artifactSHA256": "b07383f2e82fb056b953609937b1441fdfd9420c52fd5d833d60ead178a01782",
+          "scopeSHA256": "f46e9d385cfbf2b39e5a41fd3a1cdab45ac237f9dce63d94a8538563c4d10975",
+          "signerKeySPKISHA256": "3dc67ee3231405453a15c48d820267af337b12ed6502245e0f5cddc5b956924e",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "runtime-inventory:/body/target/buildProvenance",
+          "contractId": "saintvision-proof-build-provenance:1",
+          "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+          "producerRole": "build-service",
+          "signerRole": "build-attestor",
+          "typedSubject": {
+            "kind": "build-provenance",
+            "component": "node-agent",
+            "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+            "artifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026"
+          }
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "f194780e1f376e8a554b6bc1b779b177c6f494ec72994c9cb4670be863fd0472",
+          "attestation": {
+            "contractSHA256": "f46d14f61fa02a985db3ff3dde5cfeb79ebdcd435412933c1db8c3277c7abacd",
+            "artifactSHA256": "cc77f12d1df57504b90dddd316e7d5057475930f6098ae4bf41ac0275d32a243",
+            "scopeSHA256": "7255feeb4e7f3be61544430d4a8893f319fb39744e247d389b0eca5f772052ec",
+            "signerKeySPKISHA256": "f3360b8f9ebf71ff0aa89d1c10ee25a37e95939ded9367a9eb862b3fac44bfc2",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+            "contractId": "saintvision-proof-ci-attestation:1",
+            "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+            "producerRole": "github-actions",
+            "signerRole": "ci-attestor",
+            "typedSubject": {
+              "kind": "ci-attestation",
+              "component": "node-agent",
+              "repository": "egparadise/SaintVision-Invion",
+              "workflow": "fixture-workflow",
+              "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+              "ref": "fixture-ref",
+              "event": "push",
+              "runId": 1,
+              "runAttempt": 1,
+              "artifactSHA256": "f194780e1f376e8a554b6bc1b779b177c6f494ec72994c9cb4670be863fd0472"
+            }
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "2f4af89649eeee0b4480079cff82951ac58516f98acff21b3dc9490745325789",
+          "attestation": {
+            "contractSHA256": "f46d14f61fa02a985db3ff3dde5cfeb79ebdcd435412933c1db8c3277c7abacd",
+            "artifactSHA256": "992c77b84899b21c210d87b3dbfbad917e31d5d03a19edb35bfd9ae1b50a3d30",
+            "scopeSHA256": "acbde73b374fb611e91e43ebd2c9abbef9757acc8c64fc55d4c800fdb6e6e1cb",
+            "signerKeySPKISHA256": "f3360b8f9ebf71ff0aa89d1c10ee25a37e95939ded9367a9eb862b3fac44bfc2",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+            "contractId": "saintvision-proof-ci-attestation:1",
+            "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+            "producerRole": "github-actions",
+            "signerRole": "ci-attestor",
+            "typedSubject": {
+              "kind": "ci-attestation",
+              "component": "node-agent",
+              "repository": "egparadise/SaintVision-Invion",
+              "workflow": "fixture-workflow",
+              "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+              "ref": "fixture-ref",
+              "event": "push",
+              "runId": 1,
+              "runAttempt": 1,
+              "artifactSHA256": "2f4af89649eeee0b4480079cff82951ac58516f98acff21b3dc9490745325789"
+            }
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "44e4feb9c1979c1ad17ead9d713b09d5053f4f78cbde9eab69606556ebccf0b0",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "subjectArtifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+          "reviewCommit": "d65c95a27457a6245106eac8779448d44e261b9e",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "362db0ff61fb69b50d15b4cb6b37d178745a7401ec478652f0fedc1ad27807a7",
+            "artifactSHA256": "474ca9cfc1ba808d6364838eae7d1c50085c60ce67479b70f6bf903e5c8f00d1",
+            "scopeSHA256": "73a36be153a5c02b86144f9d8582486703fd748eeeb86bc0a768a2a69254f855",
+            "signerKeySPKISHA256": "44e4feb9c1979c1ad17ead9d713b09d5053f4f78cbde9eab69606556ebccf0b0",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+            "contractId": "saintvision-proof-independent-code-review:1",
+            "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+            "producerRole": "independent-reviewer",
+            "signerRole": "independent-reviewer",
+            "typedSubject": {
+              "kind": "independent-code-review",
+              "component": "node-agent",
+              "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+              "artifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+              "authorId": "fixture-author",
+              "reviewerId": "fixture-independent-reviewer"
+            }
+          }
+        }
+      },
+      "image": {
+        "dockerImageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+        "distributionKind": "registry",
+        "distributionProof": {
+          "contractSHA256": "5ada9360b0416f8bd825120a841f674a2f8322ee51c30622409adadc46f2323a",
+          "artifactSHA256": "40ca4c9196fec872b5757e3b721131f458ce38a6660d966285a3ddc562e11825",
+          "scopeSHA256": "8aeef51ffd22e5b672caa37c047d47e5bd42aecce51e6428b6a6a8d8f1fd8ca8",
+          "signerKeySPKISHA256": "3dc67ee3231405453a15c48d820267af337b12ed6502245e0f5cddc5b956924e",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "runtime-inventory:/body/image/distributionProof",
+          "contractId": "saintvision-proof-image-distribution:1",
+          "signatureDomainASCII": "saintvision/proof/image-distribution/v1",
+          "producerRole": "artifact-publisher",
+          "signerRole": "build-attestor",
+          "typedSubject": {
+            "kind": "image-distribution",
+            "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+            "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+            "platformManifestDigest": "sha256:0bcb1dd10e5f21bb084b9c79a4c819262fb352ae889f1a6f5d7045f4aa9b9a90",
+            "configDigest": "sha256:7383a417f70b1c402794f79fbd8fb0f20a2c07352312cace993c65769d4d4a3e",
+            "archiveSHA256": "309896ce0b819a10a6ed68560daa80695cb0ff9cdc78db9a10628fb2da3f5d91",
+            "executableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563"
+          }
+        },
+        "indexOrManifestDigest": "sha256:2b681497ff9cae43497a32c7368c048e4da6bd4568145e687a07ebbe465834c8",
+        "platformManifestDigest": "sha256:0bcb1dd10e5f21bb084b9c79a4c819262fb352ae889f1a6f5d7045f4aa9b9a90",
+        "configDigest": "sha256:7383a417f70b1c402794f79fbd8fb0f20a2c07352312cace993c65769d4d4a3e",
+        "rootFSDiffIDs": [
+          "sha256:1b8c441fac4f8a78d4de510640b26331159761782b89c1ad0a81c3eb6a95eba1"
+        ],
+        "archiveSHA256": "309896ce0b819a10a6ed68560daa80695cb0ff9cdc78db9a10628fb2da3f5d91",
+        "os": "linux",
+        "architecture": "amd64",
+        "executableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+        "inheritedConfigSHA256": "9fa73cf618910be4b925f383fe1f07fb562b20bfd55b6b6e9b926ba149cf278b",
+        "buildRecipeSHA256": "02048df4eedbe5223a89be0e7d8dac083887f0ede70513b72fe517b2139807ee"
+      },
+      "members": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "oldBackup": {
+            "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+            "id": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+            "name": "/fixture-backupReservedName",
+            "inspectSHA256": "6c40d73850201a708d457b00ea73735668a9feecfeadbbee065d01fed4512d96",
+            "imageId": "sha256:9c846ddff12d79db37088a75dfd8aa76b51bd41c67f0dbe1563e1143417cbf42",
+            "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+            "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+            "restartPolicy": "no"
+          },
+          "currentContainer": {
+            "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+            "id": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+            "name": "/fixture-new-node-0",
+            "inspectSHA256": "d0c55a1333dadfc2f3bd3c45ad3fc36d0844d01d1302d3c4f74f712855ad80be",
+            "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+            "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+            "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+            "restartPolicy": "no"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+            "mountIdentitySHA256": "c768647cb578fd5186ad18c2e2bd689f8b23764ce1ab84532bda65dbc577991f",
+            "protectedTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+            "nodeLeafDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+            "controlLeafDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+            "caBundleRawSHA256": "25ad97394610842cafb54eb3b8dac1cd5078b217f0a0510e8b7777107e34d922",
+            "signerPublicRawSHA256": "03fe03b00a86d8dc2f9001e4b118771e811557c588bf5831b2228ca32ffc9d50"
+          },
+          "bootstrapFloor": {
+            "version": 11,
+            "policySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+            "floorRawSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+            "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+            "journalUID": 1
+          },
+          "unchangedBootstrapChannel": {
+            "version": 3,
+            "certificateDERSHA256": "e09fa59bed5fb4deb1e6122281b35b42fdea0c09abafaed96f4228b1b6cacfb7",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "bootstrapVerifiedEvent": {
+            "sequence": 14,
+            "envelopeSHA256": "c4d7853978160e2f26a7963b3035129ca029b6460817a7c9e42adb058eadb1b1"
+          },
+          "signedM2": {
+            "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+            "artifactSHA256": "d6fa4752d7265358978f9550f674dfb9f50e277a200bc4ccb9ccc6c7d342b05c",
+            "scopeSHA256": "4e1a37bf94307bd74f42f4264fb6ea616e1415ce773e5f35e67b2c9d04b6ff61",
+            "signerKeySPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/signedM2",
+            "contractId": "saintvision-proof-node-floor-v2:1",
+            "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+            "producerRole": "actual-serving-node",
+            "signerRole": "node-leaf",
+            "typedSubject": {
+              "kind": "node-floor-v2",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "nonce": "5cd00104e9ea494286ae5f43cc36cb826a5b80c4d9f9370d74de4d62e4bc31a3",
+              "certificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "peerPolicyVersion": 11,
+              "peerPolicySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+              "floorSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+              "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+              "journalUID": 1,
+              "servingPID": 1,
+              "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+              "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+            }
+          },
+          "mtls": {
+            "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+            "artifactSHA256": "9ee85e256da40ddbe15e8c7e82634d56e2c5e2b20e50869b5376d26c067a37ad",
+            "scopeSHA256": "18fb3f33d22ff4c5a1a75108c56e0672b99a18fc719c4249ea763737ded32095",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/mtls",
+            "contractId": "saintvision-proof-unchanged-mtls:1",
+            "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+            "producerRole": "owned-mtls-client",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "unchanged-mtls",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "channelVersion": 3,
+              "nodeCertificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "controlCertificateDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+              "endpoint": "fixture-endpoint",
+              "authoritySHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d"
+            }
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "abceb18136747c6202090decd80e37359152824aad3ba6b0fb4bdfad864e06c3",
+            "artifactSHA256": "13681fb809c02dd5e43ff5187999a9fb5d3aafb0d68158029d6214113b314b50",
+            "scopeSHA256": "29acb61a6fe387546fbb64d1a34dac7c26ff2da1e499ebfbcc75db225adafe40",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+            "contractId": "saintvision-proof-protected-tree-equality:1",
+            "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "protected-tree-equality",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "volumeMetadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+              "beforeTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "afterTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "operationId": "fixture-operation-migration"
+            }
+          },
+          "execReceipt": {
+            "contractSHA256": "e5afd0d36a78148791a1aa3cccc8619715a3a595f118186a92406f17335f078f",
+            "artifactSHA256": "9d4d5f7973acaf0927797d921afcdf7e30c1190d391c8bbd0d514c69635ff42c",
+            "scopeSHA256": "b05dff7b2849476cb4b16a7204c570265cbfedc81ca46c4dfef368c92ebe4c5a",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/execReceipt",
+            "contractId": "saintvision-proof-owned-engine-exec:1",
+            "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "owned-engine-exec",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+              "containerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+              "execId": "19951afa96c893fd6275b713942993be3b62169e2fefe34d0647366368d0a002",
+              "commandSHA256": "188cfe7a97458fad3cab6eeefbe4126d48b9d7aaa9483bd714d34fe7b8af298a",
+              "uid": 1,
+              "exitCode": 0
+            }
+          },
+          "runtimeInspectionBeforeM2": {
+            "contractSHA256": "5911bb0694ba3416385ee9ac2c5d06e00079b9a514c4ccf018eec41a62723112",
+            "artifactSHA256": "cd59fac86b9574a5acd143f4bd48d9cb124440309b9de95f3130850562c58165",
+            "scopeSHA256": "1576f6fdf41baabb8d20a723d1e605b990a4bd0773c8224e99491a0482359c66",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+            "contractId": "saintvision-proof-runtime-inspection-before:1",
+            "signatureDomainASCII": "saintvision/proof/runtime-inspection-before/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "runtime-inspection-before",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+              "containerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+              "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+              "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+              "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+              "processGenerationSHA256": "59bb99cb3a12e08f153d05340b51085dcc56ee25f7d9c3cc713e79e050af1fbf",
+              "point": "before-M2"
+            }
+          },
+          "runtimeInspectionAfterM2": {
+            "contractSHA256": "d3f99d33a844c1b1a9fc04502d11c4a871010e2ebaf317338f9a0a316db484b4",
+            "artifactSHA256": "f3d5068d9f5023dd4762b960270eb9b9e100a925a58fee63904c1975adf243ff",
+            "scopeSHA256": "8a68a39f2a5b73f62e7058c3fd4fb829d9a92088e891a14c301bb29b943ad306",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+            "contractId": "saintvision-proof-runtime-inspection-after:1",
+            "signatureDomainASCII": "saintvision/proof/runtime-inspection-after/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "runtime-inspection-after",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+              "containerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+              "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+              "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+              "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+              "processGenerationSHA256": "59bb99cb3a12e08f153d05340b51085dcc56ee25f7d9c3cc713e79e050af1fbf",
+              "point": "after-M2"
+            }
+          }
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "oldBackup": {
+            "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+            "id": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+            "name": "/fixture-backupReservedName",
+            "inspectSHA256": "d3b3c95adf094096915342db091132d857bbdfc42419cfc0db25204b0757997c",
+            "imageId": "sha256:183506cc27f3b013f80ca7890e01477b47e7b2fdb6e21f881bac57ccc33ad699",
+            "configSHA256": "943a12bfd86bc1980473c390684b4dcc2f4c5262c0976ecd35cc7b983ce20b29",
+            "mountsSHA256": "75f6eb07dfcb4a59bdbf16a3cdc3c2be7f13aee227a7f4ffe89bb5e030400f75",
+            "restartPolicy": "no"
+          },
+          "currentContainer": {
+            "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+            "id": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+            "name": "/fixture-new-node-1",
+            "inspectSHA256": "5b3100319538c9e86cb2a97a5865096032627fb92fb356db3c565923996f9488",
+            "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+            "configSHA256": "943a12bfd86bc1980473c390684b4dcc2f4c5262c0976ecd35cc7b983ce20b29",
+            "mountsSHA256": "75f6eb07dfcb4a59bdbf16a3cdc3c2be7f13aee227a7f4ffe89bb5e030400f75",
+            "restartPolicy": "no"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+            "mountIdentitySHA256": "54de7ffe37453c5ceebe6ea46b0aea723b0f00310b980203629c59a4b474e12e",
+            "protectedTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+            "nodeLeafDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+            "controlLeafDERSHA256": "b22c528e1e1803f63170865874979a6096bf8403c802827f000e31532039f071",
+            "caBundleRawSHA256": "aa9da6e48bae675993abba9afb18275d70da58ab92574ed321919cd5d57cb02e",
+            "signerPublicRawSHA256": "00eef128e3655e84e449a5ca4da408ab7be2f0b2b71b9fb01f4f2c113a7b12e3"
+          },
+          "bootstrapFloor": {
+            "version": 11,
+            "policySHA256": "9e480f2bafcfde6a8206821a0b26e2ab250acb443e99197673bacc673baa809f",
+            "floorRawSHA256": "076f019c902e3c79d25fb4309826d2684b724f2f7bad79e10f073151d445e383",
+            "journalIdentitySHA256": "687bc05375671ea5e91cbc86adf1170b970b904dd9ccb16726b0697dd5b0994f",
+            "journalUID": 1
+          },
+          "unchangedBootstrapChannel": {
+            "version": 3,
+            "certificateDERSHA256": "c116e5ba393416c6aff5fb2b66d564be7b5ef7e784a582edf4221590aeba2edd",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "bootstrapVerifiedEvent": {
+            "sequence": 15,
+            "envelopeSHA256": "0f97a4babfc6d1b80438f72805be0dc32bcfe78fbef3a296b51ec78b3f94e9e6"
+          },
+          "signedM2": {
+            "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+            "artifactSHA256": "589932da8e073cbc488b67ee201633e2e4bb406db4c2a25f12863611e727b7e6",
+            "scopeSHA256": "4dfd85207706dc813823e1bab515053c90b207ba108da5ebe5324528a62d498f",
+            "signerKeySPKISHA256": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/signedM2",
+            "contractId": "saintvision-proof-node-floor-v2:1",
+            "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+            "producerRole": "actual-serving-node",
+            "signerRole": "node-leaf",
+            "typedSubject": {
+              "kind": "node-floor-v2",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "nonce": "ef77a56438c9922245bebe5de6ac148857ffc308c882e7b21bf244266e6ab7ac",
+              "certificateDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+              "peerPolicyVersion": 11,
+              "peerPolicySHA256": "9e480f2bafcfde6a8206821a0b26e2ab250acb443e99197673bacc673baa809f",
+              "floorSHA256": "076f019c902e3c79d25fb4309826d2684b724f2f7bad79e10f073151d445e383",
+              "journalIdentitySHA256": "687bc05375671ea5e91cbc86adf1170b970b904dd9ccb16726b0697dd5b0994f",
+              "journalUID": 1,
+              "servingPID": 1,
+              "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+              "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+            }
+          },
+          "mtls": {
+            "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+            "artifactSHA256": "435ee9e65c10339f45321cb02aa688208c844773c2fff0f91cc603b96a1f7de1",
+            "scopeSHA256": "a808fe5e6d0eb575458e7f272c1d9135f37dc49b834909d9bf3842de83efd620",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/mtls",
+            "contractId": "saintvision-proof-unchanged-mtls:1",
+            "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+            "producerRole": "owned-mtls-client",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "unchanged-mtls",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "channelVersion": 3,
+              "nodeCertificateDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+              "controlCertificateDERSHA256": "b22c528e1e1803f63170865874979a6096bf8403c802827f000e31532039f071",
+              "endpoint": "fixture-endpoint",
+              "authoritySHA256": "cccfec6ccb0316895cfcbcabd5e38bf776483a7cf14042efbf1283244a54b453"
+            }
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "abceb18136747c6202090decd80e37359152824aad3ba6b0fb4bdfad864e06c3",
+            "artifactSHA256": "0a0c90abe81bd227a27ce58fe5940c41d41291d7d4d2bdee1c3460286613f636",
+            "scopeSHA256": "2c36dafaed37489f8209521b9b1a5c433d4abfa56e895ae885ca0d6085d12757",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+            "contractId": "saintvision-proof-protected-tree-equality:1",
+            "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "protected-tree-equality",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "volumeMetadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+              "beforeTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+              "afterTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+              "operationId": "fixture-operation-migration"
+            }
+          },
+          "execReceipt": {
+            "contractSHA256": "e5afd0d36a78148791a1aa3cccc8619715a3a595f118186a92406f17335f078f",
+            "artifactSHA256": "efba344a6ef8ab33462f7027e5ab38d5571d2ce00c339fda44a86c958bf997b9",
+            "scopeSHA256": "6b7c5a81ebacdf26c96efc42eaf68e1e4e036bd9da803ab7b20f459876ec5f92",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/execReceipt",
+            "contractId": "saintvision-proof-owned-engine-exec:1",
+            "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "owned-engine-exec",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+              "containerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+              "execId": "f2a1a4ecce940896ac94d888cfaceb3ff085ffc84ecb98d70135992eb63a0ba1",
+              "commandSHA256": "86afff0ff5e0f1ea74dd4f12944a625b2c52d99db0907a166495965e901f7719",
+              "uid": 1,
+              "exitCode": 0
+            }
+          },
+          "runtimeInspectionBeforeM2": {
+            "contractSHA256": "5911bb0694ba3416385ee9ac2c5d06e00079b9a514c4ccf018eec41a62723112",
+            "artifactSHA256": "02941ba531ee8cfdc298f89db11db5fbb48487e09cd4873298f2c7f5f91d7a69",
+            "scopeSHA256": "4140e1788f6cef32bda8275ad6eacbc4977269b4377ec0d0a11679f132d2b683",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+            "contractId": "saintvision-proof-runtime-inspection-before:1",
+            "signatureDomainASCII": "saintvision/proof/runtime-inspection-before/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "runtime-inspection-before",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+              "containerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+              "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+              "configSHA256": "943a12bfd86bc1980473c390684b4dcc2f4c5262c0976ecd35cc7b983ce20b29",
+              "mountsSHA256": "75f6eb07dfcb4a59bdbf16a3cdc3c2be7f13aee227a7f4ffe89bb5e030400f75",
+              "processGenerationSHA256": "d7b1b80e3a0e860df8f20be50abd3b60a00c6660c52232607de6a9584da9d803",
+              "point": "before-M2"
+            }
+          },
+          "runtimeInspectionAfterM2": {
+            "contractSHA256": "d3f99d33a844c1b1a9fc04502d11c4a871010e2ebaf317338f9a0a316db484b4",
+            "artifactSHA256": "928c68084b1c5427ee54589354ea2a649ed120d18df95e32eab54caa410dea19",
+            "scopeSHA256": "4beb22137e32ba1cceff651fa47a6d3206ee538cd84e98ebe44f65754a2f2667",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+            "contractId": "saintvision-proof-runtime-inspection-after:1",
+            "signatureDomainASCII": "saintvision/proof/runtime-inspection-after/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "runtime-inspection-after",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-1",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+              "containerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+              "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+              "configSHA256": "943a12bfd86bc1980473c390684b4dcc2f4c5262c0976ecd35cc7b983ce20b29",
+              "mountsSHA256": "75f6eb07dfcb4a59bdbf16a3cdc3c2be7f13aee227a7f4ffe89bb5e030400f75",
+              "processGenerationSHA256": "d7b1b80e3a0e860df8f20be50abd3b60a00c6660c52232607de6a9584da9d803",
+              "point": "after-M2"
+            }
+          }
+        }
+      ],
+      "legacyAgentImageFallbackAllowed": false,
+      "channelMutationAllowed": false,
+      "previousInventoryHead": {
+        "presence": "ABSENT",
+        "envelopeSHA256": null,
+        "readbackProof": {
+          "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+          "artifactSHA256": "8c716b108f72e9231b65e58c47e0027629b2e33602ced3c97315f4393570e61f",
+          "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+          "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+          "contractId": "saintvision-proof-inventory-head-readback:1",
+          "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+          "producerRole": "cp-inventory-reader",
+          "signerRole": "cp-inventory",
+          "typedSubject": {
+            "kind": "inventory-head-readback",
+            "cohortId": "fixture-cohortId",
+            "presence": "ABSENT",
+            "envelopeSHA256": null,
+            "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+          }
+        }
+      }
+    },
+    "signer": {
+      "role": "cp-inventory",
+      "keySPKISHA256": "251e0dcd1d4429e40290c43465efb492a44ed7d8a47e4e3f60ad1b89124844f5",
+      "signatureHex": "e49c5771a1747c340dbbb0a54fbaf69ec061113260b0d1bfd207a425608c8baae7432a5827bd14a1150942a0f432a5f8bac03a9ad73a2c28c54d6fcc36f33cc3"
+    }
+  }
+}

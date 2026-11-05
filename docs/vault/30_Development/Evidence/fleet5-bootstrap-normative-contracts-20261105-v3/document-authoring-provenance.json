@@ -1,0 +1,22 @@
+{
+  "documentOnly": true,
+  "temporaryProgramHashes": {
+    "_author_v3_docs.py": "4299ea27c277541e66a939727de3b7d246096d7e24943d8fae8890f0641c3b2d",
+    "_check_v3_docs.py": "7bd5ff615ef451f97fc5f23d926ced716c5451e2456cc1ca37b0253ecf5874f8"
+  },
+  "failuresPreserved": [
+    {
+      "action": "guessed public review filename lookup",
+      "exitCode": 1,
+      "correction": "public Git inventory identified bootstrap-normative-contracts-v2-cb3b-review.json; full original read"
+    },
+    {
+      "action": "first v3 schema check after copying inventory head",
+      "exitCode": 1,
+      "correction": "preserve per-slot metadata, derive only shared head values; all v1/v2 artifacts unchanged"
+    }
+  ],
+  "thisTaskRuntimeActions": 0,
+  "keysGeneratedOrRead": 0,
+  "programsRemovedBeforeCommit": true
+}
