@@ -1,19 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.364"
+version: "1.0.365"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:30:07+09:00"
+updated: "2026-11-05T19:43:57+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "2fb L1b source delta actual ACCEPT; combined candidate/all8 and component Core pending; complete storage lifecycle B contract design; hardware prerequisites remain"
-active_card_next: "Integrator merges selected2fb and actuald06 review then freezes OWN candidate/all8; S1 preserves6fc and runs2fb Core; contract owner publishes concrete B design for review before production changes"
+active_card_status: "Failed d073 candidate retained; Backend attestation consumer fix; actual Go peer-floor/phase proof required before new final freeze; B design and physical prerequisites remain"
+active_card_next: "Integrator preserves d073 all8 and fixes exact attestation expectation; contract owner prioritizes Linux realGo policy lifecycle proof; S1 finishes2fb Core; root gates next candidate on proof/fix/review"
 ---
 
-## 2026-11-05 갱신 수정분 실제 수락과 통합 재개
+## 2026-11-05 합본 실패 보존과 실제 Go 정책 경로 재현
 
-작업한 것: Root는2fb52bbe 원격 pin/exact Docs42009966309와 actual Claude d06f93f7/exact Docs42010719443 성공을 확인하고 통합 질문에 structured reply했다. 확인한 것: source 안전성·연속 갱신 LowL1b는 수락됐지만 component Core/합본8lane과 실제 장비 인수는 남는다. 다음 첫 행동/담당: 통합 owner가2fb와 DB tooling을 함께 결합해 자체 후보/새 archive/8lane을 만들고 실제 합본 검토를 요청한다. S1 owner는 이전6fc CI를 보존한 뒤2fb Core를 실행한다. 저장소 owner는 Root가 선택한 B(명시적 보존+정책/DER/채널 동시 갱신)의 구체 계약을 게시·독립 설계 검토받고 production 변경을 진행한다. 이 보고는 전체 완료 판정이 아니다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+작업한 것: d073 합본의8개 CI/head·전체12 jobs를 직접 조회해 Backend2실패/Core1진행/나머지9job성공을 구분하고 호출부 attestation 필드의 최소 교정·회귀를 지시했다. 확인한 것: Go PinPeerPolicy는 같은 버전·다른 hash를 거부하지만 helper overlap/final은 둘 다 targetChannelVersion을 사용한다. 실제 Linux Go 재현 전 live 실패로 주장하지 않는다. 다음 첫 행동/담당: 저장소 계약 owner가 실제 Journal+Authority+정본 Python 정책의 native Linux 재현을 우선 제출하고, 통합 owner는 기존실패/진행CI를 보존하며 다음 최종freeze를 기다린다. S1은2fb Core를 마무리한다. Root는 실제 증거·수정·독립 검토 뒤에만 승격한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 

@@ -1,0 +1,167 @@
+{
+  "schema": "fleet5-failed-candidate-native-policy-gate:1",
+  "recordedAtKST": "2026-11-05T19:43:57+09:00",
+  "candidate": "d0735809b92850e7f63f6a07fdd7cd16d27e0fc8",
+  "rootIndependentlyVerifiedAllRunHeadsAndJobs": true,
+  "runs": [
+    {
+      "lane": "Backend",
+      "id": 42011550328,
+      "statusOrConclusion": "failure",
+      "jobs": [
+        {
+          "name": "backend (3.12)",
+          "statusOrConclusion": "failure"
+        },
+        {
+          "name": "backend (3.14)",
+          "statusOrConclusion": "failure"
+        },
+        {
+          "name": "mlflow-live",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Core",
+      "id": 42011559707,
+      "statusOrConclusion": "in_progress",
+      "jobs": [
+        {
+          "name": "core",
+          "statusOrConclusion": "in_progress"
+        },
+        {
+          "name": "s01-storage-roundtrip",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Frontend",
+      "id": 42011569643,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "statusOrConclusion": "success"
+        },
+        {
+          "name": "frontend",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Desktop",
+      "id": 42011579589,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "desktop-browser",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Docs",
+      "id": 42011590303,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "docs",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Portal",
+      "id": 42011843554,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "portal-login-harness",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "Security",
+      "id": 42011602744,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "security-critical-high",
+          "statusOrConclusion": "success"
+        }
+      ]
+    },
+    {
+      "lane": "A11y",
+      "id": 42011613479,
+      "statusOrConclusion": "success",
+      "jobs": [
+        {
+          "name": "accessibility-e2e",
+          "statusOrConclusion": "success"
+        }
+      ]
+    }
+  ],
+  "jobCountsAtObservation": {
+    "success": 9,
+    "failure": 2,
+    "pending": 1,
+    "total": 12
+  },
+  "candidateAccepted": false,
+  "backendFixScope": "require exact original five fields plus finalizedAttestationVerified is True; meaningful negative/positive tests, retain failed evidence",
+  "failedCandidateArtifactsOwnerReported": {
+    "archiveSHA256": "8bdadbdba23026ff4886141de676610ff2b0bad7fc20504a9aca2217de08bc49",
+    "gitBlobs": 4230,
+    "packetSHA256": "84cd03726c93a4f92036170887c708b67f7d8e599842b7744c25156415c9705b",
+    "manifestSHA256": "21a01aa064dac550ad81a186ae16f9e1029f5018a1bd53c481f2052f22b193b2"
+  },
+  "nativeGoObservation": {
+    "actualLiveFailureMeasured": false,
+    "sourceConditionsInspectedByRoot": true,
+    "helperOverlapAndFinalSamePolicyVersion": true,
+    "GoSameVersionDifferentHashRefused": true,
+    "peerFloorCanAdvanceBeforeStorageOrListener": true,
+    "actualLinuxTwoNormalCycleProofPending": true,
+    "owner": "task_a8fd2969f0b3/ctx_6f0f8253b8a7",
+    "allowedNext": "fixture/test plus early existingCore proof only; production repair awaits concrete contract and review",
+    "promotionAndNextFinalFreezeHeld": true
+  },
+  "componentCI": {
+    "6fc": {
+      "id": 42006923070,
+      "head": "6fcedbbdba24e43e3917adb07f080a683dedfefe",
+      "bothJobsSuccessRootVerified": true
+    },
+    "2fb": {
+      "id": 42011998610,
+      "head": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+      "statusLastObserved": "in_progress",
+      "s01Success": true,
+      "coreTerminalVerified": false
+    }
+  },
+  "oldPilotRuntimePinsSchedulesChanged": false,
+  "physicalFiveAccepted": false,
+  "wholeProductComplete": false,
+  "priorRoot": {
+    "SHA": "92f1738704da386ff24f196f1002ff432b04bd4f",
+    "Docs": 42011494707,
+    "exactSuccessVerified": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "destinationHashesMatched": 2303,
+    "pending": 0,
+    "conflicts": 0
+  }
+}
