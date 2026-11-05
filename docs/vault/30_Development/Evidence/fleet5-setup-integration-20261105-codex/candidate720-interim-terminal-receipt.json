@@ -1,0 +1,24 @@
+{
+  "observedAtKST": "2026-11-06T02:34:46.237606+09:00",
+  "codeSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "interimReport": "3a30a0c934cef0eab95097df488c1ce36a55cd14",
+  "interimReportExactDocs": 42074025043,
+  "terminalWorkflowSuccesses": [
+    "frontend",
+    "desktopBrowser",
+    "docs",
+    "portalLoginHarness",
+    "securityCriticalHigh",
+    "accessibilityE2e"
+  ],
+  "remainingNonterminal": [
+    "backend",
+    "core"
+  ],
+  "jobStatusCounts": {
+    "success": 10,
+    "in_progress": 2
+  },
+  "allEightFinal": false,
+  "combinedReviewVerdict": null
+}

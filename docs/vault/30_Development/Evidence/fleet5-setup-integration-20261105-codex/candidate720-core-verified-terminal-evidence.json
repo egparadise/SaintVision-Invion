@@ -1,0 +1,491 @@
+{
+  "scope": "actual exact72028 Core terminal artifacts and completed log observations; CI/disposable evidence only",
+  "sourceCommit": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "runId": 42071358669,
+  "artifacts": [
+    {
+      "id": 13439715507,
+      "name": "saintvision-core-evidence",
+      "sourceCommit": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "zipSHA256": "11a21f64f7adcc7efa82fccad02ffc12b07518ef5472e181d6e2c80287e27937",
+      "metadataDigestMatches": true,
+      "ignoredOriginalZIP": ".work/fleet5-setup-integration/candidate720-artifacts/13439715507.zip",
+      "members": [
+        {
+          "name": "build-product-runtime-real-pg.xml",
+          "bytes": 2369,
+          "sha256": "2c61133b25d0c17993a34546166f18521ba6b955e5b9076f25410cf6a2a7b346"
+        },
+        {
+          "name": "business-handoff-tests.xml",
+          "bytes": 2778,
+          "sha256": "64191939a3e2148a8879854aa1ec1b32f01ca05b029ca689719d7de984120d41"
+        },
+        {
+          "name": "api-unconfigured.log",
+          "bytes": 2745,
+          "sha256": "520accb1659fbc24dc24217fdd46646918776f64e439d02133110eba8bd038cc"
+        },
+        {
+          "name": "containment-tests.xml",
+          "bytes": 4363,
+          "sha256": "cfc4776c22496bc325ab2ddba3debb0589dcc21188866ce988f0bdf051ebdd05"
+        },
+        {
+          "name": "core-tests.xml",
+          "bytes": 1418086,
+          "sha256": "2c26274fa78fb6dfe4330177af65280cdb1ecbe8518766d01a5405118258d7e7"
+        },
+        {
+          "name": "developer-b059ee6d-9b77-4f72-863f-55e4ab418fcd.json",
+          "bytes": 1747,
+          "sha256": "2c97e90fb43412f526e1d49ad56002417d49c5919ca0c24c9989a274db7f0ff0"
+        },
+        {
+          "name": "cx01-recovery-tests.xml",
+          "bytes": 3535,
+          "sha256": "8f3bca305622c268444ba3d4f268a530cd6b207b1785537692b33edf843c393c"
+        },
+        {
+          "name": "developer-c0ba66cf-8381-4c8c-b1cb-d929aec6ac3b.json",
+          "bytes": 1731,
+          "sha256": "3e98bd5ec15583735152c161c25ecf985dfec2fa1bec99e42b15d2c4218fd6bf"
+        },
+        {
+          "name": "developer-c94ea062-aff1-4db5-8ade-b29da66479f0.json",
+          "bytes": 1002,
+          "sha256": "4e95c2ed3854c8f25886af3ccfb6b77953c365352f9c53555b2b44ffa95d1c61"
+        },
+        {
+          "name": "developer-d34f9ec0-6b27-4c06-a56c-8a85b83b209a.json",
+          "bytes": 541,
+          "sha256": "35914d3dcf2b4ca62f857a2a445fad642b4ef9e299d86ffbdbe11168b1a94330"
+        },
+        {
+          "name": "docker-compatibility.log",
+          "bytes": 1176,
+          "sha256": "75790c81cb24f67fbb3380a93c3488677632d3d86611f9eb37cdb81713a7b938"
+        },
+        {
+          "name": "docker-host-tests.xml",
+          "bytes": 539,
+          "sha256": "3853470a411806a6626d78ca43ea7d6cd6474c167bed33dd61710736c7560c2d"
+        },
+        {
+          "name": "first-a24879f5-acc8-40f0-b30e-6fb1e544d176.json",
+          "bytes": 598,
+          "sha256": "f2fc30b381b21d2f6191eb45044b16243a4ec41942852f24144c37889697d1b3"
+        },
+        {
+          "name": "first-c8a025b4-638c-4d66-9cb5-b95b112ae92c.json",
+          "bytes": 829,
+          "sha256": "ff6ee8a80530fde5a1f0ce0104085847dcf7720d47d1b4a26007037d3562cfa8"
+        },
+        {
+          "name": "first-e12f4d85-71ac-43b9-a0a5-ae9ccd95024e.json",
+          "bytes": 1489,
+          "sha256": "3c225d9d72866c118c344fe5e31f6dbb1ba741ff26284bb8b66e0d50f92b633a"
+        },
+        {
+          "name": "first-f166ad7a-fa8b-4dff-bcb9-a676c072df01.json",
+          "bytes": 1476,
+          "sha256": "7864cfb08e3187dd08833f0e3864b672c0196f41f340275ae73f7ee4b5985a1c"
+        },
+        {
+          "name": "fleet5-peer-phase-fixed-proof/go-guard-events.jsonl",
+          "bytes": 30131,
+          "sha256": "1f447ee6e3b9cd19c769dfe66a0ed881feb631254be40870a9a92b3d3578de15"
+        },
+        {
+          "name": "fleet5-peer-phase-fixed-proof/canonical-go-results.json",
+          "bytes": 2679,
+          "sha256": "265f1c8d8c7883a275a9b6dbffcd00a0fef5e2839972e87476eb8abf528814cd"
+        },
+        {
+          "name": "fleet5-peer-phase-fixed-proof/native-fixed-result.json",
+          "bytes": 7733,
+          "sha256": "ed743ab5b17c26295e876f5d07d18f611aa963c91d1a8b745601c803b549137a"
+        },
+        {
+          "name": "fleet5-peer-phase-fixed-proof/native-server.log",
+          "bytes": 160,
+          "sha256": "a1cef0e007afd152e89e3ea1df52cd8791d412044f0ad8703d6426794d606fba"
+        },
+        {
+          "name": "inv-discover",
+          "bytes": 10212675,
+          "sha256": "7ae8a0a379a073c51a229f70efc840a8cceba45ec8a70c82587cb730f77d3ff0"
+        },
+        {
+          "name": "inv-node",
+          "bytes": 13387338,
+          "sha256": "20d220607d96eab5784e8971572bc93bd15c14cfed48b212e23e9fa423209eea"
+        },
+        {
+          "name": "lan-database-readiness-phases.json",
+          "bytes": 775,
+          "sha256": "74ef82eb5dc7f18f290df38b33c7b0d30b2c259d397e27df6eae182114b59afb"
+        },
+        {
+          "name": "lan-installer-tests.xml",
+          "bytes": 2914,
+          "sha256": "016fee343aeecda1430329cb8abeaa61c5c993c746f36f51514d8ed580e79517"
+        },
+        {
+          "name": "lan-pilot-database-real-pg.xml",
+          "bytes": 563,
+          "sha256": "05d7a7adfca439d5313ebb8bc5de67d52364806ebc2e1c35f14b7004792b7693"
+        },
+        {
+          "name": "model-cancel.json",
+          "bytes": 1429,
+          "sha256": "52bf0d2639c13515fc5a293090fae2adb346126c08824f5b9ea471bedb63807a"
+        },
+        {
+          "name": "model-node-loss.json",
+          "bytes": 1429,
+          "sha256": "35861046e43fd13381a3e6c5e7c5bdbc8f92da6268b5e29040d305ffd4b49b8f"
+        },
+        {
+          "name": "model-output-recovery.json",
+          "bytes": 1493,
+          "sha256": "1030c1107966bf16b059f598f71023cba976c633dbb24ddbe6309b9894fce1a9"
+        },
+        {
+          "name": "model-replacement-node.json",
+          "bytes": 1971,
+          "sha256": "8717ba68d68cdc8bf07689f48e48558f969b258981e2890e4a62f3aa4b7b0569"
+        },
+        {
+          "name": "model-single.json",
+          "bytes": 1484,
+          "sha256": "2b82d2aaccbca720f2301288a268f5adffa57fbce82724efb0ac5b17a13d9cf3"
+        },
+        {
+          "name": "model-stale.json",
+          "bytes": 1425,
+          "sha256": "6b8747b5cfe6d9d4ff11ddcd6770eb400e649b8b9dba5b7e23b39fac73e3cd1c"
+        },
+        {
+          "name": "p0-owned-docker-floor.json",
+          "bytes": 4022,
+          "sha256": "9d363604e667605569e8682be031ab4902f1f5c0aa89b42b75d37a9e5df9670b"
+        },
+        {
+          "name": "node-unit.jsonl",
+          "bytes": 189087,
+          "sha256": "bda75d8b52d943f8fcc5febe40c93935f92d31b8f1657a560c6f4ed6f48e3794"
+        },
+        {
+          "name": "p0-real-stopped-reentry-settled.json",
+          "bytes": 3347,
+          "sha256": "2660d87ab225f1975e30fee1f839e5b437cfa4ce0d759cfed363b59164b9c463"
+        },
+        {
+          "name": "saintvision_control_plane-0.1.0-py3-none-any.whl",
+          "bytes": 335443,
+          "sha256": "c5ad7e15152bf554851eca33f074bc3d5464214c10045a92c30301764eaec1cd"
+        },
+        {
+          "name": "saintvision_control_plane-0.1.0.tar.gz",
+          "bytes": 266211,
+          "sha256": "5b2c6f497a685e76ebe78f5487cb03350e6e30a48e6fbbf686725dd45fd7afd8"
+        },
+        {
+          "name": "shard-recovery-tests.xml",
+          "bytes": 3353,
+          "sha256": "f84ac8b0c570ca2775b66fd6509c6ba1b2eeb4f3d99cd93b98471367e7ed9dee"
+        },
+        {
+          "name": "subject-boundary.json",
+          "bytes": 2219,
+          "sha256": "a72538bbb98b364c907912aa3ee141e867a9c56e2de0e24f9acf3042219e26af"
+        },
+        {
+          "name": "workspace-tests.xml",
+          "bytes": 3642,
+          "sha256": "df59b8a0f18fc36fa379a6abfd81567bbe9c796ae68e77c5583ad25c4c4afdd2"
+        }
+      ],
+      "junit": [
+        {
+          "member": "build-product-runtime-real-pg.xml",
+          "stats": {
+            "cases": 13,
+            "passed": 13,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "business-handoff-tests.xml",
+          "stats": {
+            "cases": 17,
+            "passed": 17,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "containment-tests.xml",
+          "stats": {
+            "cases": 28,
+            "passed": 28,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "core-tests.xml",
+          "stats": {
+            "cases": 9259,
+            "passed": 9213,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 46
+          }
+        },
+        {
+          "member": "cx01-recovery-tests.xml",
+          "stats": {
+            "cases": 20,
+            "passed": 20,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "docker-host-tests.xml",
+          "stats": {
+            "cases": 2,
+            "passed": 2,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "lan-installer-tests.xml",
+          "stats": {
+            "cases": 17,
+            "passed": 17,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "lan-pilot-database-real-pg.xml",
+          "stats": {
+            "cases": 2,
+            "passed": 2,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "shard-recovery-tests.xml",
+          "stats": {
+            "cases": 21,
+            "passed": 21,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "workspace-tests.xml",
+          "stats": {
+            "cases": 23,
+            "passed": 23,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        }
+      ],
+      "selectedOwnedTests": {
+        "test_backend_leaf_runtime_contract": {
+          "executed": 72,
+          "passed": 72,
+          "skipped": 0
+        },
+        "test_build_fleet5_setup_packet": {
+          "executed": 3,
+          "passed": 3,
+          "skipped": 0
+        },
+        "test_fleet5_setup_packet": {
+          "executed": 29,
+          "passed": 29,
+          "skipped": 0
+        },
+        "test_fleet5_reentry_guard_negatives": {
+          "executed": 13,
+          "passed": 13,
+          "skipped": 0
+        },
+        "test_fleet5_settled_launcher": {
+          "executed": 11,
+          "passed": 11,
+          "skipped": 0
+        },
+        "test_rotation_predecessor_residue": {
+          "executed": 2,
+          "passed": 2,
+          "skipped": 0
+        },
+        "test_leaf_rotation_archive_residue": {
+          "executed": 14,
+          "passed": 14,
+          "skipped": 0
+        },
+        "test_lan_leaf_rotation_consecutive": {
+          "executed": 43,
+          "passed": 43,
+          "skipped": 0
+        },
+        "test_lan_leaf_rotation_batch_successor": {
+          "executed": 46,
+          "passed": 46,
+          "skipped": 0
+        },
+        "test_route_coverage": {
+          "executed": 41,
+          "passed": 41,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "id": 13435652364,
+      "name": "saintvision-s01-storage-evidence-42071358669",
+      "sourceCommit": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "zipSHA256": "02f693b92c33e9ceb3989a50164157630da7d95bc6f6c685b2a8d13f3ae67b59",
+      "metadataDigestMatches": true,
+      "ignoredOriginalZIP": ".work/fleet5-setup-integration/candidate720-artifacts/13435652364.zip",
+      "members": [
+        {
+          "name": "s01-storage-roundtrip.json",
+          "bytes": 315,
+          "sha256": "13d553f1527b36b2d5e2c67390f7f4acf19a04e7d1e9de5064595d775f99bc36"
+        },
+        {
+          "name": "s01-storage-roundtrip.xml",
+          "bytes": 205,
+          "sha256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1"
+        },
+        {
+          "name": "s01-minio-image.txt",
+          "bytes": 89,
+          "sha256": "7a8a0240ecec797856d7955f7959f7c2f863ea45683d709bd2b4e7ff313d429b"
+        },
+        {
+          "name": "s3-product-object-store.xml",
+          "bytes": 512,
+          "sha256": "2b98d0d903a383542fec96898ed761c1e9a24ee34bbcefb8c4878c39738babae"
+        },
+        {
+          "name": "s3-product-postgres.xml",
+          "bytes": 736,
+          "sha256": "e778b20b7fa279a4703bd5bbedea8f47892f536f20a00a93bc769f995bd22b4e"
+        }
+      ],
+      "junit": [
+        {
+          "member": "s01-storage-roundtrip.xml",
+          "stats": {
+            "cases": 1,
+            "passed": 1,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "s3-product-object-store.xml",
+          "stats": {
+            "cases": 2,
+            "passed": 2,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "member": "s3-product-postgres.xml",
+          "stats": {
+            "cases": 3,
+            "passed": 3,
+            "failed": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        }
+      ],
+      "selectedOwnedTests": {}
+    }
+  ],
+  "completedLogZIP_SHA256": "e14033915e14120eb7083189567d1bbc32a2bff3f841b4a5f2ea6c65e643ea70",
+  "completedLogObservedEntries": [
+    {
+      "member": "1_core.txt",
+      "bytes": 492634,
+      "sha256": "317fe010c067989599ef89ab416aede90c697589d9505e38d133efc594041159",
+      "actualPytestSummaryLines": [
+        "2026-11-05T17:39:10.9165334Z == 9213 passed, 46 skipped, 2 deselected, 2035 warnings in 1233.31s (0:20:33) =="
+      ],
+      "actualObservedGoVersionLines": [
+        "2026-11-05T17:07:03.4492662Z go version go1.27.1 linux/amd64"
+      ]
+    },
+    {
+      "member": "core/4_Run actions_setup-go@v5.txt",
+      "bytes": 5924,
+      "sha256": "8d7d010945c0b58c06529ad644e726314a349e34b9abfaffbd9352a13d950c67",
+      "actualPytestSummaryLines": [],
+      "actualObservedGoVersionLines": [
+        "2026-11-05T17:07:03.4492636Z go version go1.27.1 linux/amd64"
+      ]
+    },
+    {
+      "member": "core/33_Run python -m pytest --junitxml=dist_core-tests.xml -o faulthandler_timeout=45 --ignore=tests_integration_test_build_product_runtime_real_pg.py --ignore=tests_integration_test_lan_pilot_database_real_pg.py --ignore=tests_integration_test_desktop_browser.py --ignore=tests_integration_test_approval_browser.py --ignore=tests_integration_test_studio_browser.py --ignore=tests_integration_test_web_container.py --ignore=tests_integration_test_workspace_upgrade.py --ignore=tests_integration_test_lan_storage_install.py --ignore=tests_integration_test_s3_object_store_postgres.py --ignore=tests_integration_test_recovery_drill.py.txt",
+      "bytes": 92467,
+      "sha256": "42b33078de68b7258fbb7f89a0f080b0ceed30e97f56a9629ceaee22071ee618",
+      "actualPytestSummaryLines": [
+        "2026-11-05T17:39:10.9165331Z == 9213 passed, 46 skipped, 2 deselected, 2035 warnings in 1233.31s (0:20:33) =="
+      ],
+      "actualObservedGoVersionLines": []
+    }
+  ],
+  "skippedStepsExplicitlyNotPassed": [
+    {
+      "job": "core",
+      "step": "FLEET5 early native Go peer-policy lifecycle proof",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "step": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "step": "Collect fixed-SHA S08 build acceptance observations",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "step": "Recompute S08 build acceptance verdict from raw artifacts",
+      "conclusion": "skipped"
+    }
+  ],
+  "fullPhysicalOrS08AcceptanceAssessed": false,
+  "optionalF0afCollected": false,
+  "combinedReview": "task_ba0ee0a71106/ctx_53da843108e6; actual verdict still required"
+}

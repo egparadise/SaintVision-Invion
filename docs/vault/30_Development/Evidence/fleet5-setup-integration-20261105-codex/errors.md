@@ -30,3 +30,8 @@ The new redacted diagnostic retains pytest traceback trailing blanks, so staged 
 ## Combined4f required route gate: .work test harness exclusion
 
 Ordered focus exits1 with387 pass/20 platform skips/1 route fixture failure; isolated same .work fixture root exits1 with1 fail/1 pass. scan_served intentionally excludes files with any .work path component, so placing pytest --basetemp there hides its declared served api.py fixture. The scanner and test are unchanged. A new empty verified-owned system-temp base gives the complete required route gate41 pass/0 skip/exit0. Original nonzero captures remain exact diagnostics with two literal attribute entries; no source guard is weakened and no broad suite is silently rerun. Root is informed before final freeze. This is a resolved harness placement error, not whole-candidate CI/physical acceptance.
+
+
+## Exact72028 early artifact read transport
+
+Py3.12 pinned artifact13435502912 initial gh API download returns HTTP503/exit1. The partial first output is retained ignored and hashed. One bounded read-only retry writes a distinct file and matches metadata SHA2567e49d25f3553f093fe80ccd1ed56f677d659826da51d5c8675d4bde64163d68a. No CI job retry/cancellation, code change or old evidence rewrite occurs. Actual native/pinned proof validation succeeds separately; full CI and combined verdict remain required.

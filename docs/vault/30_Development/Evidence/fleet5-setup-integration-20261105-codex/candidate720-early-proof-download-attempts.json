@@ -1,0 +1,47 @@
+{
+  "scope": "read-only artifact transport attempts, not test/CI conclusions",
+  "noCIJobCancelledOrRerun": true,
+  "attempts": [
+    {
+      "id": 13436926849,
+      "name": "fleet5-native-peer-phase-fixed-proof-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "expectedDigest": "sha256:a1efb4ee47063663cfdd656524b35beabd32461dc0702ee3b729d0003b17f56d",
+      "firstAttemptPath": ".work/fleet5-setup-integration/candidate720-artifacts/13436926849.zip",
+      "firstAttemptBytes": 6064,
+      "firstAttemptSHA256": "a1efb4ee47063663cfdd656524b35beabd32461dc0702ee3b729d0003b17f56d",
+      "firstAttempt": "SUCCESS_DIGEST_MATCH",
+      "actualZip": ".work/fleet5-setup-integration/candidate720-artifacts/13436926849.zip"
+    },
+    {
+      "id": 13436346610,
+      "name": "fleet5-settled-pinned-3.14-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "expectedDigest": "sha256:f565d60dbd76968194dc61c095921054efe2a9b8daee69b6dc016c6ae5e6db6c",
+      "firstAttemptPath": ".work/fleet5-setup-integration/candidate720-artifacts/13436346610.zip",
+      "firstAttemptBytes": 1768,
+      "firstAttemptSHA256": "f565d60dbd76968194dc61c095921054efe2a9b8daee69b6dc016c6ae5e6db6c",
+      "firstAttempt": "SUCCESS_DIGEST_MATCH",
+      "actualZip": ".work/fleet5-setup-integration/candidate720-artifacts/13436346610.zip"
+    },
+    {
+      "id": 13435502912,
+      "name": "fleet5-settled-pinned-3.12-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "expectedDigest": "sha256:7e49d25f3553f093fe80ccd1ed56f677d659826da51d5c8675d4bde64163d68a",
+      "firstAttemptPath": ".work/fleet5-setup-integration/candidate720-artifacts/13435502912.zip",
+      "firstAttemptBytes": 212,
+      "firstAttemptSHA256": "789a6ff25fdc5e1c8031bcef651486dc0493f7759ed7bf239ecfe170a509da3a",
+      "firstAttempt": "FAILED_HTTP503; exact nonzero transport captured, no CI job rerun",
+      "retry1": {
+        "path": ".work/fleet5-setup-integration/candidate720-artifacts/13435502912-retry1.zip",
+        "exit": 0,
+        "stderr": "",
+        "bytes": 6016,
+        "sha256": "7e49d25f3553f093fe80ccd1ed56f677d659826da51d5c8675d4bde64163d68a",
+        "digestMatches": true
+      },
+      "actualZip": ".work/fleet5-setup-integration/candidate720-artifacts/13435502912-retry1.zip"
+    }
+  ]
+}

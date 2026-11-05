@@ -1,0 +1,170 @@
+{
+  "scope": "actual exact72028 native/pinned CI artifacts verified while full runs still nonterminal; no full8/combined or physical acceptance inferred",
+  "sourceCommit": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "sourceRef": "agent/codex/fleet5-setup-integration-20261105-ci2",
+  "artifacts": [
+    {
+      "id": 13436926849,
+      "name": "fleet5-native-peer-phase-fixed-proof-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "zipSHA256": "a1efb4ee47063663cfdd656524b35beabd32461dc0702ee3b729d0003b17f56d",
+      "metadataDigestMatches": true,
+      "ignoredZip": ".work/fleet5-setup-integration/candidate720-artifacts/13436926849.zip",
+      "members": [
+        {
+          "path": "canonical-go-results.json",
+          "bytes": 2679,
+          "sha256": "265f1c8d8c7883a275a9b6dbffcd00a0fef5e2839972e87476eb8abf528814cd"
+        },
+        {
+          "path": "go-guard-events.jsonl",
+          "bytes": 30131,
+          "sha256": "1f447ee6e3b9cd19c769dfe66a0ed881feb631254be40870a9a92b3d3578de15"
+        },
+        {
+          "path": "native-server.log",
+          "bytes": 160,
+          "sha256": "a1cef0e007afd152e89e3ea1df52cd8791d412044f0ad8703d6426794d606fba"
+        },
+        {
+          "path": "native-fixed-result.json",
+          "bytes": 7733,
+          "sha256": "ed743ab5b17c26295e876f5d07d18f611aa963c91d1a8b745601c803b549137a"
+        }
+      ],
+      "verifiedNative": {
+        "completedNormalCycles": 2,
+        "peerPolicyVersions": [
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "channelVersions": [
+          8,
+          9
+        ],
+        "allSpecifiedFlagsTrue": true,
+        "actualGoGuardTestPassEvents": 27,
+        "actualUnicodeCanonicalVectorsAndEd25519SignaturesVerified": 7,
+        "observedCIExecutableSHA256": [
+          "c1693d63b0faf897a424c32181f2a5dc15509b869f71565a397d826b87165498"
+        ],
+        "GoToolchainObserved": "NOT YET OBSERVED in completed job log",
+        "productionDockerOwnershipOrPostgresOrPhysicalAssessed": false,
+        "proofIsHistoricalCIArtifactNotFreshLiveNodeEvidence": true
+      }
+    },
+    {
+      "id": 13436346610,
+      "name": "fleet5-settled-pinned-3.14-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "zipSHA256": "f565d60dbd76968194dc61c095921054efe2a9b8daee69b6dc016c6ae5e6db6c",
+      "metadataDigestMatches": true,
+      "ignoredZip": ".work/fleet5-setup-integration/candidate720-artifacts/13436346610.zip",
+      "members": [
+        {
+          "path": "leaf-runtime-settled-pinned.json",
+          "bytes": 5361,
+          "sha256": "a64c65e1403e7f71c83fe44cfa464a0b6b7325bbb1800391412df19dba1dc237"
+        },
+        {
+          "path": "leaf-runtime-lifecycle.json",
+          "bytes": 335,
+          "sha256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845"
+        }
+      ],
+      "verifiedPinnedRuntime": {
+        "Python": "3.14",
+        "cases": 10,
+        "caseBoundedExitsAndRefusalsExact": true,
+        "sourcePinsVerifiedAgainstActual72028GitBlobs": 7,
+        "strictLifecycleResultFields": 11,
+        "twoFixtureCyclesAndFourRestarts": true,
+        "realPinnedCrypto": true,
+        "defaultVerifierCallbackBypassed": false,
+        "actualGoAcceptanceAssessed": false,
+        "stateAndSourceUnchanged": true
+      }
+    },
+    {
+      "id": 13435502912,
+      "name": "fleet5-settled-pinned-3.12-72028cbac903c4415d9979f980a6e0f9948e914f",
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "zipSHA256": "7e49d25f3553f093fe80ccd1ed56f677d659826da51d5c8675d4bde64163d68a",
+      "metadataDigestMatches": true,
+      "ignoredZip": ".work/fleet5-setup-integration/candidate720-artifacts/13435502912-retry1.zip",
+      "members": [
+        {
+          "path": "leaf-runtime-settled-pinned.json",
+          "bytes": 5361,
+          "sha256": "85e06fea40637f9dc2e07820b8a25cf6b7fcdee600df66180daf458037bfc575"
+        },
+        {
+          "path": "leaf-runtime-lifecycle.json",
+          "bytes": 335,
+          "sha256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845"
+        },
+        {
+          "path": "fleet5-t123-mutations/baseline.log",
+          "bytes": 99,
+          "sha256": "0977a6e6842be2eb904bf3fb5d73ecdbd966ca6b5a108791e03fa73357794b35"
+        },
+        {
+          "path": "fleet5-t123-mutations/exec-field-optional.log",
+          "bytes": 2786,
+          "sha256": "60e9c24c9b312b5dae41ca194a5a287b7bd70b112dfdb7ec76f80b4337293699"
+        },
+        {
+          "path": "fleet5-t123-mutations/guard-no-post-recheck.log",
+          "bytes": 864,
+          "sha256": "de25cdd67e52dd92c37c2b91c1cd7639566d23f05d442b85118c33f92645c916"
+        },
+        {
+          "path": "fleet5-t123-mutations/mutation-result.json",
+          "bytes": 4841,
+          "sha256": "25cf98ffcecc941ed83ece32386a67130cde9ea162ecf15ef2403cb7cebfb27b"
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-allow-current-in-final.log",
+          "bytes": 805,
+          "sha256": "1f377df298c4666de95b8dc391e64612db18936d45e2786005e16e537bf210f4"
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-no-post-ack-match.log",
+          "bytes": 1799,
+          "sha256": "5c662c8655f3b96d5e702eb4931a6924294f965b0ef9e4de781e99114e3c2241"
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-skip-stopped-reread.log",
+          "bytes": 1298,
+          "sha256": "dda09683868ee16aaa80f3250be530b6c984b88762f90f84cc55e1a3afbbe0f9"
+        }
+      ],
+      "verifiedPinnedRuntime": {
+        "Python": "3.12",
+        "cases": 10,
+        "caseBoundedExitsAndRefusalsExact": true,
+        "sourcePinsVerifiedAgainstActual72028GitBlobs": 7,
+        "strictLifecycleResultFields": 11,
+        "twoFixtureCyclesAndFourRestarts": true,
+        "realPinnedCrypto": true,
+        "defaultVerifierCallbackBypassed": false,
+        "actualGoAcceptanceAssessed": false,
+        "stateAndSourceUnchanged": true
+      },
+      "verifiedFiveMutants": {
+        "baselinePassed": 13,
+        "baselineErrorsFailedSkipped": 0,
+        "mutantsKilled": 5,
+        "mutantErrorsOrSkipped": 0,
+        "allOriginalSourcePinsAndRawLogHashesMatch": true
+      }
+    }
+  ],
+  "readOnlyHTTP503ThenBoundedRetryRecorded": "candidate720-early-proof-download-attempts.json",
+  "CIJobRerunOrCancellation": false,
+  "combinedReview": "pending actual root-arranged verdict",
+  "fullWorkflowConclusions": "separate actual terminal job observations required"
+}

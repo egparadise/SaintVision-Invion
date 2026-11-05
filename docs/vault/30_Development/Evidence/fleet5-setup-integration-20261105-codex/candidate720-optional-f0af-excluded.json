@@ -1,0 +1,37 @@
+{
+  "scope": "explicit optional post-freeze test-delta exclusion; no source mutation or CI respin",
+  "observedAtKST": "2026-11-06T02:39:00.439743+09:00",
+  "rootMessages": [
+    "msg_26f9bcaa9381",
+    "msg_cea2cb491a96",
+    "msg_6eb564a23796",
+    "msg_7152d665d782"
+  ],
+  "refs": {
+    "candidate": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "acceptedComponent": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+    "optionalTestOnlyDelta": "f0af307705b4923ebc3e231db5238af4c70aa389"
+  },
+  "launcherTestPath": "tests/test_fleet5_settled_launcher.py",
+  "actualGitBlobs": {
+    "candidate": "3c2c20cc1f5dadc7d2dde14e4d85adb2c645e51b",
+    "acceptedComponent": "3c2c20cc1f5dadc7d2dde14e4d85adb2c645e51b",
+    "optionalTestOnlyDelta": "2b99768f5dac8396dd034ab44140fc11643c2456"
+  },
+  "optionalDeltaExcludedFrom72028": true,
+  "optionalReview": "70f7502bd7a25d1e133280fecf0ee2391ae82f33 test-only ACCEPT (not candidate72028 coverage)",
+  "optionalPatchDocs": 42068760043,
+  "optionalReviewDocs": 42071548359,
+  "actualCandidateCIClaimsCoverageOfF0af": false,
+  "nonblockingFollowup": "L-T3-1/L-T3-2 optional stronger valid oversize/duplicate tests; I-LT-1 exact65536 availability-only; root explicitly requires no cancel/respin after immutable freeze",
+  "actualCombinedReview": {
+    "task": "task_ba0ee0a71106",
+    "dispatch": "ctx_53da843108e6",
+    "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "status": "STARTED; actual verdict not received"
+  },
+  "immutableSourceMoved": false,
+  "newCIJobRerunOrCancellation": false,
+  "landingOrNodeOps": false,
+  "wholeTaskDone": false
+}
