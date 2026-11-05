@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "fleet5-k1-temporal-actual-review-gate:1",
+  "atKST": "2026-11-06T08:25:37+09:00",
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "actualReviewer": "Claude",
+  "task": "task_eeb63f89fecd",
+  "dispatch": "ctx_c6a8ddbbde6d",
+  "terminal": "term_531f4d6e-bf2d-4718-ba0d-d1cf7a109569",
+  "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+  "startReceipt": "ready",
+  "laterWorkerShow": "ready/input_accepted/live/active",
+  "predecessorProof": "actual B4 reviewer task72d23 succeeded/settled/exited/released before newtask/start",
+  "sourceCIGate": {
+    "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "atKST": "2026-11-06T08:08:28+09:00",
+    "runs": {
+      "Core": {
+        "id": 42126222201,
+        "exactHeadRef": true,
+        "status": "in_progress",
+        "conclusion": null,
+        "allJobsSuccess": false,
+        "linuxNodeRaceSteps": [
+          {
+            "job": 127591007221,
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      "Docs": {
+        "id": 42126225708,
+        "exactHeadRef": true,
+        "status": "completed",
+        "conclusion": "success",
+        "allJobsSuccess": true,
+        "linuxNodeRaceSteps": []
+      }
+    },
+    "qualifiedForReviewDispatch": true,
+    "fullCoreStillRequiredBeforeCodeAcceptance": true
+  },
+  "currentCoreSnapshot": {
+    "atKST": "2026-11-06T08:24:20+09:00",
+    "run": 42126222201,
+    "exactHeadRef": true,
+    "status": "in_progress",
+    "conclusion": null,
+    "jobs": [
+      {
+        "id": 127591007024,
+        "status": "completed",
+        "conclusion": "success",
+        "inProgressSteps": []
+      },
+      {
+        "id": 127591007221,
+        "status": "in_progress",
+        "conclusion": null,
+        "inProgressSteps": [
+          "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py"
+        ]
+      }
+    ]
+  },
+  "verdict": null,
+  "actualDeltaReviewCompleted": false,
+  "codeAccepted": false,
+  "wholeProgramComplete": false,
+  "explicitReviewScope": [
+    "M1 exact HELD/latest epoch+sequence and independentcurrenthead",
+    "M2 durable multi-time history vs independently current proof",
+    "L1-L5",
+    "new trusted History/NativeWitnesses and PRESENT/ABSENT boundary",
+    "unchanged source28pins/27normalized+native producerwire/crypto primitives",
+    "future K2 independent authenticated producers not yet implemented"
+  ],
+  "fullCoreArtifactQualifiedReportStillRequired": true,
+  "noSecondReviewerOrCodeAuthorStarted": true
+}

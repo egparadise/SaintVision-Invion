@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "fleet5-k1-finished-turn-supervision:1",
+  "escalation": "msg_stop_12b98da5bc322ea73c66fd1f",
+  "reason": "finished turn without worker_done; assignment remainsopen",
+  "dispatch": "ctx_ceecb3824e33",
+  "actualWorkerShow": "ready/input_accepted/live/retained",
+  "steer": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_c4f86971960b"
+    }
+  },
+  "sourceCI": {
+    "atKST": "2026-11-06T08:24:20+09:00",
+    "run": 42126222201,
+    "exactHeadRef": true,
+    "status": "in_progress",
+    "conclusion": null,
+    "jobs": [
+      {
+        "id": 127591007024,
+        "status": "completed",
+        "conclusion": "success",
+        "inProgressSteps": []
+      },
+      {
+        "id": 127591007221,
+        "status": "in_progress",
+        "conclusion": null,
+        "inProgressSteps": [
+          "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py"
+        ]
+      }
+    ]
+  },
+  "actualDeltaReviewTask": "task_eeb63f89fecd",
+  "actualDeltaReviewDispatch": "ctx_c6a8ddbbde6d",
+  "actualReviewerShow": "ready/input_accepted/live/active",
+  "newTaskRetryRestartStopOrKill": false,
+  "rootGHInlineObserverAttempt": "unquoted spaced executable path exited1 before API; corrected with literal subprocess argv; no source/CI mutation",
+  "wholeProgramComplete": false
+}

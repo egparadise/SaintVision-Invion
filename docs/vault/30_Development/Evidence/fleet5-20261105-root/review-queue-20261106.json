@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T08:06:43+09:00",
+  "atKST": "2026-11-06T08:25:37+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,17 +12,23 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "task": "task_eeb63f89fecd",
+    "dispatch": "ctx_c6a8ddbbde6d",
+    "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "scope": "ONE actual K1 corrected temporal code+new trusted app inputs delta review",
+    "state": "ready inputaccepted/live; actual verdict pending"
+  },
   "pending": null,
-  "authorParallelWork": "B author actually read concrete rev5 reply and began new rev5 branch; K1 corrected56651 published with ownDocsSUCCESS/Core inprogress",
-  "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
+  "authorParallelWork": "K1 same fullCore/artifact/report continues through directsteer after finished-turn escalation; B rev5 sourceanalysis/contracts",
+  "reason": "one actual Claude reviewer after proven settled/exited/released B4; corrected ownDocs and Linux race passed, fullCore still required",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "exact corrected K1 source56651 own CI gate; one actual Claude delta review; then B rev5 only after finalsource/Docs",
+  "nextActualReviewTrigger": "current K1 actual verdict; next B rev5 only after immutable source/ownDocs",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -65,5 +71,6 @@
     "workerDone": "msg_13ef4231b8e7",
     "resource": "succeeded/settled/exited/released"
   },
-  "BRev5Reply": "msg_03544733c9f3"
+  "BRev5Reply": "msg_03544733c9f3",
+  "K1FinishedTurnSteer": "msg_c4f86971960b"
 }

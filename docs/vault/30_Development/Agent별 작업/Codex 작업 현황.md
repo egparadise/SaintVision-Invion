@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.388"
+version: "1.0.389"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T08:06:43+09:00"
+updated: "2026-11-06T08:25:37+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B rev4 actualrevision2M4L/rev5authorworking; K1 corrected56651 ownDocsSUCCESS/Coreinprogress/deltareviewrequired; physicalincomplete"
-active_card_next: "Root one actual corrected K1 Claude review atownCI gate; K1 Codex sameCore/artifact/report; B Codex rev5 sourcewriter/lock/gate-lineage fixes; no oldCI borrowing"
+active_card_status: "K1 corrected56651 Claudeeeb actualreviewactive/fullCorepending/sameauthorsteered; B rev5 authorcontinues; physicalincomplete"
+active_card_next: "Claude actual56651 temporal/app-input delta verdict; K1 Codex sameCore/artifact/report; B Codex rev5; Root actualverdict then concretegate, no duplicateauthor or oldCI borrowing"
 ---
+
+## 2026-11-06T08:25:37+09:00 실제 K1 검토 배정과 열린 작업 이어가기
+
+작업한 것과 확인: K1 수정56651cba의 ownDocs42126225708와 실제 Linux race 성공 뒤 단일 Claude 검토 task_eeb63f89fecd/ctx_c6a8ddbbde6d를 시작했다. 전체Core42126222201은08:24:20KST Python suite 진행 중이다. 저자의 finished-turn 알림은 작업 미완료로 보존하고 msg_c4f86971960b로 같은 열린 작업의 CI·artifact·보고를 계속하도록 지시했다. 실제 reviewer는 ready/input_accepted/live/active, 저자는 ready/input_accepted/live/retained였다. 다음 첫 행동/담당: Claude는 실제 코드·새 trusted app input 경계 판정, K1 Codex는 같은 Core의 실제 결과와 qualified report이며 Root가 실제 수신 뒤 구체 gate를 정한다. 새 author task/retry/stop/kill은 하지 않았다.
 
 ## 2026-11-06T08:06:43+09:00 B rev4 실제 판정과 K1 temporal 수정 후보
 

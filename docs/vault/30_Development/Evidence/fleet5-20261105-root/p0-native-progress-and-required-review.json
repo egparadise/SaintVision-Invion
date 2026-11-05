@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "bdd565dab96fe07001c3b4fe9a67b8c52d58d782",
-    "Docs": 42122724537,
+    "SHA": "c10e7f359d5ba6f6b3973fafdec223c5bffab2e0",
+    "Docs": 42127169716,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,19 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2738,
+    "independentlyMatchedNormalizedDestinationHashes": 2745,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T07:37:32+09:00",
-    "collectorRecovery": {
-      "watchExit": 1,
-      "error": "gh run watch HTTP404 for exclude_pull_requests=true; direct actual API shows alljobsSUCCESS",
-      "workflowRerunOrRedispatch": false,
-      "verificationResumed": "exact head/ref/correlation/run+jobs+remote verified before sync"
-    }
+    "verifiedAtKST": "2026-11-06T08:08:51+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2461,7 +2455,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T08:06:43+09:00",
+  "latestRecordAtKST": "2026-11-06T08:25:37+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2775,7 +2769,7 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "corrected56651 ownCI+one actualdelta review; fullCore/artifact/report before finalK1acceptance",
+    "currentAuthorization": "same Core/artifact/report collection; actual delta reviewer inparallel; no retry/newauthorTask or K2/runtime",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
     "actualCodeAccepted": false,
@@ -2786,8 +2780,10 @@
     "correctedSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
     "correctedSourceDocs": 42126225708,
     "correctedSourceCore": 42126222201,
-    "correctedSourceCoreAtObservation": "IN PROGRESS",
-    "actualCorrectedDeltaReview": "NOT YET DISPATCHED"
+    "correctedSourceCoreAtObservation": "08:24:20KST main Python suite still inprogress",
+    "actualCorrectedDeltaReview": "actual Claude running/verdict pending",
+    "actualCorrectedDeltaReviewTask": "task_eeb63f89fecd",
+    "actualCorrectedDeltaReviewDispatch": "ctx_c6a8ddbbde6d"
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -2992,5 +2988,7 @@
   },
   "broadBRevision5Decision": "b-rev5-root-decision.json",
   "root426CIObserverRecovery": "root426-ci-observer-recovery.json",
-  "K1CorrectedTemporalSourceObservation": "k1-temporal-root-source-observation.json"
+  "K1CorrectedTemporalSourceObservation": "k1-temporal-root-source-observation.json",
+  "K1ActualCorrectedDeltaReviewGate": "k1-temporal-actual-review-gate.json",
+  "K1FinishedTurnSupervision": "k1-temporal-finished-turn-supervision.json"
 }
