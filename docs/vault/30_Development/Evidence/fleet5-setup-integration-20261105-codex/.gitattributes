@@ -6,3 +6,5 @@ backend-contract-red.txt -text -whitespace
 backend-contract-red.xml -text -whitespace
 backend-contract-green.txt -text -whitespace
 backend-contract-green.xml -text -whitespace
+backend-boolean-identity-red.txt -text -whitespace
+backend-boolean-identity-green.txt -text -whitespace

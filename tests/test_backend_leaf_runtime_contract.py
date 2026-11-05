@@ -39,7 +39,7 @@ def test_backend_accepts_complete_verified_standalone_lifecycle_contract():
     _validate_as_workflow(dict(VERIFIED_LIFECYCLE))
 
 
-@pytest.mark.parametrize("proof", ["missing", False])
+@pytest.mark.parametrize("proof", ["missing", False, 1, "true"])
 def test_backend_refuses_absent_or_failed_node_finalization_attestation(proof):
     value = dict(VERIFIED_LIFECYCLE)
     if proof == "missing":

@@ -148,6 +148,7 @@ jobs:
               'restartCount': 4,
               'rolledBack': True,
           }
+          assert lifecycle['finalizedAttestationVerified'] is True
           PY
 
       - name: Kill the standalone leaf-runtime guard mutations

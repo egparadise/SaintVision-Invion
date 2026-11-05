@@ -1,0 +1,35 @@
+{
+  "scope": "INTERMEDIATE_BACKEND_CONSUMER_ONLY",
+  "baseSource": "9a8f9a504bdbb39e6fc28c26c45427bab1d56543",
+  "observedAtKST": "2026-11-05T19:56:54.003595+09:00",
+  "rootHoldMessages": [
+    "msg_3428f1646986",
+    "msg_01c67dd2ff11"
+  ],
+  "newFullCandidateFreezeArchiveOrAllEightRepeat": false,
+  "newCoreDispatched": false,
+  "nativeGoQuestion": "Source-confirmed same policy version/different hash question; actual Go journal+Authority sequence assigned separately; not settled by helper fixture success",
+  "strictBooleanRegression": {
+    "before": {
+      "failed": 1,
+      "passed": 4,
+      "exit": 1
+    },
+    "after": {
+      "passed": 5,
+      "exit": 0
+    },
+    "rejected": [
+      "missing",
+      false,
+      1,
+      "true"
+    ],
+    "equalityAndOtherFiveExpectedFieldsPreserved": true
+  },
+  "producerAndLANToolingModified": false,
+  "combinedIndependentReview": "PENDING_NATIVE_GO_PROOF_AND_SELECTED_SOURCE",
+  "physicalAcceptance": false,
+  "backend-boolean-identity-red.txtRawCaptureSHA256": "211f40061bf5bd9808185c313c16814cf882f6a4b0e21a1139f441c29bd54a90",
+  "backend-boolean-identity-green.txtRawCaptureSHA256": "06b748150b9d22ead6e85895503497ac95ec3dd55fa061ce09798c4ded3cb39d"
+}

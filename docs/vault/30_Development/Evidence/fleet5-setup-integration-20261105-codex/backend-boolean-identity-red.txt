@@ -1,0 +1,21 @@
+...F.                                                                    [100%]
+================================== FAILURES ===================================
+___ test_backend_refuses_absent_or_failed_node_finalization_attestation[1] ____
+
+proof = 1
+
+    @pytest.mark.parametrize("proof", ["missing", False, 1, "true"])
+    def test_backend_refuses_absent_or_failed_node_finalization_attestation(proof):
+        value = dict(VERIFIED_LIFECYCLE)
+        if proof == "missing":
+            del value["finalizedAttestationVerified"]
+        else:
+            value["finalizedAttestationVerified"] = proof
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:49: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_refuses_absent_or_failed_node_finalization_attestation[1]
+1 failed, 4 passed in 0.16s
