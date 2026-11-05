@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.354"
+version: "1.0.355"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T14:30:47+09:00"
+updated: "2026-11-05T14:54:15+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
 active_card_status: "Target topology confirmed; actual worker/CP readiness and missingworker4 discovery starting"
 active_card_next: "Dispatch bounded known-worker and CP/inventory tasks; use verified identities and allowed limits for a reviewed five-node deployment plan"
 ---
+
+## 2026-11-05 실측 수신과 다음 실행 경계
+
+실제Codex/Claude Task전달·착수와early측정을수신했다. 3번SSH회복과Docker접근차단을분리하고CPAPI1.41을확인했다. 두Node의현재관측정상은5Node인수가아니다. 다음담당은owner들의구체권한/교체계획·safe보고·CI, root의독립검토와4번endpoint대조다. 기존r5/예약/키/자원offer설정은변경하지않았다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 기존5대 오케스트레이션
 
