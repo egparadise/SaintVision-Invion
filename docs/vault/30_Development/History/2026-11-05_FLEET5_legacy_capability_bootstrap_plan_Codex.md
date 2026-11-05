@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-LEGACY-CAPABILITY-BOOTSTRAP-PLAN-20261105-CODEX"
 title: "FLEET5 legacy capability bootstrap and replacement renewal plan"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T22:01:30+09:00"
+updated: "2026-11-05T22:50:12+09:00"
 source_of_truth: "Git"
 ---
 
@@ -121,8 +121,11 @@ invent a repository digest from an image ID or accept unsigned absence. Current
 target values remain null, including the added Docker-ID/repository-or-offline/
 archive bindings.
 
-M2 supplies a signed **actual process executable hash**, nonce and live
-same-executable UID/PID1/journal/scope binding. This alone does not prove a Docker
+The **desired NEW M2 v2 must supply** a separately signed actual executable-BYTES
+hash, nonce and live same-executable UID/PID1/journal/scope binding. The inspected
+unaccepted6c M2 does **not** supply executable bytes: its `servingProcessSHA256`
+hashes raw NUL cmdline, with SameFile proof only. This correction is N1 below;
+v1 cannot satisfy the desired executable proof. Even the desired bytes hash alone does not prove a Docker
 image. Root's trusted owned-daemon inspection separately binds the same exact
 container ID and stable live PID/start/restart observations to its `.Image`,
 resolved `.Config.Image`, published config/layers/platform and no executable
@@ -149,6 +152,123 @@ out-of-scope helpers stay blocked. Test/report fields using the old ambiguous
 name remain historical and cannot become bootstrap provenance. Any newly
 discovered/private consumer must be added and independently closed or BLOCK;
 there is no fallback to old global `agentImage` after typed migration.
+
+## Actual independent revision findings and bounded response
+
+Actual Claude task `task_03867932b2f0` / `ctx_37e3f120fac0` reviewed1057 at
+`830efd9317d28fa27b696db709c9a6e7a3076331`, then exact cde/delta at
+`eace0e2de11801be0e6d63a5cf08817c37214ea3`. This worker read both complete formal
+History pages and original JSON findings from Git. **cde verdict: REVISION
+REQUIRED** — R1/N1 required, R2 partial, R4/N2 additions; R3 is closed for
+source03 scope. Root reports exact review Docs42033242038/42033713492 successful.
+Those are review/document receipts, not P0/code or operational acceptance.
+Candidate `6c0fc4adf53562909e3d8246ddf293d8aadb0d0e` remains NOT ACCEPTED.
+The following are proposed contract corrections, not claims of implemented fixes.
+
+**R1 — typed retained migration predecessor and later renewal reachability.**
+`migration-predecessor-contract.json` defines proposed journal schema
+`saintvision-plain-agent-migration:1`, basename `agent-binary-migration.json`
+under the trusted registered host worker root (outside the Go volume). It is
+owned/private/regular0600/single-link, with no-follow parent/file checks, immutable
+plan/event sequence and exact common-fence owner/generation/lease or terminal seal.
+It binds exact daemon, tenant/Node/epoch, current ID/name, backup ID/literal inspect
+name, frozen **post-stop/rename/restart=no** old inspect/config/image/mount digest,
+and the exact same retained volume/stable identity. Backup is stopped, not
+restarting and restart=no; no new labels are added and labels alone prove nothing.
+
+Exactly current+that one recorded predecessor may consume the volume. Unknown,
+unrecorded, label-only/workspace-only, wrong-owner/schema/fence/phase, missing or
+third/duplicate consumer blocks without removing anything. A bootstrap M2 before
+terminal inventory uses the still-held migration owner lease plus exact
+NEW_START_INTENT/NEW_STARTED_UNVERIFIED context; a terminal-only check here would
+create a circular dependency. Later normal:3 uses immutable terminal migration
+seal/current typed inventory plus a **new common operation lease**, not a dead
+migration owner lease. The static backup/container/volume binding remains fixed,
+but current cert/policy/P/H/C are validated against the fresh signed normal:3
+generation, **never the migration authority baseline**. The shared volume will
+legitimately change during renewal; no backup deletion or restart is needed.
+
+The candidate `worker_peer_floor` target/observe/context and `worker_plain_rotation`
+floor/target/install/finalize route are explicitly in scope, with the normal:3
+dispatch/restart path. Current6c only admits the labelled workspace predecessor,
+so this is a required new reader branch, not existing functionality. Future GREEN
+must demonstrate post-bootstrap M2 **and two later completed normal:3 cycles with
+the backup retained**; RED includes unrecorded and label-only consumers.
+
+**R2 — named common coded fence and raw invocation limit.**
+The NEW proposed `agent_mutation_fence.run_owned_operation` /
+`require_operation_context` API consults persistent `agent-mutation-fence.json`
+and the migration journal through a trusted canonical Node/daemon registration.
+Any nonterminal **or terminal** migration marker denies all generic mutators.
+Known registry state with missing/malformed/unowned marker also blocks. A leaf
+`no_rotation_mutation` check is not this fence; neither a bare boolean
+`rotation_publication=True` nor a one-shot precheck grants an operation lease.
+The common logical+OS fence must span the complete operation/children/readback,
+before first mkdir/CSR/copy/image load/container action or controller publication.
+
+`common-agent-mutation-fence-contract.json` lists repair-node.sh/Repair-Worker.ps1,
+prepare-worker.sh/Prepare-Worker.ps1, finish-worker.sh, start-node.sh/Start-Worker.ps1,
+credential installers, execution/workspace/storage/replacement helpers (including
+rollback), new observer/normal:3 APIs and controller/guard adapters. Supported
+direct Python functions require guard-owned context too; shell/PowerShell entrypoints
+delegate to a fixed hash-bound guard runner that retains ownership. Generic paths
+remain denied even after migration completes; only specifically guarded migration
+advance/M2 or later normal:3 operations may pass their separate typed conditions.
+
+This is NEW required code, not a magical property of placing a marker beside old
+scripts. All supported entrypoints must be actually replaced/adapted and tested.
+Archived/unpatched raw helpers, arbitrary imports/monkeypatches and privileged raw
+Docker/shell bypass lie outside the authorized managed interface; a marker cannot
+stop a privileged bypassing actor. Root must exclude them from allowed launch
+surfaces and prove no in-flight work; if any such path remains authorized/reachable
+or unknown, G9 stays HOLD. This plan changes no permissions, scripts or launchers.
+
+**N1/N2 — desired separate signed bytes hash and exact argv encodings.**
+Root chose a required **new** signed `servingExecutableSHA256` over bounded actual
+serving executable file bytes, preserving live PID1/UID/SameFile and stable
+process/file identity checks. Proposed M2 schema is
+`saintvision-node-peer-policy-floor:2`, domain ASCII
+`saintvision/node-peer-policy-floor/v2` plus byte00; strict producer/verifier field
+sets include the new field. It is absent from unaccepted6c. Actual wire/source/
+binary/CI/verdict bindings remain null. Existing `servingProcessSHA256` retains
+its exact v1 meaning, SHA256 of raw cmdline including its final NUL; historical
+receipts are never reinterpreted. Existing v1/missing bytes field cannot satisfy
+the new bootstrap proof. Signing-body ASCII-escaped compact canonical JSON is
+separate again from argv JSON encoding.
+
+`desired-m2-v2-and-argv-contract.json` names each hash. Cmd and Entrypoint JSON
+hashes preserve their separate exact ordered string arrays. Full serving argv is
+direct Entrypoint+Cmd. Canonical argv JSON is compact UTF8, no BOM/newline, reference
+`json.dumps(..., ensure_ascii=False, separators=(',', ':'), allow_nan=False)`;
+no Unicode normalization or shell expansion. Raw cmdline is strict UTF8 argv bytes
+joined with NUL plus one appended terminator; decode by removing **one** terminator
+then splitting, preserving empty elements. Invalid UTF8/unpaired surrogates or
+embedded NUL in an argument blocks. Compare expected raw hash only to signed
+`servingProcessSHA256`; map the exact same array to its separate JSON hash, never
+compare these hash domains directly. Compare desired signed executable bytes hash
+only to the published binary bytes hash. Encoding fixtures are synthetic document
+vectors only, not process/provenance evidence.
+
+Exact minimal R1/N1 proposal was sent to P0 owner `ctx_6f0f8253b8a7`
+(`msg_5ffb02106b2c`), Root notified (`msg_01c78fa72644`); compatibility response is
+recorded separately. This plan author implements no production helper or Go change.
+
+**R4 — exact observer ExecIDs and inherited image Config.**
+`observer-exec-and-image-config-contract.json` requires actual Engine ExecCreate ID
+recorded under the same guard/nonce/current container before start. Initial ExecIDs
+is empty; all during/after entries must be that exact observer ID under the frozen
+Engine phase contract, with exact ExecInspect finished/exit0/container/argv/UID
+binding. Unknown/foreign/unrecorded ID, ambiguous outcome or process/config drift
+blocks. Current CLI docker-exec exposes no such receipt, so a new host adapter is
+required; no generic volatile ExecIDs ignore or guessed allowlist is accepted.
+`inspect-comparison-contract.json` enumerates this controlled lifecycle delta.
+
+Actual **image-inherited** Entrypoint/Env/Labels/User/WorkingDir must equal the old
+image's fields, using the same frozen scratch/COPY/ENTRYPOINT recipe; other runtime
+Config changes/unknowns block. Equal container overrides cannot hide a changed
+image default. This image Config proof is separate from container Config equality
+and published new config/layer digests. All actual Engine/image/exec bindings are
+unbound and this correction does not claim current runtime verification.
 
 ## Closed G1–G10 gates
 
@@ -341,3 +461,32 @@ remain NOT RUN. Eight further public consumer blobs and the B5 executor/launcher
 were hash-bound with checked complete Git reads; an additional PowerShell literal
 scan had expected no-match exit1, not a failed CI/test. No unlisted/private
 consumer is presumed safe and no compiled product proof is inferred.
+
+The bounded independent-review response is this1.0.2 revision. Four proposed
+contract artifacts specify R1/R2/R4/N1/N2; `review-findings-closure.json` preserves
+the actual prior REVISION REQUIRED verdict and marks this revision's independent
+verdict null. Thirty target and18 Root binding values, both member envelopes and
+the operational G2 binding remain null/HOLD. Added future A29–A36 bring product
+acceptance requirements to **36 NOT RUN**. Document mutation fixtures D17–D26
+cover the new refusal barriers; they do not implement a runtime guard.
+
+`source-review-cases.json` directly checked9 static public Git facts, confirming
+the6c gaps without accepting code; all9 matched. `encoding-validation.json`
+checked10 measured synthetic document encoding cases (strict UTF8/NUL handling,
+empty argument preservation, separate JSON/raw domains, no Unicode normalization),
+all10 matched,0 failures. The fixture hashes are computed synthetic encoding
+vectors, never actual process/binary/Node/provenance. Complete candidate/helper/
+review Git blob digests are bound in source Evidence. No actual host script,
+guard, helper, Go process or product test was invoked; main Python3.14.7 `-B`
+only parsed public source/data and ran document checks. Actual owner compatibility
+reply, final schema/gate/hash/Docs receipts and new independent delta review
+remain separately attributable; no earlier audit ACCEPT is borrowed.
+
+Final1.0.2 document schema/closure check matched **26/26** cases (1 valid HOLD,
+25 rejected mutations,0 failures), all thirty target/eighteen Root values and
+both member envelopes still null. G1–G10 parameter names and all four new contract
+references resolve;36 future product cases cover all ten gates and remain NOT RUN.
+Nine source cases and ten encoding cases matched independently of product code.
+Actual required local gates and canonical Git hashes are captured in the revised
+validation receipt; normal push/exact Docs/new actual delta review follow. No
+acceptance is inferred from an author response or a passing document schema.

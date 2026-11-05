@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "fleet5-document-encoding-validation:1",
+  "matched": 10,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "E01",
+      "matched": true,
+      "assertion": "strict exact roundtrip"
+    },
+    {
+      "id": "E02",
+      "matched": true,
+      "assertion": "strict exact roundtrip"
+    },
+    {
+      "id": "E03",
+      "matched": true,
+      "assertion": "strict exact roundtrip"
+    },
+    {
+      "id": "E04",
+      "matched": true,
+      "assertion": "invalid encoding rejected"
+    },
+    {
+      "id": "E05",
+      "matched": true,
+      "assertion": "invalid encoding rejected"
+    },
+    {
+      "id": "E06",
+      "matched": true,
+      "assertion": "invalid encoding rejected"
+    },
+    {
+      "id": "E07",
+      "matched": true,
+      "assertion": "invalid encoding rejected"
+    },
+    {
+      "id": "E08",
+      "matched": true,
+      "assertion": "JSON/raw hash domains distinct for all measured synthetic vectors"
+    },
+    {
+      "id": "E09",
+      "matched": true,
+      "assertion": "remove one terminator preserves empty last argument"
+    },
+    {
+      "id": "E10",
+      "matched": true,
+      "assertion": "no Unicode normalization"
+    }
+  ],
+  "productRuns": 0,
+  "actualRuntimeOrProductBinding": false
+}

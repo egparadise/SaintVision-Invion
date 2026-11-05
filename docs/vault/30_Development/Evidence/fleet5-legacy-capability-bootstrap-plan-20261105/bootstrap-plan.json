@@ -9,6 +9,22 @@
     "docsConclusion": "success",
     "productOrOperationalAcceptance": false
   },
+  "priorIndependentPlanReview": {
+    "reviewedCommit": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+    "initial1057ReviewCommit": "830efd9317d28fa27b696db709c9a6e7a3076331",
+    "cdeDeltaReviewCommit": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+    "actualVerdict": "REVISION REQUIRED",
+    "requiredFindings": [
+      "R1",
+      "R2",
+      "R4",
+      "N1",
+      "N2"
+    ],
+    "R3Source03ConsumerClosure": "CLOSED for source03 scope; new candidate consumers included in R1",
+    "thisRevisionVerdict": null,
+    "implementationOrOperationalAcceptance": false
+  },
   "owner": "Codex",
   "reviewer": "Claude via root pending",
   "status": "HOLD",
@@ -43,7 +59,10 @@
     ],
     "enabledBefore": true,
     "enabledAfter": false,
-    "onlyChangedFields": ["enabled", "updatedAt"],
+    "onlyChangedFields": [
+      "enabled",
+      "updatedAt"
+    ],
     "allOtherConfigPromptPrecheckTimezoneRruleDtstartPreserved": true,
     "RunNowOrNodeAction": false,
     "freshOperationReadbackRequired": true,
@@ -102,22 +121,78 @@
     "restartPolicyRestoreDecision": null
   },
   "memberBindingNames": [
-    "tenantId", "nodeId", "epoch", "daemonIdentity", "oldContainerName", "oldContainerId",
-    "oldNodeLabel", "oldInspectDigest", "preservedConfigDigest", "oldRuntimeDockerImageId",
-    "preservedPermitImageDigest", "nodeAddress", "nodePort", "volumeName", "volumeMetadataDigest",
-    "exactVolumeConsumerIds", "actualJournalPath", "protectedStateDigest", "peerFloorVersion",
-    "peerFloorHash", "activePeerPolicyHash", "nodeKeyPublicSPKISHA256", "nodeLeafDERSHA256", "controlLeafDERSHA256",
-    "caBundleRawSHA256", "signerPublicRawSHA256", "channelVersion", "channelCertificateDERSHA256", "channelEnabled",
-    "channelEndpoint", "legacyCPAgentImageValueHash", "quiescenceProof", "preCutoverUnsignedDoubleRead",
-    "backupReservedName", "newContainerId", "postStartProtectedStateDigest", "postStartSignedM2",
-    "postStartMTLS", "runtimeInventoryReceipt", "oldCmdArgvSHA256", "newCmdArgvSHA256",
-    "oldEntrypointSHA256", "newEntrypointSHA256", "livePID1ArgvSHA256", "ownedRuntimeInspectionBeforeM2",
-    "ownedRuntimeInspectionAfterM2", "newRuntimeDockerImageId", "newRuntimeRepositoryOrOfflineProof",
-    "newRuntimePlatformManifestDigest", "newRuntimeConfigDigest", "newRuntimeRootFSDiffIDs", "newRuntimeExecutableSHA256"
+    "tenantId",
+    "nodeId",
+    "epoch",
+    "daemonIdentity",
+    "oldContainerName",
+    "oldContainerId",
+    "oldNodeLabel",
+    "oldInspectDigest",
+    "preservedConfigDigest",
+    "oldRuntimeDockerImageId",
+    "preservedPermitImageDigest",
+    "nodeAddress",
+    "nodePort",
+    "volumeName",
+    "volumeMetadataDigest",
+    "exactVolumeConsumerIds",
+    "actualJournalPath",
+    "protectedStateDigest",
+    "peerFloorVersion",
+    "peerFloorHash",
+    "activePeerPolicyHash",
+    "nodeKeyPublicSPKISHA256",
+    "nodeLeafDERSHA256",
+    "controlLeafDERSHA256",
+    "caBundleRawSHA256",
+    "signerPublicRawSHA256",
+    "channelVersion",
+    "channelCertificateDERSHA256",
+    "channelEnabled",
+    "channelEndpoint",
+    "legacyCPAgentImageValueHash",
+    "quiescenceProof",
+    "preCutoverUnsignedDoubleRead",
+    "backupReservedName",
+    "newContainerId",
+    "postStartProtectedStateDigest",
+    "postStartSignedM2",
+    "postStartMTLS",
+    "runtimeInventoryReceipt",
+    "oldCmdArgvSHA256",
+    "newCmdArgvSHA256",
+    "oldEntrypointSHA256",
+    "newEntrypointSHA256",
+    "livePID1ArgvSHA256",
+    "ownedRuntimeInspectionBeforeM2",
+    "ownedRuntimeInspectionAfterM2",
+    "newRuntimeDockerImageId",
+    "newRuntimeRepositoryOrOfflineProof",
+    "newRuntimePlatformManifestDigest",
+    "newRuntimeConfigDigest",
+    "newRuntimeRootFSDiffIDs",
+    "newRuntimeExecutableSHA256",
+    "migrationPredecessorJournalDigest",
+    "postFenceBackupInspectSHA256",
+    "commonAgentMutationFenceIdentity",
+    "observedM2ExecIdsReceipt",
+    "rawServingCmdlineSHA256",
+    "servingArgvCanonicalSHA256",
+    "imageInheritedConfigBeforeAfter",
+    "signedExecutableBytesV2Receipt"
   ],
   "members": [
-    {"physicalPC": 2, "expectedProfile": "lan-observe-v1", "bindings": null},
-    {"physicalPC": 4, "expectedProfile": "lan-observe-v1", "bindings": null}
+    {
+      "physicalPC": 2,
+      "expectedProfile": "lan-observe-v1",
+      "bindings": null
+    },
+    {
+      "physicalPC": 4,
+      "expectedProfile": "lan-observe-v1",
+      "bindings": null
+    }
   ],
   "memberBindingRule": "All named fields required in a future reviewed populated revision; bindings null now, never inferred from physical PC labels or old unsigned context",
   "g2Proposal": {
@@ -141,9 +216,40 @@
     "alternativeRewriteCmdImageAndGlobalAgentImage": "OUTSIDE image-only scope; separate root decision required"
   },
   "preserve": {
-    "containerConfiguration": ["Cmd", "Env", "Entrypoint", "User", "WorkingDir", "Labels", "resources", "security", "Mounts", "PortBindings", "host endpoint", "permitted workload image"],
-    "protectedAuthority": ["tenant", "Node", "epoch", "key", "Node certificate", "CP certificate", "CA", "signer public key", "active peer policy", "journal tree", "peer P/H", "channel C/hash/enabled/endpoint"],
-    "allowedLifecycleDeltas": ["new runtime image reference/ID", "exact old backup name", "new generated container identity and enumerated transient inspect fields", "restart=no fencing; explicit new-only unless-stopped restore after M2/mTLS"],
+    "containerConfiguration": [
+      "Cmd",
+      "Env",
+      "Entrypoint",
+      "User",
+      "WorkingDir",
+      "Labels",
+      "resources",
+      "security",
+      "Mounts",
+      "PortBindings",
+      "host endpoint",
+      "permitted workload image"
+    ],
+    "protectedAuthority": [
+      "tenant",
+      "Node",
+      "epoch",
+      "key",
+      "Node certificate",
+      "CP certificate",
+      "CA",
+      "signer public key",
+      "active peer policy",
+      "journal tree",
+      "peer P/H",
+      "channel C/hash/enabled/endpoint"
+    ],
+    "allowedLifecycleDeltas": [
+      "new runtime image reference/ID",
+      "exact old backup name",
+      "new generated container identity and enumerated transient inspect fields",
+      "restart=no fencing; explicit new-only unless-stopped restore after M2/mTLS"
+    ],
     "runtimeConfigurationChange": "Image only; lifecycle fields separately enumerated, no wildcard ignoring unknown fields"
   },
   "barriers": {
@@ -157,17 +263,45 @@
     "storageWorkspaceOrFreshFiveIssuerAllowed": false,
     "unknownStopMeansQuiesced": false,
     "startupOrPublicationUncertainty": "BLOCKED_FORWARD_ONLY; preserve reservations and all evidence",
-    "autoRetryOrDowngradeAllowed": false
+    "autoRetryOrDowngradeAllowed": false,
+    "labelOnlyMigrationPredecessorAllowed": false,
+    "migrationMarkerClearedToAllowLegacy": false,
+    "leafMarkerAloneIsMigrationFence": false,
+    "unsignedOrV1CmdlineOnlyExecutableProofAllowed": false,
+    "unknownM2ExecIdAllowed": false,
+    "imageInheritedConfigOverrideMaskingAllowed": false,
+    "compareJSONArgvHashToRawCmdlineHashAllowed": false,
+    "laterNormalAuthorityMayUseMigrationBaseline": false
   },
   "proposedInterfaces": [
     "NEW storage-free LegacyBinaryMigration lifecycle; closed inspect/capture/reserve/advance/readback inputs; NOT IMPLEMENTED",
     "NEW typed authenticated CP runtime inventory atomic compare-and-publish and strict consumers; NOT IMPLEMENTED",
     "NEW schema3 renewal guard with immutable source/helper/observer/plan pins and HOLD checks; NOT IMPLEMENTED"
   ],
-  "stateNames": ["DRAFT_HOLD", "PROVENANCE_LOCKED", "RESERVED", "FENCE_INTENT", "OLD_FENCED", "CAPTURED", "PUBLICATION_INTENT", "OLD_PRESERVED", "NEW_CREATED", "NEW_START_INTENT", "NEW_STARTED_UNVERIFIED", "BOOTSTRAP_VERIFIED_RESTART_NO", "RESTART_POLICY_RESTORED", "READY_FOR_NEW_RENEWAL_PLAN", "BLOCKED_FORWARD_ONLY", "QUIESCENCE_UNKNOWN"],
+  "stateNames": [
+    "DRAFT_HOLD",
+    "PROVENANCE_LOCKED",
+    "RESERVED",
+    "FENCE_INTENT",
+    "OLD_FENCED",
+    "CAPTURED",
+    "PUBLICATION_INTENT",
+    "OLD_PRESERVED",
+    "NEW_CREATED",
+    "NEW_START_INTENT",
+    "NEW_STARTED_UNVERIFIED",
+    "BOOTSTRAP_VERIFIED_RESTART_NO",
+    "RESTART_POLICY_RESTORED",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "BLOCKED_FORWARD_ONLY",
+    "QUIESCENCE_UNKNOWN"
+  ],
   "stateMachineScope": {
     "model": "Per-member phase vector plus all-member barriers",
-    "proposedOrder": [2, 4],
+    "proposedOrder": [
+      2,
+      4
+    ],
     "beforeFirstLifecycleMutation": "Both nonmutating preflights and shared reservations complete; durable fence intent",
     "beforeFirstStop": "Both exact old containers restart=no with readback, preventing daemon old-image recovery",
     "memberSequence": "PC2 stop/capture/replace/start/M2+mTLS+unchanged-state acceptance, then PC4; second may remain running restart=no until its turn",
@@ -178,6 +312,12 @@
   "gateMatrix": "parameter-gates.json",
   "runtimeBindingContract": "runtime-inventory-contract.json",
   "consumerClosure": "legacy-consumer-closure.json",
+  "requiredContractRefs": {
+    "migrationPredecessor": "migration-predecessor-contract.json",
+    "commonCodedFence": "common-agent-mutation-fence-contract.json",
+    "desiredM2AndArgv": "desired-m2-v2-and-argv-contract.json",
+    "observerExecAndImageConfig": "observer-exec-and-image-config-contract.json"
+  },
   "futureProductAcceptance": "acceptance-matrix.json",
   "schemaMeaning": "Closed schema checks this exact nonexecuting HOLD draft, not future runtime readiness; bindings require a new actually published and reviewed successor revision",
   "nextRootAction": "Planning direction A selected by Root; actual independent bootstrap architecture review and reviewed contract binding still required; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "fleet5-proposed-common-agent-mutation-fence:1",
+  "status": "NEW_CODE_CONTRACT_NOT_IMPLEMENTED_OR_ACCEPTED",
+  "finding": "R2",
+  "proposedAPI": "agent_mutation_fence.run_owned_operation / require_operation_context",
+  "persistentMarkerBasenames": ["agent-mutation-fence.json", "agent-binary-migration.json"],
+  "trustedLocation": "Registered canonical actual host worker root and daemon/Node scope, not caller bundle/extraction directory; private owner/parent/file/single-link/type and immutable registry/journal links verified",
+  "markerSemantics": "Any nonterminal OR terminal migration journal/registry marker blocks every generic mutator; malformed/unknown/missing-contradictory marker blocks; never clear/delete marker or phase to release legacy tools",
+  "notEquivalentTo": "6c worker_config.no_rotation_mutation and rotation_mutation_guard recognize leaf-rotation state only; they are NOT this migration fence",
+  "legacyFlagNotAuthority": "A bare rotation_publication=True/skip/force flag is never a common-fence lease or migration override; every supported mutating entrypoint and internal publication caller must have a verified operation context",
+  "ownership": "One shared logical reservation plus held OS lock from scope resolution through every first write/child/side effect/readback/quiescence; a one-shot precheck that exits before the mutator is insufficient",
+  "operationMatrix": {
+    "genericLegacyMutation": "DENY in every migration phase including terminal; no repair/start/recopy/workspace/storage/old-v1 resume",
+    "migrationAdvance": "ALLOW only exact next event/plan/current IDs under held migration-owner lease and reviewed code/Root execution decision; all other callers DENY",
+    "migrationM2Observe": "ALLOW read-only Node-state observer only under typed predecessor contract and held migration-owner lease/start intent; controlled Docker exec metadata tracked separately",
+    "normal3ObserveAndMutate": "ALLOW only after typed terminal seal/current inventory and separately owned new common-fence normal:3 lease/immutable plan; cannot use legacy generic wrapper or migration baseline P/H",
+    "unknownOrPartialOperation": "DENY and preserve BLOCKED_FORWARD_ONLY"
+  },
+  "mandatoryEntrypoints": [
+    "repair-node.sh", "Repair-Worker.ps1", "prepare-worker.sh", "Prepare-Worker.ps1", "finish-worker.sh", "start-node.sh", "Start-Worker.ps1",
+    "worker_config.install_files/credential publication and CLI", "worker_execution and Enable-ExecutionTests.ps1", "worker_workspace and Enable-Workspace.ps1 including rollback",
+    "worker_storage/worker_storage_bridge and Replace-Storage.ps1", "worker_replace/worker_replacement mutating methods",
+    "worker_leaf_rotation legacy/normal dispatch/restart/rollback", "worker_plain_rotation normal:3 mutations", "worker_peer_floor target/observe/context scope resolution",
+    "Controller cohort prepare/stage/commit/retire/metadata publication adapters and NEW renewal guard/launchers"
+  ],
+  "firstMutationBoundary": "Guard before mkdir/CSR/key generation/copy/archive publication/image load/container start/stop/create/rename/restart or CP channel/publication mutation; read-only manifest parsing may only resolve and verify trusted existing scope",
+  "directFunctionAndRawInvocationLimits": [
+    "Future supported Python mutator functions require guard-owned operation context themselves, not just a top-level wrapper; Shell/PowerShell entrypoints delegate to fixed hash-bound guard runner that holds ownership for the entire operation",
+    "All supported launchers and direct helper entrypoints must be replaced by actual reviewed guard-compatible source/artifacts and tested; listing a basename or placing a marker does not retrofit old unmodified source03/B5 scripts",
+    "Old archived/unpatched raw scripts, arbitrary imports/monkeypatches and raw privileged Docker/shell invocation are OUTSIDE the authorized managed interface and forbidden by Root operation policy; marker files cannot stop a privileged actor bypassing the guard",
+    "If any such raw/unpatched mutator remains an allowed/reachable operation or an in-flight child/precheck is unknown, G9 stays HOLD; no claim of OS/permission enforcement and no permission changes are made by this plan"
+  ],
+  "actualGuardSourceArtifactRegistryOwnerAndLeaseBindings": null,
+  "requiredFutureTests": "Every listed entrypoint, including direct functions and terminal marker states, refuses before first side effect; wrong directory/owner/token/removal/leaf-marker-only/raw legacy launcher cannot bypass; legitimate guarded normal:3 later renewal still reaches typed retained predecessor"
+}

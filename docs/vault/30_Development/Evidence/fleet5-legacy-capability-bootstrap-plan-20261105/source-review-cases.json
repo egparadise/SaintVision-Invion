@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "fleet5-bootstrap-source-review-cases:1",
+  "scope": "Static public Git facts only; matched gaps DO NOT ACCEPT code or prove runtime",
+  "candidate": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+  "candidateAccepted": false,
+  "cases": [
+    {
+      "id": "S01",
+      "matched": true,
+      "fact": "actual review remains REVISION REQUIRED"
+    },
+    {
+      "id": "S02",
+      "matched": true,
+      "fact": "v1 field set lacks desired executable bytes field"
+    },
+    {
+      "id": "S03",
+      "matched": true,
+      "fact": "v1 signature domain unchanged"
+    },
+    {
+      "id": "S04",
+      "matched": true,
+      "fact": "process function hashes raw cmdline plus SameFile check"
+    },
+    {
+      "id": "S05",
+      "matched": true,
+      "fact": "desired signed executable field absent in inspected candidate"
+    },
+    {
+      "id": "S06",
+      "matched": true,
+      "fact": "current second consumer rule is workspace only"
+    },
+    {
+      "id": "S07",
+      "matched": true,
+      "fact": "plain normal:3 reaches peer floor target/context"
+    },
+    {
+      "id": "S08",
+      "matched": true,
+      "fact": "leaf guard is not proposed common migration fence"
+    },
+    {
+      "id": "S09",
+      "matched": true,
+      "fact": "four required generic wrappers lack named future common fence"
+    }
+  ],
+  "matched": 9,
+  "failed": 0,
+  "productRuns": 0,
+  "targetBindingsFilled": false
+}

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "fleet5-proposed-migration-predecessor-contract:1",
+  "status": "PROPOSED_ONLY_NOT_IMPLEMENTED_OR_ACCEPTED",
+  "finding": "R1",
+  "proposedJournalSchema": "saintvision-plain-agent-migration:1",
+  "journalBasename": "agent-binary-migration.json",
+  "journalLocation": "Canonical owned host worker root resolved from trusted Node/daemon registration, outside the Go state volume; never caller bundle directory or host mirror of floor",
+  "recordAuthentication": "Existing authorized host UID/GID, private owned directory0700, regular0600 single-link journal, no-follow parent/file identity checks and immutable plan/event chain; common coded fence verifies expected owner/generation/lease or terminal seal",
+  "nameAndDigestEncoding": "Record exact Docker inspect Name strings including leading slash; 64-lowercase-hex immutable IDs; frozen backup inspect is canonical full post-stop/rename/restart=no observation with only declared deterministic mount ordering, no pre-fence-name normalization to hide drift",
+  "requiredJournalFieldGroups": {
+    "identity": ["schemaVersion", "migrationId", "immutablePlanSHA256", "tenantId", "nodeId", "recoveryEpoch", "daemonIdentity", "canonicalWorkerRootBinding"],
+    "ownerFence": ["hostOwnerUID", "hostOwnerGID", "commonFenceIdentity", "ownerGeneration", "leaseTokenHashOrTerminalSeal", "sequence", "priorEventSHA256", "eventSHA256"],
+    "predecessor": ["exactOldContainerId", "exactReservedBackupName", "frozenPostStopRenameInspectSHA256", "frozenOldImageAndConfigSHA256", "frozenOldMountsSHA256", "stoppedNotRestarting", "restartPolicyNo"],
+    "current": ["exactNewContainerId", "exactOriginalTargetName", "publishedRuntimeDescriptorBinding", "preservedCmdAndEntrypointHashes"],
+    "volume": ["exactVolumeName", "driver", "labelsAndOptionsDigest", "mountpointBinding", "exactSharedStateMount", "stableVolumeIdentityDigest"],
+    "phaseProof": ["phase", "newStartIntentEventSHA256", "verifiedCurrentIdReceipt", "inventoryHeadOrActiveBootstrapLeaseBinding"]
+  },
+  "consumerRule": [
+    "Single current consumer is insufficient if trusted registry/journal says a retained predecessor must exist; missing backup/journal contradiction BLOCKS",
+    "For this migrated observe cohort, exactly currentId plus ONE typed migration predecessor ID, no duplicate/third/unrecorded consumer; no new label or workspace marker creates authority",
+    "Exact daemon, tenant/Node/epoch, current ID/name and volume match the owned record; current container keeps exact observe profile/config and required runtime descriptor",
+    "Backup exact ID/name is stopped, not restarting, restart=no; actual post-fence/rename inspect, old image/config and mounts match the frozen record; regular Node label may match but is not ownership proof",
+    "Same existing volume is anchored by retained container/mount identity and stable metadata; CreatedAt is observational only where the frozen Engine contract proves it unstable; no volume recreation or consumer removal",
+    "Only the new common coded fence returns a verified typed predecessor context; raw caller JSON/path/label or unowned journal is rejected"
+  ],
+  "bootstrapObservationWindow": {
+    "phases": ["NEW_START_INTENT", "NEW_STARTED_UNVERIFIED"],
+    "required": "Still-held migration owner/common-fence lease, exact durable first-start intent and recorded current ID; permits post-start M2 before terminal inventory, avoiding a circular dependency",
+    "normalRenewalAllowed": false
+  },
+  "laterNormal3Window": {
+    "phases": ["BOOTSTRAP_VERIFIED_RESTART_NO", "RESTART_POLICY_RESTORED", "READY_FOR_NEW_RENEWAL_PLAN"],
+    "required": "Immutable terminal migration seal/inventory receipt plus a NEW owned common-fence operation lease and reviewed current runtime/normal:3 plan; old migration owner lease is not kept forever",
+    "staticBindingOnly": "Retained backup ID/name/stopped/restart=no/frozen inspect/config/image/mount and same stable volume remain fixed",
+    "authorityBinding": "Current policy/cert/P/H/C/state are checked against fresh signed M2 and the approved current normal:3 generation, NEVER against the historical migration authority snapshot",
+    "sharedVolumeChanges": "Legitimate later normal:3 public credential/policy/floor changes on the same shared volume do not invalidate the immutable backup-container binding; migration baseline evidence is preserved unchanged",
+    "backupDeletedOrRestarted": false
+  },
+  "candidate6cGap": "worker_peer_floor.target accepts two consumers only through workspace-upgrade.json/ready plus ai.saintvision.upgrade label; worker_plain_rotation reaches the same target path; this proposed typed branch does NOT exist there",
+  "requiredConsumers": ["worker_peer_floor.target/observe/context", "worker_plain_rotation install/finalize/rollback barriers and fresh floor/context checks", "worker_leaf_rotation normal:3 dispatch and restart seam", "new migration observer/new guard/runtime inventory readers"],
+  "unknownPartialUnownedLabelOnlyOrWorkspaceFallback": "BLOCK for this exact migrated observe scope; do not weaken other reviewed profile contracts or claim existing workspace predecessor is a migration predecessor",
+  "actualJournalOwnerFenceIdsAndSourceBinding": null,
+  "implementationOwnerCoordination": "Proposed exact R1/N1 contract sent to P0 owner ctx_6f0f8253b8a7 in msg_5ffb02106b2c; actual compatibility reply and code acceptance tracked separately"
+}

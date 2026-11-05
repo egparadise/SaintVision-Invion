@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.369"
+version: "1.0.370"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T22:29:29+09:00"
+updated: "2026-11-05T23:02:26+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "P0 code revisions active; actual independent cde plan review REVISION REQUIRED; plan R1/R2/R4/N1/N2 assigned; legacy3 disabled"
-active_card_next: "Plan owner publishes bounded eace finding closure; P0 owner delivers native/Core/revised code review; Root reviews actual new deltas and preserves HOLD; integration waits for actual P0 delivery"
+active_card_status: "9e8 plan independent delta review task3c24/ctx9fe3 started; actual P0 author compatibility received; code/native acceptance pending; legacy3 disabled"
+active_card_next: "Claude reports exact9e8 verdict; P0 owner delivers actual revised source/native/Core/review; Root routes real results and keeps operation HOLD; integrator waits actual P0"
 ---
+
+## 2026-11-05 수정9e8 계획의 실제 독립 delta 검토
+
+작업한 것: plan9e8의 exact Docs 성공과 제품/공통판 diff0을 확인하고 실제 task_3c24efc159b8/ctx_9fe3a9741db8를 착수시켰다. 확인한 것: P0 담당은 strict M2v2 실행 파일 hash 방향과 호환되지만 source/CI가 미게시이며 migration predecessor/common fence는 미래 별도 구현이라고 회신했다. 다음 첫 행동/담당: Claude는 새 계획의 실제 독립 판정을, P0 담당은 승인된 구현·native/lifecycle/한정 복구의 실제 결과를 제출한다. Root는 결과 전 계약/배포/실장비 수락을 보류한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 한정 P0 복구 방향 RS1/SF1도 concrete323 문서를 읽고 선택했다. 같은 CID의 검증된 forward start와 same-byte settled 동작만 구현하며, :3 rollbackRejected=true/rolledBack=false를 strict proof로 확인한다. 실제 Linux crash/native/새 코드 검토는 아직 필요하다.
 

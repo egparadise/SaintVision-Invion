@@ -1,0 +1,187 @@
+{
+  "schema": "fleet5-plan9e8-actual-delta-review-root-handoff:1",
+  "recordedAtKST": "2026-11-05T23:02:26+09:00",
+  "rootBase": "e4d7499653148441a9286228334343f683faa85c",
+  "priorRootCheckpoint": {
+    "SHA": "e4d7499653148441a9286228334343f683faa85c",
+    "Docs": 42036489696,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "exported": 69,
+    "independentlyMatchedNormalizedDestinationHashes": 2384,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "plan": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+  "supersedes": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+  "Docs": 42040204454,
+  "rootVerifiedPlanExactHeadAllJobsSuccess": true,
+  "rootVerifiedPlanProductAndSharedBoardsDelta": 0,
+  "imports": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/acceptance-matrix.json",
+      "SHA256": "fcce2f9416670872a2ac653c5ce3cee3334bd09fae54f122a5fa94095fdd556b",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.json",
+      "SHA256": "4c94faffa6a42c8afc7787cfdeeff44ff30395253eec545c1368ada2a9c083ce",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.schema.json",
+      "SHA256": "1112044d2ac0f175263d4eafa632aed46707deec87d2b582be449209011710f4",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/common-agent-mutation-fence-contract.json",
+      "SHA256": "48c3d40cbdc90fb7efe33b981caa74bcfcffd04e42148eb33a6cf2643b4bf40f",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/desired-m2-v2-and-argv-contract.json",
+      "SHA256": "9f1f05f6ab3105825991e75e1068299d3265788656904d6947540ded495234b5",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/encoding-fixtures.json",
+      "SHA256": "6c693feebfbe82e86e6c59a61fb571e929411092db1f811a5284d7c64839d891",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/encoding-validation.json",
+      "SHA256": "a7cb4ea567dee2c67453bad6b2f922b7fb7a8dbb7a6ad15cf5fe96b96b44fb5e",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/inspect-comparison-contract.json",
+      "SHA256": "2b29abeed2278583f6622012241703d17b39509b55d3643dc174495a410d5e1d",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/legacy-consumer-closure.json",
+      "SHA256": "2761ee8f643301572133a4c0dfdd2fcb897ef24c55acd1c6b19be2b0f4ac0148",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/migration-predecessor-contract.json",
+      "SHA256": "b156a25db07f60848e5fcf2f0f60c0c6e9426f74db65f713ffe9c67f31e57ed9",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/observer-exec-and-image-config-contract.json",
+      "SHA256": "7be17a96ebdc6923aaf16d968d69b76d783ff2c137d77cd0e1525b83b5b9720b",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/parameter-gates.json",
+      "SHA256": "555b7e73e56b51490b7ccf148ae2f0f73fcddda57a3d01f853a8c7cd4c675463",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/plan-validation.json",
+      "SHA256": "62090a815b53c1ed94d00474e776697df77a06646a70ccc194764a345a14028e",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/public-source-bindings.json",
+      "SHA256": "8a8e6a7d32212eadf6a2dea641f7729d6163c3431edef7ad4e2ae99df643874d",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/review-findings-closure.json",
+      "SHA256": "5b4cc611b677b6532415c0236d89b251a36327faa8a554e883f5209aee419bea",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/runtime-inventory-contract.json",
+      "SHA256": "7d40ca668ce1bbad5c108ce7000c39b133cc394b3b1964d3195c96633b98bdaf",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-cases.json",
+      "SHA256": "1805f80dd11806670d6df8718d4c77d102b2318128e4e60861405d8d889d6d23",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-validation.json",
+      "SHA256": "490714dd2999bc9e38ae486a6e7ef1741366a6ef417ccf6655b3ec45ddb0d7c0",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/source-review-cases.json",
+      "SHA256": "dd1b5179abeb992832242fcc2ca0abb62a76b56e4e6924010643e773a45ae0dd",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_legacy_capability_bootstrap_plan_Codex.md",
+      "SHA256": "d5872eb9b10e00d27c5afb4b7cd9a5266b89aef644256b76e08a2041b1e8bd0f",
+      "source": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+    }
+  ],
+  "ownerClaimedDocumentChecks": {
+    "mutationCases": 26,
+    "staticSourceCases": 9,
+    "encodingCases": 10,
+    "artifactHashes": 20,
+    "independentlyRerunByRoot": false
+  },
+  "futureProductCases": {
+    "count": 36,
+    "executed": false
+  },
+  "actualIndependentReview": {
+    "task": "task_3c24efc159b8",
+    "dispatch": "ctx_9fe3a9741db8",
+    "state": "started; verdict pending",
+    "verdict": null,
+    "scope": "NONEXECUTING cde-to9e8 architecture/plan delta only"
+  },
+  "actualP0AuthorCompatibility": {
+    "message": "msg_03604b3e6bed",
+    "source": "ctx_6f0f8253b8a7",
+    "exact9e8ContractsReadByAuthor": true,
+    "N1": "compatible with in-progress required actual-executable descriptor hash, M2 schema2/domainv2, coherent live process binding, raw cmdline meaning preserved and no v1 executable-proof fallback",
+    "R1AndFence": "semantically compatible future separate reviewed implementation only; current target only existing workspace predecessor and blocks all migration phases",
+    "sourcePublished": false,
+    "nativeGreen": false,
+    "implementationAccepted": false,
+    "runtimeEnforcementClaimed": false,
+    "relayedToIndependentReviewer": true,
+    "relayedToPlanOwner": true
+  },
+  "targetBindings": null,
+  "rootOperationalBindings": null,
+  "memberBindings": null,
+  "G2Direction": "A for plan only",
+  "P0SelectedAcceptedSource": null,
+  "integrationStillPendingQuestion": "msg_fe3ec1971bc9",
+  "legacyThreeAutomations": "disabled; no re-enable",
+  "physicalOrKeyActions": false,
+  "rootProductChanged": false,
+  "wholeProgramComplete": false,
+  "nextFirstAction": {
+    "Claude": "report actual9e8 independent delta verdict with source/check evidence",
+    "P0Owner": "finish authorized native/lifecycle/recovery/M2v2 implementation and actual CI/delta review",
+    "Root": "route actual findings; keep runtime/integration acceptance HOLD"
+  },
+  "validation": {
+    "docsExit": 0,
+    "ontologyExit": 0,
+    "syncCheckExit": 0,
+    "pathCitationsRatchetExit": 0,
+    "singleSourceRatchetExit": 0,
+    "syncManaged": 2393,
+    "syncPending": 24,
+    "syncConflicts": 0,
+    "pathBase": "e4d7499653148441a9286228334343f683faa85c",
+    "productSourceUnchanged": true,
+    "newExactDocsCIStillRequired": true
+  },
+  "planOwnerPendingActualReviewQuestion": "msg_7e20f9b3f4bf",
+  "planOwnerReviewLaunchReply": "msg_0628f32d53cd"
+}

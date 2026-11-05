@@ -15,7 +15,7 @@
     {"name":"runtimeConfigDigest","meaning":"Published image config bytes hash, matched to actual Engine image/config identity with a verified format-specific mapping, not guessed by equal-looking strings"},
     {"name":"runtimeRootFSDiffIDs","meaning":"Ordered uncompressed RootFS diffIDs from actual inspect and published config; compressed layer blob digests are separately verified publication metadata and are not interchangeable"},
     {"name":"runtimeImageArchiveSHA256","meaning":"Exact transferred archive bytes hash if offline packaging; archive hash does not identify the executable or replace loaded-image/layer/config validation"},
-    {"name":"runtimeExecutableSHA256","meaning":"Exact published inv-node executable bytes; must equal signed actual live-process executable hash from reviewed M2"},
+    {"name":"runtimeExecutableSHA256","meaning":"Exact published inv-node executable bytes; desired NEW M2 v2 servingExecutableSHA256 must separately sign those actual live executable bytes. Candidate6c servingProcessSHA256 is raw cmdline hash and cannot satisfy this field"},
     {"name":"runtimeSourceGitSHA","meaning":"Full actual published P0 Git source commit linked to executable/image by verified reproducible build/CI provenance; never inferred from a label, tag or this document SHA"},
     {"name":"preservedPermitImageDigest","meaning":"Exact old Cmd --image string accepted by Go config.Image for signed workload launch ImageDigest; unchanged even though runtimeDockerImageId changes"}
   ],
@@ -27,7 +27,7 @@
   },
   "bindingJoin": [
     "Root holds exact daemon/container/volume/cohort ownership and observes image inspection before M2: actual container ID, stable host PID/start/restart observations, Image/Config.Image resolution, config/layers/platform, read-only executable root and no executable bind substitution",
-    "Fresh nonce-bound M2 signature is verified against unchanged Node certificate/key/tenant/Node/epoch; actual new compiled wire contract proves live same executable UID/PID1 and actual journal P/H/active hash/scope",
+    "Desired NEW nonce-bound M2 v2 must be verified against unchanged Node certificate/key/tenant/Node/epoch and separately SIGN servingExecutableSHA256 bytes hash, preserving existing servingProcessSHA256 raw cmdline meaning; current6c lacks this executable field and is NOT ACCEPTED",
     "Root cross-reads owned container/process/image after M2; IDs, process generation, image/config/endpoint/volume scope and restart count remain stable; a process hash alone does not prove an image",
     "Signed actual process executable hash equals published executable hash; trusted owned inspection equals published runtime image/config/layers/platform; reproducible build links that executable/image to actual source Git SHA",
     "Root binds before/after ordered Cmd argv hashes and exact arrays, Entrypoint hashes and actual PID1 argv check; preserved --image value remains exact and is never reassigned to runtime image",
@@ -36,6 +36,10 @@
   ],
   "authorityEqualityFields": ["tenantId", "nodeId", "epoch", "nodeKeyPublicSPKISHA256", "nodeLeafDERSHA256", "controlLeafDERSHA256", "caBundleRawSHA256", "signerPublicRawSHA256", "activePeerPolicyRawSHA256", "peerFloorVersion", "peerFloorPolicyRawSHA256", "peerFloorRawFileProtectedIdentity", "journalIdentityTenantNodeEpoch", "protectedStateBeforeAfter", "channelVersionCertificateDERSHA256EnabledEndpoint"],
   "argumentHashDefinition": "Proposed versioned SHA256 of canonical UTF8 JSON ordered argv array; no substitution/sorting/deduplication; exact before/after arrays also required; Entrypoint and live PID1 argv checked separately",
+  "rawCmdlineHashDefinition": "Existing servingProcessSHA256 = SHA256 exact raw NUL-separated full PID1 cmdline including appended terminator; map via strict UTF8 argv + NUL join, NEVER directly compare to canonical JSON argv hash",
+  "desiredM2AndArgvContract": "desired-m2-v2-and-argv-contract.json",
+  "retainedPredecessorContract": "migration-predecessor-contract.json",
+  "commonCodedFenceContract": "common-agent-mutation-fence-contract.json",
   "privateKeyHandling": "Public SPKI establishes key identity; exact private file preservation is proven locally by protected tree equality, never export key bytes or a private archive",
   "untrustedSubstitutesRejected": ["Node image claim without owned inspection", "same Node key alone", "image label/source tag", "binary hash used as image Id", "RepoDigest used as local Id", "unsigned capture used as normal M2", "side-loaded observer", "old global agentImage fallback", "partial member proof"],
   "actualProvenanceAndPrivateRecordValues": null,
