@@ -39,6 +39,7 @@
   "candidate6cGap": "worker_peer_floor.target accepts two consumers only through workspace-upgrade.json/ready plus ai.saintvision.upgrade label; worker_plain_rotation reaches the same target path; this proposed typed branch does NOT exist there",
   "requiredConsumers": ["worker_peer_floor.target/observe/context", "worker_plain_rotation install/finalize/rollback barriers and fresh floor/context checks", "worker_leaf_rotation normal:3 dispatch and restart seam", "new migration observer/new guard/runtime inventory readers"],
   "unknownPartialUnownedLabelOnlyOrWorkspaceFallback": "BLOCK for this exact migrated observe scope; do not weaken other reviewed profile contracts or claim existing workspace predecessor is a migration predecessor",
+  "secondMigrationPolicy": "Any second binary migration is BLOCK until separately reviewed design; retained predecessor cannot be deleted, replaced, rotated or appended to bypass the exactly-two-consumer rule; same first-plan exact resume and approved normal:3 leaf renewals remain distinct",
   "actualJournalOwnerFenceIdsAndSourceBinding": null,
   "implementationOwnerCoordination": "Proposed exact R1/N1 contract sent to P0 owner ctx_6f0f8253b8a7 in msg_5ffb02106b2c; actual compatibility reply and code acceptance tracked separately"
 }

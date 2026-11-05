@@ -55,5 +55,8 @@
     }
   ],
   "productRuns": 0,
-  "actualRuntimeOrProductBinding": false
+  "actualRuntimeOrProductBinding": false,
+  "publishedNegativeInputsReproduced": 4,
+  "negativeExpectedNoCanonicalOutput": true,
+  "publishedInputsAndExpectedHarnessBytesDigests": true
 }

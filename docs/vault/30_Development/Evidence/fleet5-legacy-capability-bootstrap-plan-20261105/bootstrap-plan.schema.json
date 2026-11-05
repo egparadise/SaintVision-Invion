@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:saintvision:nonexecuting:legacy-bootstrap-plan:1",
-  "$comment": "Closed HOLD document only; review-required R1/R2/R4/N1/N2 proposed contracts are not code acceptance",
+  "$comment": "Closed HOLD document only;9e8 accepted nonexecuting with Low C1-C3, current Low response awaits actual review; no code/contract/operation acceptance",
   "type": "object",
   "properties": {
     "schemaVersion": {
@@ -53,7 +53,7 @@
           "const": "eace0e2de11801be0e6d63a5cf08817c37214ea3"
         },
         "actualVerdict": {
-          "const": "REVISION REQUIRED"
+          "const": "ACCEPT AS NONEXECUTING PLAN with Low C1-C3; no contract/code/runtime/operations acceptance"
         },
         "requiredFindings": {
           "type": "array",
@@ -86,6 +86,58 @@
         },
         "implementationOrOperationalAcceptance": {
           "const": false
+        },
+        "earlierCdeVerdictPreserved": {
+          "const": "REVISION REQUIRED"
+        },
+        "latestReviewedCommit": {
+          "const": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a"
+        },
+        "latestReviewCommit": {
+          "const": "a471ce1988e444270fdf83283fee18e0342ddd69"
+        },
+        "planFindingsClosedByActual9e8Review": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "R1"
+            },
+            {
+              "const": "R2"
+            },
+            {
+              "const": "R4"
+            },
+            {
+              "const": "N1"
+            },
+            {
+              "const": "N2"
+            }
+          ],
+          "minItems": 5,
+          "maxItems": 5,
+          "items": false
+        },
+        "carryForwardLowConditions": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "C1"
+            },
+            {
+              "const": "C2"
+            },
+            {
+              "const": "C3"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "items": false
+        },
+        "reviewDocsReportedVerifiedByRoot": {
+          "const": 42041692267
         }
       },
       "required": [
@@ -96,7 +148,13 @@
         "requiredFindings",
         "R3Source03ConsumerClosure",
         "thisRevisionVerdict",
-        "implementationOrOperationalAcceptance"
+        "implementationOrOperationalAcceptance",
+        "earlierCdeVerdictPreserved",
+        "latestReviewedCommit",
+        "latestReviewCommit",
+        "planFindingsClosedByActual9e8Review",
+        "carryForwardLowConditions",
+        "reviewDocsReportedVerifiedByRoot"
       ],
       "additionalProperties": false
     },
@@ -973,6 +1031,21 @@
         },
         "laterNormalAuthorityMayUseMigrationBaseline": {
           "const": false
+        },
+        "secondBinaryMigrationAllowed": {
+          "const": false
+        },
+        "legacySchedulerReRegistrationAllowed": {
+          "const": false
+        },
+        "globalOuterSignatureNormalizationAllowed": {
+          "const": false
+        },
+        "blanketAsciiIdentifierRestrictionAllowed": {
+          "const": false
+        },
+        "bodyTransportNewlineIncludedInSignature": {
+          "const": false
         }
       },
       "required": [
@@ -994,7 +1067,12 @@
         "unknownM2ExecIdAllowed",
         "imageInheritedConfigOverrideMaskingAllowed",
         "compareJSONArgvHashToRawCmdlineHashAllowed",
-        "laterNormalAuthorityMayUseMigrationBaseline"
+        "laterNormalAuthorityMayUseMigrationBaseline",
+        "secondBinaryMigrationAllowed",
+        "legacySchedulerReRegistrationAllowed",
+        "globalOuterSignatureNormalizationAllowed",
+        "blanketAsciiIdentifierRestrictionAllowed",
+        "bodyTransportNewlineIncludedInSignature"
       ],
       "additionalProperties": false
     },
@@ -1163,6 +1241,12 @@
     },
     "nextRootAction": {
       "const": "Planning direction A selected by Root; actual independent bootstrap architecture review and reviewed contract binding still required; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"
+    },
+    "desiredV2BodyCanonicalization": {
+      "const": "Go encoding/json.Marshal(map) strict valid Unicode/UTF8, sorted compact body with HTML/U2028/U2029 escaping, no body newline; dedicated Python v2 mapping"
+    },
+    "nextAuthorizedDocumentationPhase": {
+      "const": "After actual Low delta review: proposed CLOSED normative migration-journal/common-fence/runtime-inventory schemas, APIs/ownership/provenance and acceptance task breakdown for Root contract/implementation decision; no helper/product code until that scoped decision"
     }
   },
   "required": [
@@ -1198,7 +1282,9 @@
     "requiredContractRefs",
     "futureProductAcceptance",
     "schemaMeaning",
-    "nextRootAction"
+    "nextRootAction",
+    "desiredV2BodyCanonicalization",
+    "nextAuthorizedDocumentationPhase"
   ],
   "additionalProperties": false
 }

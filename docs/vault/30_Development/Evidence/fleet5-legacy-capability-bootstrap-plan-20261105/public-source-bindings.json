@@ -307,6 +307,46 @@
       "sha256": "2a338f0e8fef4b4ea4094f693a184558ec46e769f44a226a2601aa2863ed652b",
       "bytes": 7658,
       "readExit": 0
+    },
+    {
+      "commit": "a471ce1988e444270fdf83283fee18e0342ddd69",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-9e8e-review.json",
+      "gitBlob": "0d939e11ff71cfcdcb3c556479d3579f6a3e5ef4",
+      "sha256": "b7073698711af71581537ee6122c6ad1b9d6c79f6ff64f7feb254abb14623612",
+      "bytes": 8693,
+      "readExit": 0
+    },
+    {
+      "commit": "a471ce1988e444270fdf83283fee18e0342ddd69",
+      "path": "docs/vault/30_Development/History/2026-11-05_23-03-41_KST_FLEET5_legacy_bootstrap_plan_9e8e_\uac80\ud1a0_Claude.md",
+      "gitBlob": "d757948a803e3919493c151eb2faa030b50b5525",
+      "sha256": "fe56ce9422d369b93b41a4aa12bec5f1c6423781d83793ce1ccf43f2b8bae665",
+      "bytes": 9393,
+      "readExit": 0
+    },
+    {
+      "commit": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+      "gitBlob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "sha256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+      "bytes": 4672,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+      "gitBlob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "sha256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+      "bytes": 4672,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "services/node-agent/transport/peer_floor.go",
+      "gitBlob": "0d98a1b665f9bed1fd73ef32f8977dc899b01ede",
+      "sha256": "870ab6a1bdba259397f2f68c9266aff418aa78f766603932af370ccba8894b2d",
+      "bytes": 3245,
+      "readExit": 0
     }
   ],
   "g2LegacyComparisons": [

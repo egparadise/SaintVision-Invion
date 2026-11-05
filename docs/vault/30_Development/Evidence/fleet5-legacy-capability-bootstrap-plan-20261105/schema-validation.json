@@ -1,7 +1,7 @@
 {
   "schemaVersion": "fleet5-bootstrap-document-schema-validation:1",
-  "observedKST": "2026-11-05T22:48:23.818747+09:00",
-  "scope": "Document only; no product/Go/Engine test",
+  "observedKST": "2026-11-05T23:26:21.839981+09:00",
+  "scope": "Document only; actual Go/signing/runtime tests0",
   "results": [
     {
       "id": "D01",
@@ -184,15 +184,52 @@
       "expected": false,
       "matched": true,
       "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D27",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D28",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D29",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D30",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D31",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
     }
   ],
-  "passed": 26,
+  "passed": 31,
   "failed": 0,
   "productAcceptanceCasesRun": 0,
-  "productAcceptanceCasesRequiredNotRun": 36,
+  "productAcceptanceCasesRequiredNotRun": 40,
   "all30Target18RootAndMemberBindingsNull": true,
   "parameterNameClosure": true,
-  "sourceFactsMatched": 9,
-  "syntheticEncodingCasesMatched": 10,
+  "publishedNegativeVectors": 4,
+  "bodyGoldenPositiveMatchedPythonOnly": 5,
+  "bodyGoldenInvalidRejectedPythonOnly": 5,
+  "actualGoCrossLanguageRuns": 0,
   "thisRevisionActualIndependentVerdict": null
 }

@@ -12,7 +12,16 @@
   "desiredFieldMeaning": "Lowercase SHA256 of exact bounded bytes read from opened /proc/servingPID/exe object, live UID/PID1/SameFile/self executable/process generation and file identity stable before/after; no hash of pathname/cmdline substituted",
   "desiredProducerAndVerifierClosure": ["Go actual serving-process reader and M2 signer/main emitter", "peer_policy_phase strict FLOOR_KEYS/schema/domain and signature verification", "worker_peer_floor host adapter/target/context", "worker_plain_rotation/new normal:3 preflight/phase matching", "new runtime inventory/current runtime reader/new guard"],
   "v1Handling": "Preserve legacy v1 meaning and historical receipts exactly; v1 cannot satisfy desired new bootstrap/normal:3 executable proof; no missing-field fallback; actual published schema/domain/canonical-signing mapping must be reviewed and pinned",
-  "receiptSigningCanonicalization": "Proposed v2 retains existing sorted compact ASCII-escaped JSON body rule, excluding nodeSignature, with allow_nan false, then v2 domain bytes prefix; this is SEPARATE from argv JSON encoding",
+  "receiptSigningCanonicalization": "Root-selected desired v2 BODY equals Go encoding/json.Marshal(map) for the closed typed body excluding nodeSignature: sorted keys, compact UTF8, Go HTML escapes less-than/greater-than/ampersand and U+2028/U+2029, strict valid Unicode/UTF8, no body newline. A dedicated Python v2 verifier must emit EXACT same bytes; NOT ensure_ascii=True",
+  "v2CanonicalBodyRules": {
+    "mapKeys": "Sort valid Unicode string keys by UTF8 byte lexicographic order (equivalent scalar order for valid Unicode); duplicate/unknown actual wire keys rejected before canonicalization",
+    "strings": "Raw valid nonASCII UTF8, quote/backslash and JSON control escaping as Go Marshal; less-than/greater-than/ampersand become lowercase unicode escapes 003c/003e/0026; U+2028/U+2029 unicode-escaped; no NFC or other normalization",
+    "strictUnicode": "Reject invalid UTF8 and unpaired surrogate scalars before signing/verification; Go replacement-character behavior is not accepted as normalization",
+    "typedNumbers": "Closed M2 wire uses bounded integers and booleans, not float coercion/NaN/Infinity; canonicalization must not invent a blanket ASCII-only restriction for legitimate string/identifier values",
+    "newlines": "No newline in BODY bytes or domain-plus-body signed message; a transport encoder newline is separate and is not part of signed BODY",
+    "dedicatedMapping": "Dedicated v2 floor-body mapping only; preserve all v1 archived bytes/meaning and different outer receipt/CP commit signature canonicalization unchanged",
+    "actualGoCrossLanguageRun": false
+  },
   "hashDefinitions": {
     "cmdArgvCanonicalSHA256": "SHA256 of Config.Cmd ordered JSON string array encoded UTF8 without BOM/whitespace/trailing newline; reference json.dumps(argv,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode('utf-8'); no Unicode normalization/shell expansion/sort/deduplication",
     "entrypointCanonicalSHA256": "Same JSON rule over the exact Config.Entrypoint array, before/after compared separately",
@@ -28,7 +37,8 @@
     "After raw-hash match and same live-process proof, bind the JSON argv hash to that same process through the explicit encoding mapping, NOT by comparing JSON hash bytes to raw cmdline hash bytes"
   ],
   "syntheticEncodingFixtureOnly": "encoding-fixtures.json; no process/key/binary/Node provenance or runtime acceptance",
+  "syntheticBodyGoldenFixtures": "m2-v2-body-golden-fixtures.json; exact inputs/expected bytes/digests published, Python document reference only until actual Go producer/verifier run",
   "actualM2WireSourceBinarySchemaDomainCIVerdictBinding": null,
   "implementationAndCodeAcceptance": false,
-  "coordination": "Exact R1/N1 proposal sent to ctx_6f0f8253b8a7 in msg_5ffb02106b2c; Root notified msg_01c78fa72644; compatibility reply tracked in review closure receipt"
+  "coordination": "R1/N1 actual Root-relayed compatibility msg_03604b3e6bed is planning-only and unpublished/unaccepted; Root-selected C2 exact Go Marshal BODY sent to P0 owner in msg_bb65618c0b49; source implementation belongs to his separately authorized scope"
 }

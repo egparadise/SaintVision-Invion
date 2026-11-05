@@ -13,7 +13,7 @@
     "reviewedCommit": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
     "initial1057ReviewCommit": "830efd9317d28fa27b696db709c9a6e7a3076331",
     "cdeDeltaReviewCommit": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
-    "actualVerdict": "REVISION REQUIRED",
+    "actualVerdict": "ACCEPT AS NONEXECUTING PLAN with Low C1-C3; no contract/code/runtime/operations acceptance",
     "requiredFindings": [
       "R1",
       "R2",
@@ -23,7 +23,23 @@
     ],
     "R3Source03ConsumerClosure": "CLOSED for source03 scope; new candidate consumers included in R1",
     "thisRevisionVerdict": null,
-    "implementationOrOperationalAcceptance": false
+    "implementationOrOperationalAcceptance": false,
+    "earlierCdeVerdictPreserved": "REVISION REQUIRED",
+    "latestReviewedCommit": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+    "latestReviewCommit": "a471ce1988e444270fdf83283fee18e0342ddd69",
+    "planFindingsClosedByActual9e8Review": [
+      "R1",
+      "R2",
+      "R4",
+      "N1",
+      "N2"
+    ],
+    "carryForwardLowConditions": [
+      "C1",
+      "C2",
+      "C3"
+    ],
+    "reviewDocsReportedVerifiedByRoot": 42041692267
   },
   "owner": "Codex",
   "reviewer": "Claude via root pending",
@@ -271,7 +287,12 @@
     "unknownM2ExecIdAllowed": false,
     "imageInheritedConfigOverrideMaskingAllowed": false,
     "compareJSONArgvHashToRawCmdlineHashAllowed": false,
-    "laterNormalAuthorityMayUseMigrationBaseline": false
+    "laterNormalAuthorityMayUseMigrationBaseline": false,
+    "secondBinaryMigrationAllowed": false,
+    "legacySchedulerReRegistrationAllowed": false,
+    "globalOuterSignatureNormalizationAllowed": false,
+    "blanketAsciiIdentifierRestrictionAllowed": false,
+    "bodyTransportNewlineIncludedInSignature": false
   },
   "proposedInterfaces": [
     "NEW storage-free LegacyBinaryMigration lifecycle; closed inspect/capture/reserve/advance/readback inputs; NOT IMPLEMENTED",
@@ -320,5 +341,7 @@
   },
   "futureProductAcceptance": "acceptance-matrix.json",
   "schemaMeaning": "Closed schema checks this exact nonexecuting HOLD draft, not future runtime readiness; bindings require a new actually published and reviewed successor revision",
-  "nextRootAction": "Planning direction A selected by Root; actual independent bootstrap architecture review and reviewed contract binding still required; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision"
+  "nextRootAction": "Planning direction A selected by Root; actual independent bootstrap architecture review and reviewed contract binding still required; await real P0 publication/native green/provenance/verdict; assign new helper/inventory/guard implementation and bind physical inputs privately before any execution decision",
+  "desiredV2BodyCanonicalization": "Go encoding/json.Marshal(map) strict valid Unicode/UTF8, sorted compact body with HTML/U2028/U2029 escaping, no body newline; dedicated Python v2 mapping",
+  "nextAuthorizedDocumentationPhase": "After actual Low delta review: proposed CLOSED normative migration-journal/common-fence/runtime-inventory schemas, APIs/ownership/provenance and acceptance task breakdown for Root contract/implementation decision; no helper/product code until that scoped decision"
 }

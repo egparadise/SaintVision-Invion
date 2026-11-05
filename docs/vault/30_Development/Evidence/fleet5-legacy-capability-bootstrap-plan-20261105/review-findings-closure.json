@@ -3,25 +3,105 @@
   "reviewedPriorPlan": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
   "actualInitialReview": "830efd9317d28fa27b696db709c9a6e7a3076331",
   "actualDeltaReview": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
-  "actualPriorVerdict": "REVISION REQUIRED",
+  "actualPriorVerdict": "ACCEPT NONEXECUTING PLAN with Low C1-C3",
   "thisRevisionActualIndependentVerdict": null,
   "authorResponsesAreNotIndependentAcceptance": true,
   "responses": [
-    {"id":"R1","authorResponse":"SPECIFIED proposed typed journal/schema/owner/common-fence/static retained backup consumer and bootstrap-versus-later normal:3 lease rule","contract":"migration-predecessor-contract.json","futureCases":["A29","A30","A36"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
-    {"id":"R2","authorResponse":"SPECIFIED named common coded guard/marker and exact helper coverage, persistent terminal denial, whole-operation ownership and raw privileged invocation boundary","contract":"common-agent-mutation-fence-contract.json","futureCases":["A31","A36"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
-    {"id":"R3","authorResponse":"Actual eace review CLOSED source03 closure; candidate worker_peer_floor/worker_plain_rotation added explicitly under R1","contract":"legacy-consumer-closure.json","deltaReview":"Source03 CLOSED by actual prior review; new scope PENDING"},
-    {"id":"R4","authorResponse":"SPECIFIED actual observer Engine ExecIDs receipt/set/outcome and exact image-inherited Config equality with no container-override masking","contract":"observer-exec-and-image-config-contract.json","futureCases":["A33","A34"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
-    {"id":"N1","authorResponse":"Root selected desired separate SIGNED servingExecutableSHA256 actual file bytes; current6c field is cmdline only; propose strict M2v2 and producer/verifier closure without v1 reinterpretation","contract":"desired-m2-v2-and-argv-contract.json","futureCases":["A32"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
-    {"id":"N2","authorResponse":"SPECIFIED separate Cmd/Entrypoint/full argv UTF8 JSON hashes and raw NUL cmdline hash, exact encoding/terminator/strict UTF8 mapping, synthetic measured vectors","contract":"desired-m2-v2-and-argv-contract.json","futureCases":["A35"],"actualRuntimeProof":false,"deltaReview":"PENDING"}
+    {
+      "id": "R1",
+      "authorResponse": "SPECIFIED proposed typed journal/schema/owner/common-fence/static retained backup consumer and bootstrap-versus-later normal:3 lease rule",
+      "contract": "migration-predecessor-contract.json",
+      "futureCases": [
+        "A29",
+        "A30",
+        "A36"
+      ],
+      "actualCodeImplementedOrAccepted": false,
+      "deltaReview": "CLOSED AT PLAN LEVEL BY ACTUAL a471 review; implementation still unaccepted"
+    },
+    {
+      "id": "R2",
+      "authorResponse": "SPECIFIED named common coded guard/marker and exact helper coverage, persistent terminal denial, whole-operation ownership and raw privileged invocation boundary",
+      "contract": "common-agent-mutation-fence-contract.json",
+      "futureCases": [
+        "A31",
+        "A36"
+      ],
+      "actualCodeImplementedOrAccepted": false,
+      "deltaReview": "CLOSED AT PLAN LEVEL BY ACTUAL a471 review; implementation still unaccepted"
+    },
+    {
+      "id": "R3",
+      "authorResponse": "Actual eace review CLOSED source03 closure; candidate worker_peer_floor/worker_plain_rotation added explicitly under R1",
+      "contract": "legacy-consumer-closure.json",
+      "deltaReview": "Source03 CLOSED by actual prior review; new scope PENDING"
+    },
+    {
+      "id": "R4",
+      "authorResponse": "SPECIFIED actual observer Engine ExecIDs receipt/set/outcome and exact image-inherited Config equality with no container-override masking",
+      "contract": "observer-exec-and-image-config-contract.json",
+      "futureCases": [
+        "A33",
+        "A34"
+      ],
+      "actualCodeImplementedOrAccepted": false,
+      "deltaReview": "CLOSED AT PLAN LEVEL BY ACTUAL a471 review; implementation still unaccepted"
+    },
+    {
+      "id": "N1",
+      "authorResponse": "Root selected desired separate SIGNED servingExecutableSHA256 actual file bytes; current6c field is cmdline only; propose strict M2v2 and producer/verifier closure without v1 reinterpretation",
+      "contract": "desired-m2-v2-and-argv-contract.json",
+      "futureCases": [
+        "A32"
+      ],
+      "actualCodeImplementedOrAccepted": false,
+      "deltaReview": "CLOSED AT PLAN LEVEL BY ACTUAL a471 review; implementation still unaccepted"
+    },
+    {
+      "id": "N2",
+      "authorResponse": "SPECIFIED separate Cmd/Entrypoint/full argv UTF8 JSON hashes and raw NUL cmdline hash, exact encoding/terminator/strict UTF8 mapping, synthetic measured vectors",
+      "contract": "desired-m2-v2-and-argv-contract.json",
+      "futureCases": [
+        "A35"
+      ],
+      "actualRuntimeProof": false,
+      "deltaReview": "CLOSED AT PLAN LEVEL BY ACTUAL a471 review; implementation still unaccepted"
+    }
   ],
   "p0OwnerCoordination": {
     "ownerDispatch": "ctx_6f0f8253b8a7",
     "proposalMessage": "msg_5ffb02106b2c",
     "rootNotification": "msg_01c78fa72644",
-    "actualCompatibilityReply": null,
-    "agreementInferred": false
+    "actualCompatibilityReply": {
+      "messageId": "msg_03604b3e6bed",
+      "source": "Actual reply relayed by Root in msg_0628f32d53cd",
+      "scope": "N1 required signed executable bytes/schema2/domainv2 compatible; R1/common fence future-only semantic compatibility; no published/accepted code"
+    },
+    "agreementInferred": false,
+    "rootSelectedC2MessageToOwner": "msg_bb65618c0b49",
+    "actualC2Reply": null
   },
   "all30Target18RootMemberBindingsRemainNull": true,
   "operationalGate": "HOLD",
-  "implementationAndPhysicalAcceptance": false
+  "implementationAndPhysicalAcceptance": false,
+  "earlierActualCdeVerdictPreserved": "REVISION REQUIRED",
+  "actualPriorReviewedPlan": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+  "actualLatestIndependentReview": "a471ce1988e444270fdf83283fee18e0342ddd69",
+  "lowConditionResponses": [
+    {
+      "id": "C1",
+      "response": "Explicit DENIED scheduler registration/launcher/executor surfaces in common fence and G9, including new task outside disabled IDs",
+      "deltaReview": "PENDING"
+    },
+    {
+      "id": "C2",
+      "response": "Root-selected desired v2 exact Go Marshal-map BODY semantics, dedicated verifier/no global normalization; fully specified positive/negative synthetic fixtures",
+      "deltaReview": "PENDING"
+    },
+    {
+      "id": "C3",
+      "response": "Second binary migration BLOCK pending separate reviewed design; no predecessor replacement/deletion/rotation",
+      "deltaReview": "PENDING"
+    }
+  ]
 }
