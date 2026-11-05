@@ -1,0 +1,84 @@
+{
+  "scope": "DOCS_ONLY_LOCAL_UNACCEPTED_P0_STUDY_PUBLICATION",
+  "observedAtKST": "2026-11-05T22:10:07.601656+09:00",
+  "rootAuthorization": "msg_dfee72500816",
+  "reportBase": "69ea5ae89305b81d42b711a0a93fd3bab73c5ad9",
+  "acceptedLowProduct": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "acceptedLowReport": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "acceptedLowReview": "45bc23cb34d30232edf5c9f097960b1300ea1b5f",
+  "p0CandidateStudiedNotSelected": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+  "actualRejectedP0Review": "c2102592f9c2204ac96a49c5d0af4a2f888951f5",
+  "checks": [
+    {
+      "receipt": "p0-static-report-docs.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedAtKST": "2026-11-05T22:08:20.042474+09:00",
+      "finishedAtKST": "2026-11-05T22:08:43.020986+09:00",
+      "stdoutAndStderr": "p0-static-report-docs.txt"
+    },
+    {
+      "receipt": "p0-static-report-ontology.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "startedAtKST": "2026-11-05T22:08:20.042924+09:00",
+      "finishedAtKST": "2026-11-05T22:08:29.836248+09:00",
+      "stdoutAndStderr": "p0-static-report-ontology.txt"
+    },
+    {
+      "receipt": "p0-static-report-paths.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "69ea5ae89305b81d42b711a0a93fd3bab73c5ad9"
+      ],
+      "exit": 0,
+      "startedAtKST": "2026-11-05T22:08:20.043502+09:00",
+      "finishedAtKST": "2026-11-05T22:08:43.275287+09:00",
+      "stdoutAndStderr": "p0-static-report-paths.txt"
+    },
+    {
+      "receipt": "p0-static-report-ratchet.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "startedAtKST": "2026-11-05T22:08:20.043240+09:00",
+      "finishedAtKST": "2026-11-05T22:08:26.518275+09:00",
+      "stdoutAndStderr": "p0-static-report-ratchet.txt"
+    },
+    {
+      "receipt": "p0-static-report-sync.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exit": 0,
+      "startedAtKST": "2026-11-05T22:08:20.044740+09:00",
+      "finishedAtKST": "2026-11-05T22:08:44.863337+09:00",
+      "stdoutAndStderr": "p0-static-report-sync.txt"
+    }
+  ],
+  "productDiffAgainstAcceptedLow": [],
+  "sharedBoardsRegistryDiffAgainstTaskBase142b": [],
+  "reviewOriginalBytesHashesBlobIdsReadback": "all match original c210 Git objects",
+  "ci2": "remote absent; no binding or mutation",
+  "upcomingHostCI": "exact new report Docs only; not yet dispatched, no outcome asserted",
+  "p0ProductionMerged": false,
+  "finalPacketRegenerated": false,
+  "wholeTaskDone": false,
+  "physicalAcceptance": false,
+  "obsidianWrites": false,
+  "nextFirstOwnerAction": "After exact report Docs terminal capture, root relays actual revised selected P0 source/pairs/native two-cycle plus negatives/Core/implementation review; integration owner then performs selected-source assembly and all complete candidate gates."
+}

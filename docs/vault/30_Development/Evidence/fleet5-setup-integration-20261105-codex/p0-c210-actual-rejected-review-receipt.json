@@ -1,0 +1,52 @@
+{
+  "scope": "ACTUAL_REJECTED_P0_REVIEW_RECEIPT_ONLY",
+  "observedAtKST": "2026-11-05T22:06:23.216521+09:00",
+  "rootMessage": "msg_848e41ea7860",
+  "actualReviewCommit": "c2102592f9c2204ac96a49c5d0af4a2f888951f5",
+  "reviewedSource": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+  "reviewTask": "task_fcd89694c5b7",
+  "reviewDispatch": "ctx_d0aa7908032b",
+  "reviewer": "Claude",
+  "verdict": "NOT ACCEPTED; REVISION REQUIRED",
+  "originalFilesReadFromGit": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-6c0f-review.json",
+      "bytes": 9830,
+      "sha256": "9992bf77602bdb148543bbaaa0885818b141d8127f557a1bf2782bee722fa75b",
+      "gitBlobSHA1": "473d7b257cc61ce954fbcff1e2d522c4126da402"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-05_21-55-00_KST_FLEET5_P0_code_6c0f_검토_Claude.md",
+      "bytes": 9539,
+      "sha256": "03927a3e9ef338d65f12f30ad3bb173fe1967ae8749cae3cc5a383e289d472e9",
+      "gitBlobSHA1": "6adbe00a8c336c4d3d25dd65dd103dbb482c0f35"
+    }
+  ],
+  "filesImportedIntoCandidate": false,
+  "acceptedLowProductPreserved": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "acceptedLowReportPreserved": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "publishedReportHEADUnchanged": "69ea5ae89305b81d42b711a0a93fd3bab73c5ad9",
+  "blocking": {
+    "B1": "Core42028616559 failed native heartbeat hex-nonce fixture; proofValid false, zero completed normal cycles, floors[7], full suites not run",
+    "B2": "Actual independent legacy lifecycle suite result128 failed; :3 residue/retirement/successor/consecutive/archive guarantees not re-proven"
+  },
+  "relatedClosure": {
+    "F1": "Preserve bd six closed expected lifecycle fields plus four is True/two type(x) is int assertions while taking actual5-module count; local static tree already shows this combination",
+    "F2": "Settled finalized rule/operator path must be actually reviewed; never use bare finalized, ignore residue, delete journal or weaken guard here",
+    "F3": "Forward stopped-after-publication recovery needs bounded actual liveness closure; no manual runtime start is authorized/performed here"
+  },
+  "ciEvidenceScope": {
+    "reviewDocs42031635606": "actual exact-head/all-jobs SUCCESS root-verified; document gate only",
+    "reportDocs42029362479": "actual exact-head/all-jobs SUCCESS root-verified",
+    "sourceDocs42028621267": "reviewer reports SUCCESS; document gate only",
+    "sourceCore42028616559": "FAILURE; not accepted or relabelled"
+  },
+  "sourceMerged": false,
+  "productionEdits": 0,
+  "testOrSchemaWeakening": 0,
+  "newCoreOrAllEightDispatch": false,
+  "newArchiveOrRefBinding": false,
+  "runtimeOrPhysicalActions": false,
+  "wholeTaskDone": false,
+  "nextOwnerAction": "Root-selected revised actual P0 source/pairs/native two-cycle plus negatives/Core/verdict; then integration owner merges and migrates own packet consumers at exact source."
+}
