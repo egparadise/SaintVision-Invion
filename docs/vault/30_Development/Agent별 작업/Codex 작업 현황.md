@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.353"
+version: "1.0.354"
 status: "review"
 author: "Codex"
-updated: "2026-11-04T20:45:59+09:00"
+updated: "2026-11-05T14:30:47+09:00"
 source_of_truth: "Git"
-active_card: "SUPERVISION-20261104 overall delivery supervision"
-active_card_status: "Source59f exact8 CI PASS; reviewed bounded current-user followups enabled; final report and future physical acceptance remain separately tracked"
-active_card_next: "Receive timed pilot result through the existing Orca run, independently verify actual14 gates, and resume blocked S01 work when the missing real-device input is available"
+active_card: "FLEET5-20261105 five physical node orchestration"
+active_card_status: "Target topology confirmed; actual worker/CP readiness and missingworker4 discovery starting"
+active_card_next: "Dispatch bounded known-worker and CP/inventory tasks; use verified identities and allowed limits for a reviewed five-node deployment plan"
 ---
+
+## 2026-11-05 기존5대 오케스트레이션
+
+작업한것: 최신f020보고와원격59f를재대조하고기존4worker+CP구성을사용자응답으로고정했다. 확인한것: worker4/CPidentity입력누락,worker1/3folder목록공백이며오늘실측은다음Task의deliverable이다. 다음행동/담당: root가scope와실제Task전달을고정하고Codex는knownworker현재상태,Claude는CP/인벤토리조건을측정한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-04 최종 운영 후속 인계
 
@@ -17,7 +21,7 @@ active_card_next: "Receive timed pilot result through the existing Orca run, ind
 
 ## 2026-11-04 train80 exact8 완료 수신
 
-작업한 것: 고정 통합59f의 착지 후8lane을 끝까지 감독하고 실제13job/API 및 hosted 시험 로그를 확인했다. 확인한 것: canonical PASS/exit0, Backend 두 Python 버전 각8519 pass, Core8877 pass이며 서명·복원·독립 검토 증거를 보고 branch에 보존했다. 다음 첫 행동/담당: root는 최종 report/Obsidian, Core는 미래 후속 M1 수정과 정밀 실행 계획, Claude는 수정 delta 및 실제 전환 측정의 독립 판정을 맡는다. 전체 인수 미충족 항목을 코드 CI 성공으로 승격하지 않는다.
+작업한 것: 고정 통합59f의 착지 후8lane을 끝까지 감독하고 실제12job/API 및 hosted 시험 로그를 확인했다. 확인한 것: canonical PASS/exit0, Backend 두 Python 버전 각8519 pass, Core8877 pass이며 서명·복원·독립 검토 증거를 보고 branch에 보존했다. 다음 첫 행동/담당: root는 최종 report/Obsidian, Core는 미래 후속 M1 수정과 정밀 실행 계획, Claude는 수정 delta 및 실제 전환 측정의 독립 판정을 맡는다. 전체 인수 미충족 항목을 코드 CI 성공으로 승격하지 않는다.
 
 ## 2026-11-04 19시 train80 최종 인계 작업
 
