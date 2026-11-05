@@ -1,0 +1,40 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_node_successor_requires_verified_predecessor_replay ___________
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-967/test_node_successor_requires_v0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021417BACFC0>
+
+    def test_node_successor_requires_verified_predecessor_replay(tmp_path, monkeypatch):
+        case = _normal_cycles(tmp_path, monkeypatch)
+        first = json.loads((case.first / "rotation.json").read_bytes())
+        archive = case.worker / "leaf-rotation-finalized" / f'{first["rotationId"]}.json'
+        canonical = archive.read_bytes()
+        archive.rename(archive.with_suffix(".preserved"))  # supported legacy finalized journal
+        key_raw = (case.worker / "node-key.pem").read_bytes()
+
+        def replay():
+            rotation.finalize(
+                case.first,
+                case.worker,
+                case.first_commit,
+                now=case.now(),
+                restart=lambda _root: pytest.fail("finalized replay restarted"),
+            )
+
+        _crash_after_link(monkeypatch, replay)
+        temporary = archive.with_name(archive.name + ".next")
+        assert archive.read_bytes() == temporary.read_bytes() == canonical
+        before = _snapshot(case.worker)
+>       with pytest.raises(ValueError, match="predecessor.*replay"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_rotation_predecessor_residue.py:48: Failed
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "30fbaffc66af4ccf842038b58cb2e441", "targetChannelVersion": 8, "proposalDigest": "056749f9c1c2e4c2f1699ee4b110a6b7488ff64b7828a6d66a26a48a4b831deb", "privateKeyTransferred": false}
+{"schemaVersion": "saintvision-lan-leaf-rotation:1", "rotationId": "30fbaffc66af4ccf842038b58cb2e441", "proposalDigest": "056749f9c1c2e4c2f1699ee4b110a6b7488ff64b7828a6d66a26a48a4b831deb", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "certificateSHA256": "05e59252d164c81ee65d970a649610b027a630f2aefb31a5cf8f8b20fa52d58f", "committed": true, "controlSignature": "b044b5e2fbe87d9731e5d6f12859157cc57c582cc5ae57329920b6bbc2ba710429dc610d42cba5114b468366a561b37b764496299ad0107dbbac3b81ac729600", "idempotentReplay": false, "restartObserverRequired": true, "nodeOverlapFinalizationRequired": true}
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "d4e2544d10a2451497e093ef9837081e", "targetChannelVersion": 9, "proposalDigest": "471e0b48d2f4affbde236f8450ebd9375da717bb6fa668fbb3c788642cc5c267", "privateKeyTransferred": false}
+=========================== short test summary info ===========================
+FAILED tests/test_rotation_predecessor_residue.py::test_node_successor_requires_verified_predecessor_replay
+1 failed in 3.49s

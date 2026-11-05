@@ -430,6 +430,12 @@ archive and refuses unequal, partial, foreign or redirected residue. Read-only
 preflight does not remove staging evidence. External setup classifiers must
 verify the canonical signed archives and all member proofs before treating
 `finalized` as settled; the phase string alone is insufficient.
+Any predecessor `.next` blocks successor Node installation and CP batch
+preparation, including a byte-identical completed staging link. Replay that
+exact predecessor's `finalize` or `retire-leaf-rotation-batch` with its original
+inputs first. Only the verified publishing replay may clean an owned equal
+duplicate; successor and preflight paths never delete it. Unequal, partial,
+foreign or redirected evidence remains blocked for separate reviewed recovery.
 This lifecycle is not permission to clear a journal or reset a scheduler latch;
 scheduled-plan changes and operational acceptance remain separate work.
 

@@ -118,6 +118,7 @@ def _normal_cycles(tmp_path, monkeypatch):
         restarts=restarts,
         now=lambda: instant,
         first_commit=tmp_path / f"{first.name}-commit.json",
+        prepare=prepare,
     )
 
 

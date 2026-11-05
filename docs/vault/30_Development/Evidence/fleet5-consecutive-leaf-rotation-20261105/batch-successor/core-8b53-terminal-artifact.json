@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "fleet5-terminal-core-artifact-proof:1",
+  "observedKST": "2026-11-05T18:58:49.096773+09:00",
+  "runId": 42001883513,
+  "head": "8b53fbfef107837602b1b2f700e1f8e7bae28638",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42001883513",
+  "jobs": [
+    {
+      "name": "s01-storage-roundtrip",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "core",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "fixtureOnly": true,
+  "operationallyAccepted": false,
+  "artifact": {
+    "id": 13404698183,
+    "name": "saintvision-core-evidence",
+    "size_in_bytes": 13902551,
+    "digest": "sha256:c3ad8f3cd10f9ed67a2ef582d880c1cb7919616df46bbfa35a9560a947623038",
+    "workflow_run": {
+      "id": 42001883513,
+      "repository_id": 1362259805,
+      "head_repository_id": 1362259805,
+      "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+      "head_sha": "8b53fbfef107837602b1b2f700e1f8e7bae28638"
+    }
+  },
+  "observedArchiveSHA256": "sha256:c3ad8f3cd10f9ed67a2ef582d880c1cb7919616df46bbfa35a9560a947623038",
+  "archiveDigestMatches": true,
+  "junit": {
+    "path": "core-tests.xml",
+    "sha256": "3dbcfb3dc9eb980978ee6907a6a7982c729b99e3e2c4bf23922e8d0f197ff77c",
+    "total": 9012,
+    "passed": 8966,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 46
+  },
+  "rotationSuites": {
+    "test_lan_leaf_rotation_consecutive": {
+      "total": 43,
+      "passed": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "test_lan_leaf_rotation_batch_successor": {
+      "total": 46,
+      "passed": 46,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "test_leaf_rotation_archive_residue": {
+      "total": 0,
+      "passed": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "test_lan_leaf_rotation_standalone_runtime": {
+      "total": 38,
+      "passed": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  }
+}
