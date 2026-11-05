@@ -1,0 +1,69 @@
+{
+  "taskId": "FLEET5-20261105-WORKER-READINESS",
+  "orcaTaskId": "task_4cfe9dbaa805",
+  "observedAtKST": "2026-11-05T14:58:35.749008+09:00",
+  "branch": "agent/codex/fleet5-worker-readiness-20261105",
+  "worktreeBase": "9b9061ed1b7bbc5b91ea2a035ea2a54fac6f010f",
+  "reportCommit": "e1afa49c13d4ed5a2beb272823889bff0c8271d6",
+  "normalCommitExit": 0,
+  "normalPushExit": 0,
+  "docsDispatchCommand": [
+    "gh",
+    "workflow",
+    "run",
+    "docs.yml",
+    "--repo",
+    "egparadise/SaintVision-Invion",
+    "--ref",
+    "agent/codex/fleet5-worker-readiness-20261105",
+    "-f",
+    "correlation_id=fleet5-worker-readiness-e1afa49c-20261105"
+  ],
+  "docsDispatchExit": 0,
+  "docsCI": {
+    "databaseId": 41977201244,
+    "headSha": "e1afa49c13d4ed5a2beb272823889bff0c8271d6",
+    "displayTitle": "fleet5-worker-readiness-e1afa49c-20261105",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41977201244",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-05T05:57:04Z",
+    "updatedAt": "2026-11-05T05:57:39Z"
+  },
+  "docsJobs": [
+    {
+      "id": 127078716959,
+      "name": "docs",
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41977201244/job/127078716959"
+    }
+  ],
+  "committedEvidenceHashDomain": "LF Git blob bytes; explicitly verified against git show HEAD",
+  "evidenceSHA256": {
+    "artifact-hashes.json": "c1a41fd22d22e8a6bbc3c83e74e0187fd4924f700b06037dcf2d211fcbc7c32b",
+    "delivery-checks.json": "c60edd7549e2f8923bd2f208b39dcc75aa060cc44a73f6f7ce6e95f85eb690cc",
+    "errors.md": "986995319a2cd38a00123ccc8b11daa5b8405c2ca09e078cf3e663cb9e0dbcd7",
+    "final-docs-checks.json": "e984ecfd9043295fa9f2db3ff807a0623b60c8014afec8fb729055ae02ab91e9",
+    "five-node-proposal.json": "574412546026f056af7261dd0fbd5f511b721c92b2213197e40454d03cb18da8",
+    "readiness.json": "a4967ef13365004ce6c9303c625daac84d7c543dda46ba09fb05b672a1b47b6a"
+  },
+  "historySHA256": "8224a1923407e9078c1599d7325a698ad545694e95a0ade97232111fdf2d1da5",
+  "proposalArithmeticValidation": "all worker1/2/3 budgets within recorded allowedResources, logical CPUs and observed available RAM/storage",
+  "freshNamespaceCurrentlyAbsent": true,
+  "earlyStatusMessage": "msg_b51b62ac9e93",
+  "diagnosticAndPolicyMessage": "msg_b5b156afca46",
+  "sudoRouteMessage": "msg_62bfba918205",
+  "independentReview": "pending Claude; no review fabricated",
+  "operationalAcceptance": "not-performed; FIVE expansion blocked",
+  "obsidianApply": false,
+  "commonBoardsAndTaskRegistryChanged": false,
+  "nextOwner": "Codex coordinator joins actual Claude CP result and worker4 endpoint with this packet, resolves worker3 operator/runtime route, requests independent Claude review before deployment",
+  "receiptCommitCIPolicy": "This receipt records the report commit CI; its own exact final commit Docs CI is reported in worker_done and hosted Actions, avoiding self-SHA recursion",
+  "finalSyncCheck": {
+    "exit": 0,
+    "summary": "CHECK: 2286 managed files, 11 pending exports, 0 conflicts. No writes.",
+    "observedAtKST": "2026-11-05T14:58:43.671031+09:00",
+    "apply": false
+  }
+}
