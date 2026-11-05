@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "fleet5-synthetic-argv-encoding-fixtures:1",
+  "scope": "DOCUMENT ENCODING ONLY; no actual Node/process/binary/key/provenance",
+  "vectors": [
+    {
+      "id": "E01",
+      "syntheticEncodingOnly": true,
+      "argv": [
+        "/inv-node",
+        "--serve",
+        "--node",
+        "synthetic-encoding-node"
+      ],
+      "canonicalArgvUTF8Hex": "5b222f696e762d6e6f6465222c222d2d7365727665222c222d2d6e6f6465222c2273796e7468657469632d656e636f64696e672d6e6f6465225d",
+      "rawNulCmdlineHex": "2f696e762d6e6f6465002d2d7365727665002d2d6e6f64650073796e7468657469632d656e636f64696e672d6e6f646500",
+      "argvCanonicalSHA256": "12247c8f8cc840a06f3aa584f62c34a4ef940de002edfc9b6d24b657601a9c2f",
+      "rawCmdlineSHA256": "e6f93fc7fed29d1508727e6298a2ef1196e4e0534dfd20c811adf144cfce9905",
+      "publishedExecutableSHA256": null,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "E02",
+      "syntheticEncodingOnly": true,
+      "argv": [
+        "/inv-node",
+        "--example",
+        "\ud55c\uae00 \"quote\" \\ path",
+        ""
+      ],
+      "canonicalArgvUTF8Hex": "5b222f696e762d6e6f6465222c222d2d6578616d706c65222c22ed959ceab880205c2271756f74655c22205c5c2070617468222c22225d",
+      "rawNulCmdlineHex": "2f696e762d6e6f6465002d2d6578616d706c6500ed959ceab880202271756f746522205c20706174680000",
+      "argvCanonicalSHA256": "b3a23e58feaca8f03eb01513b75120e7801d434b4e16548d1d243cf1a0ae80bf",
+      "rawCmdlineSHA256": "1c27bab79abeec2c2308befe9ec43f177d70b6f3f089e08256cb668a37bee3f8",
+      "publishedExecutableSHA256": null,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "E03",
+      "syntheticEncodingOnly": true,
+      "argv": [
+        "/inv-node",
+        "e\u0301",
+        "\u00e9"
+      ],
+      "canonicalArgvUTF8Hex": "5b222f696e762d6e6f6465222c2265cc81222c22c3a9225d",
+      "rawNulCmdlineHex": "2f696e762d6e6f64650065cc8100c3a900",
+      "argvCanonicalSHA256": "c61b9bd4c177a27ff8aac67b3612779a0729fa711e88e78111381a9f11019221",
+      "rawCmdlineSHA256": "c248167f49acc68cffa8b9e33867b612f269bb02288f8d5f99fc54d3f88c8716",
+      "publishedExecutableSHA256": null,
+      "runtimeExecutionAllowed": false
+    }
+  ]
+}

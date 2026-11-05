@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "fleet5-proposed-observer-exec-image-config-contract:1",
+  "status": "NEW_HOST_ADAPTER_AND_IMAGE_PROOFS_REQUIRED_NOT_IMPLEMENTED",
+  "finding": "R4",
+  "m2ExecReceipt": ["actualEngineExecId", "exactCurrentContainerId", "guardOperationAndPlanDigest", "nonce", "exactObserverArgvAndUID", "createdStartedFinishedObservations", "ExecInspectRunningFalseAndExitCodeZero", "beforeDuringAfterContainerExecIDs"],
+  "execRules": [
+    "Before the observation, current container ExecIDs must be empty for this isolated observe scope; an unrelated outstanding exec BLOCKS",
+    "Trusted guard-owned host adapter records the actual Engine ExecCreate returned ID e BEFORE ExecStart; never infer e from label/PID or accept caller-provided arbitrary allowlist",
+    "Every observed ExecIDs entry must be exactly e; exact before/during/after sets are preserved and validated against the frozen Engine-version fixture contract, not ignored as a volatile prefix",
+    "During creation/start the Engine may expose e; after completion only the Engine-contract-defined empty or retained-e set is accepted with exact ExecInspect(e) binding to this container/command/UID/nonce and finished exit0 proof",
+    "Missing/ambiguous exec outcome, unexpected extra/foreign/stale exec ID, process restart/generation change or changed container/config/image/volume BLOCKS; no pruning/unlinking arbitrary records to pass",
+    "Current6c CLI docker-exec does not return the required actual ExecCreate receipt; this desired adapter is a code gap and cannot be claimed implemented"
+  ],
+  "imageInheritedConfigEquality": {
+    "sourceRecipe": "Same frozen FROM scratch + COPY compiled inv-node + ENTRYPOINT /inv-node Dockerfile.node or verified identical remote recipe; only published binary/layer content changes",
+    "requiredExactFields": ["Entrypoint", "Env", "Labels", "User", "WorkingDir"],
+    "otherImageConfig": "Every other runtime-affecting image Config field must be equal under the closed Engine/image projection or unsupported change BLOCKS; null/absent/empty normalization cannot silently mask a difference",
+    "containerOverrideCannotMaskImageDifference": true,
+    "buildProvenance": "External verified source/build/config/layer provenance; do not add image-inherited labels/env/entrypoint defaults and then override them in container create to appear equal",
+    "actualOldNewImageInspectBindings": null
+  },
+  "sameContainerAcrossObservation": "Owned before/after ID/image/config/mount/endpoint/start/restart/volume-consumer identity remains fixed; only exact recorded observer ExecIDs lifecycle delta allowed",
+  "actualExecAdapterSourceEngineContractOrImageBindings": null,
+  "runtimeExecutionAuthorized": false
+}

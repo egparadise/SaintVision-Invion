@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "fleet5-proposed-m2-executable-and-argv-contract:1",
+  "status": "DESIRED_NEW_CONTRACT_ABSENT_FROM_UNACCEPTED_6C",
+  "findings": ["N1", "N2"],
+  "rootChoice": "Require separately signed executable BYTES hash; no SameFile-only or owned-image-only substitute for the desired new M2 field",
+  "observedCandidate": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e NOT ACCEPTED",
+  "existingServingProcessSHA256": "SHA256 of EXACT raw /proc/servingPID/cmdline bytes, including final NUL; PeerFloorServingProcess checks SameFile with /proc/self/exe but returns this CMDLINE hash, not executable bytes",
+  "proposedReceiptSchemaVersion": "saintvision-node-peer-policy-floor:2",
+  "proposedSignatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+  "proposedSignatureDomainSuffixByteHex": "00",
+  "desiredRequiredAdditionalSignedField": "servingExecutableSHA256",
+  "desiredFieldMeaning": "Lowercase SHA256 of exact bounded bytes read from opened /proc/servingPID/exe object, live UID/PID1/SameFile/self executable/process generation and file identity stable before/after; no hash of pathname/cmdline substituted",
+  "desiredProducerAndVerifierClosure": ["Go actual serving-process reader and M2 signer/main emitter", "peer_policy_phase strict FLOOR_KEYS/schema/domain and signature verification", "worker_peer_floor host adapter/target/context", "worker_plain_rotation/new normal:3 preflight/phase matching", "new runtime inventory/current runtime reader/new guard"],
+  "v1Handling": "Preserve legacy v1 meaning and historical receipts exactly; v1 cannot satisfy desired new bootstrap/normal:3 executable proof; no missing-field fallback; actual published schema/domain/canonical-signing mapping must be reviewed and pinned",
+  "receiptSigningCanonicalization": "Proposed v2 retains existing sorted compact ASCII-escaped JSON body rule, excluding nodeSignature, with allow_nan false, then v2 domain bytes prefix; this is SEPARATE from argv JSON encoding",
+  "hashDefinitions": {
+    "cmdArgvCanonicalSHA256": "SHA256 of Config.Cmd ordered JSON string array encoded UTF8 without BOM/whitespace/trailing newline; reference json.dumps(argv,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode('utf-8'); no Unicode normalization/shell expansion/sort/deduplication",
+    "entrypointCanonicalSHA256": "Same JSON rule over the exact Config.Entrypoint array, before/after compared separately",
+    "servingArgvCanonicalSHA256": "Same JSON rule over exact full direct PID1 argv = Entrypoint concatenated with Cmd for this /inv-node direct-entrypoint scope",
+    "servingProcessSHA256": "SHA256(rawCmdline), where rawCmdline = NUL.join(strict UTF8 encoding of each full argv string) + one final NUL terminator; not equal by definition to any JSON-array hash",
+    "servingExecutableSHA256": "Desired new SIGNED executable FILE BYTES hash, compared only to real published executable SHA256, never to either argv hash"
+  },
+  "exactMapping": [
+    "Require direct /inv-node entrypoint and exact preserved arrays; reject invalid UTF8/unpaired surrogates and embedded NUL in an argv element; preserve empty elements and argument order",
+    "Encode full expected argv to NUL-separated UTF8 bytes with one appended terminal NUL; compare its SHA256 to signed servingProcessSHA256",
+    "To decode raw bytes, require a final NUL, remove EXACTLY that one terminator, split remaining bytes on NUL and strict-decode each element; never trim all NULs/whitespace or shell-parse",
+    "Compute servingArgvCanonicalSHA256 from the resulting/equivalent exact string array; compute Cmd and Entrypoint JSON hashes separately; compare each only within its own encoding domain",
+    "After raw-hash match and same live-process proof, bind the JSON argv hash to that same process through the explicit encoding mapping, NOT by comparing JSON hash bytes to raw cmdline hash bytes"
+  ],
+  "syntheticEncodingFixtureOnly": "encoding-fixtures.json; no process/key/binary/Node provenance or runtime acceptance",
+  "actualM2WireSourceBinarySchemaDomainCIVerdictBinding": null,
+  "implementationAndCodeAcceptance": false,
+  "coordination": "Exact R1/N1 proposal sent to ctx_6f0f8253b8a7 in msg_5ffb02106b2c; Root notified msg_01c78fa72644; compatibility reply tracked in review closure receipt"
+}

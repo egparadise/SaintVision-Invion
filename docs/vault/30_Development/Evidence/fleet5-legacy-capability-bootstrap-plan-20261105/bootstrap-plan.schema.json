@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:saintvision:nonexecuting:legacy-bootstrap-plan:1",
-  "$comment": "Closed document-only HOLD draft; actual Root planning selection is not operational acceptance",
+  "$comment": "Closed HOLD document only; review-required R1/R2/R4/N1/N2 proposed contracts are not code acceptance",
   "type": "object",
   "properties": {
     "schemaVersion": {
@@ -37,6 +37,66 @@
         "docsRun",
         "docsConclusion",
         "productOrOperationalAcceptance"
+      ],
+      "additionalProperties": false
+    },
+    "priorIndependentPlanReview": {
+      "type": "object",
+      "properties": {
+        "reviewedCommit": {
+          "const": "cdeffee72f0480dc2df543bb3b49c87ebc95a570"
+        },
+        "initial1057ReviewCommit": {
+          "const": "830efd9317d28fa27b696db709c9a6e7a3076331"
+        },
+        "cdeDeltaReviewCommit": {
+          "const": "eace0e2de11801be0e6d63a5cf08817c37214ea3"
+        },
+        "actualVerdict": {
+          "const": "REVISION REQUIRED"
+        },
+        "requiredFindings": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "R1"
+            },
+            {
+              "const": "R2"
+            },
+            {
+              "const": "R4"
+            },
+            {
+              "const": "N1"
+            },
+            {
+              "const": "N2"
+            }
+          ],
+          "minItems": 5,
+          "maxItems": 5,
+          "items": false
+        },
+        "R3Source03ConsumerClosure": {
+          "const": "CLOSED for source03 scope; new candidate consumers included in R1"
+        },
+        "thisRevisionVerdict": {
+          "type": "null"
+        },
+        "implementationOrOperationalAcceptance": {
+          "const": false
+        }
+      },
+      "required": [
+        "reviewedCommit",
+        "initial1057ReviewCommit",
+        "cdeDeltaReviewCommit",
+        "actualVerdict",
+        "requiredFindings",
+        "R3Source03ConsumerClosure",
+        "thisRevisionVerdict",
+        "implementationOrOperationalAcceptance"
       ],
       "additionalProperties": false
     },
@@ -569,10 +629,34 @@
         },
         {
           "const": "newRuntimeExecutableSHA256"
+        },
+        {
+          "const": "migrationPredecessorJournalDigest"
+        },
+        {
+          "const": "postFenceBackupInspectSHA256"
+        },
+        {
+          "const": "commonAgentMutationFenceIdentity"
+        },
+        {
+          "const": "observedM2ExecIdsReceipt"
+        },
+        {
+          "const": "rawServingCmdlineSHA256"
+        },
+        {
+          "const": "servingArgvCanonicalSHA256"
+        },
+        {
+          "const": "imageInheritedConfigBeforeAfter"
+        },
+        {
+          "const": "signedExecutableBytesV2Receipt"
         }
       ],
-      "minItems": 52,
-      "maxItems": 52,
+      "minItems": 60,
+      "maxItems": 60,
       "items": false
     },
     "members": {
@@ -865,6 +949,30 @@
         },
         "autoRetryOrDowngradeAllowed": {
           "const": false
+        },
+        "labelOnlyMigrationPredecessorAllowed": {
+          "const": false
+        },
+        "migrationMarkerClearedToAllowLegacy": {
+          "const": false
+        },
+        "leafMarkerAloneIsMigrationFence": {
+          "const": false
+        },
+        "unsignedOrV1CmdlineOnlyExecutableProofAllowed": {
+          "const": false
+        },
+        "unknownM2ExecIdAllowed": {
+          "const": false
+        },
+        "imageInheritedConfigOverrideMaskingAllowed": {
+          "const": false
+        },
+        "compareJSONArgvHashToRawCmdlineHashAllowed": {
+          "const": false
+        },
+        "laterNormalAuthorityMayUseMigrationBaseline": {
+          "const": false
         }
       },
       "required": [
@@ -878,7 +986,15 @@
         "storageWorkspaceOrFreshFiveIssuerAllowed",
         "unknownStopMeansQuiesced",
         "startupOrPublicationUncertainty",
-        "autoRetryOrDowngradeAllowed"
+        "autoRetryOrDowngradeAllowed",
+        "labelOnlyMigrationPredecessorAllowed",
+        "migrationMarkerClearedToAllowLegacy",
+        "leafMarkerAloneIsMigrationFence",
+        "unsignedOrV1CmdlineOnlyExecutableProofAllowed",
+        "unknownM2ExecIdAllowed",
+        "imageInheritedConfigOverrideMaskingAllowed",
+        "compareJSONArgvHashToRawCmdlineHashAllowed",
+        "laterNormalAuthorityMayUseMigrationBaseline"
       ],
       "additionalProperties": false
     },
@@ -1015,6 +1131,30 @@
     "consumerClosure": {
       "const": "legacy-consumer-closure.json"
     },
+    "requiredContractRefs": {
+      "type": "object",
+      "properties": {
+        "migrationPredecessor": {
+          "const": "migration-predecessor-contract.json"
+        },
+        "commonCodedFence": {
+          "const": "common-agent-mutation-fence-contract.json"
+        },
+        "desiredM2AndArgv": {
+          "const": "desired-m2-v2-and-argv-contract.json"
+        },
+        "observerExecAndImageConfig": {
+          "const": "observer-exec-and-image-config-contract.json"
+        }
+      },
+      "required": [
+        "migrationPredecessor",
+        "commonCodedFence",
+        "desiredM2AndArgv",
+        "observerExecAndImageConfig"
+      ],
+      "additionalProperties": false
+    },
     "futureProductAcceptance": {
       "const": "acceptance-matrix.json"
     },
@@ -1031,6 +1171,7 @@
     "dispatch",
     "base",
     "priorPlanPublication",
+    "priorIndependentPlanReview",
     "owner",
     "reviewer",
     "status",
@@ -1054,6 +1195,7 @@
     "gateMatrix",
     "runtimeBindingContract",
     "consumerClosure",
+    "requiredContractRefs",
     "futureProductAcceptance",
     "schemaMeaning",
     "nextRootAction"

@@ -19,6 +19,16 @@
     {"id":"D13","patch":[{"op":"replace","path":"/stateMachineScope/rootOrderDecision","value":"silently-approved"}],"expectedSchemaValid":false,"executionAllowed":false},
     {"id":"D14","patch":[{"op":"replace","path":"/members/0/bindings","value":{"peerFloorVersion":1}}],"expectedSchemaValid":false,"executionAllowed":false},
     {"id":"D15","patch":[{"op":"replace","path":"/targetBindings/p0DockerImageId","value":"UNPUBLISHED"}],"expectedSchemaValid":false,"executionAllowed":false},
-    {"id":"D16","patch":[{"op":"replace","path":"/g2Proposal/rootPlanningChoice/operationalAcceptance","value":true}],"expectedSchemaValid":false,"executionAllowed":false}
+    {"id":"D16","patch":[{"op":"replace","path":"/g2Proposal/rootPlanningChoice/operationalAcceptance","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D17","patch":[{"op":"replace","path":"/barriers/labelOnlyMigrationPredecessorAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D18","patch":[{"op":"replace","path":"/barriers/migrationMarkerClearedToAllowLegacy","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D19","patch":[{"op":"replace","path":"/barriers/leafMarkerAloneIsMigrationFence","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D20","patch":[{"op":"replace","path":"/barriers/unsignedOrV1CmdlineOnlyExecutableProofAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D21","patch":[{"op":"replace","path":"/barriers/unknownM2ExecIdAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D22","patch":[{"op":"replace","path":"/barriers/imageInheritedConfigOverrideMaskingAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D23","patch":[{"op":"replace","path":"/barriers/compareJSONArgvHashToRawCmdlineHashAllowed","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D24","patch":[{"op":"replace","path":"/barriers/laterNormalAuthorityMayUseMigrationBaseline","value":true}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D25","patch":[{"op":"replace","path":"/requiredContractRefs/desiredM2AndArgv","value":"legacy-v1-proof-is-enough"}],"expectedSchemaValid":false,"executionAllowed":false},
+    {"id":"D26","patch":[{"op":"replace","path":"/priorIndependentPlanReview/thisRevisionVerdict","value":"ACCEPT"}],"expectedSchemaValid":false,"executionAllowed":false}
   ]
 }

@@ -187,6 +187,126 @@
       "sha256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
       "bytes": 1740,
       "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "gitBlob": "1a1e0b1408f5b3ce906a8234f0cf72b023e03ce6",
+      "sha256": "406b8227b7330c3c5ba4fc82ed78cdfb7d0fa04436af76e4d0b1d6ac05312176",
+      "bytes": 8924,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "gitBlob": "d0551face8da51a8bfc4adf64afbd9d55895c5c7",
+      "sha256": "be31cd4866cbe900bfbe6d8d7ff40f5ddfbc107b224bb9047706af5e4c0c768d",
+      "bytes": 11643,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/peer_policy_phase.py",
+      "gitBlob": "d0f424c26adcbf6efb74b20c9c8cdaa9b379e306",
+      "sha256": "7a60a59cfc8f839d822691310911a31ae2c0cc78a6acb0a848ce0932b6662feb",
+      "bytes": 8574,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "gitBlob": "eada643ef8c5ecb74442af318256de8086d88156",
+      "sha256": "1489ec11f47842b63f301e72ef064f9568d6f9cd788b2d037a9ec7f1405a3b8f",
+      "bytes": 51313,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/worker_config.py",
+      "gitBlob": "4398f6418266bfa8f59ceb09b786e07d244e25ef",
+      "sha256": "44662143b9d4095ff5bc7ae7ebc25965f95db20399dae34d08cca1ba9465a349",
+      "bytes": 10878,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "gitBlob": "81b4179e3fa87218850aff4365759ea2c0945f9d",
+      "sha256": "560607e8bee8a9d3cf03e5e04e2420926638149ed253e0de65165ba923dc5ec1",
+      "bytes": 10820,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "gitBlob": "8a8d6a64b76ac1648b3a32b6ff10251d7b9f702a",
+      "sha256": "6cb22ed647125eee9f24236269b3bf63149ad98f2a0c93bbd3c8059267ddda40",
+      "bytes": 6313,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/repair-node.sh",
+      "gitBlob": "8598cc8db2e6c80e23d8d46f708654c4b220d4f6",
+      "sha256": "3538d6a20c92cc83736b3cb8413a01aa237d2df7a8d411dce68b3b912010b19b",
+      "bytes": 843,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/Repair-Worker.ps1",
+      "gitBlob": "38fb4125cba078f798bc1504552f27e324d85609",
+      "sha256": "cdfe372cec46e2a28ef1776837dfc61b0e1d67ce8aa001542c7e706512cbb6dd",
+      "bytes": 557,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/prepare-worker.sh",
+      "gitBlob": "eff077df50f7bfbdeef937d7b404d9cba3eea8d0",
+      "sha256": "f82767d7c5db5b24937e2b3084692d55cdc0182ed9c92b1f3c5430b4c6372dcd",
+      "bytes": 1460,
+      "readExit": 0
+    },
+    {
+      "commit": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+      "path": "deploy/lan/finish-worker.sh",
+      "gitBlob": "dc876ed250d8b3c45b9f12527007a67792fde8cd",
+      "sha256": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+      "bytes": 1126,
+      "readExit": 0
+    },
+    {
+      "commit": "830efd9317d28fa27b696db709c9a6e7a3076331",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-1057-review.json",
+      "gitBlob": "ccd55739aa37ebc0dfda65bb9f2fdb237e466be8",
+      "sha256": "841acd4bc08e7304c35f1ac43c064e01406240e3e5d4184c3b2a2f49b41db1bf",
+      "bytes": 8622,
+      "readExit": 0
+    },
+    {
+      "commit": "830efd9317d28fa27b696db709c9a6e7a3076331",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-10-00_KST_FLEET5_legacy_bootstrap_plan_1057_\uac80\ud1a0_Claude.md",
+      "gitBlob": "b79cd7a0f4f96d552381710056c21b441f200016",
+      "sha256": "db6ad1fe710bf752bdb29a752e7fde8e04ffa70dda058e3a35a1385d38fdc1f5",
+      "bytes": 10077,
+      "readExit": 0
+    },
+    {
+      "commit": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-cdef-review.json",
+      "gitBlob": "aa016d8c5c407f39e1345695fe6e86be930d885d",
+      "sha256": "12b9302ad16cd74e7deb4fae2eadbff14053a66d6d75570c2e0b5bbc1d2cf510",
+      "bytes": 6785,
+      "readExit": 0
+    },
+    {
+      "commit": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-25-00_KST_FLEET5_legacy_bootstrap_plan_cdef_\uac80\ud1a0_Claude.md",
+      "gitBlob": "d87a6212a054b5fe7be60a8ae491df6fdee57152",
+      "sha256": "2a338f0e8fef4b4ea4094f693a184558ec46e769f44a226a2601aa2863ed652b",
+      "bytes": 7658,
+      "readExit": 0
     }
   ],
   "g2LegacyComparisons": [

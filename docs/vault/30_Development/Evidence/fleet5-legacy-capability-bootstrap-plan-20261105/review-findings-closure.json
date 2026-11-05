@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "fleet5-bootstrap-author-plan-revision-response:1",
+  "reviewedPriorPlan": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+  "actualInitialReview": "830efd9317d28fa27b696db709c9a6e7a3076331",
+  "actualDeltaReview": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+  "actualPriorVerdict": "REVISION REQUIRED",
+  "thisRevisionActualIndependentVerdict": null,
+  "authorResponsesAreNotIndependentAcceptance": true,
+  "responses": [
+    {"id":"R1","authorResponse":"SPECIFIED proposed typed journal/schema/owner/common-fence/static retained backup consumer and bootstrap-versus-later normal:3 lease rule","contract":"migration-predecessor-contract.json","futureCases":["A29","A30","A36"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
+    {"id":"R2","authorResponse":"SPECIFIED named common coded guard/marker and exact helper coverage, persistent terminal denial, whole-operation ownership and raw privileged invocation boundary","contract":"common-agent-mutation-fence-contract.json","futureCases":["A31","A36"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
+    {"id":"R3","authorResponse":"Actual eace review CLOSED source03 closure; candidate worker_peer_floor/worker_plain_rotation added explicitly under R1","contract":"legacy-consumer-closure.json","deltaReview":"Source03 CLOSED by actual prior review; new scope PENDING"},
+    {"id":"R4","authorResponse":"SPECIFIED actual observer Engine ExecIDs receipt/set/outcome and exact image-inherited Config equality with no container-override masking","contract":"observer-exec-and-image-config-contract.json","futureCases":["A33","A34"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
+    {"id":"N1","authorResponse":"Root selected desired separate SIGNED servingExecutableSHA256 actual file bytes; current6c field is cmdline only; propose strict M2v2 and producer/verifier closure without v1 reinterpretation","contract":"desired-m2-v2-and-argv-contract.json","futureCases":["A32"],"actualCodeImplementedOrAccepted":false,"deltaReview":"PENDING"},
+    {"id":"N2","authorResponse":"SPECIFIED separate Cmd/Entrypoint/full argv UTF8 JSON hashes and raw NUL cmdline hash, exact encoding/terminator/strict UTF8 mapping, synthetic measured vectors","contract":"desired-m2-v2-and-argv-contract.json","futureCases":["A35"],"actualRuntimeProof":false,"deltaReview":"PENDING"}
+  ],
+  "p0OwnerCoordination": {
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "proposalMessage": "msg_5ffb02106b2c",
+    "rootNotification": "msg_01c78fa72644",
+    "actualCompatibilityReply": null,
+    "agreementInferred": false
+  },
+  "all30Target18RootMemberBindingsRemainNull": true,
+  "operationalGate": "HOLD",
+  "implementationAndPhysicalAcceptance": false
+}

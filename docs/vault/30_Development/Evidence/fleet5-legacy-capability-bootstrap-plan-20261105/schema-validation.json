@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fleet5-bootstrap-document-schema-validation:1",
-  "observedKST": "2026-11-05T21:59:13.870411+09:00",
+  "observedKST": "2026-11-05T22:48:23.818747+09:00",
   "scope": "Document only; no product/Go/Engine test",
   "results": [
     {
@@ -114,13 +114,85 @@
       "expected": false,
       "matched": true,
       "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D17",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D18",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D19",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D20",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D21",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D22",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D23",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D24",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D25",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
+    },
+    {
+      "id": "D26",
+      "schemaValid": false,
+      "expected": false,
+      "matched": true,
+      "runtimeExecutionAllowed": false
     }
   ],
-  "passed": 16,
+  "passed": 26,
   "failed": 0,
   "productAcceptanceCasesRun": 0,
-  "productAcceptanceCasesRequiredNotRun": 28,
+  "productAcceptanceCasesRequiredNotRun": 36,
   "all30Target18RootAndMemberBindingsNull": true,
   "parameterNameClosure": true,
-  "rootPlanningSelectionDoesNotAuthorizeOperation": true
+  "sourceFactsMatched": 9,
+  "syntheticEncodingCasesMatched": 10,
+  "thisRevisionActualIndependentVerdict": null
 }
