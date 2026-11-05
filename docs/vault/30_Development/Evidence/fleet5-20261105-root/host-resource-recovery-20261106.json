@@ -1,0 +1,27 @@
+{
+  "schema": "fleet5-root-host-resource-recovery:1",
+  "atKST": "2026-11-06T03:45:20+09:00",
+  "actualObservation": {
+    "observedAtKST": "2026-11-06T03:40:12+09:00",
+    "memoryLoadPercent": 98,
+    "physicalTotalGiB": 15.77,
+    "physicalAvailableGiB": 0.25,
+    "commitLimitGiB": 63.77,
+    "commitAvailableGiB": 4.19
+  },
+  "PowerShellStartupExit": -65536,
+  "PowerShellHRESULT": "0x800705AF",
+  "PowerShellUserCodeExecuted": false,
+  "firstCmdInlinePythonQuotedCommand": "syntax error before writes; replaced with scoped Python script files",
+  "fallback": "cmd.exe plus original venv Python files; no .NET startup dependency",
+  "completedCL1Worker": {
+    "dispatch": "ctx_40f8f20ce8ce",
+    "state": "succeeded",
+    "liveness": "exited",
+    "terminalState": "released",
+    "proof": "actual Orca worker-show"
+  },
+  "manualKillOrUnknownResourceRelease": false,
+  "pagefileSecurityOrOSSettingChanged": false,
+  "reviewScheduling": "v4 active; e50 pending dependency; no extra simultaneous reviewer"
+}

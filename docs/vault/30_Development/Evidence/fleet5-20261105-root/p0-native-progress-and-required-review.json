@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "0bed4f23e17ea69ebf7ecbe1850587344ffbc839",
-    "Docs": 42076127230,
+    "SHA": "ee1e8057c1185674735970c7e6c2a35b81df9b5a",
+    "Docs": 42080998122,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,7 +12,7 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2619,
+    "independentlyMatchedNormalizedDestinationHashes": 2642,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
@@ -20,23 +20,16 @@
     "localGatesExit0": [
       "check_docs",
       "check_ontology",
-      "doc_path_ratchet(base60bfc722)after2immutablecitationcorrections",
+      "doc_path_ratchet(base0bed4f23)",
       "doc_single_source_ratchet",
       "sync_check",
       "staged_diff_check"
     ],
-    "combinedProductAcceptance": false,
+    "source72028AllEightAndTwelveJobsSuccess": true,
+    "actualSourceAndPacketReviewAccepted": true,
+    "landingOrOperationalAcceptance": false,
     "wholeProgramComplete": false,
-    "actualReviewTasks": [
-      "task_ba0ee0a71106",
-      "task_eaa694171f31",
-      "task_3516267fa05f"
-    ],
-    "pendingInternalArchitectureQuestions": [
-      "msg_18c3e56963c1",
-      "msg_2259b60e2c6c"
-    ],
-    "verifiedAtKST": "2026-11-06T02:38:34+09:00"
+    "verifiedAtKST": "2026-11-06T03:08:00+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -210,7 +203,7 @@
     "message": "msg_753d333c5bfe",
     "localCommit": "c91303105a9b82c63f4a091bb36bee9312c2cf51",
     "sourceBase": "50000697",
-    "status": "immutable72028 all8/12SUCCESS; source+packet ACCEPT255cfa37; C-L1 finalreport correction and separate test followup remain",
+    "status": "72028 all8/12 source+packet ACCEPT and C-L1 CLOSED97edf991; bounded delivery complete; e50 four-test followup pending actual review/final source choice",
     "ownFocused101PassAnd35WirePass": "ownerreported not root rerun",
     "pendingActualSelectedSourceQuestion": false,
     "ci2OrFinalArchivePublished": true,
@@ -245,7 +238,63 @@
     "rootVerifiedReviewExactHeadAllJobsSuccess": true,
     "allJobsCount": 12,
     "allEightVerifiedAtKST": "2026-11-06T02:46:14+09:00",
-    "landingOrOperationsAccepted": false
+    "landingOrOperationsAccepted": false,
+    "requiredDeliveryCorrectionReview": {
+      "source": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+      "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "nonDocsDiffCount": 0,
+      "Docs": 42083204187,
+      "rootVerifiedExactHeadRefAllJobsSuccess": true,
+      "deltaBase": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+      "deltaPaths": [
+        "docs/vault/30_Development/Evidence/fleet5-20261105-claude/combined-72028-review.json",
+        "docs/vault/30_Development/Evidence/fleet5-20261105-claude/low-b1-b3-bd96-0136-review.json",
+        "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-6c0f-review.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate-ci-28c00c04.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate720-cl1-supersession.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate720-qualified-delivery.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/ci-42080835896-20261106T030657.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-contracts.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-contracts.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-docs.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-docs.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-frontend.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-frontend.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-ontology.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-ontology.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-paths-canonical.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-paths-canonical.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-paths.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-paths.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-ratchet.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-ratchet.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-sync.json",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/cl1-sync.txt",
+        "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/errors.md",
+        "docs/vault/30_Development/History/2026-11-05_21-35-00_KST_FLEET5_Low_B1-B3_bd96과_0136_검토_Claude.md",
+        "docs/vault/30_Development/History/2026-11-05_21-55-00_KST_FLEET5_P0_code_6c0f_검토_Claude.md",
+        "docs/vault/30_Development/History/2026-11-05_FLEET5_setup_integration_Codex.md",
+        "docs/vault/30_Development/History/2026-11-06_02-35-58_KST_FLEET5_combined_72028_검토_Claude.md"
+      ],
+      "recordedAtKST": "2026-11-06T03:22:06+09:00",
+      "C-L1ActualClosureVerdict": "CLOSED; docs-only report ACCEPT; no new finding",
+      "schema": "fleet5-cl1-qualified-delivery-root-gate:1",
+      "actualReviewTask": "task_371ef98413c2",
+      "actualReviewDispatch": "ctx_40f8f20ce8ce",
+      "reviewer": "Claude",
+      "dispatchReceipt": "ready",
+      "originalCombinedReview": "255cfa373c5c71a0938686dde5e449eb52514111",
+      "all8SourceCIDistinctFromReportDocs": true,
+      "codeRefAndPacketMutationAuthorized": false,
+      "physicalOrLandingAccepted": false,
+      "nextOwnerAction": "independent C-L1-only verdict; integrator continues separate test-only followup",
+      "updatedAtKST": "2026-11-06T03:45:20+09:00",
+      "actualClosureReview": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+      "reviewDocs": 42084583685,
+      "rootVerifiedReviewExactHeadAllJobsSuccess": true,
+      "runtimeOrLandingAccepted": false
+    },
+    "bounded72028DeliveryComplete": true
   },
   "imports": [
     {
@@ -1427,6 +1476,26 @@
       "source": "3a30a0c934cef0eab95097df488c1ce36a55cd14",
       "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_setup_integration_Codex.md",
       "SHA256": "d32c76218ac8a0aadfd5950d7c2e9d17c19a738b9ca9c6038534dc6ff116d50a"
+    },
+    {
+      "source": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate720-cl1-supersession.json",
+      "SHA256": "791fada18beedb67e682a0e931bff2da9f03b86b5eb33a40422ed0aab46e6cfc"
+    },
+    {
+      "source": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate720-qualified-delivery.json",
+      "SHA256": "3f408e49fa7c64e91f8779b6f4e9cb4c90c97300f80b59a7205d7e37446562bf"
+    },
+    {
+      "source": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/cl1-closure-a527-review.json",
+      "SHA256": "3acee3d372589f3022aeb80c9ca547eb730ec4fe3b54a4bbf7c93c69c37a03b4"
+    },
+    {
+      "source": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+      "path": "docs/vault/30_Development/History/2026-11-06_03-26-24_KST_FLEET5_C-L1_closure_a527_검토_Claude.md",
+      "SHA256": "200290d219dfa5806f49a4b79a9c3b2fd88137b4bec318fa35ec54c1d75f9160"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2011,7 +2080,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T03:03:02+09:00",
+  "latestRecordAtKST": "2026-11-06T03:45:20+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2080,7 +2149,7 @@
     "onlyFourDraftToolPointerFieldsDiffered": true,
     "rootProductChanged": false
   },
-  "physicalRefresh": "physical-readiness-refresh-20261106.json",
+  "physicalRefresh": "physical-readiness-refresh-20261106-0325.json",
   "sourceDocCitationAdaptations": [
     {
       "source": "100f6f132132199d1204a76190f04712dd82de00",
@@ -2096,5 +2165,48 @@
     "cause": "valid immutable4f source paths absent from older Root product checkout",
     "boundedCorrection": "immutable GitHub links verified through local4f Git objects; no baseline raise"
   },
-  "implementationScopeDecision": "implementation-scope-decision-root.json"
+  "implementationScopeDecision": "implementation-scope-decision-root.json",
+  "previousPhysicalRefreshPreserved": "physical-readiness-refresh-20261106.json",
+  "pendingUserInput": "actual local OS setup results PC1/PC3; no generic approval",
+  "bootstrapV4ActualReview": {
+    "schema": "fleet5-bootstrap-v4-root-review-gate:1",
+    "atKST": "2026-11-06T03:45:20+09:00",
+    "source": "eed826e7fb066193d3a2d9d28abda15216264f77",
+    "sourceDocs": 42084619690,
+    "rootVerifiedSourceExactHeadAllJobsSuccess": true,
+    "sourceDocsOnlyAdds": 22,
+    "reviewTask": "task_65f5ad416040",
+    "reviewDispatch": "ctx_f5268654ce53",
+    "actualDispatchReceipt": "ready",
+    "verdict": null,
+    "scope": "V3-L1/L2/L3/I1 and NEW proposed cohort-projection-set schema/domain/root-fence role; no registration until actual review",
+    "runtimeAndEquipmentCases": 0,
+    "realBindings": null
+  },
+  "e50TestOnlyReview": {
+    "schema": "fleet5-e50-root-test-review-gate:1",
+    "atKST": "2026-11-06T03:45:20+09:00",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "sourceBranch": "agent/codex/fleet5-test-followup-20261106",
+    "Docs": 42084668698,
+    "automaticPortal": 42084627956,
+    "rootVerifiedBothExactHeadAllJobsSuccess": true,
+    "nonDocsDelta": [
+      "tests/test_backend_leaf_runtime_contract.py",
+      "tests/test_build_fleet5_setup_packet.py",
+      "tests/test_fleet5_plain_reentry.py",
+      "tests/test_fleet5_settled_launcher.py"
+    ],
+    "productionDelta": 0,
+    "a527AncestorVerified": true,
+    "reviewTask": "task_6baccbb465af",
+    "actualReviewStarted": false,
+    "taskStatus": "pending",
+    "dependencyTask": "task_65f5ad416040",
+    "dependencyReason": "host memory sequencing; no missing generic approval",
+    "verdict": null,
+    "finalSourceChosen": false,
+    "newAll8OrArchiveAuthorized": false
+  },
+  "hostResourceRecovery": "host-resource-recovery-20261106.json"
 }

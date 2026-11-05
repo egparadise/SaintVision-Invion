@@ -1,0 +1,62 @@
+{
+  "schema": "fleet5-readonly-readiness-refresh:1",
+  "observedStartKST": "2026-11-06T03:25:34+09:00",
+  "observedEndKST": "2026-11-06T03:25:35+09:00",
+  "scope": "one bounded attempt per four fixed SSH targets using existing key and strict pinned host identities plus local Docker version; groups/Engine metadata only",
+  "results": [
+    {
+      "physicalPC": 1,
+      "SSH": "failed",
+      "sshExit": 255,
+      "Docker": "UNKNOWN",
+      "failureClass": "public-key authentication denied"
+    },
+    {
+      "physicalPC": 2,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "accessible",
+      "arch": "x86_64",
+      "dockerGroupActive": true,
+      "dockerExit": 0,
+      "engineVersion": "29.1.3",
+      "serverMaxAPI": "1.52",
+      "serverMinAPI": "1.44"
+    },
+    {
+      "physicalPC": 3,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "unavailable-or-denied",
+      "arch": "x86_64",
+      "dockerGroupActive": false,
+      "dockerExit": 1,
+      "failureClass": "Docker socket permission denied"
+    },
+    {
+      "physicalPC": 4,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "accessible",
+      "arch": "x86_64",
+      "dockerGroupActive": true,
+      "dockerExit": 0,
+      "engineVersion": "29.8.1",
+      "serverMaxAPI": "1.56",
+      "serverMinAPI": "1.40"
+    },
+    {
+      "physicalPC": 5,
+      "Docker": "accessible",
+      "dockerExit": 0,
+      "engineVersion": "20.10.22",
+      "serverMaxAPI": "1.41",
+      "serverMinAPI": "1.12"
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "NodeOrKeyMutation": false,
+  "GuestProvisionedOrMeasured": false,
+  "wholeProgramComplete": false,
+  "pendingUserFeedback": "actual PC1 public-key enrollment and PC3 Docker-group local OS update; no password/private key requested; not generic approval"
+}

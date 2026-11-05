@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.376"
+version: "1.0.377"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T03:03:02+09:00"
+updated: "2026-11-06T03:45:20+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "72028 all8/12 SUCCESS and source/packet ACCEPT; C-L1 finalreport and separate test followup; bootstrapv4/B revised contracts active; landing/physical HOLD"
-active_card_next: "Integrator C-L1 finalreport then test-only followup; bootstrapCodex V3L1-L3; BCodex D1-D6/B1-B5; Root actual small delta reviews before registration/code"
+active_card_status: "72028 all8/12/source packet ACCEPT and C-L1 CLOSED; v4 review65 active; e50 review6b pending dependency65; physical and final source choice pending"
+active_card_next: "Root handles actualv4 verdict then starts ready e50 task6b with proven/released worker lifecycle; bootstrap registration only after acceptance; B revision continues; PC1/PC3 local OS setup feedback needed"
 ---
+
+## 2026-11-06 C-L1 수락과 v4/e50 순차 검토
+
+작업한 것: 세 새source/report의exacthead·전체job을대조하고v4실제검토와e50의존Task를등록했다. 확인한 것: 72028은8개CI/12job·실제source/packet수락에 더해97edf991/Docs42084583685에서C-L1정정납품도수락됐다. 전환v4/eed826e7은문서22개추가와exactDocs42084619690성공을확인해Claude task_65f5ad416040이실제검토중이다. e50은제품변경0·시험4개이며Docs42084668698/Portal42084627956성공만확인했다. task_6baccbb465af는호스트메모리압박으로v4뒤순차검토대기이며아직착수/수락/최종source선택은아니다. 다음첫행동/담당: Root는v4actual판정을처리하고task-list ready의e50을시작한다. PC1/3의실제로컬OS반영정보는비동기요청했으며코드/계약작업은계속한다.
+
+## 2026-11-06 C-L1 납품 정정본 실제 재검토
+
+작업한 것: a52782e8의 정정 납품 보고서를 검증하고 별도 Claude task_371ef98413c2/ctx_40f8f20ce8ce를 실제 착수시켰다. 확인한 것:72028 대비 제품 diff0, exact Docs42083204187/head/ref/전체 job SUCCESS다. 실제 C-L1 수락은 아직 없으며 기존 source/packet ACCEPT와8CI/12job 성공은 그대로다. 다음 첫 행동/담당: Claude가 정정4파일·supersession ledger의 원본 hash/실제시각/scope를 판정하고 통합 Codex는 별도 test-only 보완을 계속한다. v4/B 계약 보완·장비 준비와 전체 미완료도 유지한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-06 전체CI·실제 판정과 구체 owner 결정
 

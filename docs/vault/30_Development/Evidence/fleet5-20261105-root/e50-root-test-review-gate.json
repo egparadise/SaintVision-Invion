@@ -1,0 +1,25 @@
+{
+  "schema": "fleet5-e50-root-test-review-gate:1",
+  "atKST": "2026-11-06T03:45:20+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "sourceBranch": "agent/codex/fleet5-test-followup-20261106",
+  "Docs": 42084668698,
+  "automaticPortal": 42084627956,
+  "rootVerifiedBothExactHeadAllJobsSuccess": true,
+  "nonDocsDelta": [
+    "tests/test_backend_leaf_runtime_contract.py",
+    "tests/test_build_fleet5_setup_packet.py",
+    "tests/test_fleet5_plain_reentry.py",
+    "tests/test_fleet5_settled_launcher.py"
+  ],
+  "productionDelta": 0,
+  "a527AncestorVerified": true,
+  "reviewTask": "task_6baccbb465af",
+  "actualReviewStarted": false,
+  "taskStatus": "pending",
+  "dependencyTask": "task_65f5ad416040",
+  "dependencyReason": "host memory sequencing; no missing generic approval",
+  "verdict": null,
+  "finalSourceChosen": false,
+  "newAll8OrArchiveAuthorized": false
+}

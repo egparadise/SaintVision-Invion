@@ -1,0 +1,15 @@
+{
+  "schema": "fleet5-bootstrap-v4-root-review-gate:1",
+  "atKST": "2026-11-06T03:45:20+09:00",
+  "source": "eed826e7fb066193d3a2d9d28abda15216264f77",
+  "sourceDocs": 42084619690,
+  "rootVerifiedSourceExactHeadAllJobsSuccess": true,
+  "sourceDocsOnlyAdds": 22,
+  "reviewTask": "task_65f5ad416040",
+  "reviewDispatch": "ctx_f5268654ce53",
+  "actualDispatchReceipt": "ready",
+  "verdict": null,
+  "scope": "V3-L1/L2/L3/I1 and NEW proposed cohort-projection-set schema/domain/root-fence role; no registration until actual review",
+  "runtimeAndEquipmentCases": 0,
+  "realBindings": null
+}

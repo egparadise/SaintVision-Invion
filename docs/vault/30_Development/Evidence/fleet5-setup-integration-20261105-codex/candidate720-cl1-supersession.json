@@ -1,0 +1,137 @@
+{
+  "schema": "saintvision/fleet5-cl1-supersession:1",
+  "task": "FLEET5-SETUP-INTEGRATION-20261105 / task_78064fb4b7ff / ctx_ed7ec73163d6",
+  "recordedAtKST": "2026-11-06T03:17:03.251952+09:00",
+  "owner": "Codex",
+  "reviewer": "Claude (root arranges independent C-L1-only delta closure)",
+  "reportBase": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+  "codeSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "immutableSourceRef": "agent/codex/fleet5-setup-integration-20261105-ci2",
+  "finding": "C-L1",
+  "implementationStatus": "corrected reviewer bytes imported; independent delta closure PENDING",
+  "scope": "Only the two already-imported review pairs identified by C-L1 plus the actual combined review pair; unrelated reviews in correction commits are not imported.",
+  "rule": "Original declared windows are INVALID (not observed). Corrected windows are attributed to the reviewer transcript correction, not independently reconstructed by this integrator. Commit/Docs publication times and legacy path timestamps are never execution/observation evidence.",
+  "imports": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/low-b1-b3-bd96-0136-review.json",
+      "actualReviewOrCorrectionCommit": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "importedBlob": "3db3a5ef5acf84a7a7916e66b03f7e4c4b4f6fea",
+      "importedSHA256": "d1934e80bc953cd33adb8fd32572e9d4c961addac175bd53d9cc0fd1995779cb",
+      "bytes": 7730,
+      "importedOriginalGitBytes": true,
+      "supersededSourceBlob": "a5e3e70d5118894529d359241fd24d69a89a148a",
+      "supersededSourceSHA256": "97d8c97193a4e6f72394c6fb9b39238aabd0b966480be4cd20fa50f2504ee373",
+      "supersededBytesStillPreservedInSourceAndArchive": true,
+      "correctedObservationWindowKST": [
+        "2026-11-05T21:16:38+09:00",
+        "2026-11-05T21:21:01+09:00"
+      ],
+      "reviewerAuthoredCorrection": {
+        "originalDeclared": [
+          "2026-11-05T21:05:00+09:00",
+          "2026-11-05T21:35:00+09:00"
+        ],
+        "originalDeclaredHistoryUpdated": "2026-11-05T21:35:00+09:00",
+        "status": "original values INVALID (not observed)",
+        "reason": "declared start 21:05 precedes the brief (21:16:29) and falls inside the previous f681 task; declared end 21:35 and History updated 21:35 are after the commit (21:22:45) and Docs completion (21:23:32), so they were not observed",
+        "briefReceived": "21:16:29 (task_5ae6f7ec1457 / ctx_5e729ea765f1)",
+        "firstObservation": "21:16:38 fetch review range (result 21:16:53)",
+        "lastObservation": "21:21:01 workflow-name confirmation result",
+        "evidenceWrite": "History 21:21:41, Evidence 21:22:06-21:22:09",
+        "source": "own session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only, metadata only): brief message, first observation tool result, last observation tool result before the Evidence write; second-level precision",
+        "publicationMetadata": {
+          "commit": "45bc23cb author/commit 2026-11-05T21:22:45+09:00",
+          "docs": "42026645703 created 21:23:00, completed 21:23:32 KST, success",
+          "usedAsExecutionTime": false
+        },
+        "otherTimesInDocument": "'21:20 KST' hosted-status label matches the actual CI check call 21:20:42-21:20:50 and is kept",
+        "correctedAt": "2026-11-05T22:26:17+09:00",
+        "verdictTestsSourceChanged": false,
+        "gitHistoryRewritten": false,
+        "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation",
+        "auditScope": "this review only (with its pair f6817f3d/45bc23cb); earlier reviews remain timing-unverified"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-05_21-35-00_KST_FLEET5_Low_B1-B3_bd96과_0136_검토_Claude.md",
+      "actualReviewOrCorrectionCommit": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "importedBlob": "fbd52a7e57ab3858c1d664f497fa0446497a44bd",
+      "importedSHA256": "b2ea1f5739b7dab6cd8035324f5864b454027532f97a8389ed5f0b306fe9d2ca",
+      "bytes": 9724,
+      "importedOriginalGitBytes": true,
+      "supersededSourceBlob": "75c852c1919f2620f5cd97635706df1abf3ec7f5",
+      "supersededSourceSHA256": "83cfdfd8887e3a496038a27b9a8ebe60e4aaee7e532308ca3ab58685b1c3a239",
+      "supersededBytesStillPreservedInSourceAndArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-6c0f-review.json",
+      "actualReviewOrCorrectionCommit": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "importedBlob": "5e8f3bc42e855b50d5f202f687a0dfbbdbfbaacd",
+      "importedSHA256": "be7a9b245d9fb1978b78d59788342b78475b114f3ba8683968dc90cf822621ef",
+      "bytes": 11026,
+      "importedOriginalGitBytes": true,
+      "supersededSourceBlob": "473d7b257cc61ce954fbcff1e2d522c4126da402",
+      "supersededSourceSHA256": "9992bf77602bdb148543bbaaa0885818b141d8127f557a1bf2782bee722fa75b",
+      "supersededBytesStillPreservedInSourceAndArchive": true,
+      "correctedObservationWindowKST": [
+        "2026-11-05T21:44:49+09:00",
+        "2026-11-05T21:55:29+09:00"
+      ],
+      "reviewerAuthoredCorrection": {
+        "originalDeclared": [
+          "2026-11-05T21:40:00+09:00",
+          "2026-11-05T21:56:00+09:00"
+        ],
+        "originalDeclaredHistoryUpdated": "2026-11-05T21:55:00+09:00",
+        "status": "original values INVALID (not observed)",
+        "reason": "declared start 21:40 precedes the brief (21:44:40); declared end 21:56 is the Evidence write, not an observation",
+        "briefReceived": "2026-11-05T21:44:40+09:00",
+        "firstObservation": "21:44:49 fetch candidate",
+        "lastObservation": "21:55:29 hosted run list result",
+        "evidenceWrite": "21:56:06-21:56:52",
+        "source": "session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only): first observation tool result start and last observation tool result before the Evidence write; second-level precision",
+        "publicationMetadata": {
+          "commit": "c2102592 author/commit 2026-11-05T21:58:09+09:00",
+          "docs": "42031635606 created 21:58:20, completed 21:58:53 KST, success"
+        },
+        "correctedAt": "2026-11-05T22:20:18+09:00",
+        "verdictAndResultsChanged": false,
+        "gitHistoryRewritten": false,
+        "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation",
+        "scope": "additional: same defect class found while checking; own review doc"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-05_21-55-00_KST_FLEET5_P0_code_6c0f_검토_Claude.md",
+      "actualReviewOrCorrectionCommit": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "importedBlob": "9cd5446b26d2bc685cbfa0e4916caf3361f674be",
+      "importedSHA256": "e4fdc1b0f7b89f1a47f5b7942dc88b60268bf94038bd5d167ff022105377c6e3",
+      "bytes": 10789,
+      "importedOriginalGitBytes": true,
+      "supersededSourceBlob": "6adbe00a8c336c4d3d25dd65dd103dbb482c0f35",
+      "supersededSourceSHA256": "03927a3e9ef338d65f12f30ad3bb173fe1967ae8749cae3cc5a383e289d472e9",
+      "supersededBytesStillPreservedInSourceAndArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/combined-72028-review.json",
+      "actualReviewOrCorrectionCommit": "255cfa373c5c71a0938686dde5e449eb52514111",
+      "importedBlob": "026bbf66bf4672d1f888d38a316a9cd7771f85df",
+      "importedSHA256": "00c0ab7f730c45d5ac27f02934e0f62fb362dd40b5f475a29ea41ae09a121396",
+      "bytes": 10641,
+      "importedOriginalGitBytes": true
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_02-35-58_KST_FLEET5_combined_72028_검토_Claude.md",
+      "actualReviewOrCorrectionCommit": "255cfa373c5c71a0938686dde5e449eb52514111",
+      "importedBlob": "a0d00c106509c8fcfc761c5c21f89289381e6b33",
+      "importedSHA256": "14c31ee57c84161f04866144cd3579c10c7d291766ba121938c8586bffeb9d90",
+      "bytes": 9026,
+      "importedOriginalGitBytes": true
+    }
+  ],
+  "reviewScopeRule": "Historical verdicts retain their original source/report scope. Combined 255c applies to source72028 and its exact packet only. Its 11/12 CI observation remains unchanged; later actual all8/12 success is separate evidence.",
+  "codeOrSourceRefOrPacketChanged": false,
+  "gitHistoryRewritten": false,
+  "landingAuthorizedByThisLedger": false,
+  "nextFirstOwnerAction": "Root arranges independent C-L1-only closure against the exact new docs report SHA after its exact Docs succeeds; source72028, its packet, NodeOps and landing remain frozen."
+}
