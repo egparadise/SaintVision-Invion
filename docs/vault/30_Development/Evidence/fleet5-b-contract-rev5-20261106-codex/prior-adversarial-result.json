@@ -1,0 +1,225 @@
+{
+  "level": "SYMBOLIC_REVIEWER_PROBES",
+  "probes": 30,
+  "agree": 24,
+  "disagree": [
+    "A1-revoke-prior-after-append-blocks-commit",
+    "A4-node-refuses-rearm-of-previously-invalidated-old-release",
+    "A5-ARM-refuses-release-of-other-generation",
+    "B7-containment-column-not-writable-by-online-observer",
+    "B7b-runtime-public-nodes-status-transition-defined",
+    "B8-delivery-controller-has-distinct-signer-or-stated-purpose-restriction"
+  ],
+  "results": [
+    {
+      "id": "A1-revoke-prior-after-append-blocks-commit",
+      "requirement": "revocation of A0 after A1 appended still blocks A1 activation",
+      "actual": true,
+      "contractExpects": false,
+      "agreesWithContract": false
+    },
+    {
+      "id": "A2-A0-expiry-mid-switch-A1-authorises",
+      "requirement": "after pause, A0 time expiry does not block the appended A1 switch",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A2b-A0-expiry-mid-switch-then-delivery",
+      "requirement": "postcommit delivery completes under A1",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A3-slow-ack-commit-denied",
+      "requirement": "stale ARM ack never commits",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A3b-rearm-same-gate-while-armed-refused",
+      "requirement": "duplicate ARM over ARMED gate refused (no silent re-key)",
+      "actual": null,
+      "contractExpects": null,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A4-node-refuses-rearm-of-previously-invalidated-old-release",
+      "requirement": "Node keeps invalidated gate/release terminal (monotonic)",
+      "actual": false,
+      "contractExpects": true,
+      "agreesWithContract": false
+    },
+    {
+      "id": "A4b-old-chain-token-after-restoration",
+      "requirement": "old A0/g0 use token never accepted again by Node",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A4c-CP-still-refuses-old-chain",
+      "requirement": "CP eligibility keeps refusing old chain (current pointer is g1)",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A5-ARM-refuses-release-of-other-generation",
+      "requirement": "ARM requires release.generation == current Node generation",
+      "actual": false,
+      "contractExpects": true,
+      "agreesWithContract": false
+    },
+    {
+      "id": "A6-forked-sibling-approval-cannot-activate",
+      "requirement": "priorApprovalHash/expected pointer CAS rejects sibling",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A7-refresh-after-expiry-denied",
+      "requirement": "REFRESH denied after approval expiry",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A7b-readmit-after-expiry-denied",
+      "requirement": "READMIT denied after approval expiry",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A8-fence-after-append-blocks-commit",
+      "requirement": "active cohort mutation fence blocks activation",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "A9-unrelated-offline-not-a-dependency",
+      "requirement": "per-Node renewal proceeds with other workers offline",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B1-cross-node-challenge-replay",
+      "requirement": "challenge bound to Node identity",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B2-lease-expired-business-denied",
+      "requirement": "expired 300s lease denies CP eligibility",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B2b-refresh-same-generation-after-lease-expiry",
+      "requirement": "REFRESH same generation renews lease",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B3-scope-businessAuthority-true-rejected",
+      "requirement": "AVAILABLE scope cannot carry businessAuthority",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B3b-scope-business-path-rejected",
+      "requirement": "scope paths limited to observation literals",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B4-safety-alias-/v1/executions/cancel/",
+      "requirement": "no alias of literal path",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B4-safety-alias-/v1/executions/%63ancel",
+      "requirement": "no alias of literal path",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B4-safety-alias-//v1/executions/cancel",
+      "requirement": "no alias of literal path",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B4-safety-alias-/V1/executions/cancel",
+      "requirement": "no alias of literal path",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B5-clock-boundary-equal-30000-allowed",
+      "requirement": "abs(offset)+uncertainty <= 30000 inclusive",
+      "actual": true,
+      "contractExpects": true,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B5-clock-offset-bool-rejected",
+      "requirement": "strict signed integer within range",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B5-clock-offset-huge-rejected",
+      "requirement": "strict signed integer within range",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B6-no-online-principal-on-protected-procedures",
+      "requirement": "online principals have no protected EXECUTE",
+      "actual": false,
+      "contractExpects": false,
+      "agreesWithContract": true
+    },
+    {
+      "id": "B7-containment-column-not-writable-by-online-observer",
+      "requirement": "online VER observation cannot write containment status",
+      "actual": false,
+      "contractExpects": true,
+      "agreesWithContract": false
+    },
+    {
+      "id": "B7b-runtime-public-nodes-status-transition-defined",
+      "requirement": "runtime-writable public.nodes.status has a stated one-way transition rule",
+      "actual": false,
+      "contractExpects": true,
+      "agreesWithContract": false
+    },
+    {
+      "id": "B8-delivery-controller-has-distinct-signer-or-stated-purpose-restriction",
+      "requirement": "controller signer distinct from approval/release anchor or caller-purpose restriction stated",
+      "actual": false,
+      "contractExpects": true,
+      "agreesWithContract": false
+    }
+  ]
+}

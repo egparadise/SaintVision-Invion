@@ -1,0 +1,30 @@
+{
+  "status": "PROPOSED_ONLY_NOT_CREATED_NOT_IMPLEMENTED_ROOT_WHOLE_REVIEW_AND_CODE_GRANT_REQUIRED",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "architectureRequiresNewContract": true,
+  "reason": "Current storage-only target and R4 workspace guard intentionally disagree on socket/mount profile; current Node/manifest/channel contracts do not authorize combined execution+contribution. Shared authority mediation also requires every actual plain writer to move together, not a generic mount-copy bypass.",
+  "boundedNewModules": [
+    {"proposedPath": "deploy/lan/worker_compute_storage.py", "interface": "one explicitly approved closed role parser/validator/planner and journaled replace/rollback; never generic mounts; invoked only with exact signed role/config/manifest/current binding; default storage-only and workspace R4 paths unchanged"},
+    {"proposedPackage": "services/node-agent/role", "interface": "closed release/delegation/lineage/gate/observe/use verification, monotonic durable history and tombstones; own Node leaf signatures and existing protected anchors; strict UTF8/C2/no duplicate/float/unknown fields; current Node generation and exact shared C/DER/epoch/profile storage binding"},
+    {"proposedPath": "services/control-plane/src/inv/node_roles.py", "interface": "typed scoped business/observation/operator procedures, complete discovery and ranked rechecks, immutable operation/activation/lineage/current/safety/delivery ledgers; no raw role flag authorization"},
+    {"proposedPath": "services/control-plane/src/inv/node_role_signer_client.py", "interface": "authenticated installed-caller signing-service requests, exact purpose/domain/scope; controller never receives raw operator private key; no new delivery anchor"},
+    {"proposedMigration": "next version number assigned only after actual review", "interface": "new B tables/RLS/typed fixed SD procedures and shared plain wrappers; writer/pool cutover, protected bootstrap/internal trigger; no online legacy direct DML or SET ROLE escape"}
+  ],
+  "existingCoordinatedSurfaces": "surface-inventory.json, all46 exact source surfaces; associated tests and generated bundle/manifest/static hash locks are regenerated and verified together after grant",
+  "sharedPlainMigration": "writer-reconciliation.json maps all current matrix-table writers, including SQL trigger/backfill; fixed plain wrappers preserve owner/bootstrap/receipt/claim transaction semantics and DB truth selects B; named exclusive offline paths are not ongoing online grants",
+  "wire": {
+    "proposedClosedConfigRole": "workspace-storage-ro-v1",
+    "roleConfigSchema": "contract.schema.json roleConfig",
+    "argvRule": "one exact double-dash role option with closed value/path grammar; reject single-dash variants, duplicates, mixed forms, unknown arguments and policy/socket/mount ambiguity BEFORE Go flag parsing or container mutation",
+    "gate": "POST /v1/roles/gate: exact signed ARM/INVALIDATE predecessor/version/hash/sequence, durable history before signed ACK",
+    "observe": "POST /v1/roles/observe: existing authenticated CP peer/epoch lane, closed nonce/freshness/current durable record/original ACK readback; no business authority",
+    "business": "exact role-use body/method/path/release/delegation/current receipt/gate/generation/nonce; no workload host path or writeback rights",
+    "storage": "existing signed sample policy/root/R/shared channel is retained and additionally bound to active combined role; sample healthy is not operational acceptance",
+    "leafRenewal": "separate protected same-identity/epoch leaf CAS: DER and shared C+1, overlap P+1 and final P+2, R/root unchanged; every storage/role/helper/certificate/hash binding coordinated"
+  },
+  "failureAndRollback": "Preflight/unknown/failed states preserve current container and journal; side effects require durable exact preimage and current proof, no reset or old-gate resurrection. Unknown rollback retains scheduling fence/claims/safety obligations for protected reconciliation; no identity/policy regeneration, owner reactivation or compute downgrade.",
+  "resourceContract": "offers/planning budgets are policy, not hard quotas or measured capacity; explicit workload Docker enforcement and real capacity remain future tests",
+  "hardEvidenceRequired": "History required red/green list plus A1-A16: actual crypto/PG permissions+lock traces/Linux Docker enforcement/crash+rollback/concurrency/all-five physical storage AND execution",
+  "actualNewHardEvidence": 0,
+  "realBindings": null
+}

@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev5-20261106-codex\source_fixtures.py", line 112, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev5-20261106-codex\source_fixtures.py", line 42, in main
+    check('actual-review-mode-'+r['path'].rsplit('/',1)[-1]+':'+str(r['line']),expected in modes,{'expected':expected,'actual':modes})
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev5-20261106-codex\source_fixtures.py", line 18, in check
+    assert value,(name,detail)
+           ^^^^^
+AssertionError: ('actual-review-mode-evidence.py:147', {'expected': 'FOR UPDATE', 'actual': ['FOR UPDATE SKIP LOCKED']})

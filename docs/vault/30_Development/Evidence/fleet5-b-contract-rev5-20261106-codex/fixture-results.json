@@ -1,0 +1,1498 @@
+{
+  "level": "SCHEMA_STATIC_STATEFUL_SYMBOLIC_ONLY",
+  "passed": 222,
+  "failed": 0,
+  "cases": [
+    {
+      "case": "initial-complete-flow",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "safety-pre-IO-obligation-commits",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "quarantine-EXECUTE-loss-reported",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "quarantine-EXECUTE-loss-still-denied",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "quarantine-failure-current-preserved",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "pre-IO-EXECUTE-loss-denies-IO",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "lost-ack-fresh-resolve",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "lost-ack-resolve-no-node-mutation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "resolved-ack-CAS",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "delivery-after-time-advance",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "new-current-eligible",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gateObservation-branch0-positive",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gateObservation-branch0-extra",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-path",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-path",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-epoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-epoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-recordId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-recordId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-record",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-record",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-sequence",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-sequence",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-retiredGateIDs",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-retiredGateIDs",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-retiredReleaseHashes",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-retiredReleaseHashes",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-originalAckHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-originalAckHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-missing-originalAckExpiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch0-type-originalAckExpiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-positive",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gateObservation-branch1-extra",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-missing-recovery",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "gateObservation-branch1-type-recovery",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "A4-fresh-signed-old-g0-rearm",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "A4-no-history-mutation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "A5-release-generation-must-current",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "duplicate-original-ACK",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "duplicate-no-mutation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "duplicate-cannot-resurrect-invalidated",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gate-prior-CAS-expectedPriorSequence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gate-prior-CAS-expectedPriorRecordHash",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-append",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-append",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-ARM",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-ARM",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-activation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-activation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-delivery",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-delivery",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-refresh",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-refresh",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "revoke-issuance-current-use",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-revocation-denies-issuance-current-use",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "CP-revoke-immediate",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "Node-no-instant-remote-revocation-claim",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "Node-acknowledged-invalidation-denies",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "ancestor-time-expiry-not-revocation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "refresh-after-ancestor-time-expiry",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "business-after-ancestor-time-expiry",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "missing-authenticated-ancestor-UNKNOWN-deny",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "mid-switch-expiry-before-ARM",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "mid-switch-preserves-CP-pointer",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "mid-switch-remains-fenced",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "stale-ACK-closed-refusal",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "stale-ACK-no-resolution",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "stale-duplicate-original-time",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "stale-ACK-not-recordable",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "stale-ACK-no-CAS",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "stale-ACK-no-ordinary-renewal-reset",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "missing-ACK-HOLD",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "readback-closed-CONFLICT",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "readback-closed-EXPIRED",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "expired-available-readback-denied",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "after-append-cohortFence-ARM-denied",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "after-append-containment-ARM-denied",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "after-append-quarantined-ARM-denied",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ACK-expiry-after-CAS-denies-delivery",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "fence-after-delivery-prepare-denies-possession-commit",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_delivery_controller-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_delivery_controller-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_delivery_controller-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_delivery_controller-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_runtime-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_runtime-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_runtime-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_runtime-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_verifier-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_verifier-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_verifier-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_verifier-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_use_issuer-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_use_issuer-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_use_issuer-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_use_issuer-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_safety-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_safety-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_safety-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_safety-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_budget_approver-APPROVAL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_budget_approver-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_budget_approver-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "signer-purpose-deny-sv_b_budget_approver-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-exact-prepare",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-nodeId",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-issuerServiceId",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-issuerTLSHash",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-useKeyHash",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-gateAckHash",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-activationLedgerHash",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-generation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "controller-scope-deny-gateId",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "matrix-semantic-positive",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-ordinary-protected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-remove-protected-tag",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-clear-containment-runtime",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-runtime-quarantine-not-deny",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-owner-impersonation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-liveness-clears-quarantine",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-evidence-update",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-runtime-SET-ROLE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-table-no-writer",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-remove-table-mapping",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-read-lock-is-write",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-controller-raw-key",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-remove-ordinary-classification",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "semantic-renamed-approval-factory",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "observationScope-branch0-positive",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "observationScope-branch0-extra",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-source",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-source",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-tenantId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-tenantId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-currentControlEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-currentControlEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-targetNodeEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-targetNodeEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-targetDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-targetDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-currentTuple",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-currentTuple",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-provenanceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-provenanceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-intentId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-intentId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-paths",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-paths",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-issuedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-issuedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-missing-diagnostic",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch0-type-diagnostic",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-positive",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "observationScope-branch1-extra",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-missing-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observationScope-branch1-type-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-source",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-tenantId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-currentControlEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-targetNodeEpoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-targetDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-currentTuple",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-provenanceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-intentId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-paths",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-issuedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "observation-refusal-no-payload-diagnostic",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    }
+  ],
+  "advancingTimeTraces": [
+    [
+      {
+        "phase": "append",
+        "now": 2000000005,
+        "nodeSequence": 1,
+        "nodeGate": {
+          "commandHash": "fa8a621db7ff197e1c55a1ae7be962c9d31adf06064fccaebd3ddb834240124a",
+          "priorRecord": "0000000000000000000000000000000000000000000000000000000000000000",
+          "generation": "generation-0",
+          "sequence": 1,
+          "state": "ARMED",
+          "gateId": "gate-old",
+          "releaseHash": "3f3951777d46d9a25389217207b5e451212c5928a073e03e0c16c3ea7a111b1c",
+          "delegationHash": "6e469f690830b4f1c64fa73fe91221b298988962906711b64a40d2d205bd9db1",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "4623125932fb32b9eac0c88e55630c81fa3293239fba94ba3bc79d8a1199716d"
+        },
+        "switchPending": false,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      },
+      {
+        "phase": "invalidate",
+        "now": 2000000007,
+        "nodeSequence": 2,
+        "nodeGate": {
+          "commandHash": "14289b31d90a0c07cf6b12788bd64f7fe58c321c7bf15e85bf1defce6bd55249",
+          "priorRecord": "a75653a47e1a041c8b04e3819b0caf3052f569a600144671394f2f9b3e06c22d",
+          "generation": "generation-0",
+          "sequence": 2,
+          "state": "INVALIDATED",
+          "gateId": "gate-old",
+          "releaseHash": "3f3951777d46d9a25389217207b5e451212c5928a073e03e0c16c3ea7a111b1c",
+          "delegationHash": "6e469f690830b4f1c64fa73fe91221b298988962906711b64a40d2d205bd9db1",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "3d15ff2bd8947554e371b4abf82a88208d99d2917141da01f9d57b976fcae730"
+        },
+        "switchPending": true,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      },
+      {
+        "phase": "ARM-ack-lost",
+        "now": 2000000010,
+        "nodeSequence": 3,
+        "nodeGate": {
+          "commandHash": "d4e443b2f02b9db6eac03788e5798f77cb9b8e52eb8260b3e93aa33c38a298de",
+          "priorRecord": "67101c9d82cbd3dc1352a38dcbcb4c709e1e0877380f83b9231d6437872ebaae",
+          "generation": "generation-0",
+          "sequence": 3,
+          "state": "ARMED",
+          "gateId": "gate-new",
+          "releaseHash": "5eb5d974d0944d2c5176b3ef514ed76bc1670871d53b3dbb3b5e078c705963c7",
+          "delegationHash": "f8890c4405a6edc8e3671ae30f986938324d832f36cb61a84993e6e9857561ae",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "1bb98c0c24dae9da4ee3f3b28eeed96bf7448855c1d17ec2e8f56331aaab3289"
+        },
+        "switchPending": true,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      },
+      {
+        "phase": "CAS",
+        "now": 2000000016,
+        "nodeSequence": 3,
+        "nodeGate": {
+          "commandHash": "d4e443b2f02b9db6eac03788e5798f77cb9b8e52eb8260b3e93aa33c38a298de",
+          "priorRecord": "67101c9d82cbd3dc1352a38dcbcb4c709e1e0877380f83b9231d6437872ebaae",
+          "generation": "generation-0",
+          "sequence": 3,
+          "state": "ARMED",
+          "gateId": "gate-new",
+          "releaseHash": "5eb5d974d0944d2c5176b3ef514ed76bc1670871d53b3dbb3b5e078c705963c7",
+          "delegationHash": "f8890c4405a6edc8e3671ae30f986938324d832f36cb61a84993e6e9857561ae",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "1bb98c0c24dae9da4ee3f3b28eeed96bf7448855c1d17ec2e8f56331aaab3289"
+        },
+        "switchPending": false,
+        "currentPointer": "a77654b1b61142e910b345dc3e91d49048b8eaa61cf845b576162588bce69fdf"
+      },
+      {
+        "phase": "delivery",
+        "now": 2000000020,
+        "nodeSequence": 3,
+        "nodeGate": {
+          "commandHash": "d4e443b2f02b9db6eac03788e5798f77cb9b8e52eb8260b3e93aa33c38a298de",
+          "priorRecord": "67101c9d82cbd3dc1352a38dcbcb4c709e1e0877380f83b9231d6437872ebaae",
+          "generation": "generation-0",
+          "sequence": 3,
+          "state": "ARMED",
+          "gateId": "gate-new",
+          "releaseHash": "5eb5d974d0944d2c5176b3ef514ed76bc1670871d53b3dbb3b5e078c705963c7",
+          "delegationHash": "f8890c4405a6edc8e3671ae30f986938324d832f36cb61a84993e6e9857561ae",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "1bb98c0c24dae9da4ee3f3b28eeed96bf7448855c1d17ec2e8f56331aaab3289"
+        },
+        "switchPending": false,
+        "currentPointer": "a77654b1b61142e910b345dc3e91d49048b8eaa61cf845b576162588bce69fdf"
+      }
+    ],
+    [
+      {
+        "phase": "append",
+        "now": 2000000000,
+        "nodeSequence": 1,
+        "nodeGate": {
+          "commandHash": "fa8a621db7ff197e1c55a1ae7be962c9d31adf06064fccaebd3ddb834240124a",
+          "priorRecord": "0000000000000000000000000000000000000000000000000000000000000000",
+          "generation": "generation-0",
+          "sequence": 1,
+          "state": "ARMED",
+          "gateId": "gate-old",
+          "releaseHash": "3f3951777d46d9a25389217207b5e451212c5928a073e03e0c16c3ea7a111b1c",
+          "delegationHash": "6e469f690830b4f1c64fa73fe91221b298988962906711b64a40d2d205bd9db1",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "4623125932fb32b9eac0c88e55630c81fa3293239fba94ba3bc79d8a1199716d"
+        },
+        "switchPending": false,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      },
+      {
+        "phase": "invalidate",
+        "now": 2000000005,
+        "nodeSequence": 2,
+        "nodeGate": {
+          "commandHash": "1960cd4c21fa1282fdbcf0ab55a815432fed2181b4a35fb96ae4bf558ab498e3",
+          "priorRecord": "a75653a47e1a041c8b04e3819b0caf3052f569a600144671394f2f9b3e06c22d",
+          "generation": "generation-0",
+          "sequence": 2,
+          "state": "INVALIDATED",
+          "gateId": "gate-old",
+          "releaseHash": "3f3951777d46d9a25389217207b5e451212c5928a073e03e0c16c3ea7a111b1c",
+          "delegationHash": "6e469f690830b4f1c64fa73fe91221b298988962906711b64a40d2d205bd9db1",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "7c2fc5c09294b78fe9fe1f3e9c665859725d82c7f9426a32817f804f4eb7ba3d"
+        },
+        "switchPending": true,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      },
+      {
+        "phase": "expiry-HOLD",
+        "now": 2000000016,
+        "nodeSequence": 2,
+        "nodeGate": {
+          "commandHash": "1960cd4c21fa1282fdbcf0ab55a815432fed2181b4a35fb96ae4bf558ab498e3",
+          "priorRecord": "a75653a47e1a041c8b04e3819b0caf3052f569a600144671394f2f9b3e06c22d",
+          "generation": "generation-0",
+          "sequence": 2,
+          "state": "INVALIDATED",
+          "gateId": "gate-old",
+          "releaseHash": "3f3951777d46d9a25389217207b5e451212c5928a073e03e0c16c3ea7a111b1c",
+          "delegationHash": "6e469f690830b4f1c64fa73fe91221b298988962906711b64a40d2d205bd9db1",
+          "staticHash": "08411807b94a8cf01777b9a08d316aef595fa1d159ca2add9e8df67c02dc824c",
+          "ackHash": "7c2fc5c09294b78fe9fe1f3e9c665859725d82c7f9426a32817f804f4eb7ba3d"
+        },
+        "switchPending": true,
+        "currentPointer": "1e9f23b22fd9dea0c1a977fcfea68bc3d0d9e384ebd8b5f30e00e8cb3bb667d5"
+      }
+    ]
+  ],
+  "actualGoCryptoPGDockerCrashConcurrencyEquipment": 0
+}

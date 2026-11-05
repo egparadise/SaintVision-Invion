@@ -1,0 +1,1448 @@
+{
+  "level": "STATIC_GIT_AST_MUTATIONS_AND_OFFLINE_SQL_COMPILATION_ONLY",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "passed": 113,
+  "failed": 0,
+  "sourceMutationCount": 12,
+  "sourceMutations": [
+    {
+      "case": "S1-remove-known-lock_run",
+      "changedSemanticProjection": true,
+      "seconds": 20.51,
+      "probeEdges": [],
+      "probeRecords": []
+    },
+    {
+      "case": "S2-remove-ORM-Node-lock",
+      "changedSemanticProjection": true,
+      "seconds": 20.17,
+      "probeEdges": [],
+      "probeRecords": []
+    },
+    {
+      "case": "S3-alias-helper",
+      "changedSemanticProjection": true,
+      "seconds": 20.22,
+      "probeEdges": [
+        {
+          "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "line": 4,
+          "column": 8,
+          "spelling": "lr",
+          "targets": [
+            "inv.leases.lock_run"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.lock_run"
+        }
+      ],
+      "probeRecords": []
+    },
+    {
+      "case": "S4-dotted-import",
+      "changedSemanticProjection": true,
+      "seconds": 20.19,
+      "probeEdges": [
+        {
+          "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "line": 4,
+          "column": 8,
+          "spelling": "inv.leases.lock_run",
+          "targets": [
+            "inv.leases.lock_run"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.lock_run"
+        }
+      ],
+      "probeRecords": []
+    },
+    {
+      "case": "S5-instance-wrapper",
+      "changedSemanticProjection": true,
+      "seconds": 20.34,
+      "probeEdges": [
+        {
+          "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "line": 5,
+          "column": 8,
+          "spelling": "store._admit_locked",
+          "targets": [
+            "inv.leases.LeaseStore._admit_locked"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.LeaseStore._admit_locked"
+        }
+      ],
+      "probeRecords": []
+    },
+    {
+      "case": "S6-SQL-constant",
+      "changedSemanticProjection": true,
+      "seconds": 20.13,
+      "probeEdges": [],
+      "probeRecords": [
+        {
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "tables": [
+            "inv.nodes"
+          ],
+          "modes": [
+            "FOR UPDATE"
+          ],
+          "kind": "SQL"
+        }
+      ]
+    },
+    {
+      "case": "S7-real-NO-KEY-mode-change",
+      "changedSemanticProjection": true,
+      "seconds": 19.43,
+      "probeEdges": [],
+      "probeRecords": []
+    },
+    {
+      "case": "S8-new-unmapped-writer",
+      "changedSemanticProjection": true,
+      "seconds": 19.63,
+      "probeEdges": [],
+      "probeRecords": [
+        {
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "tables": [
+            "inv.nodes"
+          ],
+          "modes": [],
+          "kind": "SQL"
+        }
+      ]
+    },
+    {
+      "case": "S9-unknown-locked-table-block",
+      "changedSemanticProjection": true,
+      "seconds": 19.61,
+      "probeEdges": [],
+      "probeRecords": [
+        {
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "tables": [
+            "inv.unknown_guard_scope"
+          ],
+          "modes": [
+            "FOR UPDATE"
+          ],
+          "kind": "SQL"
+        }
+      ]
+    },
+    {
+      "case": "S10-unknown-instance-explicit",
+      "changedSemanticProjection": true,
+      "seconds": 19.99,
+      "probeEdges": [],
+      "probeRecords": []
+    },
+    {
+      "case": "S11-ORM-keyword-mode",
+      "changedSemanticProjection": true,
+      "seconds": 19.68,
+      "probeEdges": [],
+      "probeRecords": [
+        {
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "tables": [],
+          "modes": [
+            "FOR KEY SHARE NOWAIT"
+          ],
+          "kind": "ORM_OR_UNRESOLVED_DB"
+        }
+      ]
+    },
+    {
+      "case": "S12-unresolved-SQL-explicit-block",
+      "changedSemanticProjection": true,
+      "seconds": 19.73,
+      "probeEdges": [],
+      "probeRecords": [
+        {
+          "function": "inv.zz_rev5_static_probe.sneaky",
+          "tables": [],
+          "modes": [],
+          "kind": "ORM_OR_UNRESOLVED_DB"
+        }
+      ]
+    }
+  ],
+  "sqlalchemyVersion": "2.0.52",
+  "postgreSQLCompilations": [
+    {
+      "options": {},
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE",
+      "expectedMode": "FOR UPDATE"
+    },
+    {
+      "options": {
+        "key_share": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR NO KEY UPDATE",
+      "expectedMode": "FOR NO KEY UPDATE"
+    },
+    {
+      "options": {
+        "read": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR SHARE",
+      "expectedMode": "FOR SHARE"
+    },
+    {
+      "options": {
+        "read": true,
+        "key_share": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR KEY SHARE",
+      "expectedMode": "FOR KEY SHARE"
+    },
+    {
+      "options": {
+        "skip_locked": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE SKIP LOCKED",
+      "expectedMode": "FOR UPDATE SKIP LOCKED"
+    },
+    {
+      "options": {
+        "nowait": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE NOWAIT",
+      "expectedMode": "FOR UPDATE NOWAIT"
+    },
+    {
+      "options": {
+        "read": true,
+        "key_share": true,
+        "nowait": true
+      },
+      "SQL": "SELECT public.nodes.node_id \nFROM public.nodes FOR KEY SHARE NOWAIT",
+      "expectedMode": "FOR KEY SHARE NOWAIT"
+    }
+  ],
+  "cases": [
+    {
+      "case": "unmodified-semantic-writer-audit",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "case": "unmodified-golden-fidelity",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "reviewer-real-CP-drop-count",
+      "passed": true,
+      "detail": 24
+    },
+    {
+      "case": "real-dropped-edge-build_preparations.py:752",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/build_preparations.py",
+          "function": "inv.build_preparations.BuildPreparationService._terminalize",
+          "line": 752,
+          "column": 20,
+          "spelling": "RunStore(BoundDatabase(self.db, principal.tenant_id, conn))._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-containment.py:274",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/containment.py",
+          "function": "inv.containment.ContainmentReconciler.once",
+          "line": 274,
+          "column": 22,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-dispatch.py:207",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "function": "inv.dispatch.DeliveryQueue.acquire",
+          "line": 207,
+          "column": 26,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-dispatch.py:186",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "function": "inv.dispatch.DeliveryQueue.acquire",
+          "line": 186,
+          "column": 20,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-dispatch.py:286",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "function": "inv.dispatch.DeliveryQueue.finish",
+          "line": 286,
+          "column": 20,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-model_retry.py:121",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/model_retry.py",
+          "function": "inv.model_retry.ModelRetryStore.prepare",
+          "line": 121,
+          "column": 23,
+          "spelling": "PlacementStore(bound).reserve",
+          "targets": [
+            "inv.placement.PlacementStore.reserve"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.placement.PlacementStore.reserve"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-output_ingestion.py:108",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "function": "inv.output_ingestion.OutputIngestion.once",
+          "line": 108,
+          "column": 16,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-output_ingestion.py:206",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "function": "inv.output_ingestion.OutputIngestion.once",
+          "line": 206,
+          "column": 16,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-placement.py:130",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/placement.py",
+          "function": "inv.placement.PlacementStore.reserve",
+          "line": 130,
+          "column": 12,
+          "spelling": "lease_store._admit_locked",
+          "targets": [
+            "inv.leases.LeaseStore._admit_locked"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.LeaseStore._admit_locked"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-placement.py:698",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/placement.py",
+          "function": "inv.placement.PlacementStore._reserve_short_commit",
+          "line": 698,
+          "column": 24,
+          "spelling": "lease_store._admit_locked",
+          "targets": [
+            "inv.leases.LeaseStore._admit_locked"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.LeaseStore._admit_locked"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-results.py:231",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/results.py",
+          "function": "inv.results.ResultStore.complete",
+          "line": 231,
+          "column": 24,
+          "spelling": "store._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-results.py:229",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/results.py",
+          "function": "inv.results.ResultStore.complete",
+          "line": 229,
+          "column": 16,
+          "spelling": "store._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_completion.py:32",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_completion.py",
+          "function": "inv.shard_completion.create_parent",
+          "line": 32,
+          "column": 8,
+          "spelling": "store._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_completion.py:164",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_completion.py",
+          "function": "inv.shard_completion.ShardCompletion.once",
+          "line": 164,
+          "column": 12,
+          "spelling": "store._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_completion.py:162",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_completion.py",
+          "function": "inv.shard_completion.ShardCompletion.once",
+          "line": 162,
+          "column": 16,
+          "spelling": "store._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_completion.py:83",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_completion.py",
+          "function": "inv.shard_completion.ShardCompletion.once",
+          "line": 83,
+          "column": 20,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_completion.py:72",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_completion.py",
+          "function": "inv.shard_completion.ShardCompletion.once",
+          "line": 72,
+          "column": 24,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shard_recovery.py:321",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shard_recovery.py",
+          "function": "inv.shard_recovery.ShardRecovery.enqueue",
+          "line": 321,
+          "column": 25,
+          "spelling": "LeaseStore(bound).reserve",
+          "targets": [
+            "inv.leases.LeaseStore.reserve"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.LeaseStore.reserve"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shards.py:487",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shards.py",
+          "function": "inv.shards.ShardRuntime.reconcile_failures",
+          "line": 487,
+          "column": 16,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shards.py:423",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shards.py",
+          "function": "inv.shards.ShardRuntime.cancel",
+          "line": 423,
+          "column": 20,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shards.py:438",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shards.py",
+          "function": "inv.shards.ShardRuntime.cancel",
+          "line": 438,
+          "column": 36,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-shards.py:90",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/shards.py",
+          "function": "inv.shards.ShardRuntime._admission_transaction",
+          "line": 90,
+          "column": 20,
+          "spelling": "RunStore(self.db)._transition",
+          "targets": [
+            "inv.runs.RunStore._transition"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.runs.RunStore._transition"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-workspace_api.py:175",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/workspace_api.py",
+          "function": "inv.workspace_api.WorkspaceAPI.prepare",
+          "line": 175,
+          "column": 21,
+          "spelling": "WorkspaceResume(bound, self.working)._prepare",
+          "targets": [
+            "inv.workspace_resume.WorkspaceResume._prepare"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.workspace_resume.WorkspaceResume._prepare"
+        }
+      ]
+    },
+    {
+      "case": "real-dropped-edge-workspace_resume.py:273",
+      "passed": true,
+      "detail": [
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "function": "inv.workspace_resume.WorkspaceResume.enqueue",
+          "line": 273,
+          "column": 21,
+          "spelling": "LeaseStore(bound).reserve",
+          "targets": [
+            "inv.leases.LeaseStore.reserve"
+          ],
+          "resolution": "EXACT_STATIC_TARGET",
+          "inferredTarget": "inv.leases.LeaseStore.reserve"
+        }
+      ]
+    },
+    {
+      "case": "constructor-injected-worker-service-edge",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "ALL-actual-lockers-seeded-and-planned",
+      "passed": true,
+      "detail": {
+        "lockers": 121,
+        "plans": 584
+      }
+    },
+    {
+      "case": "actual-review-mode-leases.py:164",
+      "passed": true,
+      "detail": {
+        "expected": "FOR NO KEY UPDATE",
+        "actual": [
+          "FOR NO KEY UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-placement.py:134",
+      "passed": true,
+      "detail": {
+        "expected": "FOR NO KEY UPDATE",
+        "actual": [
+          "FOR NO KEY UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-shard_recovery.py:284",
+      "passed": true,
+      "detail": {
+        "expected": "FOR NO KEY UPDATE",
+        "actual": [
+          "FOR NO KEY UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-deps.py:154",
+      "passed": true,
+      "detail": {
+        "expected": "TRANSACTION_ADVISORY",
+        "actual": [
+          "TRANSACTION_ADVISORY"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-evidence.py:147",
+      "passed": true,
+      "detail": {
+        "expected": "FOR UPDATE SKIP LOCKED",
+        "actual": [
+          "FOR UPDATE SKIP LOCKED"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-evidence.py:148",
+      "passed": true,
+      "detail": {
+        "expected": "FOR UPDATE SKIP LOCKED",
+        "actual": [
+          "FOR UPDATE SKIP LOCKED"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-lineage.py:667",
+      "passed": true,
+      "detail": {
+        "expected": "FOR SHARE",
+        "actual": [
+          "FOR SHARE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-lineage.py:668",
+      "passed": true,
+      "detail": {
+        "expected": "FOR SHARE",
+        "actual": [
+          "FOR SHARE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-projects.py:94",
+      "passed": true,
+      "detail": {
+        "expected": "FOR SHARE",
+        "actual": [
+          "FOR SHARE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-projects.py:333",
+      "passed": true,
+      "detail": {
+        "expected": "FOR UPDATE",
+        "actual": [
+          "FOR UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-settings.py:162",
+      "passed": true,
+      "detail": {
+        "expected": "FOR SHARE",
+        "actual": [
+          "FOR SHARE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-settings.py:435",
+      "passed": true,
+      "detail": {
+        "expected": "FOR UPDATE",
+        "actual": [
+          "FOR UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-settings.py:516",
+      "passed": true,
+      "detail": {
+        "expected": "FOR UPDATE",
+        "actual": [
+          "FOR UPDATE"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-tracking.py:133",
+      "passed": true,
+      "detail": {
+        "expected": "TRANSACTION_ADVISORY",
+        "actual": [
+          "TRANSACTION_ADVISORY"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-tracking.py:395",
+      "passed": true,
+      "detail": {
+        "expected": "TRANSACTION_ADVISORY",
+        "actual": [
+          "TRANSACTION_ADVISORY"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-operational_readiness.py:616",
+      "passed": true,
+      "detail": {
+        "expected": "TRANSACTION_ADVISORY",
+        "actual": [
+          "TRANSACTION_ADVISORY"
+        ]
+      }
+    },
+    {
+      "case": "actual-review-mode-provision_account.py:159",
+      "passed": true,
+      "detail": {
+        "expected": "TRANSACTION_ADVISORY",
+        "actual": [
+          "TRANSACTION_ADVISORY"
+        ]
+      }
+    },
+    {
+      "case": "concrete-plan-BuildPreparationService._terminalize",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-BuildExecutionIntentQueue.enqueue",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-NodePrincipal.lock_current",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-NodeObservation.accept",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-NodeObservation.mark_offline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-provision_channel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-revoke_channel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-BuildExecutionService._mark_node_quarantined",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-NodeDelivery._quarantine_gpu_node",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-capture_channels",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-capture_locations",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-_owned_for_update",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "concrete-plan-set_resource_offer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "case": "remove-writer-mapping-0",
+      "passed": true,
+      "detail": {
+        "function": "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+        "line": 304
+      }
+    },
+    {
+      "case": "remove-writer-mapping-1",
+      "passed": true,
+      "detail": {
+        "function": "inv.build_execution.BuildExecutionService._commit_consequences",
+        "line": 666
+      }
+    },
+    {
+      "case": "remove-writer-mapping-2",
+      "passed": true,
+      "detail": {
+        "function": "inv.containment.Containment.change",
+        "line": 147
+      }
+    },
+    {
+      "case": "remove-writer-mapping-3",
+      "passed": true,
+      "detail": {
+        "function": "inv.containment.Containment.change",
+        "line": 155
+      }
+    },
+    {
+      "case": "remove-writer-mapping-4",
+      "passed": true,
+      "detail": {
+        "function": "inv.containment.Containment.change",
+        "line": 196
+      }
+    },
+    {
+      "case": "remove-writer-mapping-5",
+      "passed": true,
+      "detail": {
+        "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+        "line": 34
+      }
+    },
+    {
+      "case": "remove-writer-mapping-6",
+      "passed": true,
+      "detail": {
+        "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+        "line": 39
+      }
+    },
+    {
+      "case": "remove-writer-mapping-7",
+      "passed": true,
+      "detail": {
+        "function": "inv.node_channels.provision_channel",
+        "line": 183
+      }
+    },
+    {
+      "case": "remove-writer-mapping-8",
+      "passed": true,
+      "detail": {
+        "function": "inv.node_channels.revoke_channel",
+        "line": 218
+      }
+    },
+    {
+      "case": "remove-writer-mapping-9",
+      "passed": true,
+      "detail": {
+        "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+        "line": 247
+      }
+    },
+    {
+      "case": "remove-writer-mapping-10",
+      "passed": true,
+      "detail": {
+        "function": "inv.observation.NodeObservation.accept",
+        "line": 87
+      }
+    },
+    {
+      "case": "remove-writer-mapping-11",
+      "passed": true,
+      "detail": {
+        "function": "inv.observation.NodeObservation.mark_offline",
+        "line": 145
+      }
+    },
+    {
+      "case": "remove-writer-mapping-12",
+      "passed": true,
+      "detail": {
+        "function": "inv.results.ResultStore.complete",
+        "line": 219
+      }
+    },
+    {
+      "case": "remove-writer-mapping-13",
+      "passed": true,
+      "detail": {
+        "function": "inv.runs.RunStore.complete",
+        "line": 180
+      }
+    },
+    {
+      "case": "remove-writer-mapping-14",
+      "passed": true,
+      "detail": {
+        "function": "inv.shard_completion.ShardCompletion.once",
+        "line": 142
+      }
+    },
+    {
+      "case": "remove-writer-mapping-15",
+      "passed": true,
+      "detail": {
+        "function": "inv.storage_commit.StorageSampleStore.apply_sample",
+        "line": 327
+      }
+    },
+    {
+      "case": "remove-writer-mapping-16",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.nodes.enroll_node",
+        "line": 113
+      }
+    },
+    {
+      "case": "remove-writer-mapping-17",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.nodes.record_heartbeat",
+        "line": 191
+      }
+    },
+    {
+      "case": "remove-writer-mapping-18",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.nodes.mark_lost_nodes",
+        "line": 329
+      }
+    },
+    {
+      "case": "remove-writer-mapping-19",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.storage.register_contribution",
+        "line": 76
+      }
+    },
+    {
+      "case": "remove-writer-mapping-20",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.storage.activate_contribution",
+        "line": 109
+      }
+    },
+    {
+      "case": "remove-writer-mapping-21",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.storage.revoke_contribution",
+        "line": 126
+      }
+    },
+    {
+      "case": "remove-writer-mapping-22",
+      "passed": true,
+      "detail": {
+        "function": "saintvision.services.storage.revoke_contribution",
+        "line": 127
+      }
+    },
+    {
+      "case": "remove-writer-mapping-23",
+      "passed": true,
+      "detail": {
+        "function": "tools.check_migration_upgrade.main",
+        "line": 107
+      }
+    },
+    {
+      "case": "remove-writer-mapping-24",
+      "passed": true,
+      "detail": {
+        "function": "tools.check_migration_upgrade.main",
+        "line": 110
+      }
+    },
+    {
+      "case": "remove-writer-mapping-25",
+      "passed": true,
+      "detail": {
+        "function": "tools.lan_execution.execute",
+        "line": 116
+      }
+    },
+    {
+      "case": "remove-writer-mapping-26",
+      "passed": true,
+      "detail": {
+        "function": "tools.lan_execution.execute",
+        "line": 123
+      }
+    },
+    {
+      "case": "remove-writer-mapping-27",
+      "passed": true,
+      "detail": {
+        "function": "tools.lan_pilot.provision_observation_node",
+        "line": 920
+      }
+    },
+    {
+      "case": "remove-writer-mapping-28",
+      "passed": true,
+      "detail": {
+        "function": "tools.lan_pilot.provision_observation_node",
+        "line": 926
+      }
+    },
+    {
+      "case": "remove-writer-mapping-29",
+      "passed": true,
+      "detail": {
+        "function": "tools.lan_pilot.init",
+        "line": 1149
+      }
+    },
+    {
+      "case": "remove-writer-mapping-30",
+      "passed": true,
+      "detail": {
+        "function": "tools.remote_workspace_entry.initialize",
+        "line": 80
+      }
+    },
+    {
+      "case": "remove-writer-mapping-31",
+      "passed": true,
+      "detail": {
+        "function": "tools.remote_workspace_entry.initialize",
+        "line": 82
+      }
+    },
+    {
+      "case": "remove-writer-mapping-32",
+      "passed": true,
+      "detail": {
+        "function": "tools.run_s04_fe_matrix.run_acceptance",
+        "line": 1100
+      }
+    },
+    {
+      "case": "remove-writer-mapping-33",
+      "passed": true,
+      "detail": {
+        "function": "tools.run_s04_fe_matrix.run_acceptance",
+        "line": 1157
+      }
+    },
+    {
+      "case": "S1-remove-known-lock_run",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.51,
+        "probeEdges": [],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S2-remove-ORM-Node-lock",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.17,
+        "probeEdges": [],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S3-alias-helper",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.22,
+        "probeEdges": [
+          {
+            "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "line": 4,
+            "column": 8,
+            "spelling": "lr",
+            "targets": [
+              "inv.leases.lock_run"
+            ],
+            "resolution": "EXACT_STATIC_TARGET",
+            "inferredTarget": "inv.leases.lock_run"
+          }
+        ],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S4-dotted-import",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.19,
+        "probeEdges": [
+          {
+            "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "line": 4,
+            "column": 8,
+            "spelling": "inv.leases.lock_run",
+            "targets": [
+              "inv.leases.lock_run"
+            ],
+            "resolution": "EXACT_STATIC_TARGET",
+            "inferredTarget": "inv.leases.lock_run"
+          }
+        ],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S5-instance-wrapper",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.34,
+        "probeEdges": [
+          {
+            "path": "services/control-plane/src/inv/zz_rev5_static_probe.py",
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "line": 5,
+            "column": 8,
+            "spelling": "store._admit_locked",
+            "targets": [
+              "inv.leases.LeaseStore._admit_locked"
+            ],
+            "resolution": "EXACT_STATIC_TARGET",
+            "inferredTarget": "inv.leases.LeaseStore._admit_locked"
+          }
+        ],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S6-SQL-constant",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 20.13,
+        "probeEdges": [],
+        "probeRecords": [
+          {
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "tables": [
+              "inv.nodes"
+            ],
+            "modes": [
+              "FOR UPDATE"
+            ],
+            "kind": "SQL"
+          }
+        ]
+      }
+    },
+    {
+      "case": "S7-real-NO-KEY-mode-change",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.43,
+        "probeEdges": [],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S8-new-unmapped-writer",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.63,
+        "probeEdges": [],
+        "probeRecords": [
+          {
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "tables": [
+              "inv.nodes"
+            ],
+            "modes": [],
+            "kind": "SQL"
+          }
+        ]
+      }
+    },
+    {
+      "case": "S9-unknown-locked-table-block",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.61,
+        "probeEdges": [],
+        "probeRecords": [
+          {
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "tables": [
+              "inv.unknown_guard_scope"
+            ],
+            "modes": [
+              "FOR UPDATE"
+            ],
+            "kind": "SQL"
+          }
+        ]
+      }
+    },
+    {
+      "case": "S10-unknown-instance-explicit",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.99,
+        "probeEdges": [],
+        "probeRecords": []
+      }
+    },
+    {
+      "case": "S11-ORM-keyword-mode",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.68,
+        "probeEdges": [],
+        "probeRecords": [
+          {
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "tables": [],
+            "modes": [
+              "FOR KEY SHARE NOWAIT"
+            ],
+            "kind": "ORM_OR_UNRESOLVED_DB"
+          }
+        ]
+      }
+    },
+    {
+      "case": "S12-unresolved-SQL-explicit-block",
+      "passed": true,
+      "detail": {
+        "changedSemanticProjection": true,
+        "seconds": 19.73,
+        "probeEdges": [],
+        "probeRecords": [
+          {
+            "function": "inv.zz_rev5_static_probe.sneaky",
+            "tables": [],
+            "modes": [],
+            "kind": "ORM_OR_UNRESOLVED_DB"
+          }
+        ]
+      }
+    },
+    {
+      "case": "pinned-SQLAlchemy-2.0.52",
+      "passed": true,
+      "detail": "2.0.52"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR UPDATE",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR NO KEY UPDATE",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR NO KEY UPDATE"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR SHARE",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR SHARE"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR KEY SHARE",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR KEY SHARE"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR UPDATE SKIP LOCKED",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE SKIP LOCKED"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR UPDATE NOWAIT",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR UPDATE NOWAIT"
+    },
+    {
+      "case": "PostgreSQL-compile-FOR KEY SHARE NOWAIT",
+      "passed": true,
+      "detail": "SELECT public.nodes.node_id \nFROM public.nodes FOR KEY SHARE NOWAIT"
+    }
+  ],
+  "actualDBOrPGTrace": false
+}

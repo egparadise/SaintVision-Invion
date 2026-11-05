@@ -1,0 +1,13 @@
+{
+  "status": "HISTORICAL_FAILED_DEVELOPMENT_RUN_NOT_FINAL_VALIDATION_LEDGER",
+  "retainedOriginalCommandMetadata": "development-source-checks.json",
+  "retainedActualFailureLog": "development-source-checks-3.log",
+  "originalSuccessLogPathsMayContainLaterRegeneratedFinalLogs": true,
+  "completeOriginalFailedRunLogRetentionClaim": false,
+  "authoritativeFinalLedgers": [
+    "proof-checks.json",
+    "source-checks.json",
+    "publication-gates.json"
+  ],
+  "purpose": "Preserve actual assertion failure and original exit metadata honestly; no failed result is relabelled PASS or acceptance"
+}

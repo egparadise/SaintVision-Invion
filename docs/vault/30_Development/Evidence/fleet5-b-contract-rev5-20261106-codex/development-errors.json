@@ -1,0 +1,37 @@
+{
+  "level": "OWNER_FIXTURE_DEVELOPMENT_ERRORS_NOT_PRODUCT_FAILURE_OR_ACCEPTANCE",
+  "errors": [
+    {
+      "command": "python -B fixtures.py",
+      "actualExit": 1,
+      "finding": "type negative used [] for retiredGateIDs, but empty array is legal",
+      "correction": "use {} wrong-type/closed-object negatives for every required field"
+    },
+    {
+      "command": "python -B fixtures.py",
+      "actualExit": 1,
+      "finding": "signing-service test requested a second challenge after the original was already consumed",
+      "correction": "test from a newly activated but not-yet-delivered release, preserving no challenge reissue"
+    },
+    {
+      "command": "python -B source_fixtures.py",
+      "actualExit": 1,
+      "finding": "golden fidelity varied across processes because transitive query sites iterated a set",
+      "correction": "sort reached function identities before building function-specific query sites; semantic mutations remain separately asserted"
+    },
+    {
+      "command": "rg requirements-*.txt and two guessed source paths",
+      "actualExit": 1,
+      "finding": "PowerShell glob/nonexistent path read-only discovery failed",
+      "correction": "use rg --files and explicit existing paths; not a gate or permission action"
+    },
+    {
+      "command": "python -B source_fixtures.py",
+      "actualExit": 1,
+      "finding": "mode expected-value derivation used reviewer expression truncated to160 characters, hiding skip_locked/read kwargs",
+      "correction": "assert all17 source/review-identified sites with explicit expected modes; preserve failure log and regenerate semantic tests"
+    }
+  ],
+  "earlierRevisions": "All original probes, errors and REVISION REQUIRED verdicts remain immutable; prior review/audit scripts and results copied byte-for-byte here. Old JSON comparator-only probes are historical, not recast as source mutations.",
+  "finalVerification": "See final proof/publication logs and source-fixture-results; no test result promotes actual B evidence above zero."
+}

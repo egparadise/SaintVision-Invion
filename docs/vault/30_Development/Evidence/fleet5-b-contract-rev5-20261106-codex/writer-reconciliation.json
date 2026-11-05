@@ -1,0 +1,1955 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "writers": [
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "function": "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+      "line": 304,
+      "column": 12,
+      "expression": "conn.execute(\n                \"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\",\n                (leased_node_id,),\n            )",
+      "expressionSHA256": "9a1b60d3d0fafb5190635984d197e280b4387b67f22d760860cbe06a758b4597",
+      "table": "inv.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/build_execution.py",
+        "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+        304,
+        12,
+        "inv.nodes",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "9a1b60d3d0fafb5190635984d197e280b4387b67f22d760860cbe06a758b4597"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_raise_node_quarantine"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime",
+        "sv_b_safety",
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_raise_node_quarantine": "DENY_ONLY: owned tenant+Node+epoch+current operation and authenticated causal reconciliation obligation; raise quarantined from schedulable/offline or retain stronger denial; never clear draining/retired/quarantined, release claims, physical stop or success"
+      },
+      "atomicBoundary": {
+        "b_raise_node_quarantine": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "function": "inv.build_execution.BuildExecutionService._commit_consequences",
+      "line": 666,
+      "column": 12,
+      "expression": "conn.execute(\n                \"INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)\",\n                (tenant_id, run_id, evidence_id, Jsonb(envelope)),\n            )",
+      "expressionSHA256": "060e0cab781dd97f757a7154c4858d4600253976e90eca22015c1d93b4a544d1",
+      "table": "inv.evidence",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "run_id",
+        "evidence_id",
+        "envelope"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/build_execution.py",
+        "inv.build_execution.BuildExecutionService._commit_consequences",
+        666,
+        12,
+        "inv.evidence",
+        "INSERT",
+        [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ],
+        "060e0cab781dd97f757a7154c4858d4600253976e90eca22015c1d93b4a544d1"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_append_build_cleanup_evidence"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime"
+      ],
+      "allowedTransitions": {
+        "b_append_build_cleanup_evidence": "typed build_cleanup evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; BuildExecutionService._commit_consequences: current intent/run/lease CAS, verified duplicate physical cleanup receipts, resource lease release, BuildCleanupReceipt validation and completion outbox together"
+      },
+      "atomicBoundary": {
+        "b_append_build_cleanup_evidence": "BuildExecutionService._commit_consequences: current intent/run/lease CAS, verified duplicate physical cleanup receipts, resource lease release, BuildCleanupReceipt validation and completion outbox together"
+      },
+      "lockPlanFunction": "inv.build_execution.BuildExecutionService._commit_consequences",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.Containment.change",
+      "line": 147,
+      "column": 16,
+      "expression": "conn.execute(\n                    \"UPDATE inv.tenant_controls SET kill_switch=true,version=version+1,updated_at=clock_timestamp()\"\n                )",
+      "expressionSHA256": "0aeb57bcc92d81ca9ec8dcc1881815f4c4550eee89b7a779547360add6a630cc",
+      "table": "inv.tenant_controls",
+      "verb": "UPDATE",
+      "columns": [
+        "kill_switch",
+        "updated_at",
+        "version"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/containment.py",
+        "inv.containment.Containment.change",
+        147,
+        16,
+        "inv.tenant_controls",
+        "UPDATE",
+        [
+          "kill_switch",
+          "updated_at",
+          "version"
+        ],
+        "0aeb57bcc92d81ca9ec8dcc1881815f4c4550eee89b7a779547360add6a630cc"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_set_tenant_containment",
+        "b_clear_tenant_containment"
+      ],
+      "executePrincipals": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "allowedTransitions": {
+        "b_set_tenant_containment": "DENY_ONLY false->true CAS version with causal evidence",
+        "b_clear_tenant_containment": "true->false protected restore grant + reconciled proof + version CAS"
+      },
+      "atomicBoundary": {
+        "b_set_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit",
+        "b_clear_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.containment.Containment.change",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.Containment.change",
+      "line": 155,
+      "column": 16,
+      "expression": "conn.execute(\n                    \"UPDATE inv.tenant_controls SET kill_switch=false,version=version+1,updated_at=clock_timestamp()\"\n                )",
+      "expressionSHA256": "5d242ae44458b88aefc6c3b2155902f9ce92872057c74db740ad3cb0bc7f0896",
+      "table": "inv.tenant_controls",
+      "verb": "UPDATE",
+      "columns": [
+        "kill_switch",
+        "updated_at",
+        "version"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/containment.py",
+        "inv.containment.Containment.change",
+        155,
+        16,
+        "inv.tenant_controls",
+        "UPDATE",
+        [
+          "kill_switch",
+          "updated_at",
+          "version"
+        ],
+        "5d242ae44458b88aefc6c3b2155902f9ce92872057c74db740ad3cb0bc7f0896"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_set_tenant_containment",
+        "b_clear_tenant_containment"
+      ],
+      "executePrincipals": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "allowedTransitions": {
+        "b_set_tenant_containment": "DENY_ONLY false->true CAS version with causal evidence",
+        "b_clear_tenant_containment": "true->false protected restore grant + reconciled proof + version CAS"
+      },
+      "atomicBoundary": {
+        "b_set_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit",
+        "b_clear_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.containment.Containment.change",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.Containment.change",
+      "line": 196,
+      "column": 16,
+      "expression": "conn.execute(\"UPDATE inv.nodes SET status=%s WHERE node_id=%s\", (target, node_id))",
+      "expressionSHA256": "5787a82fd52182153b097c9b375afb2c0de02a25958e2d9775bdd5247f0137de",
+      "table": "inv.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/containment.py",
+        "inv.containment.Containment.change",
+        196,
+        16,
+        "inv.nodes",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "5787a82fd52182153b097c9b375afb2c0de02a25958e2d9775bdd5247f0137de"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_set_node_containment",
+        "b_clear_node_containment"
+      ],
+      "executePrincipals": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "allowedTransitions": {
+        "b_set_node_containment": "DENY_ONLY typed quarantine/drain/retire with current operation and evidence; retirement terminal",
+        "b_clear_node_containment": "reviewed protected recovery only: current signed clear/restore grant + physical reconciliation + unchanged identity/epoch/shared C; never revive retired via ordinary clear"
+      },
+      "atomicBoundary": {
+        "b_set_node_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit",
+        "b_clear_node_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.containment.Containment.change",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+      "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+      "line": 34,
+      "column": 0,
+      "expression": "INSERT INTO inv.tenant_controls(tenant_id) SELECT tenant_id FROM inv.tenants",
+      "expressionSHA256": "15bb3ac9a6130f8303782e426d42ab4a05f1c9ff481e65bb6abe5fb7b7fbe109",
+      "table": "inv.tenant_controls",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id"
+      ],
+      "kind": "SQL_FUNCTION_OR_MIGRATION",
+      "writerID": [
+        "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+        "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+        34,
+        0,
+        "inv.tenant_controls",
+        "INSERT",
+        [
+          "tenant_id"
+        ],
+        "15bb3ac9a6130f8303782e426d42ab4a05f1c9ff481e65bb6abe5fb7b7fbe109"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "versioned offline migration backfill before any B traffic",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+      "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+      "line": 39,
+      "column": 0,
+      "expression": "INSERT INTO inv.tenant_controls(tenant_id) VALUES(NEW.tenant_id)",
+      "expressionSHA256": "118209f7e8b6818a0383d15e4a81b65986832198123d8f826c538da9573d9515",
+      "table": "inv.tenant_controls",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id"
+      ],
+      "kind": "SQL_FUNCTION_OR_MIGRATION",
+      "writerID": [
+        "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+        "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+        39,
+        0,
+        "inv.tenant_controls",
+        "INSERT",
+        [
+          "tenant_id"
+        ],
+        "118209f7e8b6818a0383d15e4a81b65986832198123d8f826c538da9573d9515"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_seed_new_tenant_control"
+      ],
+      "executePrincipals": [],
+      "allowedTransitions": {
+        "b_seed_new_tenant_control": "internal fixed-scope SECURITY DEFINER trigger replacement only for NEW tenant insertion; absence proven under bootstrap lock; defaults only, cannot reset existing control or create B identity; no service EXECUTE/PUBLIC membership"
+      },
+      "atomicBoundary": {
+        "b_seed_new_tenant_control": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "function": "inv.node_channels.provision_channel",
+      "line": 183,
+      "column": 8,
+      "expression": "cursor.execute(\n            \"\"\"INSERT INTO inv.node_channels(tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,certificate_not_after,enabled)\n            VALUES(%s,%s,%s,%s,%s,%s,%s,true) ON CONFLICT(tenant_id,node_id) DO UPDATE SET\n            recovery_epoch=excluded.recovery_epoch,version=excluded.version,endpoint=excluded.endpoint,\n            certificate_sha256=excluded.certificate_sha256,certificate_not_after=excluded.certificate_not_after,enabled=true\"\"\",\n            (\n                node.tenant_id,\n                node.node_id,\n                epoch,\n                version,\n                endpoint,\n                fingerprint,\n                not_after,\n            ),\n        )",
+      "expressionSHA256": "17a1d2f34594b452b13259e948192cefdafc2c634819df47a25ff04c31c2986b",
+      "table": "inv.node_channels",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "node_id",
+        "recovery_epoch",
+        "version",
+        "endpoint",
+        "certificate_sha256",
+        "certificate_not_after",
+        "enabled"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/node_channels.py",
+        "inv.node_channels.provision_channel",
+        183,
+        8,
+        "inv.node_channels",
+        "INSERT",
+        [
+          "tenant_id",
+          "node_id",
+          "recovery_epoch",
+          "version",
+          "endpoint",
+          "certificate_sha256",
+          "certificate_not_after",
+          "enabled"
+        ],
+        "17a1d2f34594b452b13259e948192cefdafc2c634819df47a25ff04c31c2986b"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_provision_node_channel"
+      ],
+      "executePrincipals": [
+        "sv_b_operator"
+      ],
+      "allowedTransitions": {
+        "b_provision_node_channel": "derive identity/fingerprint/expiry from approved DER; current control/Node epoch equal; exact expected C (0 only initial) -> C+1; separate initial provisioning vs existing B leaf rotation plan; retired/revoked requires reviewed recovery; audit in same transaction"
+      },
+      "atomicBoundary": {
+        "b_provision_node_channel": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.node_channels.provision_channel",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "function": "inv.node_channels.revoke_channel",
+      "line": 218,
+      "column": 8,
+      "expression": "cursor.execute(\n            \"UPDATE inv.node_channels SET enabled=false,version=%s WHERE tenant_id=%s AND node_id=%s\",\n            (version, node.tenant_id, node.node_id),\n        )",
+      "expressionSHA256": "074b49f6d5f49a7520a8d82a12051028b2d91654bd63ae38430b7746ee4dfc64",
+      "table": "inv.node_channels",
+      "verb": "UPDATE",
+      "columns": [
+        "enabled",
+        "version"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/node_channels.py",
+        "inv.node_channels.revoke_channel",
+        218,
+        8,
+        "inv.node_channels",
+        "UPDATE",
+        [
+          "enabled",
+          "version"
+        ],
+        "074b49f6d5f49a7520a8d82a12051028b2d91654bd63ae38430b7746ee4dfc64"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_revoke_node_channel"
+      ],
+      "executePrincipals": [
+        "sv_b_operator"
+      ],
+      "allowedTransitions": {
+        "b_revoke_node_channel": "exact tenant+Node+expected shared C; enabled=false,C+1,audit; cannot re-enable/reset/replace certificate, no separate storage C"
+      },
+      "atomicBoundary": {
+        "b_revoke_node_channel": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.node_channels.revoke_channel",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+      "line": 247,
+      "column": 12,
+      "expression": "conn.execute(\n                \"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\",\n                (node.node_id,),\n            )",
+      "expressionSHA256": "a460c7addbd77c371664d9aacf39f119acdcfe175b99978d1de0db8a78ead9a5",
+      "table": "inv.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/node_transport.py",
+        "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+        247,
+        12,
+        "inv.nodes",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "a460c7addbd77c371664d9aacf39f119acdcfe175b99978d1de0db8a78ead9a5"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_raise_node_quarantine"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime",
+        "sv_b_safety",
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_raise_node_quarantine": "DENY_ONLY: owned tenant+Node+epoch+current operation and authenticated causal reconciliation obligation; raise quarantined from schedulable/offline or retain stronger denial; never clear draining/retired/quarantined, release claims, physical stop or success"
+      },
+      "atomicBoundary": {
+        "b_raise_node_quarantine": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/observation.py",
+      "function": "inv.observation.NodeObservation.accept",
+      "line": 87,
+      "column": 18,
+      "expression": "conn.execute(\n                \"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status=CASE WHEN status='offline' THEN 'online' ELSE status END WHERE node_id=%s RETURNING status\",\n                (\n                    now,\n                    pending[\"issued_at\"],\n                    (observed - now).total_seconds(),\n                    node.node_id,\n                ),\n            )",
+      "expressionSHA256": "bc8c3939d486ff57ffd71b098cab5d64921b7db8e35d9d4adb749e6cd3172b05",
+      "table": "inv.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "clock_skew_seconds",
+        "heartbeat_at",
+        "probe_started_at",
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/observation.py",
+        "inv.observation.NodeObservation.accept",
+        87,
+        18,
+        "inv.nodes",
+        "UPDATE",
+        [
+          "clock_skew_seconds",
+          "heartbeat_at",
+          "probe_started_at",
+          "status"
+        ],
+        "bc8c3939d486ff57ffd71b098cab5d64921b7db8e35d9d4adb749e6cd3172b05"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_commit_node_observation"
+      ],
+      "executePrincipals": [
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_commit_node_observation": "telemetry update; status only offline->online or online->offline when no containment/retirement; preserves quarantined/draining/retired"
+      },
+      "atomicBoundary": {
+        "b_commit_node_observation": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.observation.NodeObservation.accept",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/observation.py",
+      "function": "inv.observation.NodeObservation.mark_offline",
+      "line": 145,
+      "column": 19,
+      "expression": "conn.execute(\n                    \"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\",\n                    (row[\"node_id\"],),\n                )",
+      "expressionSHA256": "6101486d25e3828bb5acc2bc30e822083e2e4e50938fe8b09dc29041a77d395d",
+      "table": "inv.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/observation.py",
+        "inv.observation.NodeObservation.mark_offline",
+        145,
+        19,
+        "inv.nodes",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "6101486d25e3828bb5acc2bc30e822083e2e4e50938fe8b09dc29041a77d395d"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_commit_node_observation"
+      ],
+      "executePrincipals": [
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_commit_node_observation": "telemetry update; status only offline->online or online->offline when no containment/retirement; preserves quarantined/draining/retired"
+      },
+      "atomicBoundary": {
+        "b_commit_node_observation": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "inv.observation.NodeObservation.mark_offline",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/results.py",
+      "function": "inv.results.ResultStore.complete",
+      "line": 219,
+      "column": 12,
+      "expression": "conn.execute(\n                \"INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)\",\n                (tenant, run_id, result[\"evidence_id\"], Jsonb(result[\"envelope\"])),\n            )",
+      "expressionSHA256": "b7610c5f5500cca78970c392a614dd87b5253e162553146303910958d9b87cc0",
+      "table": "inv.evidence",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "run_id",
+        "evidence_id",
+        "envelope"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/results.py",
+        "inv.results.ResultStore.complete",
+        219,
+        12,
+        "inv.evidence",
+        "INSERT",
+        [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ],
+        "b7610c5f5500cca78970c392a614dd87b5253e162553146303910958d9b87cc0"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_append_result_completion_evidence"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime"
+      ],
+      "allowedTransitions": {
+        "b_append_result_completion_evidence": "typed result_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; ResultStore.complete: authenticated stop receipt, ready immutable prepared output, workspace checkpoint/pin, result_completions and RunStore transitions together"
+      },
+      "atomicBoundary": {
+        "b_append_result_completion_evidence": "ResultStore.complete: authenticated stop receipt, ready immutable prepared output, workspace checkpoint/pin, result_completions and RunStore transitions together"
+      },
+      "lockPlanFunction": "inv.results.ResultStore.complete",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/runs.py",
+      "function": "inv.runs.RunStore.complete",
+      "line": 180,
+      "column": 12,
+      "expression": "conn.execute(\n                \"INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)\",\n                (tenant_id, run_id, evidence[\"evidenceId\"], Jsonb(evidence)),\n            )",
+      "expressionSHA256": "3d8c9865c5f426b3f75c3223e2bc4c774d4d4d135042b63b325a7976eeba45e3",
+      "table": "inv.evidence",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "run_id",
+        "evidence_id",
+        "envelope"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/runs.py",
+        "inv.runs.RunStore.complete",
+        180,
+        12,
+        "inv.evidence",
+        "INSERT",
+        [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ],
+        "3d8c9865c5f426b3f75c3223e2bc4c774d4d4d135042b63b325a7976eeba45e3"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_append_run_completion_evidence"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime"
+      ],
+      "allowedTransitions": {
+        "b_append_run_completion_evidence": "typed run_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; RunStore.complete: EvidenceEnvelope validation, trusted bytes hash/size, verifying exact version and current fencing proofs, succeeded transition together"
+      },
+      "atomicBoundary": {
+        "b_append_run_completion_evidence": "RunStore.complete: EvidenceEnvelope validation, trusted bytes hash/size, verifying exact version and current fencing proofs, succeeded transition together"
+      },
+      "lockPlanFunction": "inv.runs.RunStore.complete",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "function": "inv.shard_completion.ShardCompletion.once",
+      "line": 142,
+      "column": 12,
+      "expression": "conn.execute(\n                \"INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)\",\n                (tenant, parent[\"run_id\"], envelope[\"evidenceId\"], Jsonb(envelope)),\n            )",
+      "expressionSHA256": "54b50c8e730a51f756bd45f3ac13809e5822f87da11aa9aaab605602dfede143",
+      "table": "inv.evidence",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "run_id",
+        "evidence_id",
+        "envelope"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/shard_completion.py",
+        "inv.shard_completion.ShardCompletion.once",
+        142,
+        12,
+        "inv.evidence",
+        "INSERT",
+        [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ],
+        "54b50c8e730a51f756bd45f3ac13809e5822f87da11aa9aaab605602dfede143"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_append_shard_completion_evidence"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime"
+      ],
+      "allowedTransitions": {
+        "b_append_shard_completion_evidence": "typed shard_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; ShardCompletion.once: exact run/shard/attempt and authenticated receipt/nonce/dedup, shard sample/completion/run transitions together"
+      },
+      "atomicBoundary": {
+        "b_append_shard_completion_evidence": "ShardCompletion.once: exact run/shard/attempt and authenticated receipt/nonce/dedup, shard sample/completion/run transitions together"
+      },
+      "lockPlanFunction": "inv.shard_completion.ShardCompletion.once",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "function": "inv.storage_commit.StorageSampleStore.apply_sample",
+      "line": 327,
+      "column": 8,
+      "expression": "conn.execute(\n            \"INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)\",\n            (principal.tenant_id, run_id, evidence_id, Jsonb(evidence)),\n        )",
+      "expressionSHA256": "48ca45e6ccfff37219b2e531fdd96a70789196188058385d9f9bdd36895ea883",
+      "table": "inv.evidence",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "run_id",
+        "evidence_id",
+        "envelope"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "services/control-plane/src/inv/storage_commit.py",
+        "inv.storage_commit.StorageSampleStore.apply_sample",
+        327,
+        8,
+        "inv.evidence",
+        "INSERT",
+        [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ],
+        "48ca45e6ccfff37219b2e531fdd96a70789196188058385d9f9bdd36895ea883"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "services/control-plane/src/inv/db.py:180",
+          "services/control-plane/src/inv/db.py:183",
+          "services/control-plane/src/inv/app.py:1313",
+          "services/control-plane/src/inv/worker.py:118",
+          "services/control-plane/src/inv/observer_worker.py:54"
+        ],
+        "current": "Database.transaction psycopg connection; rejects super/bypass/table-owner; exact deployed session_user UNMEASURED",
+        "future": "shared plain/B sv_b_runtime or dedicated verifier/protected pool per mapping; BoundDatabase preserves caller outer transaction; NO legacy inv_kernel DML escape"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_append_storage_sample_evidence"
+      ],
+      "executePrincipals": [
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_append_storage_sample_evidence": "typed storage_sample evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; StorageSampleStore.apply_sample: exact Node/channel/epoch/nonce/signed sample, storage claim/sample and evidence commit together"
+      },
+      "atomicBoundary": {
+        "b_append_storage_sample_evidence": "StorageSampleStore.apply_sample: exact Node/channel/epoch/nonce/signed sample, storage claim/sample and evidence commit together"
+      },
+      "lockPlanFunction": "inv.storage_commit.StorageSampleStore.apply_sample",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/nodes.py",
+      "function": "saintvision.services.nodes.enroll_node",
+      "line": 113,
+      "column": 11,
+      "expression": "Node(\n        node_id=node_id,\n        tenant_id=tenant_id,\n        hostname=hostname,\n        os_type=os_type,\n        os_version=os_version,\n        agent_version=agent_version,\n        status=\"active\" if certificate_fingerprint else \"enrolling\",\n        certificate_fingerprint=certificate_fingerprint,\n        labels=labels or {},\n        enrolled_at=now,\n        heartbeat_sequence=0,\n    )",
+      "expressionSHA256": "ef568100012c15abc0fec9d4e36752b04b351c47646d107e11249eb81162319d",
+      "table": "public.nodes",
+      "verb": "INSERT",
+      "columns": [
+        "agent_version",
+        "certificate_fingerprint",
+        "enrolled_at",
+        "heartbeat_sequence",
+        "hostname",
+        "labels",
+        "node_id",
+        "os_type",
+        "os_version",
+        "status",
+        "tenant_id"
+      ],
+      "kind": "ORM_CONSTRUCTOR",
+      "writerID": [
+        "src/saintvision/services/nodes.py",
+        "saintvision.services.nodes.enroll_node",
+        113,
+        11,
+        "public.nodes",
+        "INSERT",
+        [
+          "agent_version",
+          "certificate_fingerprint",
+          "enrolled_at",
+          "heartbeat_sequence",
+          "hostname",
+          "labels",
+          "node_id",
+          "os_type",
+          "os_version",
+          "status",
+          "tenant_id"
+        ],
+        "ef568100012c15abc0fec9d4e36752b04b351c47646d107e11249eb81162319d"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_bootstrap_plain_node"
+      ],
+      "executePrincipals": [
+        "sv_node_bootstrap"
+      ],
+      "allowedTransitions": {
+        "b_bootstrap_plain_node": "authenticated one-use tenant-bound bootstrap consumption, same capability/offer/audit transaction; status enrolling or active; protected approved cert binding if present; cannot create a fresh B identity to bypass existing quarantined/partial cohort"
+      },
+      "atomicBoundary": {
+        "b_bootstrap_plain_node": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.nodes.enroll_node",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/nodes.py",
+      "function": "saintvision.services.nodes.record_heartbeat",
+      "line": 191,
+      "column": 14,
+      "expression": "session.execute(\n        update(Node)\n        .where(\n            Node.node_id == node_id,\n            Node.tenant_id == tenant_id,\n            # The guard. Anything not strictly greater is stale by definition.\n            Node.heartbeat_sequence < sequence,\n        )\n        .values(\n            heartbeat_sequence=sequence,\n            last_heartbeat_at=now,\n            # A node that was declared lost and is heard from again is back.\n            # Written in the same statement so it cannot be applied to a row\n            # whose sequence check failed.\n            status=case((Node.status == \"lost\", \"active\"), else_=Node.status),\n        )\n        .returning(Node)\n        .execution_options(synchronize_session=False, populate_existing=True)\n    )",
+      "expressionSHA256": "67b16c5e703ae255dc702b66b2d63e54b777c9ab84e5084d36dd148744f1c8cf",
+      "table": "public.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "heartbeat_sequence",
+        "last_heartbeat_at",
+        "status"
+      ],
+      "kind": "ORM_DML",
+      "writerID": [
+        "src/saintvision/services/nodes.py",
+        "saintvision.services.nodes.record_heartbeat",
+        191,
+        14,
+        "public.nodes",
+        "UPDATE",
+        [
+          "heartbeat_sequence",
+          "last_heartbeat_at",
+          "status"
+        ],
+        "67b16c5e703ae255dc702b66b2d63e54b777c9ab84e5084d36dd148744f1c8cf"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_public_node_heartbeat"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime"
+      ],
+      "allowedTransitions": {
+        "b_public_node_heartbeat": "atomic sequence strictly advances; lost->active only if no containment/retirement; other statuses unchanged"
+      },
+      "atomicBoundary": {
+        "b_public_node_heartbeat": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.nodes.record_heartbeat",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/nodes.py",
+      "function": "saintvision.services.nodes.mark_lost_nodes",
+      "line": 329,
+      "column": 12,
+      "expression": "node.status = \"lost\"",
+      "expressionSHA256": "de2575440c50ed3340f780e3d6ac18b2aa7351136b2cbb76b8fccbdfaf75c8e0",
+      "table": "public.nodes",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "ORM_ATTRIBUTE",
+      "writerID": [
+        "src/saintvision/services/nodes.py",
+        "saintvision.services.nodes.mark_lost_nodes",
+        329,
+        12,
+        "public.nodes",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "de2575440c50ed3340f780e3d6ac18b2aa7351136b2cbb76b8fccbdfaf75c8e0"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_public_node_lost"
+      ],
+      "executePrincipals": [
+        "sv_b_runtime",
+        "sv_b_verifier"
+      ],
+      "allowedTransitions": {
+        "b_public_node_lost": "active->lost only on stale heartbeat; preserve stronger denial and retirement; replica unavailability in same transaction"
+      },
+      "atomicBoundary": {
+        "b_public_node_lost": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.nodes.mark_lost_nodes",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/storage.py",
+      "function": "saintvision.services.storage.register_contribution",
+      "line": 76,
+      "column": 19,
+      "expression": "StorageContribution(\n        contribution_id=new_id(\"storage_contribution\"),\n        tenant_id=tenant_id,\n        node_id=payload.node_id,\n        declared_path=payload.declared_path,\n        normalized_path=normalized.normalized,\n        mode=payload.mode,\n        status=\"pending\",\n        capacity_bytes=payload.capacity_bytes,\n        available_bytes=payload.available_bytes,\n        registered_by_user_id=registered_by_user_id,\n        registered_at=now,\n    )",
+      "expressionSHA256": "20a5573c2b057be9329ea7ad08f8b095e3ddce515c375c34c9a77e2356200937",
+      "table": "public.storage_contributions",
+      "verb": "INSERT",
+      "columns": [
+        "available_bytes",
+        "capacity_bytes",
+        "contribution_id",
+        "declared_path",
+        "mode",
+        "node_id",
+        "normalized_path",
+        "registered_at",
+        "registered_by_user_id",
+        "status",
+        "tenant_id"
+      ],
+      "kind": "ORM_CONSTRUCTOR",
+      "writerID": [
+        "src/saintvision/services/storage.py",
+        "saintvision.services.storage.register_contribution",
+        76,
+        19,
+        "public.storage_contributions",
+        "INSERT",
+        [
+          "available_bytes",
+          "capacity_bytes",
+          "contribution_id",
+          "declared_path",
+          "mode",
+          "node_id",
+          "normalized_path",
+          "registered_at",
+          "registered_by_user_id",
+          "status",
+          "tenant_id"
+        ],
+        "20a5573c2b057be9329ea7ad08f8b095e3ddce515c375c34c9a77e2356200937"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_register_owner_contribution"
+      ],
+      "executePrincipals": [
+        "sv_storage_owner_api"
+      ],
+      "allowedTransitions": {
+        "b_register_owner_contribution": "authenticated tenant user registration on same tenant Node, OS-aware safe path and uniqueness; registered_by_user_id from authenticated principal, status pending; preserves plain mode catalogue semantics, never B admission"
+      },
+      "atomicBoundary": {
+        "b_register_owner_contribution": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.storage.register_contribution",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/storage.py",
+      "function": "saintvision.services.storage.activate_contribution",
+      "line": 109,
+      "column": 4,
+      "expression": "contribution.status = \"active\"",
+      "expressionSHA256": "9de1e979c4b8782d5af8a9989636a5f4572bc0ce7efe75f30b1aff3f3a6a067f",
+      "table": "public.storage_contributions",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "ORM_ATTRIBUTE",
+      "writerID": [
+        "src/saintvision/services/storage.py",
+        "saintvision.services.storage.activate_contribution",
+        109,
+        4,
+        "public.storage_contributions",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "9de1e979c4b8782d5af8a9989636a5f4572bc0ce7efe75f30b1aff3f3a6a067f"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_activate_owner_contribution"
+      ],
+      "executePrincipals": [
+        "sv_storage_owner_api"
+      ],
+      "allowedTransitions": {
+        "b_activate_owner_contribution": "row registered_by_user_id equals authenticated owner; pending->active or active idempotent, Node folder confirmation; revoked terminal; no project grade/operator impersonation substitute"
+      },
+      "atomicBoundary": {
+        "b_activate_owner_contribution": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.storage.activate_contribution",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/storage.py",
+      "function": "saintvision.services.storage.revoke_contribution",
+      "line": 126,
+      "column": 4,
+      "expression": "contribution.status = \"revoked\"",
+      "expressionSHA256": "a93b1b2bb15abf71c43fae57aa27fcab422357d0905a5aa427e43e2a8ee6094f",
+      "table": "public.storage_contributions",
+      "verb": "UPDATE",
+      "columns": [
+        "status"
+      ],
+      "kind": "ORM_ATTRIBUTE",
+      "writerID": [
+        "src/saintvision/services/storage.py",
+        "saintvision.services.storage.revoke_contribution",
+        126,
+        4,
+        "public.storage_contributions",
+        "UPDATE",
+        [
+          "status"
+        ],
+        "a93b1b2bb15abf71c43fae57aa27fcab422357d0905a5aa427e43e2a8ee6094f"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_revoke_owner_contribution"
+      ],
+      "executePrincipals": [
+        "sv_storage_owner_api"
+      ],
+      "allowedTransitions": {
+        "b_revoke_owner_contribution": "same registered owner withdraws ->revoked terminal; retain folder+catalogue; affected B eligibility denied, no deletion/reactivation/policy regeneration/compute downgrade"
+      },
+      "atomicBoundary": {
+        "b_revoke_owner_contribution": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.storage.revoke_contribution",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "src/saintvision/services/storage.py",
+      "function": "saintvision.services.storage.revoke_contribution",
+      "line": 127,
+      "column": 4,
+      "expression": "contribution.revoked_at = now",
+      "expressionSHA256": "9c6e4e357ce670384634c41709ac18debb7f32fdd5000eb3f4c15c76ded92fd4",
+      "table": "public.storage_contributions",
+      "verb": "UPDATE",
+      "columns": [
+        "revoked_at"
+      ],
+      "kind": "ORM_ATTRIBUTE",
+      "writerID": [
+        "src/saintvision/services/storage.py",
+        "saintvision.services.storage.revoke_contribution",
+        127,
+        4,
+        "public.storage_contributions",
+        "UPDATE",
+        [
+          "revoked_at"
+        ],
+        "9c6e4e357ce670384634c41709ac18debb7f32fdd5000eb3f4c15c76ded92fd4"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "src/saintvision/api/deps.py:69",
+          "src/saintvision/db/session.py:59",
+          "src/saintvision/config.py:188"
+        ],
+        "current": "request app engine -> SQLAlchemy Session; INV_DATABASE_URL; actual login/DSN UNMEASURED and not read",
+        "future": "shared plain/B scoped API, bootstrap or owner pool per authenticated caller; no inherited app/legacy direct DML"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_revoke_owner_contribution"
+      ],
+      "executePrincipals": [
+        "sv_storage_owner_api"
+      ],
+      "allowedTransitions": {
+        "b_revoke_owner_contribution": "same registered owner withdraws ->revoked terminal; retain folder+catalogue; affected B eligibility denied, no deletion/reactivation/policy regeneration/compute downgrade"
+      },
+      "atomicBoundary": {
+        "b_revoke_owner_contribution": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "saintvision.services.storage.revoke_contribution",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/check_migration_upgrade.py",
+      "function": "tools.check_migration_upgrade.main",
+      "line": 107,
+      "column": 24,
+      "expression": "conn.execute(\"INSERT INTO inv.control_epoch(singleton,epoch) VALUES(true,%s)\", (epoch,))",
+      "expressionSHA256": "297c4c39f9321e9ec9754541dc2ed22c3b6d96cf5650dfdb4f87e930a7935951",
+      "table": "inv.control_epoch",
+      "verb": "INSERT",
+      "columns": [
+        "singleton",
+        "epoch"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/check_migration_upgrade.py",
+        "tools.check_migration_upgrade.main",
+        107,
+        24,
+        "inv.control_epoch",
+        "INSERT",
+        [
+          "singleton",
+          "epoch"
+        ],
+        "297c4c39f9321e9ec9754541dc2ed22c3b6d96cf5650dfdb4f87e930a7935951"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/check_migration_upgrade.py:107"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable migration proof database only",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.check_migration_upgrade.main",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/check_migration_upgrade.py",
+      "function": "tools.check_migration_upgrade.main",
+      "line": 110,
+      "column": 24,
+      "expression": "conn.execute(\"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'online',%s)\", (sentinel,node,epoch))",
+      "expressionSHA256": "9e4bf83f0dba6244fa52ed22ef22046b1af4c28a64b85616d0463b17f7cd4f6d",
+      "table": "inv.nodes",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "node_id",
+        "status",
+        "recovery_epoch"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/check_migration_upgrade.py",
+        "tools.check_migration_upgrade.main",
+        110,
+        24,
+        "inv.nodes",
+        "INSERT",
+        [
+          "tenant_id",
+          "node_id",
+          "status",
+          "recovery_epoch"
+        ],
+        "9e4bf83f0dba6244fa52ed22ef22046b1af4c28a64b85616d0463b17f7cd4f6d"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/check_migration_upgrade.py:110"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable migration proof database only",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.check_migration_upgrade.main",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/lan_execution.py",
+      "function": "tools.lan_execution.execute",
+      "line": 116,
+      "column": 16,
+      "expression": "conn.execute('UPDATE inv.tenant_controls SET kill_switch=false,version=version+1 WHERE tenant_id=%s AND kill_switch=true RETURNING version',(state['tenantId'],))",
+      "expressionSHA256": "d825ab35a02de2cf8f8307263dcec4c8810cfbd7f44b1931ee0360a90c90d009",
+      "table": "inv.tenant_controls",
+      "verb": "UPDATE",
+      "columns": [
+        "kill_switch",
+        "version"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/lan_execution.py",
+        "tools.lan_execution.execute",
+        116,
+        16,
+        "inv.tenant_controls",
+        "UPDATE",
+        [
+          "kill_switch",
+          "version"
+        ],
+        "d825ab35a02de2cf8f8307263dcec4c8810cfbd7f44b1931ee0360a90c90d009"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/lan_execution.py:116"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_set_tenant_containment",
+        "b_clear_tenant_containment"
+      ],
+      "executePrincipals": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "allowedTransitions": {
+        "b_set_tenant_containment": "DENY_ONLY false->true CAS version with causal evidence",
+        "b_clear_tenant_containment": "true->false protected restore grant + reconciled proof + version CAS"
+      },
+      "atomicBoundary": {
+        "b_set_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit",
+        "b_clear_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "tools.lan_execution.execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/lan_execution.py",
+      "function": "tools.lan_execution.execute",
+      "line": 123,
+      "column": 16,
+      "expression": "conn.execute('UPDATE inv.tenant_controls SET kill_switch=true,version=version+1 WHERE tenant_id=%s AND kill_switch=false',(state['tenantId'],))",
+      "expressionSHA256": "47c6e273b8d77808554acb8b6cb096679e09f792a21e81893633d88ce9c171a3",
+      "table": "inv.tenant_controls",
+      "verb": "UPDATE",
+      "columns": [
+        "kill_switch",
+        "version"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/lan_execution.py",
+        "tools.lan_execution.execute",
+        123,
+        16,
+        "inv.tenant_controls",
+        "UPDATE",
+        [
+          "kill_switch",
+          "version"
+        ],
+        "47c6e273b8d77808554acb8b6cb096679e09f792a21e81893633d88ce9c171a3"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/lan_execution.py:123"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+      "replacementProcedures": [
+        "b_set_tenant_containment",
+        "b_clear_tenant_containment"
+      ],
+      "executePrincipals": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "allowedTransitions": {
+        "b_set_tenant_containment": "DENY_ONLY false->true CAS version with causal evidence",
+        "b_clear_tenant_containment": "true->false protected restore grant + reconciled proof + version CAS"
+      },
+      "atomicBoundary": {
+        "b_set_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit",
+        "b_clear_tenant_containment": "same outer source caller transaction with exact current guard/evidence/idempotency/related effects; no split approval or partial commit"
+      },
+      "lockPlanFunction": "tools.lan_execution.execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/lan_pilot.py",
+      "function": "tools.lan_pilot.provision_observation_node",
+      "line": 920,
+      "column": 4,
+      "expression": "conn.execute(\n        \"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'offline',%s) ON CONFLICT DO NOTHING\",\n        (state[\"tenantId\"], state[\"nodeId\"], state[\"epoch\"]),\n    )",
+      "expressionSHA256": "c66ff5d4035540f646f7dcefcf379738a9115e31bca875a0e21dc87173af8fa2",
+      "table": "inv.nodes",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "node_id",
+        "status",
+        "recovery_epoch"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/lan_pilot.py",
+        "tools.lan_pilot.provision_observation_node",
+        920,
+        4,
+        "inv.nodes",
+        "INSERT",
+        [
+          "tenant_id",
+          "node_id",
+          "status",
+          "recovery_epoch"
+        ],
+        "c66ff5d4035540f646f7dcefcf379738a9115e31bca875a0e21dc87173af8fa2"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/lan_pilot.py:920"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "protected initial plain observation identity provisioning",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.lan_pilot.provision_observation_node",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/lan_pilot.py",
+      "function": "tools.lan_pilot.provision_observation_node",
+      "line": 926,
+      "column": 4,
+      "expression": "conn.execute(\n        \"INSERT INTO inv.tenant_controls(tenant_id,kill_switch) VALUES(%s,true) ON CONFLICT(tenant_id) DO UPDATE SET kill_switch=true,version=inv.tenant_controls.version+1,updated_at=clock_timestamp()\",\n        (state[\"tenantId\"],),\n    )",
+      "expressionSHA256": "4fde5d220511ce3fbf14bfcfd5fb3a4d2922e683a4ab782c704424216ae9c371",
+      "table": "inv.tenant_controls",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "kill_switch"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/lan_pilot.py",
+        "tools.lan_pilot.provision_observation_node",
+        926,
+        4,
+        "inv.tenant_controls",
+        "INSERT",
+        [
+          "tenant_id",
+          "kill_switch"
+        ],
+        "4fde5d220511ce3fbf14bfcfd5fb3a4d2922e683a4ab782c704424216ae9c371"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/lan_pilot.py:926"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "protected initial plain tenant provisioning",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.lan_pilot.provision_observation_node",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/lan_pilot.py",
+      "function": "tools.lan_pilot.init",
+      "line": 1149,
+      "column": 8,
+      "expression": "conn.execute(\n            \"INSERT INTO inv.control_epoch VALUES(true,%s) ON CONFLICT DO NOTHING\",\n            (state[\"epoch\"],),\n        )",
+      "expressionSHA256": "002d61e81f696ffe16dbe0783150a51b24ad83c0fb996a91a9589a1abbc059c7",
+      "table": "inv.control_epoch",
+      "verb": "INSERT",
+      "columns": [
+        "UNKNOWN_COLUMNS_BLOCK"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/lan_pilot.py",
+        "tools.lan_pilot.init",
+        1149,
+        8,
+        "inv.control_epoch",
+        "INSERT",
+        [
+          "UNKNOWN_COLUMNS_BLOCK"
+        ],
+        "002d61e81f696ffe16dbe0783150a51b24ad83c0fb996a91a9589a1abbc059c7"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/lan_pilot.py:1149"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "one-time exact empty control-plane initialization",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.lan_pilot.init",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/remote_workspace_entry.py",
+      "function": "tools.remote_workspace_entry.initialize",
+      "line": 80,
+      "column": 8,
+      "expression": "conn.execute('INSERT INTO inv.control_epoch VALUES(true,%s)',(config['epoch'],))",
+      "expressionSHA256": "52060bc57d0d4ad9a0f43c644f4fc7d7fd82e692ff089f83edb63c29977f68dd",
+      "table": "inv.control_epoch",
+      "verb": "INSERT",
+      "columns": [
+        "UNKNOWN_COLUMNS_BLOCK"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/remote_workspace_entry.py",
+        "tools.remote_workspace_entry.initialize",
+        80,
+        8,
+        "inv.control_epoch",
+        "INSERT",
+        [
+          "UNKNOWN_COLUMNS_BLOCK"
+        ],
+        "52060bc57d0d4ad9a0f43c644f4fc7d7fd82e692ff089f83edb63c29977f68dd"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/remote_workspace_entry.py:80"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable/local fixture control-plane initialization",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.remote_workspace_entry.initialize",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/remote_workspace_entry.py",
+      "function": "tools.remote_workspace_entry.initialize",
+      "line": 82,
+      "column": 8,
+      "expression": "conn.execute(\"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch,clock_skew_seconds) VALUES(%s,%s,'online',%s,0)\",(config['tenantId'],config['nodeId'],config['epoch']))",
+      "expressionSHA256": "ddb31970bbd6051d07afbdf6f817f64a41630be730418ecccbb22c8e7d0e1048",
+      "table": "inv.nodes",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "node_id",
+        "status",
+        "recovery_epoch",
+        "clock_skew_seconds"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/remote_workspace_entry.py",
+        "tools.remote_workspace_entry.initialize",
+        82,
+        8,
+        "inv.nodes",
+        "INSERT",
+        [
+          "tenant_id",
+          "node_id",
+          "status",
+          "recovery_epoch",
+          "clock_skew_seconds"
+        ],
+        "ddb31970bbd6051d07afbdf6f817f64a41630be730418ecccbb22c8e7d0e1048"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/remote_workspace_entry.py:82"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable/local fixture plain Node initialization",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.remote_workspace_entry.initialize",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/run_s04_fe_matrix.py",
+      "function": "tools.run_s04_fe_matrix.run_acceptance",
+      "line": 1100,
+      "column": 32,
+      "expression": "cur.execute(\n                                    \"\"\"INSERT INTO inv.nodes(tenant_id, node_id, status)\n                                       VALUES (%s, %s, 'online')\n                                       ON CONFLICT (tenant_id, node_id) DO NOTHING\"\"\",\n                                    (tenant_id, created_node_id),\n                                )",
+      "expressionSHA256": "9d66f4d2292c687e070a1e576359ce4c851ae229c6002c7af164a9cbb2fab8ae",
+      "table": "inv.nodes",
+      "verb": "INSERT",
+      "columns": [
+        "tenant_id",
+        "node_id",
+        "status"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/run_s04_fe_matrix.py",
+        "tools.run_s04_fe_matrix.run_acceptance",
+        1100,
+        32,
+        "inv.nodes",
+        "INSERT",
+        [
+          "tenant_id",
+          "node_id",
+          "status"
+        ],
+        "9d66f4d2292c687e070a1e576359ce4c851ae229c6002c7af164a9cbb2fab8ae"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/run_s04_fe_matrix.py:1100"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable acceptance fixture insert/delete only",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.run_s04_fe_matrix.run_acceptance",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    },
+    {
+      "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "tools/run_s04_fe_matrix.py",
+      "function": "tools.run_s04_fe_matrix.run_acceptance",
+      "line": 1157,
+      "column": 36,
+      "expression": "cur.execute(\"DELETE FROM inv.nodes WHERE tenant_id=%s AND node_id=%s\", (tenant_id, created_node_id))",
+      "expressionSHA256": "61a2792a541bf527b7f2b8387d604359d8fafe650635469ea93f597e2ec23bb8",
+      "table": "inv.nodes",
+      "verb": "DELETE",
+      "columns": [
+        "ROW_DELETE"
+      ],
+      "kind": "SQL",
+      "writerID": [
+        "tools/run_s04_fe_matrix.py",
+        "tools.run_s04_fe_matrix.run_acceptance",
+        1157,
+        36,
+        "inv.nodes",
+        "DELETE",
+        [
+          "ROW_DELETE"
+        ],
+        "61a2792a541bf527b7f2b8387d604359d8fafe650635469ea93f597e2ec23bb8"
+      ],
+      "callerPrincipalPool": {
+        "source": [
+          "tools/run_s04_fe_matrix.py:1157"
+        ],
+        "current": "explicit tool connection; no actual credentials inspected",
+        "future": "protected narrow online caller for lan_execution only; other named fixture/bootstrap operations exclusive offline prerequisites"
+      },
+      "plainCompatibility": "DB persisted profile/status selects fixed plain or B wrapper; all shared authority writes mediated, no request flag or legacy SET ROLE",
+      "disposition": "NAMED_EXCLUSIVE_OFFLINE_OR_DISPOSABLE_FIXTURE",
+      "replacementProcedures": [],
+      "executePrincipals": [
+        "protected_nonpooled_initialization_or_fixture_owner"
+      ],
+      "offlinePrerequisites": {
+        "purpose": "disposable acceptance fixture insert/delete only",
+        "concurrentBTraffic": false,
+        "proof": "exclusive maintenance/advisory lock in separately scoped namespace; B services stopped/fenced and absence of B current/cohort/claims proven; exact DB instance/empty-init CAS; no ongoing online DML permission; no identity merge",
+        "failure": "deny before mutation; existing deployment not initialized here"
+      },
+      "lockPlanFunction": "tools.run_s04_fe_matrix.run_acceptance",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f"
+    }
+  ],
+  "noCurrentSourceWriter": {
+    "inv.node_role_approvals": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_operations": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_current": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_routing": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_cohorts": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_candidates": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_gate_acks": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_member_cas": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_releases": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_delegations": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_admissions": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_leases": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_activation_ledger": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_delivery_challenges": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_key_possessions": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_delivery_consumptions": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_key_deliveries": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_request_issuance": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_request_commits": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_reconcile_evidence": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_safety_requests": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_service_bindings": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_safety_obligations": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_storage_bindings": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY",
+    "inv.node_role_lineage_tombstones": "LEGITIMATE_NONE_PROPOSED_CONTRACT_ONLY"
+  },
+  "missingCurrentLifecycleWriters": {
+    "public.nodes certificate update": "no current writer beyond initial enrollment found; proposed b_bind_public_node_certificate only protected approved leaf CAS",
+    "public.nodes retirement": "no current writer found; NodePrincipal.lock_current already rejects retired; proposed terminal b_retire_public_node"
+  },
+  "errors": [],
+  "actualPGGrants": false
+}

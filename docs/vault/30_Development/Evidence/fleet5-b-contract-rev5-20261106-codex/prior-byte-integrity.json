@@ -1,0 +1,44 @@
+[
+  {
+    "file": "prior-review.json",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/review.json",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "120ac8b9b48afbbef3cb9ec7842e308a6f59c08e9d6c2f8f64a734bc74437838",
+    "byteExact": true
+  },
+  {
+    "file": "prior-adversarial-result.json",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/adversarial-result.json",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "37418daf10ec72c387dc9eddce439d163844f5ac67923f73c6136c94e47ba63d",
+    "byteExact": true
+  },
+  {
+    "file": "prior-census-audit-result.json",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/census-audit-result.json",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "ec36160cc15d1adfac164827a8c10f4a85c2e74522391bbb288ab801bd1736ba",
+    "byteExact": true
+  },
+  {
+    "file": "prior-adversarial.py",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/adversarial.py",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "cf5bb20975c7a8947c7069b1f5a19db1c1301bf3741248a139ef8032a1c5bf77",
+    "byteExact": true
+  },
+  {
+    "file": "prior-census_audit.py",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/census_audit.py",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "20b1c0bef7e1f6bdc663518549621ffdff96efc763b1fb638550f3a87bb7ae15",
+    "byteExact": true
+  },
+  {
+    "file": "prior-commands.json",
+    "sourcePath": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/commands.json",
+    "sourceSHA": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "sha256": "8013746e7d294a67dc89a987f66d23d8a2f8bef4ee9324c752cea05b61ac1720",
+    "byteExact": true
+  }
+]

@@ -1,0 +1,141 @@
+{
+  "level": "STATIC_BYTE_PROVENANCE_SCOPE_ONLY",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "modelCases": 222,
+  "sourceCases": 113,
+  "totalCases": 335,
+  "sourceMutationCount": 12,
+  "files": 523,
+  "records": 1671,
+  "sourceWriters": 400,
+  "mappedMatrixWriters": 34,
+  "functionPlans": 584,
+  "observedLockingFunctions": 121,
+  "realPreviouslyDroppedCPReceiverEdges": 24,
+  "priorReviewByteExactFiles": 6,
+  "verifiedFinalRawLogs": [
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-1.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-2.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-3.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "c8cabf2f0bf6499328963a1f295d5c64e4b33c627b6a358b0cffaeeb112dda1c"
+    },
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-4.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51"
+    },
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-5.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "ledger": "proof-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/proof-checks-6.log",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "sha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    },
+    {
+      "ledger": "source-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/source-checks-1.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "5e426254ecab17655dd01cfc36cccf8b8a75acfe8564b5c06dc9f4a8cce115d9"
+    },
+    {
+      "ledger": "source-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/source-checks-2.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51"
+    },
+    {
+      "ledger": "source-checks.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/source-checks-3.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "46880b868bf35983881add38f58ddf226632ebb6f54e25a44f8d3549d5919b76"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-1.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "005ca8f6b7a5884264e7779e7ef9219f99a9a4d3874158b37348089c3b9e65c2"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-2.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-3.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "5a647781637e48a8c7e9ba0db705ffb27fc7e6140308473db21b016528591100"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-4.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-5.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-6.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-7.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc"
+    },
+    {
+      "ledger": "publication-gates.json",
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev5-20261106-codex/publication-gates-8.log",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+    }
+  ],
+  "actualNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "allRealBindings": null,
+  "independentWholeReview": "PENDING via Root",
+  "historicalDevelopmentFailureLedger": "development-run-record.json explicitly separates retained failure from regenerated final logs"
+}

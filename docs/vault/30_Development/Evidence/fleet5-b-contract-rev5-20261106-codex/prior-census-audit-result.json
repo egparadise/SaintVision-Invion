@@ -1,0 +1,740 @@
+{
+  "level": "STATIC_GIT_AST_REVIEWER_AUDIT",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "ownerScript": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/source_census.py",
+  "baselineMatches": true,
+  "baselineSeconds": 23.2,
+  "helperCallsTextual": 91,
+  "helperCallsWithoutEdge": [],
+  "instanceReceiverHelperCallsDropped": [
+    {
+      "path": "services/control-plane/src/inv/build_preparations.py",
+      "line": 752,
+      "spelling": "RunStore(BoundDatabase(self.db, principal.tenant_id, conn))._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/containment.py",
+      "line": 274,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "line": 207,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "line": 186,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "line": 286,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_retry.py",
+      "line": 121,
+      "spelling": "PlacementStore(bound).reserve",
+      "wouldReach": [
+        "inv.leases.LeaseStore.reserve",
+        "inv.placement.PlacementStore.reserve"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "line": 108,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "line": 206,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/placement.py",
+      "line": 130,
+      "spelling": "lease_store._admit_locked",
+      "wouldReach": [
+        "inv.leases.LeaseStore._admit_locked"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/placement.py",
+      "line": 698,
+      "spelling": "lease_store._admit_locked",
+      "wouldReach": [
+        "inv.leases.LeaseStore._admit_locked"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/results.py",
+      "line": 231,
+      "spelling": "store._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/results.py",
+      "line": 229,
+      "spelling": "store._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "line": 32,
+      "spelling": "store._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "line": 164,
+      "spelling": "store._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "line": 162,
+      "spelling": "store._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "line": 83,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "line": 72,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_recovery.py",
+      "line": 321,
+      "spelling": "LeaseStore(bound).reserve",
+      "wouldReach": [
+        "inv.leases.LeaseStore.reserve",
+        "inv.placement.PlacementStore.reserve"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shards.py",
+      "line": 487,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shards.py",
+      "line": 423,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shards.py",
+      "line": 438,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/shards.py",
+      "line": 90,
+      "spelling": "RunStore(self.db)._transition",
+      "wouldReach": [
+        "inv.runs.RunStore._transition"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "line": 175,
+      "spelling": "WorkspaceResume(bound, self.working)._prepare",
+      "wouldReach": [
+        "inv.workspace_resume.WorkspaceResume._prepare"
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "line": 273,
+      "spelling": "LeaseStore(bound).reserve",
+      "wouldReach": [
+        "inv.leases.LeaseStore.reserve",
+        "inv.placement.PlacementStore.reserve"
+      ]
+    },
+    {
+      "path": "src/saintvision/adapters/mlflow_sink.py",
+      "line": 79,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/adapters/tracking.py",
+      "line": 87,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/api/problem.py",
+      "line": 157,
+      "spelling": "Exception.__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/credentials/contract.py",
+      "line": 28,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/errors.py",
+      "line": 100,
+      "spelling": "Exception.__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/identity/discovery_credentials.py",
+      "line": 44,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/identity/node_auth.py",
+      "line": 65,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/services/discovery.py",
+      "line": 42,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/services/release_acceptance_auth.py",
+      "line": 72,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/services/verification.py",
+      "line": 52,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/storage/pathsafe.py",
+      "line": 73,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "src/saintvision/tracking/canonical.py",
+      "line": 50,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/check_s12_acceptance_shape.py",
+      "line": 143,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/pitr_archive_retention.py",
+      "line": 84,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/plan_lan_migration.py",
+      "line": 27,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/provision_credentials.py",
+      "line": 51,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/provision_credentials.py",
+      "line": 59,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/provision_credentials.py",
+      "line": 67,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/run_ac11_migration_rehearsal.py",
+      "line": 84,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    },
+    {
+      "path": "tools/sync_obsidian.py",
+      "line": 28,
+      "spelling": "super().__init__",
+      "wouldReach": [
+        "saintvision.storage.readroot.ReadRoot.__init__"
+      ]
+    }
+  ],
+  "droppedAlsoListedUnknown": 0,
+  "lockModeMislabels": [
+    {
+      "path": "services/control-plane/src/inv/leases.py",
+      "line": 164,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "conn.execute(\n            \"SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE\",\n            (project_id,),\n        )"
+    },
+    {
+      "path": "services/control-plane/src/inv/placement.py",
+      "line": 134,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "conn.execute(\n                    \"SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE\",\n                    (project,),\n                )"
+    },
+    {
+      "path": "services/control-plane/src/inv/shard_recovery.py",
+      "line": 284,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "conn.execute(\n                \"SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE\",\n                (project,),\n            )"
+    },
+    {
+      "path": "src/saintvision/api/deps.py",
+      "line": 154,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.execute(text(\"SELECT pg_advisory_xact_lock(:key)\"), {\"key\": key})"
+    },
+    {
+      "path": "src/saintvision/services/evidence.py",
+      "line": 147,
+      "modes": [
+        "ORM FOR UPDATE"
+      ],
+      "expression": "session.scalars(\n            select(OutboxEvent)\n            .where(OutboxEvent.status == \"pending\")\n            .order_by(OutboxEvent.created_at)\n            ."
+    },
+    {
+      "path": "src/saintvision/services/evidence.py",
+      "line": 148,
+      "modes": [
+        "ORM FOR UPDATE"
+      ],
+      "expression": "select(OutboxEvent)\n            .where(OutboxEvent.status == \"pending\")\n            .order_by(OutboxEvent.created_at)\n            .limit(limit)\n            .wit"
+    },
+    {
+      "path": "src/saintvision/services/lineage.py",
+      "line": 667,
+      "modes": [
+        "ORM FOR UPDATE"
+      ],
+      "expression": "session.scalar(\n        select(Approval).where(\n            Approval.tenant_id == tenant_id, Approval.approval_id == approval_id,\n        ).with_for_update(read"
+    },
+    {
+      "path": "src/saintvision/services/lineage.py",
+      "line": 668,
+      "modes": [
+        "ORM FOR UPDATE"
+      ],
+      "expression": "select(Approval).where(\n            Approval.tenant_id == tenant_id, Approval.approval_id == approval_id,\n        ).with_for_update(read=True)"
+    },
+    {
+      "path": "src/saintvision/services/projects.py",
+      "line": 94,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.get(User, created_by_user_id, populate_existing=True, with_for_update={\"read\": True})"
+    },
+    {
+      "path": "src/saintvision/services/projects.py",
+      "line": 333,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.refresh(workspace, with_for_update=True)"
+    },
+    {
+      "path": "src/saintvision/services/settings.py",
+      "line": 162,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.get(User, user_id, populate_existing=True, with_for_update={\"read\": True})"
+    },
+    {
+      "path": "src/saintvision/services/settings.py",
+      "line": 435,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.refresh(workspace, with_for_update=True)"
+    },
+    {
+      "path": "src/saintvision/services/settings.py",
+      "line": 516,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.refresh(capability, with_for_update=True)"
+    },
+    {
+      "path": "src/saintvision/services/tracking.py",
+      "line": 133,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.execute(\n        text(\"SELECT pg_advisory_xact_lock(:key)\"), {\"key\": _advisory_key(\"enqueue\", tenant_id, scope)}\n    )"
+    },
+    {
+      "path": "src/saintvision/services/tracking.py",
+      "line": 395,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "session.execute(\n        text(\"SELECT pg_advisory_xact_lock(:key)\"),\n        {\"key\": int.from_bytes(key, \"big\", signed=True)},\n    )"
+    },
+    {
+      "path": "tools/operational_readiness.py",
+      "line": 616,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "lock.execute(\"SELECT pg_advisory_xact_lock(%s)\", (_snapshot_lock_key(args),))"
+    },
+    {
+      "path": "tools/provision_account.py",
+      "line": 159,
+      "modes": [
+        "MVCC read or implicit ORM/UOW/FK lock: exact expression retained"
+      ],
+      "expression": "conn.execute(\n            \"SELECT pg_advisory_xact_lock(hashtextextended(%s,0))\",\n            (\"account-provisioning:\" + target[\"tenant\"],),\n        )"
+    }
+  ],
+  "productSqlWritersOfMatrixTables": {
+    "inv.evidence": {
+      "matrixProcedures": [
+        "b_commit_business_nonce_evidence"
+      ],
+      "source72028": [
+        [
+          "services/control-plane/src/inv/build_execution.py",
+          666,
+          "INSERT",
+          "inv.build_execution.BuildExecutionService._commit_consequences"
+        ],
+        [
+          "services/control-plane/src/inv/results.py",
+          219,
+          "INSERT",
+          "inv.results.ResultStore.complete"
+        ],
+        [
+          "services/control-plane/src/inv/runs.py",
+          180,
+          "INSERT",
+          "inv.runs.RunStore.complete"
+        ],
+        [
+          "services/control-plane/src/inv/shard_completion.py",
+          142,
+          "INSERT",
+          "inv.shard_completion.ShardCompletion.once"
+        ],
+        [
+          "services/control-plane/src/inv/storage_commit.py",
+          327,
+          "INSERT",
+          "inv.storage_commit.StorageSampleStore.apply_sample"
+        ]
+      ]
+    },
+    "inv.node_channels": {
+      "matrixProcedures": [
+        "b_member_cas"
+      ],
+      "source72028": [
+        [
+          "services/control-plane/src/inv/node_channels.py",
+          183,
+          "INSERT",
+          "inv.node_channels.provision_channel"
+        ],
+        [
+          "services/control-plane/src/inv/node_channels.py",
+          218,
+          "UPDATE",
+          "inv.node_channels.revoke_channel"
+        ]
+      ]
+    },
+    "inv.nodes": {
+      "matrixProcedures": [
+        "b_commit_node_observation",
+        "b_change_node_containment"
+      ],
+      "source72028": [
+        [
+          "services/control-plane/src/inv/build_execution.py",
+          304,
+          "UPDATE",
+          "inv.build_execution.BuildExecutionService._mark_node_quarantined"
+        ],
+        [
+          "services/control-plane/src/inv/containment.py",
+          196,
+          "UPDATE",
+          "inv.containment.Containment.change"
+        ],
+        [
+          "services/control-plane/src/inv/node_transport.py",
+          247,
+          "UPDATE",
+          "inv.node_transport.NodeDelivery._quarantine_gpu_node"
+        ],
+        [
+          "services/control-plane/src/inv/observation.py",
+          87,
+          "UPDATE",
+          "inv.observation.NodeObservation.accept"
+        ],
+        [
+          "services/control-plane/src/inv/observation.py",
+          145,
+          "UPDATE",
+          "inv.observation.NodeObservation.mark_offline"
+        ]
+      ]
+    },
+    "inv.tenant_controls": {
+      "matrixProcedures": [
+        "b_change_node_containment"
+      ],
+      "source72028": [
+        [
+          "services/control-plane/src/inv/containment.py",
+          147,
+          "UPDATE",
+          "inv.containment.Containment.change"
+        ],
+        [
+          "services/control-plane/src/inv/containment.py",
+          155,
+          "UPDATE",
+          "inv.containment.Containment.change"
+        ]
+      ]
+    }
+  },
+  "ormWritersOfMatrixPublicTables": [
+    {
+      "path": "src/saintvision/services/nodes.py",
+      "line": 113,
+      "text": "node = Node("
+    },
+    {
+      "path": "src/saintvision/services/nodes.py",
+      "line": 192,
+      "text": "update(Node)"
+    },
+    {
+      "path": "src/saintvision/services/nodes.py",
+      "line": 329,
+      "text": "node.status = \"lost\""
+    },
+    {
+      "path": "src/saintvision/services/storage.py",
+      "line": 76,
+      "text": "contribution = StorageContribution("
+    },
+    {
+      "path": "src/saintvision/services/storage.py",
+      "line": 109,
+      "text": "contribution.status = \"active\""
+    },
+    {
+      "path": "src/saintvision/services/storage.py",
+      "line": 126,
+      "text": "contribution.status = \"revoked\""
+    },
+    {
+      "path": "src/saintvision/services/storage.py",
+      "line": 127,
+      "text": "contribution.revoked_at = now"
+    }
+  ],
+  "matrixPublicWriters": {
+    "public.nodes": [
+      {
+        "procedure": "b_public_node_observation",
+        "verb": "UPDATE",
+        "columns": [
+          "heartbeat_sequence",
+          "last_heartbeat_at",
+          "status"
+        ]
+      }
+    ],
+    "public.storage_contributions": [
+      {
+        "procedure": "b_public_contribution_change",
+        "verb": "UPDATE",
+        "columns": [
+          "status",
+          "version",
+          "normalized_path",
+          "registered_by_user_id"
+        ]
+      }
+    ]
+  },
+  "sourceMutations": [
+    {
+      "mutation": "S1-remove-known-lock_run-call-build_preparations223",
+      "expectation": "DETECT",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [],
+      "probeRecords": [],
+      "probeFileInScope": false,
+      "seconds": 23.1
+    },
+    {
+      "mutation": "S2-remove-orm-with_for_update-node_auth111",
+      "expectation": "DETECT",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [],
+      "probeRecords": [],
+      "probeFileInScope": false,
+      "seconds": 23.5
+    },
+    {
+      "mutation": "S3-add-aliased-lock_run-caller-new-module",
+      "expectation": "DETECT",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [
+        "inv.zz_reviewer_probe.sneaky"
+      ],
+      "probeRecords": [],
+      "probeFileInScope": true,
+      "seconds": 23.3
+    },
+    {
+      "mutation": "S4-blindspot-dotted-import-call",
+      "expectation": "BLIND_SPOT_PROBE",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [],
+      "probeRecords": [],
+      "probeFileInScope": false,
+      "seconds": 24.5
+    },
+    {
+      "mutation": "S5-blindspot-instance-receiver-wrapper",
+      "expectation": "BLIND_SPOT_PROBE",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [],
+      "probeRecords": [],
+      "probeFileInScope": false,
+      "seconds": 24.5
+    },
+    {
+      "mutation": "S6-blindspot-sql-constant-inv-nodes-for-update",
+      "expectation": "BLIND_SPOT_PROBE",
+      "censusDiffersFromStored": true,
+      "probeFunctionReached": [],
+      "probeRecords": [],
+      "probeFileInScope": false,
+      "seconds": 24.9
+    }
+  ]
+}

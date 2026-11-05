@@ -1,0 +1,3225 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "count": 46,
+  "files": [
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "sha256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "gitBlob": "33fbf2ef8aaa42b5e1384e6c2aa69f867e80cf63",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 20,
+          "currentLines": [
+            20
+          ],
+          "text": "def docker(*args, timeout=30):",
+          "present": true
+        },
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "def inspect(name):",
+          "present": true
+        },
+        {
+          "oldLine": 36,
+          "currentLines": [
+            36
+          ],
+          "text": "def atomic(path, value):",
+          "present": true
+        },
+        {
+          "oldLine": 46,
+          "currentLines": [
+            46
+          ],
+          "text": "def exclusive_lock(path):",
+          "present": true
+        },
+        {
+          "oldLine": 53,
+          "currentLines": [
+            53
+          ],
+          "text": "def validate_target(manifest, value):",
+          "present": true
+        },
+        {
+          "oldLine": 70,
+          "currentLines": [
+            70
+          ],
+          "text": "def validate_install_target(manifest, value):",
+          "present": true
+        },
+        {
+          "oldLine": 95,
+          "currentLines": [
+            95
+          ],
+          "text": "def idle(node):",
+          "present": true
+        },
+        {
+          "oldLine": 102,
+          "currentLines": [
+            102
+          ],
+          "text": "def verify_credentials(folder, state):",
+          "present": true
+        },
+        {
+          "oldLine": 123,
+          "currentLines": [
+            123
+          ],
+          "text": "def load_image(folder, spec, archive):",
+          "present": true
+        },
+        {
+          "oldLine": 141,
+          "currentLines": [
+            141
+          ],
+          "text": "def rollback(manifest, state, record):",
+          "present": true
+        },
+        {
+          "oldLine": 177,
+          "currentLines": [
+            177
+          ],
+          "text": "def install(folder, state, *, undo=False):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_storage.py",
+      "sha256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "gitBlob": "a7cddd5e783287d9e5d090bf748c3c39b35888d6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 23,
+          "currentLines": [
+            23
+          ],
+          "text": "def reject():",
+          "present": true
+        },
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "def digest(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 31,
+          "currentLines": [
+            31
+          ],
+          "text": "def regular(path):",
+          "present": true
+        },
+        {
+          "oldLine": 50,
+          "currentLines": [
+            50
+          ],
+          "text": "def strict(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 62,
+          "currentLines": [
+            62
+          ],
+          "text": "def source_identity(source, private):",
+          "present": true
+        },
+        {
+          "oldLine": 88,
+          "currentLines": [
+            88
+          ],
+          "text": "def prepare(manifest, policy_path, source, expected_hash, image):",
+          "present": true
+        },
+        {
+          "oldLine": 155,
+          "currentLines": [
+            155
+          ],
+          "text": "def current(plan):",
+          "present": true
+        },
+        {
+          "oldLine": 163,
+          "currentLines": [
+            163
+          ],
+          "text": "def mount_args(plan):",
+          "present": true
+        },
+        {
+          "oldLine": 171,
+          "currentLines": [
+            171
+          ],
+          "text": "def docker(*args, input=None):",
+          "present": true
+        },
+        {
+          "oldLine": 178,
+          "currentLines": [
+            178
+          ],
+          "text": "def target(plan, inspected, running=False):",
+          "present": true
+        },
+        {
+          "oldLine": 197,
+          "currentLines": [
+            197
+          ],
+          "text": "len(inspected[\"Mounts\"]) != 2",
+          "present": true
+        },
+        {
+          "oldLine": 220,
+          "currentLines": [
+            220
+          ],
+          "text": "def install(container, plan):",
+          "present": true
+        },
+        {
+          "oldLine": 251,
+          "currentLines": [
+            251
+          ],
+          "text": "def receipt(plan, inspected, logs):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_storage_bridge.py",
+      "sha256": "cbb5c63be37e5bcb932c4d3c3d31f9818cd6c1794e077f2ca02460e148bab95d",
+      "gitBlob": "db062b4fcb6f35de4dfdd77fa46276d77a77469b",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 19,
+          "currentLines": [
+            19
+          ],
+          "text": "def bridge(mode, bundle, source, policy_hash, request_hash=None):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_replacement.py",
+      "sha256": "aed3e41951c4481de3ccc94e3f5d755c11631bb8e0e09f949782288a1b932f67",
+      "gitBlob": "cc08219e81099610a52cd36f225550e76698b227",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 19,
+          "currentLines": [
+            19
+          ],
+          "text": "def canonical(value):",
+          "present": true
+        },
+        {
+          "oldLine": 23,
+          "currentLines": [
+            23
+          ],
+          "text": "def inspected(name):",
+          "present": true
+        },
+        {
+          "oldLine": 31,
+          "currentLines": [
+            31
+          ],
+          "text": "def state_archive(container):",
+          "present": true
+        },
+        {
+          "oldLine": 54,
+          "currentLines": [
+            54
+          ],
+          "text": "def state_digest(raw, manifest, *, exclude=()):",
+          "present": true
+        },
+        {
+          "oldLine": 103,
+          "currentLines": [
+            103
+          ],
+          "text": "def stopped_target(plan, value, volume, consumers):",
+          "present": true
+        },
+        {
+          "oldLine": 137,
+          "currentLines": [
+            137
+          ],
+          "text": "def capture(plan):",
+          "present": true
+        },
+        {
+          "oldLine": 176,
+          "currentLines": [
+            176
+          ],
+          "text": "def recheck(plan, receipt):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_replace.py",
+      "sha256": "c11206224052edec8a05e8b8fc77e2df0320d37b7681afebee67a75aa5439244",
+      "gitBlob": "ac9d55aa27081224a8beb8c761ff04ecffd8134a",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 21,
+          "currentLines": [
+            21
+          ],
+          "text": "def sync_directory(path):",
+          "present": true
+        },
+        {
+          "oldLine": 29,
+          "currentLines": [
+            29
+          ],
+          "text": "def save(path, value):",
+          "present": true
+        },
+        {
+          "oldLine": 44,
+          "currentLines": [
+            44
+          ],
+          "text": "def locked(directory):",
+          "present": true
+        },
+        {
+          "oldLine": 65,
+          "currentLines": [
+            65
+          ],
+          "text": "def optional(name):",
+          "present": true
+        },
+        {
+          "oldLine": 78,
+          "currentLines": [
+            78
+          ],
+          "text": "def validate_volume(previous, current, expected_hash):",
+          "present": true
+        },
+        {
+          "oldLine": 90,
+          "currentLines": [
+            90
+          ],
+          "text": "def command(plan):",
+          "present": true
+        },
+        {
+          "oldLine": 125,
+          "currentLines": [
+            125
+          ],
+          "text": "def preserved(plan, container):",
+          "present": true
+        },
+        {
+          "oldLine": 136,
+          "currentLines": [
+            136
+          ],
+          "text": "def start_and_confirm(name, container_id, checkpoint):",
+          "present": true
+        },
+        {
+          "oldLine": 144,
+          "currentLines": [
+            144
+          ],
+          "text": "def old_target(record, value):",
+          "present": true
+        },
+        {
+          "oldLine": 159,
+          "currentLines": [
+            159
+          ],
+          "text": "def new_target(plan, record, value):",
+          "present": true
+        },
+        {
+          "oldLine": 190,
+          "currentLines": [
+            190
+          ],
+          "text": "def run(plan, receipt, *, checkpoint=lambda phase: None):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "sha256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "gitBlob": "e42f017ea011780ee2724866c3b11cdc087d7af6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 25,
+          "currentLines": [
+            25
+          ],
+          "text": "def strict_json(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 36,
+          "currentLines": [
+            36
+          ],
+          "text": "def no_migration(directory, *, leaf_observation=False):",
+          "present": true
+        },
+        {
+          "oldLine": 54,
+          "currentLines": [
+            54
+          ],
+          "text": "def validate_topology(manifest):",
+          "present": true
+        },
+        {
+          "oldLine": 74,
+          "currentLines": [
+            74
+          ],
+          "text": "def credential_archive(directory):",
+          "present": true
+        },
+        {
+          "oldLine": 112,
+          "currentLines": [
+            112
+          ],
+          "text": "def no_rotation_mutation(directory):",
+          "present": true
+        },
+        {
+          "oldLine": 122,
+          "currentLines": [
+            122
+          ],
+          "text": "def _settled(directory):",
+          "present": true
+        },
+        {
+          "oldLine": 143,
+          "currentLines": [
+            143
+          ],
+          "text": "def _stable_settled(value):",
+          "present": true
+        },
+        {
+          "oldLine": 149,
+          "currentLines": [
+            149
+          ],
+          "text": "def rotation_mutation_guard(directory, *, action=None):",
+          "present": true
+        },
+        {
+          "oldLine": 183,
+          "currentLines": [
+            183
+          ],
+          "text": "def install_files(container, directory, *, rotation_publication=False):",
+          "present": true
+        },
+        {
+          "oldLine": 204,
+          "currentLines": [
+            204
+          ],
+          "text": "def _install_files(container, directory, *, rotation_publication=False, settled=False, frozen=None):",
+          "present": true
+        },
+        {
+          "oldLine": 239,
+          "currentLines": [
+            239
+          ],
+          "text": "def repair_target(manifest, container):",
+          "present": true
+        },
+        {
+          "oldLine": 264,
+          "currentLines": [
+            264
+          ],
+          "text": "def check_running(container):",
+          "present": true
+        },
+        {
+          "oldLine": 278,
+          "currentLines": [
+            278
+          ],
+          "text": "def same_identity(previous, current):",
+          "present": true
+        },
+        {
+          "oldLine": 284,
+          "currentLines": [
+            284
+          ],
+          "text": "def image_id(manifest, image):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "sha256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "gitBlob": "9407f6ad974b8f19daeb75d95fcb1fcbc5465693",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 11,
+          "currentLines": [
+            11
+          ],
+          "text": "def run(*args, **kwargs):",
+          "present": true
+        },
+        {
+          "oldLine": 16,
+          "currentLines": [
+            16
+          ],
+          "text": "def main():",
+          "present": true
+        },
+        {
+          "oldLine": 26,
+          "currentLines": [
+            26
+          ],
+          "text": "def configure(folder, manifest, node, state, *, settled=None):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "gitBlob": "2a03a3dd9445a51ffc1954a8878498ea51beab0b",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 75,
+          "currentLines": [
+            75
+          ],
+          "text": "def manifest_keys(schema):",
+          "present": true
+        },
+        {
+          "oldLine": 81,
+          "currentLines": [
+            81
+          ],
+          "text": "def file_names(manifest):",
+          "present": true
+        },
+        {
+          "oldLine": 85,
+          "currentLines": [
+            85
+          ],
+          "text": "def _peer_binding(manifest):",
+          "present": true
+        },
+        {
+          "oldLine": 89,
+          "currentLines": [
+            89
+          ],
+          "text": "def observe_actual_floor(worker_root, manifest, files):",
+          "present": true
+        },
+        {
+          "oldLine": 93,
+          "currentLines": [
+            93
+          ],
+          "text": "def floor_target_context(worker_root):",
+          "present": true
+        },
+        {
+          "oldLine": 97,
+          "currentLines": [
+            97
+          ],
+          "text": "def _version_tuple(value: str) -> tuple[int, int, int]:",
+          "present": true
+        },
+        {
+          "oldLine": 104,
+          "currentLines": [
+            104
+          ],
+          "text": "def runtime_preflight() -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 125,
+          "currentLines": [
+            125
+          ],
+          "text": "def _utc(value: object) -> datetime:",
+          "present": true
+        },
+        {
+          "oldLine": 134,
+          "currentLines": [
+            134
+          ],
+          "text": "def _canonical(value: object) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 140,
+          "currentLines": [
+            140
+          ],
+          "text": "def _digest(data: bytes) -> str:",
+          "present": true
+        },
+        {
+          "oldLine": 144,
+          "currentLines": [
+            144
+          ],
+          "text": "def _regular(path: Path, *, limit: int = 65536) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 151,
+          "currentLines": [
+            151
+          ],
+          "text": "def _certificates(raw: bytes) -> list[x509.Certificate]:",
+          "present": true
+        },
+        {
+          "oldLine": 158,
+          "currentLines": [
+            158
+          ],
+          "text": "def _verify_signature(issuer: x509.Certificate, certificate: x509.Certificate) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 165,
+          "currentLines": [
+            165
+          ],
+          "text": "def _leaf(",
+          "present": true
+        },
+        {
+          "oldLine": 194,
+          "currentLines": [
+            194
+          ],
+          "text": "def _historical_expired_leaf(",
+          "present": true
+        },
+        {
+          "oldLine": 223,
+          "currentLines": [
+            223
+          ],
+          "text": "def _policy(raw: bytes, *, manifest: dict, fingerprints: list[str], expires: str) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 244,
+          "currentLines": [
+            244
+          ],
+          "text": "def validate_bundle(",
+          "present": true
+        },
+        {
+          "oldLine": 466,
+          "currentLines": [
+            466
+          ],
+          "text": "def _atomic(path: Path, data: bytes) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 489,
+          "currentLines": [
+            489
+          ],
+          "text": "def _exclusive(path: Path):",
+          "present": true
+        },
+        {
+          "oldLine": 501,
+          "currentLines": [
+            501
+          ],
+          "text": "def _owned_directory(path: Path) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 514,
+          "currentLines": [
+            514
+          ],
+          "text": "def _history_bytes(path: Path, *, limit: int = 65536) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 521,
+          "currentLines": [
+            521
+          ],
+          "text": "def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 566,
+          "currentLines": [
+            566
+          ],
+          "text": "def _finalized_evidence(",
+          "present": true
+        },
+        {
+          "oldLine": 657,
+          "currentLines": [
+            657
+          ],
+          "text": "def _require_settled_archive(path: Path) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 665,
+          "currentLines": [
+            665
+          ],
+          "text": "def _finalized_successor(",
+          "present": true
+        },
+        {
+          "oldLine": 773,
+          "currentLines": [
+            773
+          ],
+          "text": "def _finalization_body(",
+          "present": true
+        },
+        {
+          "oldLine": 794,
+          "currentLines": [
+            794
+          ],
+          "text": "def verify_finalized_attestation(value: dict, manifest_raw: bytes, files: dict) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 829,
+          "currentLines": [
+            829
+          ],
+          "text": "def attest_finalized(bundle: Path, worker_root: Path, *, now: datetime | None = None) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 859,
+          "currentLines": [
+            859
+          ],
+          "text": "def _supersede_expired_journal(",
+          "present": true
+        },
+        {
+          "oldLine": 926,
+          "currentLines": [
+            926
+          ],
+          "text": "def install(",
+          "present": true
+        },
+        {
+          "oldLine": 942,
+          "currentLines": [
+            942
+          ],
+          "text": "def finalize(",
+          "present": true
+        },
+        {
+          "oldLine": 1029,
+          "currentLines": [
+            1029
+          ],
+          "text": "def rollback(",
+          "present": true
+        },
+        {
+          "oldLine": 1043,
+          "currentLines": [
+            1043
+          ],
+          "text": "def docker_restart(worker_root: Path) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 1064,
+          "currentLines": [
+            1064
+          ],
+          "text": "def main() -> None:",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "gitBlob": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "\"servingPID\", \"servingProcessSHA256\", \"servingExecutableSHA256\", \"plainServingProcess\",",
+          "present": true
+        },
+        {
+          "oldLine": 33,
+          "currentLines": [
+            33
+          ],
+          "text": "def canonical(value):",
+          "present": true
+        },
+        {
+          "oldLine": 37,
+          "currentLines": [
+            37
+          ],
+          "text": "def floor_canonical(value):",
+          "present": true
+        },
+        {
+          "oldLine": 66,
+          "currentLines": [
+            66
+          ],
+          "text": "def digest(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 70,
+          "currentLines": [
+            70
+          ],
+          "text": "def strict(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 81,
+          "currentLines": [
+            81
+          ],
+          "text": "def version(value, increment=0):",
+          "present": true
+        },
+        {
+          "oldLine": 87,
+          "currentLines": [
+            87
+          ],
+          "text": "def versions(manifest):",
+          "present": true
+        },
+        {
+          "oldLine": 101,
+          "currentLines": [
+            101
+          ],
+          "text": "def binding(manifest):",
+          "present": true
+        },
+        {
+          "oldLine": 105,
+          "currentLines": [
+            105
+          ],
+          "text": "def signed_shape(value, body, signature):",
+          "present": true
+        },
+        {
+          "oldLine": 110,
+          "currentLines": [
+            110
+          ],
+          "text": "def current_policy(raw, *, version_number, scope, control_fingerprint, now):",
+          "present": true
+        },
+        {
+          "oldLine": 123,
+          "currentLines": [
+            123
+          ],
+          "text": "def validate_policy(raw, manifest, phase, *, now=None, before_write=False):",
+          "present": true
+        },
+        {
+          "oldLine": 143,
+          "currentLines": [
+            143
+          ],
+          "text": "def verify_floor(value, certificate_raw, scope, *, nonce=None, now=None, fresh=True):",
+          "present": true
+        },
+        {
+          "oldLine": 149,
+          "currentLines": [
+            149
+          ],
+          "text": "if type(value[\"servingPID\"]) is not int or value[\"servingPID\"] < 1 or value[\"plainServingProcess\"] is not True:",
+          "present": true
+        },
+        {
+          "oldLine": 179,
+          "currentLines": [
+            179
+          ],
+          "text": "def match_floor(value, manifest, phase):",
+          "present": true
+        },
+        {
+          "oldLine": 188,
+          "currentLines": [
+            188
+          ],
+          "text": "def commit_body(manifest, raw):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "gitBlob": "b537809fb623ebc84dabc9f4b6a076948e1db3cc",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "def regular(path):",
+          "present": true
+        },
+        {
+          "oldLine": 43,
+          "currentLines": [
+            43
+          ],
+          "text": "def _stopped_archive(cid):",
+          "present": true
+        },
+        {
+          "oldLine": 72,
+          "currentLines": [
+            72
+          ],
+          "text": "def stopped_entries(worker_root, expected_context):",
+          "present": true
+        },
+        {
+          "oldLine": 112,
+          "currentLines": [
+            112
+          ],
+          "text": "def docker(*args):",
+          "present": true
+        },
+        {
+          "oldLine": 119,
+          "currentLines": [
+            119
+          ],
+          "text": "def _plain(manifest, value, *, current=True):",
+          "present": true
+        },
+        {
+          "oldLine": 158,
+          "currentLines": [
+            158
+          ],
+          "text": "def target(worker_root):",
+          "present": true
+        },
+        {
+          "oldLine": 191,
+          "currentLines": [
+            191
+          ],
+          "text": "def observe(worker_root, rotation, files, *, nonce=None):",
+          "present": true
+        },
+        {
+          "oldLine": 221,
+          "currentLines": [
+            221
+          ],
+          "text": "def context(worker_root):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "sha256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "gitBlob": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 14,
+          "currentLines": [
+            14
+          ],
+          "text": "def _legacy():",
+          "present": true
+        },
+        {
+          "oldLine": 19,
+          "currentLines": [
+            19
+          ],
+          "text": "def identity(manifest, raw):",
+          "present": true
+        },
+        {
+          "oldLine": 24,
+          "currentLines": [
+            24
+          ],
+          "text": "def _sign(root, body):",
+          "present": true
+        },
+        {
+          "oldLine": 30,
+          "currentLines": [
+            30
+          ],
+          "text": "def _floor(root, manifest, files):",
+          "present": true
+        },
+        {
+          "oldLine": 39,
+          "currentLines": [
+            39
+          ],
+          "text": "def _target(root, record=None):",
+          "present": true
+        },
+        {
+          "oldLine": 46,
+          "currentLines": [
+            46
+          ],
+          "text": "def _record(root):",
+          "present": true
+        },
+        {
+          "oldLine": 67,
+          "currentLines": [
+            67
+          ],
+          "text": "def _verify_record(record, manifest, files, raw):",
+          "present": true
+        },
+        {
+          "oldLine": 95,
+          "currentLines": [
+            95
+          ],
+          "text": "def install(bundle, worker_root, *, restart, now=None, kill=lambda point: None, superseded_bundle=None):",
+          "present": true
+        },
+        {
+          "oldLine": 191,
+          "currentLines": [
+            191
+          ],
+          "text": "def finalize(bundle, worker_root, commit_receipt, *, restart, now=None):",
+          "present": true
+        },
+        {
+          "oldLine": 264,
+          "currentLines": [
+            264
+          ],
+          "text": "def rollback(*args, **kwargs):",
+          "present": true
+        },
+        {
+          "oldLine": 268,
+          "currentLines": [
+            268
+          ],
+          "text": "def _commit(raw, manifest, manifest_raw, files):",
+          "present": true
+        },
+        {
+          "oldLine": 277,
+          "currentLines": [
+            277
+          ],
+          "text": "def verify_settled(worker_root, *, now=None):",
+          "present": true
+        },
+        {
+          "oldLine": 331,
+          "currentLines": [
+            331
+          ],
+          "text": "def resume_publication(bundle, worker_root, *, commit_receipt=None, now=None):",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "sha256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "gitBlob": "c1b6ec66a37e33a9fda8e6a015ca892f1f1034b7",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 45,
+          "currentLines": [
+            45
+          ],
+          "text": "def _prevent_bytecode_writes() -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 50,
+          "currentLines": [
+            50
+          ],
+          "text": "def _canonical(value: object) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 54,
+          "currentLines": [
+            54
+          ],
+          "text": "def _sha256(value: bytes) -> str:",
+          "present": true
+        },
+        {
+          "oldLine": 58,
+          "currentLines": [
+            58
+          ],
+          "text": "def _regular(path: Path, *, limit: int) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 65,
+          "currentLines": [
+            65
+          ],
+          "text": "def _write_file(path: Path, value: bytes) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 72,
+          "currentLines": [
+            72
+          ],
+          "text": "def _fsync_directory(path: Path) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 82,
+          "currentLines": [
+            82
+          ],
+          "text": "def load_lock() -> tuple[bytes, dict]:",
+          "present": true
+        },
+        {
+          "oldLine": 121,
+          "currentLines": [
+            121
+          ],
+          "text": "def _platform_key(lock: dict) -> str:",
+          "present": true
+        },
+        {
+          "oldLine": 139,
+          "currentLines": [
+            139
+          ],
+          "text": "def _download(url: str) -> bytes:",
+          "present": true
+        },
+        {
+          "oldLine": 150,
+          "currentLines": [
+            150
+          ],
+          "text": "def _worker_sources() -> dict[str, bytes]:",
+          "present": true
+        },
+        {
+          "oldLine": 180,
+          "currentLines": [
+            180
+          ],
+          "text": "def build_bundle(output: Path) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 227,
+          "currentLines": [
+            227
+          ],
+          "text": "def _bundle(",
+          "present": true
+        },
+        {
+          "oldLine": 267,
+          "currentLines": [
+            267
+          ],
+          "text": "def _wheel_members(raw: bytes) -> dict[str, bytes]:",
+          "present": true
+        },
+        {
+          "oldLine": 298,
+          "currentLines": [
+            298
+          ],
+          "text": "def _expected_files(",
+          "present": true
+        },
+        {
+          "oldLine": 321,
+          "currentLines": [
+            321
+          ],
+          "text": "def _installed_worker_modules(runtime_dir: Path) -> dict[str, bytes]:",
+          "present": true
+        },
+        {
+          "oldLine": 337,
+          "currentLines": [
+            337
+          ],
+          "text": "def _installed_files(runtime_dir: Path) -> dict[str, bytes]:",
+          "present": true
+        },
+        {
+          "oldLine": 354,
+          "currentLines": [
+            354
+          ],
+          "text": "def validate_runtime(",
+          "present": true
+        },
+        {
+          "oldLine": 402,
+          "currentLines": [
+            402
+          ],
+          "text": "def clean_bytecode_cache(runtime_dir: Path) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 478,
+          "currentLines": [
+            478
+          ],
+          "text": "def install(bundle: Path, runtime_dir: Path) -> dict:",
+          "present": true
+        },
+        {
+          "oldLine": 527,
+          "currentLines": [
+            527
+          ],
+          "text": "def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 570,
+          "currentLines": [
+            570
+          ],
+          "text": "def main() -> int:",
+          "present": true
+        }
+      ],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+      "sha256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+      "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "gitBlob": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 20,
+          "currentLines": [
+            20
+          ],
+          "text": "func main() {",
+          "present": true
+        },
+        {
+          "oldLine": 26,
+          "currentLines": [
+            26
+          ],
+          "text": "func run() error {",
+          "present": true
+        },
+        {
+          "oldLine": 169,
+          "currentLines": [
+            169
+          ],
+          "text": "func strictPeerFloorArguments(args []string) bool {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "sha256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "gitBlob": "df8600ec30da8f9426f6bc7c18eaeb093aa80cc5",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 39,
+          "currentLines": [
+            39
+          ],
+          "text": "func ServingExecutableSHA256(pid int, uid uint32) (string, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 107,
+          "currentLines": [
+            107
+          ],
+          "text": "func PeerFloorServingProcess(pid int, state, policy string, config Config, uid uint32) (string, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 192,
+          "currentLines": [
+            192
+          ],
+          "text": "if len(fields) > 4 && (fields[4] == \"/contribution\" || strings.HasPrefix(fields[4], \"/contribution/\")) {",
+          "present": true
+        },
+        {
+          "oldLine": 200,
+          "currentLines": [
+            200
+          ],
+          "text": "func strictObject(raw []byte, names ...string) (map[string]json.RawMessage, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 239,
+          "currentLines": [
+            239
+          ],
+          "text": "func existingDirectory(path string) (*os.File, syscall.Stat_t, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 266,
+          "currentLines": [
+            266
+          ],
+          "text": "func observedEntry(directory *os.File, name string, uid uint32) ([]byte, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 296,
+          "currentLines": [
+            296
+          ],
+          "text": "func ReadPeerPolicyFloor(state, policyPath string, config Config) (PeerPolicyFloorObservation, error) {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/runtime/storage_policy.go",
+      "sha256": "8a15937331502f5f94abc2e489d0f0c9cfe48473b857e6bd266218a69b8cb33f",
+      "gitBlob": "9feaa06a68f0553e1c7087bec0da702b6dd551fb",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 25,
+          "currentLines": [
+            25
+          ],
+          "text": "func (p StoragePolicyPin) valid() bool {",
+          "present": true
+        },
+        {
+          "oldLine": 31,
+          "currentLines": [
+            31
+          ],
+          "text": "func (j *Journal) PinStoragePolicy(next StoragePolicyPin) error {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/runtime/docker.go",
+      "sha256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb",
+      "gitBlob": "5de7ff0d154a4086fddb94e1be51e694fc45f9cb",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 52,
+          "currentLines": [
+            52
+          ],
+          "text": "func (d *Docker) apiVersion(ctx context.Context) (string, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 104,
+          "currentLines": [
+            104
+          ],
+          "text": "func NewDocker(socket string) (*Docker, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 113,
+          "currentLines": [
+            113
+          ],
+          "text": "func (d *Docker) request(ctx context.Context, method, path string, body any, out any) error {",
+          "present": true
+        },
+        {
+          "oldLine": 155,
+          "currentLines": [
+            155
+          ],
+          "text": "func labels(r Record) map[string]string {",
+          "present": true
+        },
+        {
+          "oldLine": 167,
+          "currentLines": [
+            167
+          ],
+          "text": "func gpuRequests(plan contracts.SandboxLaunchSpec) []deviceRequest {",
+          "present": true
+        },
+        {
+          "oldLine": 180,
+          "currentLines": [
+            180
+          ],
+          "text": "func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 266,
+          "currentLines": [
+            266
+          ],
+          "text": "func equal(a, b []string) bool {",
+          "present": true
+        },
+        {
+          "oldLine": 278,
+          "currentLines": [
+            278
+          ],
+          "text": "func equalDeviceRequests(actual, expected []deviceRequest) bool {",
+          "present": true
+        },
+        {
+          "oldLine": 323,
+          "currentLines": [
+            323
+          ],
+          "text": "func owned(value inspection, r Record) error {",
+          "present": true
+        },
+        {
+          "oldLine": 334,
+          "currentLines": [
+            334
+          ],
+          "text": "func (d *Docker) Start(ctx context.Context, id string) error {",
+          "present": true
+        },
+        {
+          "oldLine": 340,
+          "currentLines": [
+            340
+          ],
+          "text": "func (d *Docker) Inspect(ctx context.Context, name string, r Record) (State, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 353,
+          "currentLines": [
+            353
+          ],
+          "text": "func (d *Docker) Stop(ctx context.Context, id string) error {",
+          "present": true
+        },
+        {
+          "oldLine": 359,
+          "currentLines": [
+            359
+          ],
+          "text": "func (d *Docker) Remove(ctx context.Context, id string, r Record) error {",
+          "present": true
+        },
+        {
+          "oldLine": 369,
+          "currentLines": [
+            369
+          ],
+          "text": "func stopped(s State) bool {",
+          "present": true
+        },
+        {
+          "oldLine": 373,
+          "currentLines": [
+            373
+          ],
+          "text": "func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.NodeOutput, error) {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "sha256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "gitBlob": "c2551c0366cf9d4c74e4b3096937b7d142355646",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 23,
+          "currentLines": [
+            23
+          ],
+          "text": "func ObservePeerPolicyFloor(config node.Config, state, policy, certPath, keyPath, nonce string, servingPID int) (map[string]any, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 79,
+          "currentLines": [
+            79
+          ],
+          "text": "body := map[string]any{\"schemaVersion\": \"saintvision-node-peer-policy-floor:2\", \"tenantId\": config.TenantID, \"nodeId\": config.NodeID, \"recoveryEpoch\": config.Epoch, \"nonce\": nonce, \"observedAt\": now.Unix(), \"certificateDER_SHA256\": hex.EncodeToString(der[:]), \"peerPolicyVersion\": floor.Version, \"peerPolicySHA256\": floor.Hash, \"floorSHA256\": floor.FloorSHA256, \"journalIdentitySHA256\": floor.JournalIdentitySHA256, \"journalUID\": floor.JournalUID, \"servingPID\": servingPID, \"servingProcessSHA256\": processHash, \"servingExecutableSHA256\": executableHash, \"plainServingProcess\": true}",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/transport/storage.go",
+      "sha256": "9bf91ac747df5e9ceb14ffa990d73e8384ddb024f1ecec66630f00d0c00e6e12",
+      "gitBlob": "6fa6d9c01d47b774198f012069b427f55a0db1e1",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 30,
+          "currentLines": [
+            30
+          ],
+          "text": "func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config, pin func(node.StoragePolicyPin) error) (*ConfiguredStorage, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 66,
+          "currentLines": [
+            66
+          ],
+          "text": "func (s *ConfiguredStorage) Installation() node.StoragePolicyPin { return s.receipt }",
+          "present": true
+        },
+        {
+          "oldLine": 67,
+          "currentLines": [
+            67
+          ],
+          "text": "func (s *ConfiguredStorage) Close() error                        { return s.sampler.Close() }",
+          "present": true
+        },
+        {
+          "oldLine": 68,
+          "currentLines": [
+            68
+          ],
+          "text": "func (s *ConfiguredStorage) current() bool {",
+          "present": true
+        },
+        {
+          "oldLine": 72,
+          "currentLines": [
+            72
+          ],
+          "text": "func (s *ConfiguredStorage) Sample(ctx context.Context, raw []byte) (map[string]string, error) {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/storage/sample.go",
+      "sha256": "296892a8a2b3a80c9146daf9922fe195a3c0808de81da08b8b11b28798f9a7c8",
+      "gitBlob": "d99a2394b18f6537b94538b77fbc06e3bd531b99",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 32,
+          "currentLines": [
+            32
+          ],
+          "text": "func Open(raw []byte) (*Sampler, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 46,
+          "currentLines": [
+            46
+          ],
+          "text": "func (s *Sampler) Close() error { return s.root.close() }",
+          "present": true
+        },
+        {
+          "oldLine": 49,
+          "currentLines": [
+            49
+          ],
+          "text": "func (s *Sampler) CheckCertificate(pair *tls.Certificate) error {",
+          "present": true
+        },
+        {
+          "oldLine": 54,
+          "currentLines": [
+            54
+          ],
+          "text": "func endpoint(value string) bool {",
+          "present": true
+        },
+        {
+          "oldLine": 67,
+          "currentLines": [
+            67
+          ],
+          "text": "func validPath(path string) bool {",
+          "present": true
+        },
+        {
+          "oldLine": 84,
+          "currentLines": [
+            84
+          ],
+          "text": "func keyFor(pair *tls.Certificate, channel contracts.NodeStorageChannel, now time.Time) (ed25519.PrivateKey, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 111,
+          "currentLines": [
+            111
+          ],
+          "text": "func (s *Sampler) Collect(ctx context.Context, raw []byte, pair *tls.Certificate) (map[string]string, error) {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/node-agent/storage/root_linux.go",
+      "sha256": "f174c3b9e6971c273ddf53c77e119e6f335708cf66b96bba0a908aeae1609596",
+      "gitBlob": "db210c75dc9ef5f9658cd50913018ea82d24ecdd",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 23,
+          "currentLines": [
+            23
+          ],
+          "text": "func directory(path string) (*os.File, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 44,
+          "currentLines": [
+            44
+          ],
+          "text": "func openRoot(path string) (*readRoot, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 59,
+          "currentLines": [
+            59
+          ],
+          "text": "func (r *readRoot) close() error    { return r.file.Close() }",
+          "present": true
+        },
+        {
+          "oldLine": 60,
+          "currentLines": [
+            60
+          ],
+          "text": "func same(a, b syscall.Stat_t) bool { return a.Dev == b.Dev && a.Ino == b.Ino }",
+          "present": true
+        },
+        {
+          "oldLine": 61,
+          "currentLines": [
+            61
+          ],
+          "text": "func (r *readRoot) current() error {",
+          "present": true
+        },
+        {
+          "oldLine": 73,
+          "currentLines": [
+            73
+          ],
+          "text": "func (r *readRoot) open(path string) (*os.File, error) {",
+          "present": true
+        },
+        {
+          "oldLine": 102,
+          "currentLines": [
+            102
+          ],
+          "text": "func (r *readRoot) hash(ctx context.Context, path string) (string, int64, error) {",
+          "present": true
+        }
+      ],
+      "requiredAction": "CONTRACT_BINDING_REGENERATION_REVIEW_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "sha256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "gitBlob": "30902552b9d584dd50182344d4a4140e32e41051",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 21,
+          "currentLines": [
+            21
+          ],
+          "text": "def node_uri(node, epoch):",
+          "present": true
+        },
+        {
+          "oldLine": 25,
+          "currentLines": [
+            25
+          ],
+          "text": "def endpoint_parts(endpoint):",
+          "present": true
+        },
+        {
+          "oldLine": 58,
+          "currentLines": [
+            58
+          ],
+          "text": "def certificate_identity(der, node, epoch, *, now=None):",
+          "present": true
+        },
+        {
+          "oldLine": 84,
+          "currentLines": [
+            84
+          ],
+          "text": "class ChannelProof:",
+          "present": true
+        },
+        {
+          "oldLine": 93,
+          "currentLines": [
+            93
+          ],
+          "text": "def proof(row):",
+          "present": true
+        },
+        {
+          "oldLine": 104,
+          "currentLines": [
+            104
+          ],
+          "text": "def assert_channel(conn, expected):",
+          "present": true
+        },
+        {
+          "oldLine": 106,
+          "currentLines": [
+            106
+          ],
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE\",",
+          "present": true
+        },
+        {
+          "oldLine": 120,
+          "currentLines": [
+            120
+          ],
+          "text": "class NodeChannels:",
+          "present": true
+        },
+        {
+          "oldLine": 142,
+          "currentLines": [
+            142
+          ],
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (node.node_id,)",
+          "present": true
+        },
+        {
+          "oldLine": 151,
+          "currentLines": [
+            151
+          ],
+          "text": "def provision_channel(",
+          "present": true
+        },
+        {
+          "oldLine": 205,
+          "currentLines": [
+            205
+          ],
+          "text": "def revoke_channel(conn, node: NodePrincipal, *, expected_version):",
+          "present": true
+        }
+      ],
+      "requiredAction": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "gitBlob": "56d62d6aee56bb7878197244d3c00b929e4d0762",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 40,
+          "currentLines": [
+            40
+          ],
+          "text": "def reject():",
+          "present": true
+        },
+        {
+          "oldLine": 44,
+          "currentLines": [
+            44
+          ],
+          "text": "def canonical(value):",
+          "present": true
+        },
+        {
+          "oldLine": 50,
+          "currentLines": [
+            50
+          ],
+          "text": "def identifier(value, prefix):",
+          "present": true
+        },
+        {
+          "oldLine": 55,
+          "currentLines": [
+            55
+          ],
+          "text": "def integer(value, low, high):",
+          "present": true
+        },
+        {
+          "oldLine": 60,
+          "currentLines": [
+            60
+          ],
+          "text": "def sha(value):",
+          "present": true
+        },
+        {
+          "oldLine": 66,
+          "currentLines": [
+            66
+          ],
+          "text": "class SampleItem:",
+          "present": true
+        },
+        {
+          "oldLine": 75,
+          "currentLines": [
+            75
+          ],
+          "text": "class Challenge:",
+          "present": true
+        },
+        {
+          "oldLine": 101,
+          "currentLines": [
+            101
+          ],
+          "text": "integer(self.channel.version, 1, 2**31 - 1)",
+          "present": true
+        },
+        {
+          "oldLine": 102,
+          "currentLines": [
+            102
+          ],
+          "text": "integer(self.root_version, 1, 2**31 - 1)",
+          "present": true
+        },
+        {
+          "oldLine": 117,
+          "currentLines": [
+            117
+          ],
+          "text": "integer(item.version, 1, 2**31 - 1)",
+          "present": true
+        },
+        {
+          "oldLine": 142,
+          "currentLines": [
+            142
+          ],
+          "text": "def new_challenge(",
+          "present": true
+        },
+        {
+          "oldLine": 162,
+          "currentLines": [
+            162
+          ],
+          "text": "def certificate_key(certificate_der, channel, now):",
+          "present": true
+        },
+        {
+          "oldLine": 180,
+          "currentLines": [
+            180
+          ],
+          "text": "class ConfiguredSampler:",
+          "present": true
+        },
+        {
+          "oldLine": 235,
+          "currentLines": [
+            235
+          ],
+          "text": "class VerifiedSample:",
+          "present": true
+        },
+        {
+          "oldLine": 251,
+          "currentLines": [
+            251
+          ],
+          "text": "def verify_sample(challenge, envelope, *, certificate_der, now=None):",
+          "present": true
+        }
+      ],
+      "requiredAction": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "sha256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "gitBlob": "443a936a4aab28a0bb1fe5585255c07511f12253",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "def refused():",
+          "present": true
+        },
+        {
+          "oldLine": 31,
+          "currentLines": [
+            31
+          ],
+          "text": "def decode_challenge(value):",
+          "present": true
+        },
+        {
+          "oldLine": 42,
+          "currentLines": [
+            42
+          ],
+          "text": "class StorageSampleStore:",
+          "present": true
+        },
+        {
+          "oldLine": 79,
+          "currentLines": [
+            79
+          ],
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (row[\"node_id\"],)",
+          "present": true
+        }
+      ],
+      "requiredAction": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "gitBlob": "962ea07b3801d696b563884b9c0dc90cf2e5d502",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 78,
+          "currentLines": [
+            78
+          ],
+          "text": "def derive_request_id(*, tenant_id, project_id, run_id, key) -> str:",
+          "present": true
+        },
+        {
+          "oldLine": 95,
+          "currentLines": [
+            95
+          ],
+          "text": "class CatalogueProjectReader:",
+          "present": true
+        },
+        {
+          "oldLine": 171,
+          "currentLines": [
+            171
+          ],
+          "text": "class StorageCheckCollector:",
+          "present": true
+        },
+        {
+          "oldLine": 350,
+          "currentLines": [
+            350
+          ],
+          "text": "def configured_storage_sample_collector(database, configuration, catalogue_engine):",
+          "present": true
+        }
+      ],
+      "requiredAction": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/lan_workspace.py",
+      "sha256": "c767f4e9f96a8f174e8bc2f7ead9558101a9f1faf2e414a2e2a93922c276ebb3",
+      "gitBlob": "70a34cdd79a478580c7c006ebec26093b0f805b6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 20,
+          "currentLines": [
+            20
+          ],
+          "text": "INSTALLERS = ('worker_config.py','worker_workspace.py','Enable-Workspace.ps1',",
+          "present": true
+        },
+        {
+          "oldLine": 25,
+          "currentLines": [
+            25
+          ],
+          "text": "def sha(path):",
+          "present": true
+        },
+        {
+          "oldLine": 33,
+          "currentLines": [
+            33
+          ],
+          "text": "def bundle(args):",
+          "present": true
+        }
+      ],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "gitBlob": "d8de953f7cd2f69f0e4915efccb24df352e7ea64",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 103,
+          "currentLines": [
+            103
+          ],
+          "text": "def run(args, **kwargs):",
+          "present": true
+        },
+        {
+          "oldLine": 114,
+          "currentLines": [
+            114
+          ],
+          "text": "def write(path, data):",
+          "present": true
+        },
+        {
+          "oldLine": 122,
+          "currentLines": [
+            122
+          ],
+          "text": "def atomic_write(path, data):",
+          "present": true
+        },
+        {
+          "oldLine": 150,
+          "currentLines": [
+            150
+          ],
+          "text": "def exclusive_file(path):",
+          "present": true
+        },
+        {
+          "oldLine": 162,
+          "currentLines": [
+            162
+          ],
+          "text": "def private_directory(path):",
+          "present": true
+        },
+        {
+          "oldLine": 182,
+          "currentLines": [
+            182
+          ],
+          "text": "def _read_pgpass(path, *, host, port, dbname, user):",
+          "present": true
+        },
+        {
+          "oldLine": 204,
+          "currentLines": [
+            204
+          ],
+          "text": "def validate_pilot_database_name(value):",
+          "present": true
+        },
+        {
+          "oldLine": 215,
+          "currentLines": [
+            215
+          ],
+          "text": "def pilot_runtime_role(database):",
+          "present": true
+        },
+        {
+          "oldLine": 220,
+          "currentLines": [
+            220
+          ],
+          "text": "def _require_same_external_database(admin_dsn, runtime_dsn):",
+          "present": true
+        },
+        {
+          "oldLine": 234,
+          "currentLines": [
+            234
+          ],
+          "text": "def read_external_dsn(path, expected_user):",
+          "present": true
+        },
+        {
+          "oldLine": 264,
+          "currentLines": [
+            264
+          ],
+          "text": "def external_dsn_password(value, expected_user):",
+          "present": true
+        },
+        {
+          "oldLine": 275,
+          "currentLines": [
+            275
+          ],
+          "text": "def _dsn_with_passfile(value, expected_user, passfile):",
+          "present": true
+        },
+        {
+          "oldLine": 304,
+          "currentLines": [
+            304
+          ],
+          "text": "def bind_db_auth(args):",
+          "present": true
+        },
+        {
+          "oldLine": 390,
+          "currentLines": [
+            390
+          ],
+          "text": "def _pem_certificates(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 397,
+          "currentLines": [
+            397
+          ],
+          "text": "def _load_external_ca(key_path, password_path, chain_path):",
+          "present": true
+        },
+        {
+          "oldLine": 431,
+          "currentLines": [
+            431
+          ],
+          "text": "def ensure_pilot_pki(path, state, args):",
+          "present": true
+        },
+        {
+          "oldLine": 488,
+          "currentLines": [
+            488
+          ],
+          "text": "def load_pilot_ca_key(path, *, key_path=None, password_path=None, chain_path=None):",
+          "present": true
+        },
+        {
+          "oldLine": 508,
+          "currentLines": [
+            508
+          ],
+          "text": "def load_prebuilt_image(archive_path, inspect_path, tag, target):",
+          "present": true
+        },
+        {
+          "oldLine": 637,
+          "currentLines": [
+            637
+          ],
+          "text": "def configured_nodes(state):",
+          "present": true
+        },
+        {
+          "oldLine": 693,
+          "currentLines": [
+            693
+          ],
+          "text": "def active_configured_nodes(state):",
+          "present": true
+        },
+        {
+          "oldLine": 702,
+          "currentLines": [
+            702
+          ],
+          "text": "def normalized_state(state):",
+          "present": true
+        },
+        {
+          "oldLine": 714,
+          "currentLines": [
+            714
+          ],
+          "text": "def load(path):",
+          "present": true
+        },
+        {
+          "oldLine": 718,
+          "currentLines": [
+            718
+          ],
+          "text": "def save(path, data):",
+          "present": true
+        },
+        {
+          "oldLine": 727,
+          "currentLines": [
+            727
+          ],
+          "text": "def validate_node_ips(server_ip, node_ips, *, allow_server_node_colocation=False):",
+          "present": true
+        },
+        {
+          "oldLine": 744,
+          "currentLines": [
+            744
+          ],
+          "text": "def add_requested_nodes(state, node_ips, *, node_port=None):",
+          "present": true
+        },
+        {
+          "oldLine": 764,
+          "currentLines": [
+            764
+          ],
+          "text": "def revoked_colocation_state(state):",
+          "present": true
+        },
+        {
+          "oldLine": 779,
+          "currentLines": [
+            779
+          ],
+          "text": "def node_by_id(state, node_id):",
+          "present": true
+        },
+        {
+          "oldLine": 786,
+          "currentLines": [
+            786
+          ],
+          "text": "def node_from_csr(state, raw):",
+          "present": true
+        },
+        {
+          "oldLine": 796,
+          "currentLines": [
+            796
+          ],
+          "text": "def node_state_directory(path, node):",
+          "present": true
+        },
+        {
+          "oldLine": 806,
+          "currentLines": [
+            806
+          ],
+          "text": "def node_policy_path(path, state, node):",
+          "present": true
+        },
+        {
+          "oldLine": 812,
+          "currentLines": [
+            812
+          ],
+          "text": "def node_public_directory(path, node):",
+          "present": true
+        },
+        {
+          "oldLine": 818,
+          "currentLines": [
+            818
+          ],
+          "text": "def node_certificate_path(path, state, node):",
+          "present": true
+        },
+        {
+          "oldLine": 828,
+          "currentLines": [
+            828
+          ],
+          "text": "def ensure_node_policy(path, state, node):",
+          "present": true
+        },
+        {
+          "oldLine": 854,
+          "currentLines": [
+            854
+          ],
+          "text": "def manifest_for_node(state, node, inspected, tag):",
+          "present": true
+        },
+        {
+          "oldLine": 877,
+          "currentLines": [
+            877
+          ],
+          "text": "def artifact_for_client(state, public, client_ip, request_path):",
+          "present": true
+        },
+        {
+          "oldLine": 902,
+          "currentLines": [
+            902
+          ],
+          "text": "def runtime(state):",
+          "present": true
+        },
+        {
+          "oldLine": 906,
+          "currentLines": [
+            906
+          ],
+          "text": "def tls(path):",
+          "present": true
+        },
+        {
+          "oldLine": 915,
+          "currentLines": [
+            915
+          ],
+          "text": "def provision_observation_node(conn, state):",
+          "present": true
+        },
+        {
+          "oldLine": 932,
+          "currentLines": [
+            932
+          ],
+          "text": "def init(args):",
+          "present": true
+        },
+        {
+          "oldLine": 1192,
+          "currentLines": [
+            1192
+          ],
+          "text": "def bundle(args):",
+          "present": true
+        },
+        {
+          "oldLine": 1301,
+          "currentLines": [
+            1301
+          ],
+          "text": "def enroll(args):",
+          "present": true
+        },
+        {
+          "oldLine": 1366,
+          "currentLines": [
+            1366
+          ],
+          "text": "def _canonical_json(value):",
+          "present": true
+        },
+        {
+          "oldLine": 1372,
+          "currentLines": [
+            1372
+          ],
+          "text": "def _rotation_digest(raw):",
+          "present": true
+        },
+        {
+          "oldLine": 1376,
+          "currentLines": [
+            1376
+          ],
+          "text": "def _utc_z(value):",
+          "present": true
+        },
+        {
+          "oldLine": 1380,
+          "currentLines": [
+            1380
+          ],
+          "text": "def _load_revocations(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1400,
+          "currentLines": [
+            1400
+          ],
+          "text": "def _validate_current_control_leaf(certificate, intermediate, *, state, now):",
+          "present": true
+        },
+        {
+          "oldLine": 1419,
+          "currentLines": [
+            1419
+          ],
+          "text": "def _validate_expired_historical_leaf(",
+          "present": true
+        },
+        {
+          "oldLine": 1446,
+          "currentLines": [
+            1446
+          ],
+          "text": "def _load_offline_authorization(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1506,
+          "currentLines": [
+            1506
+          ],
+          "text": "def _rotation_material(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1537,
+          "currentLines": [
+            1537
+          ],
+          "text": "def _channel_row(conn, state, node, *, lock=False):",
+          "present": true
+        },
+        {
+          "oldLine": 1549,
+          "currentLines": [
+            1549
+          ],
+          "text": "def _normal_floor_input(args, node):",
+          "present": true
+        },
+        {
+          "oldLine": 1564,
+          "currentLines": [
+            1564
+          ],
+          "text": "def _plain_cp_floor(path, state, node, channel, observation, nonce, now):",
+          "present": true
+        },
+        {
+          "oldLine": 1569,
+          "currentLines": [
+            1569
+          ],
+          "text": "if observation[\"plainServingProcess\"] is not True or observation[\"servingPID\"] != 1:",
+          "present": true
+        },
+        {
+          "oldLine": 1594,
+          "currentLines": [
+            1594
+          ],
+          "text": "def _batch_journal_path(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1598,
+          "currentLines": [
+            1598
+          ],
+          "text": "def _load_batch_journal(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1615,
+          "currentLines": [
+            1615
+          ],
+          "text": "def _batch_material(path):",
+          "present": true
+        },
+        {
+          "oldLine": 1706,
+          "currentLines": [
+            1706
+          ],
+          "text": "def _write_batch_journal(path, *, manifest_raw, manifest, bundle, phase, staged):",
+          "present": true
+        },
+        {
+          "oldLine": 1719,
+          "currentLines": [
+            1719
+          ],
+          "text": "def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):",
+          "present": true
+        },
+        {
+          "oldLine": 1730,
+          "currentLines": [
+            1730
+          ],
+          "text": "def _batch_archive_path(path, batch):",
+          "present": true
+        },
+        {
+          "oldLine": 1736,
+          "currentLines": [
+            1736
+          ],
+          "text": "def _current_finalized_batch(path, state, batch, bundles, conn):",
+          "present": true
+        },
+        {
+          "oldLine": 1820,
+          "currentLines": [
+            1820
+          ],
+          "text": "def _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn):",
+          "present": true
+        },
+        {
+          "oldLine": 1876,
+          "currentLines": [
+            1876
+          ],
+          "text": "def _finalized_predecessor(path, state, journal, *, candidate=None):",
+          "present": true
+        },
+        {
+          "oldLine": 1962,
+          "currentLines": [
+            1962
+          ],
+          "text": "def retire_leaf_rotation_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 2031,
+          "currentLines": [
+            2031
+          ],
+          "text": "def _write_rotation_public_material(",
+          "present": true
+        },
+        {
+          "oldLine": 2183,
+          "currentLines": [
+            2183
+          ],
+          "text": "def _write_fully_expired_rotation_public_material(",
+          "present": true
+        },
+        {
+          "oldLine": 2303,
+          "currentLines": [
+            2303
+          ],
+          "text": "def prepare_leaf_rotation_recovery_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 2603,
+          "currentLines": [
+            2603
+          ],
+          "text": "def prepare_fully_expired_leaf_rotation_recovery_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 2997,
+          "currentLines": [
+            2997
+          ],
+          "text": "def prepare_leaf_rotation_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3181,
+          "currentLines": [
+            3181
+          ],
+          "text": "def abandon_expired_prepared_leaf_rotation_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3282,
+          "currentLines": [
+            3282
+          ],
+          "text": "def prepare_leaf_rotation(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3444,
+          "currentLines": [
+            3444
+          ],
+          "text": "def _validate_rotation_receipt(path, state, bundle, receipt_path):",
+          "present": true
+        },
+        {
+          "oldLine": 3540,
+          "currentLines": [
+            3540
+          ],
+          "text": "def stage_leaf_rotation_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3619,
+          "currentLines": [
+            3619
+          ],
+          "text": "def commit_leaf_rotation_batch(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3713,
+          "currentLines": [
+            3713
+          ],
+          "text": "def commit_leaf_rotation(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3782,
+          "currentLines": [
+            3782
+          ],
+          "text": "def revoke_server_node_colocation(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3836,
+          "currentLines": [
+            3836
+          ],
+          "text": "def revoke_node_certificate(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3884,
+          "currentLines": [
+            3884
+          ],
+          "text": "def node_status_rows(state):",
+          "present": true
+        },
+        {
+          "oldLine": 3926,
+          "currentLines": [
+            3926
+          ],
+          "text": "def status(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3943,
+          "currentLines": [
+            3943
+          ],
+          "text": "def observe(args):",
+          "present": true
+        },
+        {
+          "oldLine": 3980,
+          "currentLines": [
+            3980
+          ],
+          "text": "def serve(args):",
+          "present": true
+        },
+        {
+          "oldLine": 4067,
+          "currentLines": [
+            4067
+          ],
+          "text": "def main():",
+          "present": true
+        }
+      ],
+      "requiredAction": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/check_workspace_package.py",
+      "sha256": "c4956d9ad6a284a22743e2e63ade020a164a8673e9885424806144845a2bb7bd",
+      "gitBlob": "c026f350ac9c0974c156997d7f201daf7583f0a3",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 16,
+          "currentLines": [
+            16
+          ],
+          "text": "INSTALLERS = ('worker_config.py', 'worker_workspace.py', 'Enable-Workspace.ps1')",
+          "present": true
+        },
+        {
+          "oldLine": 24,
+          "currentLines": [
+            24
+          ],
+          "text": "def digest(path):",
+          "present": true
+        },
+        {
+          "oldLine": 29,
+          "currentLines": [
+            29
+          ],
+          "text": "def bounded(archive, name, limit):",
+          "present": true
+        },
+        {
+          "oldLine": 40,
+          "currentLines": [
+            40
+          ],
+          "text": "def archive_checksums(archive, manifest, limit):",
+          "present": true
+        },
+        {
+          "oldLine": 62,
+          "currentLines": [
+            62
+          ],
+          "text": "def inspect_package(state_path, identity, *, source_root=ROOT, now=None,",
+          "present": true
+        },
+        {
+          "oldLine": 137,
+          "currentLines": [
+            137
+          ],
+          "text": "def main():",
+          "present": true
+        }
+      ],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/check_workspace_upgrade.py",
+      "sha256": "f46da4fb47e4b2a15ccfe6495b2b110c8c718d42d88c8865d9dcab99378025d0",
+      "gitBlob": "d6be18b00840bd046f436700909e25365f32cda6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/check_storage_bundle.py",
+      "sha256": "860debab6c5f83a920dc71971672138c1e352c4c914424119d0cdab660f18df4",
+      "gitBlob": "da515b19dcfc1a8498e287679aa60932c7d3c1b5",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 18,
+          "currentLines": [
+            18
+          ],
+          "text": "def run(args, timeout=60):",
+          "present": true
+        },
+        {
+          "oldLine": 25,
+          "currentLines": [
+            25
+          ],
+          "text": "def main(prepared, bridge_only=False):",
+          "present": true
+        }
+      ],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/check_lan_storage_readiness.py",
+      "sha256": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "gitBlob": "b759db9c233518202386c0ea830d38749ad59f87",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 27,
+          "currentLines": [
+            27
+          ],
+          "text": "def relation_access(conn, name):",
+          "present": true
+        },
+        {
+          "oldLine": 56,
+          "currentLines": [
+            56
+          ],
+          "text": "def bundle_view(public):",
+          "present": true
+        },
+        {
+          "oldLine": 76,
+          "currentLines": [
+            76
+          ],
+          "text": "def evaluate(report):",
+          "present": true
+        },
+        {
+          "oldLine": 96,
+          "currentLines": [
+            96
+          ],
+          "text": "def inspect(state_path):",
+          "present": true
+        },
+        {
+          "oldLine": 135,
+          "currentLines": [
+            135
+          ],
+          "text": "def main():",
+          "present": true
+        }
+      ],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "tools/five_node_lab_preflight.py",
+      "sha256": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "gitBlob": "06ae5823a7ffd016ceff54d7666c27f7bda2eb73",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [
+        {
+          "oldLine": 21,
+          "currentLines": [
+            21
+          ],
+          "text": "def five_node_inventory_revision(payload: dict[str, Any]) -> str:",
+          "present": true
+        },
+        {
+          "oldLine": 34,
+          "currentLines": [
+            34
+          ],
+          "text": "def _require_exact_keys(value: dict[str, Any], expected: set[str], *, where: str) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 42,
+          "currentLines": [
+            42
+          ],
+          "text": "def validate_five_node_inventory(payload: Any) -> dict[str, Any]:",
+          "present": true
+        },
+        {
+          "oldLine": 142,
+          "currentLines": [
+            142
+          ],
+          "text": "def load_five_node_inventory(path: Path) -> dict[str, Any]:",
+          "present": true
+        },
+        {
+          "oldLine": 181,
+          "currentLines": [
+            181
+          ],
+          "text": "def _seconds_since(value: datetime | None, now: datetime) -> float | None:",
+          "present": true
+        },
+        {
+          "oldLine": 187,
+          "currentLines": [
+            187
+          ],
+          "text": "def _endpoint_ip(endpoint: str | None) -> str | None:",
+          "present": true
+        },
+        {
+          "oldLine": 199,
+          "currentLines": [
+            199
+          ],
+          "text": "def _assert_database_identity(node: dict[str, Any], row: dict[str, Any]) -> None:",
+          "present": true
+        },
+        {
+          "oldLine": 241,
+          "currentLines": [
+            241
+          ],
+          "text": "def _resource_snapshot_complete(snapshot: dict[str, Any] | None) -> bool:",
+          "present": true
+        },
+        {
+          "oldLine": 255,
+          "currentLines": [
+            255
+          ],
+          "text": "def _node_preflight(node: dict[str, Any], row: dict[str, Any] | None) -> dict[str, Any]:",
+          "present": true
+        },
+        {
+          "oldLine": 338,
+          "currentLines": [
+            338
+          ],
+          "text": "def five_node_lab_dry_run(",
+          "present": true
+        },
+        {
+          "oldLine": 423,
+          "currentLines": [
+            423
+          ],
+          "text": "def write_registration_mtls_preflight(",
+          "present": true
+        }
+      ],
+      "requiredAction": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Prepare-Worker.ps1",
+      "sha256": "95361cd51a2b92c28bee9effa092e49666bb3ee9351bb705e83cf43ccd448ea0",
+      "gitBlob": "2920add40038deba631ad67eba46513cc67067f2",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/prepare-worker.sh",
+      "sha256": "f82767d7c5db5b24937e2b3084692d55cdc0182ed9c92b1f3c5430b4c6372dcd",
+      "gitBlob": "eff077df50f7bfbdeef937d7b404d9cba3eea8d0",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/finish-worker.sh",
+      "sha256": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+      "gitBlob": "dc876ed250d8b3c45b9f12527007a67792fde8cd",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Start-Worker.ps1",
+      "sha256": "635a45184c82ce32d2dcf0ce95e8f9e32453e1ac48c5f5604cc771e10ace163e",
+      "gitBlob": "90f7a1c1a78c2f8b5ec230e0e6721b5c733d9a21",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/start-node.sh",
+      "sha256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "gitBlob": "bd67b7910152a67ea01cf78fc83faf2628efaaa2",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Repair-Worker.ps1",
+      "sha256": "cdfe372cec46e2a28ef1776837dfc61b0e1d67ce8aa001542c7e706512cbb6dd",
+      "gitBlob": "38fb4125cba078f798bc1504552f27e324d85609",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/repair-node.sh",
+      "sha256": "3538d6a20c92cc83736b3cb8413a01aa237d2df7a8d411dce68b3b912010b19b",
+      "gitBlob": "8598cc8db2e6c80e23d8d46f708654c4b220d4f6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Enable-Workspace.ps1",
+      "sha256": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "gitBlob": "7138f2f20dbfa2b08ea1bd89527ba9a14ae2dabd",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Enable-ExecutionTests.ps1",
+      "sha256": "485067ad443ed85a1178aa90d6407db4445f4987d4d1f2712b75d868a4954aa6",
+      "gitBlob": "521ee55573e5740d0bd4de6d1e7b07e26c345ec9",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Replace-Storage.ps1",
+      "sha256": "cbb07e36a3d42caa750170891c05d1a4686608984606acf684bce4cc59343fae",
+      "gitBlob": "8cee84bd431f5c8f4359759983f41e49e386d6b6",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Invoke-ScheduledLeafRenewal.ps1",
+      "sha256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+      "gitBlob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+      "sha256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+      "gitBlob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+      "sha256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+      "gitBlob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    },
+    {
+      "path": "deploy/lan/SvLauncherInput.ps1",
+      "sha256": "616ba0e59a294b032be5535b738784402027aeb5103745d89b2a032062a47cb0",
+      "gitBlob": "f44244df9c5d5af18e91d5d3947a270740caab18",
+      "sameBytesAsOriginal4fInventory": true,
+      "anchors": [],
+      "requiredAction": "ROLE_WRAPPER_CLOSED_ABI_OR_REFUSE_B",
+      "reverifiedAtSourceAnchor": true,
+      "futureCoordinatedUpdate": "B role/schema/manifest/channel/epoch binding; retain R4 plain floor; leaf rotation same shared C+1 and overlap/final P updates, R/root identity/policy bytes preserved until explicit policy revision"
+    }
+  ],
+  "claim": "Exact inherited 46-surface source inventory reverified; future coordinated update list, no source change or runtime proof"
+}

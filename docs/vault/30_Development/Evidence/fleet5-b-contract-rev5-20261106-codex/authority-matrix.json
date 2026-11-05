@@ -1,0 +1,2014 @@
+{
+  "version": "fleet5-b-authority-rev5:1",
+  "implemented": false,
+  "tables": {
+    "inv.node_role_approvals": [
+      {
+        "procedure": "b_append_approval",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "prior_approval_hash",
+          "candidate_ref",
+          "operator_grant_ref"
+        ]
+      }
+    ],
+    "inv.node_role_operations": [
+      {
+        "procedure": "b_begin_node_switch",
+        "verb": "INSERT",
+        "columns": [
+          "frozen_intent",
+          "expected_current_hash"
+        ]
+      },
+      {
+        "procedure": "b_plan_fresh",
+        "verb": "INSERT",
+        "columns": [
+          "frozen_intent"
+        ]
+      }
+    ],
+    "inv.node_role_current": [
+      {
+        "procedure": "b_begin_node_switch",
+        "verb": "UPDATE",
+        "columns": [
+          "switch_state",
+          "operation_ref"
+        ]
+      },
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "UPDATE",
+        "columns": [
+          "approval_ref",
+          "admission_ref",
+          "lease_ref",
+          "switch_state",
+          "activation_ledger_ref"
+        ]
+      },
+      {
+        "procedure": "b_refresh_same_generation",
+        "verb": "UPDATE",
+        "columns": [
+          "lease_ref"
+        ]
+      },
+      {
+        "procedure": "b_record_key_delivery",
+        "verb": "UPDATE",
+        "columns": [
+          "delivery_receipt_ref"
+        ]
+      }
+    ],
+    "inv.node_role_routing": [
+      {
+        "procedure": "b_plan_fresh",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "node_id",
+          "cohort_id",
+          "assignment_hash"
+        ]
+      }
+    ],
+    "inv.node_role_cohorts": [
+      {
+        "procedure": "b_fence_cohort",
+        "verb": "UPDATE",
+        "columns": [
+          "fence_state",
+          "operation_ref"
+        ]
+      },
+      {
+        "procedure": "b_commit_fresh_cohort",
+        "verb": "UPDATE",
+        "columns": [
+          "fence_state",
+          "release_evidence_ref"
+        ]
+      }
+    ],
+    "inv.node_role_candidates": [
+      {
+        "procedure": "b_append_candidate",
+        "verb": "INSERT",
+        "columns": [
+          "raw_node_proof",
+          "raw_host_proof",
+          "nonce",
+          "observed_at",
+          "static_hash"
+        ]
+      }
+    ],
+    "inv.node_role_gate_acks": [
+      {
+        "procedure": "b_record_gate_ack",
+        "verb": "INSERT",
+        "columns": [
+          "raw_node_signed_ack",
+          "command_hash",
+          "node_der_hash",
+          "candidate_ref"
+        ]
+      }
+    ],
+    "inv.node_channels": [
+      {
+        "procedure": "b_member_cas",
+        "verb": "UPDATE",
+        "columns": [
+          "version",
+          "certificate_sha256",
+          "certificate_not_after",
+          "enabled"
+        ]
+      },
+      {
+        "procedure": "b_provision_node_channel",
+        "verb": "INSERT_OR_UPDATE",
+        "columns": [
+          "tenant_id",
+          "node_id",
+          "recovery_epoch",
+          "version",
+          "endpoint",
+          "certificate_sha256",
+          "certificate_not_after",
+          "enabled"
+        ]
+      },
+      {
+        "procedure": "b_revoke_node_channel",
+        "verb": "UPDATE",
+        "columns": [
+          "enabled",
+          "version"
+        ]
+      }
+    ],
+    "inv.node_role_member_cas": [
+      {
+        "procedure": "b_member_cas",
+        "verb": "INSERT",
+        "columns": [
+          "operation_id",
+          "node_id",
+          "old_tuple",
+          "target_tuple"
+        ]
+      }
+    ],
+    "inv.node_role_releases": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "approval_ref",
+          "candidate_ref"
+        ]
+      }
+    ],
+    "inv.node_role_delegations": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "signed_record",
+          "release_ref"
+        ]
+      }
+    ],
+    "inv.node_role_admissions": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "release_ref",
+          "delegation_ref",
+          "gate_ack_ref",
+          "generation"
+        ]
+      }
+    ],
+    "inv.node_role_leases": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "admission_ref",
+          "expires_at",
+          "fresh_proof_ref"
+        ]
+      },
+      {
+        "procedure": "b_refresh_same_generation",
+        "verb": "INSERT",
+        "columns": [
+          "admission_ref",
+          "expires_at",
+          "fresh_proof_ref"
+        ]
+      }
+    ],
+    "inv.node_role_activation_ledger": [
+      {
+        "procedure": "b_commit_node_activation",
+        "verb": "INSERT",
+        "columns": [
+          "exact_result",
+          "expected_prior_pointer_hash"
+        ]
+      }
+    ],
+    "inv.node_role_delivery_challenges": [
+      {
+        "procedure": "b_prepare_key_delivery",
+        "verb": "INSERT",
+        "columns": [
+          "signed_challenge",
+          "activation_ledger_ref",
+          "nonce",
+          "expires_at",
+          "state"
+        ]
+      },
+      {
+        "procedure": "b_consume_key_challenge",
+        "verb": "UPDATE",
+        "columns": [
+          "state",
+          "consumption_ledger_ref"
+        ]
+      }
+    ],
+    "inv.node_role_key_possessions": [
+      {
+        "procedure": "b_append_key_possession",
+        "verb": "INSERT",
+        "columns": [
+          "challenge_ref",
+          "raw_use_key_signature",
+          "authenticated_issuer_tls_hash"
+        ]
+      }
+    ],
+    "inv.node_role_delivery_consumptions": [
+      {
+        "procedure": "b_consume_key_challenge",
+        "verb": "INSERT",
+        "columns": [
+          "challenge_ref",
+          "possession_ref",
+          "exact_context_hash"
+        ]
+      }
+    ],
+    "inv.node_role_key_deliveries": [
+      {
+        "procedure": "b_record_key_delivery",
+        "verb": "INSERT",
+        "columns": [
+          "protected_receipt",
+          "consumption_ref",
+          "activation_ledger_ref"
+        ]
+      }
+    ],
+    "inv.node_role_request_issuance": [
+      {
+        "procedure": "b_record_request_issuance",
+        "verb": "INSERT",
+        "columns": [
+          "node_id",
+          "request_hash",
+          "nonce",
+          "release_ref",
+          "expires_at"
+        ]
+      }
+    ],
+    "inv.node_role_request_commits": [
+      {
+        "procedure": "b_commit_business_nonce_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "issuance_ref",
+          "request_hash",
+          "verified_outcome_ref"
+        ]
+      }
+    ],
+    "inv.node_role_reconcile_evidence": [
+      {
+        "procedure": "b_commit_reconcile_receipt",
+        "verb": "INSERT",
+        "columns": [
+          "recorded_permit_hash",
+          "actual_node_outcome",
+          "authority_scope_ref"
+        ]
+      }
+    ],
+    "inv.node_role_safety_requests": [
+      {
+        "procedure": "b_record_safety_request",
+        "verb": "INSERT",
+        "columns": [
+          "scoped_request",
+          "nonce",
+          "grant_ref"
+        ]
+      }
+    ],
+    "inv.node_role_service_bindings": [
+      {
+        "procedure": "b_update_service_bindings",
+        "verb": "INSERT_OR_UPDATE",
+        "columns": [
+          "login_oid",
+          "tenant_scope",
+          "permitted_purposes",
+          "tls_identity_hash"
+        ]
+      }
+    ],
+    "inv.nodes": [
+      {
+        "procedure": "b_raise_node_quarantine",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_commit_node_observation",
+        "verb": "UPDATE",
+        "columns": [
+          "heartbeat_at",
+          "probe_started_at",
+          "clock_skew_seconds",
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_set_node_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_clear_node_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      }
+    ],
+    "inv.node_role_safety_obligations": [
+      {
+        "procedure": "b_register_node_safety_obligation",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "node_id",
+          "epoch",
+          "operation_id",
+          "causal_intent_hash",
+          "state"
+        ]
+      },
+      {
+        "procedure": "b_settle_node_safety_obligation",
+        "verb": "UPDATE",
+        "columns": [
+          "state",
+          "protected_clear_ref",
+          "physical_proof_hash"
+        ]
+      }
+    ],
+    "inv.tenant_controls": [
+      {
+        "procedure": "b_set_tenant_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "kill_switch",
+          "version",
+          "updated_at"
+        ]
+      },
+      {
+        "procedure": "b_clear_tenant_containment",
+        "verb": "UPDATE",
+        "columns": [
+          "kill_switch",
+          "version",
+          "updated_at"
+        ]
+      },
+      {
+        "procedure": "b_seed_new_tenant_control",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id"
+        ]
+      }
+    ],
+    "public.nodes": [
+      {
+        "procedure": "b_bootstrap_plain_node",
+        "verb": "INSERT",
+        "columns": [
+          "node_id",
+          "tenant_id",
+          "hostname",
+          "os_type",
+          "os_version",
+          "agent_version",
+          "status",
+          "certificate_fingerprint",
+          "labels",
+          "enrolled_at",
+          "heartbeat_sequence"
+        ]
+      },
+      {
+        "procedure": "b_bind_public_node_certificate",
+        "verb": "UPDATE",
+        "columns": [
+          "certificate_fingerprint",
+          "version"
+        ]
+      },
+      {
+        "procedure": "b_public_node_heartbeat",
+        "verb": "UPDATE",
+        "columns": [
+          "heartbeat_sequence",
+          "last_heartbeat_at",
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_public_node_lost",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_retire_public_node",
+        "verb": "UPDATE",
+        "columns": [
+          "status",
+          "version"
+        ]
+      }
+    ],
+    "public.storage_contributions": [
+      {
+        "procedure": "b_register_owner_contribution",
+        "verb": "INSERT",
+        "columns": [
+          "contribution_id",
+          "tenant_id",
+          "node_id",
+          "declared_path",
+          "normalized_path",
+          "mode",
+          "status",
+          "capacity_bytes",
+          "available_bytes",
+          "registered_by_user_id",
+          "registered_at"
+        ]
+      },
+      {
+        "procedure": "b_activate_owner_contribution",
+        "verb": "UPDATE",
+        "columns": [
+          "status"
+        ]
+      },
+      {
+        "procedure": "b_revoke_owner_contribution",
+        "verb": "UPDATE",
+        "columns": [
+          "status",
+          "revoked_at"
+        ]
+      }
+    ],
+    "inv.node_role_storage_bindings": [
+      {
+        "procedure": "b_approve_readonly_contribution_root",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "node_id",
+          "contribution_id",
+          "root_identity",
+          "policy_bytes_hash",
+          "r",
+          "approval_ref"
+        ]
+      }
+    ],
+    "inv.evidence": [
+      {
+        "procedure": "b_append_build_cleanup_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ]
+      },
+      {
+        "procedure": "b_append_result_completion_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ]
+      },
+      {
+        "procedure": "b_append_run_completion_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ]
+      },
+      {
+        "procedure": "b_append_shard_completion_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ]
+      },
+      {
+        "procedure": "b_append_storage_sample_evidence",
+        "verb": "INSERT",
+        "columns": [
+          "tenant_id",
+          "run_id",
+          "evidence_id",
+          "envelope"
+        ]
+      }
+    ],
+    "inv.node_role_lineage_tombstones": [
+      {
+        "procedure": "b_revoke_approval_lineage",
+        "verb": "INSERT",
+        "columns": [
+          "root_lineage_id",
+          "revoked_ancestor_hash",
+          "node_id",
+          "epoch",
+          "version",
+          "causal_evidence_hash"
+        ]
+      }
+    ],
+    "inv.control_epoch": []
+  },
+  "procedures": {
+    "b_append_approval": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_approvals": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "prior_approval_hash",
+            "candidate_ref",
+            "operator_grant_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_begin_node_switch": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_operations": {
+          "verb": "INSERT",
+          "columns": [
+            "frozen_intent",
+            "expected_current_hash"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "switch_state",
+            "operation_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_plan_fresh": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_operations": {
+          "verb": "INSERT",
+          "columns": [
+            "frozen_intent"
+          ]
+        },
+        "inv.node_role_routing": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "node_id",
+            "cohort_id",
+            "assignment_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_fence_cohort": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_cohorts": {
+          "verb": "UPDATE",
+          "columns": [
+            "fence_state",
+            "operation_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_append_candidate": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_candidates": {
+          "verb": "INSERT",
+          "columns": [
+            "raw_node_proof",
+            "raw_host_proof",
+            "nonce",
+            "observed_at",
+            "static_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_record_gate_ack": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_gate_acks": {
+          "verb": "INSERT",
+          "columns": [
+            "raw_node_signed_ack",
+            "command_hash",
+            "node_der_hash",
+            "candidate_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_member_cas": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_channels": {
+          "verb": "UPDATE",
+          "columns": [
+            "version",
+            "certificate_sha256",
+            "certificate_not_after",
+            "enabled"
+          ]
+        },
+        "inv.node_role_member_cas": {
+          "verb": "INSERT",
+          "columns": [
+            "operation_id",
+            "node_id",
+            "old_tuple",
+            "target_tuple"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_commit_node_activation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_releases": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "approval_ref",
+            "candidate_ref"
+          ]
+        },
+        "inv.node_role_delegations": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_record",
+            "release_ref"
+          ]
+        },
+        "inv.node_role_admissions": {
+          "verb": "INSERT",
+          "columns": [
+            "release_ref",
+            "delegation_ref",
+            "gate_ack_ref",
+            "generation"
+          ]
+        },
+        "inv.node_role_leases": {
+          "verb": "INSERT",
+          "columns": [
+            "admission_ref",
+            "expires_at",
+            "fresh_proof_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "approval_ref",
+            "admission_ref",
+            "lease_ref",
+            "switch_state",
+            "activation_ledger_ref"
+          ]
+        },
+        "inv.node_role_activation_ledger": {
+          "verb": "INSERT",
+          "columns": [
+            "exact_result",
+            "expected_prior_pointer_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_commit_fresh_cohort": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_cohorts": {
+          "verb": "UPDATE",
+          "columns": [
+            "fence_state",
+            "release_evidence_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_refresh_same_generation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_leases": {
+          "verb": "INSERT",
+          "columns": [
+            "admission_ref",
+            "expires_at",
+            "fresh_proof_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "lease_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_prepare_key_delivery": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_delivery_challenges": {
+          "verb": "INSERT",
+          "columns": [
+            "signed_challenge",
+            "activation_ledger_ref",
+            "nonce",
+            "expires_at",
+            "state"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_append_key_possession": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_use_issuer"
+      ],
+      "effects": {
+        "inv.node_role_key_possessions": {
+          "verb": "INSERT",
+          "columns": [
+            "challenge_ref",
+            "raw_use_key_signature",
+            "authenticated_issuer_tls_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_consume_key_challenge": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_delivery_challenges": {
+          "verb": "UPDATE",
+          "columns": [
+            "state",
+            "consumption_ledger_ref"
+          ]
+        },
+        "inv.node_role_delivery_consumptions": {
+          "verb": "INSERT",
+          "columns": [
+            "challenge_ref",
+            "possession_ref",
+            "exact_context_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_record_key_delivery": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_delivery_controller"
+      ],
+      "effects": {
+        "inv.node_role_key_deliveries": {
+          "verb": "INSERT",
+          "columns": [
+            "protected_receipt",
+            "consumption_ref",
+            "activation_ledger_ref"
+          ]
+        },
+        "inv.node_role_current": {
+          "verb": "UPDATE",
+          "columns": [
+            "delivery_receipt_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_record_request_issuance": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_use_issuer"
+      ],
+      "effects": {
+        "inv.node_role_request_issuance": {
+          "verb": "INSERT",
+          "columns": [
+            "node_id",
+            "request_hash",
+            "nonce",
+            "release_ref",
+            "expires_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_commit_business_nonce_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.node_role_request_commits": {
+          "verb": "INSERT",
+          "columns": [
+            "issuance_ref",
+            "request_hash",
+            "verified_outcome_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_commit_reconcile_receipt": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_reconcile_evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "recorded_permit_hash",
+            "actual_node_outcome",
+            "authority_scope_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_record_safety_request": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.node_role_safety_requests": {
+          "verb": "INSERT",
+          "columns": [
+            "scoped_request",
+            "nonce",
+            "grant_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_update_service_bindings": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_service_bindings": {
+          "verb": "INSERT_OR_UPDATE",
+          "columns": [
+            "login_oid",
+            "tenant_scope",
+            "permitted_purposes",
+            "tls_identity_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact typed current approved operation, tenant/Node/epoch/shared C and predecessor CAS; lineage checked at commit, never caller-selected plain/B flag"
+    },
+    "b_raise_node_quarantine": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_verifier",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "DENY_ONLY: owned tenant+Node+epoch+current operation and authenticated causal reconciliation obligation; raise quarantined from schedulable/offline or retain stronger denial; never clear draining/retired/quarantined, release claims, physical stop or success",
+      "denyOnly": true,
+      "mayReduceDenial": false,
+      "requiresDurableCausalEvidence": true,
+      "relatedAtomicEffects": [
+        "causal reconciliation/outbox obligation, no success assertion"
+      ]
+    },
+    "b_register_node_safety_obligation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.node_role_safety_obligations": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "node_id",
+            "epoch",
+            "operation_id",
+            "causal_intent_hash",
+            "state"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "durable PRE_IO exact current owned operation obligation; state=PENDING_PROOF; inability to commit denies IO; every eligibility query checks unresolved obligation independently of nodes.status",
+      "denyOnly": true,
+      "mayReduceDenial": false
+    },
+    "b_settle_node_safety_obligation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_safety_obligations": {
+          "verb": "UPDATE",
+          "columns": [
+            "state",
+            "protected_clear_ref",
+            "physical_proof_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "protected automated reconciliation service only: exact current operation + independent authenticated physical cleanup proof + protected clear/restore record; unknown/failed quarantine writes cannot settle from ordinary success path; no node.status clear",
+      "mayReduceDenial": true
+    },
+    "b_commit_node_observation": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "heartbeat_at",
+            "probe_started_at",
+            "clock_skew_seconds",
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "telemetry update; status only offline->online or online->offline when no containment/retirement; preserves quarantined/draining/retired",
+      "statusTransitions": [
+        [
+          "offline",
+          "online"
+        ],
+        [
+          "online",
+          "offline"
+        ]
+      ],
+      "mayReduceDenial": false
+    },
+    "b_set_node_containment": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "DENY_ONLY typed quarantine/drain/retire with current operation and evidence; retirement terminal",
+      "denyOnly": true,
+      "mayReduceDenial": false
+    },
+    "b_clear_node_containment": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "reviewed protected recovery only: current signed clear/restore grant + physical reconciliation + unchanged identity/epoch/shared C; never revive retired via ordinary clear",
+      "mayReduceDenial": true
+    },
+    "b_set_tenant_containment": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.tenant_controls": {
+          "verb": "UPDATE",
+          "columns": [
+            "kill_switch",
+            "version",
+            "updated_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "DENY_ONLY false->true CAS version with causal evidence",
+      "denyOnly": true,
+      "mayReduceDenial": false
+    },
+    "b_clear_tenant_containment": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.tenant_controls": {
+          "verb": "UPDATE",
+          "columns": [
+            "kill_switch",
+            "version",
+            "updated_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "true->false protected restore grant + reconciled proof + version CAS",
+      "mayReduceDenial": true
+    },
+    "b_seed_new_tenant_control": {
+      "owner": "sv_b_proc_owner",
+      "execute": [],
+      "effects": {
+        "inv.tenant_controls": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "internal fixed-scope SECURITY DEFINER trigger replacement only for NEW tenant insertion; absence proven under bootstrap lock; defaults only, cannot reset existing control or create B identity; no service EXECUTE/PUBLIC membership",
+      "internalTriggerOnly": true
+    },
+    "b_provision_node_channel": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_channels": {
+          "verb": "INSERT_OR_UPDATE",
+          "columns": [
+            "tenant_id",
+            "node_id",
+            "recovery_epoch",
+            "version",
+            "endpoint",
+            "certificate_sha256",
+            "certificate_not_after",
+            "enabled"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "derive identity/fingerprint/expiry from approved DER; current control/Node epoch equal; exact expected C (0 only initial) -> C+1; separate initial provisioning vs existing B leaf rotation plan; retired/revoked requires reviewed recovery; audit in same transaction",
+      "relatedAtomicEffects": [
+        "inv.node_channel_audit action provision same C and DER"
+      ]
+    },
+    "b_revoke_node_channel": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_channels": {
+          "verb": "UPDATE",
+          "columns": [
+            "enabled",
+            "version"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "exact tenant+Node+expected shared C; enabled=false,C+1,audit; cannot re-enable/reset/replace certificate, no separate storage C",
+      "denyOnly": true,
+      "mayReduceDenial": false,
+      "relatedAtomicEffects": [
+        "inv.node_channel_audit action revoke same C and DER; affected B eligibility denied"
+      ]
+    },
+    "b_bootstrap_plain_node": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_node_bootstrap"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "INSERT",
+          "columns": [
+            "node_id",
+            "tenant_id",
+            "hostname",
+            "os_type",
+            "os_version",
+            "agent_version",
+            "status",
+            "certificate_fingerprint",
+            "labels",
+            "enrolled_at",
+            "heartbeat_sequence"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "authenticated one-use tenant-bound bootstrap consumption, same capability/offer/audit transaction; status enrolling or active; protected approved cert binding if present; cannot create a fresh B identity to bypass existing quarantined/partial cohort",
+      "oneUseBootstrap": true,
+      "dbTruthSelectsProfile": true,
+      "relatedAtomicEffects": [
+        "bootstrap consumed once; capabilities/offers/audit same enrollment transaction; token never reusable after committed consumption"
+      ]
+    },
+    "b_bind_public_node_certificate": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "certificate_fingerprint",
+            "version"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "protected approved enrollment/leaf CAS; exact same identity/tenant/epoch and shared node_channels C; no heartbeat change to certificate"
+    },
+    "b_public_node_heartbeat": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "heartbeat_sequence",
+            "last_heartbeat_at",
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "atomic sequence strictly advances; lost->active only if no containment/retirement; other statuses unchanged",
+      "statusTransitions": [
+        [
+          "lost",
+          "active"
+        ]
+      ],
+      "mayReduceDenial": false
+    },
+    "b_public_node_lost": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "active->lost only on stale heartbeat; preserve stronger denial and retirement; replica unavailability in same transaction",
+      "statusTransitions": [
+        [
+          "active",
+          "lost"
+        ]
+      ],
+      "mayReduceDenial": false
+    },
+    "b_retire_public_node": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "public.nodes": {
+          "verb": "UPDATE",
+          "columns": [
+            "status",
+            "version"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "terminal retired; authenticated narrow request + evidence, retains identity and catalogue; no ordinary recovery",
+      "denyOnly": true,
+      "mayReduceDenial": false
+    },
+    "b_register_owner_contribution": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_storage_owner_api"
+      ],
+      "effects": {
+        "public.storage_contributions": {
+          "verb": "INSERT",
+          "columns": [
+            "contribution_id",
+            "tenant_id",
+            "node_id",
+            "declared_path",
+            "normalized_path",
+            "mode",
+            "status",
+            "capacity_bytes",
+            "available_bytes",
+            "registered_by_user_id",
+            "registered_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "authenticated tenant user registration on same tenant Node, OS-aware safe path and uniqueness; registered_by_user_id from authenticated principal, status pending; preserves plain mode catalogue semantics, never B admission",
+      "ownerConsent": true,
+      "grantsBAdmission": false
+    },
+    "b_activate_owner_contribution": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_storage_owner_api"
+      ],
+      "effects": {
+        "public.storage_contributions": {
+          "verb": "UPDATE",
+          "columns": [
+            "status"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "row registered_by_user_id equals authenticated owner; pending->active or active idempotent, Node folder confirmation; revoked terminal; no project grade/operator impersonation substitute",
+      "ownerConsent": true,
+      "grantsBAdmission": false,
+      "statusTransitions": [
+        [
+          "pending",
+          "active"
+        ],
+        [
+          "active",
+          "active"
+        ]
+      ]
+    },
+    "b_revoke_owner_contribution": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_storage_owner_api"
+      ],
+      "effects": {
+        "public.storage_contributions": {
+          "verb": "UPDATE",
+          "columns": [
+            "status",
+            "revoked_at"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "same registered owner withdraws ->revoked terminal; retain folder+catalogue; affected B eligibility denied, no deletion/reactivation/policy regeneration/compute downgrade",
+      "ownerConsent": true,
+      "grantsBAdmission": false,
+      "denyOnly": true,
+      "mayReduceDenial": false
+    },
+    "b_approve_readonly_contribution_root": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator"
+      ],
+      "effects": {
+        "inv.node_role_storage_bindings": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "node_id",
+            "contribution_id",
+            "root_identity",
+            "policy_bytes_hash",
+            "r",
+            "approval_ref"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "ADDITIONAL protected B RO/root/R/policy approval with current ACTIVE owner consent; no consent substitute; no RW, arbitrary mount, writeback or workload host-path access"
+    },
+    "b_append_build_cleanup_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "run_id",
+            "evidence_id",
+            "envelope"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "typed build_cleanup evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; BuildExecutionService._commit_consequences: current intent/run/lease CAS, verified duplicate physical cleanup receipts, resource lease release, BuildCleanupReceipt validation and completion outbox together",
+      "appendOnlyData": true,
+      "grantsApproval": false,
+      "assertsSuccessByAppendAlone": false,
+      "transactionBoundary": "BuildExecutionService._commit_consequences: current intent/run/lease CAS, verified duplicate physical cleanup receipts, resource lease release, BuildCleanupReceipt validation and completion outbox together"
+    },
+    "b_append_result_completion_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "run_id",
+            "evidence_id",
+            "envelope"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "typed result_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; ResultStore.complete: authenticated stop receipt, ready immutable prepared output, workspace checkpoint/pin, result_completions and RunStore transitions together",
+      "appendOnlyData": true,
+      "grantsApproval": false,
+      "assertsSuccessByAppendAlone": false,
+      "transactionBoundary": "ResultStore.complete: authenticated stop receipt, ready immutable prepared output, workspace checkpoint/pin, result_completions and RunStore transitions together"
+    },
+    "b_append_run_completion_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "run_id",
+            "evidence_id",
+            "envelope"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "typed run_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; RunStore.complete: EvidenceEnvelope validation, trusted bytes hash/size, verifying exact version and current fencing proofs, succeeded transition together",
+      "appendOnlyData": true,
+      "grantsApproval": false,
+      "assertsSuccessByAppendAlone": false,
+      "transactionBoundary": "RunStore.complete: EvidenceEnvelope validation, trusted bytes hash/size, verifying exact version and current fencing proofs, succeeded transition together"
+    },
+    "b_append_shard_completion_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime"
+      ],
+      "effects": {
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "run_id",
+            "evidence_id",
+            "envelope"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "typed shard_completion evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; ShardCompletion.once: exact run/shard/attempt and authenticated receipt/nonce/dedup, shard sample/completion/run transitions together",
+      "appendOnlyData": true,
+      "grantsApproval": false,
+      "assertsSuccessByAppendAlone": false,
+      "transactionBoundary": "ShardCompletion.once: exact run/shard/attempt and authenticated receipt/nonce/dedup, shard sample/completion/run transitions together"
+    },
+    "b_append_storage_sample_evidence": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_verifier"
+      ],
+      "effects": {
+        "inv.evidence": {
+          "verb": "INSERT",
+          "columns": [
+            "tenant_id",
+            "run_id",
+            "evidence_id",
+            "envelope"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": false,
+      "transitionPredicate": "typed storage_sample evidence append only; body schema and persisted scope/reference hashes verified, not arbitrary JSON; StorageSampleStore.apply_sample: exact Node/channel/epoch/nonce/signed sample, storage claim/sample and evidence commit together",
+      "appendOnlyData": true,
+      "grantsApproval": false,
+      "assertsSuccessByAppendAlone": false,
+      "transactionBoundary": "StorageSampleStore.apply_sample: exact Node/channel/epoch/nonce/signed sample, storage claim/sample and evidence commit together"
+    },
+    "b_revoke_approval_lineage": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_safety"
+      ],
+      "effects": {
+        "inv.node_role_lineage_tombstones": {
+          "verb": "INSERT",
+          "columns": [
+            "root_lineage_id",
+            "revoked_ancestor_hash",
+            "node_id",
+            "epoch",
+            "version",
+            "causal_evidence_hash"
+          ]
+        }
+      },
+      "searchPath": "pg_catalog",
+      "rowSecurity": "on/FORCE where applicable",
+      "arbitrarySqlOrTableParameter": false,
+      "protected": true,
+      "transitionPredicate": "authenticated immutable ancestor chain; durable terminal tombstone; any descendant denied at every current CP commit gate; no ordinary renewal clears",
+      "denyOnly": true,
+      "mayReduceDenial": false
+    }
+  },
+  "lockOnlyProcedures": {
+    "b_lock_business_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_runtime",
+        "sv_b_use_issuer"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_lock_observation_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier",
+        "sv_b_runtime",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_lock_operator_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_delivery_controller",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    },
+    "b_read_observation_scope": {
+      "owner": "sv_b_proc_owner",
+      "execute": [
+        "sv_b_operator",
+        "sv_b_verifier",
+        "sv_b_runtime",
+        "sv_b_safety"
+      ],
+      "columnsWritten": [],
+      "canonicalOrder": [
+        "control_epoch",
+        "tenant_controls",
+        "routing/fence",
+        "sorted inv.nodes",
+        "sorted public.nodes/contributions",
+        "shared node_channels",
+        "role/current",
+        "business/run",
+        "operator grants/resources",
+        "nonce/evidence/ledger"
+      ]
+    }
+  },
+  "allOnlineDirectAuthorityDML": {
+    "INSERT": false,
+    "UPDATE": false,
+    "DELETE": false,
+    "lock_sentinel_UPDATE": false,
+    "SET_ROLE_to_owner_operator_or_legacy_inv_kernel": false
+  },
+  "principals": {
+    "sv_b_ddl_owner": "NOLOGIN owns new B tables; not pooled",
+    "sv_b_proc_owner": "NOLOGIN non-super/non-bypass leastpriv function owner; no runtime membership",
+    "sv_b_operator": "protected approval/release planner, separate credentials and purpose-restricted signing service",
+    "sv_b_delivery_controller": "protected postcommit delivery controller; no approval/plan EXECUTE",
+    "sv_b_verifier": "online authenticated evidence verifier, no approval/release signing key",
+    "sv_b_use_issuer": "online delegated use key only, raw PoP append/issuance functions only",
+    "sv_b_runtime": "plain AND B shared online pool; external plain behavior retained through fixed plain wrappers; no inherited legacy inv_kernel/app DML or SET ROLE",
+    "sv_b_safety": "typed containment only; separate safety key",
+    "sv_b_budget_approver": "distinct protected planning-budget role/key/pin, no Node release/business authority",
+    "sv_storage_owner_api": "authenticated owner API pool; only owner registration/activation/withdrawal; actor derived from authenticated service binding, never request GUC/project grade",
+    "sv_node_bootstrap": "authenticated tenant-bound one-use bootstrap pool; no approval, containment clear or arbitrary identity creation"
+  },
+  "signaturePurposes": {
+    "APPROVAL": {
+      "domain": "saintvision/node-role-approval/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "APPROVAL_RENEW_SAME_CONFIG",
+        "REAPPROVE_SAME_CONFIG",
+        "FRESH_ACTIVATE"
+      ]
+    },
+    "RELEASE": {
+      "domain": "saintvision/node-role-release/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "RELEASE"
+      ]
+    },
+    "DELEGATION": {
+      "domain": "saintvision/node-role-delegation/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "DELEGATION"
+      ]
+    },
+    "GATE_CONTROL": {
+      "domain": "saintvision/node-role-gate/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "ARM_EXACT_RELEASE",
+        "INVALIDATE_EXACT_GATE"
+      ]
+    },
+    "GATE_ACK": {
+      "domain": "saintvision/node-role-gate-ack/v1",
+      "signer": "REGISTERED_NODE_LEAF",
+      "purposes": [
+        "ACK_EXACT_DURABLE_TRANSITION"
+      ]
+    },
+    "DELIVERY_CHALLENGE": {
+      "domain": "saintvision/node-role-key-delivery-challenge/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "KEY_DELIVERY_PREPARE"
+      ]
+    },
+    "KEY_POSSESSION": {
+      "domain": "saintvision/node-role-key-possession/v1",
+      "signer": "DELEGATED_USE_KEY",
+      "purposes": [
+        "PROVE_EXACT_CHALLENGE_POSSESSION"
+      ]
+    },
+    "KEY_DELIVERY_RECEIPT": {
+      "domain": "saintvision/node-role-key-delivery-receipt/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "KEY_DELIVERY_RECEIPT"
+      ]
+    },
+    "ROLE_USE": {
+      "domain": "saintvision/node-role-use/v1",
+      "signer": "DELEGATED_USE_KEY",
+      "purposes": [
+        "BUSINESS_USE"
+      ]
+    },
+    "SAFETY": {
+      "domain": "saintvision/node-role-safety/v1",
+      "signer": "PROTECTED_SAFETY",
+      "purposes": [
+        "CANCEL_EXACT_COMMAND",
+        "QUARANTINE_EXACT_OBLIGATION"
+      ]
+    },
+    "CONTEXT_BUDGET": {
+      "domain": "saintvision/context-budget/v1",
+      "signer": "PROTECTED_BUDGET_APPROVER",
+      "purposes": [
+        "APPROVE_MEASURED_CONTEXT_BUDGET"
+      ]
+    },
+    "GATE_OBSERVATION": {
+      "domain": "saintvision/node-role-observe/v1",
+      "signer": "REGISTERED_NODE_LEAF",
+      "purposes": [
+        "READ_DURABLE_GATE"
+      ]
+    },
+    "LINEAGE_TOMBSTONE": {
+      "domain": "saintvision/node-role-lineage-revoke/v1",
+      "signer": "OPERATOR_RELEASE",
+      "purposes": [
+        "REVOKE_LINEAGE"
+      ]
+    }
+  },
+  "rls": "Every new B table ENABLE+FORCE RLS, add to actual census/collector/ratchet/aggregate pin during future migration. Procedures verify session_user/service binding, tenant/sorted Node set/purpose/current grant; GUC alone not authority. Fixed qualified SQL, no caller-supplied table or lock mode. b_guard equivalent retains mandatory epoch then tenant guard via owner lock operations before B locks.",
+  "nodeCompromiseBound": "CP 300s admission lease is NOT a Node-enforced use-key compromise bound. Node bound is delegated/release/approval/cert expiry plus acknowledged gate invalidation; future protected signer/custody availability remains prerequisite.",
+  "externalPlanningTrustPin": {
+    "contextBudgetApproverPublicKeySHA256": null,
+    "custodyRole": "sv_b_budget_approver",
+    "permittedKind": "CONTEXT_BUDGET",
+    "cannotAuthorize": [
+      "Node release",
+      "business",
+      "safety"
+    ]
+  },
+  "actualKeys": null,
+  "actualDBGrants": false,
+  "legitimateNoOnlineWriter": {
+    "inv.control_epoch": "one-time/offline exclusive bootstrap only; online epoch change is B-RECOVERY1 HOLD"
+  },
+  "plainAndBSharedMediation": true,
+  "profileSelection": "persisted routing/current/cohort/status is authoritative; request profile/compatibility flags cannot choose a legacy bypass",
+  "ordinaryOnline": [
+    "sv_b_runtime",
+    "sv_b_verifier",
+    "sv_b_use_issuer",
+    "sv_storage_owner_api",
+    "sv_node_bootstrap"
+  ],
+  "signingService": {
+    "rawOperatorPrivateKeyToController": false,
+    "installedCallerPolicy": {
+      "sv_b_operator": [
+        "APPROVAL",
+        "RELEASE",
+        "DELEGATION",
+        "GATE_CONTROL",
+        "LINEAGE_TOMBSTONE"
+      ],
+      "sv_b_delivery_controller": [
+        "DELIVERY_CHALLENGE",
+        "KEY_DELIVERY_RECEIPT"
+      ],
+      "sv_b_budget_approver": [
+        "CONTEXT_BUDGET"
+      ]
+    },
+    "scopeValidation": "authenticated installed caller binding -> exact purpose/domain/body scope; controller requires postcommit activation ledger, current ARM ACK, exact recipient/key/challenge/possession; reject BEFORE signing",
+    "keyCustody": {
+      "OPERATOR_RELEASE": "existing protected signing service only",
+      "CONTEXT_BUDGET": "separate protected budget key"
+    },
+    "actualCustody": null
+  }
+}

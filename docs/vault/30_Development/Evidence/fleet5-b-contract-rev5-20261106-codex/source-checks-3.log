@@ -1,0 +1,13 @@
+{"sourceMutation": "S1-remove-known-lock_run", "semanticDetected": true}
+{"sourceMutation": "S2-remove-ORM-Node-lock", "semanticDetected": true}
+{"sourceMutation": "S3-alias-helper", "semanticDetected": true}
+{"sourceMutation": "S4-dotted-import", "semanticDetected": true}
+{"sourceMutation": "S5-instance-wrapper", "semanticDetected": true}
+{"sourceMutation": "S6-SQL-constant", "semanticDetected": true}
+{"sourceMutation": "S7-real-NO-KEY-mode-change", "semanticDetected": true}
+{"sourceMutation": "S8-new-unmapped-writer", "semanticDetected": true}
+{"sourceMutation": "S9-unknown-locked-table-block", "semanticDetected": true}
+{"sourceMutation": "S10-unknown-instance-explicit", "semanticDetected": true}
+{"sourceMutation": "S11-ORM-keyword-mode", "semanticDetected": true}
+{"sourceMutation": "S12-unresolved-SQL-explicit-block", "semanticDetected": true}
+{"passed": 113, "sourceMutations": 12, "actualPG": 0}

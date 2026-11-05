@@ -1,0 +1,68 @@
+{
+  "priorReview": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+  "rootDecision": "msg_03544733c9f3",
+  "status": "OWNER_PROPOSED_REMEDIES_ACTUAL_WHOLE_REVIEW_PENDING",
+  "findings": [
+    {
+      "id": "B4-M1",
+      "proposal": "Every actual matrix-table SQL/ORM/trigger writer reconciled; typed plain+B shared procedure mediation, deny-only quarantine+durable pre-IO guard, exact evidence append/owner/bootstrap/channel/status authority",
+      "evidence": [
+        "writer-reconciliation.json",
+        "authority-matrix.json",
+        "reconcile.py",
+        "source-fixture-results.json"
+      ]
+    },
+    {
+      "id": "B4-M2",
+      "proposal": "All real24 CP edges resolved; every row/advisory locker/writer/unknownSQL scope seeded; per-function actual set/modes/ranks/outer transaction/discovery/rechecks and source mutations; unknown scoped BLOCK",
+      "evidence": [
+        "source-analysis.json",
+        "plan_specs.py",
+        "source-fixture-results.json"
+      ]
+    },
+    {
+      "id": "B4-L1",
+      "proposal": "Authenticated immutable full prior chain/rootLineageID; inherited durable explicit revocation at every CP commit gate; ancestor expiry separate; Node acknowledgement/expiry bound honest",
+      "evidence": [
+        "model.py",
+        "fixture-results.json",
+        "contract.schema.json"
+      ]
+    },
+    {
+      "id": "B4-L2",
+      "proposal": "Terminal durable gate/release history, sequence/predecessor/hash/current-generation checks; signed closed observe readback resolves only valid original ACK; stale/missing/conflict/restart B-RECOVERY1 HOLD",
+      "evidence": [
+        "model.py",
+        "fixture-results.json",
+        "contract.schema.json"
+      ]
+    },
+    {
+      "id": "B4-L3",
+      "proposal": "Existing anchor signing SERVICE with authenticated installed caller purpose/domain/scope restriction; controller only prepare/receipt, no raw private key; separate budget purpose/key",
+      "evidence": [
+        "authority-matrix.json",
+        "model.py",
+        "fixture-results.json"
+      ]
+    },
+    {
+      "id": "B4-L4",
+      "proposal": "Semantic ACL/status/owner/evidence/census invariants; every observationScope oneOf branch missing/extra/type/refusal negatives and advancing-time phase fixtures; preserved old comparator limitations",
+      "evidence": [
+        "fixtures.py",
+        "source_fixtures.py",
+        "fixture-results.json",
+        "source-fixture-results.json"
+      ]
+    }
+  ],
+  "actualNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "A1_A16": "PENDING",
+  "allRealBindings": null,
+  "independentReviewer": "Claude via Root PENDING",
+  "next": "Publish one immutable head/exact Docs and one actual whole review; code only on concrete Root grant"
+}
