@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-FLEET5-20261105-CP-INVENTORY-CLAUDE"
 title: "2026-11-05 FLEET5 CP 겸 Node와 inventory 대조 (읽기 전용 발견·배치 계획)"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T15:05:00+09:00"
+updated: "2026-11-05T15:25:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9b9061ed"
@@ -65,8 +65,8 @@ SSH alias InvizMain/DrSaint/inviz-api/saint_label/webpacs는 접속 없이 설�
 
 **가장 작은 안전 경로(제안이며 실행하지 않음).** 지원되는 runtime이 이 PC에 실제로 없으므로, 아래는 격리된 준비·업그레이드 제안이다.
 
-1. 시점: Nov 10 08:00 KST 후속이 정산되고 결과를 검토한 뒤로 잡는다. r5 DB는 외부 SSH tunnel 방식이라 local container가 없다. 그래서 Docker 재시작이 r5를 직접 끊지는 않는다. 그러나 설치기가 logoff나 재부팅을 요구하면 r5 process(python/node/ssh)와 Orca 후속이 멈춘다.
-2. 권한: Docker Desktop 업그레이드는 이 PC의 공용 runtime을 바꾼다. 다른 제품 container 24개와 진료 stack이 포함되고 WSL data를 이전해야 한다. 그러므로 기존 프로젝트 승인과 **별도인 새 사용자 권한**이 필요하다. 관리자 권한(설치, Start-Worker 방화벽)과 `wsl --install -d Ubuntu`(다운로드)도 같은 성격이다. 이 기록은 그 권한을 대신 주장하지 않으며 같은 질문을 반복하지 않는다. root가 사용자 결정 한 건으로 묶어 처리한다.
+1. 시점(v1.0.1 정정): 달력 시각이 아니라 상태로 판단한다. 모든 예약 시도가 정산되고, 살아 있는 child와 unknown completion이 없고, 세 pin과 r5 health가 정상이어야 한다. 세부 조건은 [[2026-11-05_15-25-00_KST_FLEET5_worker_readiness_독립검토_Claude]]에 있다. r5 DB는 외부 SSH tunnel 방식이라 local container가 없지만, 설치기가 logoff나 재부팅을 요구하면 r5 process(python/node/ssh)와 Orca 후속이 멈춘다.
+2. 실행 경계(v1.0.1 정정): 기존 프로젝트 승인은 유지되며 일반 동의를 다시 묻지 않는다. 실제 경계는 세 가지다. 첫째, 설치·방화벽·`wsl --install`에 OS 관리자 권한이 필요하다. 둘째, Docker Desktop을 종료하면 running 8개가 멈추고 그중 7개가 다른 제품이라 유지보수 조율이 필요하다. 셋째, WSL data를 이전하기 전에 백업해야 한다. 진료 stack은 열지 않는다.
 3. 사전 기록: 같은 명령으로 container 25개의 이름·상태·project, volume 83, image 146, `docker version`, r5 health(listener 3개, 2Node fresh)와 Orca 후속 3개를 다시 기록한다.
 4. 보존: Docker Desktop을 종료한다. 이때 running 8개가 멈추므로 다른 제품 owner에게 미리 알린다. 다음으로 `%LOCALAPPDATA%\Docker\wsl\data\ext4.vhdx`(69.6GB)와 `distro\ext4.vhdx`, `%APPDATA%\Docker\settings.json`을 D:의 날짜별 백업 폴더로 복사하고 크기와 sha256을 기록한다. 삭제·prune·export는 하지 않는다.
 5. 업그레이드: Engine 26 이상(API ≥ 1.45)을 공식 release note로 확인한 Desktop 버전으로 올리고 WSL2 backend는 유지한다. 4.16에서 올리면 `docker-desktop-data` 배치가 바뀔 수 있으므로 해당 버전 note의 data migration 항목을 먼저 읽는다. 그 다음 `wsl --install -d Ubuntu`로 distro를 만들고 Ubuntu integration을 켠다. Ubuntu 안에 `openssl`, `python3`, `curl`, `unzip`을 설치한다.
@@ -134,7 +134,7 @@ bash finish-worker.sh <absolute-folder> <storage-policy-sha256>
 | worker4 주소와 SSH 사용자(진행 중인 사용자 질문의 답) | root/사용자 |
 | 1~4번 `hostnamectl`로 그림 이름과 칸 대응 확정, `docker version` API, `timedatectl`, nproc/mem/disk, 후보 port 비어 있음 확인(읽기 전용) | Codex 운영 worker |
 | worker3 docker socket 접근 권한, 5번 allowedResources/Folders | 장비 관리자/사용자 결정 |
-| CP Docker Desktop 업그레이드·Ubuntu WSL·관리자 권한을 한 건의 결정으로(11-10 08:00 이후) | root가 사용자 결정으로 묶음 |
+| CP Docker Desktop 업그레이드·Ubuntu WSL: 상태 기반 해제 조건, OS 관리자, 다른 제품 유지보수 조율, vhdx 백업과 rollback 자산(v1.0.1 정정) | root(조율), Codex/Claude(오프라인 계획 검토) |
 | 위 측정 후 f5 inventory revision 초안과 Codex 실행 계획의 독립 검토 | Claude |
 | f5 init/bundle/enroll과 dry-run preflight 실행 | Codex(Claude 검토) |
 

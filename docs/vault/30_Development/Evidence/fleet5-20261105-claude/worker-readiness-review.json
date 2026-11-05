@@ -1,0 +1,137 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_e1b499632366 (independent review of Codex 6ba9ee46 and CP offline plan)",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T15:06:00+09:00", "2026-11-05T15:25:00+09:00"],
+  "reviewedCommit": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
+  "reviewedReportCommit": "e1afa49c13d4ed5a2beb272823889bff0c8271d6",
+  "reviewedUncommittedWordingFix": "worktree fleet5-worker-readiness-20261105 on agent/codex/fleet5-first-wave-plan-20261105: README.md, prepare-worker.sh, tests/core/test_lan_worker_config.py (not committed at review time)",
+  "firstWaveSummaryAvailable": false,
+  "integrityChecks": {
+    "sourceFileSHA256AtProduct59f": {"files": 10, "matched": 10},
+    "installerDiffProduct59fToBase": 0,
+    "evidenceBlobSHA256": {"files": 6, "matched": 6},
+    "historyBlobSHA256Matched": true,
+    "docsCI": [
+      {"run": 41977201244, "head": "e1afa49c", "conclusion": "success"},
+      {"run": 41977391990, "head": "6ba9ee46", "conclusion": "success"}
+    ]
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "High",
+      "verdict": "CONFIRMED",
+      "summary": "Candidate ports reuse historical pilot ports: bootstrap 18085 = r3 downloadPort, overview 18086 = r4 downloadPort, nodeTLS 18447 = r4 nodePort; r2/r3/r4 states, keys, journals and volumes are documented as preserved and worker-side containers/ports were not measured.",
+      "evidence": "private-state.json downloadPort/nodePort per lan-5node state; CP listeners 15:07:27 KST: 18085/18086/3005/55450/18447 free, 18105 = r5 serve",
+      "requiredFix": "choose ports outside {18081,18084,18085,18086,18105} and {18443,18445,18446,18447,18505} and {55440,55447,55448}; measure free on CP and on every target worker including stopped containers' published ports before init"
+    },
+    {
+      "id": "R2",
+      "severity": "Medium",
+      "verdict": "CONFIRMED",
+      "summary": "The managed workspaces folder has no consumer in shipped code: lan-workspace-v1 runs use a 16 MiB tmpfs /workspace (snapshot-tmpfs-v1) and the workspace upgrade mounts only the state volume and the Docker socket; the only host-folder path is worker_storage /contribution (read-only, first container creation only).",
+      "evidence": "services/node-agent/runtime/docker.go tmpfs map; deploy/lan/worker_workspace.py docker create mounts; deploy/lan/finish-worker.sh and worker_storage.py",
+      "requiredFix": "describe the folder as an optional read-only storage-contribution source or drop it; storageBytes 20GiB is a policy ceiling with no enforcing code path"
+    },
+    {
+      "id": "R3",
+      "severity": "Medium",
+      "verdict": "PLAUSIBLE",
+      "summary": "A mode-0700 folder owned by the human UID is likely unreadable by the Node container, which runs as root with --cap-drop ALL (no DAC override); the README records the same failure class for signer.pub (NODE-0005).",
+      "requiredFix": "decide owner/mode in review and prove readability with a disposable probe before claiming the folder usable"
+    },
+    {
+      "id": "R4",
+      "severity": "Medium",
+      "verdict": "PLAUSIBLE",
+      "summary": "worker_workspace.install keeps the existing Cmd (which would contain --storage-policy) but re-creates mounts without /contribution, so combining storage contribution and lan-workspace-v1 on one Node is unreviewed and may fail or drop the share.",
+      "requiredFix": "do not combine on the same Node until Codex reviews or tests the sequence"
+    },
+    {
+      "id": "R5",
+      "severity": "Low",
+      "verdict": "CONFIRMED",
+      "summary": "Resource arithmetic is correct (2000m/2GiB/20GiB/GPU0 below recorded ceilings and measured free values on workers 1-3) but the shipped container limits are fixed (agent 0.5 CPU/256 MiB, workload 1 CPU/512 MiB/30 s/network none); the 2 CPU/2 GiB figure is a policy ceiling, not an enforced quota."
+    },
+    {
+      "id": "R6",
+      "severity": "Info",
+      "verdict": "CONFIRMED",
+      "summary": "lan_workspace.py packages only the state's top-level nodeId (no --node-id), as Codex reported."
+    },
+    {
+      "id": "R7",
+      "severity": "Info",
+      "verdict": "CONFIRMED",
+      "summary": "Uncommitted wording fix changes only messages and the matching test string; the >= (1,45) guard is unchanged. Changed prepare-worker.sh bytes mean a bundle built from the fixed source is not the 59f0a3c2 bundle; pin one source per namespace."
+    }
+  ],
+  "firstWaveWorkers12": {
+    "verdict": "acceptable before Nov 10 only under all listed conditions; calendar alone is not the gate",
+    "isolationByConstruction": ["container and volume names derive from the new nodeId", "image tag saintvision-lan-node:<epoch8> derives from the fresh epoch", "per-Node folder ~/.local/share/saintvision/<nodeId>", "Start-Worker/firewall rule uses manifest nodePort"],
+    "r5GuardInputsThatMustStayUntouched": ["r5 private-state.json sha256", "source03 and executor tracked-clean HEADs", "106 cycle-plan input pins", "pinned executables python/ssh/scp/powershell/node/git", "overview 18082 membership == exactly the two r5 nodeIds, fresh", "owner SID, session 1, interactive", "receipt roots without completion-unknown or orphan intents"],
+    "conditions": [
+      "measured-free ports outside every historical set (R1)",
+      "run from a separate exact-source checkout and interpreter, never the source03 worktree or its venv",
+      "no Python/Git/OpenSSH/Node/PowerShell change on the CP until all follow-ups settle",
+      "separate DB instance/role; no restart or configuration change of the PostgreSQL that serves r5",
+      "measured CP memory headroom (host free RAM was 0.55 GB in the 14:45 KST sample) before starting new serve/observe processes",
+      "no new live f5 process start, enrollment step or load on worker1/2 inside the follow-up execution windows",
+      "label results as a fresh 2-node observation namespace; never sum f5 and r5 nodes on the same hosts"
+    ],
+    "followUpExecutionWindowsKST": [
+      ["2026-11-08T14:20:00+09:00", "2026-11-08T18:32:00+09:00"],
+      ["2026-11-09T12:15:00+09:00", "2026-11-09T16:27:00+09:00"],
+      ["2026-11-10T08:00:00+09:00", "2026-11-10T12:12:00+09:00"]
+    ],
+    "windowBasis": "slot + graceMinutes 10 + maximumWaitSeconds 14520 from the r5 guard config",
+    "membership": {"worker1": "candidate", "worker2": "candidate", "worker3": "blocked: socket access/API unmeasured", "worker4": "blocked: endpoint unknown", "cpColocated": "blocked: API 1.41, no Ubuntu WSL"}
+  },
+  "cpUpgradeReleaseCondition": {
+    "replaces": "calendar-only 'after Nov 10 08:00' in 138ece54",
+    "allRequired": [
+      "every follow-up run has a recorded terminal outcome (renewed or recorded skip), checked in automation run history",
+      "attempt latch absent or phase completed for the canonical run",
+      "no scheduled-leaf-renewal.lock / lock.guard",
+      "no *.completion-unknown.json and no *.intent.json without a matching result in any receipt root",
+      "no live Cycle controller child process",
+      "config, release-parameter and guard pins unchanged (ca684b45..., d46ddd2a..., acf8b4f6...)",
+      "r5 overview 200, two pinned nodes online/fresh, earliest leaf notAfter beyond the planned margin"
+    ],
+    "noImpactProofStatus": "not proved: Docker is not among the pinned executables and r5 DB is external, but an installer logoff/reboot or session change would stop 18082/3000/55448 and break session/interactive gates; release notes of the pinned target are needed to rule this out",
+    "earliestRelease": "after the last scheduled slot's outcome is recorded; up to 2026-11-10 12:12 KST if that slot actually runs a Cycle"
+  },
+  "authorityWording": {
+    "correction": "existing project authorization persists; no new general consent is requested",
+    "actualBoundaries": ["OS administrator elevation for the installer and firewall rule (capability this session does not have)", "maintenance impact: quitting Docker Desktop stops 8 running containers, 7 of them other products (coco-annotator 2, saint-control 5) plus the old node1 pilot DB", "data preservation: WSL data vhdx backup before any data-distro migration", "clinical stack containers stay uninspected"]
+  },
+  "rollbackAsset": {
+    "searchedRoots": ["%USERPROFILE%/Downloads", "%USERPROFILE%/Desktop", "%USERPROFILE%/Documents", "C:/Program Files/Docker/Docker", "C:/ProgramData/DockerDesktop", "%LOCALAPPDATA%/Docker", "%APPDATA%/Docker", "C:/ProgramData/Package Cache", "D:/{Installers,Setup,Backup,Backups,Downloads} (absent)"],
+    "found": {
+      "path": "C:/Program Files/Docker/Docker/Docker Desktop Installer.exe",
+      "fileVersion": "4.16.3.96739",
+      "bytes": 7408976,
+      "sha256": "991dc4bcecdd1292dc88bf82974fb581d4c9e1dbc1341b7736670a96e5f95cdc",
+      "authenticode": "Valid, CN=Docker Inc, timestamped (signer certificate notAfter 2023-10-04)",
+      "caveat": "lives inside the directory an upgrade replaces; far smaller than a full Desktop installer, so offline reinstall capability is unproven"
+    },
+    "fullOfflineInstaller": "not found",
+    "vhdxBackupOrManifest": "not found",
+    "result": "usable rollback asset not established"
+  },
+  "upgradeTargetPinning": "required before action: official release notes naming the Engine version, server API max >= 1.45 and MinAPIVersion <= 1.45 (node-agent negotiation cap), data-distro migration notes, and published installer checksum",
+  "rootDeltaReview": {
+    "range": "70dcb699..8585b61b on agent/codex/fleet-five-orchestration-20261105",
+    "files": 5,
+    "integratedBlobsMatchSourceReports": true,
+    "docsCI": [{"run": 41977218989, "head": "939e6dae", "conclusion": "success"}, {"run": 41978843474, "head": "8585b61b", "conclusion": "success"}],
+    "factVsPlanSeparation": "correct",
+    "fakeCompletionOrOperationalClaims": "none found",
+    "lowFinding": "resource proposal sentence should carry R2/R5 (no folder consumer, storage ceiling unenforced) so it is not read as policy acceptance",
+    "verdict": "accepted with 1 Low"
+  },
+  "supersededInOwnHistory": "138ece54 History v1.0.1: calendar condition and 'new user authority' wording replaced by state-based release and actual OS/maintenance/data boundaries",
+  "actionsTaken": "read-only; no source, runtime, schedule, metadata, download, execute, stop, export or test rerun"
+}
