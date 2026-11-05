@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.355"
+version: "1.0.356"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T14:54:15+09:00"
+updated: "2026-11-05T15:10:44+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Target topology confirmed; actual worker/CP readiness and missingworker4 discovery starting"
-active_card_next: "Dispatch bounded known-worker and CP/inventory tasks; use verified identities and allowed limits for a reviewed five-node deployment plan"
+active_card_status: "Initial reports integrated; actual followup agents working; no new enrollment or resource offers"
+active_card_next: "Review hash-bound Linux1/2 packet and CP rollback prerequisites; resolve worker4 identity and worker3 runtime access without repeat project approval"
 ---
+
+## 2026-11-05 준비 보고 수락과 후속 감독
+
+작업한 것: worker 보고 e1afa49c/6ba9ee46와 CP 보고138ece54를 현재 보고 branch에 통합했다. 확인한 것: 두 최종 SHA의 Docs CI SUCCESS, 원본 receipt의 6개 Git blob digest 일치, 실측과 배치 제안의 구분이다. 기존 proposal 포트는 예약값이 아니며 충돌 목록을 후속 owner에게 전달했다. 다음 첫 행동/담당: Codex Task05d9dcda1dca는 Linux1·2 격리 계획과 Docker 하한 문구를, Claude Taske1b499632366은 독립 검토와 CP 복구 자산 확인을 진행한다. 실제 후속 terminal 착수도 확인했고 중복 재전송하지 않았다. 상세는 [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]다.
+
 
 ## 2026-11-05 실측 수신과 다음 실행 경계
 

@@ -1,0 +1,79 @@
+{
+  "schema": "fleet5-root-integration-review:1",
+  "observedAtKST": "2026-11-05T15:10:44+09:00",
+  "owner": "Codex root",
+  "task": "FLEET5-20261105",
+  "reportIntegrationBase": "939e6dae3de0a40ae8cf1f6d2990d19ca377123b",
+  "sourceReports": [
+    "e1afa49c13d4ed5a2beb272823889bff0c8271d6",
+    "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
+    "138ece5467b738eea79718794c468eca3c2e83cf"
+  ],
+  "verifiedExactHeadDocs": [
+    41977391990,
+    41977171006,
+    41977218989
+  ],
+  "importedEvidenceDigests": {
+    "checked": 6,
+    "match": 6,
+    "domain": "Git blob LF"
+  },
+  "cpDiscoveryVerdict": "accepted measured observations; deployment proposal requires explicit technical corrections",
+  "workerIndependentReview": "active Claude followup; root does not substitute its verdict",
+  "deploymentVerdict": "not accepted or executed",
+  "corrections": [
+    "candidate ports require actual free/ownership reservation",
+    "no calendar-only delay for isolated Linux1/2",
+    "no repeated blanket project approval",
+    "renewal settlement requires quiescence and known completion, not last nominal slot alone"
+  ],
+  "followups": [
+    {
+      "task": "task_05d9dcda1dca",
+      "dispatch": "ctx_faa86b318dd8",
+      "actualLiveness": "active implementation observed despite start_unknown; no restart"
+    },
+    {
+      "task": "task_e1b499632366",
+      "dispatch": "ctx_774596be590b",
+      "actualLiveness": "ready/live"
+    }
+  ],
+  "fiveNodeOperationalAcceptance": false,
+  "remoteMutationExecuted": false,
+  "nextOwner": "Codex execution packet, Claude independent review, root coordinated delivery",
+  "localGateReceipt": {
+    "observedAtKST": "2026-11-05T15:12:02+09:00",
+    "environment": "Windows PowerShell5.1 / existing repo Python3.14.7 / coordinator worktree",
+    "checks": [
+      {
+        "command": "python tools/check_docs.py",
+        "exit": 0,
+        "privateLogSHA256": "3b0bc065f258d9b52da5de241333921cafacfe1b7388e130d27b3c0f7c57f585"
+      },
+      {
+        "command": "python tools/check_ontology.py",
+        "exit": 0,
+        "privateLogSHA256": "816b17f7320f72d2fc017b990a7c62ceef2048fe53b5731be2d7f4df1f0d5f80"
+      },
+      {
+        "command": "python tools/sync_obsidian.py --check",
+        "exit": 0,
+        "privateLogSHA256": "218d11fb2e692545791cf9ae685a8e2f589de02ac24ad18fbae3a88182600e20"
+      },
+      {
+        "command": "python tools/check_doc_single_source.py --ratchet",
+        "exit": 0,
+        "privateLogSHA256": "e09b3205db8a6fb21809aee296bdb48d219d84d9a6a2ff92ae8cef1b948f9fe9"
+      },
+      {
+        "command": "python tools/check_doc_path_citations.py --ratchet --base-ref HEAD",
+        "exit": 0,
+        "privateLogSHA256": "3df0c66852a23cc5f42cbfb2569970e2157935937e8ae3d33a5a019ab296087f"
+      }
+    ],
+    "syncCheck": "2289 managed files / 15 pending exports / 0 conflicts / no writes",
+    "scope": "documentation delivery checks, not a product build or five-PC acceptance"
+  }
+}

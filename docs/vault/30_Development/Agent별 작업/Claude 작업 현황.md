@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.126"
+version: "1.2.127"
 status: "review"
 author: "Claude"
-updated: "2026-11-04T20:45:59+09:00"
+updated: "2026-11-05T15:10:44+09:00"
 
 
 
@@ -12,6 +12,11 @@ updated: "2026-11-04T20:45:59+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-05 CP 준비 보고 감독 수신
+
+Codex root가 Claude의 실제138ece54 보고와 Docs41977171006 성공을 확인하고 통합했다. Windows의 실제 API1.41·Ubuntu 부재·다른 제품 8개 실행 container 영향을 발견한 결과는 수락했다. 달력 날짜만으로 새 Linux 연결을 미루는 제안과 포괄적 재승인 요구는 수락하지 않고 실제 작업 정산·실행 권한·보존 조건으로 구체화하도록 전달했다. Claude 후속은 Taske1b499632366/ctx_774596be590b에서 진행 중이며, 초기 worker 보고의 독립 검토와 기존 CP 복구 설치 파일의 제한된 읽기 전용 확인을 맡는다. 이 절은 root의 수신 기록이며 새 Claude 검토 완료를 대신 주장하지 않는다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-04 최종 독립 판정 감독 수신
 
