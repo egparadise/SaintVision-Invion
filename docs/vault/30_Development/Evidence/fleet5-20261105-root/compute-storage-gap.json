@@ -1,0 +1,41 @@
+{
+  "schema": "fleet5-compute-storage-gap:1",
+  "recordedAtKST": "2026-11-05T19:13:06+09:00",
+  "sourceInspected": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "candidateFinal": false,
+  "supportedInstallerCombination": false,
+  "runtimeCombinationFeasibility": "not yet established; do not infer impossibility from installer restriction",
+  "constraints": {
+    "workspaceRejectsStoragePolicyAndUnpreservedMounts": true,
+    "storageTargetRequiresStateAndReadonlyContributionOnly": true,
+    "uniqueNodeIPAddress": true,
+    "independentLinuxWorkspaceHostsRequired": 4,
+    "CPcolocatedNodeExcludedFromIndependentS05S07": true
+  },
+  "baseline": "four plain Linux workspace Nodes; prepared share inactive",
+  "baselineDoesNotAcceptContributedStorage": true,
+  "contractTask": {
+    "task": "task_a8fd2969f0b3",
+    "dispatch": "ctx_6f0f8253b8a7",
+    "startReceipt": "outcome_unknown / turn_start_unobserved",
+    "readOnlyFollowup": "exact transcript shows actual assistant/tools/live activity",
+    "duplicateStartOrStateOverride": false,
+    "scope": "source proof and explicit opt-in design; no production change before root design reply"
+  },
+  "physicalOrRuntimeChanges": false,
+  "oldR5Changed": false,
+  "allFiveAccepted": false,
+  "previousRootCheckpoint": {
+    "SHA": "2a29c01979fd6817aa34484c442a8f8d9894db74",
+    "Docs": 42007644271,
+    "exactHeadAndJobSuccessVerified": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "allDestinationHashesMatch": 2301,
+    "pending": 0,
+    "conflicts": 0
+  }
+}

@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.362"
+version: "1.0.363"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:03:32+09:00"
+updated: "2026-11-05T19:13:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
 active_card_status: "Physical PC map corrected; actual PC4 read-only share and fresh issuer prepared; source2 fixes delivered; successor Low closure/integration and hardware prerequisites remain"
 active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
 ---
+
+## 2026-11-05 설치 경로 공백 분리와 추가 계약 검증
+
+작업한 것: 통합 preliminary0bcf9670은 최종 후보가 아님을 유지하고4 Linux plain workspace Node를 기본 구성으로 진행시켰다. 확인한 것: 현 workspace installer는 storage-policy/추가 mount를 거부하며 storage helper는 state+contribution 두 mount만 검증한다. 같은 Node의 실행+공유 동시 지원을 완료라고 쓸 수 없다. 다음 첫 행동/담당: 별도 Codex task_a8fd2969f0b3/ctx_6f0f8253b8a7가 소스·재현·명시적 opt-in 계약을 제안한 뒤 root에게 설계 판정을 요청한다. 초기 receipt는 start_unknown이나 transcript에서 실제 지침 읽기·도구 실행을 확인했으며 중복 시작하지 않았다. S1 LowL1b와 통합 owner는 계속 작업한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 
