@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "fleet5-v4-auxiliary-contract-proposal:1",
+  "status": "PROPOSED_NOT_REGISTERED",
+  "schema": "saintvision-migration-cohort-projection-set:1",
+  "domainASCII": "saintvision/migration-cohort-projection-set/v1",
+  "domainSuffixByteHex": "00",
+  "signerRole": "root-fence",
+  "canonicalization": "strict C2 body; envelope digest SHA256(C2({body,signer})); all Node projection signatures/roots/scopes/sequence verified separately",
+  "purpose": "Bind BOTH Node predecessor projections for cohort API calls; Node calls use their own projection, no first-member fallback",
+  "actualCanonicalRegistrySHA256": null,
+  "actualVerifierSourceSHA": null,
+  "actualVerifierArtifactSHA256": null,
+  "actualCI": null,
+  "actualIndependentVerdict": null,
+  "actualRoleGrant": null,
+  "implementationAuthorized": false
+}

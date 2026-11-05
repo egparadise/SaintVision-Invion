@@ -1,0 +1,2598 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-01",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-02",
+      "method": "reserve",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-03",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-04",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-05",
+      "method": "setOldRestartNo",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-06",
+      "method": "setOldRestartNo",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-07",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-08",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-09",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-10",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-11",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-12",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-13",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-14",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-15",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-16",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-17",
+      "method": "stopOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-18",
+      "method": "stopOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-19",
+      "method": "captureFenced",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-20",
+      "method": "preserveOld",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-21",
+      "method": "preserveOld",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-22",
+      "method": "createNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-23",
+      "method": "createNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-24",
+      "method": "startNew",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-25",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-26",
+      "method": "verifyBootstrap",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-27",
+      "method": "publishInventory",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-28",
+      "method": "publishInventory",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-29",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-30",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-31",
+      "method": "seal",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-32",
+      "method": "seal",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-33",
+      "method": "readState",
+      "recordKind": "readback",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-34",
+      "method": "release",
+      "recordKind": "outcome",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-35",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "intent",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": null,
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": null,
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": null,
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC2",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC2",
+      "effectTarget": "PC2",
+      "expected": "VALID_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC2",
+      "effectTarget": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC4",
+      "effectTarget": null,
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC4",
+      "effectTarget": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "event": "event-36",
+      "method": "restoreNewRestartPolicy",
+      "recordKind": "failure",
+      "topTarget": "PC4",
+      "effectTarget": "PC4",
+      "expected": "VALID_SCHEMA"
+    }
+  ],
+  "fullCartesianMemberAndCohortSweep": true
+}

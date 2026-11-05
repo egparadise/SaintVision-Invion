@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "fleet5-v4-document-validation:1",
+  "observedAtKST": "2026-11-06T03:18:01.851729+09:00",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "metaschemaDocuments": 18,
+  "effectiveSchemaKinds": 10,
+  "scenarioObjects": 195,
+  "events": 36,
+  "bindingRules": 3173,
+  "coveredNonProofLeaves": 6411,
+  "unclassifiedLeaves": 0,
+  "unresolvedReferenceEdges": 0,
+  "proofDerivations": 112,
+  "nonProofMutationFamilies": 341,
+  "targetCartesianCases": 324,
+  "schemaTargetRejects": 258,
+  "cryptoGoOSLockEngineEquipmentCases": 0,
+  "all40FutureCases": "NOT RUN",
+  "registrationImplementationOperations": false,
+  "actualBindings": "NULL/HOLD",
+  "exitCode": 0
+}

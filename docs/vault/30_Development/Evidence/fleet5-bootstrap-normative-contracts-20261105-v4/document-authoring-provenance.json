@@ -1,0 +1,36 @@
+{
+  "documentOnly": true,
+  "temporaryPrograms": {
+    "_author_v4_docs.py": "f3f259f7ca75998edd2184b1a188320dfd56a3e54d3955af90f3d98d62323c3d",
+    "_check_v4_docs.py": "e639eead43aab31efd1db4da800e29afab9acf1854ced35c07bc147e6f88703b"
+  },
+  "failuresPreserved": [
+    {
+      "step": "first trace replay compared pre-intent request projection to post-intent snapshot",
+      "exitCode": 1,
+      "correction": "Admission state checked once for each request; exact same request/idempotency then binds intent/outcome"
+    },
+    {
+      "step": "public governance scope document lookup at Development path",
+      "exitCode": 1,
+      "correction": "rg --files found Governance path; full version1.0.0 read"
+    }
+  ],
+  "runtimeProductHelpersCommitted": false,
+  "keysGeneratedOrRead": 0,
+  "runtimeActions": 0,
+  "allProgramsRemovedBeforeCommit": true,
+  "inputRefinement": {
+    "stage": "post-check unused seed cleanup",
+    "exitCode": 0,
+    "observedAtKST": "2026-11-06T03:26:23.415248+09:00",
+    "command": "main .venv Python -B stdin; collect every graph input expression, prune unused prototype fields, assert every used input value unchanged; preserve all proof-context namespaces",
+    "usedInputPointersChecked": 102,
+    "allUsedInputValuesUnchanged": true,
+    "all195ObjectsAnd3173RulesUnchanged": true,
+    "proofFactPolicyContainerSignerInputsUnchanged": true,
+    "oldInputSHA256": "51c0370462d40b021d46f906dbe362dcf5ac2ebdc4c1117083c402619d744c3e",
+    "newInputSHA256": "d40a7486193e36781bbe5c3a1102e198f61159b8b38084ef440fc96e5e690a18",
+    "reason": "Remove unused v3 seed reference fields and the old reduced-plan digest so model inputs cannot be mistaken for unresolved scenario artifacts; actual graph objects and all validated relationships remain identical"
+  }
+}

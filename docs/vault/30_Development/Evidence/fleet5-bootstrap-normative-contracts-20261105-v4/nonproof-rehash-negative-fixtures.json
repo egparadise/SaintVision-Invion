@@ -1,0 +1,3085 @@
+{
+  "fixtureOnly": true,
+  "algorithm": "For each base graph node in topological order: re-evaluate and merge all graph bindings, preserving exact typed proof objects; after each binding restore chosen bad leaf only in selected node; recompute node SHA256(C2(payload)). Validate all hashes then every graph rule. No source-input/model mutation.",
+  "cases": [
+    {
+      "family": "successor-plan:schemaVersion",
+      "node": "plan",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-plain-agent-migration-plan:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c48d02feab32748378a56b9d9939d034e9fc1831c38a7a241cf9e66994546079"
+    },
+    {
+      "family": "successor-plan:planId",
+      "node": "plan",
+      "pointer": "/body/planId",
+      "value": "fixture-planId-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9010565130fae2225f39119b460ce56e0356ea7a6af5ec0e5255a1ab036a5763"
+    },
+    {
+      "family": "successor-plan:migrationId",
+      "node": "plan",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "822068ff0368f63e7991ea30c47127f3501f4cd882ef894d4b11eb0736afbaa9"
+    },
+    {
+      "family": "successor-plan:createdAt",
+      "node": "plan",
+      "pointer": "/body/createdAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f61ddc86fae38d8f0e97dad8ea6755361251169cdcd84049c17fe3679126a316"
+    },
+    {
+      "family": "successor-plan:expiresAt",
+      "node": "plan",
+      "pointer": "/body/expiresAt",
+      "value": "2030-01-01T00:01:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c6039e2002f90c1cb5eabf0a6bfa9b8886f4511a5e547e764423c58070c7b10c"
+    },
+    {
+      "family": "successor-plan:canonicalContractSHA256",
+      "node": "plan",
+      "pointer": "/body/canonicalContractSHA256",
+      "value": "a18998f0afa172a542c1a8e2f4b0966df716b775c51eff8f0278a746b2888d1a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "626983d12ed0a607d441fc61feea31b447864ad60fcc391fc26b9bd98bfaf547"
+    },
+    {
+      "family": "successor-plan:acceptedP0",
+      "node": "plan",
+      "pointer": "/body/acceptedP0/sourceSHA",
+      "value": "c44aabba4e51ce0c4096e9946f38f24ca2c90950-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6d29bef68eff78e2c618738d5609a81aabbab6085c6660e9b7568759e0e241e3"
+    },
+    {
+      "family": "successor-plan:image",
+      "node": "plan",
+      "pointer": "/body/image/dockerImageId",
+      "value": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "34d6c21eded245b1aeea2a208a3244a21030a314773792b95ffb3084522ef081"
+    },
+    {
+      "family": "successor-plan:migrationHelper",
+      "node": "plan",
+      "pointer": "/body/migrationHelper/sourceSHA",
+      "value": "c2bdc6db0a475f500d571127d5b6210fa132d894-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2a7bdf48642d994a8284aa0447dbca25515185de0a061a9e33192bdfee53eddd"
+    },
+    {
+      "family": "successor-plan:commonFence",
+      "node": "plan",
+      "pointer": "/body/commonFence/sourceSHA",
+      "value": "f1b380451fa84bbb5bdd3b1978fc5795f6a8ad72-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "8509dd08673b0f6aad9f969039cc63ab5355a78fe7bffd50ee7a2a4670187d77"
+    },
+    {
+      "family": "successor-plan:runtimeInventoryAPI",
+      "node": "plan",
+      "pointer": "/body/runtimeInventoryAPI/sourceSHA",
+      "value": "d2edd4a46d301c874055282c0cf319ef2085e3a2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "44433f0d2f6471c8e2a9e5598a36853dc46504d0fae2e1eba7b23380e38dd2cd"
+    },
+    {
+      "family": "successor-plan:schema3Helper",
+      "node": "plan",
+      "pointer": "/body/schema3Helper/sourceSHA",
+      "value": "8efb6fa5735456bf3900380041a9205bd5d79620-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c91e8034811d8cc5b20a6d1c2cd3b5caea0110376934cd07d2dbc70fc897331c"
+    },
+    {
+      "family": "successor-plan:newRenewalGuard",
+      "node": "plan",
+      "pointer": "/body/newRenewalGuard/sourceSHA",
+      "value": "b4004ea02c209740aca06884585f70e48a6b9f3e-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "68c8d9d17f73651cff16fbc5091664ae7da3f1d21fbfe52cdf080709dbc6c810"
+    },
+    {
+      "family": "successor-plan:legacyCPStateSHA256",
+      "node": "plan",
+      "pointer": "/body/legacyCPStateSHA256",
+      "value": "a12616d9d78c3788e44512a112bf875d638eb9500caa85a783e95e76b80a0eb5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3f9ceb162eca6a1341ba8a4e82f47b3da18fbd07065a96dfb9a42767d81e0806"
+    },
+    {
+      "family": "successor-plan:memberInputs",
+      "node": "plan",
+      "pointer": "/body/memberInputs/0/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5a4d90573e3ee562c9064668a4c60081ecc581cfa323761cbbf1a1e12f30c84d"
+    },
+    {
+      "family": "successor-plan:timing",
+      "node": "plan",
+      "pointer": "/body/timing/leafDeadline",
+      "value": "2030-01-07T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e876ed181ce287e5716766beb67be10c1adea89ff18f60484d2328679cacc04c"
+    },
+    {
+      "family": "successor-plan:restartRestore",
+      "node": "plan",
+      "pointer": "/body/restartRestore",
+      "value": "keep-no-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ebb5572b26462a3995dd7dc7f2e3c3df57613a8de400b8ca0a19e14472a087aa"
+    },
+    {
+      "family": "successor-plan:secondMigrationAllowed",
+      "node": "plan",
+      "pointer": "/body/secondMigrationAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "53852745c85fc6a722d324efdd0dbe0c3cb1a9f97a63425856b14c3c48114ad9"
+    },
+    {
+      "family": "successor-plan:credentialRecopyAllowed",
+      "node": "plan",
+      "pointer": "/body/credentialRecopyAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e553e5ab3632e679a590e8f3f177d6ba86c13e4361aace417a1fa72bdf85927f"
+    },
+    {
+      "family": "successor-plan:oldContainerRestartAllowed",
+      "node": "plan",
+      "pointer": "/body/oldContainerRestartAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7df5b4cee57cacc461e5f66a3f46767a66e34e0cd9591e11d790f3c1917f592f"
+    },
+    {
+      "family": "successor-plan:sourceOfFreshFiveIssuerAllowed",
+      "node": "plan",
+      "pointer": "/body/sourceOfFreshFiveIssuerAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "faed083b2a70c038993d1f65837f6eaab3a5c4fadd4e42152861c0635d83194e"
+    },
+    {
+      "family": "successor-plan:expectedInventoryHead",
+      "node": "plan",
+      "pointer": "/body/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f727c4d7d974e51678618cec615cdba95f4b22692d429d3ba0d31df5125bf69c"
+    },
+    {
+      "family": "successor-plan:planSubjectSHA256",
+      "node": "plan",
+      "pointer": "/body/planSubjectSHA256",
+      "value": "a1cdac4afe8f2f036822243d68e58cbe4a8153e77f058e2d9756d92b27f06122",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3e53f9a00fbffefab549d17aa98fc72d551d604015cd543eb1ed307b087ae878"
+    },
+    {
+      "family": "successor-plan:signer",
+      "node": "plan",
+      "pointer": "/signer/role",
+      "value": "root-plan-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c7fa5d80bc7a5309023d0f5b6cb18425969e2aebdf0d7dac5a68f8a449b4fc65"
+    },
+    {
+      "family": "operation-lease:schemaVersion:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-agent-mutation-fence:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7feae4b1a7e81911717954f851c23abb3761e60e8a77cf213549915c446246c8"
+    },
+    {
+      "family": "operation-lease:leaseId:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/leaseId",
+      "value": "lease-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "36f6b0308ecf5484a6e7a9baae4bdca93666150039a121db3b20cf29b77cbac0"
+    },
+    {
+      "family": "operation-lease:operationId:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "db79ba14f4d8c3ce6f9f9bec4e67cace091353ee82dc4d9b0f5066523a28548c"
+    },
+    {
+      "family": "operation-lease:operation:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/operation",
+      "value": "migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b54a8964a469c24df57753fdcaa974f34c57eec670cd32cb9cc022b31248fee4"
+    },
+    {
+      "family": "operation-lease:planEnvelopeSHA256:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "96f52a6ef5ae1db0e27368b81a1841fa872b543075dfcd391e4ae24125bb41c0"
+    },
+    {
+      "family": "operation-lease:migrationId:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "783bd5957a95fff505526111c5c5de587b7384d3398adbf88da4eda8ddd654ef"
+    },
+    {
+      "family": "operation-lease:fenceEpoch:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/fenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a27d14a6cf896afa5bc706826f88b387587e5255e7705ff4c207368a18ece1ed"
+    },
+    {
+      "family": "operation-lease:priorFenceEnvelopeSHA256:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/priorFenceEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "811305fe2e3d224cd2e7b28353fc4906712c88f74adf368a6a74c7811325861d"
+    },
+    {
+      "family": "operation-lease:scopes:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/scopes/0/scope/tenantId",
+      "value": "fixture-tenant-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5650aa9c35007abc91080ed26b4f2e8440fef33af234673beebc970c5f7c108b"
+    },
+    {
+      "family": "operation-lease:owner:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/owner/principal",
+      "value": "fixture-principal-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c52d7dc09ae1121fc9abc1c2a60e0ee536f0c7936f92f5ade87577569f72eb7f"
+    },
+    {
+      "family": "operation-lease:tokenSHA256:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/tokenSHA256",
+      "value": "a74dfea0832c96e943ac181d4bd6822b17ad2844c63a4c41df738a749d91d131",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "46a871b4f920eb6096ae040364af74ca29b0c4243009ed3090e8e6f0bc62e32d"
+    },
+    {
+      "family": "operation-lease:acquiredAt:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/acquiredAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6b5a03706d4092b357b50f16bc6314ba47ce546960c1344e145d67e07d13e7d8"
+    },
+    {
+      "family": "operation-lease:expiresAt:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/expiresAt",
+      "value": "2030-01-01T00:01:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "db9b987e90acf421e51440c51e35ae3f9a7e830fd2b11f5685e5373d04a33ad5"
+    },
+    {
+      "family": "operation-lease:mode:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/mode",
+      "value": "HELD-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "49d3c8a07937e2f0a1f192c686a394d2b8fd5a7976dc3d77964b84e1928dc66a"
+    },
+    {
+      "family": "operation-lease:permittedEntrypointsSHA256:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/permittedEntrypointsSHA256",
+      "value": "ae91e5ad471fed6b3def2f4fc34428320b10fecb6eeaff73760d96569a044205",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "843ea289dff75631a1093797cc8f282bbf24c0df25554fa0d0759e45070eda2c"
+    },
+    {
+      "family": "operation-lease:descendantRegistrySHA256:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/descendantRegistrySHA256",
+      "value": "af53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "fee70ee7f2bbc2b9b9fb15f6a9676556e1aebc6aa31be816903035c455f0eb81"
+    },
+    {
+      "family": "operation-lease:terminalSeals:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/terminalSeals",
+      "value": [
+        "foreign"
+      ],
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e455b4ba5837d579435718a2b90caebb64bee867ec239ee5b73182c20260289c"
+    },
+    {
+      "family": "operation-lease:requiresHeldOSLocks:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/requiresHeldOSLocks",
+      "value": false,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f2c5553b2917d21d03278ad625237315e546aa0a6f26eccd0f5136608ae0b9d6"
+    },
+    {
+      "family": "operation-lease:staleAgeReclaimAllowed:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/staleAgeReclaimAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2d85fab062837991a879c0d50a9e00b53ff20cc86b23bd0768c755762d632bbd"
+    },
+    {
+      "family": "operation-lease:rawTokenPublished:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/rawTokenPublished",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5dfd25e1a89dc07e4272329fad1c72eb62984e2e44cfc75b83f3ec035948e255"
+    },
+    {
+      "family": "operation-lease:expectedInventoryHead:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/body/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9ad635685ce05b7cbe516cde0223ada6e6a2e049df897dbd1de1235449e33909"
+    },
+    {
+      "family": "operation-lease:signer:migration:HELD",
+      "node": "lease-migration",
+      "pointer": "/signer/role",
+      "value": "root-fence-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "adf86698b4a9c9bd0043a077400b78b1a3ddbfca58d4937403f24c0462d58121"
+    },
+    {
+      "family": "api-request:schemaVersion:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e20da886b82b66375d321f786583f61301b8d9ba534843ae01f41fea64bbfff9"
+    },
+    {
+      "family": "api-request:method:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/method",
+      "value": "inspectAndValidate-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e3dd8697f2281808b58849747ac5281c1cb4eb1cf32e52080729abfa870ea2a5"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1c3568e153cfd4bc9cbd1ff09bf2d79d9215e97c96989ebfe7d8cd749c7f2e66"
+    },
+    {
+      "family": "api-request:operationId:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "dc8b8fefc4c0e63fb2dc9fd4f96fc19790300bafde7fbf8c81af4fb3bd56d832"
+    },
+    {
+      "family": "api-request:idempotencyKey:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/idempotencyKey",
+      "value": "aad7c73a430030e8d39f22d39ad39bf237300babad91d15c5b3da0667e46bd6a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3cc486c9c63268cb2f3d06c18dddd190e745ee9803353e377bcfd7e6f827bddf"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "11c9aafa378151d4061adda7a8c0c1c12f5320ba98553878c59e4bc28f8cd666"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f86630fbe3d430e8460054677e31163a73175721d3ec99552637f59923688470"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "63188937113ebc9814bd1dc13f5752941e9f2543e35322f903c7c506e4bb82bd"
+    },
+    {
+      "family": "api-request:arguments:inspectAndValidate:ABSENT",
+      "node": "request-01-inspectAndValidate",
+      "pointer": "/arguments",
+      "value": {
+        "foreign": true
+      },
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ccec228957dbf739684e175db06cf5574563be21256decf8146ade6bc72f771d"
+    },
+    {
+      "family": "migration-event:schemaVersion",
+      "node": "event-01",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-plain-agent-migration-event:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1b9ec4ed77779be531a4094de8e304a56098aecf1e0a5ce876fd56858dd57fe3"
+    },
+    {
+      "family": "migration-event:migrationId",
+      "node": "event-01",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9443d206c1c0bad50f6aff4dcb2209b6a90f322c56f6d612c9aec266c4dca54f"
+    },
+    {
+      "family": "migration-event:planEnvelopeSHA256",
+      "node": "event-01",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0d645332d7da73d4c83aa31f6a976b17ad6ad86a139cfff525233348aac75df7"
+    },
+    {
+      "family": "migration-event:sequence",
+      "node": "event-01",
+      "pointer": "/body/sequence",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "398f991163873fc2f0145632eeb88c6e2e6f2aeefbafb3a43d17e21e297fcef3"
+    },
+    {
+      "family": "migration-event:previousEventSHA256",
+      "node": "event-01",
+      "pointer": "/body/previousEventSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ba5be1b92296ddacd5da72e95f53e2add3db8ac52a0dfd0a09a1cf90fdb22128"
+    },
+    {
+      "family": "migration-event:operationId",
+      "node": "event-01",
+      "pointer": "/body/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c611882ee0ff19307f1856d573fa88548de1924ef02dc92e9312faba17b48265"
+    },
+    {
+      "family": "migration-event:idempotencyKey",
+      "node": "event-01",
+      "pointer": "/body/idempotencyKey",
+      "value": "aad7c73a430030e8d39f22d39ad39bf237300babad91d15c5b3da0667e46bd6a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ef62605ae2e1a96162ae47646983fa935be7dc88fb26df77b4279fc5b7a4f39f"
+    },
+    {
+      "family": "migration-event:requestSHA256",
+      "node": "event-01",
+      "pointer": "/body/requestSHA256",
+      "value": "a69151c087092b094eb9838644dfe30f34d4e3994f2eba7db206c8396f713725",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "64a2eb101ebb3e8c1e241d4fdc3d4186fd945589c900657c30de59719024eb54"
+    },
+    {
+      "family": "migration-event:recordedAt",
+      "node": "event-01",
+      "pointer": "/body/recordedAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c7b75a92e59bf3dd205f95fb9c0119fe2c2d38c4aee78c6d78ea8eabc0b7b164"
+    },
+    {
+      "family": "migration-event:phase",
+      "node": "event-01",
+      "pointer": "/body/phase",
+      "value": "PROVENANCE_LOCKED-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "49388583ca4065a2ff1923f378b3678f18c95d7c73040e5f72724cb9f0bb644a"
+    },
+    {
+      "family": "migration-event:fenceEpoch",
+      "node": "event-01",
+      "pointer": "/body/fenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "afad8cdc7fc9f91585c6d346373e0d76e2a8bfa200de0772aa4c34565ec3724e"
+    },
+    {
+      "family": "migration-event:leaseEnvelopeSHA256",
+      "node": "event-01",
+      "pointer": "/body/leaseEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5f714f9966190bf32d7d1b38ee89bf7b13ed37b486185bbd84ee888773b8d7bd"
+    },
+    {
+      "family": "migration-event:memberStates",
+      "node": "event-01",
+      "pointer": "/body/memberStates/0/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "28698b745cc5af5b79d266a2dd19d0fe4258e36b77463d62c35b0bd9f5679db7"
+    },
+    {
+      "family": "migration-event:effect",
+      "node": "event-01",
+      "pointer": "/body/effect/kind",
+      "value": "none-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "fd987463b99a1b13c18d8d10db02a629d31d22881fa8990314a86ba688579eac"
+    },
+    {
+      "family": "migration-event:evidence",
+      "node": "event-01",
+      "pointer": "/body/evidence",
+      "value": [
+        "foreign"
+      ],
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "89f12f4d0648438ab6d9b1a859c4f9e65d3839def9f0b96698a2df9c2858eebf"
+    },
+    {
+      "family": "migration-event:inventoryEnvelopeSHA256",
+      "node": "event-01",
+      "pointer": "/body/inventoryEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "79209746be08f26c05487b54f88ba43ae9967f2bcd9ddad8480a55d99c4dcafc"
+    },
+    {
+      "family": "migration-event:terminalSealEnvelopeSHA256",
+      "node": "event-01",
+      "pointer": "/body/terminalSealEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e599049d80da7b6655ec3c2fa2085a5c0477c718327046f9b4cedc85d6af914a"
+    },
+    {
+      "family": "migration-event:failureReason",
+      "node": "event-01",
+      "pointer": "/body/failureReason",
+      "value": "none-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f6e8951e3aec9e89ffc9de40ca3e52466019bae81d0642d732cc5a285055069d"
+    },
+    {
+      "family": "migration-event:method",
+      "node": "event-01",
+      "pointer": "/body/method",
+      "value": "inspectAndValidate-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4498d669b27cc64c5e231db438f284e8d183e443e46862ba0709c59a8a2c5439"
+    },
+    {
+      "family": "migration-event:recordKind",
+      "node": "event-01",
+      "pointer": "/body/recordKind",
+      "value": "readback-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3cf534c25546a2ff0138343eb6b5f55e703a475cdd1243ed5bf96dbbcf780f55"
+    },
+    {
+      "family": "migration-event:priorPhase",
+      "node": "event-01",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "036c089b66368f379d0ea7c15654756a2bf655a14183d05676873a6cf391edff"
+    },
+    {
+      "family": "migration-event:sealedHistory",
+      "node": "event-01",
+      "pointer": "/body/sealedHistory",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ae7419d469333a19b0eacf11b810c64d811f4d9354edf1677f354f91c43f7e90"
+    },
+    {
+      "family": "migration-event:inventoryPublishedHistory",
+      "node": "event-01",
+      "pointer": "/body/inventoryPublishedHistory",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6e85bc910d3779ddc95f33e8cbbb610ecabfd4eea86a375db228f403e09d4e0c"
+    },
+    {
+      "family": "migration-event:targetSlot",
+      "node": "event-01",
+      "pointer": "/body/targetSlot",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1ffa6b4bd152fb432415fb82cba2a2b7d4d205630f90428f87bb2ae1c37be577"
+    },
+    {
+      "family": "migration-event:signer",
+      "node": "event-01",
+      "pointer": "/signer/role",
+      "value": "host-helper-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ded87456d8f0ccab3c3e9ce149fb0976869edb946bfe03d5d48c8a24534e3b6e"
+    },
+    {
+      "family": "migration-journal:schemaVersion",
+      "node": "projection-01-PC2",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-plain-agent-migration:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "79659eca1c319bcf99a8f2f0fb43c26be69deb11f92524f5c2479aa02b375013"
+    },
+    {
+      "family": "migration-journal:migrationId",
+      "node": "projection-01-PC2",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ce12a6768a16bd71e786185568a77e47a2834160fed0b3e118e8e874a0cd7ce6"
+    },
+    {
+      "family": "migration-journal:planEnvelopeSHA256",
+      "node": "projection-01-PC2",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a79f9c068926b8b3182eb2baaf740d514cd104391895e2d3001f7e6b74985d54"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a32971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "fb47467f43e46a041a4d38604a86c7c60039ca47e49eea78578fe095761461ab"
+    },
+    {
+      "family": "migration-journal:scope",
+      "node": "projection-01-PC2",
+      "pointer": "/body/scope/tenantId",
+      "value": "fixture-tenant-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7ff2815d9cb57f7ae5bce442e995800af02c4796330cc86a5a2047eb7d165eea"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3202351dc87127914fdaee354a07ade28e76af6aea0fd2c8ef39a5b6b982ed5a"
+    },
+    {
+      "family": "migration-journal:ownerGeneration",
+      "node": "projection-01-PC2",
+      "pointer": "/body/ownerGeneration",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "18f026c045240aa984cc47632e048710bf755fdb51621a8f03fde1eb1dc36ee7"
+    },
+    {
+      "family": "migration-journal:commonFenceIdentitySHA256",
+      "node": "projection-01-PC2",
+      "pointer": "/body/commonFenceIdentitySHA256",
+      "value": "a0b140439f0228e019909b382a92a9b0db770b3fecec8d23088b2955411e4d18",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6d6bdd8c4aba71629d58eb20ee27dcd20f75840f6e8be3718c1e5ca3787db932"
+    },
+    {
+      "family": "migration-journal:latestEvent",
+      "node": "projection-01-PC2",
+      "pointer": "/body/latestEvent/sequence",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9de15e939398ff65f0042420055174194b436aebbca78b035acfc73087e201ae"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "46330437f714e0618a4e9ac09705b7df28b04ff9d7c4530117df3d7672d3f7dc"
+    },
+    {
+      "family": "migration-journal:phase",
+      "node": "projection-01-PC2",
+      "pointer": "/body/phase",
+      "value": "PROVENANCE_LOCKED-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "88747927f8e9ac9ecf9171a56875275f0f2e59cdc6f10fd8d755d08ff14e353b"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "870472e0f80140ab0808537a11a926f2023c66d237417d4d0a2271c6f568481c"
+    },
+    {
+      "family": "migration-journal:terminalSealEnvelopeSHA256",
+      "node": "projection-01-PC2",
+      "pointer": "/body/terminalSealEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6fdf5cd7d7d0cb11e402622f847a586aab586cd3826cb492eb600414aa01fc59"
+    },
+    {
+      "family": "migration-journal:oldBackup",
+      "node": "projection-01-PC2",
+      "pointer": "/body/oldBackup",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d11cc70bb8728e189c8e856dec041f573e3034dbc8202843e6ea2e98fb2ec566"
+    },
+    {
+      "family": "migration-journal:currentContainer",
+      "node": "projection-01-PC2",
+      "pointer": "/body/currentContainer/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "205fd619bd6c1f5279868b612c8233708ab79ef5b97e64af2c6c4877409dc564"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1be618fecf7249ecf18d9e36df3aabc7e9d7a4c8a980c54320df94bf33d32486"
+    },
+    {
+      "family": "migration-journal:sealedHistory",
+      "node": "projection-01-PC2",
+      "pointer": "/body/sealedHistory",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c3181896cb176ffd7949a2edf5d1db8a811513d9b29eaeca540824fe31b377d9"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-0:MIGRATION",
+      "node": "projection-01-PC2",
+      "pointer": "/body/sealOriginEvent",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d11a1f53a2977c4ac06010cfdae1726b340c2e53c633147a740929af4cbcb1fb"
+    },
+    {
+      "family": "migration-journal:operationKind",
+      "node": "projection-01-PC2",
+      "pointer": "/body/operationKind",
+      "value": "MIGRATION-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "381301305a69c7b4130454b241ddc60e60bfc6348136fae90b2c4cb1e2131934"
+    },
+    {
+      "family": "migration-journal:leaseState",
+      "node": "projection-01-PC2",
+      "pointer": "/body/leaseState",
+      "value": "HELD-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "65b84c170a15f0997041393aeda08d423429c3df2e221a5d06e1f31157d909c8"
+    },
+    {
+      "family": "migration-journal:signer",
+      "node": "projection-01-PC2",
+      "pointer": "/signer/role",
+      "value": "host-helper-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "155de088fb4e2381e602c4f4537cc975eb3c4aa4761d8605b3672aae210d346b"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a87e3d9bb5b3975006bdccfad79881afada14d90dd1905d011e22e023016ed16"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "aeca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "45b9e5760fc3aca882a0587b89fe0464d020f64d24ecc1be3bdf9fec9706c646"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f36a94db8814a2da58c5b610ed6665dc8b6af9624a34638889ab174aa8752a0c"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d3be3c3c10cfbd2f852e71990014090e29a11dc308833d088d67a6ec88f66572"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "969e696533f9a4978eb43aae7eacb823e4d12eb6f30bd8d1a114ec75b0110c49"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-1:MIGRATION",
+      "node": "projection-01-PC4",
+      "pointer": "/body/sealOriginEvent",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9591e799c587048ec9c7ae12300102c22bfc1e3d7a02c57ac88978a9a6f09047"
+    },
+    {
+      "family": "cohort-projection-set:schemaVersion",
+      "node": "cohort-01",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-migration-cohort-projection-set:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "91c4d53f49e29a61c667037b56bab41b41242a404625309754757bdca5e0de8e"
+    },
+    {
+      "family": "cohort-projection-set:planEnvelopeSHA256",
+      "node": "cohort-01",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "11538591459b44aecca9946e97a7fc475c999e38c9077bf3e915860d7b2320a2"
+    },
+    {
+      "family": "cohort-projection-set:sequence",
+      "node": "cohort-01",
+      "pointer": "/body/sequence",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d2f98c48f60379047059e0667c083d84f038eeca71d7577194f45af89019da16"
+    },
+    {
+      "family": "cohort-projection-set:members",
+      "node": "cohort-01",
+      "pointer": "/body/members/0/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d7f03ad7066ffe28fc16ab443ed8bab5436ea3000e035083a343de8d36116ce0"
+    },
+    {
+      "family": "cohort-projection-set:signer",
+      "node": "cohort-01",
+      "pointer": "/signer/role",
+      "value": "root-fence-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "850ef12bfe8bff577444ad0772916bf793096654044bd6b48bc1107f296c2ad0"
+    },
+    {
+      "family": "api-response:schemaVersion",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-response:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1948ce7d4f38e5b51225dfce9029dc81a61a4539622f05d0256345b49b13dec0"
+    },
+    {
+      "family": "api-response:requestSHA256",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/requestSHA256",
+      "value": "a69151c087092b094eb9838644dfe30f34d4e3994f2eba7db206c8396f713725",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "14d86efab9511324842470a56d50bb96762225fb4ba93ccfd3c5f104ac2bf571"
+    },
+    {
+      "family": "api-response:operationId",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e05916f564022a00a17cba677eb9f10b8b7f15f0bf1e90e8280ffdd715708f57"
+    },
+    {
+      "family": "api-response:idempotencyKey",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/idempotencyKey",
+      "value": "aad7c73a430030e8d39f22d39ad39bf237300babad91d15c5b3da0667e46bd6a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2f6489429ab10b470cfdc7e78a3220f17ba253acc180e669bf8ecbf3ace3d4e2"
+    },
+    {
+      "family": "api-response:status",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/status",
+      "value": "RECORDED-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "322e913626b54a6a5f22a2c48f2baa4f9f83250ab7280162da6b09eea062fd17"
+    },
+    {
+      "family": "api-response:projectionEnvelopeSHA256",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/projectionEnvelopeSHA256",
+      "value": "b705ed088fe98afb8e88f83d9a2e917c090d4a15de0fc76396a2f0d03082099d",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "409af886335999eb804402c7aff40a8acb8d0822ce9e2ecc48b706ffd37e8221"
+    },
+    {
+      "family": "api-response:eventEnvelopeSHA256",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/eventEnvelopeSHA256",
+      "value": "a4ed5c054cf7fc6172700b514571f2f0a4a15791205c50b6eed00aba0685526f",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "200846a0b303a9a867360d392f8f9546824cc50053392ae2844b237cac5b9be2"
+    },
+    {
+      "family": "api-response:leaseEnvelopeSHA256",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/leaseEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6e93934de53e2ff5b9d59b248f8ca84a97d7735e3b1d8dc19f6540e4e4811e07"
+    },
+    {
+      "family": "api-response:inventoryEnvelopeSHA256",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/inventoryEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "feec113899644bc4403f814601456431312403e53e65909cf1f548926139067c"
+    },
+    {
+      "family": "api-response:errorCode",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/errorCode",
+      "value": "none-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "96047a7b8b9a098e95dace8c8de5be38e83839b7772a57d373504396f8f7462e"
+    },
+    {
+      "family": "api-response:sideEffectPermitted",
+      "node": "response-request-01-inspectAndValidate",
+      "pointer": "/sideEffectPermitted",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "413454d85e9d7d84d0f6338cdb943755c06c7790387839397e8d0c39cbf19827"
+    },
+    {
+      "family": "api-request:schemaVersion:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a22340b028d2e77c9706593a354f5e3081f0fd2e8cee6922b3f169dbac0bafaa"
+    },
+    {
+      "family": "api-request:method:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/method",
+      "value": "reserve-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0822560c8fd271c10404f8d405f41ee1b166b7b401aa96be007142c9f91e5d13"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1fd93f0b7415c4fa6ab3f1276ee4112111988dac50a05e723a5ad21d335a7e4b"
+    },
+    {
+      "family": "api-request:operationId:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "00e75924606bfcd438ea866f3dd67242eb56a2840581abedd00b88126e6b549f"
+    },
+    {
+      "family": "api-request:idempotencyKey:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/idempotencyKey",
+      "value": "a8fabd19c6414843fe36f1bec6f52fb7f97708954a3e2469468816900ae2b40f",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2bd4bc2df9ccbf1632c4a808f7f7e6e4431a8d39bb53e75e74b2a619e3afc0a3"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "b705ed088fe98afb8e88f83d9a2e917c090d4a15de0fc76396a2f0d03082099d",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4923948ae450055963a98e17a6dfcc9b3b0460e5ed4c58c47fbdf37d25aee780"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "97f571637f3580fa264b355fd84ac527d69643df97e0e59a8fece0056fa25c91"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4e06286e80c5814efe355086f90def3f59baa802e905788935c4dc67f440eef5"
+    },
+    {
+      "family": "api-request:arguments:reserve:ABSENT",
+      "node": "request-02-reserve",
+      "pointer": "/arguments/expectedNoPriorMigration",
+      "value": false,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "92b590d4fd3ba8fe649be53340b5107c48a1a8de0e31e9c8368bfb98d2841139"
+    },
+    {
+      "family": "api-request:schemaVersion:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3b8c1d5e82932bc79b2c38b427fe0fe4f3b66681dcfba915a4eba373bd31f6b7"
+    },
+    {
+      "family": "api-request:method:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/method",
+      "value": "setOldRestartNo-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c435b44f39c948c3c3e2ec03764dee9746d7cd024967a502f375f80a553c8110"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "59d629e16c17db6833862ec866666f32836289bdd5eafeb3a944084847410b98"
+    },
+    {
+      "family": "api-request:operationId:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "be9fd6bce9e0bd6c11441db0861abb9ed62a0a65d3190cedf2613191f66f02e7"
+    },
+    {
+      "family": "api-request:idempotencyKey:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "ad7ad7ae987ec71b2ee5461e173c78fa7af72fa0edfd733967773ba63d2f8c86",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9efb7d1a2ff3e67b44d5833963e9a08eb52f00f890b5e995dd600df21c81a978"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a1c6b3ab11f4bd3ba56e617a6f44e46344423acd8c97a06c97195220ef2bedcc",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "375957467a16a6712c6da3341130fc44e1e3a513ae85549d87e83029655a32c7"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3cc30c7cf80f39696f290ebbab0d0e44aea136862c7bb3f1da3f5a36d206efc2"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a700f92cd882f2f4553292f8fe582be62f135ef8011866d15d0a7e20cdf52d2f"
+    },
+    {
+      "family": "api-request:arguments:setOldRestartNo:ABSENT",
+      "node": "request-03-setOldRestartNo-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4b98d1a6b99c0352050d8bbef2918f1603b2dc537d15c55dc1c6c5313617f773"
+    },
+    {
+      "family": "api-request:schemaVersion:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b7bdd58bf296f0db4a336d9fea0fb7717647e6a81b1ae10f2e9256ce6b182efe"
+    },
+    {
+      "family": "api-request:method:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/method",
+      "value": "stopOld-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "735ee7a2c343e73401b5d05a897027bc3294d9937c338ced8fb8d223425cef6c"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "925169bab99ce9f39e107621da04230bcf3f109bd2992215042b2dec8f13c999"
+    },
+    {
+      "family": "api-request:operationId:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9785f869291a983b7830fd8215922bc5beb1434a52b038272a37ba03267947ab"
+    },
+    {
+      "family": "api-request:idempotencyKey:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "afb327a678d6e6ffbbe57236e1a8b3edfb045f56c2332b2101080519caa6f328",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "185ed4b8cf5b13feb6d6816353de35c13c1101fb959f8de1d6bbfef9901b88ef"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "ae1fe19b142670b52cd28eed4d68f070670f54ff14a4224e8d785f8682970459",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0802a29c9fc2cef07e6f62cb7e746315be94d0fcdcbebccdfd0e4da064706d5e"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "abb415b47b691053db51a5887a958e22242e6d9bdf9a25b813f7f5332d689cc4"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ef0aeac2b7236e9a5319c085e57d31228849f73953a4c06ea99419e65c11acb4"
+    },
+    {
+      "family": "api-request:arguments:stopOld:ABSENT",
+      "node": "request-05-stopOld-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0a66eea7a957835deb4b3e58489c7fc19649cfe254c4d5a12fda0cd60ee4930e"
+    },
+    {
+      "family": "api-request:schemaVersion:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4ad7c187a104fce6aa27e6d2310bcc47afa50953231417b3773aae70d0e1787a"
+    },
+    {
+      "family": "api-request:method:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/method",
+      "value": "captureFenced-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c55064b02ca5626d2f48ebf2f145c1ee372762db3d1ea8614903d115595a13b6"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1e079d5559ba0a9a905ee533c8e29c25cb17491ec421ed41313614a8d878a0c0"
+    },
+    {
+      "family": "api-request:operationId:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4183a53ab4beef745c6f7fed8bcf9c0fcf99994a08e8125bdacc3d945c99397d"
+    },
+    {
+      "family": "api-request:idempotencyKey:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "ac19b781411cda260d77384affa423cdb07be1cfa5c189a250652202d099e1f4",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7e00911b4861b10b436e5712f75f4f650913b43bb6388de1cd7f65abb9b832ee"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a8e99194717add32bcda4159fa3c78ca24083834ef5a5f0482ef34b24f906d51",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7bc3d6619b7981f52c9de4c04d6f850df52ff9cc9919e125e2ebd0b52e79178b"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "75aababc26701d196d92287cbbf1ee07b8ff5f86d180375504092c15192f37c8"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "501835e6e410619c1c38be8fec8fcd1575c35c7a98d3d52ebdfa000890c96892"
+    },
+    {
+      "family": "api-request:arguments:captureFenced:ABSENT",
+      "node": "request-06-captureFenced-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4199b63c776066966d921c22c20c527f66f16ad9d9568cc822f395b5014da30c"
+    },
+    {
+      "family": "api-request:schemaVersion:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b3e7d91a444e6470acaa1910c4157ece3d88449c287027d6c79733775f2773bf"
+    },
+    {
+      "family": "api-request:method:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/method",
+      "value": "preserveOld-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "277e89c39629b1648a6f3a0ed51b6872c7e398d6126b31a5b1d6d91b5101221b"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0f0b625fdc4d1efa22f771196b2c118eaebf8767b27570c289a485ef26c98ea3"
+    },
+    {
+      "family": "api-request:operationId:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a758d1d1edeaecaa62df6e0f8719990d2330aebe95b038766ecce1ab527cb159"
+    },
+    {
+      "family": "api-request:idempotencyKey:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "ac3b0c40ed114dda36779e37693445e3eb0d30de9f7255bd1608fb70ac7a5941",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c4565d7dff6aa5a29d3013de06adcd3f236b11fa2bca80ff05055a0dd8e973af"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a6674182b23673ea1300a381569e4c4ab972257240fe1f4790e5bdc444ec6793",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a14bdfb5c20ca7f30eace0dd46bc0db6af99f46d899772918a9aeff9ae80f144"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3b8ad1a0327dad93d8635cdbaf1f219e5d8ea3037c8df6dfed00975e4cdf9cad"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ba8f73cf10af32ca2700def360734a29ba8b94848dff5fc386bc6f3035d3cbfe"
+    },
+    {
+      "family": "api-request:arguments:preserveOld:ABSENT",
+      "node": "request-07-preserveOld-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "99918bc3436a092b6d9099ecbec915a74be57b5b386eb1442b61d1cf141b0387"
+    },
+    {
+      "family": "api-request:schemaVersion:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "44f3aba4995fb2693d62b44951721a3dcbf78b755ee6de3b2b128d54e55501bc"
+    },
+    {
+      "family": "api-request:method:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/method",
+      "value": "createNew-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e8c2e3858e06c9d1a7f6be39de17eef50f351e2e024a29a1739850ecc7daa1c9"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2102761785a778982fc1d6dcb1f718e236c56e25a9d12d8441418d9d123d887b"
+    },
+    {
+      "family": "api-request:operationId:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0efe840ed366cc770752c8db69bcb834338b7e6023a0b38cf3b4cbd3ed26643a"
+    },
+    {
+      "family": "api-request:idempotencyKey:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "adc226a5f5e6f5a245a3bd08459c76167a087fc1580d5591211e7018247a452a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "fa778295e6b043660a863102fca9a7a915626205d4431f3e7234d0414660ffde"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "aebd79cf34e2c0dcf63f6aee6b2251e49f7ec91363ed374f001aeca6a8e2d5b7",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "325d614ec72df48782b03ba116b961cb8f00a95ec45f79975db907457fd37029"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cfc098db2681fe888e94abe37f03c86d54abb12113c52db6506bc36fb734a44f"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "55b233e1caa76ef2d0986273d45a31d1b1018b8d57514e02a56b25d7a871b458"
+    },
+    {
+      "family": "api-request:arguments:createNew:ABSENT",
+      "node": "request-08-createNew-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "682c215024fd8bdb10160a4888bc90d485d2425608ffab7acce6caf58f4c8217"
+    },
+    {
+      "family": "api-request:schemaVersion:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "32661c48f981dcf06720adc03a73423ea51d98ea80ce7d2e769772f145019f5f"
+    },
+    {
+      "family": "api-request:method:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/method",
+      "value": "startNew-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f14c916a6d54bc82bd611a8e5dfd0a77a064136329e657509fc232b7bb634e47"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ffd6b9758632023d2793096bbf9cd65fe76159b2870c013cd347a701c851c20e"
+    },
+    {
+      "family": "api-request:operationId:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "57be5689cb30f92586c03dd7586a9ca03a9552636905aba5578d86045ddc2c04"
+    },
+    {
+      "family": "api-request:idempotencyKey:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "b92455e93232d2f77de03880fa132aeedda85805210c0b22693eb4120a517f7a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c63c0195a15da1202c7f8fa9267cc2cab5c02e8b4c24916ba7cb060938099864"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "ac501f353bbbaa72d154654aac4e43c47c2ff32c33ec678f248d2cc8f06c203a",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b740902c69671583f4617547701a0b918e9f483ef088be4b76f0408317728b92"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4a67fb9599fd78de9eb3c21e281e88c11e1adab981cda6eab1e45127a612993d"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "dc7d56ff39b482c74b1d60a65bf462c42fad479efc3619bf116cd1b0b160a8b7"
+    },
+    {
+      "family": "api-request:arguments:startNew:ABSENT",
+      "node": "request-09-startNew-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e8bce96aaef57fee8d0e5c94a9bb68c0b054d0647c64cf8d7c1cda9a26a11cfd"
+    },
+    {
+      "family": "api-request:schemaVersion:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cfde1d3c3957f634ea161e0d5c3c61ac544f0677628b14807caa7460b921138f"
+    },
+    {
+      "family": "api-request:method:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/method",
+      "value": "verifyBootstrap-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9b959b729c92a16b858a7360ca9bbe40144785eb5e7964c117f352bf62f5e61d"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a9984e2222042e55e2a3191c48312ac6de20eac286c5ebd3223e8cebbc097f89"
+    },
+    {
+      "family": "api-request:operationId:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5849ac43a1787a8b74b9b855e9fd2713da1e701a814028bc32db24a7d34c959f"
+    },
+    {
+      "family": "api-request:idempotencyKey:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "a4894aec3b29fa2dea6e8445960b574c055a7a932d32800b3764d753105c7c2b",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4096712371d4d66ebf795cc9f4882ab2c1674380dc2f8e2400ddd4229a33a582"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a9ded04d921f72cb10146e42a5f1c65d1c68ddde9a19833da028ff8ba59927be",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "88e9a259f3cc56e3895f5a946439ff8b9e638618ed1eff7babb2a0b3c75962aa"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d8ae55c9aa7ab102604ad5c8c3256666c787d59ec8c9ff3c8920ff13b21d900d"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ad97429437acbb7581171dfb07b1377c15e9329f90502174adaa5c6212c92db4"
+    },
+    {
+      "family": "api-request:arguments:verifyBootstrap:ABSENT",
+      "node": "request-10-verifyBootstrap-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4755f19ae0ef41cf431e40e0f691c4543b964017edc3c5ccb9987c69db0e73df"
+    },
+    {
+      "family": "runtime-inventory:schemaVersion",
+      "node": "inventory",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-node-runtime-inventory:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "89533fc6b3636f43d8485c8a8d0289ac6e538c3936f58d93530bf6f93a80c33f"
+    },
+    {
+      "family": "runtime-inventory:cohortId",
+      "node": "inventory",
+      "pointer": "/body/cohortId",
+      "value": "fixture-cohortId-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2b3ba5593316c4228f6febd3845358080d33220a31eddc14e080e8ebb9a7c272"
+    },
+    {
+      "family": "runtime-inventory:migrationId",
+      "node": "inventory",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b28ceb6864b5472d160b7b71ae4b67196252f54bcfc53d110c1531ab62c4250b"
+    },
+    {
+      "family": "runtime-inventory:planEnvelopeSHA256",
+      "node": "inventory",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "27236e2a61edbf571fffad6f548277b3c5ef1d002a85a66b1a0d39fce42e13af"
+    },
+    {
+      "family": "runtime-inventory:revision",
+      "node": "inventory",
+      "pointer": "/body/revision",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e21c52508bc20f63165b2e6f795981809c0bb29cd586aeb9cbf3408ff7839d74"
+    },
+    {
+      "family": "runtime-inventory:publishedAt",
+      "node": "inventory",
+      "pointer": "/body/publishedAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "11b6fa1b0d909503298339d01b93aaa9deca1869834e1441514ad7c2150d4e96"
+    },
+    {
+      "family": "runtime-inventory:publicationId",
+      "node": "inventory",
+      "pointer": "/body/publicationId",
+      "value": "a294c756baeed0fdce376c6467004aa89b972a3c083f90dcc4a21fa78e246540",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "732d4b099fd8fb8d6c61c7437912f94b1452d34f38f354e838e86adfc7983733"
+    },
+    {
+      "family": "runtime-inventory:expectedLegacyCPStateSHA256",
+      "node": "inventory",
+      "pointer": "/body/expectedLegacyCPStateSHA256",
+      "value": "a12616d9d78c3788e44512a112bf875d638eb9500caa85a783e95e76b80a0eb5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "227c56cbc8bde04bc72defde9c0009d0889c932b634aff2bb43b3e1d479cad22"
+    },
+    {
+      "family": "runtime-inventory:expectedChannelVectorSHA256",
+      "node": "inventory",
+      "pointer": "/body/expectedChannelVectorSHA256",
+      "value": "a5817712be6fd0cea813ec54c3abd91f4cdb054b64d502e024f73da3769966b2",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "16420830bbb9784ae377025c7b7da2a05af0604a0183f1ffdf49ee7c2a722bfb"
+    },
+    {
+      "family": "runtime-inventory:leaseEnvelopeSHA256",
+      "node": "inventory",
+      "pointer": "/body/leaseEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "59584657b14f9a76aa457c1e5036a2bf706c8dc78ee27a35897499f3e4c92f2b"
+    },
+    {
+      "family": "runtime-inventory:target",
+      "node": "inventory",
+      "pointer": "/body/target/sourceSHA",
+      "value": "c44aabba4e51ce0c4096e9946f38f24ca2c90950-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e8b782f2adbf3b738b584b3215d53fa9836567902c822513b5b5ca84774e1504"
+    },
+    {
+      "family": "runtime-inventory:image",
+      "node": "inventory",
+      "pointer": "/body/image/dockerImageId",
+      "value": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0f06990df278401cf022498ef36af6808402145466e88afa8504eec796dd594d"
+    },
+    {
+      "family": "runtime-inventory:members",
+      "node": "inventory",
+      "pointer": "/body/members/0/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "06ee6ea2063a2005791d5176c2008397948f2846f5044ce48e95dcb9353b1cb1"
+    },
+    {
+      "family": "runtime-inventory:legacyAgentImageFallbackAllowed",
+      "node": "inventory",
+      "pointer": "/body/legacyAgentImageFallbackAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "756c757717633ad5df19e5f6d71a22802250eeb5aaf9e1189d05595299f4c79a"
+    },
+    {
+      "family": "runtime-inventory:channelMutationAllowed",
+      "node": "inventory",
+      "pointer": "/body/channelMutationAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2dd908971ad4d9a83dc8ee2e240204b1a08bbd65a25c528f899a43acec1daabc"
+    },
+    {
+      "family": "runtime-inventory:previousInventoryHead",
+      "node": "inventory",
+      "pointer": "/body/previousInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6a2dd30b8f0e2974ab0ca922d23ca306c983743fce54fa3ff6b63034f7fdeb74"
+    },
+    {
+      "family": "runtime-inventory:signer",
+      "node": "inventory",
+      "pointer": "/signer/role",
+      "value": "cp-inventory-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d64607bf6e29f6f140563ce19cd54d5416dfb20b4fcaa2b669ac0969e587348c"
+    },
+    {
+      "family": "api-request:schemaVersion:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d2c965fd036d5d29c792970b8bf28ee91e50391db635be3b408dc9776c330276"
+    },
+    {
+      "family": "api-request:method:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/method",
+      "value": "publishInventory-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "86cdce789cb5165529573d564c441940ec46fd0843f17fb83da37ccf9ab2323d"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6bbc5f9b483198a1966278e742a2ecd8680109c55b4aadea196aa2a5d8c516c9"
+    },
+    {
+      "family": "api-request:operationId:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "019a69c0743b2a44ad17e3aa6286123322b129523e4ef227a49d44ccf04d56c1"
+    },
+    {
+      "family": "api-request:idempotencyKey:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/idempotencyKey",
+      "value": "ac92b5776c513b62162ac89f6061b2901315d36200062ce2e87b67858460169c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a4371ec578fa85ebf8657cdb59e040c3d2abfe5c951e6f5a65ad66cd50f2c722"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "ab952fcf881c5649d503822420580b43eabbf89740980081a288fe0d179153d8",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9090612a5dc037e9cc99b0a62993353a812bf87324082ae919540cc032420d7c"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4fbc2b0dd3e566e05cfe67431894e9d9d9d0086028f39156ff9f98060db27e9a"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "ABSENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d20eaf063257d198759994c0d7286ae0c64c38901f802a55fae0b908241dad47"
+    },
+    {
+      "family": "api-request:arguments:publishInventory:ABSENT",
+      "node": "request-17-publishInventory",
+      "pointer": "/arguments/candidateInventoryEnvelopeSHA256",
+      "value": "a4d0ce0d5bfdb52dca6b0674f4da81b9232579ce375a42216851be5d7b8da77c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d309a8fdce9761369649531a5579023577ae7a7670583c567f15598eaa6b4cf0"
+    },
+    {
+      "family": "terminal-seal:schemaVersion",
+      "node": "seal-PC2",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-plain-agent-migration-seal:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b8242f0ec7f73199e5f28fd64b08d731d06f1ba821c4958c51e0b83e3958a45c"
+    },
+    {
+      "family": "terminal-seal:migrationId",
+      "node": "seal-PC2",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7ada887f1c41dadcfce0d4fae327b931a34ae68d3b5339461017b32a544c4bad"
+    },
+    {
+      "family": "terminal-seal:planEnvelopeSHA256",
+      "node": "seal-PC2",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "47a8d13fd48f1c1687d8cdfb7bb899106baf01d0524c3d6010705cec87913400"
+    },
+    {
+      "family": "terminal-seal:slot",
+      "node": "seal-PC2",
+      "pointer": "/body/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1cf09fbcf8faabc6411a4628a6480aca018eb8aab5b30b076b2de91ba142c523"
+    },
+    {
+      "family": "terminal-seal:scope",
+      "node": "seal-PC2",
+      "pointer": "/body/scope/tenantId",
+      "value": "fixture-tenant-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ed2ed7ab8bd2802591c1aa03b9f16def63d2553f8557a1db9620e96522921a30"
+    },
+    {
+      "family": "terminal-seal:sealedAt",
+      "node": "seal-PC2",
+      "pointer": "/body/sealedAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "63e0141d393a525d7f5e5d653f4474a8a6ee0246ad3cba6ed47c35f0476577f4"
+    },
+    {
+      "family": "terminal-seal:bootstrapVerifiedEvent",
+      "node": "seal-PC2",
+      "pointer": "/body/bootstrapVerifiedEvent/sequence",
+      "value": 17,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7dfd7e6b68b25bc3f20dafe8d2d69492d2c3ca29535cc7a58b8736817d90a150"
+    },
+    {
+      "family": "terminal-seal:inventoryEnvelopeSHA256",
+      "node": "seal-PC2",
+      "pointer": "/body/inventoryEnvelopeSHA256",
+      "value": "a4d0ce0d5bfdb52dca6b0674f4da81b9232579ce375a42216851be5d7b8da77c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b4338c98380bcd617a7efffd60a2ac54931a11f9e3b10130bae7a847ef00f409"
+    },
+    {
+      "family": "terminal-seal:oldBackup",
+      "node": "seal-PC2",
+      "pointer": "/body/oldBackup/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c36e6673c22ebfe5ccd899065573ac2f916cbdd7a6ad3ebe60ab91c3c4f0ba1a"
+    },
+    {
+      "family": "terminal-seal:currentContainer",
+      "node": "seal-PC2",
+      "pointer": "/body/currentContainer/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ca91de37b6300313d1d70b5a41a85667e3af34d854729b99598bc538181a3ff7"
+    },
+    {
+      "family": "terminal-seal:volume",
+      "node": "seal-PC2",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7db3e715dce199fed638b0d7ed8f3fafd4c3225e88babf48b9dac694804e2f22"
+    },
+    {
+      "family": "terminal-seal:finalProtectedTreeSHA256",
+      "node": "seal-PC2",
+      "pointer": "/body/finalProtectedTreeSHA256",
+      "value": "a84098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "958cde5546f467ad10b2d5523eb9865ff159ba8cf4dee00c3ff35eaf5ba2623a"
+    },
+    {
+      "family": "terminal-seal:secondMigrationAllowed",
+      "node": "seal-PC2",
+      "pointer": "/body/secondMigrationAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ee5699b64cc723ca13bfa39fb8c8eb64c5091cfde12975f4d0a8a9266a0ea610"
+    },
+    {
+      "family": "terminal-seal:backupRestartAllowed",
+      "node": "seal-PC2",
+      "pointer": "/body/backupRestartAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a2d89e04304a3d16ed871023beb8596f7e46c52d1e749016568eb3dbbe353a8b"
+    },
+    {
+      "family": "terminal-seal:backupDeletionAllowed",
+      "node": "seal-PC2",
+      "pointer": "/body/backupDeletionAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2d6201cf21bf2f0eca4f9bcc2c034bfd9a1f1f200e1b3cd21c88228ef2c41ab4"
+    },
+    {
+      "family": "terminal-seal:normalRenewalRequiresFreshLeaseAndM2",
+      "node": "seal-PC2",
+      "pointer": "/body/normalRenewalRequiresFreshLeaseAndM2",
+      "value": false,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ea267d63c3a469fc6e96f6d6680e1a6a51baeaba8b4a4ece7f516b399d73b35a"
+    },
+    {
+      "family": "terminal-seal:signer",
+      "node": "seal-PC2",
+      "pointer": "/signer/role",
+      "value": "root-seal-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4eaaf6cf5dc7ec94824f6ed81ceda75bf55d4a40b1160e7df368d0656309c016"
+    },
+    {
+      "family": "api-request:schemaVersion:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "45242cc71517b36d993aaba4ce1086e0c28e63ae1b2f20b11fe4b2df12e7fbcb"
+    },
+    {
+      "family": "api-request:method:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/method",
+      "value": "seal-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a70a4db5589202ddb5ec4309ffab01dfed2b8eda3fd6e67d0b2895215d04fbf3"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cf883455b733fe96abe315e7b8e59348bdc7a491540aa94b45857273b590f4a2"
+    },
+    {
+      "family": "api-request:operationId:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a9acfa77089e90b2e2ae731b72a9c669263a5f4f3910d16226714fb6f028b053"
+    },
+    {
+      "family": "api-request:idempotencyKey:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "a912d7536b7840f87b110bb7f4437025dfcf03a6baa125a2af289967f96d9239",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f021c42f8257ce02afa2bc3685fd2d29580c7dfde3e8f8d2ebebd4dcea77cec9"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "aa645e53a8fd4bfe24bb02f95fe8fa001eaa5bfed56ab89e0819a3abfec57a1c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "97d4d8b44a7e59bf1f08f1cbfbf4100e7da790af1cde1c8db01c4a4c02e63b6a"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9c87cc45a18106a479d4082fe8281587aca69ce8f30618b8008f556f3bee48e5"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4a0f28ab3d3ae4c0e44345c0a055663697aa8a75c56801b39a846294f3e4a3f6"
+    },
+    {
+      "family": "api-request:arguments:seal:PRESENT",
+      "node": "request-18-seal-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ef28f6762c3cf95fd521d4083df863a4c0becfc8892127fecdbe9f86e5443bb7"
+    },
+    {
+      "family": "api-request:schemaVersion:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "98819054ef38a52d8d889afb30a927f4ee19cdb1dbf0b7b88a5e0014d087e7c6"
+    },
+    {
+      "family": "api-request:method:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/method",
+      "value": "readState-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a7f5fb204978cb9ccc7fc1b3f316175cc9b73bc82c23da14322f4669d46491ee"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "3c5273970e01734d7cfb1d2a900349d4fd7a387043bd23c7953d854657b121d7"
+    },
+    {
+      "family": "api-request:operationId:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5a1ab0fa7fd03d90e2b9b393aeb91cbf4cabd732929fcb85e74773de6df1acd6"
+    },
+    {
+      "family": "api-request:idempotencyKey:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/idempotencyKey",
+      "value": "aba23becddd9a5dd2953c683d7f354b622558eb76e9921a158386e7a1c516ab1",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6252ca5dd00396421f01642ab07bcfbcb3d7d123782640384a9bbd8f71188e56"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a868f2c87d5e5619a29c1200934c98f9735663fe9a218a609ef67b6a623a0a2e",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "239b0f690722643ec923fc787db6a310ee2932f1a762774239f329383215e3e8"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "71e1fb716171ea746bd4411f994e7c26c4e9ad17da1fc1b97986b42d4f2a9a6b"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a00f1a0327003c5bd1e022d733755fe3161897407e78834f101ac591fef2dc58"
+    },
+    {
+      "family": "api-request:arguments:readState:PRESENT",
+      "node": "request-20-readState",
+      "pointer": "/arguments",
+      "value": {
+        "foreign": true
+      },
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ccd465ad8113c01884b868057a82b8088daf8514575794dab8c0fdc5661ba5ea"
+    },
+    {
+      "family": "api-request:schemaVersion:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "eddf64b46d41a38907cbe446ac90d7ed3c07bdc972409f35bdd950b8bc39f6f8"
+    },
+    {
+      "family": "api-request:method:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/method",
+      "value": "release-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ee619f1e97fc37028dbe8b8352d12da50495742d556d8b3a1e21d70d2ffce49b"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "49f47a91cc9eabe957774179a20fd24e423486ef0bad99d41146cd01cfda0aaa"
+    },
+    {
+      "family": "api-request:operationId:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7a046024ed59219981d51a49ba823e93560643cd31219c0f5e06953c84dc176c"
+    },
+    {
+      "family": "api-request:idempotencyKey:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/idempotencyKey",
+      "value": "a76ddd8337e54a5e20485e62bb6b3874ac2fcc01a7f888b0a1630b431afeba1f",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b2254017c81c24c7a113d2d7de1cc0acdccb02f3b10f71128586c29a80fda642"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "a0799967824e4188100da68ffd0aa66aef56b075e713e8ef26bf02a44e45c326",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "20f85dc2f056d0a423a6409eb9bc0ee1125bde06e6a2e2184fd6a06fdcae9645"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/expectedFenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c7584d4e008e3be3b71926941d3e22b242ba4045feb8e3ac0f8d018171831b8d"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:release:PRESENT",
+      "node": "request-21-release",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "899bfac85a814223dede310ee3296827a4d43b3e7acab60167c120b0572e04e4"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a32971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "df624f17cc664fe7a0a74b768256a06072de29b2db75093ddb842022f13a6cac"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6b00cbf731d5665c9040a48d2a707f445e23f3fec3cf3bea949244046f02147a"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "aade246bfc4e590fffaa21e18ae76c76cb4006c692d4eb916c4c7e384f7c31a2",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "86a3d5034a5204ecb939b26999d52b8dfe3da2b82c6384ba49ef8f0152d81961"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6b496de227e719527d686d89da478f6b7219dc0285af00fbe243dc6218f142fb"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4ae7cc3d2888fd1a6b6832455f3d7410c47a6d1168d8a72caf361681a47734c4"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-0:NONE",
+      "node": "projection-34-PC2",
+      "pointer": "/body/sealOriginEvent/sequence",
+      "value": 31,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9f1b9b155ba7416b85db354dc6b5e1b97959eb72d6da111dc8b804775fc9f9a6"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4e75355570da77f0924844e67eb6b3e7c9607c1b047bf3aa19a829ff6ece359e"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "aeca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "eabdb13877aa282b789be3d87d98e8c3bcd3243a856c88afcde8fe51ce192ec3"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "aa6f70e3b97b37e7c59e8104b0011af5c1fcdd4b50fbc1f33ccfc31599f97023",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d99b700fcb98d66da26a12b8f39488cf3530dc2b91a4598e341439599b715cb8"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1fd2179a6769739a61f83fa5e06380ecb61f6d0f7ea865eb56037dea6143baac"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cd1062f5b5ddf8ed01f313b52479dd3dc960dc4491e5bc1417494150ac6a9934"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-1:NONE",
+      "node": "projection-34-PC4",
+      "pointer": "/body/sealOriginEvent/sequence",
+      "value": 33,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9dd017144de0c2b0106ae710b5cb84ef7f3677084ab7faaab4aa83dc55a603f7"
+    },
+    {
+      "family": "operation-lease:schemaVersion:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-agent-mutation-fence:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "18f603ef71481504fdc79b742630632e6aaa2d0c229a8498f0cbb5edd43d4072"
+    },
+    {
+      "family": "operation-lease:leaseId:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/leaseId",
+      "value": "lease-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "54da5fcd5a475ae5440fc4228275dab1ead826ab0c452e926771c1569eb0d5bb"
+    },
+    {
+      "family": "operation-lease:operationId:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/operationId",
+      "value": "fixture-operation-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "8ef5b7dab6c091434c822cd817c8e27f0430bed92257de87ce7b1a3198cf5c97"
+    },
+    {
+      "family": "operation-lease:operation:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/operation",
+      "value": "migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "aa53c00f201d9b9f010a7a9933203d1ad652eaae21cc4e88890852e7cdd531c4"
+    },
+    {
+      "family": "operation-lease:planEnvelopeSHA256:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a30e0e1bf0cfb00db59f5d82116b34324b3e8139ed8817d964ab2a8c7d5b00f4"
+    },
+    {
+      "family": "operation-lease:migrationId:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cbc3b9310e8b015395dfc2697a104ed49cdcb9ca59934fcf2b79460a4acff0e7"
+    },
+    {
+      "family": "operation-lease:fenceEpoch:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/fenceEpoch",
+      "value": 2,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "bc8829fba46f2fb305d0268572149d64559a1ff01f86299076ca2c62a178ddf8"
+    },
+    {
+      "family": "operation-lease:priorFenceEnvelopeSHA256:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/priorFenceEnvelopeSHA256",
+      "value": "a59b6c757892bbbda3226bf0ee560e409e5d37a5b8b4b8a35903d5c6ac67d96c",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "8957d89b0cb784945b9490089ee1cca3b4dab106e820ab37317a14d4184111fb"
+    },
+    {
+      "family": "operation-lease:scopes:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/scopes/0/scope/tenantId",
+      "value": "fixture-tenant-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "db538a53c98682c53615b396a18993d55d7aaaeadb787fccb51eab7c009f34de"
+    },
+    {
+      "family": "operation-lease:owner:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/owner/principal",
+      "value": "fixture-principal-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "63ddc472520bac5e7e505972b84bd341439510bbbbb2499963a9f6b83f069426"
+    },
+    {
+      "family": "operation-lease:tokenSHA256:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/tokenSHA256",
+      "value": "a74dfea0832c96e943ac181d4bd6822b17ad2844c63a4c41df738a749d91d131",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "8c4d0f37af0d34f5ba72a6c0187bdf40419f55af726e73c7ee70a01736436f44"
+    },
+    {
+      "family": "operation-lease:acquiredAt:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/acquiredAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "1f83670476e34b7bc441003dc2f9faf75ba53c58a44ac1c0860a07554b22c0f5"
+    },
+    {
+      "family": "operation-lease:expiresAt:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/expiresAt",
+      "value": "2030-01-01T00:01:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "05a1370f00dec38148231300b19eaa44ee65bb6ae2cb7ced292ce1886cb5e7b7"
+    },
+    {
+      "family": "operation-lease:mode:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/mode",
+      "value": "RELEASED-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "e2aa90a9ee35e464d7f3beed410551ba43cc858028d6dd9b50de69bea4df1c31"
+    },
+    {
+      "family": "operation-lease:permittedEntrypointsSHA256:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/permittedEntrypointsSHA256",
+      "value": "ae91e5ad471fed6b3def2f4fc34428320b10fecb6eeaff73760d96569a044205",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5127354416b9a8cc2166690748946588680eefce889c64f50f0af3284386a2f5"
+    },
+    {
+      "family": "operation-lease:descendantRegistrySHA256:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/descendantRegistrySHA256",
+      "value": "af53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "42f4568d919fa6d15027efafcc3f4860f7b55ae07fdbd886320fd49b17290840"
+    },
+    {
+      "family": "operation-lease:terminalSeals:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/terminalSeals",
+      "value": [
+        "foreign"
+      ],
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "34efff54110055b0866d553dd96902decabff91ebbed6c0573e51bf5d9d25458"
+    },
+    {
+      "family": "operation-lease:requiresHeldOSLocks:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/requiresHeldOSLocks",
+      "value": false,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a9d3777d4ef3a5d83865db1f960da7803482d2eccc04e91b5c02e61a0c52c333"
+    },
+    {
+      "family": "operation-lease:staleAgeReclaimAllowed:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/staleAgeReclaimAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4f8ad87c926ebe8cfd45902f26d368dd1e923d3a9f163190d3a484b1d4e75a64"
+    },
+    {
+      "family": "operation-lease:rawTokenPublished:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/rawTokenPublished",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c3c1c2c82b514c0833badf54e7451ce57a72151384ade6a1c417ea0de11bb1d0"
+    },
+    {
+      "family": "operation-lease:expectedInventoryHead:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/body/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "d642b167fe22d6bb2f1cba36b2a3ff393a7a7fe1a47e14cb7a7f1cf30ecd9aa0"
+    },
+    {
+      "family": "operation-lease:signer:migration:RELEASED",
+      "node": "fence-released",
+      "pointer": "/signer/role",
+      "value": "root-fence-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "2b68571c6b6832daa5a0ab1995951b38c80cb3ce5c01e1ee42e89791d44c4bb6"
+    },
+    {
+      "family": "operation-lease:schemaVersion:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/schemaVersion",
+      "value": "saintvision-agent-mutation-fence:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "65a9d7aef467e8ccefe9f081135553755bc78646c624ae5fbd4043449e0e713e"
+    },
+    {
+      "family": "operation-lease:leaseId:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/leaseId",
+      "value": "lease-restore-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0668ac52d3149cd0fbc093b50418fe4e0a09b49e5e98f34b91ac046ea02e14f8"
+    },
+    {
+      "family": "operation-lease:operationId:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/operationId",
+      "value": "fixture-operation-restore-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "954be7af45964ba137c2c3a25386aa152aa005d18414a65bb37d8857044aa87d"
+    },
+    {
+      "family": "operation-lease:operation:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/operation",
+      "value": "new-restart-restore-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "def2ebabdea66f2ed172b0f0290d18442fdf5a06f6a99a0a89b138093431209e"
+    },
+    {
+      "family": "operation-lease:planEnvelopeSHA256:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9dfd05c094a02cb5415b1c56c6849da04ebe251c954e3e3cd41ec9566d2bcbd5"
+    },
+    {
+      "family": "operation-lease:migrationId:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/migrationId",
+      "value": "fixture-first-migration-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "46a06ad81debb6243ab94bde6c9385b5ce17998eb808398d31114c21e77a38e4"
+    },
+    {
+      "family": "operation-lease:fenceEpoch:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/fenceEpoch",
+      "value": 3,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b01f999ec37280fe39c895455fb005c322111bf367e44c812c38e7151ccebcda"
+    },
+    {
+      "family": "operation-lease:priorFenceEnvelopeSHA256:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/priorFenceEnvelopeSHA256",
+      "value": "a7cb1a256aa783fe7259253be2d673400db5d34988cf0dfcfd03d2f88c8ee046",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ab8e2b90e3de46c34d93f7a18c4eaa20294ec5147af058fb8ff3ce9a0bd913c5"
+    },
+    {
+      "family": "operation-lease:scopes:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/scopes/0/scope/tenantId",
+      "value": "fixture-tenant-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cad86b32dfa8778dbf9827ec197d449eae1455a1c3c69ef91799ca588ad3b8c4"
+    },
+    {
+      "family": "operation-lease:owner:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/owner/principal",
+      "value": "fixture-principal-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "00b3c6f4bdb2f62130a4aa40c40ac504916faffcca953e3ed7595b9432f09fbb"
+    },
+    {
+      "family": "operation-lease:tokenSHA256:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/tokenSHA256",
+      "value": "a39e7fd799a9dd2c88764bc726c66ef9c44e6dad1cb6ad4b1acafe1f5eeeaefa",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "cd1b0bd45ed4f08ece128b93d194bb8b57a340c0c4d0258ef8a9c3a0735b63dd"
+    },
+    {
+      "family": "operation-lease:acquiredAt:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/acquiredAt",
+      "value": "2030-01-01T00:00:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "0e21aedf8e1b234bfce94204ca78055b8d0bf2f48f5866dd27657b68bd268841"
+    },
+    {
+      "family": "operation-lease:expiresAt:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/expiresAt",
+      "value": "2030-01-01T00:01:00Z-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "a144d9e717d4718761fbab51ffe2385dec2b44a28c22da6d4a3aaa92d2416000"
+    },
+    {
+      "family": "operation-lease:mode:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/mode",
+      "value": "HELD-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "64abb440069505944615a19e6fe0f15b6430daa01f90dae98e4277f7091add38"
+    },
+    {
+      "family": "operation-lease:permittedEntrypointsSHA256:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/permittedEntrypointsSHA256",
+      "value": "ae91e5ad471fed6b3def2f4fc34428320b10fecb6eeaff73760d96569a044205",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "c32ee6a9f17b5d1dcdfb30fa1ba3b77aa82c6bd5a901ad6eb9046c17d66c99a4"
+    },
+    {
+      "family": "operation-lease:descendantRegistrySHA256:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/descendantRegistrySHA256",
+      "value": "af53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "fb1441d545b58a187e733214e17d8ac3bb170af261311a9d269d49a8d8f9f886"
+    },
+    {
+      "family": "operation-lease:terminalSeals:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/terminalSeals/0",
+      "value": "a34f2a495856be228f275f8b2f7b0be78c5e4b77b9a463ca3370371148f6b438",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "bb1495a06d143d4f7d806a0686375f39fbcf74e2979b96df017ba8a310cc9cee"
+    },
+    {
+      "family": "operation-lease:requiresHeldOSLocks:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/requiresHeldOSLocks",
+      "value": false,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "eaa66a52db346484eefea2cd359cd5fc70c2d8df4ee8c952d2d02882863318c5"
+    },
+    {
+      "family": "operation-lease:staleAgeReclaimAllowed:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/staleAgeReclaimAllowed",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "98d862429ae8ab5b82c51b5ccc60b8975cd4d22469a9ad613a5bf058f93f4933"
+    },
+    {
+      "family": "operation-lease:rawTokenPublished:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/rawTokenPublished",
+      "value": true,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "157530ce6f177d3ebb69a397377d827192a7125b7f1eba3f858298f7bc4f7b7f"
+    },
+    {
+      "family": "operation-lease:expectedInventoryHead:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/body/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "bca11057b989a7cafffb809f8d29f151b5390efe821dfa3355e9b38f5ee15945"
+    },
+    {
+      "family": "operation-lease:signer:new-restart-restore:HELD",
+      "node": "lease-restore",
+      "pointer": "/signer/role",
+      "value": "root-fence-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "184452939d45ecc7aee2b0aec951bfd769cb33f1cfeada20371ad0b2c05f6349"
+    },
+    {
+      "family": "api-request:schemaVersion:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/schemaVersion",
+      "value": "saintvision-bootstrap-api-request:1-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "5358245fe0bd52464756d4e4a7ecc14814679eefd01fc95361d03cac1de632b8"
+    },
+    {
+      "family": "api-request:method:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/method",
+      "value": "restoreNewRestartPolicy-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "7bd267c09885b37d964973030e35839c54d7aec2201b3a64d8ade0f7e4ce4404"
+    },
+    {
+      "family": "api-request:planEnvelopeSHA256:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/planEnvelopeSHA256",
+      "value": "a0574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "46f317f7f909c9cd4199871d86b7e31ef3f275780b5d6df26a8d954e9cae0149"
+    },
+    {
+      "family": "api-request:operationId:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/operationId",
+      "value": "fixture-operation-restore-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4116d2e9464d3c8c1788bea7add489ae2caa2bda8e303e84441324c8537bba44"
+    },
+    {
+      "family": "api-request:idempotencyKey:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/idempotencyKey",
+      "value": "ad2913006b8ac0de3c21de72d781257734f13b026008a1002b24613e6b21c9ec",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "956515e2f9f3c5da23fb9865725f9dfa918461f0c91a54f577bfcbccda1f905a"
+    },
+    {
+      "family": "api-request:expectedPriorProjectionSHA256:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/expectedPriorProjectionSHA256",
+      "value": "bd5b07f91ff1927adec0be32e96a1444412098ade8dc0cdd451dda9b40103e4e",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "955ab59e4b301fbd381c64de720dab4d082c4da789607f18daa565ed7498d268"
+    },
+    {
+      "family": "api-request:expectedFenceEpoch:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/expectedFenceEpoch",
+      "value": 3,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f45604ce94b3d925d28cd31941a080441827dee69dbe4211605177d8ec86fdef"
+    },
+    {
+      "family": "api-request:expectedInventoryHead:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/expectedInventoryHead/presence",
+      "value": "PRESENT-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "6dff37fd8a9355fa40c3be8a2c3c9d498b0c446b950fbec27fe531da31b1252d"
+    },
+    {
+      "family": "api-request:arguments:restoreNewRestartPolicy:PRESENT",
+      "node": "request-22-restoreNewRestartPolicy-PC2",
+      "pointer": "/arguments/slot",
+      "value": "PC2-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b4a56b34e4972c5306366d1382aeca8186dfef87f9fd982aa5ef619127c1efb4"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a32971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "ca65f0628e9b10d846b30233f3aa709c62dfa10d973e25b6cf2154ade5160fef"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "b309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "15f80f3fe460f63b6f7723dd6ada84a697e1db8aa16e74818c1cbf5275eb680a"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "bd5b07f91ff1927adec0be32e96a1444412098ade8dc0cdd451dda9b40103e4e",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "f30abdcfbc2011a43051aa52f0252b08d6c6bae3b3028fd9300c255dae631c91"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "a766e5b74b77110d1f1fbefc7bb4f0e494614b1118cee3eeb98b6cd144850697",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "85d99dad4df5a502dcea3aeb039afc5b37e6c203c415afbbe462b7142e30fa94"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9a2255978278fc2d731099f7c323ccf5ee8ac10cd75318e772ce9b61af85f0c8"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-0:RESTART_RESTORE",
+      "node": "projection-35-PC2",
+      "pointer": "/body/sealOriginEvent/sequence",
+      "value": 31,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "eb97a440f54ff608a6676d945b0457c11abb8462ba926d9951b099e5c545f404"
+    },
+    {
+      "family": "migration-journal:workerRootRegistrationSHA256:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/workerRootRegistrationSHA256",
+      "value": "a6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b1e784b59f0ebecc00fe2a3b71f52501b3d397bb154c33b1909d843ae52fb59b"
+    },
+    {
+      "family": "migration-journal:daemonIdentitySHA256:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/daemonIdentitySHA256",
+      "value": "aeca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "bf01bf4b041087d8ec95eb32e288bd5cc678627de4ccd3df1013f86a367aa90f"
+    },
+    {
+      "family": "migration-journal:previousProjectionSHA256:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/previousProjectionSHA256",
+      "value": "ae3c5f21cc9a7e70193704a47d38668a5e608affa8172238336ed50f19ab2d30",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "da60f042248eaac24502e330d8e5803b059316e7061b19041bb8619762e856aa"
+    },
+    {
+      "family": "migration-journal:ownerLeaseEnvelopeSHA256:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/ownerLeaseEnvelopeSHA256",
+      "value": "a766e5b74b77110d1f1fbefc7bb4f0e494614b1118cee3eeb98b6cd144850697",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "b5dd36eaf4e380033466c15ed4d8711c7d65840462f5f73ab30bc82416601d94"
+    },
+    {
+      "family": "migration-journal:volume:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/volume/name",
+      "value": "fixture-name-foreign",
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "4e61db89d48d206c21080f3b4c38573440f62517327780be8bc096c22ea891f2"
+    },
+    {
+      "family": "migration-journal:sealOriginEvent:fixture-node-1:RESTART_RESTORE",
+      "node": "projection-35-PC4",
+      "pointer": "/body/sealOriginEvent/sequence",
+      "value": 33,
+      "expected": "REJECT_NONPROOF_BINDING",
+      "rehash": "all nodes and dependent bindings recomputed in graph order; retain ONLY selected wrong relation; proof signatures not generated/verified",
+      "candidateNodeSHA256": "9ed7ba02895e607afbfcc6bd9e22e87b6f6c18bbd58b28ade6bab0f867cbb824"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v4/cohort-projection-set.schema.json",
+  "$comment": "PROPOSED auxiliary aggregate for cohort API expectedPriorProjectionSHA256/response projectionEnvelopeSHA256. No registration, signer provisioning or runtime code. Node API methods still bind their own Node projection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["body", "signer"],
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "planEnvelopeSHA256", "sequence", "members"],
+      "properties": {
+        "schemaVersion": {"const": "saintvision-migration-cohort-projection-set:1"},
+        "planEnvelopeSHA256": {"$ref": "../v2/common.schema.json#/$defs/sha256"},
+        "sequence": {"$ref": "../v2/common.schema.json#/$defs/positive"},
+        "members": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "prefixItems": [
+            {"allOf": [{"$ref": "#/$defs/member"}, {"properties": {"slot": {"const": "PC2"}}}]},
+            {"allOf": [{"$ref": "#/$defs/member"}, {"properties": {"slot": {"const": "PC4"}}}]}
+          ],
+          "items": false
+        }
+      }
+    },
+    "signer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "keySPKISHA256", "signatureHex"],
+      "properties": {
+        "role": {"const": "root-fence"},
+        "keySPKISHA256": {"$ref": "../v2/common.schema.json#/$defs/sha256"},
+        "signatureHex": {"$ref": "../v2/common.schema.json#/$defs/signature"}
+      }
+    }
+  },
+  "$defs": {
+    "member": {
+      "type": "object", "additionalProperties": false,
+      "required": ["slot", "scope", "projectionEnvelopeSHA256"],
+      "properties": {
+        "slot": {"enum": ["PC2", "PC4"]},
+        "scope": {"$ref": "../v2/common.schema.json#/$defs/scope"},
+        "projectionEnvelopeSHA256": {"$ref": "../v2/common.schema.json#/$defs/sha256"}
+      }
+    }
+  }
+}

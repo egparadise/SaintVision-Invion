@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "fleet5-v4-historic-pathspec-audit:1",
+  "historicCommit": "5d0753e561149f1c4dface08583c232f10be15fc",
+  "historicFile": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/proposal-validation.json",
+  "historicGitBlobSHA256": "fab17377582498c846bb683fbfc216cb4bd3036da3cb9cf9d61756d899012c16",
+  "earlierFaultyCommandAndExitPreserved": {
+    "name": "frozen-cb3-prior-plans-boards",
+    "argv": [
+      "git",
+      "diff",
+      "--exit-code",
+      "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+      "--",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v1",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2",
+      "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105",
+      "docs/vault/30_Development/History/2026-11-05_FLEET5_bootstrap_normative_contract_proposal_Codex.md",
+      "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_contracts_v2_review_revision_Codex.md",
+      "docs/vault/30_Development/History/2026-11-05_FLEET5_legacy_capability_bootstrap_plan_Codex.md",
+      "docs/vault/00_Index",
+      "docs/vault/30_Development/Agent? ??"
+    ],
+    "startKST": "2026-11-06T02:16:18.934775+09:00",
+    "endKST": "2026-11-06T02:16:19.644133+09:00",
+    "exitCode": 0,
+    "output": "",
+    "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "semanticLimit": "The recorded mojibake board pathspec matched nothing; exit0 did not prove board coverage. Historical actual full diff had only additions, as independently reviewed. Do not rewrite this old record.",
+  "replacement": "Complete raw NUL Git name/status diff with NO pathspec; strict UTF8 decode, only additions under unique v4/History permitted. Actual command/path list in actual-git-path-audit.json."
+}

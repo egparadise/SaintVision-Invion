@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "fleet5-v4-full-git-path-audit:1",
+  "argv": [
+    "git",
+    "diff",
+    "--no-ext-diff",
+    "--no-renames",
+    "--name-status",
+    "-z",
+    "5d0753e561149f1c4dface08583c232f10be15fc"
+  ],
+  "startKST": "2026-11-06T03:22:46.615920+09:00",
+  "endKST": "2026-11-06T03:22:47.299643+09:00",
+  "exitCode": 0,
+  "pathspecUsed": false,
+  "decode": "strict UTF8 of actual Git NUL fields; no lossy shell spelling",
+  "rawOutputSHA256": "0047e0a182168dce0c742bbc656875499f4ea5f25a3f7a78e49f89ac378081ee",
+  "actualNameStatus": [
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/actual-bindings-HOLD.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/actual-git-path-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/all-method-target-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/artifact-reference-graph.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/auxiliary-contract-proposal-HOLD.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/closed-graph-contract.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/cohort-projection-set.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/document-authoring-provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/document-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/effective-schema-document-dependencies.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/historic-pathspec-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/migration-event.schema.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/nonproof-rehash-negative-fixtures.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/proof-slot-registry.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/proposal-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/recipe-definitions.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/reference-graph-coverage.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/review-response.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/scenario-inputs.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/scenario-objects.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v4/trust-bootstrap-contract.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_contracts_v4_closed_graph_Codex.md"
+    }
+  ],
+  "changedPaths": 22,
+  "modifiedDeletedRenamedOldPaths": 0,
+  "allChangesUniqueV4Additions": true
+}
