@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.379"
+version: "1.0.380"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T05:27:23+09:00"
+updated: "2026-11-06T05:37:50+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "e50 ALL8/ALL12 packet ACCEPT/final qualifiedDocs pending; v5 DESIGN registered/K1 real Go code; B rev3 docs; R-L1 CLOSED/Linux notrun; physical incomplete"
-active_card_next: "Integrator final exacte50 qualified report/Docs; Codex K1 new e50 branch real verifier; B Codex rev3; Root source-qualified integration and physical holds"
+active_card_status: "K1 parser/schema groundwork and fixed proof-wire proposal code; no crypto acceptance yet; B rev3; e50 all8/packet accepted/final report pending; physical incomplete"
+active_card_next: "K1 Codex real per-contract proofs/crypto/native M2 codec and actual CI then one code review; B Codex rev3; Integrator final qualified e50 report; Root gates"
 ---
+
+## 2026-11-06T05:37:50+09:00 K1 구체 wire 공백 해결과 구현 지속
+
+작업한 것과 확인: K1은 e50 기반 새 Orca worktree에서 parser/schema/C2 구현을 시작했고 실제 signed referent wire 부재를 확인했다. Root는 77slot/28contract와 기존 native M2 원문을 읽고 새 fixed proof codec 제안을 구체화해 reply msg_b005ebff62ab로 구현을 계속하도록 했다. 새 wire는 실제 코드·crypto 검토 전 PROPOSED이며 기존 v5 설계 pin과 live NULL/HOLD는 유지한다. 27개 normalized 계약과1개 기존 native M2를 구분하고 raw referent identity·보호된 signer metadata·fresh/provenance/approval 규칙·native 파생 expiry를 명시했다. 다음 첫 행동/담당: K1 Codex가 실제 codec/crypto/negative를 구현하고 게시한 코드/CI에서 Claude가 새 wire와 코드를 함께 검토한다. Root는 운영 등록을 완료로 바꾸지 않는다.
 
 ## 2026-11-06T05:27:23+09:00 e50 terminal CI와 R-L1 실제 판정
 

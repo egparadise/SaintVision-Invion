@@ -64,6 +64,13 @@
     "unique owner History/Evidence and test fixtures within the new package"
   ],
   "reply": "msg_a21df0511488",
-  "currentAuthorization": "K1 real Go offline verifier + tests on new branch from frozen e50; no runtime/host effects",
-  "future40Cases": "NOT RUN; not complete"
+  "currentAuthorization": "real K1 offline verifier + fixed new referent-codec proposal/tests; no live trust/host effects",
+  "future40Cases": "NOT RUN; not complete",
+  "additiveImplementationWireProposal": "k1-proof-wire-gap-decision-root.json",
+  "additiveWireReviewed": false,
+  "existingDesignSourceAndPinsUnchanged": true,
+  "actualQuestionAndDecision": [
+    "msg_45aaff1c9662",
+    "msg_b005ebff62ab"
+  ]
 }

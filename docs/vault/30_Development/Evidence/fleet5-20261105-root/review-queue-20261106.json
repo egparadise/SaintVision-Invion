@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T05:27:23+09:00",
+  "atKST": "2026-11-06T05:37:50+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -14,12 +14,13 @@
   },
   "active": null,
   "pending": null,
-  "authorParallelWork": "Codex K1 real offline verifier on new e50 branch; Codex B rev3; Integrator final qualified e50 report/ownDocs",
+  "authorParallelWork": "Codex K1 parser/graph/real fixed proof codecs; Codex B rev3; Integrator final qualified e50 report",
   "reason": "one active Claude review under measured host memory pressure; completed settled reviewer reopened with actual ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
-  }
+  },
+  "nextActualReviewTrigger": "published K1 code SHA + exact CI, review new referent wire and implementation/crypto together once; not launched for an unpublished working tree"
 }
