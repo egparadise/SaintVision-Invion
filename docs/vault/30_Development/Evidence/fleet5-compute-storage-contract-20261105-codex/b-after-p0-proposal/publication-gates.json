@@ -1,0 +1,71 @@
+{
+  "recordedAtKST": "2026-11-06T02:20:05+09:00",
+  "scope": "Final DOCS-only B proposal including CP admission/rootversion fence; no implementation",
+  "checks": [
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-1.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-2.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-3.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-4.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-5.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-6.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-7.log"
+    }
+  ]
+}
