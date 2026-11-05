@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": "fleet5-p0-corrected-source-surface:1",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Independent Claude corrected-delta review via root pending",
+  "recordedAtKST": "2026-11-05T23:40:08.321880+09:00",
+  "baseHead": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+  "historicalReviewedSource": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e NOT ACCEPTED",
+  "rootDecision": "msg_87edde1811d5 bounded RS1/SF1/versioned standalone; msg_d43265602041 C2; msg_b2c6d37559b1 N1",
+  "initialGuidanceInventory": "source-inventory.json (Index401/Codex362, exact first-read versions)",
+  "localFixtureResult": "309 passed, 20 existing Windows platform skips; exit0",
+  "actualNativeGo": "PENDING corrected exact-head CI",
+  "actualLinuxDocker": "PENDING provisioned CI",
+  "standaloneInstalledCLI": "PENDING Backend CI",
+  "physicalAcceptance": false,
+  "bootstrapConsumerClassImplemented": false,
+  "fullCompoundBImplemented": false,
+  "independentCodeAcceptance": false,
+  "surfaces": [
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "gitBlobSHA1": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8",
+      "anchors": [
+        {
+          "line": 33,
+          "declaration": "def canonical(value):"
+        },
+        {
+          "line": 37,
+          "declaration": "def floor_canonical(value):"
+        },
+        {
+          "line": 66,
+          "declaration": "def digest(raw):"
+        },
+        {
+          "line": 70,
+          "declaration": "def strict(raw):"
+        },
+        {
+          "line": 81,
+          "declaration": "def version(value, increment=0):"
+        },
+        {
+          "line": 87,
+          "declaration": "def versions(manifest):"
+        },
+        {
+          "line": 101,
+          "declaration": "def binding(manifest):"
+        },
+        {
+          "line": 105,
+          "declaration": "def signed_shape(value, body, signature):"
+        },
+        {
+          "line": 110,
+          "declaration": "def current_policy(raw, *, version_number, scope, control_fingerprint, now):"
+        },
+        {
+          "line": 123,
+          "declaration": "def validate_policy(raw, manifest, phase, *, now=None, before_write=False):"
+        },
+        {
+          "line": 143,
+          "declaration": "def verify_floor(value, certificate_raw, scope, *, nonce=None, now=None, fresh=True):"
+        },
+        {
+          "line": 179,
+          "declaration": "def match_floor(value, manifest, phase):"
+        },
+        {
+          "line": 188,
+          "declaration": "def commit_body(manifest, raw):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "sha256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "gitBlobSHA1": "e42f017ea011780ee2724866c3b11cdc087d7af6",
+      "anchors": [
+        {
+          "line": 25,
+          "declaration": "def strict_json(raw):"
+        },
+        {
+          "line": 36,
+          "declaration": "def no_migration(directory, *, leaf_observation=False):"
+        },
+        {
+          "line": 54,
+          "declaration": "def validate_topology(manifest):"
+        },
+        {
+          "line": 74,
+          "declaration": "def credential_archive(directory):"
+        },
+        {
+          "line": 112,
+          "declaration": "def no_rotation_mutation(directory):"
+        },
+        {
+          "line": 122,
+          "declaration": "def _settled(directory):"
+        },
+        {
+          "line": 143,
+          "declaration": "def _stable_settled(value):"
+        },
+        {
+          "line": 149,
+          "declaration": "def rotation_mutation_guard(directory, *, action=None):"
+        },
+        {
+          "line": 183,
+          "declaration": "def install_files(container, directory, *, rotation_publication=False):"
+        },
+        {
+          "line": 204,
+          "declaration": "def _install_files(container, directory, *, rotation_publication=False, settled=False, frozen=None):"
+        },
+        {
+          "line": 239,
+          "declaration": "def repair_target(manifest, container):"
+        },
+        {
+          "line": 264,
+          "declaration": "def check_running(container):"
+        },
+        {
+          "line": 278,
+          "declaration": "def same_identity(previous, current):"
+        },
+        {
+          "line": 284,
+          "declaration": "def image_id(manifest, image):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "gitBlobSHA1": "b537809fb623ebc84dabc9f4b6a076948e1db3cc",
+      "anchors": [
+        {
+          "line": 27,
+          "declaration": "def regular(path):"
+        },
+        {
+          "line": 43,
+          "declaration": "def _stopped_archive(cid):"
+        },
+        {
+          "line": 72,
+          "declaration": "def stopped_entries(worker_root, expected_context):"
+        },
+        {
+          "line": 112,
+          "declaration": "def docker(*args):"
+        },
+        {
+          "line": 119,
+          "declaration": "def _plain(manifest, value, *, current=True):"
+        },
+        {
+          "line": 158,
+          "declaration": "def target(worker_root):"
+        },
+        {
+          "line": 191,
+          "declaration": "def observe(worker_root, rotation, files, *, nonce=None):"
+        },
+        {
+          "line": 221,
+          "declaration": "def context(worker_root):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "sha256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "gitBlobSHA1": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+      "anchors": [
+        {
+          "line": 14,
+          "declaration": "def _legacy():"
+        },
+        {
+          "line": 19,
+          "declaration": "def identity(manifest, raw):"
+        },
+        {
+          "line": 24,
+          "declaration": "def _sign(root, body):"
+        },
+        {
+          "line": 30,
+          "declaration": "def _floor(root, manifest, files):"
+        },
+        {
+          "line": 39,
+          "declaration": "def _target(root, record=None):"
+        },
+        {
+          "line": 46,
+          "declaration": "def _record(root):"
+        },
+        {
+          "line": 67,
+          "declaration": "def _verify_record(record, manifest, files, raw):"
+        },
+        {
+          "line": 95,
+          "declaration": "def install(bundle, worker_root, *, restart, now=None, kill=lambda point: None, superseded_bundle=None):"
+        },
+        {
+          "line": 191,
+          "declaration": "def finalize(bundle, worker_root, commit_receipt, *, restart, now=None):"
+        },
+        {
+          "line": 264,
+          "declaration": "def rollback(*args, **kwargs):"
+        },
+        {
+          "line": 268,
+          "declaration": "def _commit(raw, manifest, manifest_raw, files):"
+        },
+        {
+          "line": 277,
+          "declaration": "def verify_settled(worker_root, *, now=None):"
+        },
+        {
+          "line": 331,
+          "declaration": "def resume_publication(bundle, worker_root, *, commit_receipt=None, now=None):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "gitBlobSHA1": "2a03a3dd9445a51ffc1954a8878498ea51beab0b",
+      "anchors": [
+        {
+          "line": 75,
+          "declaration": "def manifest_keys(schema):"
+        },
+        {
+          "line": 81,
+          "declaration": "def file_names(manifest):"
+        },
+        {
+          "line": 85,
+          "declaration": "def _peer_binding(manifest):"
+        },
+        {
+          "line": 89,
+          "declaration": "def observe_actual_floor(worker_root, manifest, files):"
+        },
+        {
+          "line": 93,
+          "declaration": "def floor_target_context(worker_root):"
+        },
+        {
+          "line": 97,
+          "declaration": "def _version_tuple(value: str) -> tuple[int, int, int]:"
+        },
+        {
+          "line": 104,
+          "declaration": "def runtime_preflight() -> dict:"
+        },
+        {
+          "line": 125,
+          "declaration": "def _utc(value: object) -> datetime:"
+        },
+        {
+          "line": 134,
+          "declaration": "def _canonical(value: object) -> bytes:"
+        },
+        {
+          "line": 140,
+          "declaration": "def _digest(data: bytes) -> str:"
+        },
+        {
+          "line": 144,
+          "declaration": "def _regular(path: Path, *, limit: int = 65536) -> bytes:"
+        },
+        {
+          "line": 151,
+          "declaration": "def _certificates(raw: bytes) -> list[x509.Certificate]:"
+        },
+        {
+          "line": 158,
+          "declaration": "def _verify_signature(issuer: x509.Certificate, certificate: x509.Certificate) -> None:"
+        },
+        {
+          "line": 165,
+          "declaration": "def _leaf("
+        },
+        {
+          "line": 194,
+          "declaration": "def _historical_expired_leaf("
+        },
+        {
+          "line": 223,
+          "declaration": "def _policy(raw: bytes, *, manifest: dict, fingerprints: list[str], expires: str) -> dict:"
+        },
+        {
+          "line": 244,
+          "declaration": "def validate_bundle("
+        },
+        {
+          "line": 466,
+          "declaration": "def _atomic(path: Path, data: bytes) -> None:"
+        },
+        {
+          "line": 489,
+          "declaration": "def _exclusive(path: Path):"
+        },
+        {
+          "line": 501,
+          "declaration": "def _owned_directory(path: Path) -> None:"
+        },
+        {
+          "line": 514,
+          "declaration": "def _history_bytes(path: Path, *, limit: int = 65536) -> bytes:"
+        },
+        {
+          "line": 521,
+          "declaration": "def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:"
+        },
+        {
+          "line": 566,
+          "declaration": "def _finalized_evidence("
+        },
+        {
+          "line": 657,
+          "declaration": "def _require_settled_archive(path: Path) -> None:"
+        },
+        {
+          "line": 665,
+          "declaration": "def _finalized_successor("
+        },
+        {
+          "line": 773,
+          "declaration": "def _finalization_body("
+        },
+        {
+          "line": 794,
+          "declaration": "def verify_finalized_attestation(value: dict, manifest_raw: bytes, files: dict) -> dict:"
+        },
+        {
+          "line": 829,
+          "declaration": "def attest_finalized(bundle: Path, worker_root: Path, *, now: datetime | None = None) -> dict:"
+        },
+        {
+          "line": 859,
+          "declaration": "def _supersede_expired_journal("
+        },
+        {
+          "line": 926,
+          "declaration": "def install("
+        },
+        {
+          "line": 942,
+          "declaration": "def finalize("
+        },
+        {
+          "line": 1029,
+          "declaration": "def rollback("
+        },
+        {
+          "line": 1043,
+          "declaration": "def docker_restart(worker_root: Path) -> None:"
+        },
+        {
+          "line": 1064,
+          "declaration": "def main() -> None:"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "sha256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "gitBlobSHA1": "33fbf2ef8aaa42b5e1384e6c2aa69f867e80cf63",
+      "anchors": [
+        {
+          "line": 20,
+          "declaration": "def docker(*args, timeout=30):"
+        },
+        {
+          "line": 27,
+          "declaration": "def inspect(name):"
+        },
+        {
+          "line": 36,
+          "declaration": "def atomic(path, value):"
+        },
+        {
+          "line": 46,
+          "declaration": "def exclusive_lock(path):"
+        },
+        {
+          "line": 53,
+          "declaration": "def validate_target(manifest, value):"
+        },
+        {
+          "line": 70,
+          "declaration": "def validate_install_target(manifest, value):"
+        },
+        {
+          "line": 95,
+          "declaration": "def idle(node):"
+        },
+        {
+          "line": 102,
+          "declaration": "def verify_credentials(folder, state):"
+        },
+        {
+          "line": 123,
+          "declaration": "def load_image(folder, spec, archive):"
+        },
+        {
+          "line": 141,
+          "declaration": "def rollback(manifest, state, record):"
+        },
+        {
+          "line": 177,
+          "declaration": "def install(folder, state, *, undo=False):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "sha256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "gitBlobSHA1": "9407f6ad974b8f19daeb75d95fcb1fcbc5465693",
+      "anchors": [
+        {
+          "line": 11,
+          "declaration": "def run(*args, **kwargs):"
+        },
+        {
+          "line": 16,
+          "declaration": "def main():"
+        },
+        {
+          "line": 26,
+          "declaration": "def configure(folder, manifest, node, state, *, settled=None):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "sha256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "gitBlobSHA1": "c1b6ec66a37e33a9fda8e6a015ca892f1f1034b7",
+      "anchors": [
+        {
+          "line": 45,
+          "declaration": "def _prevent_bytecode_writes() -> None:"
+        },
+        {
+          "line": 50,
+          "declaration": "def _canonical(value: object) -> bytes:"
+        },
+        {
+          "line": 54,
+          "declaration": "def _sha256(value: bytes) -> str:"
+        },
+        {
+          "line": 58,
+          "declaration": "def _regular(path: Path, *, limit: int) -> bytes:"
+        },
+        {
+          "line": 65,
+          "declaration": "def _write_file(path: Path, value: bytes) -> None:"
+        },
+        {
+          "line": 72,
+          "declaration": "def _fsync_directory(path: Path) -> None:"
+        },
+        {
+          "line": 82,
+          "declaration": "def load_lock() -> tuple[bytes, dict]:"
+        },
+        {
+          "line": 121,
+          "declaration": "def _platform_key(lock: dict) -> str:"
+        },
+        {
+          "line": 139,
+          "declaration": "def _download(url: str) -> bytes:"
+        },
+        {
+          "line": 150,
+          "declaration": "def _worker_sources() -> dict[str, bytes]:"
+        },
+        {
+          "line": 180,
+          "declaration": "def build_bundle(output: Path) -> dict:"
+        },
+        {
+          "line": 227,
+          "declaration": "def _bundle("
+        },
+        {
+          "line": 267,
+          "declaration": "def _wheel_members(raw: bytes) -> dict[str, bytes]:"
+        },
+        {
+          "line": 298,
+          "declaration": "def _expected_files("
+        },
+        {
+          "line": 321,
+          "declaration": "def _installed_worker_modules(runtime_dir: Path) -> dict[str, bytes]:"
+        },
+        {
+          "line": 337,
+          "declaration": "def _installed_files(runtime_dir: Path) -> dict[str, bytes]:"
+        },
+        {
+          "line": 354,
+          "declaration": "def validate_runtime("
+        },
+        {
+          "line": 402,
+          "declaration": "def clean_bytecode_cache(runtime_dir: Path) -> dict:"
+        },
+        {
+          "line": 478,
+          "declaration": "def install(bundle: Path, runtime_dir: Path) -> dict:"
+        },
+        {
+          "line": 527,
+          "declaration": "def run_worker(runtime_dir: Path, worker_script: Path, arguments: list[str]) -> None:"
+        },
+        {
+          "line": 570,
+          "declaration": "def main() -> int:"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "gitBlobSHA1": "d8de953f7cd2f69f0e4915efccb24df352e7ea64",
+      "anchors": [
+        {
+          "line": 103,
+          "declaration": "def run(args, **kwargs):"
+        },
+        {
+          "line": 114,
+          "declaration": "def write(path, data):"
+        },
+        {
+          "line": 122,
+          "declaration": "def atomic_write(path, data):"
+        },
+        {
+          "line": 150,
+          "declaration": "def exclusive_file(path):"
+        },
+        {
+          "line": 162,
+          "declaration": "def private_directory(path):"
+        },
+        {
+          "line": 182,
+          "declaration": "def _read_pgpass(path, *, host, port, dbname, user):"
+        },
+        {
+          "line": 204,
+          "declaration": "def validate_pilot_database_name(value):"
+        },
+        {
+          "line": 215,
+          "declaration": "def pilot_runtime_role(database):"
+        },
+        {
+          "line": 220,
+          "declaration": "def _require_same_external_database(admin_dsn, runtime_dsn):"
+        },
+        {
+          "line": 234,
+          "declaration": "def read_external_dsn(path, expected_user):"
+        },
+        {
+          "line": 264,
+          "declaration": "def external_dsn_password(value, expected_user):"
+        },
+        {
+          "line": 275,
+          "declaration": "def _dsn_with_passfile(value, expected_user, passfile):"
+        },
+        {
+          "line": 304,
+          "declaration": "def bind_db_auth(args):"
+        },
+        {
+          "line": 390,
+          "declaration": "def _pem_certificates(raw):"
+        },
+        {
+          "line": 397,
+          "declaration": "def _load_external_ca(key_path, password_path, chain_path):"
+        },
+        {
+          "line": 431,
+          "declaration": "def ensure_pilot_pki(path, state, args):"
+        },
+        {
+          "line": 488,
+          "declaration": "def load_pilot_ca_key(path, *, key_path=None, password_path=None, chain_path=None):"
+        },
+        {
+          "line": 508,
+          "declaration": "def load_prebuilt_image(archive_path, inspect_path, tag, target):"
+        },
+        {
+          "line": 637,
+          "declaration": "def configured_nodes(state):"
+        },
+        {
+          "line": 693,
+          "declaration": "def active_configured_nodes(state):"
+        },
+        {
+          "line": 702,
+          "declaration": "def normalized_state(state):"
+        },
+        {
+          "line": 714,
+          "declaration": "def load(path):"
+        },
+        {
+          "line": 718,
+          "declaration": "def save(path, data):"
+        },
+        {
+          "line": 727,
+          "declaration": "def validate_node_ips(server_ip, node_ips, *, allow_server_node_colocation=False):"
+        },
+        {
+          "line": 744,
+          "declaration": "def add_requested_nodes(state, node_ips, *, node_port=None):"
+        },
+        {
+          "line": 764,
+          "declaration": "def revoked_colocation_state(state):"
+        },
+        {
+          "line": 779,
+          "declaration": "def node_by_id(state, node_id):"
+        },
+        {
+          "line": 786,
+          "declaration": "def node_from_csr(state, raw):"
+        },
+        {
+          "line": 796,
+          "declaration": "def node_state_directory(path, node):"
+        },
+        {
+          "line": 806,
+          "declaration": "def node_policy_path(path, state, node):"
+        },
+        {
+          "line": 812,
+          "declaration": "def node_public_directory(path, node):"
+        },
+        {
+          "line": 818,
+          "declaration": "def node_certificate_path(path, state, node):"
+        },
+        {
+          "line": 828,
+          "declaration": "def ensure_node_policy(path, state, node):"
+        },
+        {
+          "line": 854,
+          "declaration": "def manifest_for_node(state, node, inspected, tag):"
+        },
+        {
+          "line": 877,
+          "declaration": "def artifact_for_client(state, public, client_ip, request_path):"
+        },
+        {
+          "line": 902,
+          "declaration": "def runtime(state):"
+        },
+        {
+          "line": 906,
+          "declaration": "def tls(path):"
+        },
+        {
+          "line": 915,
+          "declaration": "def provision_observation_node(conn, state):"
+        },
+        {
+          "line": 932,
+          "declaration": "def init(args):"
+        },
+        {
+          "line": 1192,
+          "declaration": "def bundle(args):"
+        },
+        {
+          "line": 1301,
+          "declaration": "def enroll(args):"
+        },
+        {
+          "line": 1366,
+          "declaration": "def _canonical_json(value):"
+        },
+        {
+          "line": 1372,
+          "declaration": "def _rotation_digest(raw):"
+        },
+        {
+          "line": 1376,
+          "declaration": "def _utc_z(value):"
+        },
+        {
+          "line": 1380,
+          "declaration": "def _load_revocations(path):"
+        },
+        {
+          "line": 1400,
+          "declaration": "def _validate_current_control_leaf(certificate, intermediate, *, state, now):"
+        },
+        {
+          "line": 1419,
+          "declaration": "def _validate_expired_historical_leaf("
+        },
+        {
+          "line": 1446,
+          "declaration": "def _load_offline_authorization(path):"
+        },
+        {
+          "line": 1506,
+          "declaration": "def _rotation_material(path):"
+        },
+        {
+          "line": 1537,
+          "declaration": "def _channel_row(conn, state, node, *, lock=False):"
+        },
+        {
+          "line": 1549,
+          "declaration": "def _normal_floor_input(args, node):"
+        },
+        {
+          "line": 1564,
+          "declaration": "def _plain_cp_floor(path, state, node, channel, observation, nonce, now):"
+        },
+        {
+          "line": 1594,
+          "declaration": "def _batch_journal_path(path):"
+        },
+        {
+          "line": 1598,
+          "declaration": "def _load_batch_journal(path):"
+        },
+        {
+          "line": 1615,
+          "declaration": "def _batch_material(path):"
+        },
+        {
+          "line": 1706,
+          "declaration": "def _write_batch_journal(path, *, manifest_raw, manifest, bundle, phase, staged):"
+        },
+        {
+          "line": 1719,
+          "declaration": "def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):"
+        },
+        {
+          "line": 1730,
+          "declaration": "def _batch_archive_path(path, batch):"
+        },
+        {
+          "line": 1736,
+          "declaration": "def _current_finalized_batch(path, state, batch, bundles, conn):"
+        },
+        {
+          "line": 1820,
+          "declaration": "def _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn):"
+        },
+        {
+          "line": 1876,
+          "declaration": "def _finalized_predecessor(path, state, journal, *, candidate=None):"
+        },
+        {
+          "line": 1962,
+          "declaration": "def retire_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 2031,
+          "declaration": "def _write_rotation_public_material("
+        },
+        {
+          "line": 2183,
+          "declaration": "def _write_fully_expired_rotation_public_material("
+        },
+        {
+          "line": 2303,
+          "declaration": "def prepare_leaf_rotation_recovery_batch(args):"
+        },
+        {
+          "line": 2603,
+          "declaration": "def prepare_fully_expired_leaf_rotation_recovery_batch(args):"
+        },
+        {
+          "line": 2997,
+          "declaration": "def prepare_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3181,
+          "declaration": "def abandon_expired_prepared_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3282,
+          "declaration": "def prepare_leaf_rotation(args):"
+        },
+        {
+          "line": 3444,
+          "declaration": "def _validate_rotation_receipt(path, state, bundle, receipt_path):"
+        },
+        {
+          "line": 3540,
+          "declaration": "def stage_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3619,
+          "declaration": "def commit_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3713,
+          "declaration": "def commit_leaf_rotation(args):"
+        },
+        {
+          "line": 3782,
+          "declaration": "def revoke_server_node_colocation(args):"
+        },
+        {
+          "line": 3836,
+          "declaration": "def revoke_node_certificate(args):"
+        },
+        {
+          "line": 3884,
+          "declaration": "def node_status_rows(state):"
+        },
+        {
+          "line": 3926,
+          "declaration": "def status(args):"
+        },
+        {
+          "line": 3943,
+          "declaration": "def observe(args):"
+        },
+        {
+          "line": 3980,
+          "declaration": "def serve(args):"
+        },
+        {
+          "line": 4067,
+          "declaration": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_workspace.py",
+      "sha256": "c767f4e9f96a8f174e8bc2f7ead9558101a9f1faf2e414a2e2a93922c276ebb3",
+      "gitBlobSHA1": "70a34cdd79a478580c7c006ebec26093b0f805b6",
+      "anchors": [
+        {
+          "line": 25,
+          "declaration": "def sha(path):"
+        },
+        {
+          "line": 33,
+          "declaration": "def bundle(args):"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+      "sha256": "0cfbb3beede8db22eb675546c088a3d3ae18760b8246e7d40e9771d74413675e",
+      "gitBlobSHA1": "61450dc28b45837d1f51c763a531b44d2ed6d2c7",
+      "anchors": [
+        {
+          "line": 33,
+          "declaration": "def status():return json.loads((root/'status.json').read_bytes())"
+        },
+        {
+          "line": 34,
+          "declaration": "def put(value):(root/'status.json').write_bytes(canonical(value))"
+        },
+        {
+          "line": 35,
+          "declaration": "def inspected():"
+        },
+        {
+          "line": 79,
+          "declaration": "def _run(runtime,arguments,env,*,rejected=False):"
+        },
+        {
+          "line": 89,
+          "declaration": "def validate_result(value):"
+        },
+        {
+          "line": 98,
+          "declaration": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "gitBlobSHA1": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "anchors": [
+        {
+          "line": 20,
+          "declaration": "func main() {"
+        },
+        {
+          "line": 26,
+          "declaration": "func run() error {"
+        },
+        {
+          "line": 169,
+          "declaration": "func strictPeerFloorArguments(args []string) bool {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "sha256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "gitBlobSHA1": "df8600ec30da8f9426f6bc7c18eaeb093aa80cc5",
+      "anchors": [
+        {
+          "line": 39,
+          "declaration": "func ServingExecutableSHA256(pid int, uid uint32) (string, error) {"
+        },
+        {
+          "line": 107,
+          "declaration": "func PeerFloorServingProcess(pid int, state, policy string, config Config, uid uint32) (string, error) {"
+        },
+        {
+          "line": 200,
+          "declaration": "func strictObject(raw []byte, names ...string) (map[string]json.RawMessage, error) {"
+        },
+        {
+          "line": 239,
+          "declaration": "func existingDirectory(path string) (*os.File, syscall.Stat_t, error) {"
+        },
+        {
+          "line": 266,
+          "declaration": "func observedEntry(directory *os.File, name string, uid uint32) ([]byte, error) {"
+        },
+        {
+          "line": 296,
+          "declaration": "func ReadPeerPolicyFloor(state, policyPath string, config Config) (PeerPolicyFloorObservation, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "sha256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "gitBlobSHA1": "c2551c0366cf9d4c74e4b3096937b7d142355646",
+      "anchors": [
+        {
+          "line": 23,
+          "declaration": "func ObservePeerPolicyFloor(config node.Config, state, policy, certPath, keyPath, nonce string, servingPID int) (map[string]any, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical.go",
+      "sha256": "5b7731eb0d499f12b130830b5c2fe2553d5c3b18886907e74db9ca923cea0661",
+      "gitBlobSHA1": "e2ca80ff64ed7b12cbff2199a3cd3431e1ca9f52",
+      "anchors": [
+        {
+          "line": 13,
+          "declaration": "func CanonicalPeerFloorBody(body map[string]any) ([]byte, error) {"
+        }
+      ]
+    },
+    {
+      "path": "tests/proofs/run_fleet5_peer_phase_fixed_probe.py",
+      "sha256": "d0c0e64657b4d9d9e4eaf9695ef326d4e92b5c184b673b04841ae4f87c0e8ccb",
+      "gitBlobSHA1": "d93a6b9a442da857dce221d7770f30868f4430ec",
+      "anchors": [
+        {
+          "line": 27,
+          "declaration": "def sha(raw):"
+        },
+        {
+          "line": 31,
+          "declaration": "def heartbeat_request():"
+        },
+        {
+          "line": 36,
+          "declaration": "def run_proof(output):"
+        },
+        {
+          "line": 327,
+          "declaration": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "sha256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "gitBlobSHA1": "4d8389aa2af430c0226293fb5aed0d017c0fe941",
+      "anchors": [
+        {
+          "line": 25,
+          "declaration": "def installation(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 82,
+          "declaration": "def test_real_upgrade_preserves_credentials_journal_and_replays(installation):"
+        },
+        {
+          "line": 117,
+          "declaration": "def test_real_failed_start_restores_prior_container_and_journal(installation,monkeypatch):"
+        },
+        {
+          "line": 134,
+          "declaration": "def test_real_trust_mismatch_does_not_stop_node(installation):"
+        },
+        {
+          "line": 144,
+          "declaration": "def plain_rotation_installation(tmp_path):"
+        },
+        {
+          "line": 186,
+          "declaration": "def test_real_stopped_publication_reentry_starts_only_frozen_phase(plain_rotation_installation,monkeypatch,point):"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/backend.yml",
+      "sha256": "2e511a6aedd2eff44491054f7255b5bba36797d9a4c9dec1ca2c0bf32ee4b190",
+      "gitBlobSHA1": "104714f04bbff7d10f988e7e240f1e0b7438f121",
+      "anchors": []
+    }
+  ]
+}

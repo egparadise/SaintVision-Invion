@@ -1255,6 +1255,8 @@ def bundle(args):
                 "peer_policy_phase.py",
                 "worker_peer_floor.py",
                 "worker_plain_rotation.py",
+                "leaf_rotation_standalone_runtime.py",
+                "leaf-rotation-runtime-lock.json",
                 "worker_storage.py",
                 "worker_replacement.py",
                 "worker_replace.py",
@@ -2599,6 +2601,7 @@ def prepare_leaf_rotation_recovery_batch(args):
 
 
 def prepare_fully_expired_leaf_rotation_recovery_batch(args):
+    raise ValueError("Expired/partial/unknown normal phase recovery is blocked; separately reviewed offline recovery required")
     """Recover an all-expired pilot without accepting an expired leaf as authority."""
     path, state = args.state, load(args.state)
     output = args.output.resolve()
@@ -3176,6 +3179,7 @@ def prepare_leaf_rotation_batch(args):
 
 
 def abandon_expired_prepared_leaf_rotation_batch(args):
+    raise ValueError("Unobserved Node publication intent cannot be abandoned from CP staging flags; separate offline recovery required")
     """Archive an expired, entirely unstaged batch whose live authority never changed."""
     path, state = args.state, load(args.state)
     bundle = args.bundle.resolve()
@@ -3442,8 +3446,36 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
     node = node_by_id(state, manifest["nodeId"])
     if node.get("credentialRevoked"):
         raise ValueError("Revoked Node credentials cannot be committed")
+    if manifest['schemaVersion'] == peer_phase.SCHEMA:
+        # Public input is never an alternate CA or Node-key provisioning path.
+        # Authenticate every proposed leaf before accepting its receipt or CAS.
+        now = datetime.now(timezone.utc)
+        if (manifest['tenantId'],manifest['nodeId'],manifest['recoveryEpoch'],manifest['nodeIP']) != (state['tenantId'],node['nodeId'],state['epoch'],node['nodeIP']):
+            raise ValueError('Rotation receipt scope differs from current authority')
+        if files['ca.pem'] != worker_rotation._regular(path/'ca.pem') or _rotation_digest(files['ca.pem']) != state['caBundleSHA256']:
+            raise ValueError('Rotation receipt issuing chain differs from the current pin')
+        intermediate, root = worker_rotation._certificates(files['ca.pem'])
+        worker_rotation._verify_signature(root,intermediate)
+        worker_rotation._verify_signature(root,root)
+        if (not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc
+                or not root.not_valid_before_utc <= now < root.not_valid_after_utc):
+            raise ValueError('Rotation receipt issuing chain expired')
+        uri = node_uri(NodePrincipal(state['tenantId'],node['nodeId']),state['epoch'])
+        previous = worker_rotation._leaf(files['previous-node-cert.pem'],intermediate=intermediate,uri=uri,
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,now=worker_rotation._utc(manifest['createdAt']),address=node['nodeIP'])
+        proposed = worker_rotation._leaf(files['node-cert.pem'],intermediate=intermediate,uri=uri,
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,now=now,address=node['nodeIP'])
+        control = worker_rotation._leaf(files['control-cert.pem'],intermediate=intermediate,
+            uri=f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',usage=ExtendedKeyUsageOID.CLIENT_AUTH,now=now)
+        if (fingerprint(previous) != manifest['currentNodeCertificateSHA256'] or fingerprint(proposed) != manifest['nextNodeCertificateSHA256']
+                or fingerprint(control) != manifest['nextControlCertificateSHA256']
+                or previous.public_key().public_bytes_raw() != proposed.public_key().public_bytes_raw()
+                or worker_rotation._utc(manifest['certificateNotAfter']) != min(proposed.not_valid_after_utc,control.not_valid_after_utc)):
+            raise ValueError('Rotation receipt certificate/key/expiry tuple differs')
     proposal_digest = _rotation_digest(manifest_raw)
-    receipt = json.loads(receipt_path.read_text("utf-8"))
+    receipt = peer_phase.strict(receipt_path.read_bytes())
+    if not isinstance(receipt,dict):
+        raise ValueError('Node installation receipt differs')
     expected_receipt_body = {
         "schemaVersion": manifest["schemaVersion"],
         "rotationId": manifest["rotationId"],
@@ -3461,6 +3493,8 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
                                          (receipt.get("postPeerFloor"), "overlap", files["node-cert.pem"])):
             peer_phase.verify_floor(floor, certificate, manifest, fresh=False)
             peer_phase.match_floor(floor, manifest, name)
+        if not peer_phase.signed_shape(receipt,expected_receipt_body,'nodeSignature'):
+            raise ValueError('Node installation receipt differs (strict v3 shape)')
     if set(receipt) != {*expected_receipt_body, "nodeSignature"} or any(
         receipt.get(key) != value for key, value in expected_receipt_body.items()
     ):

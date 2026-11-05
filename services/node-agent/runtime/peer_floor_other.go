@@ -4,6 +4,10 @@ package runtime
 
 import "errors"
 
+func ServingExecutableSHA256(pid int, uid uint32) (string, error) {
+	return "", errors.New("NODE-0041: Linux serving executable observation required")
+}
+
 const MaxPeerPolicyVersion int64 = 9007199254740991
 
 type PeerPolicyFloorObservation struct {

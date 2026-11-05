@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "deploy/lan"))
 import lan_pilot
 from lan_pki import fingerprint, issue, pem, private_pem
 import worker_leaf_rotation as rotation
+import peer_policy_phase as phase
 
 NODE_ID = "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ"
 TENANT_ID = "22222222-2222-4222-8222-222222222222"
@@ -69,7 +70,7 @@ def _write(path, name, raw):
     (path / name).write_bytes(raw)
 
 
-def _fixture(tmp_path, *, now=None, second_node_key=False):
+def _legacy_fixture(tmp_path, *, now=None, second_node_key=False):
     now = now or datetime(2026, 10, 7, 1, 0, tzinfo=timezone.utc)
     root_key, root, issuer_key, issuer = _ca(now)
     chain = pem(issuer) + pem(root)
@@ -116,6 +117,7 @@ def _fixture(tmp_path, *, now=None, second_node_key=False):
     _write(worker, "ca.pem", chain)
     _write(worker, "node-key.pem", private_pem(node_key))
     _write(worker, "node-cert.pem", pem(current_node))
+    _write(worker, "signer.pub", b'\x01' * 32)
     current_policy = {
         "version": 7,
         "tenantId": TENANT_ID,
@@ -188,6 +190,44 @@ def _fixture(tmp_path, *, now=None, second_node_key=False):
     )
 
 
+@pytest.fixture(autouse=True)
+def _plain_unit_transport(tmp_path, monkeypatch):
+    from peer_phase_unit_fixtures import install_unit_adapters
+    install_unit_adapters(monkeypatch, tmp_path)
+
+
+def _fixture(tmp_path, *, now=None, second_node_key=False):
+    """Normal :3 Python unit fixture, with an explicitly synthetic signed floor."""
+    from peer_phase_unit_fixtures import observation
+    import peer_policy_phase as phase
+    now = now or lan_pilot.datetime.now(timezone.utc).replace(microsecond=0)
+    f = _legacy_fixture(tmp_path, now=now)
+    value = observation((f.worker / "peer-policy.json").read_bytes(), (f.worker / "node-cert.pem").read_bytes(),
+                        f.node_key, f.manifest, now, "a" * 64)
+    output = tmp_path / "normal-bundle"
+    raw, manifest, files = lan_pilot._write_rotation_public_material(
+        output, state={"tenantId": TENANT_ID, "epoch": EPOCH}, node={"nodeId": NODE_ID, "nodeIP": NODE_IP},
+        current_node=f.current_node, current_control=f.current_control, control_key=f.control_key,
+        public_key=f.node_key.public_key(), ca_key=f.issuer_key, intermediate=f.issuer, chain_raw=f.chain,
+        revocations=set(), now=now, current_version=7, overlap_seconds=3600, leaf_valid_seconds=21600,
+        rotation_id="a" * 32, peer_floor_observation=value, peer_floor_nonce=value["nonce"],
+        current_policy_raw=(f.worker / "peer-policy.json").read_bytes(), current_node_raw=(f.worker / "node-cert.pem").read_bytes())
+    if second_node_key:
+        wrong = Ed25519PrivateKey.generate()
+        bad = issue(f.issuer_key, f.issuer, wrong.public_key(),
+                    f"spiffe://saintvision.ai/tenant/{TENANT_ID}/node/{NODE_ID}/epoch/{EPOCH}", address=NODE_IP,
+                    now=now, valid_for=timedelta(hours=6))
+        files["node-cert.pem"] = pem(bad)
+        manifest["files"]["node-cert.pem"] = phase.digest(files["node-cert.pem"])
+        manifest["nextNodeCertificateSHA256"] = fingerprint(bad)
+        (output / "node-cert.pem").write_bytes(files["node-cert.pem"])
+        (output / "rotation.json").write_bytes(phase.canonical(manifest))
+    f.bundle, f.manifest = output, manifest
+    f.next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
+    f.next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
+    return f
+
+
 def test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap(tmp_path):
     fixture = _fixture(tmp_path)
     before_key = (fixture.worker / "node-key.pem").read_bytes()
@@ -209,15 +249,7 @@ def test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap(tmp_
         fingerprint(fixture.next_control),
     ]
 
-    commit_body = {
-        "schemaVersion": rotation.SCHEMA,
-        "rotationId": fixture.manifest["rotationId"],
-        "proposalDigest": receipt["proposalDigest"],
-        "nodeId": NODE_ID,
-        "channelVersion": 8,
-        "certificateSHA256": fingerprint(fixture.next_node),
-        "committed": True,
-    }
+    commit_body = phase.commit_body(fixture.manifest, (fixture.bundle / "rotation.json").read_bytes())
     commit = {
         **commit_body,
         "controlSignature": fixture.control_key.sign(rotation._canonical(commit_body)).hex(),
@@ -231,7 +263,8 @@ def test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap(tmp_
         now=fixture.now + timedelta(seconds=30),
         restart=lambda root: restarts.append(root),
     )
-    assert result == {"rotationId": "a" * 32, "finalized": True, "channelVersion": 8}
+    assert result == {"rotationId": "a" * 32, "finalized": True, "channelVersion": 8,
+                      "finalPeerPolicyVersion": 9, "finalPeerPolicySHA256": fixture.manifest["finalPeerPolicySHA256"]}
     assert json.loads((fixture.worker / "peer-policy.json").read_text())["clientFingerprints"] == [
         fingerprint(fixture.next_control)
     ]
@@ -247,7 +280,7 @@ def test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap(tmp_
         == result
     )
     assert len(restarts) == 2
-    with pytest.raises(ValueError, match="completed leaf rotation"):
+    with pytest.raises(ValueError, match="Final phase"):
         rotation.install(
             fixture.bundle,
             fixture.worker,
@@ -266,55 +299,24 @@ def test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap(tmp_
         )
 
 
-def test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority(tmp_path):
+def test_publication_intent_never_restores_old_authority_from_date_or_phase(tmp_path):
     fixture = _fixture(tmp_path)
     rotation.install(fixture.bundle, fixture.worker, now=fixture.now, restart=lambda _root: None)
-    restarts = []
-    result = rotation.rollback(
-        fixture.bundle,
-        fixture.worker,
-        now=fixture.now + timedelta(seconds=30),
-        restart=lambda root: restarts.append(root),
-    )
-    restored = x509.load_pem_x509_certificate((fixture.worker / "node-cert.pem").read_bytes())
-    assert result == {"rotationId": "a" * 32, "rolledBack": True, "channelVersion": 7}
-    assert fingerprint(restored) == fingerprint(fixture.current_node)
-    assert (
-        rotation.rollback(
-            fixture.bundle,
-            fixture.worker,
-            now=fixture.now + timedelta(seconds=30),
-            restart=lambda root: restarts.append(root),
-        )
-        == result
-    )
-    assert restarts == [fixture.worker.resolve()]
-    with pytest.raises(ValueError, match="completed leaf rotation"):
-        rotation.install(
-            fixture.bundle,
-            fixture.worker,
-            now=fixture.now + timedelta(seconds=30),
-            restart=lambda _root: None,
-        )
+    before = {str(p.relative_to(fixture.worker)): p.read_bytes() for p in fixture.worker.rglob('*') if p.is_file()}
+    for instant in (fixture.now, fixture.now + timedelta(hours=7)):
+        with pytest.raises(ValueError, match="forward-only"):
+            rotation.rollback(fixture.bundle, fixture.worker, now=instant, restart=lambda _: pytest.fail("old restart"))
+        assert {str(p.relative_to(fixture.worker)): p.read_bytes() for p in fixture.worker.rglob('*') if p.is_file()} == before
 
-    other = _fixture(tmp_path / "expired")
-    rotation.install(other.bundle, other.worker, now=other.now, restart=lambda _root: None)
-    with pytest.raises(ValueError, match="expired or differs"):
-        rotation.rollback(
-            other.bundle,
-            other.worker,
-            now=other.now + timedelta(minutes=5),
-            restart=lambda _root: None,
-        )
 
 
 @pytest.mark.parametrize(
     "point",
     [
         "before-install",
-        "after-intent",
-        "after-public-install",
-        "after-install",
+        "after-publication-intent",
+        "after-overlap-publication",
+        "after-restart-before-ack",
         "before-restart",
     ],
 )
@@ -345,36 +347,21 @@ def test_rotation_kill_points_recover_idempotently_without_replacing_key(tmp_pat
     assert (fixture.worker / "node-key.pem").read_bytes() == old_key
 
 
-@pytest.mark.parametrize("point", ["after-intent", "after-public-install"])
-def test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe(tmp_path, point):
+@pytest.mark.parametrize("point", ["after-publication-intent", "after-overlap-publication"])
+def test_durable_pre_and_post_publication_intent_is_forward_only(tmp_path, point):
     fixture = _fixture(tmp_path)
-
-    def kill(current):
-        if current == point:
+    def kill(actual):
+        if actual == point:
             raise RuntimeError("synthetic publication kill")
+    with pytest.raises(RuntimeError):
+        rotation.install(fixture.bundle, fixture.worker, now=fixture.now, restart=lambda _: None, kill=kill)
+    record = json.loads((fixture.worker / "leaf-rotation.json").read_bytes())
+    assert record["publicationIntent"] is True
+    before = {str(p.relative_to(fixture.worker)): p.read_bytes() for p in fixture.worker.rglob('*') if p.is_file()}
+    with pytest.raises(ValueError, match="forward-only"):
+        rotation.rollback(fixture.bundle, fixture.worker, now=fixture.now, restart=lambda _: pytest.fail("old restart"))
+    assert {str(p.relative_to(fixture.worker)): p.read_bytes() for p in fixture.worker.rglob('*') if p.is_file()} == before
 
-    with pytest.raises(RuntimeError, match="synthetic publication kill"):
-        rotation.install(
-            fixture.bundle,
-            fixture.worker,
-            now=fixture.now,
-            restart=lambda _root: None,
-            kill=kill,
-        )
-
-    journal = json.loads((fixture.worker / "leaf-rotation.json").read_text("utf-8"))
-    assert journal["phase"] == "installing"
-    restarts = []
-    assert rotation.rollback(
-        fixture.bundle,
-        fixture.worker,
-        now=fixture.now + timedelta(seconds=30),
-        restart=lambda root: restarts.append(root),
-    ) == {"rotationId": "a" * 32, "rolledBack": True, "channelVersion": 7}
-    assert restarts == [fixture.worker.resolve()]
-    assert fingerprint(
-        x509.load_pem_x509_certificate((fixture.worker / "node-cert.pem").read_bytes())
-    ) == fingerprint(fixture.current_node)
 
 
 @pytest.mark.parametrize(
@@ -422,7 +409,7 @@ def test_rotation_rejects_wrong_identity_chain_key_version_and_expiry(tmp_path, 
     elif fault == "stale-version":
         manifest["targetChannelVersion"] = manifest["currentChannelVersion"]
     (fixture.bundle / "rotation.json").write_bytes(rotation._canonical(manifest))
-    now = fixture.now + timedelta(minutes=5) if fault == "expired" else fixture.now
+    now = fixture.now + timedelta(hours=7) if fault == "expired" else fixture.now
     with pytest.raises(ValueError, match=error):
         rotation.install(fixture.bundle, fixture.worker, now=now, restart=lambda _root: None)
 
@@ -439,7 +426,7 @@ def test_rotation_refuses_concurrent_second_writer_and_different_retry(tmp_path)
     manifest = json.loads((fixture.bundle / "rotation.json").read_text())
     manifest["rotationId"] = "b" * 32
     (fixture.bundle / "rotation.json").write_bytes(rotation._canonical(manifest))
-    with pytest.raises(ValueError, match="Another leaf rotation or stale channel version"):
+    with pytest.raises(ValueError, match="Current Node leaf|Only the exact|finalized predecessor"):
         rotation.install(
             fixture.bundle, fixture.worker, now=fixture.now, restart=lambda _root: None
         )
@@ -579,8 +566,9 @@ def _prepare_inputs(tmp_path, monkeypatch, *, now=None):
         ca_chain=ca_chain,
         revocations=revocations,
         safety_window_hours=1,
-        overlap_seconds=120,
-        leaf_valid_seconds=240,
+        overlap_seconds=3600,
+        leaf_valid_seconds=21600,
+        _unit_keys={NODE_ID: fixture.node_key},
     )
     return fixture, state, row, args
 
@@ -597,7 +585,7 @@ def test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel(tmp_path, mo
     assert manifest["currentChannelVersion"] == 7
     assert manifest["targetChannelVersion"] == 8
     assert manifest["currentNodeCertificateSHA256"] == fingerprint(fixture.current_node)
-    assert set(files) == set(rotation.FILE_NAMES)
+    assert set(files) == set(rotation.file_names(manifest))
     assert not any("key" in name for name in files)
 
     lan_pilot.prepare_leaf_rotation(args)
@@ -805,8 +793,9 @@ def _batch_inputs(tmp_path, monkeypatch, *, now=None):
         ca_chain=single.ca_chain,
         revocations=single.revocations,
         safety_window_hours=1,
-        overlap_seconds=120,
-        leaf_valid_seconds=240,
+        overlap_seconds=3600,
+        leaf_valid_seconds=21600,
+        _unit_keys={NODE_ID: fixture.node_key, NODE_ID_2: second_key},
     )
     return fixture, second_key, second_node, rows, batch
 
@@ -816,6 +805,7 @@ def _batch_worker(tmp_path, name, *, chain, key, certificate, policy, node_id):
     worker.mkdir()
     (worker / "ca.pem").write_bytes(chain)
     (worker / "node-key.pem").write_bytes(private_pem(key))
+    (worker / "signer.pub").write_bytes(b'\x01' * 32)
     (worker / "node-cert.pem").write_bytes(pem(certificate))
     (worker / "peer-policy.json").write_text(json.dumps(policy), encoding="utf-8")
     (worker / "manifest.json").write_text(json.dumps({"nodeId": node_id}), encoding="utf-8")
@@ -1011,579 +1001,42 @@ def test_isolated_rotation_runtime_is_exactly_pinned_and_preflighted():
     assert "pip install" in source
 
 
-def test_expired_partial_batch_is_superseded_by_fresh_all_node_batch(tmp_path, monkeypatch, capsys):
-    fixture, second_key, second_node, rows, args = _batch_inputs(tmp_path, monkeypatch)
+def test_expired_partial_batch_preserves_published_intent_and_all_authorities(tmp_path, monkeypatch, capsys):
+    fixture, _key2, _cert2, _rows, args = _batch_inputs(tmp_path, monkeypatch)
     lan_pilot.prepare_leaf_rotation_batch(args)
-    capsys.readouterr()
-    _batch_raw, old_batch, old_bundles = lan_pilot._batch_material(args.output)
-    first_policy = json.loads((args.state / "peer-policy.json").read_text("utf-8"))
-    second_policy = json.loads(
-        (args.state / "nodes" / NODE_ID_2 / "peer-policy.json").read_text("utf-8")
-    )
-    worker1 = _batch_worker(
-        tmp_path,
-        "recovery-worker-1",
-        chain=fixture.chain,
-        key=fixture.node_key,
-        certificate=fixture.current_node,
-        policy=first_policy,
-        node_id=NODE_ID,
-    )
-    worker2 = _batch_worker(
-        tmp_path,
-        "recovery-worker-2",
-        chain=fixture.chain,
-        key=second_key,
-        certificate=second_node,
-        policy=second_policy,
-        node_id=NODE_ID_2,
-    )
-    receipt = rotation.install(
-        args.output / f"nodes/{NODE_ID}", worker1, restart=lambda _root: None
-    )
-    receipt_path = tmp_path / "partial-receipt.json"
-    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-    lan_pilot.stage_leaf_rotation_batch(
-        Namespace(state=args.state, bundle=args.output, node_receipt=receipt_path)
-    )
-    capsys.readouterr()
-    expired_journal = (args.state / "leaf-rotation-batch.json").read_bytes()
-    overlap = datetime.fromisoformat(old_batch["overlapExpiresAt"].replace("Z", "+00:00"))
-    recovery_now = overlap + timedelta(seconds=1)
-    recovery = Namespace(
-        **{
-            **vars(args),
-            "expired_batch": args.output,
-            "output": tmp_path / "recovery-batch",
-            "overlap_seconds": 900,
-            "leaf_valid_seconds": 1200,
-            "_now": recovery_now,
-        }
-    )
-    lan_pilot.prepare_leaf_rotation_recovery_batch(recovery)
-    output = json.loads(capsys.readouterr().out)
-    assert output["recovery"] is True
-    assert output["expiredBatchSuperseded"] is True
-    _new_raw, new_batch, new_bundles = lan_pilot._batch_material(recovery.output)
-    assert new_batch["batchId"] != old_batch["batchId"]
-    assert new_bundles[NODE_ID][1]["currentChannelVersion"] == rows[NODE_ID][0]
-    assert (
-        new_bundles[NODE_ID][1]["currentNodeCertificateSHA256"]
-        == old_bundles[NODE_ID][1]["nextNodeCertificateSHA256"]
-    )
-    assert new_bundles[NODE_ID_2][1]["currentChannelVersion"] == 11
-    journal = lan_pilot._load_batch_journal(args.state)
-    assert journal["batchId"] == new_batch["batchId"]
-    assert journal["phase"] == "prepared"
-    recovery_record = args.state / f'leaf-rotation-recovery-{old_batch["batchId"]}.json'
-    assert (
-        json.loads(recovery_record.read_text("utf-8"))["replacementBatchId"] == new_batch["batchId"]
-    )
-    # Publishing the replacement directory before the CP journal is crash-replayable.
-    (args.state / "leaf-rotation-batch.json").write_bytes(expired_journal)
-    lan_pilot.prepare_leaf_rotation_recovery_batch(recovery)
-    replay = json.loads(capsys.readouterr().out)
-    assert replay["idempotentReplay"] is True
-    assert lan_pilot._load_batch_journal(args.state)["batchId"] == new_batch["batchId"]
-    original_csr = args.csr[0].read_bytes()
-    wrong_key = Ed25519PrivateKey.generate()
-    args.csr[0].write_bytes(
-        x509.CertificateSigningRequestBuilder()
-        .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, NODE_ID)]))
-        .sign(wrong_key, None)
-        .public_bytes(serialization.Encoding.PEM)
-    )
-    with pytest.raises(ValueError, match="CSR binding differs"):
-        lan_pilot.prepare_leaf_rotation_recovery_batch(recovery)
-    args.csr[0].write_bytes(original_csr)
-
-    # A crash after archiving the old journal but before writing the new intent is replayable:
-    # the current public files still match the fresh bundle's declared recovery base.
-    old_journal = json.loads((worker1 / "leaf-rotation.json").read_text("utf-8"))
-    rotation._supersede_expired_journal(
-        args.output / f"nodes/{NODE_ID}",
-        recovery.output / f"nodes/{NODE_ID}",
-        worker1,
-        old_journal,
-        now=recovery_now + timedelta(seconds=1),
-    )
-    assert not (worker1 / "leaf-rotation.json").exists()
-    recovered1 = rotation.install(
-        recovery.output / f"nodes/{NODE_ID}",
-        worker1,
-        restart=lambda _root: None,
-        now=recovery_now + timedelta(seconds=1),
-        superseded_bundle=args.output / f"nodes/{NODE_ID}",
-    )
-    recovered2 = rotation.install(
-        recovery.output / f"nodes/{NODE_ID_2}",
-        worker2,
-        restart=lambda _root: None,
-        now=recovery_now + timedelta(seconds=1),
-    )
-    assert recovered1["targetChannelVersion"] == rows[NODE_ID][0] + 1
-    assert recovered2["targetChannelVersion"] == 12
-    assert (worker1 / "leaf-rotation-superseded" / f'{old_batch["batchId"]}.json').is_file()
-
-    bad_worker = _batch_worker(
-        tmp_path,
-        "bad-policy-worker",
-        chain=fixture.chain,
-        key=fixture.node_key,
-        certificate=x509.load_pem_x509_certificate(old_bundles[NODE_ID][2]["node-cert.pem"]),
-        policy={**first_policy, "version": first_policy["version"] + 99},
-        node_id=NODE_ID,
-    )
-    (bad_worker / "leaf-rotation.json").write_text(json.dumps(old_journal), encoding="utf-8")
-    with pytest.raises(ValueError, match="safe supersession base"):
-        rotation.install(
-            recovery.output / f"nodes/{NODE_ID}",
-            bad_worker,
-            restart=lambda _root: None,
-            now=recovery_now + timedelta(seconds=1),
-            superseded_bundle=args.output / f"nodes/{NODE_ID}",
-        )
-
-
-def test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare(
-    tmp_path, monkeypatch, capsys
-):
-    _fixture, _second_key, second_node, rows, args = _batch_inputs(tmp_path, monkeypatch)
-    lan_pilot.prepare_leaf_rotation_batch(args)
-    capsys.readouterr()
-    _raw, manifest, _bundles = lan_pilot._batch_material(args.output)
-    expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
-    command = Namespace(state=args.state, bundle=args.output, _now=expires - timedelta(seconds=1))
-    with pytest.raises(ValueError, match="before overlap expiry"):
-        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    assert lan_pilot._load_batch_journal(args.state)["phase"] == "prepared"
-
-    journal_path = args.state / "leaf-rotation-batch.json"
-    original_journal = journal_path.read_bytes()
-    staged = json.loads(original_journal)
-    staged["phase"] = "staging"
-    staged["stagedNodeIds"] = [NODE_ID]
-    journal_path.write_text(json.dumps(staged), encoding="utf-8")
-    command._now = expires + timedelta(seconds=1)
-    with pytest.raises(ValueError, match="entirely unstaged"):
-        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    journal_path.write_bytes(original_journal)
-
-    control_path = args.state / "control-cert.pem"
-    old_control = control_path.read_bytes()
-    control_path.write_bytes(pem(second_node))
-    with pytest.raises(ValueError, match="Control Plane leaf changed"):
-        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    control_path.write_bytes(old_control)
-
-    rows[NODE_ID] = (
-        rows[NODE_ID][0] + 1,
-        rows[NODE_ID][1],
-        rows[NODE_ID][2],
-        rows[NODE_ID][3],
-        rows[NODE_ID][4],
-    )
-    with pytest.raises(ValueError, match="channel changed"):
-        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    rows[NODE_ID] = (
-        rows[NODE_ID][0] - 1,
-        rows[NODE_ID][1],
-        rows[NODE_ID][2],
-        rows[NODE_ID][3],
-        rows[NODE_ID][4],
-    )
-
-    lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    result = json.loads(capsys.readouterr().out)
-    assert result["abandoned"] is True
-    assert result["newBatchAllowed"] is True
-    assert lan_pilot._load_batch_journal(args.state) is None
-    archive = args.state / f'leaf-rotation-abandoned-{manifest["batchId"]}.json'
-    record = json.loads(archive.read_text("utf-8"))
-    assert record["phase"] == "prepared"
-    assert record["stagedNodeIds"] == []
-    assert record["reason"] == "expired-before-any-node-stage"
-
-    lan_pilot.abandon_expired_prepared_leaf_rotation_batch(command)
-    assert json.loads(capsys.readouterr().out)["idempotentReplay"] is True
-    replacement = Namespace(**{**vars(args), "output": tmp_path / "replacement-batch"})
-    lan_pilot.prepare_leaf_rotation_batch(replacement)
-    assert lan_pilot._load_batch_journal(args.state)["batchId"] != manifest["batchId"]
-
-
-def test_expired_supersession_rejects_policy_or_channel_drift(tmp_path, monkeypatch, capsys):
-    fixture, second_key, second_node, rows, args = _batch_inputs(tmp_path, monkeypatch)
-    lan_pilot.prepare_leaf_rotation_batch(args)
-    capsys.readouterr()
-    _raw, old_batch, _bundles = lan_pilot._batch_material(args.output)
-    worker = _batch_worker(
-        tmp_path,
-        "drift-worker",
-        chain=fixture.chain,
-        key=fixture.node_key,
-        certificate=fixture.current_node,
-        policy=json.loads((args.state / "peer-policy.json").read_text("utf-8")),
-        node_id=NODE_ID,
-    )
-    receipt = rotation.install(args.output / f"nodes/{NODE_ID}", worker, restart=lambda _root: None)
-    receipt_path = tmp_path / "drift-receipt.json"
-    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-    lan_pilot.stage_leaf_rotation_batch(
-        Namespace(state=args.state, bundle=args.output, node_receipt=receipt_path)
-    )
-    capsys.readouterr()
-    overlap = datetime.fromisoformat(old_batch["overlapExpiresAt"].replace("Z", "+00:00"))
-    recovery = Namespace(
-        **{
-            **vars(args),
-            "expired_batch": args.output,
-            "output": tmp_path / "drift-recovery",
-            "overlap_seconds": 900,
-            "leaf_valid_seconds": 1200,
-            "_now": overlap + timedelta(seconds=1),
-        }
-    )
-    rows[NODE_ID] = (99, rows[NODE_ID][1], rows[NODE_ID][2], True, rows[NODE_ID][4])
-    with pytest.raises(ValueError, match="channel state differs"):
+    root = _batch_worker(tmp_path, "partial-node", chain=fixture.chain, key=fixture.node_key,
+                         certificate=fixture.current_node, policy=json.loads((args.state / "peer-policy.json").read_bytes()), node_id=NODE_ID)
+    receipt = rotation.install(args.output / f"nodes/{NODE_ID}", root, restart=lambda _: None)
+    receipt_path = tmp_path / "partial-receipt.json"; receipt_path.write_bytes(rotation._canonical(receipt))
+    lan_pilot.stage_leaf_rotation_batch(Namespace(state=args.state, bundle=args.output, node_receipt=receipt_path))
+    before = {str(p.relative_to(tmp_path)): p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()}
+    recovery = Namespace(**{**vars(args), "expired_batch": args.output, "output": tmp_path / "blocked-recovery"})
+    with pytest.raises(ValueError, match="separately reviewed offline"):
         lan_pilot.prepare_leaf_rotation_recovery_batch(recovery)
     assert not recovery.output.exists()
+    assert {str(p.relative_to(tmp_path)): p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()} == before
 
 
-def _fully_expired_inputs(tmp_path, monkeypatch, capsys):
-    fixture, second_key, second_node, rows, old_args = _batch_inputs(tmp_path, monkeypatch)
-    # Keep the untouched Node live slightly longer than the shared Card 292 leaf so
-    # the mixed-validity boundary can be exercised independently.
-    second_node = issue(
-        fixture.issuer_key,
-        fixture.issuer,
-        second_key.public_key(),
-        f"spiffe://saintvision.ai/tenant/{TENANT_ID}/node/{NODE_ID_2}/epoch/{EPOCH}",
-        address=NODE_IP_2,
-        now=second_node.not_valid_before_utc + timedelta(minutes=1),
-        valid_for=timedelta(minutes=10),
-    )
-    second_path = old_args.state / "public" / "nodes" / NODE_ID_2 / "node-cert.pem"
-    second_path.write_bytes(pem(second_node))
-    old_row = rows[NODE_ID_2]
-    rows[NODE_ID_2] = (
-        old_row[0],
-        fingerprint(second_node),
-        second_node.not_valid_after_utc,
-        old_row[3],
-        old_row[4],
-    )
-    lan_pilot.prepare_leaf_rotation_batch(old_args)
-    capsys.readouterr()
-    old_raw, old_batch, old_bundles = lan_pilot._batch_material(old_args.output)
-    first_policy = json.loads((old_args.state / "peer-policy.json").read_text("utf-8"))
-    second_policy = json.loads(
-        (old_args.state / "nodes" / NODE_ID_2 / "peer-policy.json").read_text("utf-8")
-    )
-    worker1 = _batch_worker(
-        tmp_path,
-        "fully-expired-worker-1",
-        chain=fixture.chain,
-        key=fixture.node_key,
-        certificate=fixture.current_node,
-        policy=first_policy,
-        node_id=NODE_ID,
-    )
-    worker2 = _batch_worker(
-        tmp_path,
-        "fully-expired-worker-2",
-        chain=fixture.chain,
-        key=second_key,
-        certificate=second_node,
-        policy=second_policy,
-        node_id=NODE_ID_2,
-    )
-    partial_receipt = rotation.install(
-        old_args.output / f"nodes/{NODE_ID}", worker1, restart=lambda _root: None
-    )
-    partial_receipt_path = tmp_path / "fully-expired-partial-receipt.json"
-    partial_receipt_path.write_text(json.dumps(partial_receipt), encoding="utf-8")
-    lan_pilot.stage_leaf_rotation_batch(
-        Namespace(
-            state=old_args.state,
-            bundle=old_args.output,
-            node_receipt=partial_receipt_path,
-        )
-    )
-    capsys.readouterr()
-    recovery_now = max(
-        fixture.current_control.not_valid_after_utc,
-        second_node.not_valid_after_utc,
-        datetime.fromisoformat(old_batch["certificateNotAfter"].replace("Z", "+00:00")),
-    ) + timedelta(seconds=1)
-    authorization = {
-        "schemaVersion": lan_pilot.OFFLINE_AUTHORIZATION_SCHEMA,
-        "confirmation": lan_pilot.OFFLINE_AUTHORIZATION_CONFIRMATION,
-        "tenantId": TENANT_ID,
-        "recoveryEpoch": EPOCH,
-        "expiredBatchId": old_batch["batchId"],
-        "expiredBatchDigest": hashlib.sha256(old_raw).hexdigest(),
-        "controlCertificateSHA256": fingerprint(fixture.current_control),
-        "nodes": [
-            {
-                "nodeId": node_id,
-                "nodeIP": NODE_IP if node_id == NODE_ID else NODE_IP_2,
-                "channelVersion": rows[node_id][0],
-                "certificateSHA256": rows[node_id][1],
-            }
-            for node_id in sorted(rows)
-        ],
-    }
-    authorization_path = tmp_path / "private-offline-authorization.json"
-    authorization_path.write_text(
-        json.dumps(authorization, sort_keys=True, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
-    recovery = Namespace(
-        state=old_args.state,
-        expired_batch=old_args.output,
-        offline_authorization=authorization_path,
-        csr=old_args.csr,
-        output=tmp_path / "fully-expired-recovery-batch",
-        ca_key=old_args.ca_key,
-        ca_key_password_file=old_args.ca_key_password_file,
-        ca_chain=old_args.ca_chain,
-        revocations=old_args.revocations,
-        overlap_seconds=900,
-        leaf_valid_seconds=1200,
-        _now=recovery_now,
-    )
-    return Namespace(
-        fixture=fixture,
-        second_key=second_key,
-        rows=rows,
-        old_args=old_args,
-        old_batch=old_batch,
-        old_bundles=old_bundles,
-        worker1=worker1,
-        worker2=worker2,
-        recovery_now=recovery_now,
-        authorization=authorization,
-        authorization_path=authorization_path,
-        recovery=recovery,
-    )
+
+def test_empty_cp_staging_does_not_prove_unpublished_node_floor(tmp_path, monkeypatch, capsys):
+    _f, _key2, _cert2, _rows, args = _batch_inputs(tmp_path, monkeypatch)
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    before = {str(p.relative_to(args.state)): p.read_bytes() for p in args.state.rglob('*') if p.is_file()}
+    with pytest.raises(ValueError, match="publication intent cannot be abandoned"):
+        lan_pilot.abandon_expired_prepared_leaf_rotation_batch(Namespace(state=args.state, bundle=args.output))
+    assert {str(p.relative_to(args.state)): p.read_bytes() for p in args.state.rglob('*') if p.is_file()} == before
 
 
-def test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp(
-    tmp_path, monkeypatch, capsys
-):
-    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
-    lan_pilot.prepare_fully_expired_leaf_rotation_recovery_batch(case.recovery)
-    result = json.loads(capsys.readouterr().out)
-    assert result["fullyExpiredOfflineRecovery"] is True
-    assert result["expiredLeafAcceptedAsAuthority"] is False
-    batch_raw, batch, bundles = lan_pilot._batch_material(case.recovery.output)
-    assert batch["schemaVersion"] == lan_pilot.OFFLINE_BATCH_ROTATION_SCHEMA
-    assert batch["recoveryMode"] == rotation.OFFLINE_RECOVERY_MODE
-    assert len({files["control-cert.pem"] for _raw, _manifest, files in bundles.values()}) == 1
-    for node_id, (_raw, manifest, files) in bundles.items():
-        policy = json.loads(files["peer-policy-overlap.json"])
-        assert manifest["schemaVersion"] == rotation.OFFLINE_SCHEMA
-        assert policy["clientFingerprints"] == [manifest["nextControlCertificateSHA256"]]
-        assert manifest["currentPeerPolicySHA256"]
-        assert manifest["offlineAuthorizationSHA256"] == batch["offlineAuthorizationSHA256"]
-        assert not any(
-            "key" in path.name for path in (case.recovery.output / "nodes" / node_id).iterdir()
-        )
 
-    killed = False
+def test_unknown_expired_state_has_no_normal_recovery_writer(tmp_path, monkeypatch, capsys):
+    _f, _key2, _cert2, _rows, args = _batch_inputs(tmp_path, monkeypatch)
+    lan_pilot.prepare_leaf_rotation_batch(args)
+    before = {str(p.relative_to(args.state)): p.read_bytes() for p in args.state.rglob('*') if p.is_file()}
+    with pytest.raises(ValueError, match="separately reviewed offline"):
+        lan_pilot.prepare_fully_expired_leaf_rotation_recovery_batch(Namespace(**{**vars(args), "output": tmp_path / "forbidden-offline"}))
+    assert not (tmp_path / "forbidden-offline").exists()
+    assert {str(p.relative_to(args.state)): p.read_bytes() for p in args.state.rglob('*') if p.is_file()} == before
 
-    def kill_after_public_install(point):
-        nonlocal killed
-        if point == "after-public-install" and not killed:
-            killed = True
-            raise RuntimeError("synthetic fully expired install kill")
-
-    with pytest.raises(RuntimeError, match="synthetic fully expired install kill"):
-        rotation.install(
-            case.recovery.output / f"nodes/{NODE_ID}",
-            case.worker1,
-            now=case.recovery_now,
-            restart=lambda _root: None,
-            kill=kill_after_public_install,
-            superseded_bundle=case.old_args.output / f"nodes/{NODE_ID}",
-        )
-    receipt1 = rotation.install(
-        case.recovery.output / f"nodes/{NODE_ID}",
-        case.worker1,
-        now=case.recovery_now,
-        restart=lambda _root: None,
-    )
-    receipt2 = rotation.install(
-        case.recovery.output / f"nodes/{NODE_ID_2}",
-        case.worker2,
-        now=case.recovery_now,
-        restart=lambda _root: None,
-    )
-    assert receipt1["schemaVersion"] == rotation.OFFLINE_SCHEMA
-    assert receipt2["schemaVersion"] == rotation.OFFLINE_SCHEMA
-    assert (case.worker1 / "node-key.pem").read_bytes() == private_pem(case.fixture.node_key)
-    assert (case.worker2 / "node-key.pem").read_bytes() == private_pem(case.second_key)
-
-    class FrozenDateTime(datetime):
-        @classmethod
-        def now(cls, tz=None):
-            return case.recovery_now if tz else case.recovery_now.replace(tzinfo=None)
-
-    monkeypatch.setattr(lan_pilot, "datetime", FrozenDateTime)
-    receipt_paths = []
-    for index, receipt in enumerate((receipt1, receipt2), 1):
-        target = tmp_path / f"fully-expired-receipt-{index}.json"
-        target.write_text(json.dumps(receipt), encoding="utf-8")
-        receipt_paths.append(target)
-        lan_pilot.stage_leaf_rotation_batch(
-            Namespace(state=case.old_args.state, bundle=case.recovery.output, node_receipt=target)
-        )
-        capsys.readouterr()
-    before_switch = (case.old_args.state / "control-cert.pem").read_bytes()
-    assert (
-        fingerprint(x509.load_pem_x509_certificate(before_switch))
-        == batch["currentControlCertificateSHA256"]
-    )
-    commits = tmp_path / "fully-expired-commits"
-    lan_pilot.commit_leaf_rotation_batch(
-        Namespace(state=case.old_args.state, bundle=case.recovery.output, output=commits)
-    )
-    commit_result = json.loads(capsys.readouterr().out)
-    assert commit_result["globalControlLeafSwitched"] is True
-    assert (
-        fingerprint(
-            x509.load_pem_x509_certificate((case.old_args.state / "control-cert.pem").read_bytes())
-        )
-        == batch["nextControlCertificateSHA256"]
-    )
-    for node_id, worker in ((NODE_ID, case.worker1), (NODE_ID_2, case.worker2)):
-        finalized = rotation.finalize(
-            case.recovery.output / f"nodes/{node_id}",
-            worker,
-            commits / f"{node_id}.json",
-            now=case.recovery_now + timedelta(seconds=1),
-            restart=lambda _root: None,
-        )
-        assert finalized["channelVersion"] == bundles[node_id][1]["targetChannelVersion"]
-        assert json.loads((worker / "peer-policy.json").read_text("utf-8"))[
-            "clientFingerprints"
-        ] == [batch["nextControlCertificateSHA256"]]
-
-    # Exact retries retain the same new authority and never mint another batch.
-    lan_pilot.prepare_fully_expired_leaf_rotation_recovery_batch(case.recovery)
-    replay = json.loads(capsys.readouterr().out)
-    assert replay["idempotentReplay"] is True
-    assert replay["batchId"] == batch["batchId"]
-    assert (
-        hashlib.sha256((case.recovery.output / "batch.json").read_bytes()).hexdigest()
-        == hashlib.sha256(batch_raw).hexdigest()
-    )
-
-
-@pytest.mark.parametrize(
-    "fault,error",
-    [
-        ("authorization", "authorization differs"),
-        ("duplicate-authorization", "duplicate key"),
-        ("csr", "prove the pinned Node key"),
-        ("channel", "channel baseline differs"),
-        ("chain", "issuing chain differs"),
-        ("identity", "identity, chain, or expiry differs"),
-        ("revoked", "revoked"),
-        ("not-fully-expired", "requires every partial-batch leaf to be expired"),
-        ("mixed-validity", "remains live"),
-        ("journal", "owns the pilot state"),
-    ],
-)
-def test_fully_expired_recovery_boundaries_fail_before_output(
-    tmp_path, monkeypatch, capsys, fault, error
-):
-    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
-    if fault == "authorization":
-        changed = {
-            **case.authorization,
-            "nodes": [dict(row) for row in case.authorization["nodes"]],
-        }
-        changed["nodes"][0]["channelVersion"] += 1
-        case.authorization_path.write_text(json.dumps(changed), encoding="utf-8")
-    elif fault == "duplicate-authorization":
-        raw = case.authorization_path.read_text("utf-8")
-        case.authorization_path.write_text(
-            '{"schemaVersion":"duplicate",' + raw.lstrip()[1:], encoding="utf-8"
-        )
-    elif fault == "csr":
-        wrong_key = Ed25519PrivateKey.generate()
-        case.recovery.csr[0].write_bytes(
-            x509.CertificateSigningRequestBuilder()
-            .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, NODE_ID)]))
-            .sign(wrong_key, None)
-            .public_bytes(serialization.Encoding.PEM)
-        )
-    elif fault == "channel":
-        row = case.rows[NODE_ID_2]
-        case.rows[NODE_ID_2] = (row[0] + 1, *row[1:])
-    elif fault == "chain":
-        state = json.loads((case.old_args.state / "private-state.json").read_text("utf-8"))
-        state["caBundleSHA256"] = "0" * 64
-        (case.old_args.state / "private-state.json").write_text(json.dumps(state), encoding="utf-8")
-    elif fault == "identity":
-        state = json.loads((case.old_args.state / "private-state.json").read_text("utf-8"))
-        state["epoch"] = "33333333-3333-4333-8333-333333333333"
-        (case.old_args.state / "private-state.json").write_text(json.dumps(state), encoding="utf-8")
-        changed = {**case.authorization, "recoveryEpoch": state["epoch"]}
-        case.authorization_path.write_text(json.dumps(changed), encoding="utf-8")
-    elif fault == "revoked":
-        case.recovery.revocations.write_text(
-            json.dumps(
-                [
-                    {
-                        "serialNumber": "01",
-                        "certificateSHA256": fingerprint(case.fixture.current_control),
-                        "reason": "superseded",
-                        "revokedAt": "2026-10-13T00:00:00+00:00",
-                    }
-                ]
-            ),
-            encoding="utf-8",
-        )
-    elif fault == "not-fully-expired":
-        case.recovery._now = datetime.fromisoformat(
-            case.old_batch["certificateNotAfter"].replace("Z", "+00:00")
-        ) - timedelta(seconds=1)
-    elif fault == "mixed-validity":
-        case.recovery._now = datetime.fromisoformat(
-            case.old_batch["certificateNotAfter"].replace("Z", "+00:00")
-        ) + timedelta(seconds=1)
-    else:
-        journal = json.loads((case.old_args.state / "leaf-rotation-batch.json").read_text("utf-8"))
-        journal["batchId"] = "f" * 32
-        (case.old_args.state / "leaf-rotation-batch.json").write_text(
-            json.dumps(journal), encoding="utf-8"
-        )
-    with pytest.raises(ValueError, match=error):
-        lan_pilot.prepare_fully_expired_leaf_rotation_recovery_batch(case.recovery)
-    assert not case.recovery.output.exists()
-
-
-def test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict(
-    tmp_path, monkeypatch, capsys
-):
-    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
-    lock = case.old_args.state / "leaf-rotation.lock"
-    lock.write_text("held", encoding="utf-8")
-    with pytest.raises(ValueError, match="Another leaf rotation writer"):
-        lan_pilot.prepare_fully_expired_leaf_rotation_recovery_batch(case.recovery)
-    lock.unlink()
-    normal = Namespace(
-        **{
-            **vars(case.recovery),
-            "output": tmp_path / "normal-recovery-must-fail",
-            "safety_window_hours": 1,
-        }
-    )
-    with pytest.raises(ValueError, match="still-valid batch leaves"):
-        lan_pilot.prepare_leaf_rotation_recovery_batch(normal)
-    assert not normal.output.exists()
 
 
 def test_overlap_default_allows_operator_delay_but_remains_bounded():

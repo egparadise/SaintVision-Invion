@@ -1,0 +1,1749 @@
+FF.FFF.FF.....FF..F.FF...F.FFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFsFFFF [ 49%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.......Fssss [ 98%]
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___ test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap ___
+tests\test_lan_leaf_rotation.py:265: in test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap
+    result = rotation.finalize(
+deploy\lan\worker_leaf_rotation.py:942: in finalize
+    return plain_finalize(bundle, worker_root, commit_receipt, restart=restart, now=now)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:158: in finalize
+    raise ValueError("CP commit does not bind exact final peer P+2/hash")
+E   ValueError: CP commit does not bind exact final peer P+2/hash
+_____ test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority ______
+tests\test_lan_leaf_rotation.py:311: in test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority
+    result = rotation.rollback(
+deploy\lan\worker_leaf_rotation.py:1028: in rollback
+    return plain_rollback(bundle, worker_root, restart=restart, now=now)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:205: in rollback
+    raise ValueError("Normal :3 publication intent is forward-only; old restoration is not authorized by a failed start, phase flag or old certificate")
+E   ValueError: Normal :3 publication intent is forward-only; old restoration is not authorized by a failed start, phase flag or old certificate
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-intent] _
+tests\test_lan_leaf_rotation.py:370: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    with pytest.raises(RuntimeError, match="synthetic kill"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-public-install] _
+tests\test_lan_leaf_rotation.py:370: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    with pytest.raises(RuntimeError, match="synthetic kill"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-install] _
+tests\test_lan_leaf_rotation.py:370: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    with pytest.raises(RuntimeError, match="synthetic kill"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError
+_ test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-intent] _
+tests\test_lan_leaf_rotation.py:394: in test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe
+    with pytest.raises(RuntimeError, match="synthetic publication kill"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError
+_ test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-public-install] _
+tests\test_lan_leaf_rotation.py:394: in test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe
+    with pytest.raises(RuntimeError, match="synthetic publication kill"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-validity window] _
+tests\test_lan_leaf_rotation.py:464: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_____ test_rotation_refuses_concurrent_second_writer_and_different_retry ______
+tests\test_lan_leaf_rotation.py:480: in test_rotation_refuses_concurrent_second_writer_and_different_retry
+    with pytest.raises(ValueError, match="Another leaf rotation or stale channel version"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Another leaf rotation or stale channel version'
+E     Actual message: 'Current Node leaf does not match the rotation base'
+_______ test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel _______
+tests\test_lan_leaf_rotation.py:639: in test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel
+    assert set(files) == set(rotation.FILE_NAMES)
+E   AssertionError: assert {'ca.pem', 'c...ap.json', ...} == {'ca.pem', 'c...overlap.json'}
+E     
+E     Extra items in the left set:
+E     'previous-node-cert.pem'
+E     'previous-peer-policy.json'
+E     'peer-floor-observation.json'
+E     Use -v to get more diff
+_________ test_cp_commit_requires_exact_node_receipt_and_channel_cas __________
+tests\test_lan_leaf_rotation.py:719: in test_cp_commit_requires_exact_node_receipt_and_channel_cas
+    lan_pilot.commit_leaf_rotation(commit_args)
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes __
+tests\test_lan_leaf_rotation.py:931: in test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "ee274c22ec73436898dc88988ed8266a", "nodeCount": 2, "batchDigest": "63aa9a9c1ca0e4cffcfbb5b3d2b10b622f150fb44ea6aabe6d0df18c26b9c364", "privateKeyTransferred": false}
+______ test_expired_partial_batch_is_superseded_by_fresh_all_node_batch _______
+tests\test_lan_leaf_rotation.py:1086: in test_expired_partial_batch_is_superseded_by_fresh_all_node_batch
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+__________ test_expired_supersession_rejects_policy_or_channel_drift __________
+tests\test_lan_leaf_rotation.py:1271: in test_expired_supersession_rejects_policy_or_channel_drift
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp _
+tests\test_lan_leaf_rotation.py:1414: in test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[authorization-authorization differs] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[duplicate-authorization-duplicate key] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[csr-prove the pinned Node key] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[channel-channel baseline differs] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[chain-issuing chain differs] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[identity-identity, chain, or expiry differs] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[revoked-revoked] __
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[not-fully-expired-requires every partial-batch leaf to be expired] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[mixed-validity-remains live] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_boundaries_fail_before_output[journal-owns the pilot state] _
+tests\test_lan_leaf_rotation.py:1541: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict _
+tests\test_lan_leaf_rotation.py:1611: in test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1345: in _fully_expired_inputs
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+_ test_two_server_issued_normal_cycles_keep_generation_and_immutable_history __
+tests\test_lan_leaf_rotation_consecutive.py:129: in test_two_server_issued_normal_cycles_keep_generation_and_immutable_history
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "882ed01ed1c4489cbd25651a4e4403ee", "targetChannelVersion": 8, "proposalDigest": "9544439222ab8f666e05e1f147da680677664421f4a792d68bc3d087a8b133b7", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installing] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "fb9a73a626444d33998170a343f2215c", "targetChannelVersion": 8, "proposalDigest": "ad61b2270e5f6846f1f222949ea71bcf03e7edc794f5cd5ed3a5b6290bb4c881", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installed] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "d51aa09322184ace8f4108427dfa2420", "targetChannelVersion": 8, "proposalDigest": "2682d274a2b8c8f3da5b335a1bbc72f491b1cbbb13e33b5e35484b7b3e27fabe", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[restarted] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "adb7e82bf1684f41a7e81bbd48c81c31", "targetChannelVersion": 8, "proposalDigest": "32f783f5eb8ac2a873da1b04ba4a8a6d3fb8a86e0474285c96514fbc17b7efb2", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[rolled-back] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "1382da6c048e4250b3978c7c99a2b98f", "targetChannelVersion": 8, "proposalDigest": "bf62bc77f047b0eebb37405fd98d1eda84a3e36b7fc9bcf35769268ac4ad1d0f", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[prepared] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "cddbd8ec6aae439ba875af7891e0eb79", "targetChannelVersion": 8, "proposalDigest": "a7562f1d040d82642dc6e3290b036fd825f5a02985076aab473384a6f053a647", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[staged] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "b11eeaf8618846ac81385a55bc51731b", "targetChannelVersion": 8, "proposalDigest": "c79fc8e63f8c10adc2200e34808f2015e0d3643611922671b2094f7eb4b50127", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[switched] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "9f3b8660424c4a6b8085728726e62bbf", "targetChannelVersion": 8, "proposalDigest": "1d5b0c66a14cefccf8513fc32d0d3f7470d6b799aa1951ef8e57e1dc03e1b532", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[unknown] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "60826e0e6cbe4701ab25e244d84eb8d2", "targetChannelVersion": 8, "proposalDigest": "fcf2ead0dfb0b4bf3f1dc01e87bfe2ddf95e46fefa390c09088ef318e79f0a74", "privateKeyTransferred": false}
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[None] _
+tests\test_lan_leaf_rotation_consecutive.py:207: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "13b66a8766734f91a2314d49eb053712", "targetChannelVersion": 8, "proposalDigest": "3e74c0be95d03f7f9b870c6c8a05d44a03c57b54bb25b48439c09ca162c35b69", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[policy] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "503779eb98c94005be139d0a0d8f2dd9", "targetChannelVersion": 8, "proposalDigest": "1564c8a3fc50e54c081262df4652d1f25f9ba95286f274537d9ebd82789593a5", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[current-leaf] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "ec528a4c7ada4472a7980b7bc228eedc", "targetChannelVersion": 8, "proposalDigest": "40a5ea60dcde9e36758d1437793e7493a34109a5b860c582a0e31ecccdf7028f", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[generation] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "eda7f23bebb443a5bef7cfbb59804400", "targetChannelVersion": 8, "proposalDigest": "a5e139c20e60d5a412cf9df0fcbb4b08177107893d173c9d929fdeac62d7e989", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[tenant] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "b1973c5a119e4e87a1086a73ecd4456b", "targetChannelVersion": 8, "proposalDigest": "1e409a130f1eec3d32646155767a06d50d64937373304166c91eb1d0f7f0e31c", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[epoch] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "cf6ffba2b90b437f920e6891cf2f61ca", "targetChannelVersion": 8, "proposalDigest": "2580072399c3238e9719e1f4e8549647d31bef3997b7eaf222fdcdcc0ea1516e", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[control-hash] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "b3194b55060c482bbf81e18e9a7626ef", "targetChannelVersion": 8, "proposalDigest": "c0e1b6e6e837b76018e05fcb14887bba2c95ce75a78baa8eaef0c6b56eb95f2e", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-collision] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "134a664079b64b22b95a580fb9df35df", "targetChannelVersion": 8, "proposalDigest": "af796ce8fddbb811be48b8d606c0d5fd9185043379bb3e25c07097ae10ff3dea", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-journal] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "8e02c92e2344416fae937f150a39c682", "targetChannelVersion": 8, "proposalDigest": "d364630aa6cda200f83fdbecde57d332035ef0a829e8f461f3340c7b146cad26", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-signature] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "d7216f3db2374f9ab4fc86a4b4c49b0e", "targetChannelVersion": 8, "proposalDigest": "a21c06edd7ec23db22d568a2aeb1973f70e2ffec0b893145e88f35eab070f039", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[missing-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "110c5be13abb4f328dbe82fa91960765", "targetChannelVersion": 8, "proposalDigest": "49048f6dfc53ba4d22cb45071806fdc3d8a7facdea9d7b85b33bd1787209cb8b", "privateKeyTransferred": false}
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[backup-collision] _
+tests\test_lan_leaf_rotation_consecutive.py:236: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "2a421a95bcd848a0886120a6353676c0", "targetChannelVersion": 8, "proposalDigest": "8ba4e93b215c09d5cf1853218fe43184b810ceaf502134dc08bb6d2cea070c33", "privateKeyTransferred": false}
+_ test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart _
+tests\test_lan_leaf_rotation_consecutive.py:282: in test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "3aab8d28a74642f091984593a7e3b975", "targetChannelVersion": 8, "proposalDigest": "6ba13c37e870af00cca8c9179e45203ca6770c482abd78fcc9537b70e4a7cbf5", "privateKeyTransferred": false}
+_ test_finalize_archive_collision_fails_before_republishing_policy_or_restart _
+tests\test_lan_leaf_rotation_consecutive.py:302: in test_finalize_archive_collision_fails_before_republishing_policy_or_restart
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "8ca5197fa0364d07a92d2c03240d9f3a", "targetChannelVersion": 8, "proposalDigest": "1a9e851eedc23227b999c1a9b43fb730d01ba57cb804d1e36da29787ceefd72b", "privateKeyTransferred": false}
+__________ test_legacy_formatted_journal_bytes_are_preserved_exactly __________
+tests\test_lan_leaf_rotation_consecutive.py:319: in test_legacy_formatted_journal_bytes_are_preserved_exactly
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "86929d0d661841ad910c1dcb0d5be900", "targetChannelVersion": 8, "proposalDigest": "758d08637aaa592e9bafd793227add9d23368cb7115f426fd1c0034da950d5cf", "privateKeyTransferred": false}
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:340: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "d418f3e75e754d6e9693327e69e2b0ab", "targetChannelVersion": 8, "proposalDigest": "e07d588158661908244f9be418d39c620f5f6b37604738ccafd91cfc9569e0fa", "privateKeyTransferred": false}
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:340: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "60d22cd626b549eba483284a13ba538a", "targetChannelVersion": 8, "proposalDigest": "e4769bf288771b25efc3584e9838cf5f4c6aeaea1d3803f7d535ef6614ea5fab", "privateKeyTransferred": false}
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[before-install] __
+tests\test_lan_leaf_rotation_consecutive.py:397: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "a133cdc99e6e4ae78fe7d7d020dd1a77", "targetChannelVersion": 8, "proposalDigest": "84b0ea879ebdbf610b75816f5d881add47b1f059292a8ef980f48e0c719fce64", "privateKeyTransferred": false}
+__ test_successor_crash_resume_keeps_prior_archive_and_backup[after-intent] ___
+tests\test_lan_leaf_rotation_consecutive.py:397: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "4469f32cfd1f44eea1400b553c45a9ff", "targetChannelVersion": 8, "proposalDigest": "12a84a69dda94c97455505e0b9a1c2e722265b0d1c3bfd95544b5fb7ff24a123", "privateKeyTransferred": false}
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[after-public-install] _
+tests\test_lan_leaf_rotation_consecutive.py:397: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "74853f28667044399ef12240f2ee9c32", "targetChannelVersion": 8, "proposalDigest": "995e95261be967d64b9312f2199ddd43d8a9e0e43d9fd852dcd879b6c62e7e0f", "privateKeyTransferred": false}
+__ test_successor_crash_resume_keeps_prior_archive_and_backup[after-install] __
+tests\test_lan_leaf_rotation_consecutive.py:397: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "01760cad1b274362ad9b7e20339a8f25", "targetChannelVersion": 8, "proposalDigest": "ff5781f8f8511560fa38e8a7583fa91da9d6caf10bd13760533af4f80f4e7eee", "privateKeyTransferred": false}
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[before-restart] __
+tests\test_lan_leaf_rotation_consecutive.py:397: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "f4adc5503bc2466eb86c2c762293dec2", "targetChannelVersion": 8, "proposalDigest": "235decd99eac492e7d52c6612bf33999c4cc03ccfb9020ef2d831dc1b68d58a3", "privateKeyTransferred": false}
+________________ test_successor_lock_refuses_concurrent_writer ________________
+tests\test_lan_leaf_rotation_consecutive.py:412: in test_successor_lock_refuses_concurrent_writer
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "0dbb28b4a292425ca3e20ccd4d342f88", "targetChannelVersion": 8, "proposalDigest": "679df418e28e19382fdf399c6175998d46148f56b3de2796ce3069d08e85fd87", "privateKeyTransferred": false}
+_ test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority _
+tests\test_lan_leaf_rotation_consecutive.py:421: in test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "2808db947c374a3994140e5bdfd29eac", "targetChannelVersion": 8, "proposalDigest": "334485da1efbfb6f4cd850ccce1fcc328c85274bae8752392c5f42f2612c8432", "privateKeyTransferred": false}
+_____ test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused _____
+tests\test_lan_leaf_rotation_consecutive.py:436: in test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "b67a83270f8f48f3a7f0946ba57a27b1", "targetChannelVersion": 8, "proposalDigest": "500b78874cc7f699ddf9d8f253c668d7ba036bef4037307a585d5fcb0b65a622", "privateKeyTransferred": false}
+____________ test_successor_refuses_ambiguous_journal_shapes[None] ____________
+tests\test_lan_leaf_rotation_consecutive.py:463: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "f4e067bc171f4eeeb96f3ab7c1e669d2", "targetChannelVersion": 8, "proposalDigest": "207123c66104be3773a4870235400c4421c2f0d763f6c0b5278ae93f56a5a138", "privateKeyTransferred": false}
+___________ test_successor_refuses_ambiguous_journal_shapes[value1] ___________
+tests\test_lan_leaf_rotation_consecutive.py:463: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "a0ead5ccf1464781a69101aea0b041c6", "targetChannelVersion": 8, "proposalDigest": "000bc4cb6d7b612fe8e76bd1b9b6f8347f345b32f453419241780c8ae4704306", "privateKeyTransferred": false}
+___________ test_successor_refuses_ambiguous_journal_shapes[value2] ___________
+tests\test_lan_leaf_rotation_consecutive.py:463: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "781591eb6ed24aac96178f01f8339a15", "targetChannelVersion": 8, "proposalDigest": "f35b445be599ebf7f08734704a054c8573230ffb398f857512a688aaa1ee2928", "privateKeyTransferred": false}
+_________ test_successor_refuses_ambiguous_journal_shapes[finalized] __________
+tests\test_lan_leaf_rotation_consecutive.py:463: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "f74db625df304a86b989902f8149e5a0", "targetChannelVersion": 8, "proposalDigest": "9631ce3eeae7d76c8b6b4312a593d49e296c457669b8ce1b4bbb0ea7f131c4db", "privateKeyTransferred": false}
+___________ test_successor_refuses_symlink_paths[archive-directory] ___________
+tests\test_lan_leaf_rotation_consecutive.py:475: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "0ed88eafd1ae4d93af98ff6bb1ad478c", "targetChannelVersion": 8, "proposalDigest": "de15ddfbab13f82cb94aef25ae715b1a6180b61081bfe262fa783df53780fb40", "privateKeyTransferred": false}
+_____________ test_successor_refuses_symlink_paths[archive-file] ______________
+tests\test_lan_leaf_rotation_consecutive.py:475: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "a4e1537145684512af4db6c6e6cc0161", "targetChannelVersion": 8, "proposalDigest": "a835c714e153cd78885ddf70348e76e1f8f5d491498060d33300dac7e32898ee", "privateKeyTransferred": false}
+___________ test_successor_refuses_symlink_paths[backup-directory] ____________
+tests\test_lan_leaf_rotation_consecutive.py:475: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "ef9febf27dde41c68f8b163476e2f77d", "targetChannelVersion": 8, "proposalDigest": "bccee0065c5b9590377a86744255beeac31b85316b4e3285daf0803176bf6aa9", "privateKeyTransferred": false}
+________________ test_successor_refuses_symlink_paths[journal] ________________
+tests\test_lan_leaf_rotation_consecutive.py:475: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "8be7d356bd264c4cb83ab7c2099b6455", "targetChannelVersion": 8, "proposalDigest": "733d4800f89cb9ea0a785ce8403ac5d950564a78b60840ff0c648809fc08d117", "privateKeyTransferred": false}
+__ test_two_distinct_normal_multi_node_batches_preserve_prior_generation[2] ___
+tests\test_lan_leaf_rotation_batch_successor.py:178: in test_two_distinct_normal_multi_node_batches_preserve_prior_generation
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "b2c14a66f57a4ea4af6a8488319bc034", "nodeCount": 2, "batchDigest": "6dd5e9753c65abaf729e4c4af25bf8dc172b35cfea878f7bd4fe3abffd575da8", "privateKeyTransferred": false}
+__ test_two_distinct_normal_multi_node_batches_preserve_prior_generation[5] ___
+tests\test_lan_leaf_rotation_batch_successor.py:178: in test_two_distinct_normal_multi_node_batches_preserve_prior_generation
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "fe115eeb1be243bbbd3b287589645d82", "nodeCount": 5, "batchDigest": "c542137ba8f5353659f3983efe74f5776d3f682b1984b50cbf07ac91a16e1f9e", "privateKeyTransferred": false}
+_ test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs _
+tests\test_lan_leaf_rotation_batch_successor.py:270: in test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "3eaf702de1874326ba13f89c8f87a794", "nodeCount": 2, "batchDigest": "3b1084dc58a30f6a05ddf2b981579cf9d3b10bed6cbeba8dd5a30e3c0e7ea894", "privateKeyTransferred": false}
+___ test_retirement_refuses_uncommitted_partial_or_unknown_batch[prepared] ____
+tests\test_lan_leaf_rotation_batch_successor.py:315: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "5bba8095963842c59f1e6a5250a176f3", "nodeCount": 2, "batchDigest": "e0969e9d9cbd7cb0cb3a9f76dd9ac604ea9ab57b644fa64227e9e44a753aef83", "privateKeyTransferred": false}
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[staging] ____
+tests\test_lan_leaf_rotation_batch_successor.py:315: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "f18f573e4f694432ac3f27fbb3c66ac2", "nodeCount": 2, "batchDigest": "21ec68d338e014a46e5beabb43be1559ae77d09d1ff462a21a38dccad1bfe2f4", "privateKeyTransferred": false}
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[staged] _____
+tests\test_lan_leaf_rotation_batch_successor.py:315: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "1b5a7af5d0e24949bab4fa897981b831", "nodeCount": 2, "batchDigest": "97da28084a5ad2af04f9ae988c05d04cc89d870f8f7c25b0d61a989ad9dec043", "privateKeyTransferred": false}
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[unknown] ____
+tests\test_lan_leaf_rotation_batch_successor.py:315: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "c147020b59744bf2b845eaee9cea4112", "nodeCount": 2, "batchDigest": "ab80b305668d9b86f03748d59dfd77173679ab809e293be646da942f2397f415", "privateKeyTransferred": false}
+_____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[None] ______
+tests\test_lan_leaf_rotation_batch_successor.py:315: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "a3db5329e8064ce192395eebe515b66a", "nodeCount": 2, "batchDigest": "e1d837961860188e6c4086a02243fe8be1ce7f58ed76a54474095641e03bd427", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[missing] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "4247965db8ff4a98af7f10d8ce69853a", "nodeCount": 2, "batchDigest": "326facfe5e341c881e94a5466d9e5144bfa09810877d0238ea1d1ec614b95518", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[duplicate] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "82c9236cfab74027ad2d1bb492990e7f", "nodeCount": 2, "batchDigest": "5f0144b00f4a90adbabe41abede0203802ef5f3983268b8db47b8b9d4aec1eb4", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[unsigned-boolean] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "03e9ef61a1db47309d279085c9c44152", "nodeCount": 2, "batchDigest": "a4264b6daf82b0262235d6756117c1fa81437812070be4ea3eec2fbec225d53b", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[wrong-node] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "d1773384b45646d1ba70477624e47f04", "nodeCount": 2, "batchDigest": "f9fc4ade0d9113d670b2483429e11868c92aa0d3b42e9975ea40ee02198162d3", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[signature] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "9e26415a6e1c446fbd5da8162df03bf3", "nodeCount": 2, "batchDigest": "6b3f292e7acebe06e0400a34df91aa69735a0c0d8775f1cac92f811ac949e28c", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[proof-phase] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "7f95ae78f16d493eb3b4c3e4e7aca360", "nodeCount": 2, "batchDigest": "85b696d8d66754124ea9089af1534d6853f13698ec9d65b77f0feb221c5880db", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-not-switched] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "e0b4917bc31b4e1d88ec9e66c0a99120", "nodeCount": 2, "batchDigest": "e997d2acb1e334582afa8f4588e88a45904ac7013ae37b322c81b76484468f76", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-key] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "03d49b61cee04445a0f62a45a31e7ac4", "nodeCount": 2, "batchDigest": "20399511d9b42e63b83ebf6ac35d822231c8083593e06149eea875ea67ba0262", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-leaf] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "f6f7c31bd5b84d01b7505a532f32bf24", "nodeCount": 2, "batchDigest": "a95597732aafe52c4dd9b726c6b54e37c145ef0730deab8927438a342ca6a2f9", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-policy] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "2502feb55bdd40e88c58c0588e684baf", "nodeCount": 2, "batchDigest": "2eb0f1839a3c06f4ff0aab31e64332fd3de4deb2fb9f4bd3cdff161f5d84612d", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[ca-pin] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "61cc8697b75e47e48901353c6bcfc4b1", "nodeCount": 2, "batchDigest": "eb30a6a91949536d04e2409d240737f096888ccf1a92e98fb06cc200f1689701", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[epoch] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "4e358879076c4a42a379679607cb4170", "nodeCount": 2, "batchDigest": "1f1f1567c32fc41cda6b7c060098716c3112269fec9f1a6504527e9c471b7265", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[members] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "a394e0d877d048d1919387af97c76698", "nodeCount": 2, "batchDigest": "10ac6e3757e3efb0704a08a66d53a25e7bd4396045903586344ae0bb500d8cc5", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[version] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "8709756631d448769dbcba09741a03b6", "nodeCount": 2, "batchDigest": "18d5be641c900f53275cfe98d985dc983c769c9647eaf2e82c8221b0758c809b", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[disabled] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "a90d5481328340dfa0d3eaeee136fd0a", "nodeCount": 2, "batchDigest": "4308089516891ca61ab6caed5e5645f7ed2476d3a102f5a431a32e2d0e170d4b", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[endpoint] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "0f555060ebc44ffd9ac064db1c22c655", "nodeCount": 2, "batchDigest": "2989896a7cf9affe5de89ea048bcd66aa2fcf92c0434322f486614cf1ce91d2c", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[expiry] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "978bcbe4af0e483eb120f892d978d0ca", "nodeCount": 2, "batchDigest": "e66e00ee72b5461967606cc1643c3e345939942675aebfd157ca91fcb822b3c6", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "1b8313a8057c4ecc947bde77a227b58f", "nodeCount": 2, "batchDigest": "0e24515125c7dc3c44bcefeab72091d8f1acb2183291efadc384172c98b894ef", "privateKeyTransferred": false}
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive-next] _
+tests\test_lan_leaf_rotation_batch_successor.py:353: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "49028ceac79b4899ad30d7a1751713f9", "nodeCount": 2, "batchDigest": "ec3dd772f927b6257472a97af3e81672d8be10d2ae9ec60945028348c6ae78f5", "privateKeyTransferred": false}
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[phase] _
+tests\test_lan_leaf_rotation_batch_successor.py:425: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "e036c16618d347bda3c2bfd0148b38de", "nodeCount": 2, "batchDigest": "54988572afe8a911939682e6ad85f580f9ff811dea566402d6025c43264938e1", "privateKeyTransferred": false}
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[policy] _
+tests\test_lan_leaf_rotation_batch_successor.py:425: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "520e9fc8596847d08ba0ea2d50198671", "nodeCount": 2, "batchDigest": "344a948e8839ca71cfa582d1df83d86f4ef7dee1b3e3a9a84636970830bc9930", "privateKeyTransferred": false}
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[leaf] _
+tests\test_lan_leaf_rotation_batch_successor.py:425: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "7c2ab7076dd94061b0de80c370edbb49", "nodeCount": 2, "batchDigest": "3494a8c08e53092f9b3d7ee7b0559d3762db5186bf9852726b26100263b6eb13", "privateKeyTransferred": false}
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[key] _
+tests\test_lan_leaf_rotation_batch_successor.py:425: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "37a0721d11884865b06d42d3bf00b041", "nodeCount": 2, "batchDigest": "dd97d9acd8e6c4948e71822823575d2ae41ce6fb8657e9093102f31bb24902e8", "privateKeyTransferred": false}
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[missing-proof] _
+tests\test_lan_leaf_rotation_batch_successor.py:425: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "f23fa9b12c084157ae42c55824fe84b9", "nodeCount": 2, "batchDigest": "59ce1d88c9d9b8b78dbc141a77c31b7e28a4e4324af828f5fab133abab805af9", "privateKeyTransferred": false}
+______ test_retirement_archive_crash_replays_without_reset_or_overwrite _______
+tests\test_lan_leaf_rotation_batch_successor.py:454: in test_retirement_archive_crash_replays_without_reset_or_overwrite
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "6e16e67637674ec7bd071ae0d579bb0b", "nodeCount": 2, "batchDigest": "8bd609f53cd66e6b5d030be224692768d0c9d6697e54344010046fb0e5baaccc", "privateKeyTransferred": false}
+_ test_complete_successor_publication_crash_uses_verified_terminal_predecessor _
+tests\test_lan_leaf_rotation_batch_successor.py:473: in test_complete_successor_publication_crash_uses_verified_terminal_predecessor
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "c394c8f725bd476d9f70f951b1121227", "nodeCount": 2, "batchDigest": "783a5ccf0d83dc5ae370a9d369e9e63f411f785076a5a0660b2977d34985273c", "privateKeyTransferred": false}
+__________ test_retirement_and_successor_refuse_existing_writer_lock __________
+tests\test_lan_leaf_rotation_batch_successor.py:497: in test_retirement_and_successor_refuse_existing_writer_lock
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "96668a53ebad4b49991133dcb7fa14e9", "nodeCount": 2, "batchDigest": "1933992fe6dfd32dc003e9b638616fb21ba61f2fee4c362de6be31d3d2227537", "privateKeyTransferred": false}
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[archive] ______
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "bbb30504ba0c4c30968835540c9d1ba8", "nodeCount": 2, "batchDigest": "89925a4209f7645cfb723abd1fc15a11ddf8aed1533b53582efb48c76a57ba56", "privateKeyTransferred": false}
+__ test_successor_refuses_stale_terminal_or_tampered_archive[archive-format] __
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "df90746b53ea42449eb660e64f37d723", "nodeCount": 2, "batchDigest": "704fdfea55d0e114acee1e8d43fd9491c3a81c88f82e9f842036ffedef7a7279", "privateKeyTransferred": false}
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[terminal] _____
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "88a28cb4e9c046869a6b7d3091dd66f1", "nodeCount": 2, "batchDigest": "38e12b96eea132ff12ddb900a6e6b849af62bb6296b5b9651a5481dacc57dc24", "privateKeyTransferred": false}
+_ test_successor_refuses_stale_terminal_or_tampered_archive[terminal-format] __
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "9a612772a1d8492c91a69d725ee14ecd", "nodeCount": 2, "batchDigest": "7b03d55ba97fe53d18879322aac37c76a7813a98a507a3e2d5d2659f2df256f2", "privateKeyTransferred": false}
+___ test_successor_refuses_stale_terminal_or_tampered_archive[current-node] ___
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "f8ac2c5a80bf4221a9b9846bc0a5336f", "nodeCount": 2, "batchDigest": "67b58550e92eda3c24329d6299e4e6ff57ae6934096e6b4654da471e5ab09065", "privateKeyTransferred": false}
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[members] ______
+tests\test_lan_leaf_rotation_batch_successor.py:507: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "a574f55561f345b7ac2671d4fecf6cf1", "nodeCount": 2, "batchDigest": "dc8aab2378512eaef7fb379bd36a9638c12c8e7c8cd0879606be17755ad15511", "privateKeyTransferred": false}
+______________ test_retirement_refuses_redirected_paths[journal] ______________
+tests\test_lan_leaf_rotation_batch_successor.py:545: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "4f9e3d1306c34dc88d42c685d524bc2f", "nodeCount": 2, "batchDigest": "ffef6644f491e1d19f4c6dfa647158559a3db881f223a923f14d92a573dc7c83", "privateKeyTransferred": false}
+_________ test_retirement_refuses_redirected_paths[archive-directory] _________
+tests\test_lan_leaf_rotation_batch_successor.py:545: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "307d364bba18462b835135b7c2dbcd6f", "nodeCount": 2, "batchDigest": "ceec88ad8ca3b57ef488889bc83d410bb021bfa26ee3d98ea20b29333ec57046", "privateKeyTransferred": false}
+___________ test_retirement_refuses_redirected_paths[archive-file] ____________
+tests\test_lan_leaf_rotation_batch_successor.py:545: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "9f47aaff34864339b390c651860ebe4f", "nodeCount": 2, "batchDigest": "10c7448c6549c4bf388534ac98aeb810b6f19e6f308050e81167dd411f4b659a", "privateKeyTransferred": false}
+______________ test_retirement_refuses_redirected_paths[receipt] ______________
+tests\test_lan_leaf_rotation_batch_successor.py:545: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "8103637a672544e8b8838d875810036a", "nodeCount": 2, "batchDigest": "17be696c0d7476360ddace6892d441b926e32c7bd0fd2de4eb7a847b86aa5881", "privateKeyTransferred": false}
+_______ test_retirement_refuses_redirected_paths[bundle-node-directory] _______
+tests\test_lan_leaf_rotation_batch_successor.py:545: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "9e4b2989398c4d1c8bd78dd10d9c5b99", "nodeCount": 2, "batchDigest": "305c85933ba47ab1385a707c7e4c151c74daf8d7fecaf6817eea7c3fe71c706f", "privateKeyTransferred": false}
+__ test_link_publication_crash_replay_removes_only_equal_owned_residue[node] __
+tests\test_leaf_rotation_archive_residue.py:17: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "8fdf067e11b1463798f604b298870267", "nodeCount": 2, "batchDigest": "3261c600896287ea11c2c217ef8ec5d857a0fed28f849e8815c57f38a97f415f", "privateKeyTransferred": false}
+_ test_link_publication_crash_replay_removes_only_equal_owned_residue[control] _
+tests\test_leaf_rotation_archive_residue.py:17: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "0f96f01c0790468995e0b869f549f814", "nodeCount": 2, "batchDigest": "19687d3a048cb29312df5dbef630cfbd229328b37510254cb6a10fae204299f7", "privateKeyTransferred": false}
+___ test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source ___
+tests\test_leaf_rotation_archive_residue.py:103: in test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "c119d7f566d045f4a4eaaffa55b5d934", "nodeCount": 2, "batchDigest": "4c94fd60467c4141c0f6060bdfdba22105ec5b34b84f7ab6525734338c9e970c", "privateKeyTransferred": false}
+__________ test_node_successor_requires_verified_predecessor_replay ___________
+tests\test_rotation_predecessor_residue.py:29: in test_node_successor_requires_verified_predecessor_replay
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:109: in _normal_cycles
+    finish(first, receipt)
+tests\test_lan_leaf_rotation_consecutive.py:90: in finish
+    lan_pilot.commit_leaf_rotation(
+tools\lan_pilot.py:3684: in commit_leaf_rotation
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "597413aed6354c978a783230f76af1e3", "targetChannelVersion": 8, "proposalDigest": "41749dfe7acbec0fe3e90dacb6d519f8e050ed90550ff9428f707dd259af3ce4", "privateKeyTransferred": false}
+___________ test_cp_successor_requires_verified_predecessor_replay ____________
+tests\test_rotation_predecessor_residue.py:68: in test_cp_successor_requires_verified_predecessor_replay
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:126: in complete
+    lan_pilot.stage_leaf_rotation_batch(
+tools\lan_pilot.py:3519: in stage_leaf_rotation_batch
+    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(
+tools\lan_pilot.py:3472: in _validate_rotation_receipt
+    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
+E   cryptography.exceptions.InvalidSignature
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "2f68ce693f76433f81546b9974bb34a8", "nodeCount": 2, "batchDigest": "914cda4c223a9dacd1a105682785050c2c7e6d63f5f7f9ab6d8ffc1f0b6bf1e8", "privateKeyTransferred": false}
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:383: POSIX directory ownership/mode boundary
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:117: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:129: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:162: OS cannot create test symlinks
+FAILED tests/test_lan_leaf_rotation.py::test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap
+FAILED tests/test_lan_leaf_rotation.py::test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-intent]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-public-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-install]
+FAILED tests/test_lan_leaf_rotation.py::test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-intent]
+FAILED tests/test_lan_leaf_rotation.py::test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-public-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-validity window]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_refuses_concurrent_second_writer_and_different_retry
+FAILED tests/test_lan_leaf_rotation.py::test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel
+FAILED tests/test_lan_leaf_rotation.py::test_cp_commit_requires_exact_node_receipt_and_channel_cas
+FAILED tests/test_lan_leaf_rotation.py::test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes
+FAILED tests/test_lan_leaf_rotation.py::test_expired_partial_batch_is_superseded_by_fresh_all_node_batch
+FAILED tests/test_lan_leaf_rotation.py::test_expired_supersession_rejects_policy_or_channel_drift
+FAILED tests/test_lan_leaf_rotation.py::test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[authorization-authorization differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[duplicate-authorization-duplicate key]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[csr-prove the pinned Node key]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[channel-channel baseline differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[chain-issuing chain differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[identity-identity, chain, or expiry differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[revoked-revoked]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[not-fully-expired-requires every partial-batch leaf to be expired]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[mixed-validity-remains live]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[journal-owns the pilot state]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_two_server_issued_normal_cycles_keep_generation_and_immutable_history
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installing]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installed]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[restarted]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[rolled-back]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[prepared]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[staged]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[switched]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[unknown]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[None]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[policy]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[current-leaf]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[generation]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[tenant]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[epoch]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[control-hash]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-collision]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-journal]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-signature]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[missing-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[backup-collision]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_archive_collision_fails_before_republishing_policy_or_restart
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_legacy_formatted_journal_bytes_are_preserved_exactly
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[before-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-intent]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-public-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[before-restart]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_lock_refuses_concurrent_writer
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[None]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[value1]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[value2]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[finalized]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[archive-directory]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[archive-file]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[backup-directory]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[journal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_two_distinct_normal_multi_node_batches_preserve_prior_generation[2]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_two_distinct_normal_multi_node_batches_preserve_prior_generation[5]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[prepared]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[staging]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[staged]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[unknown]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[None]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[missing]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[duplicate]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[unsigned-boolean]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[wrong-node]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[signature]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[proof-phase]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-not-switched]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-key]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-leaf]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-policy]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[ca-pin]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[epoch]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[members]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[version]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[disabled]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[endpoint]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[expiry]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive-next]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[phase]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[policy]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[leaf]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[key]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[missing-proof]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_archive_crash_replays_without_reset_or_overwrite
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_complete_successor_publication_crash_uses_verified_terminal_predecessor
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_and_successor_refuse_existing_writer_lock
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[archive]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[archive-format]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[terminal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[terminal-format]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[current-node]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[members]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[journal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[archive-directory]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[archive-file]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[receipt]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[bundle-node-directory]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[control]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+FAILED tests/test_rotation_predecessor_residue.py::test_node_successor_requires_verified_predecessor_replay
+FAILED tests/test_rotation_predecessor_residue.py::test_cp_successor_requires_verified_predecessor_replay
+119 failed, 22 passed, 5 skipped in 55.60s

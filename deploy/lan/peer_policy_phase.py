@@ -24,14 +24,43 @@ FLOOR_KEYS = {
     "schemaVersion", "tenantId", "nodeId", "recoveryEpoch", "nonce", "observedAt",
     "certificateDER_SHA256", "peerPolicyVersion", "peerPolicySHA256", "floorSHA256",
     "journalIdentitySHA256", "journalUID", "nodeSignature",
-    "servingPID", "servingProcessSHA256", "plainServingProcess",
+    "servingPID", "servingProcessSHA256", "servingExecutableSHA256", "plainServingProcess",
 }
-DOMAIN = b"saintvision/node-peer-policy-floor/v1\x00"
+DOMAIN = b"saintvision/node-peer-policy-floor/v2\x00"
 HEX = re.compile(r"[0-9a-f]{64}\Z")
 
 
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode()
+
+
+def floor_canonical(value):
+    """M2:2 exact Go encoding/json.Marshal map body; no trailing newline.
+
+    M2 numbers are integers, so floats/custom JSON values are rejected instead
+    of approximating Go's floating-point formatting. Outer receipts are separate.
+    """
+    def check(item):
+        if isinstance(item,str):
+            item.encode('utf-8','strict')
+        elif item is None or type(item) is bool:
+            pass
+        elif type(item) is int:
+            if not -MAX_VERSION <= item <= MAX_VERSION:
+                raise ValueError('M2 integer exceeds its exact wire range')
+        elif isinstance(item,list):
+            for child in item:check(child)
+        elif isinstance(item,dict):
+            for key,child in item.items():
+                if not isinstance(key,str):raise ValueError('M2 object keys must be strings')
+                check(key);check(child)
+        else:
+            raise ValueError('M2 canonical body contains a non-wire value')
+    check(value)
+    encoded=json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
+    for character,escaped in (('&',r'\u0026'),('<',r'\u003c'),('>',r'\u003e'),('\u2028',r'\u2028'),('\u2029',r'\u2029')):
+        encoded=encoded.replace(character,escaped)
+    return encoded.encode('utf-8','strict')
 
 
 def digest(raw):
@@ -61,6 +90,7 @@ def versions(manifest):
         raise ValueError("Peer phases must be exact independent P+1/P+2")
     version(manifest["overlapPeerPolicyVersion"])
     version(manifest["finalPeerPolicyVersion"])
+    version(manifest["targetChannelVersion"])
     if manifest["targetChannelVersion"] != version(manifest["currentChannelVersion"], 1):
         raise ValueError("Channel CAS must remain exactly C+1")
     for key in PEER_FIELDS - {"currentPeerPolicyVersion", "overlapPeerPolicyVersion", "finalPeerPolicyVersion"}:
@@ -70,6 +100,11 @@ def versions(manifest):
 
 def binding(manifest):
     return {key: manifest[key] for key in sorted(PEER_FIELDS)} if manifest["schemaVersion"] == SCHEMA else {}
+
+
+def signed_shape(value, body, signature):
+    return (isinstance(value, dict) and set(value) == {*body, signature}
+            and canonical({k:v for k,v in value.items() if k != signature}) == canonical(body))
 
 
 def current_policy(raw, *, version_number, scope, control_fingerprint, now):
@@ -106,14 +141,14 @@ def validate_policy(raw, manifest, phase, *, now=None, before_write=False):
 
 
 def verify_floor(value, certificate_raw, scope, *, nonce=None, now=None, fresh=True):
-    if not isinstance(value, dict) or set(value) != FLOOR_KEYS or value["schemaVersion"] != "saintvision-node-peer-policy-floor:1":
+    if not isinstance(value, dict) or set(value) != FLOOR_KEYS or value["schemaVersion"] != "saintvision-node-peer-policy-floor:2":
         raise ValueError("Actual Node floor observation shape differs")
     version(value["peerPolicyVersion"])
     if type(value["observedAt"]) is not int or type(value["journalUID"]) is not int or not 0 <= value["journalUID"] <= 4294967295:
         raise ValueError("Actual Node floor observation integer differs")
     if type(value["servingPID"]) is not int or value["servingPID"] < 1 or value["plainServingProcess"] is not True:
         raise ValueError("Actual serving plain Node process is unproved")
-    for key in ("nonce", "certificateDER_SHA256", "peerPolicySHA256", "floorSHA256", "journalIdentitySHA256", "servingProcessSHA256"):
+    for key in ("nonce", "certificateDER_SHA256", "peerPolicySHA256", "floorSHA256", "journalIdentitySHA256", "servingProcessSHA256", "servingExecutableSHA256"):
         if not isinstance(value[key], str) or not HEX.fullmatch(value[key]):
             raise ValueError("Actual Node floor observation digest differs")
     if nonce is not None and value["nonce"] != nonce:
@@ -137,13 +172,16 @@ def verify_floor(value, certificate_raw, scope, *, nonce=None, now=None, fresh=T
     if not isinstance(signature, str) or not re.fullmatch(r"[0-9a-f]{128}", signature):
         raise ValueError("Actual Node floor signature differs")
     body = {key: item for key, item in value.items() if key != "nodeSignature"}
-    cert.public_key().verify(bytes.fromhex(signature), DOMAIN + canonical(body))
+    cert.public_key().verify(bytes.fromhex(signature), DOMAIN + floor_canonical(body))
     return value
 
 
 def match_floor(value, manifest, phase):
     if (value["peerPolicyVersion"], value["peerPolicySHA256"]) != (manifest[phase + "PeerPolicyVersion"], manifest[phase + "PeerPolicySHA256"]):
         raise ValueError("Actual durable peer floor differs from the frozen phase")
+    expected_der = manifest["currentNodeCertificateSHA256" if phase == "current" else "nextNodeCertificateSHA256"]
+    if value["certificateDER_SHA256"] != expected_der:
+        raise ValueError("Actual phase Node DER differs from the frozen certificate")
     return value
 
 

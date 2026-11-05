@@ -19,6 +19,36 @@ CONFIG = ('User','Env','Cmd','WorkingDir','Entrypoint','OnBuild','Volumes','Labe
           'Healthcheck','StopSignal','Shell','ExposedPorts','StopTimeout')
 CREDENTIAL_FILES = ('node-cert.pem','node-key.pem','ca.pem','signer.pub','peer-policy.json')
 _rotation_guard_depth = {}
+_settled_verifier = None  # trusted in-process leaf entry; never an argv/env bypass
+
+
+def strict_json(raw):
+    def pairs(items):
+        value = {}
+        for key, item in items:
+            if key in value:
+                raise ValueError('Duplicate private protocol field')
+            value[key] = item
+        return value
+    return json.loads(raw, object_pairs_hook=pairs, parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Invalid JSON number')))
+
+
+def no_migration(directory, *, leaf_observation=False):
+    root = Path(directory)
+    for name in ('agent-binary-migration.json', 'agent-binary-migration.json.next', 'agent-mutation-fence.json', 'agent-mutation-fence.json.next'):
+        path = root / name
+        if path.exists() or path.is_symlink():
+            raise ValueError('A migration marker requires its separately reviewed contract')
+    if leaf_observation or (root/'leaf-rotation.json').exists():
+        for name in ('storage-replacement.json','storage-replacement-input'):
+            path = root/name
+            if path.exists() or path.is_symlink():
+                raise ValueError('A pending storage migration remains blocked')
+        path = root/'workspace-upgrade.json'
+        if path.exists() or path.is_symlink():
+            value = strict_json(path.read_bytes())
+            if not isinstance(value,dict) or value.get('phase') not in ('ready','rolled-back'):
+                raise ValueError('A pending workspace migration remains blocked')
 
 
 def validate_topology(manifest):
@@ -49,7 +79,23 @@ def credential_archive(directory):
         info = path.lstat()
         if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= 65536:
             raise ValueError('Missing or unsafe Node credential file: '+name)
-        files[name] = path.read_bytes()
+        fd = os.open(path, os.O_RDONLY | getattr(os,'O_NOFOLLOW',0) | getattr(os,'O_NONBLOCK',0) | getattr(os,'O_BINARY',0))
+        with os.fdopen(fd,'rb') as source:
+            opened = os.fstat(source.fileno())
+            if (not stat.S_ISREG(opened.st_mode) or opened.st_nlink != 1
+                    or (opened.st_dev,opened.st_ino,opened.st_size) != (info.st_dev,info.st_ino,info.st_size)):
+                raise ValueError('Node credential changed before read: '+name)
+            raw = source.read(65537)
+            after = os.fstat(source.fileno())
+        named = path.lstat()
+        fields = ('st_dev','st_ino','st_size','st_mode','st_uid','st_gid','st_nlink','st_mtime_ns','st_ctime_ns')
+        # Windows named stat and descriptor fstat expose different ctime APIs;
+        # compare ctime across descriptor reads there, and also by name on Linux.
+        changed = [k for k in fields if getattr(opened,k) != getattr(after,k)
+                   or (not (os.name == 'nt' and k == 'st_ctime_ns') and getattr(opened,k) != getattr(named,k))]
+        if len(raw) != opened.st_size or changed:
+            raise ValueError('Node credential changed during read: '+name+' ('+','.join(changed)+')')
+        files[name] = raw
     if len(files['signer.pub']) != 32:
         raise ValueError('Pinned public key must contain exactly 32 bytes')
     archive = io.BytesIO()
@@ -66,20 +112,49 @@ def credential_archive(directory):
 def no_rotation_mutation(directory):
     """Legacy installers cannot resume or undo an owned leaf publication."""
     root = Path(directory)
+    no_migration(root)
     for name in ('leaf-rotation.json', 'leaf-rotation.json.next', 'leaf-rotation-finalized'):
         path = root / name
         if path.exists() or path.is_symlink():
             raise ValueError('Leaf rotation state requires its exact forward-only protocol; legacy repair/upgrade/rollback is blocked')
 
 
+def _settled(directory):
+    if _settled_verifier is not None:
+        value = _settled_verifier(Path(directory))
+    else:
+        launcher = Path(__file__).with_name('leaf_rotation_standalone_runtime.py')
+        entry = Path(__file__).with_name('worker_leaf_rotation.py')
+        runtime = Path.home()/'.local/share/saintvision/leaf-rotation-runtime'
+        if not launcher.is_file() or launcher.is_symlink() or not entry.is_file() or entry.is_symlink():
+            raise ValueError('The reviewed pinned five-module verifier is required')
+        command = [sys.executable,'-I','-B',str(launcher),'run','--runtime-dir',str(runtime),
+                   '--worker-script',str(entry),'--','verify-settled','--worker-root',str(directory)]
+        result = subprocess.run(command,capture_output=True,check=True,timeout=30)
+        if not 0 < len(result.stdout) <= 65536:
+            raise ValueError('Settled verification result is unavailable')
+        value = strict_json(result.stdout)
+    if (not isinstance(value,dict) or set(value) != {'schemaVersion','verified','archiveSHA256','journalSHA256','credentialsSHA256','context','actualFinalPeerFloor'}
+            or value['schemaVersion'] != 'saintvision-settled-rotation-verification:1' or value['verified'] is not True):
+        raise ValueError('Settled verifier result differs')
+    return value
+
+
+def _stable_settled(value):
+    floor = {k:v for k,v in value['actualFinalPeerFloor'].items() if k not in ('nonce','observedAt','nodeSignature')}
+    return json.dumps({**value,'actualFinalPeerFloor':floor},sort_keys=True,separators=(',',':'),allow_nan=False)
+
+
 @contextmanager
-def rotation_mutation_guard(directory):
+def rotation_mutation_guard(directory, *, action=None):
     """Serialize generic mutation with leaf publication; never steal stale intent."""
     root = Path(directory)
     key = os.path.abspath(root)
     if key in _rotation_guard_depth:
-        no_rotation_mutation(root)
-        yield
+        token = _rotation_guard_depth[key]
+        if token is not None and action not in ('idempotent','same-byte-copy'):
+            raise ValueError('A migration cannot inherit a settled idempotent guard')
+        yield token
         return
     path = root / 'leaf-rotation.lock'
     try:
@@ -88,31 +163,55 @@ def rotation_mutation_guard(directory):
         raise ValueError('Another leaf rotation writer owns the Node lock; preserve state') from None
     try:
         os.close(fd)
-        _rotation_guard_depth[key] = True
-        no_rotation_mutation(root)
-        yield
+        no_migration(root)
+        token = None
+        try:
+            no_rotation_mutation(root)
+        except ValueError:
+            if action not in ('idempotent','same-byte-copy'):
+                raise
+            token = _settled(root)
+        _rotation_guard_depth[key] = token
+        yield token
+        if token is not None and _stable_settled(_settled(root)) != _stable_settled(token):
+            raise ValueError('Same-byte/idempotent action changed settled identity, history or ownership')
     finally:
         _rotation_guard_depth.pop(key, None)
         path.unlink(missing_ok=True)
 
 
 def install_files(container, directory, *, rotation_publication=False):
+    no_migration(directory)
     if rotation_publication:
         return _install_files(container, directory, rotation_publication=True)
-    with rotation_mutation_guard(directory):
-        return _install_files(container, directory)
+    with rotation_mutation_guard(directory, action='same-byte-copy') as settled:
+        if settled is None:
+            return _install_files(container, directory)
+        archive, files = credential_archive(directory)
+        if {name:hashlib.sha256(raw).hexdigest() for name,raw in files.items()} != settled['credentialsSHA256']:
+            raise ValueError('SF1 repair may only copy the exact settled credential bytes')
+        context = settled['context']
+        node = strict_json((Path(directory)/'manifest.json').read_bytes())['nodeId']
+        if container not in (context['containerId'],'saintvision-'+node.lower()):
+            raise ValueError('SF1 repair container differs')
+        cid = context['containerId']
+        subprocess.run(['docker','stop',cid],capture_output=True,check=True,timeout=60)
+        _install_files(cid,directory,settled=True,frozen=(archive,files))
+        subprocess.run(['docker','start',cid],capture_output=True,check=True,timeout=60)
+        check_running(cid)
 
 
-def _install_files(container, directory, *, rotation_publication=False):
-    if not rotation_publication:
+def _install_files(container, directory, *, rotation_publication=False, settled=False, frozen=None):
+    no_migration(directory)
+    if not rotation_publication and not settled:
         no_rotation_mutation(directory)
-    archive, files = credential_archive(directory)
+    archive, files = credential_archive(directory) if frozen is None else frozen
     if rotation_publication:
         root = Path(directory)
-        record = json.loads((root / 'leaf-rotation.json').read_bytes())
+        record = strict_json((root / 'leaf-rotation.json').read_bytes())
         binding = record.get('peerPhaseBinding', {})
         name = {'installed': 'overlap', 'finalizing': 'final'}.get(record.get('phase'))
-        policy = json.loads(files['peer-policy.json'])
+        policy = strict_json(files['peer-policy.json'])
         if (record.get('peerSchemaVersion') != 3 or record.get('publicationIntent') is not True
                 or name is None or type(policy.get('version')) is not int
                 or policy['version'] != binding.get(name+'PeerPolicyVersion')

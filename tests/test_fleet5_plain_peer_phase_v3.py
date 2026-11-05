@@ -13,20 +13,20 @@ from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 
-from test_lan_leaf_rotation import _fixture, fingerprint, lan_pilot, rotation
+from test_lan_leaf_rotation import _legacy_fixture as _fixture, fingerprint, lan_pilot, rotation
 import peer_policy_phase as phase
 from worker_config import no_rotation_mutation, rotation_mutation_guard
 
 
 def synthetic_floor(root, scope, key, *, nonce="a" * 64):
     raw = (root / "peer-policy.json").read_bytes()
-    value = dict(schemaVersion="saintvision-node-peer-policy-floor:1", tenantId=scope["tenantId"], nodeId=scope["nodeId"],
+    value = dict(schemaVersion="saintvision-node-peer-policy-floor:2", tenantId=scope["tenantId"], nodeId=scope["nodeId"],
                  recoveryEpoch=scope["recoveryEpoch"], nonce=nonce, observedAt=int(datetime.now(timezone.utc).timestamp()),
                  certificateDER_SHA256=fingerprint(x509.load_pem_x509_certificate((root / "node-cert.pem").read_bytes())),
                  peerPolicyVersion=phase.strict(raw)["version"], peerPolicySHA256=phase.digest(raw),
                  floorSHA256=phase.digest(b"synthetic unit floor"), journalIdentitySHA256=phase.digest(b"synthetic unit identity"),
-                 journalUID=0, servingPID=1, servingProcessSHA256=phase.digest(b"synthetic unit process"), plainServingProcess=True)
-    return {**value, "nodeSignature": key.sign(phase.DOMAIN + phase.canonical(value)).hex()}
+                 journalUID=0, servingPID=1, servingProcessSHA256=phase.digest(b"synthetic unit process"), servingExecutableSHA256=phase.digest(b"SYNTHETIC UNIT EXECUTABLE BYTES"), plainServingProcess=True)
+    return {**value, "nodeSignature": key.sign(phase.DOMAIN + phase.floor_canonical(value)).hex()}
 
 
 def candidate(tmp_path, *, peer_version=7):
@@ -67,7 +67,7 @@ def test_preparation_refuses_unknown_actual_floor_before_any_output(tmp_path, fa
     f, kwargs = candidate(tmp_path, peer_version=phase.MAX_VERSION - 1 if fault == "overflow" else 7)
     if fault == "nonce": kwargs["peer_floor_nonce"] = "b" * 64
     elif fault == "signature": kwargs["peer_floor_observation"]["nodeSignature"] = "0" * 128
-    elif fault == "stale": kwargs["now"] += timedelta(seconds=121)
+    elif fault == "stale": kwargs["now"] = datetime.fromtimestamp(kwargs["peer_floor_observation"]["observedAt"] + 121, timezone.utc)
     elif fault == "cp-hash": kwargs["current_policy_raw"] += b" "
     elif fault == "expired-current":
         kwargs["now"] = f.current_control.not_valid_after_utc + timedelta(seconds=1)
@@ -107,6 +107,23 @@ def test_native_fixed_mode_is_early_failing_gate_with_two_real_cycles():
     assert "actualPostgresCASAssessed=False" in source
 
 
+def test_actual_native_heartbeat_request_matches_shared_contract_and_base64_is_rejected():
+    import base64
+    import importlib.util
+    from jsonschema import Draft202012Validator
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location('fixed_native_request_producer', root / 'tests/proofs/run_fleet5_peer_phase_fixed_probe.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    schema = json.loads((root / 'contracts/v1alpha1/core.schema.json').read_bytes())
+    validator = Draft202012Validator({**schema, '$ref':'#/$defs/NodeProbeInput'})
+    actual = json.loads(module.heartbeat_request())
+    validator.validate(actual)
+    assert len(actual['nonce']) == 64
+    invalid = {'nonce':base64.b64encode(bytes(range(32))).decode()}
+    assert list(validator.iter_errors(invalid))
+
+
 def test_generic_mutation_guard_serializes_with_leaf_writer_and_keeps_stale_lock(tmp_path):
     with rotation_mutation_guard(tmp_path):
         with rotation_mutation_guard(tmp_path):
@@ -120,3 +137,32 @@ def test_generic_mutation_guard_serializes_with_leaf_writer_and_keeps_stale_lock
         with rotation_mutation_guard(tmp_path):
             pytest.fail("stale lock stolen")
     assert lock.read_bytes() == b"unknown prior owner"
+
+
+@pytest.mark.parametrize("fault", ["missing-member", "unknown-member", "nonce", "cp-policy", "storage", "stale"])
+def test_complete_cohort_floor_preflight_blocks_before_any_proposal_or_cas(tmp_path, monkeypatch, fault):
+    from test_lan_leaf_rotation import _batch_inputs, NODE_ID_2
+    from peer_phase_unit_fixtures import install_unit_adapters
+    f, key2, _cert2, _rows, args = _batch_inputs(tmp_path, monkeypatch)
+    adapter = install_unit_adapters(monkeypatch, tmp_path)
+    adapter['refresh'](args)
+    del args._unit_keys  # frozen independently supplied synthetic observations
+    path = args.peer_floor_observations / (NODE_ID_2 + '.json')
+    if fault == 'missing-member': path.unlink()
+    elif fault == 'unknown-member': (args.peer_floor_observations / 'unconfigured.json').write_bytes(path.read_bytes())
+    elif fault == 'nonce': args.peer_floor_nonce = 'f' * 64
+    elif fault == 'cp-policy':
+        cp = args.state / 'nodes' / NODE_ID_2 / 'peer-policy.json'
+        cp.write_bytes(cp.read_bytes() + b' ')
+    else:
+        value = phase.strict(path.read_bytes())
+        value['plainServingProcess' if fault == 'storage' else 'observedAt'] = False if fault == 'storage' else value['observedAt'] - 121
+        body = {k:v for k,v in value.items() if k != 'nodeSignature'}
+        value['nodeSignature'] = key2.sign(phase.DOMAIN + phase.floor_canonical(body)).hex()
+        path.write_bytes(phase.canonical(value))
+    before = {str(p.relative_to(args.state)):p.read_bytes() for p in args.state.rglob('*') if p.is_file()}
+    monkeypatch.setattr(lan_pilot,'provision_channel',lambda *a,**k: pytest.fail('CAS before complete preflight'))
+    with pytest.raises((ValueError,InvalidSignature)):
+        lan_pilot.prepare_leaf_rotation_batch(args)
+    assert not args.output.exists()
+    assert {str(p.relative_to(args.state)):p.read_bytes() for p in args.state.rglob('*') if p.is_file()} == before

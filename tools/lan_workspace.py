@@ -17,6 +17,9 @@ import zipfile
 from lan_pilot import ROOT, load, run, private_directory
 
 PROFILE = 'lan-workspace-v1'
+INSTALLERS = ('worker_config.py','worker_workspace.py','Enable-Workspace.ps1',
+              'worker_leaf_rotation.py','peer_policy_phase.py','worker_peer_floor.py','worker_plain_rotation.py',
+              'leaf_rotation_standalone_runtime.py','leaf-rotation-runtime-lock.json')
 
 
 def sha(path):
@@ -63,7 +66,7 @@ def bundle(args):
     manifest.update(schemaVersion=1, scope='workspace-node-acceptance', profile=PROFILE,
                     imageCodeSHA=prepared['codeSHA'], packageCodeSHA=run(['git','rev-parse','HEAD'],cwd=ROOT),
                     packageDirty=bool(run(['git','status','--porcelain'],cwd=ROOT)),
-                    installerHashes={name:sha(ROOT/'deploy/lan'/name) for name in ('worker_config.py','worker_workspace.py','Enable-Workspace.ps1')},
+                    installerHashes={name:sha(ROOT/'deploy/lan'/name) for name in INSTALLERS},
                     preparedAt=datetime.now(timezone.utc).isoformat(),
                     certificateSHA256=sha(args.state/'public/node-cert.pem'),
                     agent=pack_image(agent_tag,'node-agent.tar'),
@@ -75,7 +78,7 @@ def bundle(args):
             archive.write(work/name,name)
         for name in ('ca.pem','signer.pub','peer-policy.json'):
             archive.write(args.state/name,name)
-        for name in ('worker_config.py','worker_workspace.py','Enable-Workspace.ps1'):
+        for name in INSTALLERS:
             archive.write(ROOT/'deploy/lan'/name,name)
     result = dict(archive=str(target),sha256=sha(target),bytes=target.stat().st_size,
                   nodeId=state['nodeId'],profile=PROFILE,imageCodeSHA=prepared['codeSHA'],

@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"unicode/utf8"
 
 	"github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire"
 )
@@ -32,6 +33,73 @@ type PeerPolicyFloorObservation struct {
 }
 
 var peerFloorUnavailable = errors.New("NODE-0041: actual peer policy floor observation unavailable")
+
+// Hash descriptor bytes of the actual owned serving executable. This is
+// deliberately distinct from the raw /proc cmdline hash and image digest.
+func ServingExecutableSHA256(pid int, uid uint32) (string, error) {
+	if pid < 1 {
+		return "", peerFloorUnavailable
+	}
+	base := fmt.Sprintf("/proc/%d", pid)
+	start := func() (string, error) {
+		info, err := os.Stat(base)
+		if err != nil {
+			return "", peerFloorUnavailable
+		}
+		owner, ok := info.Sys().(*syscall.Stat_t)
+		if !ok || owner.Uid != uid {
+			return "", peerFloorUnavailable
+		}
+		raw, err := os.ReadFile(base + "/stat")
+		end := bytes.LastIndexByte(raw, ')')
+		if err != nil || end < 1 {
+			return "", peerFloorUnavailable
+		}
+		fields := strings.Fields(string(raw[end+1:]))
+		if len(fields) < 20 {
+			return "", peerFloorUnavailable
+		}
+		if _, err := strconv.ParseUint(fields[19], 10, 64); err != nil {
+			return "", peerFloorUnavailable
+		}
+		return fields[19], nil
+	}
+	firstStart, err := start()
+	if err != nil {
+		return "", err
+	}
+	f, err := os.Open(base + "/exe") // intentional kernel proc descriptor link
+	if err != nil {
+		return "", peerFloorUnavailable
+	}
+	defer f.Close()
+	before, err := f.Stat()
+	self, selfErr := os.Stat("/proc/self/exe")
+	if err != nil || selfErr != nil || !before.Mode().IsRegular() || !os.SameFile(before, self) || before.Size() < 1 || before.Size() > 128*1024*1024 {
+		return "", peerFloorUnavailable
+	}
+	metadata, ok := before.Sys().(*syscall.Stat_t)
+	if !ok || metadata.Uid != uid || metadata.Mode&0022 != 0 {
+		return "", peerFloorUnavailable
+	}
+	h := sha256.New()
+	n, err := io.Copy(h, io.LimitReader(f, 128*1024*1024+1))
+	after, statErr := f.Stat()
+	current, currentErr := os.Stat(base + "/exe")
+	lastStart, startErr := start()
+	if err != nil || n != before.Size() || statErr != nil || currentErr != nil || startErr != nil || firstStart != lastStart || !os.SameFile(before, after) || !os.SameFile(before, current) {
+		return "", peerFloorUnavailable
+	}
+	last, ok := after.Sys().(*syscall.Stat_t)
+	if !ok || metadata.Size != last.Size || metadata.Mode != last.Mode || metadata.Uid != last.Uid || metadata.Gid != last.Gid || metadata.Nlink != last.Nlink || metadata.Mtim != last.Mtim || metadata.Ctim != last.Ctim {
+		return "", peerFloorUnavailable
+	}
+	named, ok := current.Sys().(*syscall.Stat_t)
+	if !ok || named.Size != metadata.Size || named.Mode != metadata.Mode || named.Uid != metadata.Uid || named.Gid != metadata.Gid || named.Nlink != metadata.Nlink || named.Mtim != metadata.Mtim || named.Ctim != metadata.Ctim {
+		return "", peerFloorUnavailable
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
 
 // Bind the observation to the real serving process, not caller-supplied policy
 // data. Production container observers use PID 1; native fixtures use their real
@@ -58,7 +126,7 @@ func PeerFloorServingProcess(pid int, state, policy string, config Config, uid u
 		return "", peerFloorUnavailable
 	}
 	raw, err := os.ReadFile(base + "/cmdline")
-	if err != nil || len(raw) > 65536 {
+	if err != nil || len(raw) == 0 || len(raw) > 65536 || raw[len(raw)-1] != 0 || !utf8.Valid(raw) {
 		return "", peerFloorUnavailable
 	}
 	args := strings.Split(strings.TrimSuffix(string(raw), "\x00"), "\x00")

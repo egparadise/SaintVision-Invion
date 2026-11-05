@@ -28,6 +28,11 @@ def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def heartbeat_request():
+    """The actual request producer, also validated against NodeProbeInput units."""
+    return json.dumps({"nonce": os.urandom(32).hex()}).encode()
+
+
 def run_proof(output):
     if sys.platform != "linux" or os.environ.get("GITHUB_ACTIONS") != "true":
         raise ValueError("Real runtime/fixture PKI proof is restricted to isolated Linux CI")
@@ -115,6 +120,8 @@ def run_proof(output):
                                  capture_output=True, check=True, timeout=10).stdout
             value = phase.strict(raw)
             phase.verify_floor(value, (folder / "node-cert.pem").read_bytes(), {"tenantId": tenant, "nodeId": node_id, "epoch": epoch}, nonce=nonce)
+            assert value['servingExecutableSHA256'] == sha(binary.read_bytes())
+            assert value['servingProcessSHA256'] == sha(b'\x00'.join(arg.encode() for arg in arguments) + b'\x00')
             return value
 
         def heartbeat(certificate, expected_der, *, accepted=True):
@@ -125,7 +132,7 @@ def run_proof(output):
                 connection.connect()
                 if sha(connection.sock.getpeercert(binary_form=True)) != expected_der:
                     raise ValueError("Actual server DER differs from expected native phase")
-                connection.request("POST", "/v1/heartbeats", body=json.dumps({"nonce": os.urandom(32).hex()}), headers={"Content-Type": "application/json"})
+                connection.request("POST", "/v1/heartbeats", body=heartbeat_request(), headers={"Content-Type": "application/json"})
                 response = connection.getresponse()
                 body = response.read()
                 if response.status != 200:
@@ -143,7 +150,7 @@ def run_proof(output):
         # journal, floor, listener, TLS and every acknowledgement are real Go.
         worker.observe_actual_floor = floor
         worker.floor_target_context = lambda _root: dict(nodeId=node_id, containerId=sha(b"native-fixture-container"), image="sha256:" + sha(binary.read_bytes()),
-            configSHA256=sha(phase.canonical(arguments)), mountsSHA256=sha(b"native-fixture-no-docker-mount-claim"),
+            configSHA256=sha(phase.canonical(arguments)), hostConfigSHA256=sha(b"native-fixture-no-docker-hostconfig-claim"), mountsSHA256=sha(b"native-fixture-no-docker-mount-claim"),
             volumeSHA256=sha(str(folder).encode()), consumers=[sha(b"native-fixture-container")])
         try:
             start()
@@ -239,7 +246,7 @@ def run_proof(output):
                 heartbeat(old_control_file, manifest["nextNodeCertificateSHA256"])
                 heartbeat(next_control_file, manifest["nextNodeCertificateSHA256"])
                 commit_body = phase.commit_body(manifest, raw)
-                commit = {**commit_body, "controlSignature": control_key.sign(phase.canonical(commit_body)).hex()}
+                commit = {**commit_body, "controlSignature": control_key.sign(worker._canonical(commit_body)).hex()}
                 commit_path = temp / f"commit-{cycle}.json"
                 commit_path.write_bytes(phase.canonical(commit)); commit_path.chmod(0o600)
                 # Native fixture models existing C->C+1 receipt; real PostgreSQL
@@ -277,7 +284,7 @@ def run_proof(output):
             with copied.open("xb") as stream: stream.write(guard_source)
             try:
                 with (output / "go-guard-events.jsonl").open("wb") as log_file:
-                    unit = subprocess.run(["go", "test", "-json", "./runtime", "./transport", "-run", "^TestActualPeerFloor|^TestFixedPeerPhaseGuards", "-count=1"],
+                    unit = subprocess.run(["go", "test", "-json", "./runtime", "./transport", "./cmd/inv-node", "-run", "^TestActualPeerFloor|^TestFixedPeerPhaseGuards|^TestPeerFloorArguments|^TestPeerFloorCanonical", "-count=1"],
                                           cwd=ROOT / "services/node-agent", env=dict(os.environ, FLEET5_FIXED_NATIVE_FIXTURE=str(fixture)), stdout=log_file, stderr=subprocess.STDOUT, timeout=180)
                 if unit.returncode: raise ValueError("Actual native Go observer/defense tests failed; see guard events")
             finally:
@@ -286,8 +293,24 @@ def run_proof(output):
             events = [json.loads(line) for line in (output / "go-guard-events.jsonl").read_text("utf-8").splitlines() if line.startswith("{")]
             assert not any(e.get("Action") in {"fail", "skip"} for e in events)
             assert any(e.get("Test") == "TestFixedPeerPhaseGuardsPreserveGoFloorDefense" and e.get("Action") == "pass" for e in events)
+            for name in ('TestActualPeerFloorObservationRetainsServingJournalLock','TestActualPeerFloorObservationStrictExistingState',
+                         'TestActualPeerFloorObservationChecksJournalUID','TestActualPeerFloorExecutableDigestUsesDescriptorBytes',
+                         'TestPeerFloorArgumentsAreClosedAndUnambiguous','TestPeerFloorCanonicalCrossLanguageVectors'):
+                assert any(e.get('Test') == name and e.get('Action') == 'pass' for e in events), name
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+            canonical_vectors = phase.strict((ROOT/'tests/fixtures/fleet5-floor-v2-canonical-vectors.json').read_bytes())['cases']
+            go_results_raw = (fixture/'canonical-go-results.json').read_bytes()
+            go_results = phase.strict(go_results_raw)
+            assert len(go_results) == len(canonical_vectors) >= 6
+            for vector, signed in zip(canonical_vectors,go_results):
+                assert vector['name'] == signed['name']
+                encoded = phase.floor_canonical(vector['body'])
+                assert encoded.hex() == vector['expectedCanonicalUTF8Hex'] == signed['canonicalUTF8Hex']
+                public = Ed25519PublicKey.from_public_bytes(bytes.fromhex(signed['publicKeyHex']))
+                public.verify(bytes.fromhex(signed['signatureHex']), phase.DOMAIN + encoded)
+            (output/'canonical-go-results.json').write_bytes(go_results_raw)
             result.update(sameVersionDifferentHashRejectedByActualGo=True, expiredDirectStartupStillPinsByActualGo=True,
-                          actualGoObserverOwnershipAndLockTestsPassed=True, proofValid=True)
+                          actualGoObserverOwnershipAndLockTestsPassed=True, actualCrossLanguageCanonicalSignaturesVerified=True, proofValid=True)
             assert [entry["peerPolicyVersion"] for entry in result["floors"]] == [7, 8, 9, 10, 11]
             assert result["completedNormalCycles"] == 2 and all(result[k] for k in ("expiryBeforeWriteRejected", "rollbackAfterHandshakePinRejected", "sameProposalRetryFrozen", "predecessorResidueRejected", "predecessorExactReplaySettled", "strictOldReaderRejected", "floorCPMismatchRejected"))
             (output / "native-fixed-result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
@@ -312,5 +335,7 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except Exception as error:
+        import traceback
+        traceback.print_exc()
         print("Fixed native proof failed (not green): " + type(error).__name__ + ": " + str(error), file=sys.stderr)
         raise SystemExit(1)

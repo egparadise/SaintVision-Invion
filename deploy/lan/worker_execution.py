@@ -19,17 +19,27 @@ def main():
     manifest=json.loads((folder/'manifest.json').read_text())
     node=manifest['nodeId']
     state=Path.home()/'.local/share/saintvision'/node
-    with rotation_mutation_guard(state):
-        return configure(folder, manifest, node, state)
+    with rotation_mutation_guard(state, action='idempotent') as settled:
+        return configure(folder, manifest, node, state, settled=settled)
 
 
-def configure(folder, manifest, node, state):
-    no_rotation_mutation(state)
+def configure(folder, manifest, node, state, *, settled=None):
     same_identity(json.loads((state/'manifest.json').read_text()),manifest)
     name='saintvision-'+node.lower()
     inspect=json.loads(run('inspect',name))[0]
     if inspect['Config']['Labels'].get('ai.saintvision.node')!=node:
         raise ValueError('Container ownership differs')
+    if settled is not None:
+        args=inspect['Config']['Cmd']
+        expected=manifest['executionTest']
+        actual=image_id(expected,json.loads(run('image','inspect',expected['agentTag']))[0])
+        image_id(manifest,json.loads(run('image','inspect',inspect['Image']))[0])
+        for flag,value in {'--profile':'lan-test-v1','--image':actual,'--executable':'/probe'}.items():
+            if args.count(flag)!=1 or args[args.index(flag)+1:args.index(flag)+2]!=[value]:
+                raise ValueError('SF1 cannot authorize execution image/profile/container migration')
+        check_running(name)
+        print(json.dumps(dict(nodeId=node,status='settled-idempotent-verification',profile='lan-test-v1')))
+        return
     run('load','-i',str(folder/'execution-image.tar'),timeout=120)
     expected=manifest['executionTest']
     actual=image_id(expected,json.loads(run('image','inspect',expected['agentTag']))[0])

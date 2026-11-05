@@ -184,8 +184,7 @@ def install(folder, state, *, undo=False):
     if state.is_symlink() or not state.is_dir():
         raise ValueError('Existing private Node state directory is required')
     same_identity(json.loads((state/'manifest.json').read_text('utf-8')), manifest)
-    with exclusive_lock(state/'workspace-upgrade.lock'), rotation_mutation_guard(state):
-        no_rotation_mutation(state)
+    with exclusive_lock(state/'workspace-upgrade.lock'), rotation_mutation_guard(state, action='idempotent') as settled:
         record_path = state/'workspace-upgrade.json'
         record = json.loads(record_path.read_text('utf-8')) if record_path.exists() else None
         if undo:
@@ -198,6 +197,19 @@ def install(folder, state, *, undo=False):
         name = 'saintvision-'+node.lower()
         current = inspect(name)
         args = validate_install_target(manifest, current)
+        if settled is not None:
+            if undo:
+                raise ValueError('Settled rotation cannot authorize a workspace rollback')
+            # Read-only image inspection, never load/recreate/change argv under SF1.
+            agent = image_id(manifest['agent'], json.loads(docker('image','inspect',current['Image']))[0])
+            workload = image_id(manifest['workload'], json.loads(docker('image','inspect',manifest['workload']['agentImage']))[0])
+            desired = {'--profile':PROFILE,'--image':workload,'--executable':EXECUTABLE}
+            if current['Image'] != agent or any(args[args.index(k)+1] != v for k,v in desired.items()):
+                raise ValueError('SF1 cannot authorize image/profile/container migration')
+            verify_credentials(folder,state)
+            check_running(name)
+            return dict(nodeId=node,profile=PROFILE,agentImage=agent,executionImage=workload,
+                        status='settled-idempotent-verification',identityPreserved=True,journalPreserved=True)
         idle(node)
         volume = json.loads(docker('volume', 'inspect', name+'-state'))[0]
         if (volume.get('Labels') or {}).get('ai.saintvision.node') != node:

@@ -5,18 +5,23 @@ arbitrary SaintVision container on a multi-Node host.
 """
 from copy import deepcopy
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import re
 import stat
 import subprocess
+import tarfile
+import selectors
+import time
+from pathlib import PurePosixPath
 from uuid import uuid4
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 
 import peer_policy_phase as phase
-from worker_config import repair_target
+from worker_config import repair_target, no_migration
 
 
 def regular(path):
@@ -33,6 +38,75 @@ def regular(path):
     if len(raw) != actual.st_size:
         raise ValueError("Private operation file size changed")
     return raw
+
+
+def _stopped_archive(cid):
+    process = subprocess.Popen(['docker','cp',cid+':/state','-'],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+    limit, deadline, chunks, size = 16*1024*1024, time.monotonic()+30, [], 0
+    try:
+        with selectors.DefaultSelector() as selector:
+            selector.register(process.stdout, selectors.EVENT_READ)
+            while selector.get_map():
+                remaining = deadline-time.monotonic()
+                if remaining <= 0:
+                    raise ValueError('RS1 stopped-volume read timed out')
+                for key,_ in selector.select(min(1,remaining)):
+                    block = os.read(key.fileobj.fileno(),min(65536,limit-size+1))
+                    if not block:
+                        selector.unregister(key.fileobj)
+                        continue
+                    size += len(block)
+                    if size > limit:
+                        raise ValueError('RS1 stopped-volume archive exceeds its bound')
+                    chunks.append(block)
+        if process.wait(timeout=max(.1,deadline-time.monotonic())) != 0 or size == 0:
+            raise ValueError('RS1 stopped-volume read failed')
+        return b''.join(chunks)
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+        process.stdout.close()
+
+
+def stopped_entries(worker_root, expected_context):
+    """Unsigned actual-volume read ONLY for RS1 start eligibility, never an ack."""
+    _, _, before, _, _, _ = target(worker_root)
+    if context(worker_root) != expected_context or before["State"].get("Running") or before["State"].get("Restarting") or before["State"].get("Status") not in {"exited", "created"}:
+        raise ValueError("RS1 requires this exact stopped owned Node")
+    raw_archive = _stopped_archive(before['Id'])
+    entries, seen = {}, set()
+    required = {"node-cert.pem", "node-key.pem", "ca.pem", "signer.pub", "peer-policy.json", "journal/identity.json", "journal/.peer-policy"}
+    with tarfile.open(fileobj=io.BytesIO(raw_archive),mode='r:') as archive:
+        for member in archive:
+            name = member.name.rstrip('/')
+            path = PurePosixPath(name)
+            if (len(seen) >= 2048 or name in seen or str(path) != name or path.is_absolute()
+                    or '..' in path.parts or '\\' in name or not path.parts or path.parts[0] != 'state'
+                    or member.uid != 0 or member.gid != 0
+                    or any(k not in {'mtime','atime','ctime'} or not re.fullmatch(r'-?[0-9]{1,20}(\.[0-9]{1,9})?',v) for k,v in member.pax_headers.items())):
+                raise ValueError("RS1 actual-volume metadata is unsafe")
+            seen.add(name)
+            if member.isdir():
+                if member.mode & 0o022 or (name == 'state/journal' and member.mode & 0o7777 != 0o700):
+                    raise ValueError("RS1 actual directory ownership/mode differs")
+                continue
+            if member.type not in {tarfile.REGTYPE,tarfile.AREGTYPE} or member.sparse or member.mode & 0o7777 != 0o600 or not 0 <= member.size <= 65536:
+                raise ValueError("RS1 refuses links, unsafe modes and unbounded state entries")
+            relative = name.removeprefix('state/')
+            if relative in required:
+                if member.size == 0:
+                    raise ValueError('RS1 required state entry is empty')
+                raw = archive.extractfile(member).read(65537)
+                if len(raw) != member.size:
+                    raise ValueError("RS1 actual entry changed")
+                entries[relative] = raw
+    if set(entries) != required or context(worker_root) != expected_context:
+        raise ValueError("RS1 actual-volume identity changed or required state is missing")
+    _, _, after, _, _, _ = target(worker_root)
+    if after["State"].get("Running") or after["State"].get("Restarting"):
+        raise ValueError("RS1 Node changed while reading stopped state")
+    return entries
 
 
 def docker(*args):
@@ -82,6 +156,7 @@ def _plain(manifest, value, *, current=True):
 
 
 def target(worker_root):
+    no_migration(worker_root, leaf_observation=True)
     manifest = phase.strict(regular(Path(worker_root) / "manifest.json"))
     node = manifest["nodeId"]
     if not re.fullmatch(r"nod_[0-9A-HJKMNP-TV-Z]{26}", node):
@@ -149,6 +224,7 @@ def context(worker_root):
     # volume plus exact retained container/consumer/config bindings.
     return dict(nodeId=manifest["nodeId"], containerId=value["Id"], image=value["Image"],
                 configSHA256=phase.digest(phase.canonical(value["Config"])),
+                hostConfigSHA256=phase.digest(phase.canonical(value['HostConfig'])),
                 mountsSHA256=phase.digest(phase.canonical(sorted(value["Mounts"], key=lambda m: m["Destination"]))),
                 volumeSHA256=phase.digest(phase.canonical({k: v for k, v in volume.items() if k != "CreatedAt"})),
                 consumers=consumers)

@@ -1,0 +1,1486 @@
+FFFFFFFFFFFFFFFF..F.FFF..FFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFsFFFF [ 49%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.......Fssss [ 98%]
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___ test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap ___
+tests\test_lan_leaf_rotation.py:196: in test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap
+    receipt = rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_____ test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority ______
+tests\test_lan_leaf_rotation.py:271: in test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority
+    rotation.install(fixture.bundle, fixture.worker, now=fixture.now, restart=lambda _root: None)
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[before-install] _
+tests\test_lan_leaf_rotation.py:333: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-intent] _
+tests\test_lan_leaf_rotation.py:333: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-public-install] _
+tests\test_lan_leaf_rotation.py:333: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[after-install] _
+tests\test_lan_leaf_rotation.py:333: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_kill_points_recover_idempotently_without_replacing_key[before-restart] _
+tests\test_lan_leaf_rotation.py:333: in test_rotation_kill_points_recover_idempotently_without_replacing_key
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-intent] _
+tests\test_lan_leaf_rotation.py:357: in test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-public-install] _
+tests\test_lan_leaf_rotation.py:357: in test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe
+    rotation.install(
+deploy\lan\worker_leaf_rotation.py:928: in install
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
+E   ValueError: Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-node-identity] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'identity'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-chain-pinned chain] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'pinned chain'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-root-issuing chain] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'issuing chain'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-key-private key] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'private key'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[stale-version-version] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'version'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_ test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-validity window] _
+tests\test_lan_leaf_rotation.py:426: in test_rotation_rejects_wrong_identity_chain_key_version_and_expiry
+    with pytest.raises(ValueError, match=error):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'validity window'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_____ test_rotation_refuses_concurrent_second_writer_and_different_retry ______
+tests\test_lan_leaf_rotation.py:433: in test_rotation_refuses_concurrent_second_writer_and_different_retry
+    with pytest.raises(ValueError, match="Another leaf rotation writer"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Another leaf rotation writer'
+E     Actual message: 'Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery'
+_______ test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel _______
+tests\test_lan_leaf_rotation.py:591: in test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel
+    lan_pilot.prepare_leaf_rotation(args)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_________ test_cp_commit_requires_exact_node_receipt_and_channel_cas __________
+tests\test_lan_leaf_rotation.py:647: in test_cp_commit_requires_exact_node_receipt_and_channel_cas
+    lan_pilot.prepare_leaf_rotation(args)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes __
+tests\test_lan_leaf_rotation.py:847: in test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes
+    lan_pilot.prepare_leaf_rotation_batch(args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+____________ test_batch_manifest_rejects_per_node_cp_leaf_mutation ____________
+tests\test_lan_leaf_rotation.py:979: in test_batch_manifest_rejects_per_node_cp_leaf_mutation
+    lan_pilot.prepare_leaf_rotation_batch(args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+______ test_expired_partial_batch_is_superseded_by_fresh_all_node_batch _______
+tests\test_lan_leaf_rotation.py:1016: in test_expired_partial_batch_is_superseded_by_fresh_all_node_batch
+    lan_pilot.prepare_leaf_rotation_batch(args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__ test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare ___
+tests\test_lan_leaf_rotation.py:1152: in test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare
+    lan_pilot.prepare_leaf_rotation_batch(args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__________ test_expired_supersession_rejects_policy_or_channel_drift __________
+tests\test_lan_leaf_rotation.py:1216: in test_expired_supersession_rejects_policy_or_channel_drift
+    lan_pilot.prepare_leaf_rotation_batch(args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp _
+tests\test_lan_leaf_rotation.py:1374: in test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[authorization-authorization differs] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[duplicate-authorization-duplicate key] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[csr-prove the pinned Node key] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[channel-channel baseline differs] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[chain-issuing chain differs] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[identity-identity, chain, or expiry differs] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[revoked-revoked] __
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[not-fully-expired-requires every partial-batch leaf to be expired] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[mixed-validity-remains live] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_boundaries_fail_before_output[journal-owns the pilot state] _
+tests\test_lan_leaf_rotation.py:1501: in test_fully_expired_recovery_boundaries_fail_before_output
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict _
+tests\test_lan_leaf_rotation.py:1571: in test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict
+    case = _fully_expired_inputs(tmp_path, monkeypatch, capsys)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation.py:1275: in _fully_expired_inputs
+    lan_pilot.prepare_leaf_rotation_batch(old_args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_two_server_issued_normal_cycles_keep_generation_and_immutable_history __
+tests\test_lan_leaf_rotation_consecutive.py:128: in test_two_server_issued_normal_cycles_keep_generation_and_immutable_history
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installing] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installed] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[restarted] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[rolled-back] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[prepared] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[staged] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[switched] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[unknown] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[None] _
+tests\test_lan_leaf_rotation_consecutive.py:206: in test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[policy] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[current-leaf] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[generation] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[tenant] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[epoch] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[control-hash] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-collision] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-journal] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-signature] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[missing-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_refuses_inconsistent_authority_and_history_without_mutation[backup-collision] _
+tests\test_lan_leaf_rotation_consecutive.py:235: in test_successor_refuses_inconsistent_authority_and_history_without_mutation
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart _
+tests\test_lan_leaf_rotation_consecutive.py:281: in test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_finalize_archive_collision_fails_before_republishing_policy_or_restart _
+tests\test_lan_leaf_rotation_consecutive.py:301: in test_finalize_archive_collision_fails_before_republishing_policy_or_restart
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+__________ test_legacy_formatted_journal_bytes_are_preserved_exactly __________
+tests\test_lan_leaf_rotation_consecutive.py:318: in test_legacy_formatted_journal_bytes_are_preserved_exactly
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:339: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:339: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[before-install] __
+tests\test_lan_leaf_rotation_consecutive.py:396: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+__ test_successor_crash_resume_keeps_prior_archive_and_backup[after-intent] ___
+tests\test_lan_leaf_rotation_consecutive.py:396: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[after-public-install] _
+tests\test_lan_leaf_rotation_consecutive.py:396: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+__ test_successor_crash_resume_keeps_prior_archive_and_backup[after-install] __
+tests\test_lan_leaf_rotation_consecutive.py:396: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_crash_resume_keeps_prior_archive_and_backup[before-restart] __
+tests\test_lan_leaf_rotation_consecutive.py:396: in test_successor_crash_resume_keeps_prior_archive_and_backup
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+________________ test_successor_lock_refuses_concurrent_writer ________________
+tests\test_lan_leaf_rotation_consecutive.py:411: in test_successor_lock_refuses_concurrent_writer
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_ test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority _
+tests\test_lan_leaf_rotation_consecutive.py:420: in test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_____ test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused _____
+tests\test_lan_leaf_rotation_consecutive.py:435: in test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+____________ test_successor_refuses_ambiguous_journal_shapes[None] ____________
+tests\test_lan_leaf_rotation_consecutive.py:462: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+___________ test_successor_refuses_ambiguous_journal_shapes[value1] ___________
+tests\test_lan_leaf_rotation_consecutive.py:462: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+___________ test_successor_refuses_ambiguous_journal_shapes[value2] ___________
+tests\test_lan_leaf_rotation_consecutive.py:462: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_________ test_successor_refuses_ambiguous_journal_shapes[finalized] __________
+tests\test_lan_leaf_rotation_consecutive.py:462: in test_successor_refuses_ambiguous_journal_shapes
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+___________ test_successor_refuses_symlink_paths[archive-directory] ___________
+tests\test_lan_leaf_rotation_consecutive.py:474: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+_____________ test_successor_refuses_symlink_paths[archive-file] ______________
+tests\test_lan_leaf_rotation_consecutive.py:474: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+___________ test_successor_refuses_symlink_paths[backup-directory] ____________
+tests\test_lan_leaf_rotation_consecutive.py:474: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+________________ test_successor_refuses_symlink_paths[journal] ________________
+tests\test_lan_leaf_rotation_consecutive.py:474: in test_successor_refuses_symlink_paths
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+__ test_two_distinct_normal_multi_node_batches_preserve_prior_generation[2] ___
+tests\test_lan_leaf_rotation_batch_successor.py:175: in test_two_distinct_normal_multi_node_batches_preserve_prior_generation
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__ test_two_distinct_normal_multi_node_batches_preserve_prior_generation[5] ___
+tests\test_lan_leaf_rotation_batch_successor.py:175: in test_two_distinct_normal_multi_node_batches_preserve_prior_generation
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs _
+tests\test_lan_leaf_rotation_batch_successor.py:268: in test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+___ test_retirement_refuses_uncommitted_partial_or_unknown_batch[prepared] ____
+tests\test_lan_leaf_rotation_batch_successor.py:313: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[staging] ____
+tests\test_lan_leaf_rotation_batch_successor.py:313: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[staged] _____
+tests\test_lan_leaf_rotation_batch_successor.py:313: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[unknown] ____
+tests\test_lan_leaf_rotation_batch_successor.py:313: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_____ test_retirement_refuses_uncommitted_partial_or_unknown_batch[None] ______
+tests\test_lan_leaf_rotation_batch_successor.py:313: in test_retirement_refuses_uncommitted_partial_or_unknown_batch
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[missing] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[duplicate] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[unsigned-boolean] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[wrong-node] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[signature] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[proof-phase] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-not-switched] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-key] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-leaf] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-policy] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[ca-pin] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[epoch] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[members] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[version] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[disabled] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[endpoint] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[expiry] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive-next] _
+tests\test_lan_leaf_rotation_batch_successor.py:351: in test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[phase] _
+tests\test_lan_leaf_rotation_batch_successor.py:423: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[policy] _
+tests\test_lan_leaf_rotation_batch_successor.py:423: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[leaf] _
+tests\test_lan_leaf_rotation_batch_successor.py:423: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[key] _
+tests\test_lan_leaf_rotation_batch_successor.py:423: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[missing-proof] _
+tests\test_lan_leaf_rotation_batch_successor.py:423: in test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+______ test_retirement_archive_crash_replays_without_reset_or_overwrite _______
+tests\test_lan_leaf_rotation_batch_successor.py:452: in test_retirement_archive_crash_replays_without_reset_or_overwrite
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_complete_successor_publication_crash_uses_verified_terminal_predecessor _
+tests\test_lan_leaf_rotation_batch_successor.py:471: in test_complete_successor_publication_crash_uses_verified_terminal_predecessor
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__________ test_retirement_and_successor_refuse_existing_writer_lock __________
+tests\test_lan_leaf_rotation_batch_successor.py:495: in test_retirement_and_successor_refuse_existing_writer_lock
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[archive] ______
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__ test_successor_refuses_stale_terminal_or_tampered_archive[archive-format] __
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[terminal] _____
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_successor_refuses_stale_terminal_or_tampered_archive[terminal-format] __
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+___ test_successor_refuses_stale_terminal_or_tampered_archive[current-node] ___
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_____ test_successor_refuses_stale_terminal_or_tampered_archive[members] ______
+tests\test_lan_leaf_rotation_batch_successor.py:505: in test_successor_refuses_stale_terminal_or_tampered_archive
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+______________ test_retirement_refuses_redirected_paths[journal] ______________
+tests\test_lan_leaf_rotation_batch_successor.py:543: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_________ test_retirement_refuses_redirected_paths[archive-directory] _________
+tests\test_lan_leaf_rotation_batch_successor.py:543: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+___________ test_retirement_refuses_redirected_paths[archive-file] ____________
+tests\test_lan_leaf_rotation_batch_successor.py:543: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+______________ test_retirement_refuses_redirected_paths[receipt] ______________
+tests\test_lan_leaf_rotation_batch_successor.py:543: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_______ test_retirement_refuses_redirected_paths[bundle-node-directory] _______
+tests\test_lan_leaf_rotation_batch_successor.py:543: in test_retirement_refuses_redirected_paths
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__ test_link_publication_crash_replay_removes_only_equal_owned_residue[node] __
+tests\test_leaf_rotation_archive_residue.py:16: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+_ test_link_publication_crash_replay_removes_only_equal_owned_residue[control] _
+tests\test_leaf_rotation_archive_residue.py:16: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+___ test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source ___
+tests\test_leaf_rotation_archive_residue.py:102: in test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+__________ test_node_successor_requires_verified_predecessor_replay ___________
+tests\test_rotation_predecessor_residue.py:28: in test_node_successor_requires_verified_predecessor_replay
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:106: in _normal_cycles
+    first = prepare(0)
+            ^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:73: in prepare
+    lan_pilot.prepare_leaf_rotation(proposal)
+tools\lan_pilot.py:3347: in prepare_leaf_rotation
+    floor_observation, floor_nonce = _normal_floor_input(args, node)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\lan_pilot.py:1551: in _normal_floor_input
+    raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+E   ValueError: Normal :3 requires an independently supplied fresh floor nonce
+___________ test_cp_successor_requires_verified_predecessor_replay ____________
+tests\test_rotation_predecessor_residue.py:67: in test_cp_successor_requires_verified_predecessor_replay
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:255: in _completed
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+tools\lan_pilot.py:3016: in prepare_leaf_rotation_batch
+    raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E   ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:382: POSIX directory ownership/mode boundary
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:116: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:128: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:161: OS cannot create test symlinks
+FAILED tests/test_lan_leaf_rotation.py::test_short_lived_leaf_rotation_preserves_node_key_and_finalizes_overlap
+FAILED tests/test_lan_leaf_rotation.py::test_uncommitted_rotation_rolls_back_only_to_fresh_exact_authority
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[before-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-intent]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-public-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[after-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_kill_points_recover_idempotently_without_replacing_key[before-restart]
+FAILED tests/test_lan_leaf_rotation.py::test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-intent]
+FAILED tests/test_lan_leaf_rotation.py::test_installing_journal_makes_pre_and_post_publication_crashes_rollback_safe[after-public-install]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-node-identity]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-chain-pinned chain]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-root-issuing chain]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[wrong-key-private key]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[stale-version-version]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_rejects_wrong_identity_chain_key_version_and_expiry[expired-validity window]
+FAILED tests/test_lan_leaf_rotation.py::test_rotation_refuses_concurrent_second_writer_and_different_retry
+FAILED tests/test_lan_leaf_rotation.py::test_cp_prepare_uses_csr_only_exact_chain_and_monotonic_channel
+FAILED tests/test_lan_leaf_rotation.py::test_cp_commit_requires_exact_node_receipt_and_channel_cas
+FAILED tests/test_lan_leaf_rotation.py::test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes
+FAILED tests/test_lan_leaf_rotation.py::test_batch_manifest_rejects_per_node_cp_leaf_mutation
+FAILED tests/test_lan_leaf_rotation.py::test_expired_partial_batch_is_superseded_by_fresh_all_node_batch
+FAILED tests/test_lan_leaf_rotation.py::test_expired_unstaged_batch_requires_verified_abandon_before_new_prepare
+FAILED tests/test_lan_leaf_rotation.py::test_expired_supersession_rejects_policy_or_channel_drift
+FAILED tests/test_lan_leaf_rotation.py::test_two_node_fully_expired_offline_recovery_keeps_identity_and_never_trusts_old_cp
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[authorization-authorization differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[duplicate-authorization-duplicate key]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[csr-prove the pinned Node key]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[channel-channel baseline differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[chain-issuing chain differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[identity-identity, chain, or expiry differs]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[revoked-revoked]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[not-fully-expired-requires every partial-batch leaf to be expired]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[mixed-validity-remains live]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_boundaries_fail_before_output[journal-owns the pilot state]
+FAILED tests/test_lan_leaf_rotation.py::test_fully_expired_recovery_refuses_concurrent_writer_and_normal_recovery_stays_strict
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_two_server_issued_normal_cycles_keep_generation_and_immutable_history
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installing]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[installed]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[restarted]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[rolled-back]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[prepared]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[staged]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[switched]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[unknown]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_distinct_normal_cycle_refuses_every_unfinalized_or_unknown_state[None]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[policy]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[current-leaf]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[generation]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[tenant]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[epoch]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[control-hash]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-collision]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-journal]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[archive-signature]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[missing-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_inconsistent_authority_and_history_without_mutation[backup-collision]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_legacy_finalized_replay_archives_exact_evidence_after_overlap_without_restart
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_archive_collision_fails_before_republishing_policy_or_restart
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_legacy_formatted_journal_bytes_are_preserved_exactly
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[before-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-intent]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-public-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[after-install]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_crash_resume_keeps_prior_archive_and_backup[before-restart]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_lock_refuses_concurrent_writer
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[None]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[value1]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[value2]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_ambiguous_journal_shapes[finalized]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[archive-directory]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[archive-file]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[backup-directory]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_successor_refuses_symlink_paths[journal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_two_distinct_normal_multi_node_batches_preserve_prior_generation[2]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_two_distinct_normal_multi_node_batches_preserve_prior_generation[5]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_public_attestation_and_retirement_cli_accept_only_signed_current_proofs
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[prepared]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[staging]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[staged]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[unknown]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_uncommitted_partial_or_unknown_batch[None]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[missing]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[duplicate]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[unsigned-boolean]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[wrong-node]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[signature]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[proof-phase]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-not-switched]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[cp-key]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-leaf]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[node-policy]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[ca-pin]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[epoch]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[members]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[version]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[disabled]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[endpoint]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[expiry]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_ambiguous_or_tampered_proof_and_current_authority[archive-next]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[phase]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[policy]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[leaf]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[key]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_worker_attestation_never_promotes_unfinalized_or_inconsistent_state[missing-proof]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_archive_crash_replays_without_reset_or_overwrite
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_complete_successor_publication_crash_uses_verified_terminal_predecessor
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_and_successor_refuse_existing_writer_lock
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[archive]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[archive-format]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[terminal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[terminal-format]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[current-node]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_successor_refuses_stale_terminal_or_tampered_archive[members]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[journal]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[archive-directory]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[archive-file]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[receipt]
+FAILED tests/test_lan_leaf_rotation_batch_successor.py::test_retirement_refuses_redirected_paths[bundle-node-directory]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[control]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+FAILED tests/test_rotation_predecessor_residue.py::test_node_successor_requires_verified_predecessor_replay
+FAILED tests/test_rotation_predecessor_residue.py::test_cp_successor_requires_verified_predecessor_replay
+128 failed, 13 passed, 5 skipped in 29.48s

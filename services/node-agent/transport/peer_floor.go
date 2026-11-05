@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"path/filepath"
 	"regexp"
@@ -15,7 +14,7 @@ import (
 	node "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime"
 )
 
-const PeerFloorDomain = "saintvision/node-peer-policy-floor/v1\x00"
+const PeerFloorDomain = "saintvision/node-peer-policy-floor/v2\x00"
 
 var peerFloorNonce = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
@@ -52,6 +51,10 @@ func ObservePeerPolicyFloor(config node.Config, state, policy, certPath, keyPath
 	if err != nil {
 		return nil, err
 	}
+	executableHash, err := node.ServingExecutableSHA256(servingPID, floor.JournalUID)
+	if err != nil {
+		return nil, err
+	}
 	current, err := SafeFile(certPath, false)
 	if err != nil || sha256.Sum256(current) != sha256.Sum256(certRaw) {
 		return nil, rejected
@@ -68,9 +71,13 @@ func ObservePeerPolicyFloor(config node.Config, state, policy, certPath, keyPath
 	if err != nil || lastProcess != processHash {
 		return nil, rejected
 	}
+	lastExecutable, err := node.ServingExecutableSHA256(servingPID, floor.JournalUID)
+	if err != nil || lastExecutable != executableHash {
+		return nil, rejected
+	}
 	der := sha256.Sum256(cert.Raw)
-	body := map[string]any{"schemaVersion": "saintvision-node-peer-policy-floor:1", "tenantId": config.TenantID, "nodeId": config.NodeID, "recoveryEpoch": config.Epoch, "nonce": nonce, "observedAt": now.Unix(), "certificateDER_SHA256": hex.EncodeToString(der[:]), "peerPolicyVersion": floor.Version, "peerPolicySHA256": floor.Hash, "floorSHA256": floor.FloorSHA256, "journalIdentitySHA256": floor.JournalIdentitySHA256, "journalUID": floor.JournalUID, "servingPID": servingPID, "servingProcessSHA256": processHash, "plainServingProcess": true}
-	raw, err := json.Marshal(body)
+	body := map[string]any{"schemaVersion": "saintvision-node-peer-policy-floor:2", "tenantId": config.TenantID, "nodeId": config.NodeID, "recoveryEpoch": config.Epoch, "nonce": nonce, "observedAt": now.Unix(), "certificateDER_SHA256": hex.EncodeToString(der[:]), "peerPolicyVersion": floor.Version, "peerPolicySHA256": floor.Hash, "floorSHA256": floor.FloorSHA256, "journalIdentitySHA256": floor.JournalIdentitySHA256, "journalUID": floor.JournalUID, "servingPID": servingPID, "servingProcessSHA256": processHash, "servingExecutableSHA256": executableHash, "plainServingProcess": true}
+	raw, err := CanonicalPeerFloorBody(body)
 	if err != nil {
 		return nil, rejected
 	}

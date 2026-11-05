@@ -29,11 +29,11 @@ LOCK_NAME = "leaf-rotation-runtime-lock.json"
 LOCK_SHA256 = "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
 WORKER_ENTRY = "worker_leaf_rotation.py"
 WORKER_MODULES = {
-    'worker_config.py': '44662143b9d4095ff5bc7ae7ebc25965f95db20399dae34d08cca1ba9465a349',
-    'worker_leaf_rotation.py': '1489ec11f47842b63f301e72ef064f9568d6f9cd788b2d037a9ec7f1405a3b8f',
-    'peer_policy_phase.py': '7a60a59cfc8f839d822691310911a31ae2c0cc78a6acb0a848ce0932b6662feb',
-    'worker_peer_floor.py': '406b8227b7330c3c5ba4fc82ed78cdfb7d0fa04436af76e4d0b1d6ac05312176',
-    'worker_plain_rotation.py': 'be31cd4866cbe900bfbe6d8d7ff40f5ddfbc107b224bb9047706af5e4c0c768d',
+    'worker_config.py': '909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c',
+    'worker_leaf_rotation.py': '4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998',
+    'peer_policy_phase.py': '8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8',
+    'worker_peer_floor.py': 'c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec',
+    'worker_plain_rotation.py': 'bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5',
 }
 WORKER_SHA256 = WORKER_MODULES[WORKER_ENTRY]
 BUNDLE_SCHEMA = "saintvision-leaf-rotation-runtime-bundle:2"

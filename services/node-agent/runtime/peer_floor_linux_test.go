@@ -12,6 +12,35 @@ import (
 	"time"
 )
 
+func TestActualPeerFloorExecutableDigestUsesDescriptorBytes(t *testing.T) {
+	value, err := ServingExecutableSHA256(os.Getpid(), uint32(os.Geteuid()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile("/proc/self/exe")
+	if err != nil {
+		t.Fatal(err)
+	}
+	digest := sha256.Sum256(raw)
+	if value != hex.EncodeToString(digest[:]) {
+		t.Fatal("executable digest is not actual descriptor bytes")
+	}
+	cmd, err := os.ReadFile("/proc/self/cmdline")
+	if err != nil {
+		t.Fatal(err)
+	}
+	argv := sha256.Sum256(cmd)
+	if value == hex.EncodeToString(argv[:]) {
+		t.Fatal("raw command line was mislabeled as executable bytes")
+	}
+	if _, err := ServingExecutableSHA256(os.Getpid(), uint32(os.Geteuid())+1); err == nil {
+		t.Fatal("foreign process UID admitted")
+	}
+	if _, err := ServingExecutableSHA256(0, uint32(os.Geteuid())); err == nil {
+		t.Fatal("missing process admitted")
+	}
+}
+
 func peerFloorFixture(t *testing.T) (string, string, Config, *Journal) {
 	t.Helper()
 	parent := t.TempDir()

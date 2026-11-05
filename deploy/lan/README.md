@@ -352,19 +352,32 @@ still confirm an actual mTLS observation from the server before calling it conne
 
 CA lifetime is seven days; peer certificates and the initial allowlist last at
 most six days. Expiry fails closed. `lan_pilot.py prepare-leaf-rotation` now
-accepts only a signed CSR for the already pinned Node key, the exact externally
-pinned issuing chain, and the issuer's revocation registry. It refuses an early,
+uses strict normal schema `:3` and requires a signed CSR for the already pinned
+Node key, the exact externally pinned issuing chain, the issuer's revocation
+registry, and an independently nonced fresh signed actual Go floor observation
+(`--peer-floor-observation`, `--peer-floor-nonce`). Batch preparation requires
+`--peer-floor-observations` with exactly every configured active member before
+any proposal/channel mutation. It refuses an early,
 revoked, disabled, wrong-key, wrong-node, expired, or stale-version rotation and
 emits public material only. The Node runs `worker_leaf_rotation.py install`; that
 tool verifies every public byte, writes the Node leaf and a bounded two-Control-
-Plane overlap policy with fsync/rename, records a durable install-intent before
+Plane overlap policy with fsync/rename, records durable publication intent before
 changing either public file, copies and verifies them before restart, and keeps
 an exact retry journal. A CP commit requires that Node receipt and
 uses the existing channel-version CAS before atomically publishing the matching
 Control Plane and Node public leaves. The Node then runs `finalize` with the CP
-commit receipt, reducing the policy to the new Control Plane fingerprint. An
-uncommitted rotation can use `rollback` only while the exact prior leaf and peer
-policy are both still valid; expired material is never restored. Windows reboot
+commit receipt, reducing the policy to the new Control Plane fingerprint. The
+actual durable peer version P advances to P+1 for overlap and P+2 for final;
+the independent CP channel C advances only to C+1 through the existing CAS.
+Install receipts bind signed actual pre/post floors, and final evidence binds
+the signed actual final floor. The actual M2 `:2` response signs the raw cmdline
+digest and separately the actual serving executable descriptor bytes digest.
+Its domain/body encoding is distinct from the unchanged outer receipt/CP commit
+canonical JSON plus newline. Existing images without this capability refuse.
+Publication intent is forward-only: `rollback` refuses even if an old leaf is
+still valid. Legacy `:1`/`:2` are retained for exact historical verification;
+new live installs, in-flight conversion and expired/partial normal recovery
+refuse. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
@@ -445,6 +458,35 @@ foreign or redirected evidence remains blocked for separate reviewed recovery.
 This lifecycle is not permission to clear a journal or reset a scheduler latch;
 scheduled-plan changes and operational acceptance remain separate work.
 
+For the bounded stopped-publication case, `resume-publication --bundle <exact>
+--worker-root <owned-state>` may start only the same recorded stopped container
+whose actual volume already contains the exact frozen phase credentials. A
+final phase also requires `--commit-receipt <exact-signed-CP-receipt>`. Strict
+actual-volume reads provide start eligibility only; the command requires a NEW
+signed actual Go expected-phase observation after start. It copies no files,
+never restores an old phase, and never creates/replaces an image/container.
+An already-running retry only observes. A stop before the frozen files reached
+the volume remains blocked; unknown/expired/mismatched state needs separately
+reviewed recovery. The original install/finalize protocol retains its own receipt
+and archive steps.
+
+`verify-settled --worker-root <owned-state>` is read-only and checks the original
+finalized `:3` journal/archive, exact bytes/signatures, absence of staging residue,
+current credentials and a fresh actual final M2. `repair-current` permits only
+those exact same credential bytes on the same running container, with pre/post
+verification; stopped nodes first use the bounded re-entry above. Generic
+workspace/execution helpers permit only idempotent checks after settlement.
+Image/profile/container/mount/storage migrations and migration markers remain
+blocked under their separate future contracts. The pinned standalone verifier
+must be present; these paths never install packages or accept a force flag.
+
+The standalone lifecycle result is versioned `:3`: two CLI fixture cycles, four
+phase restarts, `rollbackRejected=true` and `rolledBack=false`, strict boolean/
+integer fields and original archives preserved. Its synthetic daemon is an
+interoperability fixture; actual Go and actual Linux Docker proofs are separate
+required CI lanes. Legacy scheduled-renewal examples below do not implement the
+new floor-input/operation contract and are not a new normal `:3` scheduler.
+
 Leaf rotation has two isolated Python runtime choices. The existing venv path is
 still supported. When `python3-venv` is unavailable, build the reviewed offline
 runtime on the Control Plane from the exact PyPI URLs and SHA-256 values in
@@ -456,7 +498,8 @@ python tools/build_leaf_rotation_runtime.py \
 ```
 
 The bundle contains the exact reviewed local worker-module closure
-(`worker_leaf_rotation.py` and `worker_config.py`) as well as the wheels. The
+(`worker_leaf_rotation.py`, `worker_config.py`, `peer_policy_phase.py`,
+`worker_peer_floor.py`, and `worker_plain_rotation.py`) as well as the wheels. The
 builder parses the worker imports before any download and rejects a missing or
 unreviewed local module. Transfer that public bundle, its separately calculated
 SHA-256, the lock, the standalone installer, the shell wrapper, and the separately
@@ -473,7 +516,7 @@ bash deploy/lan/prepare-leaf-rotation-runtime.sh --standalone \
   ./worker_leaf_rotation.py ./leaf-rotation-runtime.zip
 ```
 
-Every subsequent `install`, `finalize`, or `rollback` invocation uses the same
+Every subsequent `install`, `finalize`, `verify-settled`, or `resume-publication` invocation uses the same
 isolated launcher, for example:
 
 ```text

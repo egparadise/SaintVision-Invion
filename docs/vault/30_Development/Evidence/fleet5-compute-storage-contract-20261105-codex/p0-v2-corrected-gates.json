@@ -1,0 +1,101 @@
+{
+  "recordedAtKST": "2026-11-05T23:38:05.790609+09:00",
+  "base": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+  "scope": "Local fixture/document gates; actual native/Docker/standalone/full CI and independent delta review pending",
+  "checks": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/test_lan_leaf_rotation.py",
+        "tests/test_lan_leaf_rotation_consecutive.py",
+        "tests/test_lan_leaf_rotation_batch_successor.py",
+        "tests/test_leaf_rotation_archive_residue.py",
+        "tests/test_rotation_predecessor_residue.py",
+        "tests/test_fleet5_plain_peer_phase_v3.py",
+        "tests/test_fleet5_plain_reentry.py",
+        "tests/test_fleet5_legacy_rotation_history.py",
+        "tests/test_fleet5_floor_v2_canonical.py",
+        "tests/test_fleet5_standalone_result.py",
+        "tests/test_lan_leaf_rotation_standalone_runtime.py",
+        "tests/core/test_lan_worker_config.py",
+        "tests/core/test_lan_workspace_upgrade.py",
+        "tests/test_core_workflow_cx01.py",
+        "tests/core/test_fleet5_compute_storage_contract_proof.py",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-1.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-2.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-3.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-4.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-5.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-6.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-7.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-corrected-gate-8.txt"
+    }
+  ]
+}

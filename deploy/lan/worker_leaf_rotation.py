@@ -248,10 +248,11 @@ def validate_bundle(
     now: datetime | None = None,
     installed: bool | None = False,
     finalized: bool = False,
+    _archived_public_material: tuple | None = None,
 ) -> dict:
     """Validate exact chain, Node/key binding, time window, and monotonic version."""
     now = now or datetime.now(timezone.utc)
-    manifest_raw = _regular(bundle / "rotation.json")
+    manifest_raw = (_regular(bundle / "rotation.json") if _archived_public_material is None else _archived_public_material[0])
     manifest = peer_phase.strict(manifest_raw)
     if not isinstance(manifest, dict):
         raise ValueError("Rotation manifest shape differs")
@@ -319,7 +320,9 @@ def validate_bundle(
     ):
         raise ValueError("Rotation overlap or certificate validity window is invalid")
 
-    files = {name: _regular(bundle / name) for name in file_names(manifest)}
+    files = ({name: _regular(bundle / name) for name in file_names(manifest)} if _archived_public_material is None else _archived_public_material[1])
+    if set(files) != set(file_names(manifest)):
+        raise ValueError("Archived public material field set differs")
     if any(_digest(files[name]) != manifest["files"][name] for name in file_names(manifest)):
         raise ValueError("Rotation public material digest differs")
     if _digest(files["ca.pem"]) != manifest["caBundleSHA256"]:
@@ -416,6 +419,8 @@ def validate_bundle(
         raise ValueError("Next Control Plane leaf fingerprint differs")
     if schema == peer_phase.SCHEMA:
         peer_phase.versions(manifest)
+        if not_after != min(next_node.not_valid_after_utc,next_control.not_valid_after_utc):
+            raise ValueError('Normal v3 certificate expiry tuple differs')
         observation = peer_phase.strict(files["peer-floor-observation.json"])
         if _digest(files["peer-floor-observation.json"]) != manifest["floorObservationSHA256"]:
             raise ValueError("Frozen actual floor observation differs")
@@ -605,8 +610,14 @@ def _finalized_evidence(
                                 prePeerFloor=receipt_body["prePeerFloor"],
                                 targetContext=journal.get("targetContext"), finalPeerFloor=journal.get("finalPeerFloor"))
         context = journal.get("targetContext")
-        if (not isinstance(context, dict) or set(context) != {"nodeId", "containerId", "image", "configSHA256", "mountsSHA256", "volumeSHA256", "consumers"}
-                or context["nodeId"] != manifest["nodeId"] or not HEX.fullmatch(context["containerId"])):
+        if (not isinstance(context, dict) or set(context) != {"nodeId", "containerId", "image", "configSHA256", "hostConfigSHA256", "mountsSHA256", "volumeSHA256", "consumers"}
+                or context["nodeId"] != manifest["nodeId"] or not HEX.fullmatch(context["containerId"])
+                or not re.fullmatch(r"sha256:[0-9a-f]{64}", context.get("image", ""))
+                or any(not isinstance(context[k], str) or not HEX.fullmatch(context[k]) for k in ("configSHA256", "hostConfigSHA256", "mountsSHA256", "volumeSHA256"))
+                or not isinstance(context["consumers"], list) or not 1 <= len(context["consumers"]) <= 2
+                or any(not isinstance(cid, str) or not HEX.fullmatch(cid) for cid in context["consumers"])
+                or len(context["consumers"]) != len(set(context["consumers"]))
+                or context["containerId"] not in context["consumers"]):
             raise ValueError("Finalized actual target binding differs")
         archive_schema = "saintvision-node-finalized-rotation:3"
     if (
@@ -853,6 +864,7 @@ def _supersede_expired_journal(
     *,
     now: datetime,
 ) -> None:
+    raise ValueError("Expired/partial Node publication is blocked for separately reviewed offline recovery")
     """Archive exactly one expired partial-batch journal before a fresh recovery install."""
     old_raw = _regular(old_bundle / "rotation.json")
     old_manifest = json.loads(old_raw)
@@ -1052,8 +1064,9 @@ def docker_restart(worker_root: Path) -> None:
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description=__doc__)
-    commands = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    commands = parser.add_subparsers(dest="command", required=True,
+                                    parser_class=lambda **kw: argparse.ArgumentParser(allow_abbrev=False, **kw))
     commands.add_parser("runtime-preflight")
     floor_parser = commands.add_parser("observe-floor")
     floor_parser.add_argument("--worker-root", type=Path, required=True)
@@ -1076,6 +1089,14 @@ def main() -> None:
     rollback_parser = commands.add_parser("rollback")
     rollback_parser.add_argument("--bundle", type=Path, required=True)
     rollback_parser.add_argument("--worker-root", type=Path, required=True)
+    resume_parser = commands.add_parser('resume-publication')
+    resume_parser.add_argument('--bundle', type=Path, required=True)
+    resume_parser.add_argument('--worker-root', type=Path, required=True)
+    resume_parser.add_argument('--commit-receipt', type=Path)
+    settled_parser = commands.add_parser('verify-settled')
+    settled_parser.add_argument('--worker-root', type=Path, required=True)
+    repair_parser = commands.add_parser('repair-current')
+    repair_parser.add_argument('--worker-root', type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command == "runtime-preflight":
@@ -1099,6 +1120,19 @@ def main() -> None:
             )
         elif args.command == "attest-finalized":
             result = attest_finalized(args.bundle, args.worker_root)
+        elif args.command in {'resume-publication','verify-settled','repair-current'}:
+            runtime_preflight()
+            import worker_plain_rotation as plain
+            import worker_config
+            worker_config._settled_verifier = plain.verify_settled
+            if args.command == 'resume-publication':
+                result = plain.resume_publication(args.bundle,args.worker_root,commit_receipt=args.commit_receipt)
+            elif args.command == 'verify-settled':
+                result = plain.verify_settled(args.worker_root)
+            else:
+                metadata = peer_phase.strict(_regular(args.worker_root/'manifest.json'))
+                worker_config.install_files('saintvision-'+metadata['nodeId'].lower(),args.worker_root)
+                result = {'schemaVersion':'saintvision-settled-repair:1','sameBytesVerified':True,'acceptanceAssessed':False}
         else:
             result = rollback(args.bundle, args.worker_root, restart=docker_restart)
         print(json.dumps(result, sort_keys=True))

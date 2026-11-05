@@ -233,9 +233,13 @@
           "minimum": 1
         },
         "schemaVersion": {
-          "const": "saintvision-node-peer-policy-floor:1"
+          "const": "saintvision-node-peer-policy-floor:2"
         },
         "floorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingExecutableSHA256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
         }
@@ -254,6 +258,7 @@
         "plainServingProcess",
         "recoveryEpoch",
         "schemaVersion",
+        "servingExecutableSHA256",
         "servingPID",
         "servingProcessSHA256",
         "tenantId"

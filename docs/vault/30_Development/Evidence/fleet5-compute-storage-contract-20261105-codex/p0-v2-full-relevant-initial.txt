@@ -1,0 +1,26 @@
+....................F..................................s............ssss [ 21%]
+.........................................sssss..........ssss............ [ 43%]
+........................................................................ [ 65%]
+....................................ssssss.............................. [ 87%]
+.........................................                                [100%]
+================================== FAILURES ===================================
+_________ test_cp_commit_requires_exact_node_receipt_and_channel_cas __________
+tests\test_lan_leaf_rotation.py:678: in test_cp_commit_requires_exact_node_receipt_and_channel_cas
+    with pytest.raises(ValueError, match="receipt differs"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'receipt differs'
+E     Actual message: 'Node installation receipt strict v3 shape differs'
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:383: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:480: symlink capability unavailable: 1314
+SKIPPED [5] tests\test_lan_leaf_rotation_batch_successor.py:561: OS cannot create test symlinks
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:117: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:129: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:162: OS cannot create test symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:620: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:634: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:647: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:663: Windows runner cannot create the reviewed symlinks
+FAILED tests/test_lan_leaf_rotation.py::test_cp_commit_requires_exact_node_receipt_and_channel_cas
+1 failed, 308 passed, 20 skipped in 76.36s (0:01:16)

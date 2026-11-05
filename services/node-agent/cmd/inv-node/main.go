@@ -57,7 +57,7 @@ func run() error {
 	flag.IntVar(&peerFloorServingPID, "peer-floor-serving-pid", 1, "actual serving inv-node PID (container default 1)")
 	flag.Parse()
 	if observePeerFloor {
-		if serve || recoverOnly || permit != "" || storagePolicy != "" || state == "" || config.TenantID == "" || config.NodeID == "" || config.Epoch == "" {
+		if !strictPeerFloorArguments(os.Args[1:]) || serve || recoverOnly || permit != "" || storagePolicy != "" || state == "" || config.TenantID == "" || config.NodeID == "" || config.Epoch == "" {
 			return fmt.Errorf("NODE-0005: exclusive explicit peer floor observation required")
 		}
 		result, err := transport.ObservePeerPolicyFloor(config, state, peerPolicy, tlsCert, tlsKey, peerFloorNonce, peerFloorServingPID)
@@ -161,4 +161,38 @@ func run() error {
 		return err
 	}
 	return json.NewEncoder(os.Stdout).Encode(result)
+}
+
+// This new observation contract has one spelling and one occurrence per field.
+// Existing execution flag parsing is unchanged; ambiguous observation commands
+// cannot produce an acknowledgement used by a normal renewal.
+func strictPeerFloorArguments(args []string) bool {
+	required := map[string]bool{"--tenant": true, "--node": true, "--epoch": true, "--state": true, "--peer-policy": true, "--tls-cert": true, "--tls-key": true, "--peer-floor-nonce": true}
+	seen := map[string]bool{}
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if seen[arg] {
+			return false
+		}
+		seen[arg] = true
+		if arg == "--observe-peer-policy-floor" {
+			continue
+		}
+		if !required[arg] && arg != "--peer-floor-serving-pid" {
+			return false
+		}
+		i++
+		if i >= len(args) || args[i] == "" {
+			return false
+		}
+	}
+	if !seen["--observe-peer-policy-floor"] {
+		return false
+	}
+	for name := range required {
+		if !seen[name] {
+			return false
+		}
+	}
+	return true
 }
