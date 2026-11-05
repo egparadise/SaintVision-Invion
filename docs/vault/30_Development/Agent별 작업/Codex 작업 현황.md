@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.384"
+version: "1.0.385"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T06:49:38+09:00"
+updated: "2026-11-06T07:14:41+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 c6f actual code+new wire/Docs+Linuxrace verified/Claude review pending/fullCore active; B rev4; e50 bounded complete; physical incomplete"
-active_card_next: "Claude actual c6f code+wire/strictcrypto/native review; K1 Codex currentCore terminal/artifact/qualifiedreport separatebranch; B Codex rev4; Root accepts only after both actual gates"
+active_card_status: "K1 c6f real code review/fullCore active; B rev4 final2a08 Docs verified/queued actual review Task; e50 bounded complete; physical incomplete"
+active_card_next: "Claude K1 actual code verdict; K1 Codex currentCore/finalreport; Root start existing ready B task_72d23bdd01a8 after dependency settlement then actual verdict before any B code"
 ---
+
+## 2026-11-06T07:14:41+09:00 B rev4 검토 대기열 등록
+
+작업한 것과 확인: B rev4 최종2a08284a/Docs42118500179의 exact head·ref·전체 job 성공, e993 parent·39개 고유 문서 추가·72028 대비 productdiff0를 Root가 확인했다. 실제 독립 검토 task task_72d23bdd01a8를 만들고 현재 K1 code reviewer task_5627222e0f59 뒤에 dependency로 연결했다. B 검토 dispatch와 실제 판정은 아직 없으며 코드/등록·부분 동결도 하지 않았다. 다음 첫 행동/담당: Claude는 현재 K1 검토, K1 Codex는 현재 Core를 마무리하며 Root는 dependency가 끝나면 새로 만든 같은 B task를 한 번 시작한다. task pending은 추가 사용자 승인 요청이 아니고 검토 자원 순서다. B의476개 static/SYMBOLIC 검사를 실제 crypto/PG/장비 인수로 쓰지 않는다.
 
 ## 2026-11-06T06:49:38+09:00 K1 실제 코드 검토와 full Core 병행
 
