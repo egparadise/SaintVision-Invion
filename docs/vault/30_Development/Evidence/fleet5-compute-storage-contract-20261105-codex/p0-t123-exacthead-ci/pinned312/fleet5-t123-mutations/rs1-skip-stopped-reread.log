@@ -1,0 +1,16 @@
+...FF........                                                            [100%]
+=================================== FAILURES ===================================
+____ test_rs1_rechecks_stopped_volume_and_context_before_any_start[volume] _____
+tests/test_fleet5_reentry_guard_negatives.py:55: in test_rs1_rechecks_stopped_volume_and_context_before_any_start
+    with pytest.raises(ValueError,match='changed|ownership'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+____ test_rs1_rechecks_stopped_volume_and_context_before_any_start[context] ____
+tests/test_fleet5_reentry_guard_negatives.py:55: in test_rs1_rechecks_stopped_volume_and_context_before_any_start
+    with pytest.raises(ValueError,match='changed|ownership'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_rechecks_stopped_volume_and_context_before_any_start[volume] - Failed: DID NOT RAISE ValueError
+FAILED tests/test_fleet5_reentry_guard_negatives.py::test_rs1_rechecks_stopped_volume_and_context_before_any_start[context] - Failed: DID NOT RAISE ValueError
+2 failed, 11 passed in 0.73s
