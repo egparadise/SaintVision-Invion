@@ -1,0 +1,68 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_c90b362f7470 / ctx_1e0814952956",
+  "reviewer": "Claude",
+  "author": "Codex (task_a8fd2969f0b3 / ctx_6f0f8253b8a7)",
+  "observedWindowKST": ["2026-11-05T23:47:23+09:00", "2026-11-06T00:10:02+09:00"],
+  "observedWindowSource": "own shell `date` outputs: first fetch/worktree call and the last CI status check before writing; publication times are separate",
+  "reviewKind": "independent CODE review of exact immutable 4a928310 versus 6c0fc4ad (NOT ACCEPTED, c2102592, timing corrected c2e63982), plus a bounded test-only vector delta verdict for 50000697 requested by Root msg_272d6847bae2; candidate code verdict, full CI and runtime/physical acceptance are reported separately",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+    "commit": "4a928310e88ac336efb040c1621525fee7133f32",
+    "base": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+    "intermediate": {"526d48e4": "fixture hex nonce", "323baeb5": "docs-only F2/F3 proposal, two failed native artifacts preserved"},
+    "delta": {"nonDocsFiles": 36, "insertions": 1852, "deletions": 943},
+    "vectorDelta": {"commit": "5000069744931afb2fb85d24752a9916f7ba0ccc", "parent": "4a928310", "nonDocsFiles": ["services/node-agent/transport/peer_floor_canonical_test.go", "tests/fixtures/fleet5-floor-v2-canonical-vectors.json", "tests/test_fleet5_floor_v2_canonical.py"], "runtimeFilesChanged": 0},
+    "readFrom": "Git objects in a private detached scratch worktree; author checkout untouched; scratch mutations restored and verified clean",
+    "decisionInputs": ["Root bounded-A RS1/SF1 msg_87edde1811d5 and 4a928310:docs/vault/30_Development/History/2026-11-05_FLEET5_P0_settled_and_stopped_reentry_decision_Codex.md (read)", "C2 msg_d43265602041 (Root-relayed, not independently verified)", "Root status msg_4415851b1fef, msg_af733431a8e1, msg_272d6847bae2, msg_7924500c4b81 (Root-relayed)"]
+  },
+  "nativeFixedProof": {
+    "source": "Core 42047390811 artifact 13426365088 (fleet5-native-peer-phase-fixed-proof-4a928310...), zip digest sha256:89905efc..., downloaded and parsed by Claude",
+    "result": "proofValid true, runtimeGOOS linux, completedNormalCycles 2; floors P7-P11 schema :2 with constant servingExecutableSHA256; cycle1 C8 pre7/post8/final9, cycle2 C9 pre9/post10/final11; finalAccepted and oldCPRejectedAfterFinal true in both",
+    "negativesTrue": ["expiryBeforeWriteRejected", "rollbackAfterHandshakePinRejected", "sameProposalRetryFrozen", "predecessorResidueRejected", "predecessorExactReplaySettled", "floorCPMismatchRejected", "strictOldReaderRejected", "sameVersionDifferentHashRejectedByActualGo", "expiredDirectStartupStillPinsByActualGo", "actualGoObserverOwnershipAndLockTestsPassed", "actualCrossLanguageCanonicalSignaturesVerified"],
+    "explicitlyFalse": ["productionDockerOwnershipAssessed", "actualPostgresCASAssessed", "operationalAcceptanceAssessed"],
+    "goGuardEvents": "all PASS: TestPeerFloorArgumentsAreClosedAndUnambiguous, TestActualPeerFloorExecutableDigestUsesDescriptorBytes, TestActualPeerFloorObservationChecksJournalUID, TestActualPeerFloorObservationRetainsServingJournalLock, TestActualPeerFloorObservationStrictExistingState (13 subtests), TestFixedPeerPhaseGuardsPreserveGoFloorDefense, TestPeerFloorCanonicalCrossLanguageVectors (7 subtests)",
+    "limit": "the 4a Go canonical vectors did not carry intended non-ASCII (finding C2-V1); this artifact is not reused as 50000697 success"
+  },
+  "independentChecks": {
+    "interpreter": "main .venv Python 3.14.7 -B (-I for own scripts); no local Go toolchain, so no local Go run",
+    "c2Python": {"803GoldensB01toB05": "5/5 floor_canonical bytes equal", "803NegativesB06toB10": "5/5 rejected", "randomDifferentialVsOwnGoMarshalEmulator": "5000/5000 equal (raw BMP/astral keys and values, controls, HTML, U+2028/2029)", "v1CanonicalDiffersFromV2": true, "invalidAccepted": []},
+    "m2Go": "ServingExecutableSHA256 hashes /proc/<pid>/exe descriptor bytes with SameFile(/proc/self/exe), owner UID, no group/other write, 128MiB bound, starttime generation re-read, descriptor and by-name stat coherence; observed twice around the observation; cmdline now requires non-empty, terminal NUL and valid UTF-8; body via CanonicalPeerFloorBody (strict UTF-8, exact integers, floats rejected) under v2 domain; Python verify_floor requires schema :2, the hex servingExecutableSHA256 and v2 domain with no v1 fallback",
+    "localSuites": "10 legacy/new FLEET5 files: 206 passed, 14 Windows platform skips (POSIX owner/mode, symlink)",
+    "testInventory": {"functions6c": 5153, "functions4a": 5168, "removed": 9, "added": 24, "retainedTestsWithFewerAssertsOrRaises": 0},
+    "testLanLeafRotationShrink": "22->19 tests, asserts 116->67, raises 36->28; the whole drop is 8 removed tests (57 asserts, 15 raises) for semantics 4a blocks: legacy uncommitted rollback restore and installing rollback (legacy rollback/install already hard-blocked at 6c), expired partial supersession (_supersede_expired_journal now raises), fully expired offline recovery and abandon (lan_pilot now raises); replaced by 5 forward-only refusal tests; consecutive successor rollback restore replaced by refusal test; batch_successor, archive_residue, predecessor_residue assertion counts unchanged",
+    "mutationRedControls": {
+      "killed": ["tar-allow-nonroot", "guard-settled-any-action", "no-migration-off", "final-floor-refresh (first final archive stable on retry)", "c2-no-u2028-escape", "c2-no-html-escape", "verify-v1-domain", "rs1-unsigned-ack"],
+      "survived": {"rs1-no-post-ack-match": "removing post-start match_floor and executable check passes unit tests (Docker integration skipped locally)", "rs1-skip-stopped-reread": "removing the pre-start stopped re-read passes", "rs1-allow-current-in-final": "admitting P/current floor for finalizing passes", "guard-no-post-recheck": "removing the post-operation settled re-verification passes", "exec-field-optional": "dropping servingExecutableSHA256 from the hex check passes (key presence still required)", "tar-allow-symlink": "masked by the 0600 mode and size checks (defense in depth, not a gap)"},
+      "workspaceCleanAfter": true
+    },
+    "b1": "fixed probe heartbeat_request() validates against shared NodeProbeInput, 64-hex nonce; the base64 negative is isolated (request has only nonce) and fails only on the nonce pattern; outer receipt and CP commit use legacy._canonical with newline, distinct from v2 body",
+    "f1": "backend.yml asserts the exact 11-key standalone lifecycle :3 dict with rolledBack False, rollbackRejected True, completedNormalCycles 2, plus is-True and type-int checks; WORKER_MODULES pins five modules; not re-derived field-by-field against bd96479b",
+    "f2": "SF1 verify_settled reads the finalized :3 journal, immutable archive (exact keys, original journalRaw bytes, no .next), signatures, CP commit, current credential bytes and a fresh actual Go final floor, then re-reads to detect change; generic guard takes the existing leaf-rotation.lock without stale theft, obtains the token in-process (leaf entry) or through the pinned five-module launcher (hash-checked entry, runtime modules, pinned crypto versions, -I -B, 30s, 64KiB strict JSON, exact keys), allows only idempotent or same-byte-copy actions and re-verifies stable identity after; workspace/execution SF1 branches are inspect-only and refuse image/profile/container change and undo; copy path checks credential hashes equal the settled set and the exact CID",
+    "f3": "RS1 under the leaf lock requires durable :3 publicationIntent, exact proposal and signed pre-floor, unexpired chain and policy before start, signed CP C+1 commit for final; phase tuples equal the decision table; unsigned stopped read only for eligibility via docker cp TAR bounded 16MiB/30s/2048 entries, root owner, 0600 files, journal 0700, regular files only, restricted pax; host and volume bytes equal the frozen active tuple and are re-read before the only action docker start <CID>; uncertain start forward-reobserves ownership; ack only from a fresh actual Go observation matched to the phase and the original executable",
+    "vectorDelta50000697": {"fixtureAndGoTestAsciiOnly": true, "questionMarkLiterals": 0, "ownEmulatorEqualsExpected": "7/7", "pythonEqualsExpected": "7/7", "noBodyNewline": "7/7", "codePoints": "U+00E9, U+00EF, U+0301, Hangul U+D55C/U+AE00/U+D14C/U+C2A4/U+D2B8, U+2028/2029, U+1F600, U+1D11E, U+1F9ED, U+10FFFF", "nfcWouldMergeDistinctKeys": true, "redControlOld4aFixture": "1 failed, 9 passed", "corrected": "10 passed", "goRunAt50000697": "NOT RUN by Claude; pending CI"}
+  },
+  "findings": [
+    {"id": "C2-V1", "severity": "Medium", "status": "fixed in test-only delta 50000697 at Python level; Go run pending", "summary": "4a cross-language vector fixture replaced non-ASCII with literal '?' (0 non-ASCII bytes): unicode is ASCII, supplementary keeps only U+10FFFF via escape, nested lost scalars; Go never canonicalized raw non-ASCII; independently found and matched owner msg_7113bdba916c"},
+    {"id": "CI-B1", "severity": "Medium", "status": "open; owner reports a test-isolation-only fix coming (not yet published, not reviewed)", "summary": "Backend 42047403498 FAILED on 3.12 and 3.14: same 5 residue/predecessor tests, 'Actual Node floor observation is stale or clock-uncertain'; reproduced locally: test_lan_leaf_rotation + standalone_runtime + residue = 5 failed, without standalone = 41 passed; launcher run_worker pops worker modules from sys.modules in-process and the new 4a peer_phase_unit_fixtures patches stale module objects, so the observation clock (frozen) and verifier clock (real) split; residue code unchanged; fix must not widen freshness or skip"},
+    {"id": "T1", "severity": "Medium", "status": "open", "summary": "Required RS1/SF1 negatives missing: 4 own mutants survive unit tests: post-start ack match/executable check, pre-start stopped re-read, finalizing tuple widened to P/current, guard post-operation settled re-verification"},
+    {"id": "T2", "severity": "Low", "status": "open", "summary": "No negative for a malformed but signed servingExecutableSHA256 (hex check removable)"},
+    {"id": "T3", "severity": "Low", "status": "open", "summary": "SF1 default pinned-launcher subprocess dispatch is statically sound but untested: both Python and Docker integration tests set worker_config._settled_verifier=plain.verify_settled; actual Go+Docker in the integration test does not prove the installed pinned runtime path"},
+    {"id": "I1", "severity": "Info", "summary": "after-stop/no-copy crash is a guarded BLOCK, not recovered: the integration test expects RS1 to refuse and the same CID to stay stopped; only after-copy forward-resumes; whole-operation recovery needs a separate forward-publication design (Root msg_af733431a8e1)"},
+    {"id": "I2", "severity": "Info", "summary": "journal phase 'restarted' is not RS1-eligible (matches the decision table); a stopped Node in that phase stays blocked"},
+    {"id": "I3", "severity": "Info", "summary": "verify-settled CLI does not itself assert the leaf lock; read-only with before/after change detection; guarded callers hold the lock"}
+  ],
+  "ci": {"core42047390811": "in_progress at 2026-11-06T00:10:02+09:00 (s01-storage-roundtrip success)", "backend42047403498": "completed failure (3.12 and 3.14: 5 failed, 8717 passed; mlflow-live success)", "docs4a42047397366": "success (listed, not inspected)", "docs50000697_42050046566": "success (listed, not inspected)", "duplicateCoreScheduledByClaude": false},
+  "verdicts": {
+    "candidateCode4a": "NOT ACCEPTED as exact head: no runtime correctness defect found in M2/C2/RS1/SF1/B1/B2/F1 source, but C2-V1, CI-B1 and T1 are required; T2/T3 Low",
+    "vectorDelta50000697": "ACCEPT test-only delta at Python/source level (C2-V1 closed for Python and fixture); Go canonical run at 50000697 pending, no C2 native acceptance",
+    "fullCI": "Backend RED at 4a; Core pending; nothing green claimed",
+    "runtimePhysical": "unaccepted; Docker ownership, actual Postgres CAS, operations and physical explicitly not assessed"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "scratchWorktreeMutationsRestored": true},
+  "nextFirstAction": [
+    {"owner": "ctx_6f0f8253b8a7", "action": "publish the standalone test isolation fix and T1 negatives (and T2/T3 if accepted) as an exact SHA with Backend green, without widening freshness or skipping"},
+    {"owner": "root", "action": "keep 4a NOT ACCEPTED; take the 50000697 Go canonical result from its own CI; keep runtime/physical HOLD"},
+    {"owner": "Claude", "action": "review the published test-only delta and its exact CI"}
+  ]
+}
