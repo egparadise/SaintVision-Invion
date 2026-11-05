@@ -1,0 +1,6 @@
+2026-11-05T15:19:26.5409576Z FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node] - ValueError: Actual Node floor observation is stale or clock-uncertain
+2026-11-05T15:19:26.5412221Z FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[control] - ValueError: Actual Node floor observation is stale or clock-uncertain
+2026-11-05T15:19:26.5414883Z FAILED tests/test_leaf_rotation_archive_residue.py::test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source - ValueError: Actual Node floor observation is stale or clock-uncertain
+2026-11-05T15:19:26.5417620Z FAILED tests/test_rotation_predecessor_residue.py::test_node_successor_requires_verified_predecessor_replay - ValueError: Actual Node floor observation is stale or clock-uncertain
+2026-11-05T15:19:26.5419982Z FAILED tests/test_rotation_predecessor_residue.py::test_cp_successor_requires_verified_predecessor_replay - ValueError: Actual Node floor observation is stale or clock-uncertain
+2026-11-05T15:19:26.5421562Z = 5 failed, 9075 passed, 46 skipped, 2 deselected, 2035 warnings in 1465.31s (0:24:25) =

@@ -1,0 +1,87 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "id": "J01",
+      "inputHex": "7b2278223a312c2278223a327d",
+      "inputSHA256": "d38245cfdb5d2239d67fe2a719312768b668a6928d8d97d04fbce83215e50b44",
+      "expected": "REJECT",
+      "reason": "duplicate-key",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J02",
+      "inputHex": "7b2278223a22ff227d",
+      "inputSHA256": "36781faac995a68b69aab7d540747e0c70efed427e66a608cdf64fc4feaaff12",
+      "expected": "REJECT",
+      "reason": "invalid-utf8",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J03",
+      "inputHex": "7b2278223a225c7564383030227d",
+      "inputSHA256": "7f3c6b6b4a88409efe4d2fba1cb3cf2b79b682fe4387678cba2e6b9645b58221",
+      "expected": "REJECT",
+      "reason": "unpaired-surrogate",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J04",
+      "inputHex": "7b2278223a4e614e7d",
+      "inputSHA256": "c238cb6e9ac5407491b0988102620ab9445290d2ed7713c516a2b28bd2388968",
+      "expected": "REJECT",
+      "reason": "nonfinite",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J05",
+      "inputHex": "7b2278223a312e357d",
+      "inputSHA256": "461b06088af6528a5584517dd01a204856b291c4eead2bf678c9a6cc0e615623",
+      "expected": "REJECT",
+      "reason": "float-forbidden",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J06",
+      "inputHex": "7b2278223a312e307d",
+      "inputSHA256": "bf32f56236899e13ef54db875d136c6cbcc65244464829c54911aa9069b0ae25",
+      "expected": "REJECT",
+      "reason": "decimal-token",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J07",
+      "inputHex": "7b2278223a3165307d",
+      "inputSHA256": "fe0a7174116116d9794adf31e74e647187f7265072d28e61488c05b96da6a4c5",
+      "expected": "REJECT",
+      "reason": "exponent-token",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J08",
+      "inputHex": "7b2278223a3145327d",
+      "inputSHA256": "acdc75b7f3d4dd7f5602472131bd0454e5a20ad1493fd7294cc4023a72b84d80",
+      "expected": "REJECT",
+      "reason": "exponent-token",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    },
+    {
+      "id": "J09",
+      "inputHex": "7b2278223a2d307d",
+      "inputSHA256": "ea1ee51d0264a2f47ec96a676c4fe606fbb18b1cc55fb8be80a9a568fd8c02c3",
+      "expected": "REJECT",
+      "reason": "negative-zero-token",
+      "canonicalOutput": null,
+      "fixtureOnly": true
+    }
+  ],
+  "actualGoRuns": 0
+}

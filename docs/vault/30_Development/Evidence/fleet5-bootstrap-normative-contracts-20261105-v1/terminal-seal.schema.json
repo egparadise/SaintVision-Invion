@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-plain-agent-migration-seal:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-plain-agent-migration-seal:1"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "slot": {
+          "$ref": "common.schema.json#/$defs/memberKey"
+        },
+        "scope": {
+          "$ref": "common.schema.json#/$defs/scope"
+        },
+        "sealedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "bootstrapVerifiedEvent": {
+          "$ref": "common.schema.json#/$defs/eventRef"
+        },
+        "inventoryEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "oldBackup": {
+          "$ref": "common.schema.json#/$defs/container"
+        },
+        "currentContainer": {
+          "$ref": "common.schema.json#/$defs/container"
+        },
+        "volume": {
+          "$ref": "common.schema.json#/$defs/volume"
+        },
+        "finalProtectedTreeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bootstrapM2": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "bootstrapMTLS": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "secondMigrationAllowed": {
+          "const": false
+        },
+        "backupRestartAllowed": {
+          "const": false
+        },
+        "backupDeletionAllowed": {
+          "const": false
+        },
+        "normalRenewalRequiresFreshLeaseAndM2": {
+          "const": true
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "slot",
+        "scope",
+        "sealedAt",
+        "bootstrapVerifiedEvent",
+        "inventoryEnvelopeSHA256",
+        "oldBackup",
+        "currentContainer",
+        "volume",
+        "finalProtectedTreeSHA256",
+        "bootstrapM2",
+        "bootstrapMTLS",
+        "secondMigrationAllowed",
+        "backupRestartAllowed",
+        "backupDeletionAllowed",
+        "normalRenewalRequiresFreshLeaseAndM2"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "root-seal"
+        },
+        "keySPKISHA256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "signatureHex": {
+          "$ref": "common.schema.json#/$defs/signature"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

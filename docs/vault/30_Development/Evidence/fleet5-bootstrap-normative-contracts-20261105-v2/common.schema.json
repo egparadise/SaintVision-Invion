@@ -1,0 +1,866 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitSHA": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "positive": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "counter": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "uid": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[^\\u0000]*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 4096,
+      "pattern": "^/[^\\u0000]*$"
+    },
+    "imageDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "argv": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 4096,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": false
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        }
+      },
+      "required": [
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch"
+      ]
+    },
+    "proof": false,
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "certificateDERSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "enabled": {
+          "const": true
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^[^\\u0000]*$"
+        }
+      },
+      "required": [
+        "version",
+        "certificateDERSHA256",
+        "enabled",
+        "endpoint"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeKeyPublicSPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nodeLeafDERSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "controlLeafDERSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "caBundleRawSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signerPublicRawSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "nodeKeyPublicSPKISHA256",
+        "nodeLeafDERSHA256",
+        "controlLeafDERSHA256",
+        "caBundleRawSHA256",
+        "signerPublicRawSHA256"
+      ]
+    },
+    "floor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "policySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "floorRawSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "journalIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "journalUID": {
+          "$ref": "common.schema.json#/$defs/uid"
+        }
+      },
+      "required": [
+        "version",
+        "policySHA256",
+        "floorRawSHA256",
+        "journalIdentitySHA256",
+        "journalUID"
+      ]
+    },
+    "volume": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "driver": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "metadataSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "mountIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "protectedTreeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "goJournalPath": {
+          "$ref": "common.schema.json#/$defs/path"
+        }
+      },
+      "required": [
+        "name",
+        "driver",
+        "metadataSHA256",
+        "mountIdentitySHA256",
+        "protectedTreeSHA256",
+        "goJournalPath"
+      ]
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "daemonIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 256,
+          "pattern": "^/[^/\\u0000]+$"
+        },
+        "inspectSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "imageId": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "configSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "mountsSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "restartPolicy": {
+          "enum": [
+            "no",
+            "unless-stopped"
+          ]
+        }
+      },
+      "required": [
+        "daemonIdentitySHA256",
+        "id",
+        "name",
+        "inspectSHA256",
+        "imageId",
+        "configSHA256",
+        "mountsSHA256",
+        "restartPolicy"
+      ]
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dockerImageId": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "distributionKind": {
+          "enum": [
+            "registry",
+            "authenticated-offline"
+          ]
+        },
+        "distributionProof": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "indexOrManifestDigest": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "platformManifestDigest": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "configDigest": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "rootFSDiffIDs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/imageDigest"
+          },
+          "minItems": 1,
+          "maxItems": 128,
+          "uniqueItems": false
+        },
+        "archiveSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "os": {
+          "const": "linux"
+        },
+        "architecture": {
+          "enum": [
+            "amd64",
+            "arm64"
+          ]
+        },
+        "executableSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inheritedConfigSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "buildRecipeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "dockerImageId",
+        "distributionKind",
+        "distributionProof",
+        "indexOrManifestDigest",
+        "platformManifestDigest",
+        "configDigest",
+        "rootFSDiffIDs",
+        "archiveSHA256",
+        "os",
+        "architecture",
+        "executableSHA256",
+        "inheritedConfigSHA256",
+        "buildRecipeSHA256"
+      ]
+    },
+    "ci": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "const": "egparadise/SaintVision-Invion"
+        },
+        "workflow": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "runId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "runAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "headSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "event": {
+          "enum": [
+            "push",
+            "workflow_dispatch",
+            "pull_request"
+          ]
+        },
+        "conclusion": {
+          "const": "success"
+        },
+        "artifactSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "attestation": {
+          "$ref": "common.schema.json#/$defs/proof"
+        }
+      },
+      "required": [
+        "repository",
+        "workflow",
+        "runId",
+        "runAttempt",
+        "headSHA",
+        "ref",
+        "event",
+        "conclusion",
+        "artifactSHA256",
+        "attestation"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reviewerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "reviewerKeySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "subjectSourceSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subjectArtifactSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "verdict": {
+          "const": "ACCEPT"
+        },
+        "receipt": {
+          "$ref": "common.schema.json#/$defs/proof"
+        }
+      },
+      "required": [
+        "reviewerId",
+        "reviewerKeySPKISHA256",
+        "authorId",
+        "subjectSourceSHA",
+        "subjectArtifactSHA256",
+        "reviewCommit",
+        "verdict",
+        "receipt"
+      ]
+    },
+    "fenceScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "$ref": "common.schema.json#/$defs/scope"
+        },
+        "daemonIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workerRootRegistrationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ownedVolumeMetadataSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "scope",
+        "daemonIdentitySHA256",
+        "workerRootRegistrationSHA256",
+        "ownedVolumeMetadataSHA256"
+      ]
+    },
+    "processOwner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "principal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "uid": {
+          "$ref": "common.schema.json#/$defs/uid"
+        },
+        "gid": {
+          "$ref": "common.schema.json#/$defs/uid"
+        },
+        "hostBootIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "processStartIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ownerGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "principal",
+        "uid",
+        "gid",
+        "hostBootIdentitySHA256",
+        "pid",
+        "processStartIdentitySHA256",
+        "ownerGeneration"
+      ]
+    },
+    "eventRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "envelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "sequence",
+        "envelopeSHA256"
+      ]
+    },
+    "memberKey": {
+      "enum": [
+        "PC2",
+        "PC4"
+      ]
+    },
+    "inventoryHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "presence": {
+          "enum": [
+            "ABSENT",
+            "PRESENT"
+          ]
+        },
+        "envelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readbackProof": {
+          "$ref": "common.schema.json#/$defs/proof"
+        }
+      },
+      "required": [
+        "presence",
+        "envelopeSHA256",
+        "readbackProof"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "presence": {
+                "const": "ABSENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "envelopeSHA256": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "envelopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourceSHA": {
+          "$ref": "common.schema.json#/$defs/gitSHA"
+        },
+        "artifactSHA256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "buildProvenance": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "coreCI": {
+          "$ref": "common.schema.json#/$defs/ci"
+        },
+        "backendCI": {
+          "$ref": "common.schema.json#/$defs/ci"
+        },
+        "independentReview": {
+          "$ref": "common.schema.json#/$defs/review"
+        }
+      },
+      "required": [
+        "sourceSHA",
+        "artifactSHA256",
+        "buildProvenance",
+        "coreCI",
+        "backendCI",
+        "independentReview"
+      ]
+    },
+    "memberInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "slot": {
+          "$ref": "common.schema.json#/$defs/memberKey"
+        },
+        "scope": {
+          "$ref": "common.schema.json#/$defs/scope"
+        },
+        "hostRegistrationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workerRootRegistrationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "hostUID": {
+          "$ref": "common.schema.json#/$defs/uid"
+        },
+        "hostGID": {
+          "$ref": "common.schema.json#/$defs/uid"
+        },
+        "oldContainer": {
+          "$ref": "common.schema.json#/$defs/container"
+        },
+        "volume": {
+          "$ref": "common.schema.json#/$defs/volume"
+        },
+        "exactConsumerIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true
+        },
+        "nodeLabelSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "preservedPermitImageDigest": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "cmd": {
+          "$ref": "common.schema.json#/$defs/argv"
+        },
+        "entrypoint": {
+          "$ref": "common.schema.json#/$defs/argv"
+        },
+        "cmdArgvCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "entrypointCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingArgvCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rawServingCmdlineSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authority": {
+          "$ref": "common.schema.json#/$defs/authority"
+        },
+        "floor": {
+          "$ref": "common.schema.json#/$defs/floor"
+        },
+        "channel": {
+          "$ref": "common.schema.json#/$defs/channel"
+        },
+        "legacyCPAgentImageValueSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "backupReservedName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 256,
+          "pattern": "^/[^/\\u0000]+$"
+        }
+      },
+      "required": [
+        "slot",
+        "scope",
+        "hostRegistrationSHA256",
+        "workerRootRegistrationSHA256",
+        "hostUID",
+        "hostGID",
+        "oldContainer",
+        "volume",
+        "exactConsumerIds",
+        "nodeLabelSHA256",
+        "preservedPermitImageDigest",
+        "cmd",
+        "entrypoint",
+        "cmdArgvCanonicalSHA256",
+        "entrypointCanonicalSHA256",
+        "servingArgvCanonicalSHA256",
+        "rawServingCmdlineSHA256",
+        "authority",
+        "floor",
+        "channel",
+        "legacyCPAgentImageValueSHA256",
+        "backupReservedName"
+      ]
+    },
+    "runtimeMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "slot": {
+          "$ref": "common.schema.json#/$defs/memberKey"
+        },
+        "scope": {
+          "$ref": "common.schema.json#/$defs/scope"
+        },
+        "oldBackup": {
+          "$ref": "common.schema.json#/$defs/container"
+        },
+        "currentContainer": {
+          "$ref": "common.schema.json#/$defs/container"
+        },
+        "volume": {
+          "$ref": "common.schema.json#/$defs/volume"
+        },
+        "preservedPermitImageDigest": {
+          "$ref": "common.schema.json#/$defs/imageDigest"
+        },
+        "cmdArgvCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "entrypointCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingArgvCanonicalSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rawServingCmdlineSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authority": {
+          "$ref": "common.schema.json#/$defs/authority"
+        },
+        "bootstrapFloor": {
+          "$ref": "common.schema.json#/$defs/floor"
+        },
+        "unchangedBootstrapChannel": {
+          "$ref": "common.schema.json#/$defs/channel"
+        },
+        "bootstrapVerifiedEvent": {
+          "$ref": "common.schema.json#/$defs/eventRef"
+        },
+        "signedM2": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "mtls": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "protectedStateEquality": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "execReceipt": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "runtimeInspectionBeforeM2": {
+          "$ref": "common.schema.json#/$defs/proof"
+        },
+        "runtimeInspectionAfterM2": {
+          "$ref": "common.schema.json#/$defs/proof"
+        }
+      },
+      "required": [
+        "slot",
+        "scope",
+        "oldBackup",
+        "currentContainer",
+        "volume",
+        "preservedPermitImageDigest",
+        "cmdArgvCanonicalSHA256",
+        "entrypointCanonicalSHA256",
+        "servingArgvCanonicalSHA256",
+        "rawServingCmdlineSHA256",
+        "authority",
+        "bootstrapFloor",
+        "unchangedBootstrapChannel",
+        "bootstrapVerifiedEvent",
+        "signedM2",
+        "mtls",
+        "protectedStateEquality",
+        "execReceipt",
+        "runtimeInspectionBeforeM2",
+        "runtimeInspectionAfterM2"
+      ]
+    }
+  },
+  "$comment": "v2 proposal: generic proof references FORBIDDEN; artifact and API proof slots are fully specialized. External trust registration required BEFORE plan authentication."
+}

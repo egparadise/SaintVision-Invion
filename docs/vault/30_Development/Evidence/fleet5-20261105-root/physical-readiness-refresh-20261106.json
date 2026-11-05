@@ -1,0 +1,68 @@
+{
+  "schema": "fleet5-readonly-readiness-refresh:1",
+  "observedAtKST": "2026-11-06T01:46:03+09:00",
+  "scope": "fixed approved four SSH targets plus local Docker version; no key contents, remote file writes, Docker exec/start/stop, Node policy, lease or credential changes",
+  "results": [
+    {
+      "physicalPC": 1,
+      "trustedPinInSelectedKnownHosts": true,
+      "attempted": true,
+      "SSH": "failed",
+      "sshExit": 255,
+      "Docker": "UNKNOWN",
+      "failureClass": "public-key authentication denied"
+    },
+    {
+      "physicalPC": 2,
+      "trustedPinInSelectedKnownHosts": true,
+      "attempted": true,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "accessible",
+      "arch": "x86_64",
+      "dockerGroupActive": true,
+      "dockerExit": 0,
+      "engineVersion": "29.1.3",
+      "serverMaxAPI": "1.52",
+      "serverMinAPI": "1.44"
+    },
+    {
+      "physicalPC": 3,
+      "trustedPinInSelectedKnownHosts": true,
+      "attempted": true,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "unavailable-or-denied",
+      "arch": "x86_64",
+      "dockerGroupActive": false,
+      "dockerExit": 1,
+      "failureClass": "Docker socket permission denied; active docker group absent"
+    },
+    {
+      "physicalPC": 4,
+      "trustedPinInSelectedKnownHosts": true,
+      "attempted": true,
+      "SSH": "authenticated",
+      "sshExit": 0,
+      "Docker": "accessible",
+      "arch": "x86_64",
+      "dockerGroupActive": true,
+      "dockerExit": 0,
+      "engineVersion": "29.8.1",
+      "serverMaxAPI": "1.56",
+      "serverMinAPI": "1.40"
+    },
+    {
+      "physicalPC": 5,
+      "Docker": "accessible",
+      "dockerExit": 0,
+      "engineVersion": "20.10.22",
+      "serverMaxAPI": "1.41",
+      "serverMinAPI": "1.12"
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "NodeOrKeyMutation": false,
+  "wholeProgramComplete": false,
+  "errorClassification": "classified from existing private stderr only; no further authentication attempt"
+}

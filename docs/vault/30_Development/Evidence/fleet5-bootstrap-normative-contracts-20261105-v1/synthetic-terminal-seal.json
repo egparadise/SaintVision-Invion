@@ -1,0 +1,79 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-seal:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "b84b1b44815e32bfa5348e256321d0958acc101012a3d6638ea99494ef0f9ad5",
+      "slot": "PC2",
+      "scope": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "fixture-node-0",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "sealedAt": "2030-01-01T00:00:00Z",
+      "bootstrapVerifiedEvent": {
+        "sequence": 1,
+        "envelopeSHA256": "49df3835ca5b8493cd7e5f3ec274c5836ca7949bfc4b11e463917d1b67ce39bb"
+      },
+      "inventoryEnvelopeSHA256": "1532e817a33a8514fd4a72120a7bef4ef899b6345e1999f9119addeed6887e12",
+      "oldBackup": {
+        "daemonIdentitySHA256": "e39d5f51bd3cb0edb42fbfc64607cde85e3f3c5d4a3c1b211a3541fb1314d13f",
+        "id": "cbfaa792794e88ecf0b319b4d5a243901e634246837dc449dbcd22ef2a0a2d5f",
+        "name": "/fixture-name",
+        "inspectSHA256": "87b32a229516fe0fbe2d3f71c2050276a01a1495020da52e909480054923ffb9",
+        "imageId": "sha256:e73b09d1d79052341b8f08795b4be3a6f08228cdba177baf34909a2b8e07a474",
+        "configSHA256": "6920a3a1b2ed34e905272c9bdfa5594486a188a7e3fcd341122fd3f53f3e81e7",
+        "mountsSHA256": "870042940f92604007d16933adcca1bc35656f39609f5b520f474abe381daaef",
+        "restartPolicy": "no"
+      },
+      "currentContainer": {
+        "daemonIdentitySHA256": "16fc34b4f89cae7aeec52294a15dd760c3b52d2b69d3c6ac8eb5d9b19e4af47c",
+        "id": "c06a0260c9b669f445d451770c292652c8bfd3e51e23510652b491f390547a37",
+        "name": "/fixture-name",
+        "inspectSHA256": "c02d44207ab250f704b0244727532f08a9b2f612f70e57daf2b137ca7abba7d7",
+        "imageId": "sha256:71949f96764fa558eb35c25a0367216744136c321f2a1afa59da247264b9e7bd",
+        "configSHA256": "6930a13ed5887b8fbc8dc610e8e2bbe201ae3de9a2d4e434a2aec3bd2bbde2fd",
+        "mountsSHA256": "ff9480b129d0cb24430da876e58e1113ebf32b9ad56f0c3f2d42ca922ac86b59",
+        "restartPolicy": "no"
+      },
+      "volume": {
+        "name": "fixture-name",
+        "driver": "fixture-driver",
+        "metadataSHA256": "a4eebf9d0f6a8635a42394e38e0c498863ba47c8809df623b55d67fe12aa25f1",
+        "mountIdentitySHA256": "b8e2b37244d5057b3b6c580182099a3619189a6d2effa59140f4758ba1573850",
+        "protectedTreeSHA256": "06ff2b413db20a8d25a3416eaf5565d865ea2a8f2f280bcc6c6c86fdcfdcd258",
+        "goJournalPath": "/fixture-goJournalPath"
+      },
+      "finalProtectedTreeSHA256": "537900db9d6c5e32e919d37c2fd292cd3f0271c8705a326bf14e5901d4552a33",
+      "bootstrapM2": {
+        "contractSHA256": "23c8c58a6fb8879c58529f947c29b243c5fa8fc25c77af5da09186877cdd8a83",
+        "artifactSHA256": "ca1aa74469c44db86c13fb1b387bf202349a6d30902cef746fe27b604c0c5a3b",
+        "scopeSHA256": "fde2feac3172906479b668dec53c230bdae3e812d8e06965d4afe04986b2d395",
+        "signerKeySPKISHA256": "f81b8570649b6b528240e78d9b79e3d54ce212ff49cd18a465b95d3d34d8e99e",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "bootstrapMTLS": {
+        "contractSHA256": "39bb72dd82148b363771424037fcab0a9388a6fea0594252b9fb83d99a5f5bca",
+        "artifactSHA256": "5c4ec4c65c120f9610c488f5d2d17ff17e657a144e6a180c41089b7cc689f738",
+        "scopeSHA256": "dc551ed7acb9a5fddc61e83ab42a7905e136571913231aded03fc429d4cbc3cb",
+        "signerKeySPKISHA256": "1034b3e6430c96de6293954d56051ff7c4cd7d4d2e4c9a62da9322b031dacef6",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "secondMigrationAllowed": false,
+      "backupRestartAllowed": false,
+      "backupDeletionAllowed": false,
+      "normalRenewalRequiresFreshLeaseAndM2": true
+    },
+    "signer": {
+      "role": "root-seal",
+      "keySPKISHA256": "a9aba5afb7ec1c77a64b7e629d6da1fb36da5a770a65c8666c837adf093e19e3",
+      "signatureHex": "03db1353aafb61a7b29a0799cae784c4979ba03bf095b0c682bf4e1e49826775619141c0d9c76081d1c4e31e5880022f97915b3f6b1030864793161ef05e39c8"
+    }
+  }
+}

@@ -1,0 +1,358 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-node-runtime-inventory:1",
+      "cohortId": "fixture-cohortId",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "b84b1b44815e32bfa5348e256321d0958acc101012a3d6638ea99494ef0f9ad5",
+      "revision": 1,
+      "publishedAt": "2030-01-01T00:00:00Z",
+      "publicationId": "fixture-publicationId",
+      "expectedLegacyCPStateSHA256": "1d98427f1ab1244f6e109816d20799c35668482ceedebeca82f2c2e327bd7ad9",
+      "expectedChannelVectorSHA256": "aae96be9e87c661ee574dcd9af87a8ec6e9ae8c9f28b083b71300dcacf573109",
+      "leaseEnvelopeSHA256": "1a76e856e05eb1b956992dd09151f8b11fc739b082a1b792c595cf040f729117",
+      "target": {
+        "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+        "artifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+        "buildProvenance": {
+          "contractSHA256": "3851952edc0a49646902c386fbb764d479f9a2aaf078e3fcb654347fe028af4f",
+          "artifactSHA256": "b07383f2e82fb056b953609937b1441fdfd9420c52fd5d833d60ead178a01782",
+          "scopeSHA256": "d4d08c5a167ce7d14c2aba8e29afa78943a4c8d7cb24d0daea2318187c5aad49",
+          "signerKeySPKISHA256": "d3489d5cceae5f890337076dc51f717c36c11ea7e728114b084d36bbb370f82a",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "f194780e1f376e8a554b6bc1b779b177c6f494ec72994c9cb4670be863fd0472",
+          "attestation": {
+            "contractSHA256": "1daea8aa6c2ab52c2f85496633b536994a4ad5f53a2b0e14044893474e64abb5",
+            "artifactSHA256": "cc77f12d1df57504b90dddd316e7d5057475930f6098ae4bf41ac0275d32a243",
+            "scopeSHA256": "4612843b5f0e105c2a626dca35030b3ebcb635a0096a91743aa0addddafd0e9d",
+            "signerKeySPKISHA256": "0b2caec0a4d4a668d7f035e3349fe00f8c9206e117a1cdd1b3cf28b17985d33d",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "2f4af89649eeee0b4480079cff82951ac58516f98acff21b3dc9490745325789",
+          "attestation": {
+            "contractSHA256": "991b2136d4f9cad80c03bba98064a90442cac0acc5b52b7f2884d93cd332d549",
+            "artifactSHA256": "992c77b84899b21c210d87b3dbfbad917e31d5d03a19edb35bfd9ae1b50a3d30",
+            "scopeSHA256": "6a0528b7a4a1fc31660f31040f4fe8040e0178f280afb0e38368a30e9b3e853b",
+            "signerKeySPKISHA256": "bdf1e531018fc7adcd761dc295fc4bffce9576ec8aba9f0b0033bd40a0734ac5",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "44e4feb9c1979c1ad17ead9d713b09d5053f4f78cbde9eab69606556ebccf0b0",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "subjectArtifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+          "reviewCommit": "d65c95a27457a6245106eac8779448d44e261b9e",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "86c86b16409e723232e309f0484eebb8523ccc4de9cd5c5c251b37174e37ceb4",
+            "artifactSHA256": "474ca9cfc1ba808d6364838eae7d1c50085c60ce67479b70f6bf903e5c8f00d1",
+            "scopeSHA256": "d78541a905f51f2f7a02cbdce6f22f80126af7a941c047d64098c045fe0d54b9",
+            "signerKeySPKISHA256": "a6db0181270e556b4872394e3fa7069a865f5834616c0fcae4be353d62f2fc6e",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "image": {
+        "dockerImageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+        "distributionKind": "registry",
+        "distributionProof": {
+          "contractSHA256": "d01dc3dda034ca0439311301a91c974ecd919074ce4e8ffe68e4a5273bd0b8fd",
+          "artifactSHA256": "40ca4c9196fec872b5757e3b721131f458ce38a6660d966285a3ddc562e11825",
+          "scopeSHA256": "2c5142ec493d1f489057ac417810046500c79358bf5e00ce89aebdf8ee002cd3",
+          "signerKeySPKISHA256": "15f3e64809a0592f10b595e9f591d6bee67bfd0d38018241a3c1e9504c031e0b",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "indexOrManifestDigest": "sha256:2b681497ff9cae43497a32c7368c048e4da6bd4568145e687a07ebbe465834c8",
+        "platformManifestDigest": "sha256:0bcb1dd10e5f21bb084b9c79a4c819262fb352ae889f1a6f5d7045f4aa9b9a90",
+        "configDigest": "sha256:7383a417f70b1c402794f79fbd8fb0f20a2c07352312cace993c65769d4d4a3e",
+        "rootFSDiffIDs": [
+          "sha256:1b8c441fac4f8a78d4de510640b26331159761782b89c1ad0a81c3eb6a95eba1"
+        ],
+        "archiveSHA256": "309896ce0b819a10a6ed68560daa80695cb0ff9cdc78db9a10628fb2da3f5d91",
+        "os": "linux",
+        "architecture": "amd64",
+        "executableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+        "inheritedConfigSHA256": "9fa73cf618910be4b925f383fe1f07fb562b20bfd55b6b6e9b926ba149cf278b",
+        "buildRecipeSHA256": "02048df4eedbe5223a89be0e7d8dac083887f0ede70513b72fe517b2139807ee"
+      },
+      "members": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "oldBackup": {
+            "daemonIdentitySHA256": "d17e82f1bb5e54ad0625af51779a6845f3c3ce5f2475c9a63892da1876d1251b",
+            "id": "9455cb858cc54d9caec149884b86846baff3f5f1c6c2149e880fcf142d25b656",
+            "name": "/fixture-name",
+            "inspectSHA256": "6f968f4f511840e8355dbdf3272a98ccc1d29a6277ac6af71c823766071c7adb",
+            "imageId": "sha256:5c10ef527ee7ccc4be7dd5dbf661e246e53906540d0013a0784c42ac48d4c336",
+            "configSHA256": "06be9da6a2d0a8dca39ec50f3ec05ede45355c21c3277740d00abc9151349f71",
+            "mountsSHA256": "c9a310cb4ed38f7beaba20cf49f32a0c270a46b451afa87000fb02ada12637c3",
+            "restartPolicy": "no"
+          },
+          "currentContainer": {
+            "daemonIdentitySHA256": "8ea4e6d8d1747bceb919daca1d1a574a921f7f6f6de8dae1c5a5fb85fd840886",
+            "id": "15b0bfd6413a9eb86ae7969010943810ce1b5c97b3123eb644e5dd035113702f",
+            "name": "/fixture-name",
+            "inspectSHA256": "c31de7244c2e51809ce3fee58bab7de53926070e743ff6bbc08c54ffb882c0f5",
+            "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+            "configSHA256": "1cc7dc3e925a94a629bb39c3f7ff6bde4e51c13fa399b2b84cad0c1e2a2916ef",
+            "mountsSHA256": "345c6d7f280135a246d8badd6ac47ed7a390f763780869dda8e5dbcaf51cc3fd",
+            "restartPolicy": "no"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+            "mountIdentitySHA256": "c768647cb578fd5186ad18c2e2bd689f8b23764ce1ab84532bda65dbc577991f",
+            "protectedTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+            "nodeLeafDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+            "controlLeafDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+            "caBundleRawSHA256": "25ad97394610842cafb54eb3b8dac1cd5078b217f0a0510e8b7777107e34d922",
+            "signerPublicRawSHA256": "03fe03b00a86d8dc2f9001e4b118771e811557c588bf5831b2228ca32ffc9d50"
+          },
+          "bootstrapFloor": {
+            "version": 11,
+            "policySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+            "floorRawSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+            "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+            "journalUID": 1
+          },
+          "unchangedBootstrapChannel": {
+            "version": 3,
+            "certificateDERSHA256": "e09fa59bed5fb4deb1e6122281b35b42fdea0c09abafaed96f4228b1b6cacfb7",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "bootstrapVerifiedEvent": {
+            "sequence": 1,
+            "envelopeSHA256": "9fa804a1975f5c5a0536982719bf3e0710cc5476a9ff5506ed61db1bf6d90aae"
+          },
+          "signedM2": {
+            "contractSHA256": "8ba394c3d4196a1b035dfe75c2161e06852da9f764e65aa5efaa13cdd98a2ac7",
+            "artifactSHA256": "d6fa4752d7265358978f9550f674dfb9f50e277a200bc4ccb9ccc6c7d342b05c",
+            "scopeSHA256": "2ec87aaa94a521dcb2ca0a87dacad4e3006de87f48e56fb0673c201cc75816c5",
+            "signerKeySPKISHA256": "6c50f2e785f79a99cff07a2269e266623f961f8f3b577b40ae5b367ad5bb2c6b",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "mtls": {
+            "contractSHA256": "fb98d6d7dd1ec95255c66cbc642ae77c44b4eecb8b37d3cf27f518799330a53e",
+            "artifactSHA256": "9ee85e256da40ddbe15e8c7e82634d56e2c5e2b20e50869b5376d26c067a37ad",
+            "scopeSHA256": "e4b04dd7cefa374255cdf17546baca1b404c084d0cfde91e32b4d09fdd3a4f01",
+            "signerKeySPKISHA256": "dac5bea756121e23a0ce48922c51ed1637d399c4b0482d5b3127b9592aa2b3f8",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "13f89f0703d23f207d1b5fd580602f00273ecd2769cabefb6dceeabe4e0408a5",
+            "artifactSHA256": "13681fb809c02dd5e43ff5187999a9fb5d3aafb0d68158029d6214113b314b50",
+            "scopeSHA256": "d2ea1c3f10dbae3e281994402ef403a284d5e1840e6b638c0c2e1602bd9a0636",
+            "signerKeySPKISHA256": "8946eb94760e1a0bd75b774bdbb6afeaed96603f3bb8b50bafb980b429a6d188",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "execReceipt": {
+            "contractSHA256": "a8be7df6af542a98e3b3b5f074026c7bb7e6ad5017f0fc08722480b1f6b8cf9f",
+            "artifactSHA256": "9d4d5f7973acaf0927797d921afcdf7e30c1190d391c8bbd0d514c69635ff42c",
+            "scopeSHA256": "08e0a9e76283c83d16d3721cc0a406bc85a600606de889507182a92c0b99feac",
+            "signerKeySPKISHA256": "e66cf542c78b0f436c378bb08e2ba1b4279111f9de79ba7b292631654eff86f1",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "runtimeInspectionBeforeM2": {
+            "contractSHA256": "1eaa8f17b614c9cf16e69d629789a05313cf197914ed84f5d4c05435efd81fb7",
+            "artifactSHA256": "cd59fac86b9574a5acd143f4bd48d9cb124440309b9de95f3130850562c58165",
+            "scopeSHA256": "7ffb7dc6b33300a4438afc113340b09e3ca71e504369c08ee3949b3ada53e2a0",
+            "signerKeySPKISHA256": "f0c921772f0c34c0bf20f64aeb566d9e92eacc4929c402a97065b446612ff748",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "runtimeInspectionAfterM2": {
+            "contractSHA256": "bc68fee60f627032379920201a41bac64f4bd540de9abdf267cba9b0259d1ab7",
+            "artifactSHA256": "f3d5068d9f5023dd4762b960270eb9b9e100a925a58fee63904c1975adf243ff",
+            "scopeSHA256": "1045dc5f118cd38efa4e37e7c27c1bdec971dc44c8ea54f2ee0482a00859752f",
+            "signerKeySPKISHA256": "0804be95d5603b19be85334cfa53be63ca03db96acdc8a4b60f93e29cba13a8c",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "oldBackup": {
+            "daemonIdentitySHA256": "6845a92ea56b51154b9c5a14661888a42e8953f7f6337b84bedcf2521ee1eb23",
+            "id": "7f52ae850b30d9724d685a5e7ae00f80a7b3b77ba28042795177e8609d3a7149",
+            "name": "/fixture-name",
+            "inspectSHA256": "20e96ee35e4a3045c526fee5a2210ad71ba8eb8678d8c10ef3ff611a3a97420a",
+            "imageId": "sha256:55cb7da8b1eb7b0480e60e864f5d1245a98aa239f63eb4b1fea2497310f04893",
+            "configSHA256": "c296bdc826221a88447784332e09120bbbd24c48b1dc89b2c963019c10aecbc5",
+            "mountsSHA256": "46eb0b7d0d5d87d37593c6bc650d36a9047c18f45fb444b19a63c79cc0c0110b",
+            "restartPolicy": "no"
+          },
+          "currentContainer": {
+            "daemonIdentitySHA256": "cf0f1abab052fe1dee4021cd6eb70f0a84de616690e9fcec690edfe289bf8e71",
+            "id": "72d1c6c16bfc9562fa6cb6026ff8019af033348e32ed972a2c30e774bf5d2076",
+            "name": "/fixture-name",
+            "inspectSHA256": "c0072eb453fe58d8cc4c0f1ba317d4b2037762bea5670482dc4268c79e83c4c9",
+            "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+            "configSHA256": "2ccc6297bb95a3ef28c03f69fcce015fd1c1d5a16a481f6b9d79d8ba9d1a08fc",
+            "mountsSHA256": "42cfb94e75f39e2fd3fdbdee956e790cc3189d10a9232775084fbfb031c827f8",
+            "restartPolicy": "no"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+            "mountIdentitySHA256": "54de7ffe37453c5ceebe6ea46b0aea723b0f00310b980203629c59a4b474e12e",
+            "protectedTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+            "nodeLeafDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+            "controlLeafDERSHA256": "b22c528e1e1803f63170865874979a6096bf8403c802827f000e31532039f071",
+            "caBundleRawSHA256": "aa9da6e48bae675993abba9afb18275d70da58ab92574ed321919cd5d57cb02e",
+            "signerPublicRawSHA256": "00eef128e3655e84e449a5ca4da408ab7be2f0b2b71b9fb01f4f2c113a7b12e3"
+          },
+          "bootstrapFloor": {
+            "version": 11,
+            "policySHA256": "9e480f2bafcfde6a8206821a0b26e2ab250acb443e99197673bacc673baa809f",
+            "floorRawSHA256": "076f019c902e3c79d25fb4309826d2684b724f2f7bad79e10f073151d445e383",
+            "journalIdentitySHA256": "687bc05375671ea5e91cbc86adf1170b970b904dd9ccb16726b0697dd5b0994f",
+            "journalUID": 1
+          },
+          "unchangedBootstrapChannel": {
+            "version": 3,
+            "certificateDERSHA256": "c116e5ba393416c6aff5fb2b66d564be7b5ef7e784a582edf4221590aeba2edd",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "bootstrapVerifiedEvent": {
+            "sequence": 1,
+            "envelopeSHA256": "bf510c08afd0c08da05f157058af7d6cfd6b32d9816960c4cedd2e7cd52ec3bd"
+          },
+          "signedM2": {
+            "contractSHA256": "0d5bd03bdff1764d1085b7b68baa87eb931861cc659e47747eeffa050b9a98d7",
+            "artifactSHA256": "589932da8e073cbc488b67ee201633e2e4bb406db4c2a25f12863611e727b7e6",
+            "scopeSHA256": "8a2e542b8c1aa384cdf69d2ea3fafff8abee8876e9dc618ee29a4e72be1ebea9",
+            "signerKeySPKISHA256": "118f24a6a99c7e9f792b9a0034cce471434456323a5d5e14e6909d62d8618487",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "mtls": {
+            "contractSHA256": "8a5f751d3000d5715cf283dd058a1657dc0188817b4822a34e31b0056181d554",
+            "artifactSHA256": "435ee9e65c10339f45321cb02aa688208c844773c2fff0f91cc603b96a1f7de1",
+            "scopeSHA256": "cbaa2bc016446415744df4a11989156769aae95eee04e871c3fe2cf10490c26d",
+            "signerKeySPKISHA256": "0362470ca3f5b347d88e56f7c7be5048dd5ea85306b29254f72f495d3e794845",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "8b86794e2e29fca48598155ef0887b12d5c076ea15ea9b23f8aba1cc643bd6e7",
+            "artifactSHA256": "0a0c90abe81bd227a27ce58fe5940c41d41291d7d4d2bdee1c3460286613f636",
+            "scopeSHA256": "3bfd4c727a096d6104f5054bfca9753344886d443bcc45ffc1ea630d384b3e74",
+            "signerKeySPKISHA256": "95e574e15bdf5c2b285a9c1255a9ac46ed6923813958d6224a8cfb88bfbf41d9",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "execReceipt": {
+            "contractSHA256": "a4cd67a9959e13d5b7decb7068af3805d79fc4e1615adb71da89161402b007b2",
+            "artifactSHA256": "efba344a6ef8ab33462f7027e5ab38d5571d2ce00c339fda44a86c958bf997b9",
+            "scopeSHA256": "af9687e20197879146f7f7a8eb202e562af532c8a97c26131cdc34e145b96687",
+            "signerKeySPKISHA256": "f874d663a7860f374b23808c7f467f14041b9863caaf090c3e8ff5a120248298",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "runtimeInspectionBeforeM2": {
+            "contractSHA256": "3d3eee239fc40dc284fcd6dc62ec49f212ab3457699a826060ab7057e269607d",
+            "artifactSHA256": "02941ba531ee8cfdc298f89db11db5fbb48487e09cd4873298f2c7f5f91d7a69",
+            "scopeSHA256": "5eeeaf512059d25a39bd194b553ea1be65938fbb2eb3073b82145cef346d3166",
+            "signerKeySPKISHA256": "291f6f9639c4e05a044383ab78ce949043b1965a9b667c045638d7f30f6a678a",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          },
+          "runtimeInspectionAfterM2": {
+            "contractSHA256": "b129ec703f6e0f8cd4bc874e6840d96acdcc9b9083cf4fd9283ebb3ecd75b8aa",
+            "artifactSHA256": "928c68084b1c5427ee54589354ea2a649ed120d18df95e32eab54caa410dea19",
+            "scopeSHA256": "2014e7f6fa1155e4d42b6d5c1d40142c8b5134d4bc2ee16baf91b57a8d2fd019",
+            "signerKeySPKISHA256": "5aa90c8a575dcbfdeb3b5f36ffac2451b8f2195f672973e37b055e3b1cc88f89",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      ],
+      "legacyAgentImageFallbackAllowed": false,
+      "channelMutationAllowed": false,
+      "previousInventoryHead": {
+        "presence": "ABSENT",
+        "envelopeSHA256": null,
+        "readbackProof": {
+          "contractSHA256": "c29acdddaee4f69a78ed33ab0e17b766df93fa38c7fa52f25993a832c65e4a78",
+          "artifactSHA256": "8c716b108f72e9231b65e58c47e0027629b2e33602ced3c97315f4393570e61f",
+          "scopeSHA256": "0e961bae4e3073cd902433cfcef01d47cc18d80f48405c967dc2ae7e5bc374e1",
+          "signerKeySPKISHA256": "8566917b00ba010f0368a279f3576e90a0dd0142143a5244f9f0ce489ccb1d3a",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        }
+      }
+    },
+    "signer": {
+      "role": "cp-inventory",
+      "keySPKISHA256": "251e0dcd1d4429e40290c43465efb492a44ed7d8a47e4e3f60ad1b89124844f5",
+      "signatureHex": "e49c5771a1747c340dbbb0a54fbaf69ec061113260b0d1bfd207a425608c8baae7432a5827bd14a1150942a0f432a5f8bac03a9ad73a2c28c54d6fcc36f33cc3"
+    }
+  }
+}

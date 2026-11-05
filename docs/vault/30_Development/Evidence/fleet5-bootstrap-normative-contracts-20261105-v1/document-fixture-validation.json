@@ -1,0 +1,472 @@
+{
+  "schemaVersion": "fleet5-normative-proposal-document-validation:1",
+  "observedAtKST": "2026-11-06T00:18:37.675295+09:00",
+  "environment": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "command": "main .venv Python -B temporary document-only checker (no product imports)",
+  "schemasChecked": 9,
+  "structurallyValidExamples": 6,
+  "adversarialCases": 46,
+  "requiredFieldRemovalCases": 1083,
+  "apiMethods": 14,
+  "apiPositiveAndNegativeCases": 42,
+  "strictByteRejects": [
+    {
+      "id": "J01",
+      "result": "REJECT"
+    },
+    {
+      "id": "J02",
+      "result": "REJECT"
+    },
+    {
+      "id": "J03",
+      "result": "REJECT"
+    },
+    {
+      "id": "J04",
+      "result": "REJECT"
+    },
+    {
+      "id": "J05",
+      "result": "REJECT"
+    }
+  ],
+  "canonicalBodyGoldens": 6,
+  "bindingNameCoverage": "exact 30/18/60 original names",
+  "results": [
+    {
+      "id": "VALID-migration-event",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "VALID-migration-journal",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "VALID-operation-lease",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "VALID-runtime-inventory",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "VALID-successor-plan",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "VALID-terminal-seal",
+      "result": "STRUCTURALLY_VALID",
+      "staticSubset": "PASS",
+      "trust": "UNTRUSTED_REJECT_IN_PRODUCTION"
+    },
+    {
+      "id": "X01",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X07",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X13",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X02",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X08",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X14",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X03",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X09",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X15",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X04",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X10",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X16",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X05",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X11",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X17",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X06",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X12",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X18",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X19",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X20",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X21",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X22",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X23",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X24",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X25",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X26",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X27",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X28",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X29",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X30",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X31",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X32",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X33",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X34",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X35",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X36",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X37",
+      "result": "REJECT",
+      "layer": "static-semantic-subset",
+      "reasons": [
+        "S01",
+        "plan-subject-digest"
+      ]
+    },
+    {
+      "id": "X38",
+      "result": "REJECT",
+      "layer": "static-semantic-subset",
+      "reasons": [
+        "S02",
+        "plan-subject-digest"
+      ]
+    },
+    {
+      "id": "X39",
+      "result": "REJECT",
+      "layer": "static-semantic-subset",
+      "reasons": [
+        "S02",
+        "plan-subject-digest"
+      ]
+    },
+    {
+      "id": "X40",
+      "result": "REJECT",
+      "layer": "static-semantic-subset",
+      "reasons": [
+        "S05-restart"
+      ]
+    },
+    {
+      "id": "X41",
+      "result": "REJECT",
+      "layer": "static-semantic-subset",
+      "reasons": [
+        "S03",
+        "plan-subject-digest"
+      ]
+    },
+    {
+      "id": "X42",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X43",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X44",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X45",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    },
+    {
+      "id": "X46",
+      "result": "REJECT",
+      "layer": "schema",
+      "reasons": []
+    }
+  ],
+  "apiResults": [
+    {
+      "method": "inspectAndValidate",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "reserve",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "setOldRestartNo",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "stopOld",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "captureFenced",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "preserveOld",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "createNew",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "startNew",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "verifyBootstrap",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "publishInventory",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "seal",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "restoreNewRestartPolicy",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "readState",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    },
+    {
+      "method": "release",
+      "validShape": true,
+      "unknownForceRejected": true,
+      "callerRootRejected": true,
+      "actualInvocation": false
+    }
+  ],
+  "actualBindings": "30 target +18 Root +2 member envelopes NULL/HOLD, prior803 unchanged",
+  "actualGoRuns": 0,
+  "actualSignaturesVerified": 0,
+  "actualRuntimeCalls": 0,
+  "actualFilesystemAtomicityOrEngineCases": 0,
+  "fullSemanticOrProductionAcceptance": false,
+  "trustResult": "ALL synthetic fixture artifacts MUST BLOCK at production authentication",
+  "exitCode": 0
+}

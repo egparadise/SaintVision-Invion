@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-plain-agent-migration-event:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-plain-agent-migration-event:1"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "previousEventSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "requestSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recordedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "phase": {
+          "enum": [
+            "PROVENANCE_LOCKED",
+            "RESERVED",
+            "FENCE_INTENT",
+            "OLD_FENCED",
+            "CAPTURED",
+            "PUBLICATION_INTENT",
+            "OLD_PRESERVED",
+            "NEW_CREATED",
+            "NEW_START_INTENT",
+            "NEW_STARTED_UNVERIFIED",
+            "BOOTSTRAP_VERIFIED_RESTART_NO",
+            "INVENTORY_PUBLISHED",
+            "SEALED",
+            "RESTART_POLICY_RESTORED",
+            "READY_FOR_NEW_RENEWAL_PLAN",
+            "BLOCKED_FORWARD_ONLY",
+            "QUIESCENCE_UNKNOWN"
+          ]
+        },
+        "fenceEpoch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "leaseEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "memberStates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slot": {
+                "$ref": "common.schema.json#/$defs/memberKey"
+              },
+              "scope": {
+                "$ref": "common.schema.json#/$defs/scope"
+              },
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_FENCED",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLISHED",
+                  "SEALED",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              },
+              "oldContainerId": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "backupContainerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "newContainerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "latestEvidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.json#/$defs/proof"
+                },
+                "minItems": 0,
+                "maxItems": 32,
+                "uniqueItems": false
+              }
+            },
+            "required": [
+              "slot",
+              "scope",
+              "phase",
+              "oldContainerId",
+              "backupContainerId",
+              "newContainerId",
+              "latestEvidence"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "effect": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "none",
+                "restart-no",
+                "stop",
+                "rename",
+                "create",
+                "start",
+                "inventory-cas",
+                "seal",
+                "restore-new-restart-policy"
+              ]
+            },
+            "targetSlot": {
+              "anyOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/memberKey"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "intentEventSHA256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "receipt": {
+              "anyOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/proof"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "targetSlot",
+            "intentEventSHA256",
+            "receipt"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/proof"
+          },
+          "minItems": 0,
+          "maxItems": 32,
+          "uniqueItems": false
+        },
+        "inventoryEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalSealEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failureReason": {
+          "enum": [
+            "none",
+            "ownership-lost",
+            "inspection-mismatch",
+            "quiescence-unknown",
+            "engine-result-unknown",
+            "protected-state-mismatch",
+            "m2-rejected",
+            "mtls-rejected",
+            "publication-conflict",
+            "timing-unsafe",
+            "foreign-consumer",
+            "provenance-invalid"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "sequence",
+        "previousEventSHA256",
+        "operationId",
+        "idempotencyKey",
+        "requestSHA256",
+        "recordedAt",
+        "phase",
+        "fenceEpoch",
+        "leaseEnvelopeSHA256",
+        "memberStates",
+        "effect",
+        "evidence",
+        "inventoryEnvelopeSHA256",
+        "terminalSealEnvelopeSHA256",
+        "failureReason"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sequence": {
+                "const": 1
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "previousEventSHA256": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "previousEventSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "host-helper"
+        },
+        "keySPKISHA256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "signatureHex": {
+          "$ref": "common.schema.json#/$defs/signature"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

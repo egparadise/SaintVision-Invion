@@ -1,0 +1,214 @@
+{
+  "schema": "fleet5-root-independent-4f-early-proofs:1",
+  "verifiedAtKST": "2026-11-06T01:06:38+09:00",
+  "source": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "artifacts": [
+    {
+      "id": 13429894778,
+      "run": 42058859797,
+      "source": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "ZIP_SHA256": "b1d100279ff98d0d4fb8f2948c0d303ca09f95684eaab27562b6dd0c0dc09b1c",
+      "members": [
+        {
+          "path": "canonical-go-results.json",
+          "SHA256": "265f1c8d8c7883a275a9b6dbffcd00a0fef5e2839972e87476eb8abf528814cd",
+          "bytes": 2679
+        },
+        {
+          "path": "go-guard-events.jsonl",
+          "SHA256": "39f6dd3a8be6784aeccd175e724fc8ea026e9cef4a552f38d675d9859f710883",
+          "bytes": 30125
+        },
+        {
+          "path": "native-fixed-result.json",
+          "SHA256": "f50d310fb8b311a0f57e54e53e28cff661696387895a9cbcc2e197eeef267317",
+          "bytes": 7733
+        },
+        {
+          "path": "native-server.log",
+          "SHA256": "11595bf73e40acba13197aadd0c6baa7e0b6fc5ac00487f1d9a1c55079eeffb3",
+          "bytes": 160
+        }
+      ]
+    },
+    {
+      "id": 13431055483,
+      "run": 42058865926,
+      "source": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "ZIP_SHA256": "4aafbc3995e7f1606318ddd902d1000d97efe8e3295ffae9e3c24f3cdb746f39",
+      "members": [
+        {
+          "path": "leaf-runtime-settled-pinned.json",
+          "SHA256": "fdf267a6a4c072eaee5d9816906e5b115e0ffdf829eb397b59c531dbba7a6ee0",
+          "bytes": 5361
+        },
+        {
+          "path": "leaf-runtime-lifecycle.json",
+          "SHA256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845",
+          "bytes": 335
+        }
+      ]
+    },
+    {
+      "id": 13429399588,
+      "run": 42058865926,
+      "source": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "ZIP_SHA256": "c77ae65caeae757725afc3a2bc4846d7794551227d1bb3ff22c5f6df02d913d2",
+      "members": [
+        {
+          "path": "leaf-runtime-settled-pinned.json",
+          "SHA256": "149f4963ed4a3f24cf757faa52d5b9222adad62fc9a5370023a403122a3376b6",
+          "bytes": 5361
+        },
+        {
+          "path": "leaf-runtime-lifecycle.json",
+          "SHA256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845",
+          "bytes": 335
+        },
+        {
+          "path": "fleet5-t123-mutations/baseline.log",
+          "SHA256": "157972422a22dbb79dcddf297276da24920ac806078a3a00a76d639afe8a3f63",
+          "bytes": 99
+        },
+        {
+          "path": "fleet5-t123-mutations/exec-field-optional.log",
+          "SHA256": "baee2e989439d69c33cfebead7a3ad020abc65a330f55c69d7c0f0c0c437b105",
+          "bytes": 2786
+        },
+        {
+          "path": "fleet5-t123-mutations/guard-no-post-recheck.log",
+          "SHA256": "f00d5e5feb634b0a569787597769e8b88be681f31111b82ca749e74473d24c4f",
+          "bytes": 864
+        },
+        {
+          "path": "fleet5-t123-mutations/mutation-result.json",
+          "SHA256": "453ce37d39d964fd737ab77bb42978d1e3fe1f86b50668ff1805a682f82458a0",
+          "bytes": 4841
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-allow-current-in-final.log",
+          "SHA256": "e722244b94cc4cbbce440efd3f665780017d2a8ee6fd6870b94e2ccfc882bbea",
+          "bytes": 805
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-no-post-ack-match.log",
+          "SHA256": "300b7375c4f5070da95c9473caeb7c3f64ac1b3647d0a32760f9724cfbf8879a",
+          "bytes": 1799
+        },
+        {
+          "path": "fleet5-t123-mutations/rs1-skip-stopped-reread.log",
+          "SHA256": "32b62db3cd89cba07d9ba9afb4e017229006a0608c196c6903b70a4640f4951e",
+          "bytes": 1298
+        }
+      ]
+    }
+  ],
+  "rootDownloadedAndVerifiedAllThreeZIPDigests": true,
+  "native": {
+    "actualGoCycles": 2,
+    "floors": [
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "channels": [
+      8,
+      9
+    ],
+    "requiredNegativeFlagsAllTrue": true,
+    "actualCorrectedGoUnicodeVectors": [
+      {
+        "name": "ascii",
+        "bodySHA256": "77c2a5a9d58bb59ffd7dc9c273810ba3d745a899f47b8398125354e2df7a969a",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "unicode",
+        "bodySHA256": "b339f23894289b78a627117a2d8b50d52d76f1f5d716578ef816d438b340910b",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "html",
+        "bodySHA256": "cb41b60f2ff423888e5515c8e2de8b37ef2ff72a60d22eff84f7e33ede4de492",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "controls",
+        "bodySHA256": "bbe67476457ebbc4b84d395e9bfbaf93574344de1e176ca3615d9495bee60fea",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "line-separators",
+        "bodySHA256": "6dbbe090b13c782308363ddefbf6a82a1a92a8d5f8e4a37d81823bb705b5ed80",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "supplementary",
+        "bodySHA256": "f8cdd58702741b372524cee7351d0a9a82dfa6119b5047eac4b69919201fcdb1",
+        "expectedBytesAndEd25519SignatureVerified": true
+      },
+      {
+        "name": "nested",
+        "bodySHA256": "26c02b3b0e833466abcfa31b01ccb493be0001352c2c1809f9fcb2309002df7e",
+        "expectedBytesAndEd25519SignatureVerified": true
+      }
+    ],
+    "requiredUnicodeCodepointsVerified": [
+      "U+00E9",
+      "U+00EF",
+      "U+0301",
+      "U+2028",
+      "U+2029",
+      "U+AE00",
+      "U+C2A4",
+      "U+D14C",
+      "U+D2B8",
+      "U+D55C",
+      "U+1D11E",
+      "U+1F600",
+      "U+1F9ED",
+      "U+10FFFF"
+    ],
+    "productionDockerOrSQLCASOrOperationalAcceptance": false
+  },
+  "T3PinnedRuntimeProofs": [
+    {
+      "artifact": 13431055483,
+      "Python": "3.14",
+      "tenStagesVerified": true,
+      "eightExpectedRejections": true,
+      "defaultCallbackBypassed": false,
+      "realPinnedCrypto": true,
+      "actualGoAcceptance": false,
+      "sevenSourcePinsMatchedExactGitBytes": true,
+      "strict11FieldResultVerified": true
+    },
+    {
+      "artifact": 13429399588,
+      "Python": "3.12",
+      "tenStagesVerified": true,
+      "eightExpectedRejections": true,
+      "defaultCallbackBypassed": false,
+      "realPinnedCrypto": true,
+      "actualGoAcceptance": false,
+      "sevenSourcePinsMatchedExactGitBytes": true,
+      "strict11FieldResultVerified": true
+    }
+  ],
+  "T1T2MutationProof": {
+    "baseline13Green": true,
+    "allFiveExactMutantsKilledWithExpectedAssertion": true,
+    "mutantLogHashesVerified": true,
+    "productionSourceModified": false,
+    "actualGoDockerAcceptance": false
+  },
+  "rootVerifierCorrection": "first verifier expected installerSourceSHA256 scalar; actual closed map has seven exact source hashes, all now compared to Git4f; no product change",
+  "RootDidNotReexecuteGoDockerOrHostedProof": true,
+  "RootDidNotIndependentlyVerifyGoFloorSignaturesWithoutUploadedCertificate": true,
+  "fullCoreBackendAndCodeVerdictPending": true,
+  "wholeProgramComplete": false,
+  "actualCodeReviewTask": "task_e1a7c90d207a",
+  "actualCodeReviewDispatch": "ctx_0aba9fd1087f"
+}

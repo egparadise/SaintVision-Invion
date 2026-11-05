@@ -1,0 +1,30 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/test_lan_leaf_rotation.py",
+    "tests/test_lan_leaf_rotation_consecutive.py",
+    "tests/test_lan_leaf_rotation_batch_successor.py",
+    "tests/test_leaf_rotation_archive_residue.py",
+    "tests/test_rotation_predecessor_residue.py",
+    "tests/test_fleet5_plain_peer_phase_v3.py",
+    "tests/test_fleet5_plain_reentry.py",
+    "tests/test_fleet5_legacy_rotation_history.py",
+    "tests/test_fleet5_floor_v2_canonical.py",
+    "tests/test_fleet5_standalone_result.py",
+    "tests/test_lan_leaf_rotation_standalone_runtime.py",
+    "tests/core/test_lan_worker_config.py",
+    "tests/core/test_lan_workspace_upgrade.py",
+    "tests/test_core_workflow_cx01.py",
+    "tests/core/test_fleet5_compute_storage_contract_proof.py",
+    "-q",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "exitCode": 1,
+  "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-v2-full-relevant-initial.txt",
+  "scope": "Local fixtures only; no native Go/Docker/hardware acceptance"
+}

@@ -1,0 +1,96 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "id": "M1-external-policy",
+      "operation": "planRegistrySubstitution",
+      "value": "8426ce9fc8e5c3f316f4ab0e9282130fe6c9165600cc6bfc231795819989546b",
+      "expected": "REJECT_BEFORE_RESERVE"
+    },
+    {
+      "id": "M3-preserve-seal",
+      "operation": "postsealUnknown",
+      "expected": "VALID_STATIC"
+    },
+    {
+      "id": "M3-drop-seal",
+      "operation": "dropSeal",
+      "expected": "REJECT"
+    },
+    {
+      "id": "M3-clear-history",
+      "operation": "clearSealedHistoryWithPriorSeal",
+      "expected": "REJECT"
+    },
+    {
+      "id": "M3-replace-seal",
+      "operation": "replaceOriginalSeal",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L3-restartNo-only",
+      "operation": "captureFromRestartNo",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L3-stopped-proof",
+      "operation": "captureFromStoppedWithExactProof",
+      "expected": "VALID_STATIC"
+    },
+    {
+      "id": "L3-foreign-stop-ID",
+      "operation": "captureFromForeignStopIdentity",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L3-foreign-stop-epoch",
+      "operation": "captureFromForeignFenceEpoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L4-early-inventory",
+      "operation": "earlyInventoryRef",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L4-early-seal",
+      "operation": "earlySealRef",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L4-start-wrong-effect",
+      "operation": "wrongMethodEffect",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L4-outcome-no-intent",
+      "operation": "outcomeWithoutIntent",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L5-foreign-daemon",
+      "operation": "foreignDaemon",
+      "expected": "REJECT"
+    },
+    {
+      "id": "L5-same-name",
+      "operation": "sameBackupAndCurrentName",
+      "expected": "REJECT"
+    },
+    {
+      "id": "I1-nested-other-owner",
+      "operation": "nestedOwnerMismatch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "I3-postseal-failure",
+      "operation": "postsealFailureRecord",
+      "expected": "VALID_STATIC"
+    },
+    {
+      "id": "I3-repeat-blocked-failure",
+      "operation": "repeatBlockedFailureObservation",
+      "expected": "VALID_STATIC"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "scope": "Separate provisional Low test-only delta; no source4f CI reassignment",
+  "checks": [
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-1.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-2.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-3.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-4.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-5.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-6.log"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/publication-gate-7.log"
+    }
+  ]
+}

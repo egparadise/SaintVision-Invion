@@ -1,0 +1,7 @@
+[
+  "s01-minio-image.txt",
+  "s01-storage-roundtrip.json",
+  "s01-storage-roundtrip.xml",
+  "s3-product-object-store.xml",
+  "s3-product-postgres.xml"
+]

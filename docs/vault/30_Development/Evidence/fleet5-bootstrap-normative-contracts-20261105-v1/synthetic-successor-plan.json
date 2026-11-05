@@ -1,0 +1,692 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-plan:1",
+      "planId": "fixture-planId",
+      "migrationId": "fixture-first-migration",
+      "createdAt": "2030-01-01T00:00:00Z",
+      "expiresAt": "2030-01-01T00:01:00Z",
+      "canonicalContractSHA256": "35c2c2fade1246df58862f98bbe86a6277df49184b2de1d803cf78a70ed63b7e",
+      "acceptedP0": {
+        "sourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+        "artifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+        "buildProvenance": {
+          "contractSHA256": "3851952edc0a49646902c386fbb764d479f9a2aaf078e3fcb654347fe028af4f",
+          "artifactSHA256": "b07383f2e82fb056b953609937b1441fdfd9420c52fd5d833d60ead178a01782",
+          "scopeSHA256": "d4d08c5a167ce7d14c2aba8e29afa78943a4c8d7cb24d0daea2318187c5aad49",
+          "signerKeySPKISHA256": "d3489d5cceae5f890337076dc51f717c36c11ea7e728114b084d36bbb370f82a",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "f194780e1f376e8a554b6bc1b779b177c6f494ec72994c9cb4670be863fd0472",
+          "attestation": {
+            "contractSHA256": "1daea8aa6c2ab52c2f85496633b536994a4ad5f53a2b0e14044893474e64abb5",
+            "artifactSHA256": "cc77f12d1df57504b90dddd316e7d5057475930f6098ae4bf41ac0275d32a243",
+            "scopeSHA256": "4612843b5f0e105c2a626dca35030b3ebcb635a0096a91743aa0addddafd0e9d",
+            "signerKeySPKISHA256": "0b2caec0a4d4a668d7f035e3349fe00f8c9206e117a1cdd1b3cf28b17985d33d",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "2f4af89649eeee0b4480079cff82951ac58516f98acff21b3dc9490745325789",
+          "attestation": {
+            "contractSHA256": "991b2136d4f9cad80c03bba98064a90442cac0acc5b52b7f2884d93cd332d549",
+            "artifactSHA256": "992c77b84899b21c210d87b3dbfbad917e31d5d03a19edb35bfd9ae1b50a3d30",
+            "scopeSHA256": "6a0528b7a4a1fc31660f31040f4fe8040e0178f280afb0e38368a30e9b3e853b",
+            "signerKeySPKISHA256": "bdf1e531018fc7adcd761dc295fc4bffce9576ec8aba9f0b0033bd40a0734ac5",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "44e4feb9c1979c1ad17ead9d713b09d5053f4f78cbde9eab69606556ebccf0b0",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "c44aabba4e51ce0c4096e9946f38f24ca2c90950",
+          "subjectArtifactSHA256": "af838f05a009fc02daf1c54902800eb6e1822e84f1a3157040aa30e6f19fb026",
+          "reviewCommit": "d65c95a27457a6245106eac8779448d44e261b9e",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "86c86b16409e723232e309f0484eebb8523ccc4de9cd5c5c251b37174e37ceb4",
+            "artifactSHA256": "474ca9cfc1ba808d6364838eae7d1c50085c60ce67479b70f6bf903e5c8f00d1",
+            "scopeSHA256": "d78541a905f51f2f7a02cbdce6f22f80126af7a941c047d64098c045fe0d54b9",
+            "signerKeySPKISHA256": "a6db0181270e556b4872394e3fa7069a865f5834616c0fcae4be353d62f2fc6e",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "image": {
+        "dockerImageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+        "distributionKind": "registry",
+        "distributionProof": {
+          "contractSHA256": "d01dc3dda034ca0439311301a91c974ecd919074ce4e8ffe68e4a5273bd0b8fd",
+          "artifactSHA256": "40ca4c9196fec872b5757e3b721131f458ce38a6660d966285a3ddc562e11825",
+          "scopeSHA256": "2c5142ec493d1f489057ac417810046500c79358bf5e00ce89aebdf8ee002cd3",
+          "signerKeySPKISHA256": "15f3e64809a0592f10b595e9f591d6bee67bfd0d38018241a3c1e9504c031e0b",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "indexOrManifestDigest": "sha256:2b681497ff9cae43497a32c7368c048e4da6bd4568145e687a07ebbe465834c8",
+        "platformManifestDigest": "sha256:0bcb1dd10e5f21bb084b9c79a4c819262fb352ae889f1a6f5d7045f4aa9b9a90",
+        "configDigest": "sha256:7383a417f70b1c402794f79fbd8fb0f20a2c07352312cace993c65769d4d4a3e",
+        "rootFSDiffIDs": [
+          "sha256:1b8c441fac4f8a78d4de510640b26331159761782b89c1ad0a81c3eb6a95eba1"
+        ],
+        "archiveSHA256": "309896ce0b819a10a6ed68560daa80695cb0ff9cdc78db9a10628fb2da3f5d91",
+        "os": "linux",
+        "architecture": "amd64",
+        "executableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+        "inheritedConfigSHA256": "9fa73cf618910be4b925f383fe1f07fb562b20bfd55b6b6e9b926ba149cf278b",
+        "buildRecipeSHA256": "02048df4eedbe5223a89be0e7d8dac083887f0ede70513b72fe517b2139807ee"
+      },
+      "migrationHelper": {
+        "sourceSHA": "c2bdc6db0a475f500d571127d5b6210fa132d894",
+        "artifactSHA256": "04ea65d7ee55caa149b21352e528a4824bde35285b31be58eaab6bda17bdca00",
+        "buildProvenance": {
+          "contractSHA256": "e9d3b46fd6e5fd92fd799a16279e6210e822bf24e1140a71e0167a77e6e7b923",
+          "artifactSHA256": "1df7e866289fad3c978bfecbb6460bd4ce603a36d4c5e867c1b6666f68549e15",
+          "scopeSHA256": "3dbd42b344150dd16afad2741aa38f4115e0dc760ca0c729fa5a220debfc904a",
+          "signerKeySPKISHA256": "58e47fd0a572453ff791351802299d179409bcc7b1eca2401682c28c8dad8dc7",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c2bdc6db0a475f500d571127d5b6210fa132d894",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "edd84c5653486ea2ca47f601b2422b8a0b362ae4b296fa3bd154f9ae4370c68f",
+          "attestation": {
+            "contractSHA256": "fb731d39bece3097d5b5f405637d9a74004892319d4538b41798341c745c50cd",
+            "artifactSHA256": "9cb6f3e4eafd4ec3ebe07e94329cd49551d5ee49e8feb147247733dd503001c0",
+            "scopeSHA256": "506715df43572bc0e120b906c77d1ace1d6367855ee0f4218be40b2becf93d87",
+            "signerKeySPKISHA256": "4eb45c7382001cbf9a32e0a51ecc20e368ee97096cf9c273def0bf75adfb90fc",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "c2bdc6db0a475f500d571127d5b6210fa132d894",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "b9543408ffb00b46d1d62679efd7b648ecba94966b180b1a9bced6443d248443",
+          "attestation": {
+            "contractSHA256": "eb5ebff730c5b8503ec5ff7c40e60613fe008df3d84b9c2aea93569772828548",
+            "artifactSHA256": "137386191eba4a3c1d153d3c7f0387c0ae91e640af972fdec13b6e029a43e467",
+            "scopeSHA256": "2c53051c43f1b5f302a7055f94c121801d093bf9274ccdb4e3cc9a33d6f834a6",
+            "signerKeySPKISHA256": "0dc5d5c52ab0299d654bc4b17fedd6def4a9519915d15152b68968ea4a50b479",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "bbab6e842459074c3195eba58f316f86c7f21facd258e7d9d7fc07c97a54c081",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "c2bdc6db0a475f500d571127d5b6210fa132d894",
+          "subjectArtifactSHA256": "04ea65d7ee55caa149b21352e528a4824bde35285b31be58eaab6bda17bdca00",
+          "reviewCommit": "a62a57206a99f463588fef4d4b8fa9d2ec6baa36",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "5a90d848f7976d7d9bcfb71e267c824b87a6d2d21f636e8a4f3afefde5ceafff",
+            "artifactSHA256": "4b951c7ce1fb0b245a67c9d3e3ebd93fca3d35bbf5463a1ff79c6ad849d84e02",
+            "scopeSHA256": "cef56299d3806a67f12d5dc033f64f4c574cd53475a5061bbcd59ca9562f0b52",
+            "signerKeySPKISHA256": "1b972cdc5d35042b47abef64c31a170ca4694ea5221dfa8811bf38bbe3e0b65e",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "commonFence": {
+        "sourceSHA": "f1b380451fa84bbb5bdd3b1978fc5795f6a8ad72",
+        "artifactSHA256": "865adef2f7b3e1056c301f2827827dc7b7b1b9cfe5412a2c19d85e42cebfbef5",
+        "buildProvenance": {
+          "contractSHA256": "784bf0c7f302910198ef55b5dd9b0be0ed558f9d88a6d2d4f56cd76f1ff3a007",
+          "artifactSHA256": "fcab54388c6c5846f9a314dea796249abe046e5ad250906509bbdc7196ada066",
+          "scopeSHA256": "466b9af3f4d9466f41d6857dd749dad63383a71160514d5a9ab82ae035ff34b8",
+          "signerKeySPKISHA256": "5e3588d63934e915f14fbeeabcc02c3831184e8ce2d063609f4e4ef1c9e660a9",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "f1b380451fa84bbb5bdd3b1978fc5795f6a8ad72",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "da48f5a369c8510e5fee6f93ef693df8b06c92c75de0a59094e1b9d65df21f1d",
+          "attestation": {
+            "contractSHA256": "5be96819eb29bb1d0d815f0d660c0e37ebb566a459de0e165cb3e110721ac57d",
+            "artifactSHA256": "daf2152e75ce525ee7ae815caf71b804a5eb94baa2f492359f6254e88d59c254",
+            "scopeSHA256": "c2607f35b1d2d5b213c09bf736020451da7687efd074dcc8f24bd055cb71bc1d",
+            "signerKeySPKISHA256": "08ed12a311bd1f5966a96a4591f934c0b2b56cb9b50d16ce554f6a5226f4593c",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "f1b380451fa84bbb5bdd3b1978fc5795f6a8ad72",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "e1d3cdf15d50b5f09b6c1d0bf737bfa3c609215eedfa4aeadeca3c286c7c5f3f",
+          "attestation": {
+            "contractSHA256": "2f95b90ac4d0c25b00b9f9016fcf5f89efd831b983b40228eefe46d8c65b67cc",
+            "artifactSHA256": "8dbf7b6c1e8a8b3a296fd82a6e8d158b5a45adf50e18000f3059025b48e91e5b",
+            "scopeSHA256": "9371e263fd857560a2463019bd7fcb93707fbe7f462caa0a268642d5863b98cb",
+            "signerKeySPKISHA256": "ce524dd7c1df84729e2f837dd45a08d9231510f81b5aead8169edfaf65e2388a",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "8265505cb856e5e41657bd877638012b60cb1cb911ad03645fbdfbac89fdfd9a",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "f1b380451fa84bbb5bdd3b1978fc5795f6a8ad72",
+          "subjectArtifactSHA256": "865adef2f7b3e1056c301f2827827dc7b7b1b9cfe5412a2c19d85e42cebfbef5",
+          "reviewCommit": "32c8d008850c3f86454f080e2d3c8012934dd2ec",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "ad6cc5ac340681e697ae8a4cadeb4b5f490d7193808ceea6a825cf841feb78fd",
+            "artifactSHA256": "9c1afe779408607f01c2fb4af48190336751203ba47f5a0d021b68f90d1bb2ac",
+            "scopeSHA256": "85123d0c7727a118bcd875e31e74cf4fb699ade19a7ceb9c62d3f21ab071604b",
+            "signerKeySPKISHA256": "c42529a28df203383be93179116902ff13e1881f8774d64eccd3ed22c5dbbfa8",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "runtimeInventoryAPI": {
+        "sourceSHA": "d2edd4a46d301c874055282c0cf319ef2085e3a2",
+        "artifactSHA256": "c0e33c9241f5946441c7438784800b52d7b1327d7b345465867790de0c33f58b",
+        "buildProvenance": {
+          "contractSHA256": "811f11b68cffe6fdb49780e6d6bdf2e5580819a9ef0cd7de72aca6b8951b3edb",
+          "artifactSHA256": "f7b10a2b2afaf138f92efb059ecf25672b6af5bc79949749585ad41d9142f3dd",
+          "scopeSHA256": "694a905fe6bfa23f2db99e6c3ec1ddf6b411cb3931d4f8408a19365a08205405",
+          "signerKeySPKISHA256": "441af3ce04f9c6247eff73b53ae5f8c6974ede695fcc334711a72cfab284453a",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "d2edd4a46d301c874055282c0cf319ef2085e3a2",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "30d20d322f4616640d58834d4c3e733d7476790276cb446bd1cb0d5888f29774",
+          "attestation": {
+            "contractSHA256": "0af4c1a32ffba8aca9254f8c1a87e923c5c9f197623f783a727e5573e38c2ad9",
+            "artifactSHA256": "133c618471eb9e3c7dd7525640793481d4246f8e612ef2d92c1b1f44f8209a16",
+            "scopeSHA256": "1b467e07891b6b3e64bcc269f17e21e643e9929d73626356f4333f8b749d771d",
+            "signerKeySPKISHA256": "6f5d4488ef680686968a30dc54a8686a4fea379d45310eb86e64782fc6c0df22",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "d2edd4a46d301c874055282c0cf319ef2085e3a2",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "9c1e36c64eca0f6b7b4f24ae6e7e706463b2b4f6e75e29084473aacbf22b4249",
+          "attestation": {
+            "contractSHA256": "ce929e253e3ccf01356449b8cfe056edf8e67da0659fc63eb8d17ff6e654397c",
+            "artifactSHA256": "9d1013539e1457f22a3f49b09e37b7de2ccae5bb1fb6168d061817de43112cab",
+            "scopeSHA256": "6c42645359291bf3197cab1ac4d43b81950a0ca4708aea8958db36ac206a44c6",
+            "signerKeySPKISHA256": "448f83454f10c38ccf8b0d43728b38d23f4a499f418bd0cfc8847ad8788b4dcb",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "c74eab7befc5541eb8c18eb8c7e99d42b32ede1578a3bbffcb977c8937d1d6dc",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "d2edd4a46d301c874055282c0cf319ef2085e3a2",
+          "subjectArtifactSHA256": "c0e33c9241f5946441c7438784800b52d7b1327d7b345465867790de0c33f58b",
+          "reviewCommit": "4c7dc33194b7cb8910972d02d2b13520caf0d2f6",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "27d1c2bc6ade5a13ce4988252ca07a775ba96ba6a981574e72ed3375211ed084",
+            "artifactSHA256": "d9376c1979e8aa13d1704621f0c5942526fe93d85d418e0e12ae702de2ed7443",
+            "scopeSHA256": "a120eefe5d5e52bac8a5cbf8b562144a8025d79203a112e559eb9b3674b5b929",
+            "signerKeySPKISHA256": "103ff2f9fb40c0cff5e61fde4b75a9446fc1d148b510b234292a1748ce54618c",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "schema3Helper": {
+        "sourceSHA": "8efb6fa5735456bf3900380041a9205bd5d79620",
+        "artifactSHA256": "fc91d7aed29cbea785d818fdc8e2ea78c8977a0cde7195ac8848cd15d12f8012",
+        "buildProvenance": {
+          "contractSHA256": "82d3e62e49e94aa9205014ae30eb94e7a9aedb55c47dd61b9b4a4e360a9a07e7",
+          "artifactSHA256": "8e7eea5c4632b9ba0747242fe0e5e8c465b3d7d72ea326c69a947ff3aa232cf1",
+          "scopeSHA256": "a2603ed0f24570274d9e265a637169fcc687838320520ebf4a16b5272bcb7542",
+          "signerKeySPKISHA256": "0f26d6b01d1a430ae1a3ab8a7f5131feb76c603fcd2551ffc6ebe603569b1402",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "8efb6fa5735456bf3900380041a9205bd5d79620",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "235a5f24f8d46917c2fa6f4fcb9f8ae9f93e88e5a814a43dbc8a0028c151d6a9",
+          "attestation": {
+            "contractSHA256": "2a2c7676db67ad27a4ff4cae81302bc587e7c8e700d4fdbaf901e876b1b07627",
+            "artifactSHA256": "7294076ed6f116a7b725e9d8c0c30a5e6d1b2fb87d8a30de341c67e0b1268659",
+            "scopeSHA256": "40a7303d95105d30d7a15954fc95e82962140ff44b418b95cc41822208d84a35",
+            "signerKeySPKISHA256": "e315e069e87f46045a4c8cb430cfed63f93f0f814d46ded4faec0c52fa8cb72a",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "8efb6fa5735456bf3900380041a9205bd5d79620",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "be564bdc1d1059fdeb165117ea02889babbb209eff4e6a6ea631db8bcb677791",
+          "attestation": {
+            "contractSHA256": "d1eb9dcf5dbda24d618d352249d8b0c33bdcc46a7fe6421a3810adeb1f31f9d3",
+            "artifactSHA256": "91620a3983047c6cb7b3ead4b1daafe8bd6ce43b7e490f9719c1c1484b2a473a",
+            "scopeSHA256": "527a99faa529812d6aaf0bd2decef962ce753d9fd72f00d11fb15ec84ea231de",
+            "signerKeySPKISHA256": "d9297247cd6ced6b0675583f93452fe0ca4e7c382373aa58c8eb317a017798b9",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "dc54cc92494583b96fd2ccef9d41ede79882a9ef637389236bf54ccb277aa243",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "8efb6fa5735456bf3900380041a9205bd5d79620",
+          "subjectArtifactSHA256": "fc91d7aed29cbea785d818fdc8e2ea78c8977a0cde7195ac8848cd15d12f8012",
+          "reviewCommit": "f6ddbc175c232326a0e947b03cf15f265b440917",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "52fbcd9d0ca42f3c647741fafcb63dd458006a9c9bcc4af601b8f684cfa4d3cb",
+            "artifactSHA256": "9700d4fedfffbd7da561a5bd95415220750ec130df8337cfb940fc8fa3e076d3",
+            "scopeSHA256": "d6b2e443b9e401ae5d6de30fa739d31f60d9e2e1c1f1d6b1ff6ca49ff37c9971",
+            "signerKeySPKISHA256": "6ee7a9a41eede9b9aa9c0ce6c46ab762dbd587a2fbbbb393340799e006638be8",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "newRenewalGuard": {
+        "sourceSHA": "b4004ea02c209740aca06884585f70e48a6b9f3e",
+        "artifactSHA256": "c0eacb0c7fd84e25ca2f469138ce1bad456836780d32ed18347d8a917bd269db",
+        "buildProvenance": {
+          "contractSHA256": "5f362c4c50e79184142682f5c6a1e0c9a16c9a85b60f2108617fa6d348e449a6",
+          "artifactSHA256": "59e912ccb9061333c5b354b957484ce30a5573f78550a6644344eaaebfb7d640",
+          "scopeSHA256": "e311e0a7e7aabff2cb020fbd59258e34abbb4b0ad236766f1973b935a7a613a8",
+          "signerKeySPKISHA256": "956c5caa9a4b86fe646f1070b13906e01d02bef705d7a3e47bc11eb1918befcb",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        },
+        "coreCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "b4004ea02c209740aca06884585f70e48a6b9f3e",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "39266ebd357d4305c6ce88ebd75f5d553ef5573c41c9e8e2a8a50eef9842d6ca",
+          "attestation": {
+            "contractSHA256": "09ff9f61b815584dacf90932d6a95659c6dc9b33e0ec3c87dc6a1fce77bf710b",
+            "artifactSHA256": "20c4424965959cc031cfb1aead49a6b708ee69fc4f8f40022f8d0c611c312e4a",
+            "scopeSHA256": "24179b558c0a974b7e45465443bb6282a180d59e62d9614087405983ae086cb2",
+            "signerKeySPKISHA256": "5e3ebd3176ddf74fd3a76c9d8ed898ce4abb27f039338f35c2817b974305e10e",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "backendCI": {
+          "repository": "egparadise/SaintVision-Invion",
+          "workflow": "fixture-workflow",
+          "runId": 1,
+          "runAttempt": 1,
+          "headSHA": "b4004ea02c209740aca06884585f70e48a6b9f3e",
+          "ref": "fixture-ref",
+          "event": "push",
+          "conclusion": "success",
+          "artifactSHA256": "4da8b70178657ba52494a35636174c8d73fc4a89a8c6ab74bf017a2cc7410c56",
+          "attestation": {
+            "contractSHA256": "235a874b2bccabd1754b966c5fdedd5242dee27075b333e20e324b481539105a",
+            "artifactSHA256": "f4a2d7aa2e2024793a2743bda3a7fa68aa45bf76e1a68766b54814d39835e5aa",
+            "scopeSHA256": "ec248fbae3c0650472e7f101c198d22d10d095d4172cf6925bb7b07906c0368d",
+            "signerKeySPKISHA256": "e2351b14ff55ab66a4e88a04130d2687335348d0316cf9c0cd506f41262d20ed",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        },
+        "independentReview": {
+          "reviewerId": "fixture-independent-reviewer",
+          "reviewerKeySPKISHA256": "e842707c440a63fd071b1ba4fb383df4e7f3302ffe58e259595f57a93c66b423",
+          "authorId": "fixture-author",
+          "subjectSourceSHA": "b4004ea02c209740aca06884585f70e48a6b9f3e",
+          "subjectArtifactSHA256": "c0eacb0c7fd84e25ca2f469138ce1bad456836780d32ed18347d8a917bd269db",
+          "reviewCommit": "9bde5b69fcd1d5c95018a7b5c944ca1ed46ce84b",
+          "verdict": "ACCEPT",
+          "receipt": {
+            "contractSHA256": "e0fe36a75df79883da1e348f48a4dcfbadd94526713e1b87305bcae66c125c83",
+            "artifactSHA256": "d3f2d5388d5c8b524754bd8cb0dc156bd94875d94c7c382f099e2c81bb6cbd3d",
+            "scopeSHA256": "3afa86766d422dcfb297f2c891ce60804c136fc5051cfcd4c6812057cfe90c2b",
+            "signerKeySPKISHA256": "6d23c7d34f77e1fbedb90cb38bfd5cca34f8510ffa5d462be2b089bdbf9000b3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "nativeTwoCycleProof": {
+        "contractSHA256": "a1fb119f53f9391e78a354ed9521542cc4d61517e90a487f92be9d2f75700488",
+        "artifactSHA256": "839263d6b9afab7e86d9357d706c1084580afb9e244d374aea615c815ed2f101",
+        "scopeSHA256": "8d963e6b77d3982f43738fd899a8145c8a83953ac5bbc2fb4fe325e758d773e8",
+        "signerKeySPKISHA256": "7a2883c4f02d609a158cec62197892cf9ee20abec5dbf0dd29e24ffef9f9f52f",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "oldNewNoWriteCompatibility": {
+        "contractSHA256": "76ad4068c9168f5be39d16cb6c4339ac9623d803ecfb3d13abfde6ba4fa474d2",
+        "artifactSHA256": "8ccbffd59f86700a7b184628b91c727326d5d375d742dadb2a6bf901389ae03e",
+        "scopeSHA256": "d853344b2cc62ae763ca4e5767412426382fada3a912900acc9ce22cda76d0bd",
+        "signerKeySPKISHA256": "1b9bb417dae62f74dbd6cee50e46263612660ab0f3ec0ec9096c412765384ca9",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "m2CapabilityProof": {
+        "contractSHA256": "f1ed8b33147a25f6df13d604f1336309b964151275cd7ebc9adf2ce31f034250",
+        "artifactSHA256": "b92ef1cc0ae3b4caeb196d85c094ad845cf8647e19fee202377f229e018d62ad",
+        "scopeSHA256": "2829953ec47f1fd4db554e0674d9bdd422b4d3c7448f89e56eff9dbfdb5c9110",
+        "signerKeySPKISHA256": "2c3aee425e8871cc9414070afa8852379b69bcb7762a2c8065793d6061ce7f1e",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "rootG2Decision": {
+        "contractSHA256": "35eb50bcfdf2ec5fc470975bc9c5b639cec4a649688d302fdc761ffe8f863249",
+        "artifactSHA256": "b4db1a18c96e17ee25be799c9966908556c9a018c1d5e5aeaab584503de337d0",
+        "scopeSHA256": "5c09e87e919d761ef06f89460d61fc3cab70ff45ee54a27da9f7bba4a9c53b4b",
+        "signerKeySPKISHA256": "56b1e400206a0a1b4edfb0a3ed586ead0fcda1fa42b09d82c1da9e7c005313b6",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "independentPlanReview": {
+        "contractSHA256": "41c81c76b64ed244fb0ddf9e80379ccf87d24cdf1f3284ce8beffd8a509a9ff0",
+        "artifactSHA256": "526bc37efba9b8aae6c570705b9aed25bc8e71ea27ee94e29b49bd30cc541ecb",
+        "scopeSHA256": "fae174c941c18240d9f570632045ee5f35cb0453f281ace963447307bb5076d6",
+        "signerKeySPKISHA256": "30ce51100b327fae31787fc21d827af456e42541577b65a9b36781d1defd907d",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "rootPublicationIntent": {
+        "contractSHA256": "8da5f34f9346c342955858423353ecaefcf089aecfd5a724011b09b8fb5e434f",
+        "artifactSHA256": "da48d11b1485d5ef3b3694b29ff2b5685385fd261c06d665612e94ff9b7951ee",
+        "scopeSHA256": "26ca433117c53fe49c1a2f9b6753104672440fae3702b352dfe3059267d12e5e",
+        "signerKeySPKISHA256": "bc865d828f6b3cc9af200c2cbf34755086970b2cbd61d05db66167eff3923da2",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "scheduleDisabledReadback": {
+        "contractSHA256": "b38923c1e1920b9af9b23bb3b71deaf51237a9615883038939bea8d4c7b8e643",
+        "artifactSHA256": "52da92350e7632b908a345099956b197b699e1211eacbdc967c1d4bf97cd61d6",
+        "scopeSHA256": "bb9dbdc2dfa513c1dd0f792d1d1ab65fb7b0451aad46873b2298b1fd62b2e91a",
+        "signerKeySPKISHA256": "f57f58baa5dea4b152c6a0e5da28b2aadf7a3123372fc069e613cb07f0176d3a",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "allLaunchSurfaces": {
+        "contractSHA256": "93dcfd7135814db30b4760dc928e16838c26677f283e857e0d538335904257c0",
+        "artifactSHA256": "d9f4b9654909514be8e456b68a5e5cb71f8f8e7d185353ed0d26c22970b0c2d3",
+        "scopeSHA256": "a65f83c531639e35a1920ae3699302b0064f141bb96368862d10cc9abd3c4411",
+        "signerKeySPKISHA256": "89b5898a2ee84da8bd54dc4b6542f17accb1d261ab726fc3518e61346081e515",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "noOverlap": {
+        "contractSHA256": "b0c72c75e6b6d61aa0c8d9b876ef60fe1b2b176bd22f9f697560c2eaf74f20cc",
+        "artifactSHA256": "c34209b84c08e0882f0ebb12db298be82f434bb4d3632781b4833798136d00b9",
+        "scopeSHA256": "4ee895d34585fcf36b1c28a11bc5d022b5ab2411d74fcad3a8ec182c658ef4ef",
+        "signerKeySPKISHA256": "309bbc7caad75d055a05e8a33ba9554a98940cad1ebbcb9541dc3fb4a4f4d3c4",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:00:00Z"
+      },
+      "legacyCPStateSHA256": "c12616d9d78c3788e44512a112bf875d638eb9500caa85a783e95e76b80a0eb5",
+      "memberInputs": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "hostRegistrationSHA256": "ae286cd75910c6469f6467b37990770df0c630aa117a0290d4a45c179d4daae5",
+          "workerRootRegistrationSHA256": "132971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61",
+          "hostUID": 1,
+          "hostGID": 1,
+          "oldContainer": {
+            "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+            "id": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+            "name": "/fixture-name",
+            "inspectSHA256": "1ae517ba98b605283243ce27e184c412b09640464a911ae4788b322504caf177",
+            "imageId": "sha256:9c846ddff12d79db37088a75dfd8aa76b51bd41c67f0dbe1563e1143417cbf42",
+            "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+            "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+            "restartPolicy": "unless-stopped"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+            "mountIdentitySHA256": "c768647cb578fd5186ad18c2e2bd689f8b23764ce1ab84532bda65dbc577991f",
+            "protectedTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "exactConsumerIds": [
+            "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69"
+          ],
+          "nodeLabelSHA256": "558a6ff72556f40b1acbef24b2b2b920de9e54d530c861e1d9d42afea61b5807",
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmd": [
+            "--observe",
+            "--image",
+            "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f"
+          ],
+          "entrypoint": [
+            "/inv-node"
+          ],
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+            "nodeLeafDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+            "controlLeafDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+            "caBundleRawSHA256": "25ad97394610842cafb54eb3b8dac1cd5078b217f0a0510e8b7777107e34d922",
+            "signerPublicRawSHA256": "03fe03b00a86d8dc2f9001e4b118771e811557c588bf5831b2228ca32ffc9d50"
+          },
+          "floor": {
+            "version": 11,
+            "policySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+            "floorRawSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+            "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+            "journalUID": 1
+          },
+          "channel": {
+            "version": 3,
+            "certificateDERSHA256": "e09fa59bed5fb4deb1e6122281b35b42fdea0c09abafaed96f4228b1b6cacfb7",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "legacyCPAgentImageValueSHA256": "50311a42163dc7ec185909621b4812dc75ac4b28fdedb74c5a8a8bbcf999fbcd",
+          "backupReservedName": "/fixture-backupReservedName"
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "hostRegistrationSHA256": "01cca331a19b60f986b4ab381b7f314cd0ae3429926bf46f16c8c4898fcf9e03",
+          "workerRootRegistrationSHA256": "b6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279",
+          "hostUID": 1,
+          "hostGID": 1,
+          "oldContainer": {
+            "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+            "id": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+            "name": "/fixture-name",
+            "inspectSHA256": "969d1cdaa520cd0be097ba28bbb0dfe01815d3135c84c97bdfeadd30c31b29cb",
+            "imageId": "sha256:183506cc27f3b013f80ca7890e01477b47e7b2fdb6e21f881bac57ccc33ad699",
+            "configSHA256": "943a12bfd86bc1980473c390684b4dcc2f4c5262c0976ecd35cc7b983ce20b29",
+            "mountsSHA256": "75f6eb07dfcb4a59bdbf16a3cdc3c2be7f13aee227a7f4ffe89bb5e030400f75",
+            "restartPolicy": "unless-stopped"
+          },
+          "volume": {
+            "name": "fixture-name",
+            "driver": "fixture-driver",
+            "metadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b",
+            "mountIdentitySHA256": "54de7ffe37453c5ceebe6ea46b0aea723b0f00310b980203629c59a4b474e12e",
+            "protectedTreeSHA256": "8211375c4a544d42127639cc1ec0f56e10a3c42a9c47d9759c37139dd09aa4f9",
+            "goJournalPath": "/fixture-goJournalPath"
+          },
+          "exactConsumerIds": [
+            "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a"
+          ],
+          "nodeLabelSHA256": "ee3b7716b0c42cda8f20266e0e4924ab6c69a574f179f6c91f3ae0e223ed13ce",
+          "preservedPermitImageDigest": "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f",
+          "cmd": [
+            "--observe",
+            "--image",
+            "sha256:893b016a97e59d105d09bd7f944d8b6e6d98463c51dbebe8ca83f8f1357a6e8f"
+          ],
+          "entrypoint": [
+            "/inv-node"
+          ],
+          "cmdArgvCanonicalSHA256": "d911a79fae4141f2cc130ebfbd42b002e9b566c4f49a22510aeb862547136f15",
+          "entrypointCanonicalSHA256": "cd33985a4a659fff3c00e93f71d173f98b669ae28e6da2bf0dc3c5ea64f0a9f6",
+          "servingArgvCanonicalSHA256": "56da50300253e0c5d1bc63dae375b0011aa446bccbde03b95e1d41b2b5d077d1",
+          "rawServingCmdlineSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c",
+          "authority": {
+            "nodeKeyPublicSPKISHA256": "cb2fb88376c4de9717027d92f365942c9ccb3b086ece418fea4a5d0c7a277d8c",
+            "nodeLeafDERSHA256": "2423f8dba37109b2e42fd19c2628b445b6befaff7c18fda3a1baf12faa5cbeb1",
+            "controlLeafDERSHA256": "b22c528e1e1803f63170865874979a6096bf8403c802827f000e31532039f071",
+            "caBundleRawSHA256": "aa9da6e48bae675993abba9afb18275d70da58ab92574ed321919cd5d57cb02e",
+            "signerPublicRawSHA256": "00eef128e3655e84e449a5ca4da408ab7be2f0b2b71b9fb01f4f2c113a7b12e3"
+          },
+          "floor": {
+            "version": 11,
+            "policySHA256": "9e480f2bafcfde6a8206821a0b26e2ab250acb443e99197673bacc673baa809f",
+            "floorRawSHA256": "076f019c902e3c79d25fb4309826d2684b724f2f7bad79e10f073151d445e383",
+            "journalIdentitySHA256": "687bc05375671ea5e91cbc86adf1170b970b904dd9ccb16726b0697dd5b0994f",
+            "journalUID": 1
+          },
+          "channel": {
+            "version": 3,
+            "certificateDERSHA256": "c116e5ba393416c6aff5fb2b66d564be7b5ef7e784a582edf4221590aeba2edd",
+            "enabled": true,
+            "endpoint": "fixture-endpoint"
+          },
+          "legacyCPAgentImageValueSHA256": "a31eba9623d496f0a9f734f425729478c5dd8957319dac6201294f48d433204f",
+          "backupReservedName": "/fixture-backupReservedName"
+        }
+      ],
+      "timing": {
+        "leafDeadline": "2030-01-07T00:00:00Z",
+        "caDeadline": "2030-02-01T00:00:00Z",
+        "policyDeadline": "2030-01-07T00:00:00Z",
+        "maintenanceStart": "2030-01-01T00:00:00Z",
+        "maintenanceEnd": "2030-01-01T00:10:00Z",
+        "normalRenewalStart": "2030-01-03T00:00:00Z",
+        "normalRenewalEnd": "2030-01-04T00:00:00Z",
+        "operatorWindowStart": "2030-01-01T00:00:00Z",
+        "operatorWindowEnd": "2030-01-04T00:00:00Z",
+        "measuredSafetyBudgetSeconds": 600,
+        "maxEvidenceAgeSeconds": 120,
+        "maxClockSkewSeconds": 30
+      },
+      "restartRestore": "keep-no",
+      "secondMigrationAllowed": false,
+      "credentialRecopyAllowed": false,
+      "oldContainerRestartAllowed": false,
+      "sourceOfFreshFiveIssuerAllowed": false,
+      "expectedInventoryHead": {
+        "presence": "ABSENT",
+        "envelopeSHA256": null,
+        "readbackProof": {
+          "contractSHA256": "a47bb28b8c4d45893de98078046998a973c372bec3e149717b5dc19e900b8dc4",
+          "artifactSHA256": "2afb94ae2b478dfacd504fe0ffed7e1ee4cd795024683e21073dff01ab2e90b0",
+          "scopeSHA256": "29f0070a08c8cd170d6568bb1e1c6b90a05a9d8268b11a9020d2e24e58b541e7",
+          "signerKeySPKISHA256": "fbff8f5453b9cce90dc5431b1fe4b40d4c5f5137340147ffe9202847abdb9026",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:00:00Z"
+        }
+      },
+      "planSubjectSHA256": "af79568466386cead8a10b0ca1db621a359a9cc7a4de2df4a08533789088f59f"
+    },
+    "signer": {
+      "role": "root-plan",
+      "keySPKISHA256": "33fdd2788b831cb94b8220adcbc993687b1a4d3d5ed52178865569c25ffeae05",
+      "signatureHex": "fd3ffb49cc299edfeff4b20bd387f6cc6072a2238d948ab4c5fcb76842b3aeb829bb62106a1fb8bc71484fc1c055d30a9e1008e8ab9ff1b15c619be381d42321"
+    }
+  }
+}

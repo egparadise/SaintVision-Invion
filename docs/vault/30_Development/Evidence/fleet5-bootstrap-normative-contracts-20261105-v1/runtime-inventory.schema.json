@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-node-runtime-inventory:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-runtime-inventory:1"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "publishedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "publicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "expectedLegacyCPStateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedChannelVectorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "leaseEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "target": {
+          "$ref": "common.schema.json#/$defs/product"
+        },
+        "image": {
+          "$ref": "common.schema.json#/$defs/image"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/runtimeMember"
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "legacyAgentImageFallbackAllowed": {
+          "const": false
+        },
+        "channelMutationAllowed": {
+          "const": false
+        },
+        "previousInventoryHead": {
+          "$ref": "common.schema.json#/$defs/inventoryHead"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "cohortId",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "revision",
+        "publishedAt",
+        "publicationId",
+        "expectedLegacyCPStateSHA256",
+        "expectedChannelVectorSHA256",
+        "leaseEnvelopeSHA256",
+        "target",
+        "image",
+        "members",
+        "legacyAgentImageFallbackAllowed",
+        "channelMutationAllowed",
+        "previousInventoryHead"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "cp-inventory"
+        },
+        "keySPKISHA256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "signatureHex": {
+          "$ref": "common.schema.json#/$defs/signature"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

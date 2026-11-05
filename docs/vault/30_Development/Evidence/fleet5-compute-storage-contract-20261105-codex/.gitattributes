@@ -1,0 +1,3 @@
+# Preserve exact imported pytest traceback bytes in these two historical logs only.
+p0-existing-lifecycle-migration-1.txt whitespace=-blank-at-eol
+p0-existing-lifecycle-migration-2.txt whitespace=-blank-at-eol

@@ -1,0 +1,18 @@
+{
+  "status": "PROPOSED_NOT_ACCEPTED",
+  "encoding": "Go encoding/json.Marshal(map) as strict C2 body; no BOM/newline; duplicate keys, invalid UTF8/surrogates, floats, NaN and infinities rejected before encoding",
+  "bodyKeys": "Every body key in the relevant closed schema, excluding the outer signer. No fixture wrapper enters a signed body.",
+  "domains": {
+    "successor-plan": "saintvision/plain-agent-migration-plan/v1",
+    "migration-event": "saintvision/plain-agent-migration-event/v1",
+    "migration-journal": "saintvision/plain-agent-migration-journal/v1",
+    "terminal-seal": "saintvision/plain-agent-migration-seal/v1",
+    "operation-lease": "saintvision/agent-mutation-fence/v1",
+    "runtime-inventory": "saintvision/node-runtime-inventory/v1"
+  },
+  "signedMessage": "ASCII(domain) + one 00 byte + canonical(body)",
+  "bodySHA256": "SHA256(canonical(body))",
+  "envelopeSHA256": "SHA256(canonical({body,signer})); exact canonical bytes, no newline",
+  "signerBinding": "Ed25519 role plus independently pinned registered public SPKI hash; signer roles never grant trust by themselves; no Node leaf used to sign Root/fence/inventory objects",
+  "syntheticSignaturePolicy": "Signature-shaped fixture hex is INVALID/UNTRUSTED, never produced by signing and never an acceptance proof"
+}

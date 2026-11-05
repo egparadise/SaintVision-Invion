@@ -1,0 +1,53 @@
+.....................................................FFs............ssss [ 45%]
+.........................................sssssF.........ssss............ [ 91%]
+.............                                                            [100%]
+================================== FAILURES ===================================
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:379: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    assert archive.read_bytes() == original_archive
+E   assert b'{"commitRec...otation:3"}\n' == b'{"commitRec...otation:3"}\n'
+E     
+E     At index 6957 diff: b'6' != b'c'
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "2a3b570045f64aceaca4a46bc6efeda4", "targetChannelVersion": 8, "proposalDigest": "05d1485ec8ab639a82552463d0e698a71c2d291e559375e762d06a5ed867b63d", "privateKeyTransferred": false}
+{"schemaVersion": "saintvision-lan-leaf-rotation:3", "rotationId": "2a3b570045f64aceaca4a46bc6efeda4", "proposalDigest": "05d1485ec8ab639a82552463d0e698a71c2d291e559375e762d06a5ed867b63d", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "certificateSHA256": "d78a3403ffa7c4181f4cdbc9c2dfe6c85807565c7fb880b258db0b085d4ff3e7", "committed": true, "currentPeerPolicySHA256": "ce948fb7a9c9e803c29695d0b9d6800dd30decf1315732095dcb88ac11072351", "currentPeerPolicyVersion": 7, "finalPeerPolicySHA256": "ad2a795bb34fa6510501f58ac9a61f218a3d87fb43c326d5d4a9ed48f84890a1", "finalPeerPolicyVersion": 9, "floorObservationSHA256": "62916d7ad97a3ac411ec69d1815506a2a72148d1c578f535996767b3dc0eeda8", "overlapPeerPolicySHA256": "23df99221ca5fb755a04c23827c2d582c415abed776caff9ee047188a2daf2b9", "overlapPeerPolicyVersion": 8, "controlSignature": "0159f5fe9f2a246d2e29eacd999ccbdb1c9e05f40d0982eb9a84410ae97730396b1a0913d502ac08f2ebb0cff77b527a86cff9ae3d000e0d56d4746bdea5bd0d", "idempotentReplay": false, "restartObserverRequired": true, "nodeOverlapFinalizationRequired": true}
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "5e21fd69536e4bfa99d8892790af4eae", "targetChannelVersion": 9, "proposalDigest": "9b860d38d99ea1c71ba3e6409270dff82702901902939d5348d9f3e5fd1acff0", "privateKeyTransferred": false}
+_ test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive] _
+tests\test_lan_leaf_rotation_consecutive.py:372: in test_finalize_publication_crash_is_replayable_without_overwriting_evidence
+    rotation.finalize(
+deploy\lan\worker_leaf_rotation.py:943: in finalize
+    return plain_finalize(bundle, worker_root, commit_receipt, restart=restart, now=now)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:197: in finalize
+    legacy._immutable(archive_dir / (manifest["rotationId"] + ".json"), evidence, publish=True)
+deploy\lan\worker_leaf_rotation.py:521: in _immutable
+    raise ValueError("Finalized rotation archive collision")
+E   ValueError: Finalized rotation archive collision
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "d1bbfee0a63b44b18b9cb32dba716b9c", "targetChannelVersion": 8, "proposalDigest": "1b029e2855ed08dc05c22f17af3096c86b46ca9a13d7ffc433f07cb334ecf0bd", "privateKeyTransferred": false}
+{"schemaVersion": "saintvision-lan-leaf-rotation:3", "rotationId": "d1bbfee0a63b44b18b9cb32dba716b9c", "proposalDigest": "1b029e2855ed08dc05c22f17af3096c86b46ca9a13d7ffc433f07cb334ecf0bd", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "certificateSHA256": "9911649f3d0d5deddb8501b2fa69dfe8540c58a72968129e60c631fcb2377ac7", "committed": true, "currentPeerPolicySHA256": "38c57fcafbb01e787fd0896c3205339c6621d9cd5c17bc67de154e0635697c56", "currentPeerPolicyVersion": 7, "finalPeerPolicySHA256": "76ec1816039311812d26674636d8fed6929e29a60ff236b71aa1ac287badda97", "finalPeerPolicyVersion": 9, "floorObservationSHA256": "12278708c98af57fdb4422423a15c9ef4bfb11ee0b81e375638f8c63eb2ab1f1", "overlapPeerPolicySHA256": "eb78988c5b0e0d2db1d96dd797e9ec3a0abaa6a2225bf99d70af1a6f80b1221d", "overlapPeerPolicyVersion": 8, "controlSignature": "752a50bdb81e641dbd8b979c5369c7690642827f721fd5fd226240f45f82444dfc28a7954d8f078882c0ff019f2b592ecf22eb6950390c380ccd6617849b5d07", "idempotentReplay": false, "restartObserverRequired": true, "nodeOverlapFinalizationRequired": true}
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "0e53abcf67134c4eb44870ebbcc46a55", "targetChannelVersion": 9, "proposalDigest": "85c4a495a0b46e3783955593066db795fc7f0367e564c23637d2ad3916337ab9", "privateKeyTransferred": false}
+__ test_link_publication_crash_replay_removes_only_equal_owned_residue[node] __
+tests\test_leaf_rotation_archive_residue.py:62: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    assert published == original
+E   assert b'{"commitRec...otation:3"}\n' == b'{"commitRec...otation:3"}\n'
+E     
+E     At index 6957 diff: b'5' != b'c'
+E     Use -v to get more diff
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "e6f1005cae144725be83e6aeb777c1d6", "nodeCount": 2, "batchDigest": "492ef08c06071d7734af54959be782fd5477b659020728758441aa943cca57b8", "privateKeyTransferred": false}
+{"staged": true, "idempotentReplay": false, "batchId": "e6f1005cae144725be83e6aeb777c1d6", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "globalControlLeafSwitched": false}
+{"staged": true, "idempotentReplay": false, "batchId": "e6f1005cae144725be83e6aeb777c1d6", "nodeId": "nod_01HYYYYYYYYYYYYYYYYYYYYYYY", "channelVersion": 12, "globalControlLeafSwitched": false}
+{"committed": true, "idempotentReplay": false, "batchId": "e6f1005cae144725be83e6aeb777c1d6", "nodeCount": 2, "globalControlLeafSwitched": true, "nodeOverlapFinalizationRequired": true}
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:383: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:480: symlink capability unavailable: 1314
+SKIPPED [5] tests\test_lan_leaf_rotation_batch_successor.py:561: OS cannot create test symlinks
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:117: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:129: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:162: OS cannot create test symlinks
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[before-archive]
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_finalize_publication_crash_is_replayable_without_overwriting_evidence[after-archive]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node]
+3 failed, 140 passed, 14 skipped in 69.47s (0:01:09)

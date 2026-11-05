@@ -1,0 +1,128 @@
+{
+  "schema": "fleet5-root-independent-native4a-artifact-verification:1",
+  "verifiedAtKST": "2026-11-05T23:55:57+09:00",
+  "source": "4a928310e88ac336efb040c1621525fee7133f32",
+  "run": 42047390811,
+  "artifact": 13426365088,
+  "artifactZIP_SHA256": "89905efce01632d27238a433e189c46150c7c0ff4a45838ca1b87da617683d0c",
+  "rootDownloadedAndHashed": true,
+  "members": [
+    {
+      "path": "canonical-go-results.json",
+      "SHA256": "f423e0e978a2ab8771900d94b6ff6097b31c873a7aaa53133a401dd12f07a868",
+      "bytes": 2595
+    },
+    {
+      "path": "go-guard-events.jsonl",
+      "SHA256": "aa7a4af3dc88e7d0bc457c5e8c35e9a70bc7da9d9084d7715314bd816233b287",
+      "bytes": 30122
+    },
+    {
+      "path": "native-fixed-result.json",
+      "SHA256": "38a98ed6e4c64df76fdfcc99f1668a17aa4fcd1c1bc66ad7316f0ded4e0d514f",
+      "bytes": 7733
+    },
+    {
+      "path": "native-server.log",
+      "SHA256": "4b298076169524b37fe09dda38d8b134dd4b5c887fb34d1b35ba64971869f711",
+      "bytes": 160
+    }
+  ],
+  "runtimeGOOS": "linux",
+  "completedNormalCycles": 2,
+  "floorVersions": [
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "channelVersions": [
+    8,
+    9
+  ],
+  "bothOldCPRejectedAfterFinal": true,
+  "requiredNegativeFlags": {
+    "expiryBeforeWriteRejected": true,
+    "rollbackAfterHandshakePinRejected": true,
+    "sameProposalRetryFrozen": true,
+    "predecessorResidueRejected": true,
+    "predecessorExactReplaySettled": true,
+    "floorCPMismatchRejected": true,
+    "strictOldReaderRejected": true,
+    "sameVersionDifferentHashRejectedByActualGo": true,
+    "expiredDirectStartupStillPinsByActualGo": true,
+    "actualGoObserverOwnershipAndLockTestsPassed": true,
+    "actualCrossLanguageCanonicalSignaturesVerified": true
+  },
+  "explicitLimits": {
+    "productionDockerOwnershipAssessed": false,
+    "actualPostgresCASAssessed": false,
+    "privateFixtureKeysUploaded": false,
+    "operationalAcceptanceAssessed": false
+  },
+  "rootIndependentCryptographicChecks": [
+    {
+      "case": "ascii",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "77c2a5a9d58bb59ffd7dc9c273810ba3d745a899f47b8398125354e2df7a969a",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": false
+    },
+    {
+      "case": "unicode",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "117795a30dd28bb307c87db5a1e440a38a4e3a773baa93486a981bedcebe5fc8",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": true
+    },
+    {
+      "case": "html",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "cb41b60f2ff423888e5515c8e2de8b37ef2ff72a60d22eff84f7e33ede4de492",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": false
+    },
+    {
+      "case": "controls",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "bbe67476457ebbc4b84d395e9bfbaf93574344de1e176ca3615d9495bee60fea",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": false
+    },
+    {
+      "case": "line-separators",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "6dbbe090b13c782308363ddefbf6a82a1a92a8d5f8e4a37d81823bb705b5ed80",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": false
+    },
+    {
+      "case": "supplementary",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "d80ee61f9d97218571f1ad495e6652eefb7041e731b5ece8e17c6d965053c1ca",
+      "rawNonASCIICharacterCount": 1,
+      "containsQuestionMark": true
+    },
+    {
+      "case": "nested",
+      "signatureVerifiedForActualSuppliedBody": true,
+      "canonicalBodySHA256": "7283f41178088c9e863c7aa58a40a0807cc7fa5ca89e475da2ff292e5b75ad75",
+      "rawNonASCIICharacterCount": 0,
+      "containsQuestionMark": true
+    }
+  ],
+  "fullIntendedUnicodeCoverage": false,
+  "unicodeCoverageDefectMessage": "msg_7113bdba916c",
+  "coverageMeaning": "valid signatures for actual supplied bytes; unicode/nested named vectors contain substituted ASCII question marks, intended full coverage not established",
+  "newVectorDeltaRequired": true,
+  "rootDidNotReexecuteGoOrDocker": true,
+  "rootDidNotIndependentlyVerifyFloorSignaturesWithoutUploadedPublicCertificate": true,
+  "nativeFixtureSuccessNotFullCoreOrOperationalAcceptance": true,
+  "actualCorrectedCodeReviewTask": "task_c90b362f7470",
+  "actualCorrectedCodeReviewDispatch": "ctx_1e0814952956",
+  "CIOverallAtLastObservation": "Core and Backend in progress; Docs success",
+  "codeAccepted": false,
+  "wholeProgramComplete": false,
+  "rootComparedZIPToPublished500GitBlob": true
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "fleet5-v2-frozen-boundaries:1",
+  "acceptedPlan": "803ad270562b1b75e44d26f9e14b965c714ab519",
+  "acceptedPlanActualReview": "b59a5252e065c031349fbfc6f3d9cfcd203ad581",
+  "priorProposal": "f932283de3fd96f3816a99ea5c38d6d14969b930",
+  "priorProposalVerdict": "REVISION REQUIRED, not accepted contracts",
+  "acceptedProductSourceFrozen": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "preservedInvariants": [
+    "same old PC2/PC4 registered identities/tenant/STRING epoch/keys/CA/endpoints/observe profile/args/mounts/resources/state/journal/floors/channels",
+    "image ONLY migration; preserve --image workload/permit and global CP legacy agentImage",
+    "no credential recopy/new volume/backup deletion/old image restart/downgrade/second migration",
+    "both reservations and restart=no readbacks before first stop; serial PC2 thenPC4; no-overlap across all launch surfaces",
+    "private nofollow/singlelink ownership/atomic immutable no-overwrite event publication+fsync/CAS/readback and retained old evidence",
+    "actual unsigned20:34 snapshot historical context only; three Root-disabled entries need fresh readback; no old legacy v1 plan reenable",
+    "actual deadlines/operator/renewal windows remeasured privately by Root; no clock/claim/lock/window/latch bypass or offline-ladder expansion",
+    "typed runtime inventory atomic two-member CAS only; C and authorities unchanged; normal3 new lease/fresh current M2; P+4/C+2 two-cycle actual proof separate",
+    "no five-PC/48-task/VFCL acceptance promotion"
+  ],
+  "actualTargetRootMemberBindings": "NULL/HOLD",
+  "allFutureProductCases": "40 NOT RUN",
+  "v2Overrides": "M1-M3 L1-L5 I1-I3 in revision-contract.md and v2 schemas/table override rejected v1 clauses; v1 remains unchanged historical evidence"
+}

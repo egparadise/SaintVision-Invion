@@ -1,0 +1,235 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "id": "X01",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X07",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X13",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X02",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X08",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X14",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X03",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X09",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X15",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X04",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X10",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X16",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X05",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X11",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X17",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X06",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X12",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X18",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X19",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X20",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X21",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X22",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X23",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X24",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X25",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X26",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X27",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X28",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X29",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X30",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X31",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X32",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X33",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X34",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X35",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X36",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X37",
+      "result": "REJECT",
+      "layer": "static subset"
+    },
+    {
+      "id": "X38",
+      "result": "REJECT",
+      "layer": "static subset"
+    },
+    {
+      "id": "X39",
+      "result": "REJECT",
+      "layer": "static subset"
+    },
+    {
+      "id": "X40",
+      "result": "REJECT",
+      "layer": "static subset"
+    },
+    {
+      "id": "X41",
+      "result": "REJECT",
+      "layer": "static subset"
+    },
+    {
+      "id": "X42",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X43",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X44",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X45",
+      "result": "REJECT",
+      "layer": "schema"
+    },
+    {
+      "id": "X46",
+      "result": "REJECT",
+      "layer": "schema"
+    }
+  ]
+}

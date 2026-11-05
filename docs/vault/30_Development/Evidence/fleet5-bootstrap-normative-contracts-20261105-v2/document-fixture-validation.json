@@ -1,0 +1,2214 @@
+{
+  "schemaVersion": "fleet5-v2-document-validation:1",
+  "observedAtKST": "2026-11-06T01:18:55.539837+09:00",
+  "environment": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "schemas": 9,
+  "artifactStructuralPositives": 6,
+  "postsealStructuralPositive": 1,
+  "proofSlotStaticPositives": 77,
+  "proofSlotStaticNegatives": 539,
+  "edgeCases": 18,
+  "requiredRemovals": 1866,
+  "strictBytes": 9,
+  "strictTimeCases": 6,
+  "apiShapes": 28,
+  "baselineAdversarialCases": 46,
+  "canonicalBodyFixtures": 6,
+  "results": [
+    {
+      "id": "shape-successor-plan",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "shape-migration-event",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "shape-migration-journal",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "shape-operation-lease",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "shape-runtime-inventory",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "shape-terminal-seal",
+      "result": "VALID_STRUCTURAL_ONLY"
+    },
+    {
+      "id": "L5-static-S05",
+      "result": "PASS",
+      "scope": "same daemon/distinct IDs/names/restart/no + fixture plan/volume/authority/image/scope binding; no actual inspect or crypto"
+    }
+  ],
+  "proofSlotResults": [
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-contract",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-kind",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-role",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-domain",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#invalid-time",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#scope-hash-mismatch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#stale-observation",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#nodeId",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#recoveryEpoch",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "swap:successor-plan:/body/independentPlanReview",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "swap:successor-plan:/body/rootPublicationIntent",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "swap:api-request[reserve]:/arguments/rootExecutionDecision",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    },
+    {
+      "id": "swap:successor-plan:/body/rootPublicationIntent",
+      "result": "REJECT_STATIC_SLOT_CHECK"
+    }
+  ],
+  "actualGoRuns": 0,
+  "actualSignaturesVerified": 0,
+  "actualRuntimeCalls": 0,
+  "actualLockAtomicityCases": 0,
+  "fullSemanticVerification": false,
+  "fixtureTrust": "ALL untrusted document dummies; production BLOCK",
+  "actualBindings": "NULL/HOLD including external trust registration",
+  "exitCode": 0
+}

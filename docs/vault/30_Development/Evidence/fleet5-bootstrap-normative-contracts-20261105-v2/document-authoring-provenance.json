@@ -1,0 +1,23 @@
+{
+  "documentOnly": true,
+  "temporaryPrograms": {
+    "_revise_normative_docs.py": "f6ae0e9baec702f44cf94086d6b8508b8643b0868739dffee5f2d1c90e042ed6",
+    "_check_v2_documents.py": "1b947c82427fb2866a9928ed0a552ee703ff9a8d126e20913aabe7dfcd41cd76"
+  },
+  "actualProductImports": 0,
+  "actualKeysOrSigning": 0,
+  "runtimeActions": 0,
+  "failuresPreserved": [
+    {
+      "step": "document checker local timestamp schema reference resolution",
+      "exitCode": 1,
+      "correction": "explicit local referencing registry; no external schema retrieval used"
+    },
+    {
+      "step": "new static freshness check detected zero-length validity in copied old structural template",
+      "exitCode": 1,
+      "correction": "v2 synthetic fixture interval explicitly 2030-01-01T00:00:00Z to00:01:00Z, synthetic verifier instant00:00:30; v1 artifacts/live receipts/clocks unchanged"
+    }
+  ],
+  "actualReviewPending": true
+}

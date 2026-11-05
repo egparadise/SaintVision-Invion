@@ -1,0 +1,50 @@
+{
+  "schema": "fleet5-root-docs-publication-gates:1",
+  "recordedAtKST": "2026-11-06T02:04:57+09:00",
+  "environment": "Windows PowerShell; CPython3.14.7 venv; exact branch agent/codex/fleet-five-orchestration-20261105",
+  "baseSHA": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
+  "checks": [
+    {
+      "command": "python tools/check_docs.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/check_ontology.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/check_doc_path_citations.py --ratchet --base-ref 2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/check_doc_single_source.py --ratchet",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/sync_obsidian.py --check",
+      "exitCode": 0
+    }
+  ],
+  "syncCheck": {
+    "managed": 2571,
+    "pendingExports": 177,
+    "conflicts": 0,
+    "writes": false
+  },
+  "scope": "Root documentation/evidence aggregation only; not combined product build or equipment acceptance",
+  "productChanged": false,
+  "ciPushAndObsidianApply": "performed after this immutable source is committed; final exact SHA receipt stays private to avoid self-reference",
+  "initialStagedDiffCheck": {
+    "exitCode": 2,
+    "cause": "three original pytest E-line trailing spaces in two newly imported historical raw text logs; untracked files were absent from initial working-tree diff",
+    "originalRawSHA256": {
+      "p0-existing-lifecycle-migration-1.txt": "23d72b16a99e46e5957829a3eaeab6f30c5f7a37e342a4a2fa980aa724c2fc7f",
+      "p0-existing-lifecycle-migration-2.txt": "a19fb4ac9d666c73f4e3a2d131b35c6c9cc8878c9ab72b5dee9f0b5b1455e5d0"
+    },
+    "correction": "exact two-basename .gitattributes blank-at-eol exception; raw bytes unchanged; no broad whitespace policy change"
+  }
+}

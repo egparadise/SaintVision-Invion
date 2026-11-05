@@ -1,0 +1,64 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_667a078e2dc3 / ctx_9fd4c380b503",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-05T23:34:48+09:00", "2026-11-05T23:37:33+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch call and at the last delta check before writing; publication times are separate",
+  "reviewKind": "bounded independent Low-condition DELTA review of a NONEXECUTING plan; prior a471ce19 9e8 plan ACCEPT with C1-C3 retained, not rerun or relabelled; no code, contract, runtime CI or operational acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "803ad270562b1b75e44d26f9e14b965c714ab519",
+    "base": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+    "delta": {"files": 18, "insertions": 1595, "deletions": 139, "nonDocsFiles": 0, "historyVersion": "1.0.3", "newFiles": ["m2-v2-body-golden-fixtures.json", "m2-v2-body-golden-validation.json"]},
+    "readFrom": "Git objects only (private scratch copy); author checkout untouched",
+    "planDocs": {"run": 42045613505, "verifiedBy": "Root (reported)", "checkedByClaude": false}
+  },
+  "independentChecks": {
+    "interpreter": "main .venv Python 3.14.7 -B -I; own scripts, not owner harness",
+    "artifactHashes": "22/22 recomputed and matched",
+    "ownerSchemaCases": "31/31 matched",
+    "claudeMutations": {"booleanLeafFlips": "44/44 rejected", "nullLeafFills": "53/53 rejected", "newBarriersSetTrue": "5/5 rejected (secondBinaryMigrationAllowed, legacySchedulerReRegistrationAllowed, globalOuterSignatureNormalizationAllowed, blanketAsciiIdentifierRestrictionAllowed, bodyTransportNewlineIncludedInSignature)"},
+    "bindingCounts": {"targetBindings": 30, "rootBindings": 18, "memberBindingNames": 60, "memberEnvelopes": [null, null]},
+    "acceptanceMatrix": {"cases": 40, "A01toA36ContentUnchanged": true, "added": {"A37": "C1", "A38": "C3", "A39": "C2", "A40": "C2"}, "status": "FUTURE NOT RUN"},
+    "schemaRequiredRemoved": [], "schemaAdditionalPropertiesFalse": true,
+    "unchangedFiles": ["observer-exec-and-image-config-contract.json", "inspect-comparison-contract.json", "runtime-inventory-contract.json", "root-g2-planning-choice.json", "source-review-cases.json", "parameter-contract.json"],
+    "m2V2BodyGoldens": {
+      "method": "own emulation of Go encoding/json Marshal(map[string]any) for str/int/bool: UTF-8 byte-order key sort, compact, short escapes for quote/backslash/n/r/t/b/f, lowercase u00XX for other controls, u003c/u003e/u0026 for <>&, u2028/u2029, raw non-ASCII UTF-8, no normalization",
+      "positiveB01toB05": "5/5: expected body bytes, body SHA256, v2 domain prefix, domain+body bytes and SHA256, input document parse and SHA256 all reproduced; no newline in body; transport newline not signed",
+      "negativeB06toB10": "5/5: input SHA256 matched; own strict classifier reached the same reason (invalid-utf8, unpaired-high-surrogate, unpaired-low-surrogate, overlong-utf8, raw-unescaped-json-nul); all canonical outputs null; harness verdict bytes and SHA256 reproduced"
+    },
+    "encodingE04toE07": "4/4 now published with exact input hex and SHA256; own classifier reached the same reasons (missing-terminal-nul, invalid-utf8, embedded-argv-nul, unpaired-surrogate); canonical output null by design (rejected input has no canonical form); harness verdict {reason,result} bytes and SHA256 reproduced and marked not signable",
+    "bodyVsArgvDomains": "no digest overlap between golden body digests and argv JSON/raw cmdline digests",
+    "goRuns": 0,
+    "nativeOrCoreRuns": 0
+  },
+  "conditionClosure": {
+    "C1": {"status": "CLOSED at plan level", "evidence": "fence mandatory entrypoints list Register-LeafRenewalTask.ps1, Invoke-ScheduledLeafRenewal.ps1 and tools/scheduled_leaf_renewal.py DENIED; legacySchedulerSurfaces denies registration, re-registration, invocation and execution in all marker phases including terminal; a new task outside the three disabled IDs is still an unauthorized surface with G9 HOLD; closure entry (b5b8ca68) DENIED; parameter-gates G9 explicit list; barrier legacySchedulerReRegistrationAllowed=false; A37"},
+    "C2": {"status": "CLOSED at plan level (desired contract; no Go run)", "evidence": "Root-selected v2 BODY = Go json.Marshal(map) of closed typed body without nodeSignature; strict valid UTF-8/Unicode, no replacement-character normalization; HTML and U+2028/U+2029 escapes; no body newline and transport newline outside the signature; dedicated Python v2 verifier must emit the same bytes, not ensure_ascii; no blanket ASCII restriction; v1 archives and outer receipt/CP commit canonicalization unchanged; goldens reproduced independently; A39/A40"},
+    "C3": {"status": "CLOSED at plan level", "evidence": "secondMigration DENY for any new migration ID or target on a Node with an existing journal or seal until separate reviewed design; no predecessor deletion, replacement, rotation or append; no marker reset; exact resume of the first plan and approved normal:3 renewals are distinct; barrier secondBinaryMigrationAllowed=false; A38"}
+  },
+  "carriedRulesNotWeakened": "R1 predecessor (known/unknown, label-only, workspace-only, third consumer BLOCK), R2 fence, R4 observer/image, N1 v2 executable field, N2 argv domains: only additions in 803; no removed constraint, no relaxed schema requirement, refuse guards intact",
+  "info": [
+    "B03 expects short escapes for backspace and form feed, which Go encoding/json emits from Go 1.22; repository go.mod is go 1.23, Core CI pins setup-go 1.27.1 and Dockerfile.node.remote pins golang by digest; the future Go golden run (A39) should record the exact toolchain",
+    "Go Marshal replaces invalid UTF-8 with U+FFFD rather than failing, so the producer must validate before marshalling; the plan requires this and A39 must prove it",
+    "P0 compatibility msg_03604b3e6bed and C2 hand-off msg_bb65618c0b49 are Root-relayed planning messages, not verified by Claude"
+  ],
+  "verdicts": {
+    "lowDelta803": "ACCEPT: C1, C2 and C3 closed at plan level; no new finding",
+    "planOverall": "9e8 plan ACCEPT (a471ce19) stands; 803 carries no remaining Low conditions",
+    "implementation": "none; unaccepted",
+    "contracts": "M2 v2 wire and canonical body, migration journal, common fence, runtime inventory: proposals with null bindings; unaccepted",
+    "p0": "6c0fc4ad NOT ACCEPTED; corrected source/process P0 unpublished; separate future code review",
+    "runtimeCI": "none; actual Go runs 0; 40 future product cases NOT RUN",
+    "operations": "HOLD; all 30 target, 18 Root and member bindings null",
+    "physicalAcceptance": "none"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerPrivateGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "apply 803 Low delta ACCEPT; release plan owner pending ask msg_b661a20575b9 per own decision; keep HOLD"},
+    {"owner": "Codex (plan owner)", "action": "next authorized documentation phase only after Root scoped decision"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "publish corrected P0 with v2 executable field and Go/Python golden run including toolchain"},
+    {"owner": "Claude", "action": "review corrected P0 code when assigned"}
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "expectedStructuralVerdict": "VALID",
+  "staticConsistency": "named tested subset only; cryptographic/runtime acceptance absent",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-event:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+      "sequence": 1,
+      "previousEventSHA256": null,
+      "operationId": "fixture-operationId",
+      "idempotencyKey": "ff94375804bae999f1ce639dd667aa960e33a8614e4529bfeeaf97c9577cb7ed",
+      "requestSHA256": "a9953410b0ae13350f48c68046d299305c1fed6cf4dbc73cc99bd2f726bcf13a",
+      "recordedAt": "2030-01-01T00:00:00Z",
+      "phase": "PROVENANCE_LOCKED",
+      "fenceEpoch": 1,
+      "leaseEnvelopeSHA256": "a61ea9ed3e9e987704ace0fe8f15f5323994933696541a4fea3ef531550285d4",
+      "memberStates": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "PROVENANCE_LOCKED",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+          "backupContainerId": null,
+          "newContainerId": null,
+          "latestEvidence": []
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "PROVENANCE_LOCKED",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+          "backupContainerId": null,
+          "newContainerId": null,
+          "latestEvidence": []
+        }
+      ],
+      "effect": {
+        "kind": "none",
+        "targetSlot": null,
+        "intentEventSHA256": null,
+        "receipt": null
+      },
+      "evidence": [],
+      "inventoryEnvelopeSHA256": null,
+      "terminalSealEnvelopeSHA256": null,
+      "failureReason": "none",
+      "method": "inspectAndValidate",
+      "recordKind": "readback",
+      "priorPhase": "UNRECORDED",
+      "sealedHistory": false,
+      "inventoryPublishedHistory": false,
+      "targetSlot": null
+    },
+    "signer": {
+      "role": "host-helper",
+      "keySPKISHA256": "a91319a210bd60af85c5928b01dc3ff9d9fec8ffb5768d9abc1bd3ae7ea991e1",
+      "signatureHex": "f3e9788dd38e40151f0514b462eb7b62db3d92655448c9cd4a14926435f626d9f92e44e849bb8d06c22d684d7c16589e18f5a4e4aa8474e20ed759a2c79eb0a8"
+    }
+  }
+}

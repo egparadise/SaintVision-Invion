@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.372"
+version: "1.0.373"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T23:36:46+09:00"
+updated: "2026-11-06T02:02:07+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "803 plan C1-C3 actualLow review task667/ctx9fd4 started; prior9e8 NONEXECUTING ACCEPT preserved; actualGo0/P0 and contracts/runtime unaccepted"
-active_card_next: "Claude delivers actual803 Low verdict; owner then prepares authorized precise contracts; P0 delivers source/native/Core/review; Root keeps actual operations HOLD"
+active_card_status: "P0 source4f independently accepted and fullCI green; frozen report3af complete; actual combined assembly active; cb3 design Low closure and hardware blockers remain"
+active_card_next: "Integrator freezes new combined candidate and all8CI; Claude task_bd777860781e reviews optionalf0af tests; planowner closes cb3 N-L4/N-L5; BroadB docs proposal; operations HOLD"
 ---
+
+## 2026-11-06 P0 납품 수락과 다음 담당
+
+작업한 것: 실제2736 코드 수락과4f 전체 Core·Backend·Docs,3af 문서 전용 납품을 확인해 통합 선택을 전달했다. 확인한 것: Root는 정확한 head와 모든 CI job 성공, report의 제품 diff0을 확인했으며 native/두 Python pinned-runtime 증거의 독립 검증은 별도 receipt에 보존했다. 장비 읽기 전용 재확인은1번 공개키 거부·3번 Docker 권한 거부·CP API1.41을 확인했고 키/Node 상태를 변경하지 않았다. 다음 첫 행동/담당: 통합 Codex는 새 결합 pin/packet의 8개 CI와 실제 독립 검토, Claude task_bd777860781e는 f0af 선택적 시험 delta, 전환 Codex는 cb3 N-L4/N-L5 및 Info 문서 보완, B 담당은 역할별 관측·갱신 계약 제안만 진행한다. 제품 전체/운영 인수·BroadB·전환 구현은 미완료다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
+## 이전 관측: 2026-11-06 01:10 native 진전과 당시 미수락 조건
+
+작업한 것: native4a ZIP/hash/두 cycle·거부 조건과 제공된7개 서명 샘플을 확인하고,803 Low/4a 코드/46 시험 격리의 실제 독립 판정을 구분했다. 확인한 것:4a Core5fail9075pass와 Backend 양 버전5fail8717pass는 미수락이다.500 유니코드 fixture·46 격리 수정은 runtime 변화 없이 분리됐으며 T1–T3 및 실제 새 Go/전체CI가 남는다. 다음 첫 행동/담당: P0 담당은 한정 시험 보강·정확한 CI, Claude task_c5957c5bb2f5는 f932 규범 계약 제안의 독립 검토를 수행한다. 통합 담당의 c913은 local/unaccepted로 유지하고 실제 final source 전 ci2/최종 packet/배포는 없다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 보완안803 Low 독립 검토
 
