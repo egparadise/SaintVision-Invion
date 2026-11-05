@@ -3,19 +3,23 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
-    "Docs": 42047068573,
+    "SHA": "53ea33f6200a9845d5585827d3e3fada5aa253eb",
+    "Docs": 42071392363,
     "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
     "syncExits": [
       0,
       0,
       0
     ],
-    "exported": 22,
-    "independentlyMatchedNormalizedDestinationHashes": 2399,
+    "independentlyMatchedNormalizedDestinationHashes": 2573,
     "pending": 0,
     "conflicts": 0,
-    "verifiedAtKST": "2026-11-06T00:46:51+09:00"
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "combinedProductAcceptance": false,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-06T02:08:38+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1030,6 +1034,16 @@
       "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
       "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_P0_Low_token_tests_Codex.md",
       "SHA256": "0cad749915e939dbc5c820a8dfdc18cd0f4c7cb92875a6cc71fe9333a252fa21"
+    },
+    {
+      "source": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-low-token-tests-f0af-review.json",
+      "SHA256": "1b7cb709f70b7098c8c2f4efa1dd0269e65a17a7dc805720e8b99ef778337164"
+    },
+    {
+      "source": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
+      "path": "docs/vault/30_Development/History/2026-11-06_02-05-05_KST_FLEET5_P0_Low_token_tests_f0af_검토_Claude.md",
+      "SHA256": "fd9d7bbbfe9cb231ae033a346376f27113461a21e93922bca97088b10e812ee7"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -1569,17 +1583,30 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T02:02:07+09:00",
+  "latestRecordAtKST": "2026-11-06T02:10:53+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
     "reviewTask": "task_bd777860781e",
     "reviewDispatch": "ctx_023fb7a3cc28",
-    "actualVerdict": null,
+    "actualVerdict": "ACCEPT test-only; L-T3-1/L-T3-2 closed",
     "ownerReply": "msg_1f7d3011c86c",
     "integratorRelay": "msg_cea2cb491a96",
-    "patchDocsRun": null,
-    "source4fCIIsPatchCI": false
+    "patchDocsRun": 42068760043,
+    "source4fCIIsPatchCI": false,
+    "actualReview": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
+    "reviewDocsRun": 42071548359,
+    "rootVerifiedBothExactHeadAllJobsSuccess": true,
+    "independentProbesOwnerReported": {
+      "focusedPassed": 11,
+      "mutantsKilled": 7,
+      "causalControlsRevertTo4fTestsMakesBothMutantsSurvive": true
+    },
+    "CoreBackendAtPatch": false,
+    "remainingOptionalInfo": "I-LT-1 no accept-at-exactly65536 case; failclosed availability-only; not a freeze blocker",
+    "rootSelectionRelay": "msg_6eb564a23796",
+    "ownerRelay": "msg_660aea8a1ff0",
+    "integrationCondition": "include reviewed three-line test delta if final source not frozen; combined CI must collect; preserve already frozen source otherwise"
   },
   "broadBNextProposal": {
     "status": "DOCS ONLY in progress; not implemented",
