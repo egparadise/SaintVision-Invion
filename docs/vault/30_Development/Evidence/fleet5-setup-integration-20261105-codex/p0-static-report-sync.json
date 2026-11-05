@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/sync_obsidian.py",
+    "--check"
+  ],
+  "startedAtKST": "2026-11-05T22:08:20.044740+09:00",
+  "finishedAtKST": "2026-11-05T22:08:44.863337+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "p0-static-report-sync.txt",
+  "sourceAtStart": "69ea5ae89305b81d42b711a0a93fd3bab73c5ad9",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

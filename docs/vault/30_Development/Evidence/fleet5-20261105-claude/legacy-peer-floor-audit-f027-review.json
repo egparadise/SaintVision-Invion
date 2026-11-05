@@ -1,0 +1,78 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_cfafb7eac65c / ctx_a2e0601680de",
+  "reviewer": "Claude",
+  "author": "Codex (audit task_fb415493ffa5/ctx_373e829bc65e, follow-up task_d091854abaf9/ctx_fddffc448ce0)",
+  "observedWindowKST": ["2026-11-05T21:01:40+09:00", "2026-11-05T21:08:44+09:00"],
+  "observedWindowCorrection": {"originalDeclared": ["2026-11-05T21:00:00+09:00", "2026-11-05T21:20:00+09:00"], "originalDeclaredHistoryUpdated": "2026-11-05T21:20:00+09:00", "status": "original values INVALID (not observed)", "reason": "declared start 21:00 precedes the brief (21:01:32); declared end 21:20 and History updated 21:20 are after the commit (21:10:24) and Docs completion (21:11:10), so they were not observed", "briefReceived": "21:01:32 (task_cfafb7eac65c / ctx_a2e0601680de)", "firstObservation": "21:01:40 fetch audit branch (result 21:01:59)", "lastObservation": "21:08:44 worker_replace invocation trace result", "evidenceWrite": "History 21:08:23, Evidence 21:09:33-21:09:37", "source": "own session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only, metadata only): brief message, first observation tool result, last observation tool result before the Evidence write; second-level precision", "publicationMetadata": {"commit": "f6817f3d author/commit 2026-11-05T21:10:24+09:00", "docs": "42024928449 created 21:10:40, completed 21:11:10 KST, success", "usedAsExecutionTime": false}, "otherTimesInDocument": "'20:43:53 KST' in the body is the read board documents' own version time, not an observation time", "correctedAt": "2026-11-05T22:26:17+09:00", "verdictTestsSourceChanged": false, "gitHistoryRewritten": false, "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation", "auditScope": "this review only (with its pair f6817f3d/45bc23cb); earlier reviews remain timing-unverified"},
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "latest": "f0278daffa616cae4485e4b1d4c07671715892dc",
+    "chain": ["9ec6d6bf", "b57e4e38", "83ec7b84", "f0278daf"],
+    "history": "History/2026-11-05_FLEET5_legacy_peer_floor_compat_Codex.md v1.0.2",
+    "readFrom": "Git objects only; independent verifier (uncommitted) sha256 eb29d6f359728ac015be760467e37854d5ccfee679144f220557d6a545d4f019; Codex collector not executed",
+    "rootBoardsRead": {"index": "1.0.406 (20:43:53 KST, shared Obsidian, read-only)", "codex": "1.0.367"}
+  },
+  "binding": {
+    "nonDocsFiles2fbToF027": 0,
+    "sharedBoardsOrRegistryChanged": false,
+    "artifactSHA256MatchValidation": {"audit_public_sources.py": "c5ca500fc96ce35371615b2eb3eead344ac8fd2615c72e864b96743d09704a96", "public-source-index.json": "a5d5946784a13a95d7ae7e14e44d90d3c0c82ca08867b76ec49bd504adb190d9", "findings.json": "bf5628ae1601e91811803f864ed60e6be629566c8e5f176128338fa1e6f7a242", "document-gates.log": "04bfbe95e01c3522db98186ede848c41db1d8b315e62f9b4756a9916ce8db533"},
+    "rootHoldPolicySHA256": {"value": "74560bbda92a3f736105b470c07b4856d12312f5192888fae2297f3e40c2f7ea", "matchesBrief": true, "matchesHoldValidation": true},
+    "docsRun": {"id": 42023306438, "headSha": "f0278daffa616cae4485e4b1d4c07671715892dc", "conclusion": "success", "checkedByClaude": true},
+    "authorGatesRerunByClaude": false
+  },
+  "sourceEquivalence": {
+    "commits": {"source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc", "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d", "accepted2fb": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d", "nativeFe7": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7", "report5023": "5023ce7d72b7f13431cb6a7182e2677eb6926662", "audit": "f0278daffa616cae4485e4b1d4c07671715892dc"},
+    "wholeFilesIdenticalAllSix": {"services/node-agent/runtime/journal.go": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6", "services/node-agent/transport/trust.go": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df", "services/node-agent/cmd/inv-node/main.go": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9", "deploy/lan/worker_config.py": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992"},
+    "functionSlicesIdenticalAllSix": {"_write_rotation_public_material": "2509bb185dbbc1115af55916df240843f089bdfc9c872a127143f9fc732cd99f", "prepare_leaf_rotation": "afe9b85e5b2a12e673768e959a3886029e03b0c31e5a4da3d56b3034a2267722", "_policy": "47a27a80a4db1515028c47b83e11c42c93b24e76c8c0cb7da921f44b6de7a40f", "docker_restart": "c9620cea65f630a3e7617b50b4561e818a00baa0ecce345f792d027d36e00b08", "rollback(additional)": "77f335c93e47", "Go PinPeerPolicy@341": "64016481a2c2496d9d31cb8ddec6a466542e54a2e460e4e0b1f77c0c73091302", "Go Authority.policy@67": "ced012c78c85e6b35fce4680c8d41b2065b62bd018d9242c917b297f534e1afd"},
+    "source03B5Helper": {"file": "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4", "install": "c8aef68a5c028427aa024c522615c8631b2cecd513ab95d8af2b4686e102d89c", "finalize": "4b1fa4f89ea0f1e10cba43b3a8c569b217a1c88846518181f9d5e26414615063", "cpHelper": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b"},
+    "observerFlagPresentInServices": false,
+    "callGraph": {"batchCall": "lan_pilot.py:2670 prepare_leaf_rotation(child) (report cites 2590 = batch function start 2588; cosmetic)", "finalInheritsVersion": "lan_pilot.py:2991-3006 final_policy = {**overlap_policy, expiresAt, clientFingerprints}", "worker": "_policy 199, install 508, finalize 621, rollback 678, docker_restart 743", "goRun": "main.go:26 run(), no observer flag"},
+    "b5Executor": {"order": "currentStatus>runtimePreflight>attempt intent>prepare>install,stage>commit>transition>observe>each finalize>finalObserve>fresh leaf check", "onFailure": "latch failed; later runs recovery-required exit 2; no automatic rollback call in executor", "commandBodiesRead": false}
+  },
+  "auditVerdict": "ACCEPT (source; artifact/gate/HOLD scope) with caveats C1-C4",
+  "caveats": [
+    {"id": "C1", "severity": "Medium (operational)", "summary": "HOLD is documentary/callback-level; B5 executor and Invoke-ScheduledLeafRenewal.ps1 read no hold/disable; only renewal window, failure latch and lock stop execution; a stored schedule invoking the executor directly would run once its window opens", "rootAction": "read-only confirm what the 3 stored schedules invoke and each renewAt"},
+    {"id": "C2", "summary": "03/B5 worker rollback() slice equals 2fb (restores version P in installing/installed/restarted); post-overlap-pin rollback bricks the legacy Node too (same as M5); covered by HOLD and no-old-policy-restore"},
+    {"id": "C3", "summary": "original containers use --restart unless-stopped; host/daemon restart re-runs old binary regardless of HOLD; floor-safe only while active bytes == floor hash (exact replay); root snapshot says so but unsigned"},
+    {"id": "C4", "summary": "no-old-binary-restart is conservative policy; source risk exists only when active != floor; not a request to weaken"}
+  ],
+  "binaryOnlyUpgradeAssessment": {
+    "existingSafePath": false,
+    "helpers": [
+      {"path": "deploy/lan/start-node.sh, finish-worker.sh", "role": "fresh install", "unsuitable": "refuses existing container; new CSR, bundle policy copy, install-files"},
+      {"path": "deploy/lan/prepare-worker.sh", "role": "install prep", "unsuitable": "overwrites host worker_root peer-policy.json from bundle; new CSR (credential rotation)"},
+      {"path": "deploy/lan/repair-node.sh, Repair-Worker.ps1", "role": "restart same container", "unsuitable": "no image change; recopies 5 host files into /state; old-binary restart"},
+      {"path": "deploy/lan/worker_workspace.py", "role": "agent image swap", "unsuitable": "profile->lan-workspace-v1, --image->workload, --executable->python3, docker.sock bind, install_files recopy, automatic rollback/downgrade to old container"},
+      {"path": "deploy/lan/worker_replace.py + worker_replacement.py (via worker_storage_bridge.py/Replace-Storage.ps1)", "role": "forward-only replacement of stopped observe Node", "unsuitable": "storage mandatory (--storage-policy, storage mounts, storage.install, storage.current)"}
+    ],
+    "reusableControlsFromWorkerReplace": ["restart=no fence", "rename to backup", "same volume + exact consumers + volume metadata hash", "double-read stopped /state digest incl. identity.json and 0:0/0600 credentials", "forward-only phase journal prepared..ready", "never restore old policy/container", "no credential recopy"],
+    "requiredControls": [
+      {"id": "G1", "summary": "freeze full old inspect; new differs only in Image; same Cmd/Mounts/Labels/ports/resources/security; BLOCK on --storage-policy or non-/state mounts; needs new storage-free mode/helper"},
+      {"id": "G2", "summary": "--image (permit.go:67 ImageDigest==config.Image) equals manifest agentImage; new image changes it and CP state agentImage (lan_pilot.py:855,1233); explicit reviewed decision + receipt, not channel CAS"},
+      {"id": "G3", "summary": "no install_files/repair/prepare/finish; use existing volume bytes; host copies compared read-only"},
+      {"id": "G4", "summary": "old binary cannot give M2; pre-cutover floor evidence is unsigned fenced double-read; bind (P,H) into replacement record; post-start M2 must match (P,H)+active hash else BLOCKED, no downgrade"},
+      {"id": "G5", "summary": "forward-only: no automatic old restart/downgrade, old-policy restore, floor/latch reset, expiry bypass; failure preserves both containers + volume, BLOCKED"},
+      {"id": "G6", "summary": "new binary reads existing journal unchanged; protected-state digest equal before/after start; exact replay writes nothing; format migration separately reviewed"},
+      {"id": "G7", "summary": "P/H/C, key, cert, CA, signer.pub, identity unchanged; no channel CAS/CP leaf change; idle; exact r5 containers by name+label+Id (6 historical per host)"},
+      {"id": "G8", "summary": "replacement ends restart=no; restoring unless-stopped is explicit step after mTLS + M2"},
+      {"id": "G9", "summary": "root confirms stored schedules cannot run executor directly during cutover (C1)"},
+      {"id": "G10", "summary": "P0 source/binary CI provenance (layers/config manifest, reproducible build), native Go two-cycle green and M2 no-write/no-OpenJournal tests precede the plan"}
+    ],
+    "nature": "architecture input; not approval or implementation of bootstrap"
+  },
+  "verdicts": {
+    "auditF027": "ACCEPT with C1-C4",
+    "existingBinaryOnlyPath": "NONE (gap); minimum controls G1-G10",
+    "ci": "Docs 42023306438 success is document gate only; native proof remains intended red; no CI accepted for runtime",
+    "physicalAcceptance": "none",
+    "priorF012P0Acceptance": "does not cover this bootstrap or future implementation"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "privateConfigKeysPKISSH": 0, "hostDockerWSLRuntime": 0, "scheduleGuardClaimClock": 0, "authorWorkspaceWrites": 0, "sharedBoardsRegistryObsidianApply": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "read-only confirm stored 3 schedules' invocation targets and renewAt (C1); after P0 provenance + native green, write non-executing bootstrap/replacement plan with G1-G10, deciding G2; send for independent review"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "implement M1-M10; prove G6 journal compatibility/no-write replay in tests"},
+    {"owner": "Codex", "action": "none required; optional fix of line2590 anchor to 2670"},
+    {"owner": "Claude", "action": "review bootstrap plan and P0 implementation when assigned"}
+  ]
+}

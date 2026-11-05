@@ -107,6 +107,86 @@
       "sha256": "a4733d120880a836fb2f0c3615c441e462c6f3d9137c9e60c68a48f889779225",
       "bytes": 15019,
       "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_execution.py",
+      "gitBlob": "9daecfd065384ea32bc3bff3505f07e3b0589a1a",
+      "sha256": "42feb116beb20f1a915a70a6b56420d99a77f4f73f53f3b7c4830cdb5b83fb37",
+      "bytes": 4088,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_storage.py",
+      "gitBlob": "a7cddd5e783287d9e5d090bf748c3c39b35888d6",
+      "sha256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "bytes": 10684,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/lan_execution.py",
+      "gitBlob": "0fe37781a5785cb7c4a45126876610b048f0c039",
+      "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "bytes": 11689,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/lan_workspace.py",
+      "gitBlob": "66a9c28e6bce1e81884b5419521830e30079cd8d",
+      "sha256": "4f5d3045243bf07261aaf0cc2daf834b562495f5d50c8897472875fd55768291",
+      "bytes": 5232,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/check_storage_bundle.py",
+      "gitBlob": "da515b19dcfc1a8498e287679aa60932c7d3c1b5",
+      "sha256": "860debab6c5f83a920dc71971672138c1e352c4c914424119d0cdab660f18df4",
+      "bytes": 6306,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/check_workspace_package.py",
+      "gitBlob": "c026f350ac9c0974c156997d7f201daf7583f0a3",
+      "sha256": "c4956d9ad6a284a22743e2e63ade020a164a8673e9885424806144845a2bb7bd",
+      "bytes": 8251,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/check_workspace_upgrade.py",
+      "gitBlob": "d6be18b00840bd046f436700909e25365f32cda6",
+      "sha256": "f46da4fb47e4b2a15ccfe6495b2b110c8c718d42d88c8865d9dcab99378025d0",
+      "bytes": 3311,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/run_ac11_composite_long_soak.py",
+      "gitBlob": "8c84885a1fc7e44e22cf2fbce0875eab1d03f00a",
+      "sha256": "1aa2be09ca7fac61164f1d8abc41fa530d8a5d3aad55fd30b2b08663d6aa96ae",
+      "bytes": 21381,
+      "readExit": 0
+    },
+    {
+      "commit": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "path": "tools/scheduled_leaf_renewal.py",
+      "gitBlob": "8d9f030d6067115616a55ada1f6d1638e9c5a093",
+      "sha256": "d428424862b37b483b278539348c7930959dffde32b2db18675aec382a7b8544",
+      "bytes": 28967,
+      "readExit": 0
+    },
+    {
+      "commit": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "path": "deploy/lan/Invoke-ScheduledLeafRenewal.ps1",
+      "gitBlob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+      "sha256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+      "bytes": 1740,
+      "readExit": 0
     }
   ],
   "g2LegacyComparisons": [
@@ -142,5 +222,15 @@
       "exactBytesEqual": true,
       "readExit": 0
     }
-  ]
+  ],
+  "powerShellLiteralConsumerScan": {
+    "source": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "paths": [
+      "tools/*.ps1",
+      "deploy/lan/*.ps1"
+    ],
+    "exit": 1,
+    "meaning": "0 matches / 1 no matches, both valid read outcomes",
+    "output": ""
+  }
 }

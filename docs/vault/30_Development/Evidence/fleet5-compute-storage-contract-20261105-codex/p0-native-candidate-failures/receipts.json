@@ -1,0 +1,31 @@
+[
+  {
+    "runId": 42028616559,
+    "headSHA": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+    "conclusion": "failure",
+    "artifactId": 13415121511,
+    "artifactSHA256": "3d8e2bb08694995375f13e345e80d2626b2f2dc9a5e3c10b9396c575e90601fc",
+    "artifactDigestVerified": true,
+    "proofValid": false,
+    "completedNormalCycles": 0,
+    "floorVersions": [
+      7
+    ],
+    "mainCoreSkipped": true
+  },
+  {
+    "runId": 42029207673,
+    "headSHA": "526d48e4bdcbb0b363d6e45bfc5635fcc1584d2a",
+    "conclusion": "failure",
+    "artifactId": 13414898207,
+    "artifactSHA256": "35f75753e3bf27dccbbd157b511d6269537921e565f2a583d41902f185e821d7",
+    "artifactDigestVerified": true,
+    "proofValid": false,
+    "completedNormalCycles": 0,
+    "floorVersions": [
+      7,
+      8
+    ],
+    "mainCoreSkipped": true
+  }
+]

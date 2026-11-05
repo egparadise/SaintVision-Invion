@@ -1,0 +1,568 @@
+{
+  "schema": "fleet5-bootstrap-plan-independent-revision-root:1",
+  "recordedAtKST": "2026-11-05T22:17:08+09:00",
+  "rootBase": "c4ab8e79b83d886668dc08381e11db196908b413",
+  "priorRootCheckpoint": {
+    "SHA": "c4ab8e79b83d886668dc08381e11db196908b413",
+    "Docs": 42033054750,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "exported": 29,
+    "independentDestinationHashesMatched": 2333,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "plan": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+  "actualIndependentReview": {
+    "task": "task_03867932b2f0",
+    "dispatch": "ctx_37e3f120fac0",
+    "original1057Review": "830efd9317d28fa27b696db709c9a6e7a3076331",
+    "original1057Docs": 42033242038,
+    "supersedingCdeReview": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+    "supersedingCdeDocs": 42033713492,
+    "rootVerifiedBothExactHeadsAndAllJobsSuccess": true,
+    "planVerdict": "REVISION REQUIRED",
+    "runtimeOrContractOrOperationsAccepted": false,
+    "schemaCasesMatched": 16,
+    "reviewerMutationCasesRejected": 20,
+    "publicSourceHashesMatched": 27,
+    "futureProductCasesExecuted": false,
+    "targetBindings": null,
+    "rootOperationalBindings": null,
+    "membersBindings": null
+  },
+  "findings": {
+    "R1": "retained migration predecessor needs typed journal-bound consumer rule; current6c only accepts labelled workspace predecessor",
+    "R2": "name common coded migration fence and enumerate repair/prepare/finish and all generic mutators",
+    "R3": "closed for public source03 scope only; new6c consumers included in R1",
+    "R4": "explicit observer ExecIDs and immutable inherited image Config equality",
+    "N1": "current signed servingProcessSHA256 hashes raw cmdline; executable-bytes proof absent",
+    "N2": "canonical UTF8 JSON argv and raw NUL-separated cmdline hashes are different definitions"
+  },
+  "rootDirection": {
+    "planReply": "msg_f8bd30523ce9",
+    "P0Coordination": "msg_b2c6d37559b1",
+    "N1": "desired separate signed servingExecutableSHA256; preserve explicit raw cmdline hash meaning; strict wire and actual process descriptor coherence required",
+    "R1": "plan author proposes exact contract; no label-only/unknown consumer widening before reviewed contract",
+    "urgentPlainP0": "continue B1/B2/F1-F3 independently; bootstrap runtime helper remains absent",
+    "operationalG2": null,
+    "legacyThreeAutomations": "disabled; no re-enable or runtime action"
+  },
+  "integrationStaticReport": {
+    "SHA": "842973bb73d53015eee77e6c4c55390c072258d0",
+    "Docs": 42033485271,
+    "rootVerifiedExactHeadAndAllJobsSuccess": true,
+    "rootVerifiedRemoteSHA": true,
+    "productDiffVsAcceptedBd": 0,
+    "boardsRegistryDiffVsTaskBase": 0,
+    "pendingSelectedP0Question": "msg_fe3ec1971bc9",
+    "questionPendingUntilActualSourceNativeAndVerdict": true
+  },
+  "imports": [
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/acceptance-matrix.json",
+      "sha256": "8c6da794ebc853b115ff866acbdc6b3ee44b5fe127b277d47cb0ffc2add41a13"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.json",
+      "sha256": "cd78e02742a759457ffbf1d8d4b407ba448a2ff199259b48dae8877cf2f876fb"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/bootstrap-plan.schema.json",
+      "sha256": "44e04ee455f27aebfd72092874467931e646ebac7423ecb907417bd8e91754d1"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/legacy-consumer-closure.json",
+      "sha256": "af8c7e679bd13d9df191da42a4dd2f5c6d4a92200b0d9032b0505b168c206e42"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/parameter-contract.json",
+      "sha256": "d96dac23cf51ddd7a606e8db83b0e34384fc28f30352326d178ced90cac89fea"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/parameter-gates.json",
+      "sha256": "018d9cfdad5eb438368ba615b55bb336225473a73c091a0f82d1e77cdf25e339"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/plan-validation.json",
+      "sha256": "53371979707342fcd859ea6b43d8649a686f4224332a4cf08d5225aee944f3df"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/public-source-bindings.json",
+      "sha256": "ad02f19381b0df7e4d019cb07ecbb384f5c1dd4c23ff5a6ad2865638a2d9e60b"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/root-g2-planning-choice.json",
+      "sha256": "e6aa0868bb8a7bc605a9a73fdf513af0ba965b2eeb895212aaa14b1e98f597bf"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/runtime-inventory-contract.json",
+      "sha256": "6a5f8265eddbce85d4878719301ac0b8c02b492f4c917fdd8699a6675eb6a6c8"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-cases.json",
+      "sha256": "389098a9da6d029d091df60c52d973e82f83163a502db665ac8c625fc2542b9f"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/schema-validation.json",
+      "sha256": "4058ae2ac15ca7f37b434c88b226b0aaa6f4520294425e482093ab1f1527f6d1"
+    },
+    {
+      "revision": "cdeffee72f0480dc2df543bb3b49c87ebc95a570",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_legacy_capability_bootstrap_plan_Codex.md",
+      "sha256": "1321e1268feb2e812652d95ee1bae7a3472eca3706bfaa235b5ca53061fc076b"
+    },
+    {
+      "revision": "830efd9317d28fa27b696db709c9a6e7a3076331",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-1057-review.json",
+      "sha256": "841acd4bc08e7304c35f1ac43c064e01406240e3e5d4184c3b2a2f49b41db1bf"
+    },
+    {
+      "revision": "830efd9317d28fa27b696db709c9a6e7a3076331",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-10-00_KST_FLEET5_legacy_bootstrap_plan_1057_검토_Claude.md",
+      "sha256": "db6ad1fe710bf752bdb29a752e7fde8e04ffa70dda058e3a35a1385d38fdc1f5"
+    },
+    {
+      "revision": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-cdef-review.json",
+      "sha256": "12b9302ad16cd74e7deb4fae2eadbff14053a66d6d75570c2e0b5bbc1d2cf510"
+    },
+    {
+      "revision": "eace0e2de11801be0e6d63a5cf08817c37214ea3",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-25-00_KST_FLEET5_legacy_bootstrap_plan_cdef_검토_Claude.md",
+      "sha256": "2a338f0e8fef4b4ea4094f693a184558ec46e769f44a226a2601aa2863ed652b"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate-ci-69ea5ae8.json",
+      "sha256": "5984ef2ac084dca54794161d93444bd9007065b73dc48197b1c189729718236b"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/ci-42029362479-20261105T214429.json",
+      "sha256": "f7ee9e1fbbbea515cfea8dd1b0fab627804fee95f2944bd462294d15d7ec8cbd"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-6c0fc4ad-static-consumer-closure.json",
+      "sha256": "362b8ad811a7ad0291572d8725029eb4f5df87d37c9c8b57e78b1c3b45858e2d"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-c210-actual-rejected-review-receipt.json",
+      "sha256": "7f2727151b927f507fdbd8c1003f9f3182ca08be55778f8966a3254b2f1b5764"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-docs.json",
+      "sha256": "6d7cdc2fa58f5f26ceb2bae9106ba3daa3c8cfa20417b2b6d230dc6a9a01576b"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-docs.txt",
+      "sha256": "7e15e8902d08eed36fcb4472009e2642a20c81eb087daa1ddfadd7124fc3444e"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-ontology.json",
+      "sha256": "194d7deeba78cc0c32a418798750ea34fdfb060dbb6f6e03fab260f4d0afbd14"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-ontology.txt",
+      "sha256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-paths.json",
+      "sha256": "c3f3276d23cf1d5de76e4aa81af2ed91dfd2e9ec4b0e52dd0fc8d35b5dfda120"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-paths.txt",
+      "sha256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-publication-gates.json",
+      "sha256": "9dba8dc4a5d1da0978d5c73a824d2566392efc2e17f8ef7c4787518fe813d4a1"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-ratchet.json",
+      "sha256": "6a9fe5ed0fcda55033ff308d1fb338d66c67870c91066a521a5007be3aa22faa"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-ratchet.txt",
+      "sha256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-sync.json",
+      "sha256": "021da59a31fab30b01e34da833b3992a32a5bc0503f332f8a8b2839195391821"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-report-sync.txt",
+      "sha256": "fff90740af38d7e7102145bb4a933d3e7915341ab55e95834b5d633a8f8f2b74"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-study-docs.json",
+      "sha256": "11744f63e5141533c9dfabdfc37566aa9ea84c565a5d379755e7cd322afd054c"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/p0-static-study-docs.txt",
+      "sha256": "7e15e8902d08eed36fcb4472009e2642a20c81eb087daa1ddfadd7124fc3444e"
+    },
+    {
+      "revision": "842973bb73d53015eee77e6c4c55390c072258d0",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_setup_integration_Codex.md",
+      "sha256": "d2945554a843bf979198e79f4cc17152b11cbab394dd191a93d5379fcbacaa42"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-1057-review.json",
+      "sha256": "55812876f2f39ed14289ebf7a66220fe2fc6e597e390429135e845b188c5cf66",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-cdef-review.json",
+      "sha256": "a0a2a1b730cf22ec0dbf136ea3acfdfaf519a4e38d0de7f111e14c9706a301f1",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-code-6c0f-review.json",
+      "sha256": "be7a9b245d9fb1978b78d59788342b78475b114f3ba8683968dc90cf822621ef",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-55-00_KST_FLEET5_P0_code_6c0f_검토_Claude.md",
+      "sha256": "e4fdc1b0f7b89f1a47f5b7942dc88b60268bf94038bd5d167ff022105377c6e3",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-10-00_KST_FLEET5_legacy_bootstrap_plan_1057_검토_Claude.md",
+      "sha256": "9edb1c048b7284c94325394235447812e6dfb956b98edfb4966d0cc30969c701",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+      "path": "docs/vault/30_Development/History/2026-11-05_22-25-00_KST_FLEET5_legacy_bootstrap_plan_cdef_검토_Claude.md",
+      "sha256": "cc81093f2edf77981087894e3939b07c0fda2575a8d7dd7b19a996e28de7c1ff",
+      "reason": "actual published review timing correction"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-1.txt",
+      "sha256": "7e15e8902d08eed36fcb4472009e2642a20c81eb087daa1ddfadd7124fc3444e",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-2.txt",
+      "sha256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-3.txt",
+      "sha256": "38c86d4239ded09cf880fc2a61d48943a01ea185e7c03492cb99653b548ff7c4",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gates.json",
+      "sha256": "dba64ae8776d94ffeb9f43ce7b1746a15e382296a01fb3e0c46fc848a16c9b0d",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-final-doc-gate-1.txt",
+      "sha256": "7e15e8902d08eed36fcb4472009e2642a20c81eb087daa1ddfadd7124fc3444e",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-final-doc-gate-2.txt",
+      "sha256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-final-doc-gate-3.txt",
+      "sha256": "5dc8bd718e472bdeac9e9b0da75356e259d42172354ee6979bb9246016fc0978",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-final-doc-gates.json",
+      "sha256": "c51e0052fff3f77bc757d08da13f15f5c6c524c549835307ca0f9a036d3e3849",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42028616559/artifact.zip",
+      "sha256": "3d8e2bb08694995375f13e345e80d2626b2f2dc9a5e3c10b9396c575e90601fc",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42028616559/failed-step.log",
+      "sha256": "810f20bb05b4c8727635978899e376af5bfc48f7f65f7671bd0b4ca673ad4285",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42028616559/jobs.json",
+      "sha256": "0eb2d446356b32b1aa614b68c374d5878636aba5fe20a37f9e6695d84486a586",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42028616559/native-fixed-result.json",
+      "sha256": "b8ad5f00c974b5f2323ab5375c72011f277d6a1dfbeed7734e77759ee32b212d",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42028616559/native-server.log",
+      "sha256": "a6faa0a86bbdcd3b62cb33822c44005f83f53accf5fc2e194cc3a1bd6fb2d7e3",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42029207673/artifact.zip",
+      "sha256": "35f75753e3bf27dccbbd157b511d6269537921e565f2a583d41902f185e821d7",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42029207673/failed-step.log",
+      "sha256": "932b9ff5981bd45a27ace4637b8d6f31bd13ce16ddccf1cd75663ff0daf6d48a",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42029207673/jobs.json",
+      "sha256": "df24e09cf895f16b4d36d5778f121a504743f6dfad56620bb356fcee99571c24",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42029207673/native-fixed-result.json",
+      "sha256": "83fb290d5f7e0e624b7dc76478f4b5fa205e7cb346b3a6e8f1572cfd8160ae4a",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/42029207673/native-server.log",
+      "sha256": "105ad44d3de908377b256597cdba8681315ea4a7a7a7bff6d9eeb5a4c7406ea1",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-native-candidate-failures/receipts.json",
+      "sha256": "8f8154a55ff6356007ccc64e11570a10c66666ad94039649cbbf32f58648527e",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_P0_settled_and_stopped_reentry_decision_Codex.md",
+      "sha256": "a6a8cd03c0e4a20f8e556266bc700d621c849d76479285b70aa026d44151c19a",
+      "reason": "reviewable RS1/SF1 proposal and preserved real native failures"
+    },
+    {
+      "revision": "830efd9317d28fa27b696db709c9a6e7a3076331",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-20-00_KST_FLEET5_legacy_peer_floor_감사와_binary_upgrade_경로_검토_Claude.md",
+      "sha256": "a4733d120880a836fb2f0c3615c441e462c6f3d9137c9e60c68a48f889779225",
+      "reason": "published wiki dependency restored; no reviewer content invented"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_compute_storage_contract_Codex.md",
+      "sha256": "7516b090678089ebe43727ed5450383986a0273635fc2136bf1dbef73c9ef3cc",
+      "reason": "published wiki dependency restored; no reviewer content invented"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_P0_plain_peer_phase_implementation_Codex.md",
+      "sha256": "75bc15fbd52d33e76cc9a65ea5c842f4197bb17abdbf6644bb1234f3a2c3c7f8",
+      "reason": "published wiki dependency restored; no reviewer content invented"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_compound_lifecycle_B_contract_Codex.md",
+      "sha256": "4c131c3168ce01e7eda646d88e41f6a34d2bd8382a7ccce1a2c01d56432e4425",
+      "reason": "published wiki dependency restored; no reviewer content invented"
+    },
+    {
+      "revision": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+      "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_P0_plain_peer_phase_contract_detail_Codex.md",
+      "sha256": "4742e829b65f612ce43662c2e1c9e621676ac0f205c990d74e5d7ce18c24ead2",
+      "reason": "published wiki dependency restored; no reviewer content invented"
+    },
+    {
+      "revision": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-peer-floor-audit-f027-review.json",
+      "sha256": "2265ace87e0083ccc42c53d62c79c3d85b4f62150eecd31b969543ba502a1c81",
+      "reason": "actual two-review original-trace timing correction; original invalid fields preserved"
+    },
+    {
+      "revision": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/low-b1-b3-bd96-0136-review.json",
+      "sha256": "d1934e80bc953cd33adb8fd32572e9d4c961addac175bd53d9cc0fd1995779cb",
+      "reason": "actual two-review original-trace timing correction; original invalid fields preserved"
+    },
+    {
+      "revision": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-20-00_KST_FLEET5_legacy_peer_floor_감사와_binary_upgrade_경로_검토_Claude.md",
+      "sha256": "b60b7e0a8275f75db132a8162b5ee04d9d067529634e9828a3ebcaeab05bebce",
+      "reason": "actual two-review original-trace timing correction; original invalid fields preserved"
+    },
+    {
+      "revision": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-35-00_KST_FLEET5_Low_B1-B3_bd96과_0136_검토_Claude.md",
+      "sha256": "b2ea1f5739b7dab6cd8035324f5864b454027532f97a8389ed5f0b306fe9d2ca",
+      "reason": "actual two-review original-trace timing correction; original invalid fields preserved"
+    }
+  ],
+  "rootProductChanged": false,
+  "physicalOrKeyAction": false,
+  "wholeProgramComplete": false,
+  "nextActions": {
+    "planOwner": "publish R1/R2/R4/N1/N2 revision with real document gates and exact Docs, request delta review",
+    "P0Owner": "close nonce/lifecycle128 and safe liveness; actual native/full Core/new source/delta review; bounded executable field if proven",
+    "Root": "publish checkpoint, exact Docs and latest combined-vault sync; route actual next deliveries",
+    "integration": "resume after actual selected accepted P0 delivery"
+  },
+  "reviewTimingQualification": {
+    "originalDeclaredWindowKST": [
+      "2026-11-05T22:12:00+09:00",
+      "2026-11-05T22:25:00+09:00"
+    ],
+    "declaredWindowAcceptedAsObservedEvidence": false,
+    "reason": "declared end is later than actual publication and current independently checked clock",
+    "actualGitAuthorAndCommitKST": "2026-11-05T22:12:22+09:00",
+    "actualReviewDocsCreatedUTC": "2026-11-05T13:12:29Z",
+    "actualReviewDocsCompletedUTC": "2026-11-05T13:12:58Z",
+    "rootClockUTC": "2026-11-05 13:17:37 UTC",
+    "reviewContentVerdictChangedByRoot": false,
+    "originalReviewBlobsPreserved": true,
+    "correctionRequestedFromActualReviewer": true,
+    "noRuntimeEvidenceInferred": true,
+    "correctionSHA": "c2e63982ee29c498ef173b2bb1de5cf46e025f06",
+    "correctionDocs": 42034986387,
+    "rootVerifiedExactHeadAllJobsSuccess": true,
+    "correctedCdeObservedWindowKST": [
+      "2026-11-05T22:09:32+09:00",
+      "2026-11-05T22:10:46+09:00"
+    ],
+    "corrected1057ObservedWindowKST": [
+      "2026-11-05T22:01:31+09:00",
+      "2026-11-05T22:07:19+09:00"
+    ],
+    "corrected6cObservedWindowKST": [
+      "2026-11-05T21:44:49+09:00",
+      "2026-11-05T21:55:29+09:00"
+    ],
+    "sourceOfCorrectedWindows": "reviewer read-only original tool-result transcript timestamps; root did not independently inspect full transcript",
+    "priorF681And45bcWindows": "corrected by bounded actual own-session trace audit; source/tests/verdicts unchanged",
+    "otherEarlierReviewWindows": "UNVERIFIED",
+    "priorCorrectionSHA": "dcff213aa71b9a5f0598e32102993264572ea3cc",
+    "priorCorrectionDocs": 42035849424,
+    "rootVerifiedPriorCorrectionExactHeadAllJobsSuccess": true,
+    "correctedF681ObservedWindowKST": [
+      "2026-11-05T21:01:40+09:00",
+      "2026-11-05T21:08:44+09:00"
+    ],
+    "corrected45bcObservedWindowKST": [
+      "2026-11-05T21:16:38+09:00",
+      "2026-11-05T21:21:01+09:00"
+    ],
+    "olderThanF681Windows": "UNVERIFIED; no broader audit claimed"
+  },
+  "boundedP0LivenessDecision": {
+    "proposal": "323baeb56ca6a17bbae7fb0a56faa3759448d72c",
+    "Docs": 42034528632,
+    "rootVerifiedExactHeadAllJobsSuccess": true,
+    "reply": "msg_87edde1811d5",
+    "selected": "bounded A: RS1 + SF1 + versioned truthful normal:3 standalone result",
+    "RS1": "only SAME recorded stopped CID start from frozen signed intent and exact actual-volume tuple; no new copy/create/restore; fresh signed Go ack still mandatory",
+    "SF1": "read-only settled verification; only same-byte idempotent actions preserving exact ownership/config and real pre/post Go; migrations remain BLOCK",
+    "standalone": "rolledBack is False; rollbackRejected/finalized/attestation/installReceipt is True; strict schema and integer counts; two CLI fixture cycles four phase restarts",
+    "codeAccepted": false,
+    "CIOrOperationsAccepted": false,
+    "realLinuxDockerCrashAndNativeProofRequired": true
+  },
+  "nativeFailureFollowup": {
+    "run": 42029207673,
+    "head": "526d48e4bdcbb0b363d6e45bfc5635fcc1584d2a",
+    "rootVerifiedExactHeadFailureAndMainSuiteSkipped": true,
+    "observedFloors": [
+      7,
+      8
+    ],
+    "completedCycles": 0,
+    "ownerReportedCause": "outer canonical receipt signature mismatch after real handshake pin/rollback refusal",
+    "artifactId": 13414898207,
+    "artifactSHA256": "35f75753e3bf27dccbbd157b511d6269537921e565f2a583d41902f185e821d7",
+    "rootComparedCommittedZipBytesToGitHubArtifactDigest": true,
+    "rootReexecutedNativeProof": false,
+    "productSuccessInferred": false
+  },
+  "checkpointValidation": {
+    "initialDocsExit": 1,
+    "initialFailure": "one actual legacy review wiki dependency missing on root report branch",
+    "correction": "restore exact published dependency bytes; no gate relaxation",
+    "rerunRequired": true,
+    "pathCitationsFirstExit": 1,
+    "pathCitationsFirstFailure": "historical source0bcf line920 exceeds report branch product804 lines; explicit verified immutable source link used",
+    "correctedDocsExit": 0,
+    "ontologyExit": 0,
+    "syncCheckExit": 0,
+    "syncManaged": 2384,
+    "syncPending": 69,
+    "syncConflicts": 0,
+    "contractBindingsExit": 0,
+    "frontendIntegrityExit": 0,
+    "singleSourceRatchetExit": 0,
+    "correctedPathCitationsRatchetExit": 0,
+    "baselineRaised": false,
+    "docOnlyCheckpointNoProductTestSuccessInferred": true
+  },
+  "aggregationCitationClarification": {
+    "path": "docs/vault/30_Development/History/2026-11-05_FLEET5_compute_storage_contract_Codex.md",
+    "originalImportedSHA256": "7516b090678089ebe43727ed5450383986a0273635fc2136bf1dbef73c9ef3cc",
+    "updatedSHA256": "f808b9f9ed38c25a5a16cf1967e0221fa65185331c87c4447363f6a3f2bcec1d",
+    "historicalSource": "0bcf9670d098fac87667fc9e2448b332db46e691",
+    "historicalLines": 1171,
+    "citedLine": 920,
+    "historicalPhaseReadBack": true,
+    "rootCurrentFileLines": 804,
+    "sourceCodeChanged": false,
+    "baselineChanged": false
+  }
+}

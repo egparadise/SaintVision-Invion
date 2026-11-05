@@ -1,0 +1,35 @@
+{
+  "scope": "Documentation proposal; implementation working tree remains uncommitted and unaccepted",
+  "baseSourceSHA": "526d48e4bdcbb0b363d6e45bfc5635fcc1584d2a",
+  "recordedAtKST": "2026-11-05T22:11:27.583108+09:00",
+  "checks": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-1.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-2.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-liveness-decision-doc-gate-3.txt"
+    }
+  ]
+}

@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-FLEET5-20261105-P0-CODE-6C0F-REVIEW-CLAUDE"
 title: "2026-11-05 FLEET5 P0 plain peer-phase 구현 후보 6c0fc4ad 독립 code 검토"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T21:55:00+09:00"
+updated: "2026-11-05T22:20:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "45bc23cb"
@@ -115,3 +115,19 @@ Orca task `task_fcd89694c5b7`, dispatch `ctx_d0aa7908032b`. [[2026-11-05_20-40-0
 - **`ctx_6f0f8253b8a7`:** proof hex nonce를 고치고 같은 native dispatch를 다시 돌린다. 128개 lifecycle test를 skip 없이 `:3`으로 옮긴다. `bd96` typed check를 field 단위로 합친다. F2와 F3의 운영 경로를 정한다.
 - **root:** all-8, 최종 archive, deploy HOLD를 유지한다. Core 42028616559는 세지 않는다.
 - **Claude:** 고친 후보가 오면 그 exact SHA의 delta를 검토한다.
+
+## 시간 기록 정정 (v1.0.1, 2026-11-05T22:20:18+09:00)
+
+처음 판에 적은 관측 시각은 실제로 관측한 값이 아니었다. 이번 정정에서 바꾼 것은 시각뿐이다. 판정, 실행 결과, 발견은 바꾸지 않았고 Git history도 다시 쓰지 않았다.
+
+- **처음 적은 값(무효):** Evidence `observedWindowKST` 21:40:00~21:56:00, header `updated` 21:55:00
+- **무효인 이유:** declared start 21:40 precedes the brief (21:44:40); declared end 21:56 is the Evidence write, not an observation
+- **복원한 관측 구간:** 21:44:49~21:55:29 KST
+  - brief 수신: 21:44:40
+  - 첫 관측: 21:44:49 fetch candidate
+  - 마지막 관측: 21:55:29 hosted run list result
+  - Evidence 작성: 21:56:06-21:56:52
+- **근거:** session transcript(`f3feb390-…jsonl`)를 읽기만 했다. tool 결과의 시각이며 초 단위 정밀도다.
+- **공개 metadata (관측이 아님):** commit c2102592 author/commit 2026-11-05T21:58:09+09:00; Docs 42031635606 created 21:58:20, completed 21:58:53 KST, success
+- **파일 경로:** 경로에 든 시각은 인용이 깨지지 않도록 legacy ID로 그대로 둔다. 그 시각을 관측 시각으로 보면 **안 된다.**
+- **`updated`:** 이 정정을 한 시각이다.

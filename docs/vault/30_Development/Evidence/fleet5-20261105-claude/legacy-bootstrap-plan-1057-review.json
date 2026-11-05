@@ -1,0 +1,68 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_03867932b2f0 / ctx_37e3f120fac0",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-05T22:01:31+09:00", "2026-11-05T22:07:19+09:00"],
+  "observedWindowCorrection": {"originalDeclared": ["2026-11-05T21:58:00+09:00", "2026-11-05T22:10:00+09:00"], "originalDeclaredHistoryUpdated": "2026-11-05T22:10:00+09:00", "status": "original values INVALID (not observed)", "reason": "declared start 21:58 precedes the brief (22:01:15) and belongs to the previous task; declared end 22:10 and History updated 22:10 are after the commit (22:09:11)", "briefReceived": "2026-11-05T22:01:15+09:00", "firstObservation": "22:01:31 fetch plan branch", "lastObservation": "22:07:19 plan Docs 42029683097 view result", "evidenceWrite": "22:07:56-22:08:46", "source": "session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only): first observation tool result start and last observation tool result before the Evidence write; second-level precision", "publicationMetadata": {"commit": "830efd93 author/commit 2026-11-05T22:09:11+09:00", "docs": "42033242038 created 22:09:18, completed 22:09:44 KST, success"}, "correctedAt": "2026-11-05T22:20:18+09:00", "verdictAndResultsChanged": false, "gitHistoryRewritten": false, "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation", "scope": "requested"},
+  "reviewKind": "bounded independent architecture/plan review only; not corrected-P0 code acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "1057e0ed2e3c75d02e8ed342208fd78109cec2cd",
+    "base": "f0278daffa616cae4485e4b1d4c07671715892dc",
+    "files": 11,
+    "nonDocsFiles": 0,
+    "readFrom": "Git objects only (copied to private scratch); author checkout not read or edited",
+    "comparedAgainst": {"source03": "03e17c31", "executorB5": "b5b8ca68", "accepted2fb": "2fb52bbe", "p0Candidate6c": "6c0fc4ad", "claudeAudit": "f6817f3d", "claudeP0CodeReview": "c2102592"}
+  },
+  "documentChecks": {
+    "ownerSchemaCases": {"matched": 14, "total": 14, "rerunBy": "Claude, main .venv 3.14.7 -B -I, jsonschema draft 2020-12"},
+    "claudeAdversarialMutations": {"total": 17, "rejected": 17, "examples": ["full fake member bindings", "rootChoice B", "channelCASAllowed true", "extra member PC3", "duplicate PC", "reversed order", "extra ROLLBACK state", "delete allowed", "re-enable old plan", "historical deadline as input", "currentRootTime set", "real 6c0f SHA as p0SourceSHA", "preserve Cmd false", "review inherited", "drop member binding name", "unknown stop = quiesced", "extra targetBindings key"]},
+    "bindingCounts": {"targetBindings": 27, "rootBindings": 18, "memberBindingNames": 39, "allNull": true, "members": [{"physicalPC": 2, "bindings": null}, {"physicalPC": 4, "bindings": null}]},
+    "acceptanceCases": {"count": 24, "gatesCovered": "G1-G10", "status": "FUTURE NOT RUN"},
+    "publicSourceBindings": {"recomputed": 13, "matched": 13},
+    "blobEquality": {"start-node.sh": "b5=2fb=03=6c bd67b791", "permit.go": "b5=2fb=03=6c 084b9113", "main.go": "b5=2fb=03 2f90ea01; 6c 8a8d6a64 (observer flag only)", "journal.go": "03=6c 970a9d67", "trust.go": "03=6c d18f943d"},
+    "planDocs": {"run": 42029683097, "headSha": "1057e0ed", "conclusion": "success", "jobs": {"docs": "success"}, "checkedByClaude": true, "scope": "document gate only"}
+  },
+  "g2": {
+    "rootDirectionForPlan": "A",
+    "sourceFacts": ["start-node.sh:42-50 runtime image = resolved actual_image, --image = manifest agentImage", "main.go:40 --image -> Config.Image", "permit.go:67 plan.ImageDigest != config.Image -> NODE-0008 (workload permit, not Node self-identity)", "lan_pilot.py:855-856 manifest_for_node copies global agentImage; 1229-1234 bundle sets state agentImage to built image", "worker_replace.py:105 rebuilds --image from manifest agentImage (permit meaning, consistent with A)"],
+    "assessment": "A is consistent with source: preserved Cmd keeps permit semantics; NEW typed authenticated immutable per-Node runtimeImageDigest separate from preservedPermitImageDigest; legacy CP agentImage and manifests byte-frozen as historical/default; inventory metadata CAS is not a channel/leaf CAS",
+    "p0Compatibility": "6c PeerFloorServingProcess accepts the preserved old Cmd (--image, --executable, profile lan-observe-v1, single --serve, exact state/cert/key/CA/signer paths); no Cmd change needed for M2",
+    "operationalChoice": null
+  },
+  "gateAssessment": {
+    "G1": "sound; Dockerfile.node/.remote are FROM scratch + ENTRYPOINT /inv-node so image-inherited Config can stay equal (see R4)",
+    "G2": "sound for plan (direction A); consumer closure incomplete (R3)",
+    "G3": "sound; no install_files/prepare/repair/finish",
+    "G4": "sound; fenced unsigned pre-cutover bridge is bootstrap-only, post-start signed 6c M2 binds P/H/scope/active hash; but 6c host observer blocks on the retained backup consumer (R1)",
+    "G5": "sound; forward-only, nothing deleted, no old restart/policy restore after publication or pin",
+    "G6": "sound; source supports it (journal.go/trust.go unchanged 03->6c, observer branch returns before OpenJournal) but real old/new no-write proof required",
+    "G7": "sound; exact identities, P/H/C/authorities, quiescence, multiple historical Nodes selected by name+label+Id+daemon",
+    "G8": "sound; matches 6c _plain(current=False) requiring stopped restart=no predecessor; new-only unless-stopped after M2+mTLS+root step",
+    "G9": "sound for schedulers; generic helper launch surfaces not coded-fenced (R2)",
+    "G10": "sound; all product bindings null; 6c0f not accepted (c2102592) so HOLD holds"
+  },
+  "findings": [
+    {"id": "R1", "severity": "High (plan reachability)", "summary": "After OLD_PRESERVED/NEW_CREATED the state volume has two consumers; 6c0fc4ad:deploy/lan/worker_peer_floor.py target() accepts a second consumer only as the workspace predecessor (workspace-upgrade.json phase ready, ai.saintvision.upgrade label, agentImage), which G1 forbids (no new labels). Post-start M2 through the 6c host observer and every later schema3 renewal (worker_plain_rotation -> target) would BLOCK permanently because backups are never deleted.", "requiredRevision": "Specify a reviewed typed migration-predecessor consumer rule bound to the migration journal (exact backup ID/name, stopped, restart=no, frozen old inspect digest, same volume), owned by corrected P0 or the new helper; add GREEN post-bootstrap M2 + schema3 renewal with retained backup and RED label-only/unrecorded second consumer cases"},
+    {"id": "R2", "severity": "Medium", "summary": "6c no_rotation_mutation only recognises leaf-rotation markers; repair-node.sh/Repair-Worker.ps1, worker_workspace, storage bridge and start-node stay runnable during and after cutover (repair could docker start the new container before NEW_START_INTENT; workspace would add a third consumer or downgrade). G9 fences schedulers only.", "requiredRevision": "Migration journal (any non-terminal and terminal state) is a coded blocking marker for every existing generic helper; acceptance case"},
+    {"id": "R3", "severity": "Medium", "summary": "G2 consumer closure: 'new consumers require the typed record' is not closed until existing agentImage readers are enumerated with post-cutover behaviour", "requiredRevision": "List start-node.sh:11, worker_replace.py:105 (permit meaning, OK), worker_workspace.py:164/215/249, worker_storage.py:293, worker_storage_bridge.py:38, lan_workspace.py:60-83, lan_pilot.py:1229-1234, check_workspace_package/upgrade; each fenced or proven consistent"},
+    {"id": "R4", "severity": "Low", "summary": "Inspect contract does not enumerate ExecIDs created by the 6c docker-exec M2 observation, and does not require equal image-inherited Config (Entrypoint/Env/Labels/User/WorkingDir)", "requiredRevision": "Enumerate ExecIDs bound to the exact observer exec; require new image from the same Dockerfile.node recipe with equal image Config"}
+  ],
+  "info": ["schema forbids any non-null target binding, so a populated successor needs a new schema version (by design)", "a pre-existing workspace predecessor on an r5 Node blocks (fail-closed, correct for observe-only scope)", "PC2-then-PC4 with both fenced restart=no before first stop is coherent; second old process running restart=no is not an old-binary restart", "21:14 automation disable is root-reported, not verified by Claude; nothing re-enabled"],
+  "verdicts": {
+    "plan": "REVISION REQUIRED (bounded: R1 required, R2-R4 additions); direction G2-A, state machine, forward-only rules and G1-G10 structure acceptable",
+    "implementation": "none exists; unaccepted",
+    "p0": "6c0fc4ad NOT ACCEPTED (c2102592); corrected code review separate",
+    "ci": "Docs 42029683097 document gate only; no runtime CI accepted",
+    "operations": "HOLD; 27 target + 18 root + member bindings null; direction is not execution approval",
+    "physicalAcceptance": "none"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerPrivateKeyGuardPrecheckAutomation": 0, "sharedBoardsRegistryObsidian": 0, "authorCheckoutWrites": 0},
+  "nextFirstAction": [
+    {"owner": "Codex (plan owner)", "action": "publish plan revision adding R1 migration-predecessor consumer rule, R2 helper fence, R3 consumer list, R4 inspect deltas, with acceptance cases"},
+    {"owner": "ctx_6f0f8253b8a7", "action": "fix B1/B2/F1-F3 on P0; coordinate R1 rule ownership with plan owner"},
+    {"owner": "root", "action": "keep HOLD and G2 operational choice null until revised plan review and accepted P0"},
+    {"owner": "Claude", "action": "review plan revision and corrected P0 when assigned"}
+  ]
+}

@@ -1,15 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.368"
+version: "1.0.369"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T22:03:31+09:00"
+updated: "2026-11-05T22:29:29+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "P0 candidate6c NOT ACCEPTED by actual code review c210; nonce/lifecycle128 and safe liveness revisions;1057 independent plan review active; old3 disabled"
-active_card_next: "P0 owner corrects B1/B2/F1-F3 and delivers actual native/Core plus independent delta review; Claude reviews1057 plan; integrator prepares locally; Root keeps execution HOLD"
+active_card_status: "P0 code revisions active; actual independent cde plan review REVISION REQUIRED; plan R1/R2/R4/N1/N2 assigned; legacy3 disabled"
+active_card_next: "Plan owner publishes bounded eace finding closure; P0 owner delivers native/Core/revised code review; Root reviews actual new deltas and preserves HOLD; integration waits for actual P0 delivery"
 ---
+
+한정 P0 복구 방향 RS1/SF1도 concrete323 문서를 읽고 선택했다. 같은 CID의 검증된 forward start와 same-byte settled 동작만 구현하며, :3 rollbackRejected=true/rolledBack=false를 strict proof로 확인한다. 실제 Linux crash/native/새 코드 검토는 아직 필요하다.
+
+## 2026-11-05 전환 계획 실제 검토 결과와 후속 담당
+
+작업한 것: 830/eace의 원문 검토와 실제 Docs 성공을 확인하고 계획 담당의 대기 질문에 R1/R2/R4/N1/N2 수정을 전달했다. 확인한 것: cde16 schema/20 mutation/27 source hash는 문서·소스 검사이며28 runtime case는 미실행이다. R3는 source03 범위에서만 닫혔다. 다음 첫 행동/담당: 계획 담당은 typed backup·공통 fence·실행 파일/argv/inspect 계약을 비실행 문서로 보완하고, P0 담당은 한정 M2 보강 가능성을 검토하며 기존128 lifecycle·native2cycle 수정과 재검증을 계속한다. Root는 실제 새 소스·독립 판정 전 통합 최종화와 실제 전환을 보류한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 P0 코드 미수락과 별도 계획 검토 착수
 

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "fleet5-proposed-runtime-inventory-contract:1",
+  "status": "NONEXECUTING_HOLD_NEW_CONTRACT_NOT_IMPLEMENTED",
+  "rootPlanningSelection": "msg_f517e89d6a16",
+  "rootSelectionIsOperationalAcceptance": false,
+  "m2WireContractSHA": null,
+  "m2SignatureDomain": null,
+  "inventoryAuthenticationContractSHA": null,
+  "inventorySignatureDomain": null,
+  "envelope": "Proposed explicit versioned authenticated immutable cohort envelope containing two individually typed per-Node runtime records, plan/prior-record digest, exact scope, owner and proof digests; no overwrite or unsigned mirror authority",
+  "typedImageFields": [
+    {"name":"runtimeDockerImageId","meaning":"Actual owned Docker image inspect Id and container inspect Image; daemon-local content identity, often config digest, NEVER treated as repository manifest/index, archive, binary or source hash"},
+    {"name":"runtimeRepositoryReferenceAndDigest","meaning":"Real immutable repository reference plus RepoDigest and media type when present; resolve index to exact OS/architecture platform manifest; no tag-only authority"},
+    {"name":"runtimePlatformManifestDigest","meaning":"Selected platform manifest bytes hash from authenticated publication, distinct from index digest and local image Id"},
+    {"name":"runtimeConfigDigest","meaning":"Published image config bytes hash, matched to actual Engine image/config identity with a verified format-specific mapping, not guessed by equal-looking strings"},
+    {"name":"runtimeRootFSDiffIDs","meaning":"Ordered uncompressed RootFS diffIDs from actual inspect and published config; compressed layer blob digests are separately verified publication metadata and are not interchangeable"},
+    {"name":"runtimeImageArchiveSHA256","meaning":"Exact transferred archive bytes hash if offline packaging; archive hash does not identify the executable or replace loaded-image/layer/config validation"},
+    {"name":"runtimeExecutableSHA256","meaning":"Exact published inv-node executable bytes; must equal signed actual live-process executable hash from reviewed M2"},
+    {"name":"runtimeSourceGitSHA","meaning":"Full actual published P0 Git source commit linked to executable/image by verified reproducible build/CI provenance; never inferred from a label, tag or this document SHA"},
+    {"name":"preservedPermitImageDigest","meaning":"Exact old Cmd --image string accepted by Go config.Image for signed workload launch ImageDigest; unchanged even though runtimeDockerImageId changes"}
+  ],
+  "repositoryOrOfflineUnion": {
+    "repository": "Verified immutable repository/index/manifest/config/layer/platform chain and actual loaded-image mapping",
+    "offline": "Explicit authenticated absence of RepoDigest plus real archive SHA256, config/layer/platform manifest/build provenance and actual loaded-image mapping; never synthesize RepoDigest from image Id",
+    "currentChoiceOrProof": null,
+    "unsignedAbsenceOrHostMirrorAllowed": false
+  },
+  "bindingJoin": [
+    "Root holds exact daemon/container/volume/cohort ownership and observes image inspection before M2: actual container ID, stable host PID/start/restart observations, Image/Config.Image resolution, config/layers/platform, read-only executable root and no executable bind substitution",
+    "Fresh nonce-bound M2 signature is verified against unchanged Node certificate/key/tenant/Node/epoch; actual new compiled wire contract proves live same executable UID/PID1 and actual journal P/H/active hash/scope",
+    "Root cross-reads owned container/process/image after M2; IDs, process generation, image/config/endpoint/volume scope and restart count remain stable; a process hash alone does not prove an image",
+    "Signed actual process executable hash equals published executable hash; trusted owned inspection equals published runtime image/config/layers/platform; reproducible build links that executable/image to actual source Git SHA",
+    "Root binds before/after ordered Cmd argv hashes and exact arrays, Entrypoint hashes and actual PID1 argv check; preserved --image value remains exact and is never reassigned to runtime image",
+    "Before/after protected tree plus typed authority/scope equalities prove no changed policy/floor/key/cert/CA/signer/journal identity or C/hash/enabled/endpoint",
+    "Only after BOTH member joins, publish immutable authenticated inventory cohort record by owned metadata CAS against exact prior runtime/global-state digest and unchanged channel vector; read back all entries and the new head"
+  ],
+  "authorityEqualityFields": ["tenantId", "nodeId", "epoch", "nodeKeyPublicSPKISHA256", "nodeLeafDERSHA256", "controlLeafDERSHA256", "caBundleRawSHA256", "signerPublicRawSHA256", "activePeerPolicyRawSHA256", "peerFloorVersion", "peerFloorPolicyRawSHA256", "peerFloorRawFileProtectedIdentity", "journalIdentityTenantNodeEpoch", "protectedStateBeforeAfter", "channelVersionCertificateDERSHA256EnabledEndpoint"],
+  "argumentHashDefinition": "Proposed versioned SHA256 of canonical UTF8 JSON ordered argv array; no substitution/sorting/deduplication; exact before/after arrays also required; Entrypoint and live PID1 argv checked separately",
+  "privateKeyHandling": "Public SPKI establishes key identity; exact private file preservation is proven locally by protected tree equality, never export key bytes or a private archive",
+  "untrustedSubstitutesRejected": ["Node image claim without owned inspection", "same Node key alone", "image label/source tag", "binary hash used as image Id", "RepoDigest used as local Id", "unsigned capture used as normal M2", "side-loaded observer", "old global agentImage fallback", "partial member proof"],
+  "actualProvenanceAndPrivateRecordValues": null,
+  "requiredBeforeUse": "Actual P0 M2 wire/source/binary/image/CI/verdict, new helper/API/authentication/consumer contracts and tests, exact Root private bindings and operational decision; all remain HOLD"
+}
