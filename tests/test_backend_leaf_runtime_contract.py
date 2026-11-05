@@ -8,15 +8,20 @@ import pytest
 
 
 WORKFLOW = Path(__file__).resolve().parents[1] / ".github/workflows/backend.yml"
-# Independent acceptance expression: a finalized lifecycle includes verification
-# of the distinct Node signature, four observed restarts and no bytecode cache.
+# Independent :3 contract for two synthetic CLI cycles. Native Go acceptance is
+# separate; a forward-only renewal proves rollback refusal, not rollback success.
 VERIFIED_LIFECYCLE = {
+    "schemaVersion": "saintvision-leaf-rotation-standalone-lifecycle:3",
+    "fixtureOnly": True,
+    "actualGoAcceptanceAssessed": False,
+    "completedNormalCycles": 2,
     "bytecodeCacheCount": 0,
     "finalized": True,
     "finalizedAttestationVerified": True,
     "installRestartReceipt": True,
     "restartCount": 4,
-    "rolledBack": True,
+    "rolledBack": False,
+    "rollbackRejected": True,
 }
 
 
@@ -52,18 +57,36 @@ def test_backend_refuses_absent_or_failed_node_finalization_attestation(proof):
 
 @pytest.mark.parametrize("field,bad", [
     (field, bad)
-    for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+    for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rollbackRejected", "fixtureOnly")
     for bad in (1, 1.0, False, "true", None)
+] + [
+    (field, bad)
+    for field in ("rolledBack", "actualGoAcceptanceAssessed")
+    for bad in (0, 0.0, True, "false", None)
 ] + [
     ("restartCount", bad) for bad in (4.0, True, False, "4", None)
 ] + [
     ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+] + [
+    ("completedNormalCycles", bad) for bad in (2.0, True, False, "2", None)
+] + [
+    ("schemaVersion", bad) for bad in (
+        "saintvision-leaf-rotation-standalone-lifecycle:2",
+        "saintvision-leaf-rotation-standalone-lifecycle:4", 3, True, None,
+    )
 ])
 def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
     value = dict(VERIFIED_LIFECYCLE)
     value[field] = bad
     with pytest.raises(AssertionError):
         _validate_as_workflow(value)
+
+
+def test_versioned_fixture_contract_matches_actual_producer_predicate():
+    from check_leaf_rotation_standalone_lifecycle import validate_result
+
+    assert validate_result(dict(VERIFIED_LIFECYCLE)) == VERIFIED_LIFECYCLE
+    _validate_as_workflow(dict(VERIFIED_LIFECYCLE))
 
 
 @pytest.mark.parametrize("field", list(VERIFIED_LIFECYCLE))

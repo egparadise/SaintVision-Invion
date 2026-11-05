@@ -1,0 +1,154 @@
+{
+  "scope": "LOCAL UNACCEPTED PROSPECTIVE500 CONSUMER PREPARATION; NOT FINAL SOURCE OR PACKET",
+  "observedAtKST": "2026-11-06T00:23:16.551254+09:00",
+  "authorization": "msg_268e2074f267",
+  "localBranch": "agent/codex/fleet5-setup-integration-local-prep-50000697-20261106",
+  "localMergeCommit": "b0036ffc781ac6c0040faf353a8581a4e36878a8",
+  "acceptedReportBranchRefPreserved": "842973bb73d53015eee77e6c4c55390c072258d0",
+  "acceptedLowProduct": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "runtimeSource": "4a928310e88ac336efb040c1621525fee7133f32",
+  "incomingFixtureTestDelta": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "runtimeProductionEquivalent": true,
+  "ownConsumerChanges": [
+    "tests/test_backend_leaf_runtime_contract.py",
+    "tests/test_fleet5_setup_packet.py"
+  ],
+  "conflictsResolved": {
+    "Backend": "actual :3 closed11 result fields,5 true identities,2 false identities,3 exact int checks;5 modules",
+    "Card150": "actual LAN pair only; actual prepare60bebe/a5695c plus every other original field unchanged"
+  },
+  "actualFiveModules": [
+    {
+      "path": "deploy/lan/worker_config.py",
+      "bytes": 16855,
+      "sha256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "gitBlobSHA1": "e42f017ea011780ee2724866c3b11cdc087d7af6",
+      "launcherPin": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "bytes": 54096,
+      "sha256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "gitBlobSHA1": "2a03a3dd9445a51ffc1954a8878498ea51beab0b",
+      "launcherPin": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998"
+    },
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "bytes": 10466,
+      "sha256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "gitBlobSHA1": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8",
+      "launcherPin": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "bytes": 13159,
+      "sha256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "gitBlobSHA1": "b537809fb623ebc84dabc9f4b6a076948e1db3cc",
+      "launcherPin": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec"
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "bytes": 25708,
+      "sha256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "gitBlobSHA1": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+      "launcherPin": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5"
+    }
+  ],
+  "actualIncomingPublicTooling": [
+    {
+      "path": "tools/lan_pilot.py",
+      "bytes": 198894,
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "gitBlobSHA1": "d8de953f7cd2f69f0e4915efccb24df352e7ea64"
+    },
+    {
+      "path": "deploy/lan/prepare-pilot-database.sh",
+      "bytes": 8430,
+      "sha256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+      "gitBlobSHA1": "a5695cab0a955d0aeeedf40f6459458ccef6210a"
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "bytes": 25445,
+      "sha256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "gitBlobSHA1": "c1b6ec66a37e33a9fda8e6a015ca892f1f1034b7"
+    }
+  ],
+  "tests": {
+    "migrationRed": "20 failed,41 passed,exit1; missing module-scoped synthetic adapter and old expected contract, not a product regression",
+    "ownedGreen": "101 passed,0 skipped,exit0,109.07s",
+    "wireProducerAndModuleClosure": "35 passed,0 skipped,exit0,1.76s; Python only",
+    "separatePredicateControls": {
+      "baselinePass": 12,
+      "weakeningsDetected": 12,
+      "survivors": 0
+    },
+    "retainedOriginalNegativeCases": [
+      "missing-cp-archive",
+      "partial-cp-archive",
+      "tampered-cp-signature",
+      "duplicate-proof-key",
+      "missing-node-proof",
+      "unknown-node-proof",
+      "tampered-node-signature",
+      "missing-node-archive",
+      "unknown-cp-archive",
+      "unknown-node-archive",
+      "equal-cp-next",
+      "equal-node-next",
+      "partial-next",
+      "bare-finalized",
+      "receipt-byte-change",
+      "current-node-policy",
+      "current-channel"
+    ],
+    "positiveFixtureCohorts": [
+      2,
+      5
+    ],
+    "extraCurrentSignedFloorNegatives": 9,
+    "nonmutation": "all19 original lifecycle cases plus9 additional M2 cases compare complete fixture bytes before/after"
+  },
+  "settlement": "canonical signed CP :3 archive and current authority/cohort/channel; all Node :3 attestations; canonical SF1 immutable archive/journal/original-byte receipt/current files plus fresh signed M2v2 final floor/executable/target; every .next blocked",
+  "READMEClosure": "Incoming500 already names actual5 modules and :3 two fixture cycles/four restarts/rollbackRejected true/rolledBack false; no guessed edit",
+  "historicalPreservation": {
+    "B1BuilderAndModeTestExactWorkingAndGitBytes": true,
+    "B3StructuredReceiptCommittedLFBytesUnchanged": true,
+    "all3B3RawDiagnosticsBytesHashesBlobIdsMatch": true,
+    "oldResultAndRawEvidenceRewritten": false
+  },
+  "auditCorrection": {
+    "initialExit": 1,
+    "reason": "Audit incorrectly compared structured B3 metadata working CRLF to committed LF. Corrected audit compares exact Git LF blob and separately verifies all3 literal raw diagnostics; no metadata/raw file modified.",
+    "committedB3LF_SHA256": "3d49907cf85182b91e11bf8482e6f576aab9cdca7aa74d305e5e49354bc1acad"
+  },
+  "newRedCapture": {
+    "rawIgnoredSHA256": "3fd3a9dabf55aede5ffd95b4a84caf2cb1533650b35cd2f40bd2cd4bebbf33c2",
+    "publicDerivativeGitLF_SHA256": "064f975d09b31db2ed811849f7b6b95cdeb43fd320e9eaa4fd516941d2c1d06a",
+    "canonicalCI_DSN_masks": 2,
+    "originalReceiptAndBytesPreservedIgnored": true
+  },
+  "notPerformed": [
+    "experimental source push",
+    "complete source archive or setup packet generation",
+    "ci2 binding/finalfreeze",
+    "Core/full8 dispatch",
+    "image build/Go/Docker/remote/physical operation",
+    "landing/deployment",
+    "shared boards/registry/Obsidian writes"
+  ],
+  "remainingExternalGates": [
+    "actual500 Go corrected Unicode/nested/supplementary coverage and actual native2cycles+negatives",
+    "actual fullCore/Backend terminal at exact runtime source plus approved delta CI",
+    "independent implementation verdict task_c90b362f7470/ctx_1e0814952956",
+    "root selected source/tooling and rebuilt Node binary/sourcePair provenance before final combined review/packet/all8"
+  ],
+  "diagnosticWhitespaceCheck": {
+    "firstStagedExit": 2,
+    "reason": "Verbatim pytest source-traceback trailing blanks in the new redacted diagnostic only",
+    "productOnlyWhitespaceExit": 0,
+    "resolution": "One literal task-owned evidence .gitattributes entry preserves that diagnostic byte hash; no glob or root/product attribute change",
+    "literalEntry": "local500-own-migration-red.redacted.txt -text -whitespace",
+    "retryRequiredBeforeCommit": true
+  }
+}

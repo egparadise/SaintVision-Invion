@@ -1,0 +1,96 @@
+{
+  "scope": "LOCAL UNACCEPTED :3 consumer predicate mutation controls; private copied workflow only",
+  "candidateInput": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "localMerge": "b0036ffc781ac6c0040faf353a8581a4e36878a8",
+  "actualResult": {
+    "baselineControlsPass": 12,
+    "weakeningControlsDetected": 12,
+    "survivors": 0
+  },
+  "controls": [
+    {
+      "field": "finalized",
+      "badValue": 1,
+      "guardRemoved": "assert lifecycle['finalized'] is True",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "finalizedAttestationVerified",
+      "badValue": 1,
+      "guardRemoved": "assert lifecycle['finalizedAttestationVerified'] is True",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "installRestartReceipt",
+      "badValue": 1,
+      "guardRemoved": "assert lifecycle['installRestartReceipt'] is True",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "rollbackRejected",
+      "badValue": 1,
+      "guardRemoved": "assert lifecycle['rollbackRejected'] is True",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "fixtureOnly",
+      "badValue": 1,
+      "guardRemoved": "assert lifecycle['fixtureOnly'] is True",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "rolledBack",
+      "badValue": 0,
+      "guardRemoved": "assert lifecycle['rolledBack'] is False",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "actualGoAcceptanceAssessed",
+      "badValue": 0,
+      "guardRemoved": "assert lifecycle['actualGoAcceptanceAssessed'] is False",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "restartCount",
+      "badValue": 4.0,
+      "guardRemoved": "assert type(lifecycle['restartCount']) is int",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "bytecodeCacheCount",
+      "badValue": false,
+      "guardRemoved": "assert type(lifecycle['bytecodeCacheCount']) is int",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "completedNormalCycles",
+      "badValue": 2.0,
+      "guardRemoved": "assert type(lifecycle['completedNormalCycles']) is int",
+      "unmodifiedTest": "PASS rejects malformed input",
+      "mutation": "DETECTED: same owned test fails because weakened workflow accepts input"
+    },
+    {
+      "field": "missing-schemaVersion",
+      "guardRemoved": "exact lifecycle dictionary assertion",
+      "unmodifiedTest": "PASS rejects malformed keyset",
+      "mutation": "DETECTED: weakened workflow accepts malformed keyset"
+    },
+    {
+      "field": "extra-field",
+      "guardRemoved": "exact lifecycle dictionary assertion",
+      "unmodifiedTest": "PASS rejects malformed keyset",
+      "mutation": "DETECTED: weakened workflow accepts malformed keyset"
+    }
+  ],
+  "actualProductionWorkflowModified": false,
+  "ciOrNativeAcceptance": false
+}

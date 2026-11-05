@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_doc_single_source.py",
+    "--ratchet"
+  ],
+  "startedAtKST": "2026-11-06T00:23:46.385654+09:00",
+  "finishedAtKST": "2026-11-06T00:23:55.474197+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "local500-ratchet.txt",
+  "sourceAtStart": "b0036ffc781ac6c0040faf353a8581a4e36878a8",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

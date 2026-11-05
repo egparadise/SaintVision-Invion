@@ -30,6 +30,11 @@ def _snapshot(root):
 
 
 def _fixture(tmp_path, monkeypatch, count=2):
+    # This module does not inherit the other test module's autouse fixture.
+    # All signed floor observations are explicitly synthetic and confined here.
+    from peer_phase_unit_fixtures import install_unit_adapters
+
+    install_unit_adapters(monkeypatch, tmp_path)
     case = _batch_case(tmp_path, monkeypatch, node_count=count)
     lan_pilot.prepare_leaf_rotation_batch(case.args)
     case.complete(case.args.output, 0)
@@ -48,6 +53,8 @@ def _settlement(case):
     """
     state = lan_pilot.load(case.args.state)
     raw, batch, bundles = lan_pilot._batch_material(case.args.output)
+    if batch["schemaVersion"] != "saintvision-lan-leaf-rotation-batch:3":
+        raise ValueError("The prospective packet requires the reviewed :3 contract")
     journal = lan_pilot._load_batch_journal(case.args.state)
     cp_archive = lan_pilot._batch_archive_path(case.args.state, batch)
     expected = {cp_archive}
@@ -70,6 +77,8 @@ def _settlement(case):
     if found != expected:
         raise ValueError("Missing/unknown archive blocks settlement")
     archive = _unique_json(cp_archive.read_bytes())
+    if archive["schemaVersion"] != "saintvision-lan-finalized-batch:3":
+        raise ValueError("The prospective packet requires a signed :3 CP archive")
     for name in ("journalRaw", "terminalJournalRaw", "batchManifest"):
         _unique_json(archive[name])
     for value in archive["nodeFinalizations"].values():
@@ -85,10 +94,23 @@ def _settlement(case):
             case.args.state, state, journal, raw, batch, bundles, connection
         )
     assert verified == cp_archive.read_bytes()
-    for node_id, (proposal_raw, _proposal, files) in bundles.items():
+    from worker_plain_rotation import verify_settled
+
+    for node_id, (proposal_raw, proposal, files) in bundles.items():
         value = _unique_json(archive["nodeFinalizations"][node_id])
+        if (proposal["schemaVersion"] != "saintvision-lan-leaf-rotation:3"
+                or value["schemaVersion"] != "saintvision-node-finalized-attestation:3"):
+            raise ValueError("Every Node must bind the new signed peer-phase contract")
         proof = rotation.verify_finalized_attestation(value, proposal_raw, files)
         worker = case.workers[node_id]
+        # SF1 verifies the immutable original archive/receipt/current files plus
+        # a fresh signed M2v2 final floor and unchanged target/executable. Here
+        # only the observer/transport seam is synthetic, never actual Go proof.
+        settled = verify_settled(worker, now=case.clock[0])
+        if (settled["verified"] is not True
+                or settled["actualFinalPeerFloor"]["schemaVersion"]
+                != "saintvision-node-peer-policy-floor:2"):
+            raise ValueError("Current canonical signed M2v2 final floor is required")
         original_receipt = case.args.state.parent / "commits-0" / (node_id + ".json")
         if (
             node_archives[node_id].read_bytes() != value["evidence"].encode()
@@ -98,14 +120,65 @@ def _settlement(case):
             or original_receipt.read_bytes() != proof["commitReceipt"].encode()
         ):
             raise ValueError("Current Node files or original byte-bound receipt differ")
-    return {"fixtureProofVerified": True, "physicalAcceptance": False, "nodeCount": len(bundles)}
+    return {"fixtureProofVerified": True, "actualGoAcceptanceAssessed": False,
+            "physicalAcceptance": False, "nodeCount": len(bundles)}
 
 
 @pytest.mark.parametrize("count", [2, 5])
 def test_packet_uses_canonical_signed_finalization_without_mutating_fixture(tmp_path, monkeypatch, count):
     case = _fixture(tmp_path, monkeypatch, count)
     before = _snapshot(tmp_path)
-    assert _settlement(case) == {"fixtureProofVerified": True, "physicalAcceptance": False, "nodeCount": count}
+    assert _settlement(case) == {"fixtureProofVerified": True, "actualGoAcceptanceAssessed": False,
+                                "physicalAcceptance": False, "nodeCount": count}
+    assert _snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("fault", [
+    "old-floor-schema", "missing-executable", "unsigned-floor", "stale-floor",
+    "wrong-floor-version", "wrong-policy-hash", "changed-executable", "wrong-node",
+    "boolean-floor-version",
+])
+def test_packet_requires_current_signed_v2_floor_without_mutating_fixture(tmp_path, monkeypatch, fault):
+    case = _fixture(tmp_path, monkeypatch)
+    original = rotation.observe_actual_floor
+
+    def invalid_observation(worker, manifest, files):
+        value = original(worker, manifest, files)
+        if fault == "old-floor-schema":
+            value["schemaVersion"] = "saintvision-node-peer-policy-floor:1"
+        elif fault == "missing-executable":
+            del value["servingExecutableSHA256"]
+        elif fault == "unsigned-floor":
+            del value["nodeSignature"]
+        elif fault == "stale-floor":
+            value["observedAt"] -= 121
+        elif fault == "wrong-floor-version":
+            value["peerPolicyVersion"] = manifest["overlapPeerPolicyVersion"]
+        elif fault == "wrong-policy-hash":
+            value["peerPolicySHA256"] = "0" * 64
+        elif fault == "changed-executable":
+            value["servingExecutableSHA256"] = "0" * 64
+        elif fault == "wrong-node":
+            value["nodeId"] = "nod_01H" + "V" * 23
+        else:
+            value["peerPolicyVersion"] = True
+        if fault != "unsigned-floor":
+            # Re-sign with this disposable fixture key: semantic bindings must
+            # reject even a valid signature over the wrong tuple/executable.
+            from cryptography.hazmat.primitives import serialization
+            import peer_policy_phase as phase
+
+            key = serialization.load_pem_private_key((worker / "node-key.pem").read_bytes(), password=None)
+            body = {name: item for name, item in value.items() if name != "nodeSignature"}
+            value["nodeSignature"] = key.sign(phase.DOMAIN + phase.floor_canonical(body)).hex()
+        return value
+
+    monkeypatch.setattr(rotation, "observe_actual_floor", invalid_observation)
+    before = _snapshot(tmp_path)
+    from cryptography.exceptions import InvalidSignature
+
+    with pytest.raises((ValueError, KeyError, InvalidSignature)):
+        _settlement(case)
     assert _snapshot(tmp_path) == before
 
 

@@ -1,0 +1,1138 @@
+F........................................FFFFFFFFFFFFFFFFFFF.            [100%]
+================================== FAILURES ===================================
+____ test_backend_accepts_complete_verified_standalone_lifecycle_contract _____
+
+    def test_backend_accepts_complete_verified_standalone_lifecycle_contract():
+>       _validate_as_workflow(dict(VERIFIED_LIFECYCLE))
+
+tests\test_backend_leaf_runtime_contract.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_backend_leaf_runtime_contract.py:34: in _validate_as_workflow
+    exec(compile(ast.Module(body=checks, type_ignores=[]), str(WORKFLOW), "exec"),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    name: Backend Build
+    # Only a dispatch that passes `correlation_id` changes this; every other event keeps
+    # the workflow name. The value is used for the run's display name only.
+    run-name: ${{ inputs.correlation_id || github.workflow }}
+    on:
+      workflow_dispatch:
+        inputs:
+          correlation_id:
+            # Opaque id echoed into the run name, and read nowhere else, so a tool that
+            # dispatched this run can recognise it among runs other people dispatched at
+            # the same ref and commit (tools/post_landing_verify.py). The run list gives
+            # no link between a dispatch and the run it creates, and run ids and
+            # timestamps cannot tell two concurrent dispatches apart.
+            description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
+            required: false
+            default: ''
+      push:
+        branches:
+          - main
+          - integration/all-agents-unified
+      pull_request:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      # Keep shared evidence branches ordered, but let a PR merge ref or a manually
+      # dispatched agent branch replace its own stale run.
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/integration/all-agents-unified' }}
+    permissions:
+      contents: read
+    jobs:
+      backend:
+        runs-on: ubuntu-latest
+    
+        # Both sides of the 3.13 dataclass/slots change. The first CI run failed
+        # only on 3.12 while passing on the 3.14 development machine, so a single
+        # version is not enough to trust.
+        strategy:
+          fail-fast: false
+          matrix:
+            python-version: ['3.12', '3.14']
+    
+        # A real PostgreSQL, because the properties under test — RLS under a
+        # non-owner role, NULLS NOT DISTINCT, partition routing — have no
+        # substitute. Without it the suite would skip and report a false green.
+        services:
+          postgres:
+            image: postgres:16
+            env:
+              POSTGRES_USER: invowner
+              POSTGRES_PASSWORD: ci_local_only
+              POSTGRES_DB: invdev
+            ports:
+              - 5432:5432
+            options: >-
+              --health-cmd "pg_isready -U invowner -d invdev"
+              --health-interval 5s
+              --health-timeout 5s
+              --health-retries 20
+    
+        env:
+          INV_ENV: test
+          # INV_DATABASE_URL is deliberately NOT set job-wide. Test fixtures that
+          # provision their own database pass INV_MIGRATION_DSN, and an ambient
+          # default in scope for their subprocesses is how migrations end up
+          # applied to the wrong database. The migration steps below set it
+          # themselves.
+          INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:***@localhost:5432/invdev
+          # Codex's suites refuse to skip in CI and want an admin DSN of their own.
+          # Pointing it at this job's database is deliberate: running both halves
+          # against one PostgreSQL is the only way the integration is actually
+          # regression-tested rather than each side passing in its own container.
+          # invowner is this container's superuser, which is what their fixtures
+          # need to provision roles and schemas.
+          INV_TEST_ADMIN_DSN: postgresql://invowner:***@localhost:5432/invdev
+          # Role-shape rejection tests mutate cluster-wide role flags. They own a
+          # separate disposable cluster instead of altering the shared service.
+          INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+          # G-02: the owned archiver for the live RPO cases runs the same image as
+          # this job's PostgreSQL service; the test refuses to guess one.
+          INV_TEST_ARCHIVER_IMAGE: postgres:16
+    
+        steps:
+          # Full history: tools/check_vf_cl_registry.py re-derives two rules from it -- whether
+          # verifiedAgainst.tree is an ancestor of HEAD, and which pull requests merged. With
+          # the default fetch-depth 1 neither is knowable, and the checker reports that rather
+          # than passing quietly, so this job would fail on a truncated checkout.
+          - uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+          - uses: actions/setup-python@v5
+            with:
+              python-version: ${{ matrix.python-version }}
+              cache: pip
+              cache-dependency-path: |
+                requirements-backend.txt
+                requirements-test.txt
+                requirements-core.txt
+          - run: python -m pip install -r requirements-backend.txt -r requirements-docs.txt
+    
+          - name: Exercise the pinned venvless leaf-rotation runtime
+            run: |
+              bundle="$RUNNER_TEMP/leaf-rotation-runtime.zip"
+              runtime="$RUNNER_TEMP/leaf-rotation-runtime-${{ matrix.python-version }}"
+              python tools/build_leaf_rotation_runtime.py --output "$bundle" > "$RUNNER_TEMP/leaf-runtime-build.json"
+              python -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \
+                --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-install.json"
+              python -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \
+                --runtime-dir "$runtime" \
+                --worker-script deploy/lan/worker_leaf_rotation.py \
+                -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-preflight.json"
+              python -I -B deploy/lan/leaf_rotation_standalone_runtime.py install \
+                --bundle "$bundle" --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-reinstall.json"
+              python -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \
+                --runtime-dir "$runtime" \
+                --worker-script deploy/lan/worker_leaf_rotation.py \
+                -- runtime-preflight > "$RUNNER_TEMP/leaf-runtime-second-preflight.json"
+              python tools/check_leaf_rotation_standalone_lifecycle.py \
+                --runtime-dir "$runtime" > "$RUNNER_TEMP/leaf-runtime-lifecycle.json"
+              test -z "$(find "$runtime" -type d -name __pycache__ -print -quit)"
+              python - <<'PY'
+              import json
+              import os
+              from pathlib import Path
+    
+              root = Path(os.environ['RUNNER_TEMP'])
+              build = json.loads((root / 'leaf-runtime-build.json').read_text('utf-8'))
+              install = json.loads((root / 'leaf-runtime-install.json').read_text('utf-8'))
+              preflight = json.loads((root / 'leaf-runtime-preflight.json').read_text('utf-8'))
+              reinstall = json.loads((root / 'leaf-runtime-reinstall.json').read_text('utf-8'))
+              second = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))
+              lifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))
+              assert build['wheelCount'] == 4
+              assert build['workerModuleCount'] == 5
+              assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'
+              assert install['platformKey'] in {
+                  'cpython-312-x86_64-linux-gnu',
+                  'cpython-314-x86_64-linux-gnu',
+              }
+              assert preflight['compatible'] is True
+              assert preflight['cryptographyVersion'] == '50.0.1'
+              assert preflight['utcCertificateAPI'] is True
+              assert reinstall == install
+              assert second == preflight
+>             assert lifecycle == {
+E             AssertionError
+
+.github\workflows\backend.yml:143: AssertionError
+_ test_packet_uses_canonical_signed_finalization_without_mutating_fixture[2] __
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_uses_canonical_sig0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8AB809D0>
+count = 2
+
+    @pytest.mark.parametrize("count", [2, 5])
+    def test_packet_uses_canonical_signed_finalization_without_mutating_fixture(tmp_path, monkeypatch, count):
+>       case = _fixture(tmp_path, monkeypatch, count)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C603250>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_uses_canonical_signed_finalization_without_mutating_fixture[5] __
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_uses_canonical_sig1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C819810>
+count = 5
+
+    @pytest.mark.parametrize("count", [2, 5])
+    def test_packet_uses_canonical_signed_finalization_without_mutating_fixture(tmp_path, monkeypatch, count):
+>       case = _fixture(tmp_path, monkeypatch, count)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...VVVVVVVVVVVVVVV': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C915570>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-cp-archive] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C781B50>
+fault = 'missing-cp-archive'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C823230>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[partial-cp-archive] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8CD545A0>
+fault = 'partial-cp-archive'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E5EA7F0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[tampered-cp-signature] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8CD548D0>
+fault = 'tampered-cp-signature'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E5E5DD0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[duplicate-proof-key] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C90F650>
+fault = 'duplicate-proof-key'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E3F6C50>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-node-proof] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C90E850>
+fault = 'missing-node-proof'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E5EAD10>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-node-proof] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C78CF50>
+fault = 'unknown-node-proof'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E5064B0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[tampered-node-signature] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C78D7C0>
+fault = 'tampered-node-signature'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E317AD0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-node-archive] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C8127B0>
+fault = 'missing-node-archive'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C823970>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-cp-archive] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8CD3C2F0>
+fault = 'unknown-cp-archive'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E312410>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-node-archive] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8AB42F70>
+fault = 'unknown-node-archive'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8CF3E8F0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[equal-cp-next] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C8F31D0>
+fault = 'equal-cp-next'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C915610>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[equal-node-next] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C8F10D0>
+fault = 'equal-node-next'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8D02DFF0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[partial-next] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un12')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C89FA10>
+fault = 'partial-next'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E507570>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[bare-finalized] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un13')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C89E830>
+fault = 'bare-finalized'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8C8228B0>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[receipt-byte-change] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C5836B0>
+fault = 'receipt-byte-change'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E1E4070>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[current-node-policy] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un15')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8C580D70>
+fault = 'current-node-policy'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8E5EB190>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+_ test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[current-channel] _
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/local500-own-red/test_packet_rejects_partial_un16')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023E8CD1E0F0>
+fault = 'current-channel'
+
+    @pytest.mark.parametrize("fault", [
+        "missing-cp-archive", "partial-cp-archive", "tampered-cp-signature",
+        "duplicate-proof-key", "missing-node-proof", "unknown-node-proof",
+        "tampered-node-signature", "missing-node-archive", "unknown-cp-archive",
+        "unknown-node-archive", "equal-cp-next", "equal-node-next", "partial-next",
+        "bare-finalized", "receipt-byte-change", "current-node-policy", "current-channel",
+    ])
+    def test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup(tmp_path, monkeypatch, fault):
+>       case = _fixture(tmp_path, monkeypatch)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fleet5_setup_packet.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_fleet5_setup_packet.py:34: in _fixture
+    lan_pilot.prepare_leaf_rotation_batch(case.args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = Namespace(state=WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integ...YYYYYYYYYYYYYYY': <cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x0000023E8AB1D410>})
+
+    def prepare_leaf_rotation_batch(args):
+        """Issue one shared next CP leaf and exact per-Node public bundles."""
+        path, state = args.state, load(args.state)
+        active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
+        if len(active) < 2:
+            raise ValueError("A leaf rotation batch requires at least two active Nodes")
+        csrs = {}
+        for csr_path in args.csr:
+            raw = csr_path.read_bytes()
+            node = node_from_csr(state, raw)
+            if node["nodeId"] in csrs:
+                raise ValueError("Each active Node CSR must be supplied exactly once")
+            csrs[node["nodeId"]] = csr_path
+        if set(csrs) != {node["nodeId"] for node in active}:
+            raise ValueError("The rotation batch must include every active Node")
+        output = args.output.resolve()
+        with exclusive_file(path / "leaf-rotation.lock"):
+            # Every selected member must prove its actual floor matches CP-recorded
+            # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+            observation_dir = getattr(args, "peer_floor_observations", None)
+            nonce = getattr(args, "peer_floor_nonce", None)
+            if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+>               raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+E               ValueError: Normal :3 batch requires all actual signed floor files and independent nonce
+
+tools\lan_pilot.py:3019: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_accepts_complete_verified_standalone_lifecycle_contract
+FAILED tests/test_fleet5_setup_packet.py::test_packet_uses_canonical_signed_finalization_without_mutating_fixture[2]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_uses_canonical_signed_finalization_without_mutating_fixture[5]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-cp-archive]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[partial-cp-archive]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[tampered-cp-signature]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[duplicate-proof-key]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-node-proof]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-node-proof]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[tampered-node-signature]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[missing-node-archive]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-cp-archive]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[unknown-node-archive]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[equal-cp-next]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[equal-node-next]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[partial-next]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[bare-finalized]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[receipt-byte-change]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[current-node-policy]
+FAILED tests/test_fleet5_setup_packet.py::test_packet_rejects_partial_unknown_tampered_or_unsettled_fixture_without_cleanup[current-channel]
+20 failed, 41 passed in 14.00s

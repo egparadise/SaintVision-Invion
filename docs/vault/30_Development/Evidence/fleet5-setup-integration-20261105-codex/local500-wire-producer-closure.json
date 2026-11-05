@@ -1,0 +1,25 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_fleet5_floor_v2_canonical.py",
+    "tests/test_fleet5_standalone_result.py",
+    "tests/test_lan_leaf_rotation_standalone_runtime.py::test_reviewed_lock_is_exactly_two_observed_abis_and_four_pypi_wheels",
+    "tests/test_lan_leaf_rotation_standalone_runtime.py::test_worker_local_import_closure_is_exact_and_missing_module_fails_before_download",
+    "tests/test_lan_leaf_rotation_standalone_runtime.py::test_bundle_rejects_any_worker_module_set_or_digest_drift",
+    "--basetemp=.work/fleet5-setup-integration/local500-closure"
+  ],
+  "startedAtKST": "2026-11-06T00:17:46.320319+09:00",
+  "finishedAtKST": "2026-11-06T00:17:50.569196+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "local500-wire-producer-closure.txt",
+  "sourceAtStart": "b0036ffc781ac6c0040faf353a8581a4e36878a8",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

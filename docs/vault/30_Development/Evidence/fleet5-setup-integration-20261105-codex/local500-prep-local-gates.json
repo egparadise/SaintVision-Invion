@@ -1,0 +1,81 @@
+{
+  "scope": "LOCAL UNACCEPTED PREP DOCUMENTATION CHECKS ONLY; NOT HOSTED CI OR PRODUCT ACCEPTANCE",
+  "observedAtKST": "2026-11-06T00:26:44.060975+09:00",
+  "checks": [
+    {
+      "receipt": "local500-docs.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "finishedAtKST": "2026-11-06T00:24:32.006894+09:00",
+      "stdoutAndStderr": "local500-docs.txt"
+    },
+    {
+      "receipt": "local500-ontology.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "finishedAtKST": "2026-11-06T00:23:52.695440+09:00",
+      "stdoutAndStderr": "local500-ontology.txt"
+    },
+    {
+      "receipt": "local500-paths.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "842973bb73d53015eee77e6c4c55390c072258d0"
+      ],
+      "exit": 0,
+      "finishedAtKST": "2026-11-06T00:24:23.458319+09:00",
+      "stdoutAndStderr": "local500-paths.txt"
+    },
+    {
+      "receipt": "local500-ratchet.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "finishedAtKST": "2026-11-06T00:23:55.474197+09:00",
+      "stdoutAndStderr": "local500-ratchet.txt"
+    },
+    {
+      "receipt": "local500-sync.json",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exit": 0,
+      "finishedAtKST": "2026-11-06T00:24:32.536142+09:00",
+      "stdoutAndStderr": "local500-sync.txt"
+    }
+  ],
+  "docsVersionedPages": 1241,
+  "pathRatchetExisting": 290,
+  "singleSourceExistingPairs": 16,
+  "sync": {
+    "managed": 2908,
+    "pending": 567,
+    "conflicts": 0,
+    "writes": false
+  },
+  "CoreOrAllEightDispatched": false,
+  "finalCandidateOrPacketFrozen": false,
+  "experimentalProductPushed": false,
+  "diagnosticWhitespaceCheck": {
+    "firstStagedExit": 2,
+    "reason": "Verbatim pytest source-traceback trailing blanks in the new redacted diagnostic only",
+    "productOnlyWhitespaceExit": 0,
+    "resolution": "One literal task-owned evidence .gitattributes entry preserves that diagnostic byte hash; no glob or root/product attribute change",
+    "literalEntry": "local500-own-migration-red.redacted.txt -text -whitespace",
+    "retryRequiredBeforeCommit": true
+  }
+}
