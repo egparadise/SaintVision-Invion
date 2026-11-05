@@ -1,0 +1,91 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_e1a7c90d207a / ctx_0aba9fd1087f",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-06T00:58:02+09:00", "2026-11-06T01:10:31+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and at the last CI status check before writing; publication times are separate",
+  "reviewKind": "independent CODE/test/CI-proof DELTA review of the T1/T2/T3 closure; code verdict separate from exact full CI and from runtime/physical acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+    "commit": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+    "base": "46b4573f2b333dfbb3d37f695c19df9ae805a364",
+    "delta": {"files": 41, "insertions": 1222, "deletions": 3, "nonDocs": [".github/workflows/backend.yml", "tests/proofs/fleet5_settled_pinned_fixture.py", "tests/proofs/run_fleet5_reentry_guard_mutations.py", "tests/test_fleet5_plain_reentry.py", "tests/test_fleet5_reentry_guard_negatives.py", "tests/test_fleet5_settled_launcher.py", "tools/check_leaf_rotation_standalone_lifecycle.py"]},
+    "readFrom": "Git objects only (detached scratch worktree, removed afterwards); author checkout untouched"
+  },
+  "scope": {
+    "nonDocsVs4a": "only .github/workflows/backend.yml, services/node-agent/transport/peer_floor_canonical_test.go (from 50000697), tools/check_leaf_rotation_standalone_lifecycle.py and tests/*; deploy, src, contracts, migrations and every other services file have no diff from 4a928310",
+    "runtimeSHA256SameAs4a": ["worker_config.py 909d1c25", "worker_leaf_rotation.py 4e296852", "peer_policy_phase.py 8aac0c65", "worker_peer_floor.py c73c81ad", "worker_plain_rotation.py bf3754a2", "leaf_rotation_standalone_runtime.py 76be4088", "run_fleet5_peer_phase_fixed_probe.py d0c0e646", "core.yml 466532d8", "peer_phase_unit_fixtures.py bcd392be"],
+    "toolDiff": "CI-only lifecycle tool: required --settled-proof-output, loads the owned pinned fixture, synthetic inv-node gains a meta.invalidFixtureSignature switch that emits a zero signature; validate_result and the strict 11-field :3 lifecycle result unchanged",
+    "workflowDiff": "backend.yml adds the settled-pinned assertions (exact 12 keys, 10 named cases, 8 case keys, exit/expectation coupling), a 3.12-only mutation step and a separate always() artifact fleet5-settled-pinned-<py>-<sha>; existing steps unchanged",
+    "retainedBlocks": "resume_publication maps only installing/installed/finalizing/finalized; restarted and unknown phases raise 'RS1 unknown phase is blocked'; after-stop/no-copy stays guarded BLOCK; no Bootstrap or storage class added under deploy/lan"
+  },
+  "ownProbes": {
+    "interpreter": "main .venv Python 3.14.7 -B, PYTHONUTF8=1, Windows; own scripts -I; no local Go",
+    "newTests": "T1/T2 13 + T3 11 = 24 passed",
+    "fleet5AndLan": "test_fleet5_*.py + test_lan_*.py: 294 passed, 19 skipped (Windows/POSIX platform skips)",
+    "ordered": {"standalone->T1T2->T3->residue": "71 passed, 10 skipped", "T1T2->T3->standalone->residue": "71 passed, 10 skipped", "T3->T1T2->plain_reentry->standalone": "79 passed, 6 skipped"},
+    "ownMutantsOwnAnchors": {
+      "baseline": "13/13 passed, 0 errors, 0 skips",
+      "rs1-no-post-ack-match": "KILLED by new file (3 failed, all DID NOT RAISE); legacy plain_reentry still 0 failed",
+      "rs1-skip-stopped-reread (if False:)": "KILLED (2 failed, DID NOT RAISE); legacy 0 failed",
+      "rs1-allow-current-in-final": "KILLED (1 failed [current], DID NOT RAISE); legacy 0 failed",
+      "guard-no-post-recheck (if False:)": "KILLED (1 failed, DID NOT RAISE); legacy 0 failed",
+      "exec-field-optional": "KILLED (4 failed, DID NOT RAISE); legacy 0 failed",
+      "rs1-unsigned-ack": "also killed by the new file (5 failed)",
+      "notTargeted": "tar-allow-symlink, tar-allow-nonroot, guard-settled-any-action, no-migration-off, final-floor-refresh, c2-*, verify-v1-domain are not killed by the new file alone (outside T1/T2 scope; killed by legacy suites at 4a except the masked tar-allow-symlink)"
+    },
+    "ownerRunnerLocal": "run_fleet5_reentry_guard_mutations.py: proofValid true, productionSourceModified false, baseline 13/0/0/0, 5/5 killed with 0 errors/skips",
+    "t3RedControls": {
+      "drop -I from the dispatch argv": "KILLED (8 failed)",
+      "drop timeout=30": "KILLED (8 failed)",
+      "drop verified check": "KILLED (1 failed)",
+      "drop exact key set": "KILLED (1 failed)",
+      "drop launcher/entry file and symlink check": "KILLED (2 failed)",
+      "drop the 0<len<=65536 stdout bound": "SURVIVED 11/11 (finding L-T3-1)",
+      "strict_json -> json.loads": "SURVIVED 11/11 (finding L-T3-2)"
+    },
+    "t3Reading": "units load a byte copy of worker_config plus launcher/entry into a private installer dir, assert _settled_verifier is None, require the exact argv [sys.executable,-I,-B,launcher,run,--runtime-dir,~/.local/share/saintvision/leaf-rotation-runtime,--worker-script,entry,--,verify-settled,--worker-root,root] and kwargs capture_output/check/timeout=30, pre and post calls on valid, 0 calls on missing launcher/entry, state unchanged and lock removed; the CI fixture runs the probe with -I -B, asserts _settled_verifier is None, isolates only HOME, no env or argv verifier bypass and no arbitrary import path",
+    "porcelainAfterRedControls": 0
+  },
+  "ciArtifacts": {
+    "core": {"run": 42058859797, "artifact": 13429894778, "name": "fleet5-native-peer-phase-fixed-proof-4f97ba71b1482ae70d72dda1833a28fddcd05994", "zipSHA256": "b1d100279ff98d0d4fb8f2948c0d303ca09f95684eaab27562b6dd0c0dc09b1c", "githubDigestMatched": true, "workflowRunHeadSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "contents": "native-fixed-result headSHA 4f97, runtimeGOOS linux, completedNormalCycles 2 (cycle 1 floors 7->8->9, cycle 2 9->10->11, finalAccepted and oldCPRejectedAfterFinal both cycles), all negative flags true, proofValid true, operational/production/Postgres flags false; go-guard-events 30 pass 0 fail incl. TestPeerFloorCanonicalCrossLanguageVectors 7/7",
+      "canonicalVectors": "7/7: canonicalUTF8Hex equals tests/fixtures expectedCanonicalUTF8Hex and its body, equals own Go Marshal emulator and Python floor_canonical; Ed25519 verifies over the v2 domain+body (not body alone) with real cryptography; unicode vector keeps U+00E9, e+U+0301 and Hangul distinct (NFC would change the bytes, so no normalization)",
+      "goToolchain": {"configured": "actions/setup-go@v5 go-version 1.27.1; services/node-agent/go.mod go 1.23", "observed": "NOT OBSERVED: the core job is in progress so its log is unavailable, and the artifact records no go version"}},
+    "backend314": {"run": 42058865926, "artifact": 13431055483, "zipSHA256": "4aafbc3995e7f1606318ddd902d1000d97efe8e3295ffae9e3c24f3cdb746f39", "githubDigestMatched": true, "workflowRunHeadSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "contents": "settled-pinned :1 exact 12 keys, 10 cases in order, valid/valid-after-negatives exit 0, 8 refusals exit 1 with matched reasons, stateUnchanged all, defaultVerifierCallbackBypassed false, actualPinnedRuntimeCryptoAssessed true, actualGoAcceptanceAssessed false, privateFixtureKeysUploaded false, installerSourceSHA256 7/7 equal to 4f source; lifecycle :3 11 keys, 2 cycles, bytecodeCacheCount 0"},
+    "backend312": {"run": 42058865926, "artifact": 13429399588, "zipSHA256": "c77ae65caeae757725afc3a2bc4846d7794551227d1bb3ff22c5f6df02d913d2", "githubDigestMatched": true, "workflowRunHeadSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+      "contents": "same 10 stages and lifecycle; mutation-result proofValid true, productionSourceModified false, originalSourceSHA256 3/3 equal to 4f, baseline 13 passed 0/0/0, 5/5 killed, failing cases only in the expected test, each log SHA256 recomputed and matched, every failure DID NOT RAISE"},
+    "nodeGoInT3": "SYNTHETIC CLI fixture (fake docker and inv-node); the crypto, launcher, runtime lock and hash checks are real"
+  },
+  "ci": {
+    "core4f": {"run": 42058859797, "status": "in_progress at 01:10:31; fixed native proof steps success; core pytest step running", "claimed": false},
+    "backend4f": {"run": 42058865926, "status": "in_progress at 01:10:31; backend (3.12) job completed success (log 8751 passed, 75 skipped); backend (3.14) in progress", "claimed": false},
+    "docs4f": {"run": 42058871808, "status": "completed success (API only, log not read)"},
+    "preserved": "Core 4a 42047390811 FAILURE 5 failed/9075 passed; Backend 4a 42047403498 FAILURE 5 failed/8717 passed; 46b scoped greens unchanged"
+  },
+  "findings": [
+    {"id": "T1", "severity": "Medium", "status": "closed", "summary": "four RS1/SF1 guard negatives kill post-start ack match/executable, stopped re-read, finalizing current tuple and guard post-recheck under own and owner anchors"},
+    {"id": "T2", "severity": "Low", "status": "closed", "summary": "really signed malformed servingExecutableSHA256 (g/63/upper/65) rejected with 'digest differs' independently; kills exec-field-optional"},
+    {"id": "T3", "severity": "Low", "status": "closed", "summary": "default subprocess branch tested without callback override (11 units) and exercised through the real installed pinned runtime in CI on 3.12 and 3.14 (10 stages)"},
+    {"id": "C2-V1", "severity": "Medium", "status": "closed", "summary": "actual Go cross-language vectors with real non-ASCII bytes pass in Core at 4f and match Python and own emulator byte-for-byte"},
+    {"id": "L-T3-1", "severity": "Low", "status": "open", "summary": "the oversize case is invalid JSON (b'x'*65537) and is rejected by strict_json anyway; removing the 64 KiB stdout bound survives all 11 units and the CI fixture has no oversize case", "requiredRevision": "use a valid token padded above 65536 bytes"},
+    {"id": "L-T3-2", "severity": "Low", "status": "open", "summary": "the duplicate case {\"verified\":true,\"verified\":true} is also rejected by the key-set check, so replacing strict_json with json.loads survives", "requiredRevision": "duplicate a key inside an otherwise exact valid token"},
+    {"id": "I-T3-3", "severity": "Info", "status": "open", "summary": "four CI tamper cases share the class-only reason 'rejected (ValueError)'; they prove fail-closed (a missing guard would turn the case into exit 0) but not which check fired"},
+    {"id": "I-T3-4", "severity": "Info", "status": "open", "summary": "monkeypatch of module.Path.home patches pathlib.Path.home process-wide for the test duration (undone by monkeypatch)"},
+    {"id": "I-46-1", "severity": "Info", "status": "open", "summary": "unchanged from 315411bc"}
+  ],
+  "verdicts": {
+    "t123Closure": "ACCEPT (test/proof/workflow source): T1, T2, T3 closed; L-T3-1 and L-T3-2 are non-blocking test-strength gaps (the runtime guards exist and fail closed for those inputs)",
+    "p0CodeAt4f": "ACCEPT at code/source level: runtime identical to 4a, CI-B1 fixed (46b), C2-V1 closed by actual Go vectors, T1-T3 closed; this does not claim full CI",
+    "exactFullCI": "NOT CLAIMED: Core 42058859797 and Backend 42058865926 in progress at 01:10:31 (Backend 3.12 job success only); observed Go toolchain not obtained",
+    "runtimePhysical": "NOT ACCEPTED: Node/Go in T3 synthetic; no 5-node operations; after-stop/no-copy and restarted remain guarded BLOCK; root final integration, full 8, freeze and landing HOLD"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysClockGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "bindingsFilled": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record the 4f code ACCEPT separately; record terminal Core 42058859797 and Backend 42058865926 (3.14) and the observed setup-go version from the completed core log"},
+    {"owner": "Codex", "action": "optional follow-up for L-T3-1/L-T3-2 (valid oversize token, duplicate key inside a valid token) as a separate small test delta"},
+    {"owner": "Claude", "action": "review that delta or the next assigned delta when root dispatches it"}
+  ]
+}
