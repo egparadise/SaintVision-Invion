@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "fleet5-current-tooling-pair-proposal:1",
+  "target": "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+  "semantics": "Advance only current tooling bytes/blob; no claim that September observations were made with this future code",
+  "changes": {
+    "source.toolSHA256[tools/lan_pilot.py]": {
+      "before": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+      "after": "b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9"
+    },
+    "source.toolGitBlobSHA1[tools/lan_pilot.py]": {
+      "before": "35c2668690b0681ab87da86099400e83f39d098b",
+      "after": "502edf7b85582ad40fee1c48703787d7b87ce421"
+    }
+  },
+  "preserve": [
+    "all observedAt and historical observations",
+    "agentImageSourceCommit",
+    "controlPlaneToolingCommit",
+    "every other tool hash including independent DB preparation pair",
+    "all readiness/operational verdicts"
+  ],
+  "applied": false,
+  "sourceFocusedTests": {
+    "passed": 197,
+    "capabilitySkipped": 19,
+    "exit": 0
+  },
+  "newClassifierSemantics": "finalized CP phase is terminal only when its CP-signed immutable archive and all Node signed finalizations/current authority verify; switched alone remains nonterminal"
+}

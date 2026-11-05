@@ -148,6 +148,25 @@ def main() -> int:
             ],
             env,
         )
+        attestation = _run(
+            args.runtime_dir,
+            [
+                "attest-finalized",
+                "--bundle",
+                str(finalized.bundle),
+                "--worker-root",
+                str(finalized.worker),
+            ],
+            env,
+        )
+        definitions["rotation"].verify_finalized_attestation(
+            attestation,
+            (finalized.bundle / "rotation.json").read_bytes(),
+            {
+                name: (finalized.bundle / name).read_bytes()
+                for name in definitions["rotation"].FILE_NAMES
+            },
+        )
 
         rolled_back = fixture_factory(temporary / "rolled-back", now=now)
         (rolled_back.worker / "signer.pub").write_bytes(b"\x02" * 32)
@@ -187,6 +206,7 @@ def main() -> int:
                 {
                     "installRestartReceipt": True,
                     "finalized": True,
+                    "finalizedAttestationVerified": True,
                     "rolledBack": True,
                     "restartCount": restart_count,
                     "bytecodeCacheCount": 0,

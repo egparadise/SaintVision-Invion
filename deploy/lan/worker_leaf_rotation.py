@@ -455,22 +455,22 @@ def _owned_directory(path: Path) -> None:
         raise ValueError("Rotation history directory is unsafe")
 
 
-def _history_bytes(path: Path) -> bytes:
+def _history_bytes(path: Path, *, limit: int = 65536) -> bytes:
     info = path.lstat()
     if os.name != "nt" and (info.st_uid != os.geteuid() or info.st_mode & 0o022):
         raise ValueError("Rotation history file ownership or mode is unsafe")
-    return _regular(path)
+    return _regular(path, limit=limit)
 
 
 def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:
     """Publish complete evidence without replacing an existing archive or staging file."""
     if path.exists() or path.is_symlink():
-        if _history_bytes(path) != raw:
+        if _history_bytes(path, limit=max(65536, len(raw))) != raw:
             raise ValueError("Finalized rotation archive collision")
         return
     temporary = path.with_name(path.name + ".next")
     if temporary.exists() or temporary.is_symlink():
-        if _history_bytes(temporary) != raw:
+        if _history_bytes(temporary, limit=max(65536, len(raw))) != raw:
             raise ValueError("Finalized rotation archive staging collision")
     if not publish:
         return
@@ -479,6 +479,9 @@ def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:
         with os.fdopen(descriptor, "wb") as stream:
             stream.write(raw)
             stream.flush()
+            os.fsync(stream.fileno())
+    else:
+        with temporary.open("rb") as stream:
             os.fsync(stream.fileno())
     # link is atomic and fails if the destination exists; rename/replace can overwrite.
     os.link(temporary, path)
@@ -567,7 +570,8 @@ def _finalized_successor(
     rotation_id = journal.get("rotationId")
     if not isinstance(rotation_id, str) or not re.fullmatch(r"[a-f0-9]{32}", rotation_id):
         raise ValueError("Finalized rotation identity differs")
-    archive = json.loads(_history_bytes(archive_dir / f"{rotation_id}.json"))
+    archive_raw = _history_bytes(archive_dir / f"{rotation_id}.json")
+    archive = json.loads(archive_raw)
     if (
         set(archive)
         != {"schemaVersion", "journal", "journalRaw", "rotationManifest", "files", "commitReceipt"}
@@ -584,7 +588,7 @@ def _finalized_successor(
     files = {name: raw.encode("utf-8") for name, raw in archive["files"].items()}
     if any(_digest(files[name]) != old["files"][name] for name in FILE_NAMES):
         raise ValueError("Finalized rotation archive public material differs")
-    _finalized_evidence(
+    verified_raw = _finalized_evidence(
         {"manifest": old, "files": files},
         manifest_raw,
         archive["commitReceipt"].encode("utf-8"),
@@ -593,7 +597,8 @@ def _finalized_successor(
     )
     new = validated["manifest"]
     if (
-        archive["journal"] != journal
+        verified_raw != archive_raw
+        or archive["journal"] != journal
         or journal.get("phase") != "finalized"
         or archive["journalRaw"].encode("utf-8") != _regular(worker_root / "leaf-rotation.json")
         or new["schemaVersion"] != SCHEMA
@@ -655,6 +660,83 @@ def _finalized_successor(
         fingerprints=[new["currentControlCertificateSHA256"]],
         expires=old["certificateNotAfter"],
     )
+
+
+def _finalization_body(
+    manifest: dict, manifest_raw: bytes, files: dict, evidence_raw: bytes
+) -> dict:
+    return {
+        "schemaVersion": "saintvision-node-finalized-attestation:1",
+        "rotationId": manifest["rotationId"],
+        "proposalDigest": _digest(manifest_raw),
+        "tenantId": manifest["tenantId"],
+        "nodeId": manifest["nodeId"],
+        "recoveryEpoch": manifest["recoveryEpoch"],
+        "channelVersion": manifest["targetChannelVersion"],
+        "caBundleSHA256": manifest["caBundleSHA256"],
+        "nodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
+        "controlCertificateSHA256": manifest["nextControlCertificateSHA256"],
+        "finalPeerPolicySHA256": _digest(files["peer-policy-final.json"]),
+        "evidenceSHA256": _digest(evidence_raw),
+    }
+
+
+def verify_finalized_attestation(value: dict, manifest_raw: bytes, files: dict) -> dict:
+    """Verify transferred public evidence and the Node's distinct finalization signature."""
+    manifest = json.loads(manifest_raw)
+    evidence_raw = value["evidence"].encode("utf-8")
+    proof = json.loads(evidence_raw)
+    journal = proof["journal"]
+    expected = _finalization_body(manifest, manifest_raw, files, evidence_raw)
+    if (
+        set(value) != {*expected, "evidence", "nodeSignature"}
+        or any(value.get(key) != item for key, item in expected.items())
+        or proof.get("schemaVersion") != "saintvision-node-finalized-rotation:1"
+        or proof.get("rotationManifest") != manifest_raw.decode("utf-8")
+        or proof.get("files") != {name: raw.decode("utf-8") for name, raw in files.items()}
+        or _finalized_evidence(
+            {"manifest": manifest, "files": files},
+            manifest_raw,
+            proof["commitReceipt"].encode("utf-8"),
+            journal,
+            proof["journalRaw"].encode("utf-8"),
+        )
+        != evidence_raw
+    ):
+        raise ValueError("Node finalized attestation differs from the exact batch")
+    signature = value.get("nodeSignature")
+    if not isinstance(signature, str) or not re.fullmatch(r"[a-f0-9]{128}", signature):
+        raise ValueError("Node finalized attestation signature differs")
+    x509.load_pem_x509_certificate(files["node-cert.pem"]).public_key().verify(
+        bytes.fromhex(signature), _canonical(expected)
+    )
+    return proof
+
+
+def attest_finalized(bundle: Path, worker_root: Path, *, now: datetime | None = None) -> dict:
+    """Sign only the exact active finalized public generation; no success flag is trusted."""
+    runtime_preflight()
+    with _exclusive(worker_root / "leaf-rotation.lock"):
+        validated = validate_bundle(bundle, worker_root, now=now, installed=True, finalized=True)
+        manifest, files = validated["manifest"], validated["files"]
+        archive_dir = worker_root / "leaf-rotation-finalized"
+        _owned_directory(archive_dir)
+        evidence_raw = _history_bytes(archive_dir / f'{manifest["rotationId"]}.json')
+        body = _finalization_body(manifest, _regular(bundle / "rotation.json"), files, evidence_raw)
+        private = serialization.load_pem_private_key(
+            _regular(worker_root / "node-key.pem"), password=None
+        )
+        value = {
+            **body,
+            "evidence": evidence_raw.decode("utf-8"),
+            "nodeSignature": private.sign(_canonical(body)).hex(),
+        }
+        proof = verify_finalized_attestation(value, _regular(bundle / "rotation.json"), files)
+        if proof["journalRaw"].encode("utf-8") != _regular(
+            worker_root / "leaf-rotation.json"
+        ) or files["peer-policy-final.json"] != _regular(worker_root / "peer-policy.json"):
+            raise ValueError("Only the exact active finalized Node can attest")
+        return value
 
 
 def _supersede_expired_journal(
@@ -1038,6 +1120,9 @@ def main() -> None:
     finalize_parser.add_argument("--bundle", type=Path, required=True)
     finalize_parser.add_argument("--worker-root", type=Path, required=True)
     finalize_parser.add_argument("--commit-receipt", type=Path, required=True)
+    attest_parser = commands.add_parser("attest-finalized")
+    attest_parser.add_argument("--bundle", type=Path, required=True)
+    attest_parser.add_argument("--worker-root", type=Path, required=True)
     rollback_parser = commands.add_parser("rollback")
     rollback_parser.add_argument("--bundle", type=Path, required=True)
     rollback_parser.add_argument("--worker-root", type=Path, required=True)
@@ -1056,6 +1141,8 @@ def main() -> None:
             result = finalize(
                 args.bundle, args.worker_root, args.commit_receipt, restart=docker_restart
             )
+        elif args.command == "attest-finalized":
+            result = attest_finalized(args.bundle, args.worker_root)
         else:
             result = rollback(args.bundle, args.worker_root, restart=docker_restart)
         print(json.dumps(result, sort_keys=True))

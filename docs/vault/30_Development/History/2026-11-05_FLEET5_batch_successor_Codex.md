@@ -1,0 +1,37 @@
+---
+doc_id: "HIST-FLEET5-BATCH-SUCCESSOR-20261105-CODEX"
+title: "FLEET5 verified public normal batch retirement and successor"
+version: "1.1.0"
+status: "review"
+author: "Codex"
+updated: "2026-11-05T18:06:00+09:00"
+source_of_truth: "Git"
+---
+
+# FLEET5 verified public normal batch retirement and successor
+
+Same card `FLEET5-CONSECUTIVE-LEAF-ROTATION-20261105`, task `task_a9b68a07d157`/dispatch `ctx_4194506d5037`; owner Codex, independent Claude reviewer through root. Branch `agent/codex/fleet5-consecutive-leaf-rotation-20261105`, original source base59f, Node milestone `a93ec9f1906cf5374fa8e2de172e11be0fd7cbdf`. Required document/skill versions and original scope are in [[2026-11-05_FLEET5_consecutive_leaf_rotation_Codex]]. Root message `msg_0ee0b2f49d8b` authorized the necessary public CP tooling/worker contract/tests/README extension; no worker or helper agent was spawned.
+
+## Design and source proof
+
+The original complete two-Node batch prepared, installed, staged, switched/committed and finalized successfully, but after four fixture days a distinct normal batch failed **1 failed / exit1**: `Another leaf rotation batch owns the pilot state`. This red was produced on a93 before CP edits. Red-test SHA256 `3dfefa84dddc207457527893e81e15cc708d0c6c5337367e6c8665d419eb3742`; original CP SHA256 `1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b`. No system clock, old live receipt, claim or latch was reset.
+
+The concrete design was sent to root as `msg_de70f202b211` before implementation. A Node now exposes public `attest-finalized`: it validates the exact active finalized journal, immutable a93 archive, current leaf/key/CA and final policy, and signs a distinct attestation binding tenant/Node/epoch/rotation/proposal/version/Node+CP certificate hashes/final-policy hash/full-evidence hash. The full public evidence accompanies the signature; a signed install receipt or unsigned boolean cannot substitute for this finalization signature. The immutable a93 proof format remains valid and is not rewritten.
+
+The CP now exposes explicit `retire-leaf-rotation-batch --bundle ... --finalized-receipt ...` repeated once per active member. It requires switched phase, every unique Node signature and embedded signed install/CP receipts, exact batch and all current public files, pinned CA, tenant/epoch/address/member set and locked DB channel version/hash/expiry/enabled/endpoint. It publishes an immutable CP-signed archive containing the exact switched journal, terminal journal, batch and all public Node proofs, then atomically records phase `finalized`. It never treats `switched` alone as Node finalization and never unlinks or resets the active journal/lock.
+
+New normal preparation accepts a verified terminal predecessor only while all current authority and membership bindings still match. It preserves archived evidence and replaces the active slot only after a complete new public batch is published. The complete-output/old-terminal crash window is explicitly revalidated and resumed. Exact same-batch prepare/commit replay preserves terminal phase; old batches cannot replay across a later active generation. Unknown, partial, prepared/staging/staged, uncommitted, stale, tampered, colliding or redirected history cannot retire/start a successor. Legacy switched journals require this explicit command with every Node proof; legacy Node finalizations first replay their exact finalize inputs to create the public proof.
+
+## Verification and delivery state
+
+New evidence is isolated under `docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-rotation-20261105/batch-successor`; the a93 evidence remains unchanged. Two complete NORMAL batches are exercised for both **2 and 5 fixture Nodes**, with real Ed25519 issuer/CSR/signature validation, the public CP prepare/stage/commit/retire APIs and worker install/finalize/attestation APIs. DB persistence is a CAS fixture and restart callbacks are substituted; these are source tests, not hardware acceptance. Prior/current certificate hashes, distinct batch IDs, generation relationships, immutable prior CP/Node history, old backups and unchanged keys are asserted. The standalone hosted lifecycle helper also exercises the actual launcher `attest-finalized` command.
+
+Initial expanded focused run: **194 passed /19 capability skips /exit0** across batch successor, consecutive Node, existing leaf rotation, standalone runtime, multi-Node pilot and PKI tests. After exact archive/terminal-byte checks, CLI wiring and staged-archive durability hardening, final focused result is **197 passed /19 capability skips /exit0** (`batch-successor/focused-final.txt`); counts overlap and must not be added. Final local docs/ontology/contracts/frontend-integrity/single-source and path ratchets/ontology generation/sync-check/freshness reporter are all **exit0**, and serving/route tests are **50 passed /exit0** (`batch-successor/local-gates.json`). Sync:2250 managed/46 pending/0 conflicts/no writes. Windows cannot create test symlinks (OS1314); POSIX ownership and shell cases remain hosted Linux requirements. Final changed-source CI and actual independent review remain pending.
+
+New negatives include every nonterminal/unknown phase, missing/duplicate/unsigned/foreign/tampered Node proofs, uncommitted CP, wrong CP key, Node leaf/final policy, CA/epoch/member drift, DB version/enabled/endpoint/expiry drift, archive/staging collisions, stale terminal/archive signatures/bytes, locks and symlinks. Crash tests preserve publication evidence and resume through the explicit verified paths. No prior journal/backup/certificate/key/receipt is discarded or overwritten by retirement.
+
+The only affected current-tooling metadata pair is `source.toolSHA256[tools/lan_pilot.py]` and `source.toolGitBlobSHA1[tools/lan_pilot.py]` in Card150's Evidence JSON. After final tests, root received exact proposal `msg_4c0d159d6c2a`: SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9` / Git blob `502edf7b85582ad40fee1c48703787d7b87ce421`. `batch-successor/tooling-pair-proposal.json` is explicit and **not applied**: scope permits proposing the pair. Every historical observedAt/source commit/observation and every other hash is preserved. The independently repaired DB preparation pair belongs to its other card and is untouched here. The PKI test binds this current pair to HEAD, so the narrow pair must advance before final changed-source Core can pass; the197-pass precommit run correctly checked the then-current a93 HEAD pair and is not claimed as committed-head metadata validation.
+
+Final source worker SHA256 `3411ba485aad6ee0cc356191759584aecfca76ce1421aef68d138fabb7ef603f`, CP SHA256 `b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9`; the standalone launcher pins the worker bytes. The frozen a93 source/evidence and original source59f archive remain unchanged.
+
+Next first action: Codex completes final focused/local gates, publishes the separate future code revision and exact Core/Docs evidence; root obtains actual independent Claude review of that SHA. The Node-only a93 hosted runs remain milestone evidence. Base59f bootstrap is unchanged; unrelated hosted failures are reported for combined integration without silent retries. No live CA/Node/Docker or remote connection, private r5/executorB5, source03, frozen first-wave archive, hardware map, permissions, board/registry, schedule/pin or Obsidian apply was changed. Existing48-task/VF-CL and physical FIVE acceptance remain unchanged.

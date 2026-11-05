@@ -374,11 +374,44 @@ in place. A legacy finalized journal without this proof requires replaying
 `finalize` with its original bundle and signed CP receipt while its current
 leaves remain valid; replay does not restart an already finalized Node.
 
-This Node lifecycle does not retire the server's `leaf-rotation-batch.json`.
-The server retains `switched` after batch commit and rejects preparation at a
-different output while that journal exists. A new multi-Node batch therefore
-still requires a separately reviewed server retirement contract; do not clear
-the journal or treat the Node archive as permission to reset a scheduler latch.
+For a multi-Node batch, `switched` records the CP commit and does not establish
+that every Node finalized. After each Node finalizes, use the same reviewed
+worker runtime to export a signed public attestation:
+
+```text
+python3 -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \
+  --runtime-dir <reviewed-runtime> --worker-script ./worker_leaf_rotation.py -- \
+  attest-finalized --bundle <node-proposal> --worker-root <worker-state> > <node-finalized.json>
+```
+
+Transfer each public attestation through the reviewed operator path. Each
+contains the immutable public proof and a distinct signature from that Node's
+active private key; an unsigned success flag or install receipt is insufficient.
+On the CP, explicitly retire the batch with every member's unique attestation:
+
+```text
+python tools/lan_pilot.py --state <pilot-state> retire-leaf-rotation-batch \
+  --bundle <batch> --finalized-receipt <node1-finalized.json> \
+  --finalized-receipt <node2-finalized.json>
+```
+
+Repeat `--finalized-receipt` once for every active member, including all five
+when the batch has five Nodes. Retirement verifies the exact batch, signatures,
+CA, tenant, epoch, member set, current CP/Node leaves, final policies and locked
+channel versions/expiry/endpoints. It preserves the exact switched journal,
+batch and signed proofs in a CP-signed, no-overwrite archive under
+`<pilot-state>/leaf-rotation-finalized/<batchId>.json`, then atomically records
+terminal phase `finalized`. Partial/unknown/inconsistent state cannot retire.
+Legacy switched journals use this same explicit proof-based command; legacy
+Node finalizations first need the exact finalize replay described above.
+
+The next normal prepare uses a distinct output and verifies this archived
+predecessor against current authority before publishing a successor generation.
+Exact same-batch prepare/commit replay keeps the terminal phase; a complete
+successor publication interrupted before journal replacement can resume after
+revalidation. Keep old proposal directories, backups, archives and receipts.
+This lifecycle is not permission to clear a journal or reset a scheduler latch;
+scheduled-plan changes and operational acceptance remain separate work.
 
 Leaf rotation has two isolated Python runtime choices. The existing venv path is
 still supported. When `python3-venv` is unavailable, build the reviewed offline

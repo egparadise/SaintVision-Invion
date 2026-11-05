@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-FLEET5-CONSECUTIVE-LEAF-ROTATION-20261105-CODEX"
 title: "FLEET5 consecutive normal leaf rotation source investigation"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T17:32:00+09:00"
+updated: "2026-11-05T18:02:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,8 +36,10 @@ Evidence directory: `docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-
 - `local-gates.json`: docs, ontology, contract bindings, frontend integrity, single-source ratchet, path-citation ratchet against59f, ontology generation, sync-check and freshness reporter **exit0**; serving-anchor + route tests **50 passed / exit0**. Sync-check:2225 managed /21 pending /0 conflicts /no writes. No Obsidian apply.
 - Initial `check_docs` **exit1** was real and preserved in `local-gates-attempt1.json`/`check_docs-attempt1.txt`: PowerShell redirected red/green transcripts as UTF-16. They were losslessly transcoded to UTF-8; subsequent checks exit0. This is an evidence encoding repair, not a change to test outcomes.
 
-## Remaining server batch boundary and handoff
+## Server batch boundary at the a93 milestone
 
 `prepare_leaf_rotation_batch` rejects any distinct output while the CP batch journal exists; `commit_leaf_rotation_batch` retains phase `switched`. The existing focused test `test_multi_node_batch_shares_one_cp_leaf_and_switches_only_after_all_nodes` confirms that refusal even after both Nodes finalize. No shipped wrapper retires that server journal. This repair therefore establishes consecutive NORMAL Node lifecycle and two complete single-Node server cycles, **not** a second multi-Node/FIVE batch. A server retirement contract needs separate proof of every finalized Node and immutable CP history; no speculative server reset is added. Root received this source boundary with early cause/hash evidence.
 
 Implementation: worker SHA256 `114ae59fd9d5fa41e4ed84d33ebd050dca714106fb9270042901f67ca40ccb60`; launcher SHA256 `199e8b2d6193a8f31393254449a5dfe2e6afef21f0ae918256b30509d31cbf77`. CI and independent Claude review are pending; no full-card/FIVE operational acceptance is claimed. Next first action: Codex pushes this source and dispatches exact Core/Docs; coordinator obtains actual Claude review and decides the separate CP batch-retirement scope. The base59f DB readiness race is not repaired here; any hosted failure is preserved for combined integration with independent84bb. Coordinator owns current-board aggregation and eventual safe Obsidian export; no old vault export.
+
+The preceding section records the original Node-only milestone `a93ec9f1906cf5374fa8e2de172e11be0fd7cbdf`, not the final card scope. Its exact Docs run41995699334 succeeded; Core41995694509 was still running at17:58KST. Root message `msg_0ee0b2f49d8b` explicitly extended this card to the missing public CP retirement/successor contract. The extension, new red/green proof and next actions are recorded in [[2026-11-05_FLEET5_batch_successor_Codex]]; the a93 red/green evidence is preserved in place.
