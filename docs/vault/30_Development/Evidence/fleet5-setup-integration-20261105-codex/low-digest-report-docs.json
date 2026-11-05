@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_docs.py"
+  ],
+  "startedAtKST": "2026-11-05T20:57:53.459969+09:00",
+  "finishedAtKST": "2026-11-05T20:58:08.924824+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "low-digest-report-docs.txt",
+  "sourceAtStart": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

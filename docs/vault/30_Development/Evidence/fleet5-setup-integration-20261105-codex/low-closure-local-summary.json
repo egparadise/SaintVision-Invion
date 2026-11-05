@@ -45,5 +45,14 @@
   "obsidianApply": false,
   "low-b1-b2-red-corrected-fixture.txtSHA256": "62757a5d98a74b6a08225cba6a6a882c22c3aee7d92ce6401157b3158c9271ee",
   "low-b1-b2-green.txtSHA256": "82c171447978658673dd50204e2da1b5beaf11723211a697e13b1965512d0ed1",
-  "raw-diagnostic-bindings-b3.jsonSHA256": "4abe8dc2898d9aa09fc0bfcf316caae76c2752f77e557fb0e51be23c5fba4d6d"
+  "raw-diagnostic-bindings-b3.jsonSHA256": "3d49907cf85182b91e11bf8482e6f576aab9cdca7aa74d305e5e49354bc1acad",
+  "structuredMetadataDigestCorrection": {
+    "observedAtKST": "2026-11-05T20:57:45.573342+09:00",
+    "priorSource": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+    "previousWorkingCRLFSHA256": "4abe8dc2898d9aa09fc0bfcf316caae76c2752f77e557fb0e51be23c5fba4d6d",
+    "committedLFSHA256": "3d49907cf85182b91e11bf8482e6f576aab9cdca7aa74d305e5e49354bc1acad",
+    "scope": "Only structured JSON summary reference; three raw diagnostic bytes/hashes/Gitblobs unchanged",
+    "originalObservedWorkingHashRetained": true
+  },
+  "structuredMetadataHashSemantics": "SHA256 of complete UTF8 Git text-normalized LF bytes; raw transcript hashes remain exact captures"
 }
