@@ -1,0 +1,11 @@
+sssssssssssssss                                                          [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:80: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:95: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:112: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_lan_storage_install.py:131: Opt-in owned Docker storage installer test
+SKIPPED [1] tests\integration\test_lan_storage_install.py:152: Opt-in owned Docker storage installer test
+SKIPPED [1] tests\integration\test_lan_storage_install.py:164: Opt-in owned Docker storage installer test
+SKIPPED [8] tests\integration\test_lan_storage_install.py:191: Opt-in owned Docker storage installer test
+SKIPPED [1] tests\integration\test_lan_storage_install.py:264: Opt-in owned Docker storage installer test
+15 skipped in 0.24s

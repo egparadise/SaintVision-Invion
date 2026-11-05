@@ -67,6 +67,31 @@ def validate_target(manifest, value):
     return list(args)
 
 
+def validate_install_target(manifest, value):
+    args = validate_target(manifest, value)
+    # This installer recreates only /state and the default Docker socket. Keep
+    # this restriction out of validate_target: rollback restores recorded backups
+    # in place, including storage-enabled containers created before this guard.
+    if any(arg.split('=', 1)[0] in ('--storage-policy', '-storage-policy') for arg in args):
+        raise ValueError('Workspace upgrade does not support storage contribution; '
+                         'preserve this Node and use a separate plain Node for workspace acceptance')
+    sockets = 0
+    for mount in value.get('Mounts', []):
+        if mount.get('Destination') == '/state':
+            continue  # validate_target already checked this durable volume.
+        if (mount.get('Destination') == '/var/run/docker.sock'
+                and mount.get('Type') == 'bind'
+                and mount.get('Source') == '/var/run/docker.sock'
+                and mount.get('RW') is True
+                and mount.get('Propagation') == 'rprivate'):
+            sockets += 1
+            if sockets == 1:
+                continue
+        raise ValueError('Workspace upgrade cannot preserve existing mounts; '
+                         'preserve this Node and use a separate plain Node for workspace acceptance')
+    return args
+
+
 def idle(node):
     # Even a stopped but uncollected workload is not safe to discard or migrate.
     if docker('ps', '-aq', '--filter', 'label=ai.saintvision.node='+node,
@@ -170,7 +195,7 @@ def install(folder, state, *, undo=False):
             raise ValueError('Interrupted upgrade preserved; run Enable-Workspace.ps1 -Rollback first')
         name = 'saintvision-'+node.lower()
         current = inspect(name)
-        args = validate_target(manifest, current)
+        args = validate_install_target(manifest, current)
         idle(node)
         volume = json.loads(docker('volume', 'inspect', name+'-state'))[0]
         if (volume.get('Labels') or {}).get('ai.saintvision.node') != node:
