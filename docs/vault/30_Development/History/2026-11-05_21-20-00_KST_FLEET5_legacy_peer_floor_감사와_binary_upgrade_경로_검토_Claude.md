@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-FLEET5-20261105-LEGACY-PEER-FLOOR-AUDIT-REVIEW-CLAUDE"
 title: "2026-11-05 FLEET5 Codex legacy peer-floor 호환 감사 f0278daf 독립 검토와 binary-only upgrade 경로 평가"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T21:20:00+09:00"
+updated: "2026-11-05T22:26:17+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "f012b206"
@@ -173,3 +173,21 @@ Orca task `task_cfafb7eac65c`, dispatch `ctx_a2e0601680de`.
 - **P0 owner `ctx_6f0f8253b8a7`:** M1~M10을 구현한다. G6(journal 호환, no-write replay)을 test로 증명한다.
 - **Codex:** 이 감사에 추가로 할 일은 없다. 선택 사항으로 보고서의 "line2590" 표기를 2670으로 고친다.
 - **Claude:** bootstrap plan과 P0 구현이 오면 독립 검토한다.
+
+## 시간 기록 정정 (v1.0.1, 2026-11-05T22:26:17+09:00)
+
+처음 판에 적은 관측 시각은 실제로 관측한 값이 아니었다. 이번 정정에서 바꾼 것은 시각뿐이다. 판정, 독립 test, source 판단은 바꾸지 않았고 Git history도 다시 쓰지 않았다.
+
+- **처음 적은 값(무효):** Evidence `observedWindowKST` 21:00:00~21:20:00, header `updated` 21:20:00
+- **무효인 이유:** declared start 21:00 precedes the brief (21:01:32); declared end 21:20 and History updated 21:20 are after the commit (21:10:24) and Docs completion (21:11:10), so they were not observed
+- **복원한 관측 구간:** 21:01:40~21:08:44 KST
+  - brief 수신: 21:01:32 (task_cfafb7eac65c / ctx_a2e0601680de)
+  - 첫 관측: 21:01:40 fetch audit branch (result 21:01:59)
+  - 마지막 관측: 21:08:44 worker_replace invocation trace result
+  - 작성: History 21:08:23, Evidence 21:09:33-21:09:37
+- **근거:** 내 session transcript(`f3feb390-…jsonl`)의 metadata만 읽었다. tool 결과의 시각이며 초 단위 정밀도다.
+- **공개 metadata (실행 시각으로 쓰지 않음):** commit f6817f3d author/commit 2026-11-05T21:10:24+09:00; Docs 42024928449 created 21:10:40, completed 21:11:10 KST, success
+- **본문의 다른 시각:** '20:43:53 KST' in the body is the read board documents' own version time, not an observation time
+- **파일 경로:** 경로에 든 시각은 인용이 깨지지 않도록 legacy ID로 그대로 둔다. 그 시각을 관측 시각으로 보면 **안 된다.**
+- **`updated`:** 이 정정을 한 시각이다.
+- **범위:** 이 검토와 짝 검토(`f6817f3d`, `45bc23cb`)만 감사했다. 그보다 앞선 검토의 시각은 여전히 검증되지 않았다.
