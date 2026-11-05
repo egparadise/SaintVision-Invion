@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "fleet5-expansion-proposal:1",
+  "taskId": "FLEET5-20261105-WORKER-READINESS",
+  "executable": false,
+  "status": "BLOCKED_INPUTS_AND_INDEPENDENT_REVIEW",
+  "productSource": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "namespace": "fleet5-20261105-v1",
+  "proposedState": ".work/lan-5node/fleet5-20261105-v1",
+  "proposedDatabase": "saintvision_lan_fleet5_20261105_v1",
+  "tenantAndEpoch": "generate fresh only after review; no fabricated values",
+  "physicalSlots": [
+    "worker1-linux",
+    "worker2-linux",
+    "worker3-linux",
+    "worker4-linux",
+    "current-windows-cp-colocated"
+  ],
+  "identityPolicy": "bind one distinct Node/key/channel to each verified physical host; use current r5 mappings only as existing evidence, never copy legacy inventory nodeIds",
+  "cpFailureDomain": {
+    "sharesControlPlaneHost": true,
+    "measurementEligible": {
+      "s05": false,
+      "s07": false
+    },
+    "exclusionReason": "cp-host-colocation",
+    "hostLoss": "correlated-cp-node-host-loss, unmeasured without external observer"
+  },
+  "proposedPorts": {
+    "bootstrap": 18085,
+    "overview": 18086,
+    "web": 3005,
+    "dbTunnel": 55450,
+    "nodeTLS": 18447,
+    "availabilityAndFirewallReview": "not-performed; no reservation made"
+  },
+  "managedLinuxFolderProposal": {
+    "path": "$HOME/.local/share/saintvision/fleet5-20261105-v1/workspaces",
+    "mode": "0700",
+    "created": false,
+    "approved": false,
+    "limits": {
+      "cpuMillis": 2000,
+      "memoryBytes": 2147483648,
+      "gpuDevices": 0,
+      "storageBytes": 21474836480
+    },
+    "scope": "dedicated new project content only; no home, MinIO business path, medical files or inherited mounts",
+    "withinExistingProjectAuthorization": true,
+    "policyRecorded": false,
+    "reviewState": "proposal for independent review; no blanket home or human Docker grant"
+  },
+  "minimums": {
+    "profile": "lan-workspace-v1",
+    "dockerServerAPIAtLeast": "1.45",
+    "runtimeUnderstoodAPICap": "1.45",
+    "serverMinimumAPIMustNotExceed": "1.45",
+    "note": "ordinary runtime negotiation supporting older API does not waive FIVE installer/preflight"
+  },
+  "initialGates": {
+    "killSwitch": true,
+    "userWorkloadSubmission": false,
+    "offeredResources": 0,
+    "runs": 0
+  },
+  "preserve": {
+    "r5": true,
+    "source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+    "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+    "original993AndNew720Packets": true,
+    "allKeysReceiptsAndPinnedParameters": true,
+    "followupsKST": [
+      "2026-11-08T14:20:00+09:00",
+      "2026-11-09T12:15:00+09:00",
+      "2026-11-10T08:00:00+09:00"
+    ],
+    "renewalWindow": "2026-11-08T14:15:35+09:00"
+  },
+  "inputSHA256": {
+    "intranetInventory": "b8e93435e5830ceb3af06ee248ef226b97f48606ffee95b49d306482003edb1d",
+    "revisionTwoNodeInventory": "b6758fc452590d924cf68e172dad1408dc53ac9fdde58cfea685b1aa41a9379d",
+    "protectedBaseline": "3b03d7ab38962f4de62ffbc1d466d6d48a82e23214940a62aae0944129cb53d9",
+    "measurementCollector": "c3ee6be9d5c883cf40fcea410b9b0c0d54a3e0aac430cea0e3d56926328a95c2",
+    "rawMeasurementResult": "41d270bc11b87e4871416695d24b8e56e12af0af2e326a8382f9a1fc99c7805a",
+    "worker3DiagnosticCollector": "ee0fbcad28d0b0c8efa9fe7e30852a5a0b8d7415091dc4c1364e4bd0879505a6",
+    "worker3DiagnosticReceipt": "064a15faf8abc28be2632c925b2860e5540c65aabba94084f5e33243f0565c6e",
+    "guard": "acf8b4f6ed1e57afd4d8f1b9efa543c7139b6436f714ed42b22c78441695fc95",
+    "config": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+    "releaseParameters": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "sudoDiagnosticReceipt": "bc955ac6180b20720be857dcfbab231513aba8648ef34f1e8ef02b607c096827"
+  },
+  "sourceFileSHA256": {
+    "deploy/lan/README.md": "3468bf154a85199023e5d8f587f20f94a00b50286ac1edc794bc4939a9321818",
+    "deploy/lan/prepare-worker.sh": "3e8dc5cf1a712ccc9c9ffa62f9b289a14d0b47f7af9b1031a4e60bae90f98b12",
+    "deploy/lan/finish-worker.sh": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+    "deploy/lan/start-node.sh": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+    "deploy/lan/worker_workspace.py": "da46ab67d0220b705c54bf889c3bf63e18b3bddb327bfe5881969121d43711c3",
+    "deploy/lan/worker_storage.py": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+    "tools/lan_pilot.py": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+    "tools/lan_workspace.py": "4f5d3045243bf07261aaf0cc2daf834b562495f5d50c8897472875fd55768291",
+    "tools/five_node_lab_preflight.py": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+    "services/node-agent/runtime/docker.go": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb"
+  },
+  "blockers": [
+    "worker4 verified endpoint, account/profile, known-host binding, identity and permitted limits/folders missing",
+    "worker3 system Docker socket access denied; server API unmeasured; owner-selected access change requires separate reviewed action",
+    "worker1/3 folder policies absent; managed-folder proposal is not approval",
+    "worker2 existing allowed path is MinIO data only; it is not a general workspace grant",
+    "current Windows CP identity/runtime/API/resources/folder/failure-domain assessment belongs to Claude",
+    "all-five identity/certificate/revision inventory and lan-workspace-v1 acceptance absent",
+    "fresh port/address/firewall/DB/CA namespace bindings not yet reviewed",
+    "lan_workspace.py targets only state primary Node and requires local Docker; per-target five-Node workspace packaging and matching clean proof require review"
+  ],
+  "nextOwner": "coordinator Codex + independent Claude",
+  "nextAction": "resolve missing inputs and runtime route; then build a private exact-address/hash-bound execution packet for independent review before any live action",
+  "operatorAccessOptions": [
+    "An already authorized operator starts only the reviewed project-owned Node; current sudo -n capability is unavailable and must not be assumed",
+    "A dedicated Node service account with narrowly reviewed runtime/socket controls; account and policy creation are future reviewed changes"
+  ],
+  "rootlessRuntimeSupport": "not claimed; current installer and workspace path use rootful Docker socket",
+  "sourceFileSHA256Domain": "Git blob bytes at productSource (LF), not checkout line-ending transforms"
+}

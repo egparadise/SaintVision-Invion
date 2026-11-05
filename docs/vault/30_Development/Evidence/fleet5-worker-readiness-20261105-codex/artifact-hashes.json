@@ -1,0 +1,29 @@
+{
+  "inputSHA256": {
+    "intranetInventory": "b8e93435e5830ceb3af06ee248ef226b97f48606ffee95b49d306482003edb1d",
+    "revisionTwoNodeInventory": "b6758fc452590d924cf68e172dad1408dc53ac9fdde58cfea685b1aa41a9379d",
+    "protectedBaseline": "3b03d7ab38962f4de62ffbc1d466d6d48a82e23214940a62aae0944129cb53d9",
+    "measurementCollector": "c3ee6be9d5c883cf40fcea410b9b0c0d54a3e0aac430cea0e3d56926328a95c2",
+    "rawMeasurementResult": "41d270bc11b87e4871416695d24b8e56e12af0af2e326a8382f9a1fc99c7805a",
+    "worker3DiagnosticCollector": "ee0fbcad28d0b0c8efa9fe7e30852a5a0b8d7415091dc4c1364e4bd0879505a6",
+    "worker3DiagnosticReceipt": "064a15faf8abc28be2632c925b2860e5540c65aabba94084f5e33243f0565c6e",
+    "guard": "acf8b4f6ed1e57afd4d8f1b9efa543c7139b6436f714ed42b22c78441695fc95",
+    "config": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+    "releaseParameters": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "sudoDiagnosticReceipt": "bc955ac6180b20720be857dcfbab231513aba8648ef34f1e8ef02b607c096827"
+  },
+  "publicEvidenceSHA256": {
+    "readiness.json": "a4967ef13365004ce6c9303c625daac84d7c543dda46ba09fb05b672a1b47b6a",
+    "five-node-proposal.json": "574412546026f056af7261dd0fbd5f511b721c92b2213197e40454d03cb18da8"
+  },
+  "privateRawReceiptsSHA256": {
+    "worker1.private.json": "75788da2e6c117b12f3e743f9d699c8c8a6a1a6cf91ee1dafbbe24fb5fbda5a2",
+    "worker2.private.json": "8f03b2c879b7342ae814e70ad046072fc2a5477b8e03aacd691450fce6f5246f",
+    "worker3.private.json": "ee480bc2278758337d89af0612861459d1ba271abb05dd4b1b7155cadcf71832",
+    "worker3-diagnostic.private.json": "064a15faf8abc28be2632c925b2860e5540c65aabba94084f5e33243f0565c6e",
+    "listeners.private.json": "04c87436b1f4749261a6b6c8ccbf6b253be3b285bf88c934164dc816fa36bec3",
+    "tunnel-parents.private.json": "592c5a8b6e581d5727e268f08ba02db66d20059e3d33f30973b7be2cc1c696db",
+    "protected-baseline.private.json": "3b03d7ab38962f4de62ffbc1d466d6d48a82e23214940a62aae0944129cb53d9"
+  },
+  "publicEvidenceHashDomain": "Committed LF bytes"
+}
