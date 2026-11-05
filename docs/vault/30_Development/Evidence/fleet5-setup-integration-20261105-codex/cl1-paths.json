@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_doc_paths.py",
+    "--ratchet"
+  ],
+  "startedAtKST": "2026-11-06T03:18:05.863259+09:00",
+  "finishedAtKST": "2026-11-06T03:18:05.918784+09:00",
+  "exit": 2,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "cl1-paths.txt",
+  "sourceAtStart": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

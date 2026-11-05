@@ -35,3 +35,6 @@ Ordered focus exits1 with387 pass/20 platform skips/1 route fixture failure; iso
 ## Exact72028 early artifact read transport
 
 Py3.12 pinned artifact13435502912 initial gh API download returns HTTP503/exit1. The partial first output is retained ignored and hashed. One bounded read-only retry writes a distinct file and matches metadata SHA2567e49d25f3553f093fe80ccd1ed56f677d659826da51d5c8675d4bde64163d68a. No CI job retry/cancellation, code change or old evidence rewrite occurs. Actual native/pinned proof validation succeeds separately; full CI and combined verdict remain required.
+
+
+C-L1 docs-only gate invocation: cl1-paths exited2 because the integrator typed nonexistent tools/check_doc_paths.py. The sequence stopped before ratchet/sync; this is a command-name error, not a source or path-citation test result. Original cl1-paths.json/txt are preserved; separately named cl1-paths-canonical invokes the workflow canonical tools/check_doc_path_citations.py --ratchet --base-ref28c00c04, followed by previously unscheduled ratchet/sync. No CI job rerun, runtime correction or source relaxation was performed.

@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+  "branch": "agent/codex/fleet5-setup-integration-20261106-report72028",
+  "workflows": {
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/8f1021e855e445ae8b29c018b7070a47",
+      "dispatchRequestedAtKST": "2026-11-06T03:05:03.872337+09:00",
+      "workflowInputs": {
+        "correlation_id": "post-landing-verify/8f1021e855e445ae8b29c018b7070a47"
+      },
+      "dispatchReturnedSuccess": true,
+      "event": "workflow_dispatch",
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42080835896,
+        "headSha": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+        "headBranch": "agent/codex/fleet5-setup-integration-20261106-report72028",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42080835896,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42080835896",
+      "headSha": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127433132032,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T18:05:11Z",
+          "completedAt": "2026-11-05T18:05:45Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42080835896/job/127433132032"
+        }
+      ],
+      "rawObservation": "ci-42080835896-20261106T030657.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-setup-integration-20261106-report72028",
+    "refTipSha": "28c00c0445702156b8e10382fe93ee8a76b2f39b"
+  },
+  "observedAtKST": "2026-11-06T03:06:53.501210+09:00",
+  "intermediateScope": [
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Docs-only report; exact72028 all-eight terminal/artifact evidence and actual independent combined review remain separate required gates",
+  "jobCountObserved": 1
+}
