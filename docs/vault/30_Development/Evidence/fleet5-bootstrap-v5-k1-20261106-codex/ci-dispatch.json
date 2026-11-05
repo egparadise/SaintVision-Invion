@@ -1,0 +1,49 @@
+{
+  "sourceSHA": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "base": "e50c148287779add421265868ef16909ed984650",
+  "branch": "agent/codex/fleet5-bootstrap-v5-k1-offline-verifier-20261106",
+  "packageGitTree": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+  "dispatches": [
+    {
+      "workflow": "core.yml",
+      "correlationId": "FLEET5-K1-Core-c6f0d95ecbcd-20261106T063402",
+      "state": "DISPATCHED",
+      "atKST": "2026-11-06T06:34:02.490757+09:00",
+      "argv": [
+        "gh",
+        "workflow",
+        "run",
+        "core.yml",
+        "--ref",
+        "agent/codex/fleet5-bootstrap-v5-k1-offline-verifier-20261106",
+        "-f",
+        "correlation_id=FLEET5-K1-Core-c6f0d95ecbcd-20261106T063402",
+        "-R",
+        "egparadise/SaintVision-Invion"
+      ],
+      "exit": 0,
+      "output": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42113810160\n"
+    },
+    {
+      "workflow": "docs.yml",
+      "correlationId": "FLEET5-K1-Docs-c6f0d95ecbcd-20261106T063402",
+      "state": "DISPATCHED",
+      "atKST": "2026-11-06T06:34:04.686654+09:00",
+      "argv": [
+        "gh",
+        "workflow",
+        "run",
+        "docs.yml",
+        "--ref",
+        "agent/codex/fleet5-bootstrap-v5-k1-offline-verifier-20261106",
+        "-f",
+        "correlation_id=FLEET5-K1-Docs-c6f0d95ecbcd-20261106T063402",
+        "-R",
+        "egparadise/SaintVision-Invion"
+      ],
+      "exit": 0,
+      "output": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42113815556\n"
+    }
+  ],
+  "noRuntimeProofFlagsRequested": true
+}

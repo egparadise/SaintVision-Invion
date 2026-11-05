@@ -1,0 +1,145 @@
+{
+  "atKST": "2026-11-06T07:25:54.373697+09:00",
+  "base": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "fullNoPathspecStrictUTF8": true,
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--no-renames",
+    "--name-status",
+    "-z"
+  ],
+  "rawNameStatusSHA256": "35b647f2b1cc4faed2b1193381f0cc9d5f6c08086bc3b816b319c66983dd47ac",
+  "paths": [
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/ci-current-observation.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/ci-dispatch.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-artifact-download-receipt.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-artifact-list.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-latest.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-selected/build-product-runtime-real-pg.xml"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-selected/docker-host-tests.xml"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-selected/lan-pilot-database-real-pg.xml"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-selected/node-events-metadata.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-selected/node-unit.jsonl"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-ci-watch-result.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-completed-log-receipt.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-completed-log-selected.txt"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-test-counts.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/post-publication-source-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-01-check_docs.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-02-check_ontology_generation.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-03-check_ontology.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-04-check_contract_bindings.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-05-check_frontend_integrity.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-06-check_doc_path_citations.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-07-check_doc_single_source.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-08-test_sync.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-09-build_docs.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-gate-10-sync_obsidian.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-scope-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/report-source-gates.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/review-dispatch-receipt-root.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/source-ci-final.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_v5_K1_CI_delivery_Codex.md"
+    }
+  ],
+  "addedFiles": 30,
+  "existingModifiedFiles": 0,
+  "productDiff": 0,
+  "packageGitTreeUnchanged": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+  "sourceBranchRemainsFrozenAt": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "noCIRepeatOrCancel": true,
+  "noObsidianApply": true,
+  "privateMarkerRawMainXMLNotRepublished": true,
+  "scopeAuditDoesNotHashOwnContent": true
+}

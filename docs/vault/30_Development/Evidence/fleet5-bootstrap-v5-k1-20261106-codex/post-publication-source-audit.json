@@ -1,0 +1,13 @@
+{
+  "sourceSHA": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "parent": "e50c148287779add421265868ef16909ed984650",
+  "packageGitTree": "378a323057773f5c8f56c617ac5e82c4438c4d76",
+  "fullCommitRangeNameStatusMatchesStagedAudit": true,
+  "addedFiles": 139,
+  "existingModifiedFiles": 0,
+  "packageGitBlobsVerified": 107,
+  "nameStatusRawSHA256": "4a3dc6f4849f4ad388e68984d2066943eb182676276b1b33bb3b5c0719eb4b69",
+  "originalFrozenPinsVerified": 28,
+  "atKST": "2026-11-06T06:39:15.006824+09:00",
+  "wholeProductAcceptance": false
+}

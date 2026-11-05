@@ -1,0 +1,22 @@
+{
+  "run": 42113810160,
+  "job": 127548012850,
+  "sourceSHA": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "argv": [
+    "gh",
+    "run",
+    "view",
+    "42113810160",
+    "--job",
+    "127548012850",
+    "--log",
+    "-R",
+    "egparadise/SaintVision-Invion"
+  ],
+  "exit": 0,
+  "logBytes": 1216674,
+  "rawLogSHA256": "38086a572b3acf783cf76f8a13b56a3ec39d2383b315f377d20fd37628c42092",
+  "selectedLineCount": 41,
+  "rawLogNotRepublished": true,
+  "atKST": "2026-11-06T07:20:31.314742+09:00"
+}

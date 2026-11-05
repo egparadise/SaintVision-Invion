@@ -1,0 +1,41 @@
+core	Test Linux Node concurrency and crash boundaries	﻿2026-11-05T21:36:46.2827164Z ##[group]Run mkdir -p "$GITHUB_WORKSPACE/dist"
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2827582Z ^[[36;1mmkdir -p "$GITHUB_WORKSPACE/dist"^[[0m
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2828549Z ^[[36;1mgo test -race -json ./... > "$GITHUB_WORKSPACE/dist/node-unit.jsonl" || { cat "$GITHUB_WORKSPACE/dist/node-unit.jsonl"; exit 1; }^[[0m
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2879635Z shell: /usr/bin/bash -e {0}
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2879911Z env:
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2880405Z   INV_TEST_ADMIN_DSN: ***127.0.0.1:5432/postgres
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2880923Z   INV_TEST_EVIDENCE_DIR: /home/runner/work/SaintVision-Invion/SaintVision-Invion/dist
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2881698Z   MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2882309Z   MINIO_ROOT_USER: product-store-ci
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2882659Z   MINIO_ROOT_PASSWORD: product-store-ci-only-secret
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2883058Z   INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2883492Z   INV_OBJECT_STORE_BUCKET: saintvision-product-ci
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2883933Z   INV_OBJECT_STORE_ACCESS_KEY_ID: product-store-ci
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2884370Z   INV_OBJECT_STORE_SECRET_ACCESS_KEY: product-store-ci-only-secret
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2884791Z   INV_OBJECT_STORE_REGION: us-east-1
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2885105Z   INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2885511Z   INV_EVIDENCE_CODE_SHA: c6f0d95ecbcd79fac96673c194e2368b510ad827
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2885915Z   INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2886297Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2886780Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2887271Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2887711Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2888368Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2888815Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2889541Z   CX01_CONTAINER: 98b5618fcfc62c9c54ac9d69e602862eb37ebab6ec05cb06a82b9b69a653d3b7
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.2890001Z ##[endgroup]
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.3540753Z go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+core	Test Linux Node concurrency and crash boundaries	2026-11-05T21:36:46.3680103Z go: downloading golang.org/x/text v0.14.0
+core	Verify Workspace recovery boundary first	2026-11-05T21:42:00.1618860Z 23 passed, 1 warning in 32.23s
+core	Verify containment controls and physical cleanup	2026-11-05T21:42:30.2507069Z 28 passed, 1 warning in 29.11s
+core	Verify business handoff against the execution kernel	2026-11-05T21:42:57.7416534Z 17 passed, 1 warning in 26.52s
+core	Verify bounded shard replacement on two real Nodes	2026-11-05T21:43:28.4064404Z 21 passed in 29.76s
+core	Run provisioned LAN installer acceptance	2026-11-05T21:47:58.6656844Z 17 passed in 269.43s (0:04:29)
+core	Run owned CX01 recovery drill evidence	2026-11-05T21:48:39.0910549Z 20 passed in 39.45s
+core	Require executed CX01 recovery evidence	2026-11-05T21:48:39.2933031Z ^[[36;1m    for skipped in root.findall('.//skipped')^[[0m
+core	Require executed CX01 recovery evidence	2026-11-05T21:48:39.2935481Z ^[[36;1massert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'^[[0m
+core	Verify build admission queue fairness on PostgreSQL	2026-11-05T21:49:46.3237860Z 13 passed in 66.26s (0:01:06)
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T21:50:00.1276933Z 2 passed in 12.82s
+core	Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py	2026-11-05T22:14:50.6019491Z == 9215 passed, 46 skipped, 2 deselected, 2036 warnings in 1488.82s (0:24:48) ==
+core	Docker host hygiene (explicit lane)	2026-11-05T22:14:58.2980037Z ======================= 2 passed, 4 deselected in 4.63s ========================
+core	Require executed evidence and declared platform skips	2026-11-05T22:14:58.3767672Z ^[[36;1m    for skipped in root.findall('.//skipped')^[[0m

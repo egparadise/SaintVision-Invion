@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-06T06:54:19.226612+09:00",
+  "rootMessage": "msg_65ab78489a8e",
+  "sourceSHA": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "actualIndependentReviewTask": "task_5627222e0f59",
+  "dispatch": "ctx_0918954c585c",
+  "reviewer": "Claude via Root",
+  "status": "ACTUALLY_DISPATCHED_RESULT_PENDING",
+  "verdict": null,
+  "rootVerifiedDocsRun": 42113815556,
+  "rootVerifiedCoreRun": 42113810160,
+  "rootVerifiedNodeRaceStep": "SUCCESS",
+  "fullCore": "IN_PROGRESS_AT_ROOT_REPLY",
+  "codeSourceFrozen": true,
+  "k2AndLiveBindings": "HOLD",
+  "futureRuntimeCases": {
+    "count": 40,
+    "status": "NOT RUN"
+  }
+}
