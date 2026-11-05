@@ -1,0 +1,18 @@
+{
+  "proposalSHA": "15823c2a116ba87b6b946be747ac256c073536e6",
+  "level": "STATIC_CONTRACT_CONSISTENCY_ONLY",
+  "expectedExit": 1,
+  "actualExit": 1,
+  "missingExecuteGrants": [
+    "b_record_key_delivery"
+  ],
+  "meaning": "Caught before any independent Rev3 review; actual production untouched",
+  "command": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-B",
+    "-c",
+    "import subprocess,json,re,sys; x=json.loads(subprocess.check_output(['git','show','15823c2a116ba87b6b946be747ac256c073536e6:docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/authority-abi.json'])); allowed={f for r in x['principals'] for f in r['execute']}; required={f for t in x['tableGrantMatrix'] for f in re.findall(r'\\bb_[a-z_]+',t['writer'])}; missing=sorted(required-allowed); print(json.dumps({'missingExecuteGrants':missing})); sys.exit(1 if missing else 0)"
+  ],
+  "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/key-delivery-grant-expected-red.log",
+  "sha256": "bde1514385d2de2c83c4683eadcf6ef9503df874732043bf6c6facc117b06c82"
+}

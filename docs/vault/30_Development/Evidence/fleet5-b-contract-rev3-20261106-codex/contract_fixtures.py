@@ -302,6 +302,10 @@ def main():
     check('closed-workload-positive-SYNTHETIC',workload_valid(host),True)
     for field,value in [('CapAdd',['SYS_ADMIN']),('UsernsMode','host'),('Sysctls',{'x':'y'}),('Runtime','other'),('VolumeDriver','plugin'),('CgroupParent','host'),('Mounts',[{}]),('VolumesFrom',['other']),('UnknownFutureField',False),('Privileged',0),('Memory',536870912.0)]:
         changed=deepcopy(host);changed[field]=value;check('workload-closed-'+field,workload_valid(changed),False)
+    grants=json.loads((E/'authority-abi.json').read_bytes())
+    allowed={f for r in grants['principals'] for f in r['execute']}
+    required={f for table in grants['tableGrantMatrix'] for f in re.findall(r'\bb_[a-z_]+',table['writer'])}
+    check('named-table-writer-has-explicit-execute-grant',required<=allowed,True)
     ledger=json.loads((E/'callsite-locks.json').read_bytes());csvrows=list(csv.DictReader((E/'callsite-locks.csv').read_text(encoding='utf-8').splitlines()))
     check('callsite-count-consistent',len(csvrows)==ledger['callsiteCount'],True)
     check('explicit-expression-disposition-not-path-heuristic',set(ledger['dynamicExpressions'])==set(ledger['explicitExpressionResolutions']) and not ledger['unresolvedExpressionIds'],True)

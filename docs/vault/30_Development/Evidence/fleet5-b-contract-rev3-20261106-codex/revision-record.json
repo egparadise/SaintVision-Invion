@@ -7,7 +7,6 @@
   "owner": "Codex",
   "reviewer": "Actual independent Claude delta review via Root PENDING",
   "branch": "agent/codex/fleet5-b-contract-rev3-20261106",
-  "parentDocsSHA": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
   "immutableSourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
   "priorReviewSHA": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
   "priorVerdicts": "100f and02cf REVISION REQUIRED, not accepted/frozen; preserve originals",
@@ -42,5 +41,8 @@
     "decisionArtifact": "root-rev3-decision.json",
     "DocsRun": 42103667573,
     "DocsStatus": "Root verification pending at message, not borrowed as B acceptance"
-  }
+  },
+  "proposalBaseDocsSHA": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+  "firstRevisionDocsSHA": "15823c2a116ba87b6b946be747ac256c073536e6",
+  "correctionScope": "Explicit missing operator key-delivery grant plus safety/operator observation scope, static named-writer grant test and expected red; no production change"
 }

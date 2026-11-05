@@ -404,7 +404,7 @@ including actual key chain crypto/canonical vectors, lane reconciliation during
 fence, per-Node restart readmission, grant separation/RLS, every partial invalidation,
 PG concurrency and Docker read-only/nonrecursive/rprivate/workload decoder.
 
-Local proof uses main Python3.14.7 with -B and records241 schema/static/symbolic
+Local proof uses main Python3.14.7 with -B and records242 schema/static/symbolic
 checks. The source ledger contains602 expressions in65 files,27 explicitly
 resolved dynamic/helper expressions and138 FK/RLS/schema assets; eight named
 entry plans specify lock modes. verify_source_ledger.py independently rechecks all602 AST expressions/65 file hashes
@@ -415,6 +415,13 @@ canonical $refs and the rerun passes. Commands/exits/raw log hashes and final
 publication gates are captured alongside this record. Root governance scope1.1.0
 at7ec1af26 and exact decision source are preserved; separate bootstrapv5/K1
 acceptance is not B evidence.
+
+A final static grant check found that the first published Rev3 packet15823c2a
+named b_record_key_delivery as the table writer but omitted its operator EXECUTE
+entry. The expected static failure is preserved in key-delivery-grant-expected-red.json;
+the narrow follow-up adds that explicit grant plus protected operator/safety
+observation-scope access, and the new consistency fixture passes. No actual DB
+grant or production change was applied; independent Rev3 review remains pending.
 
 Normal delivery is unique commit/push/exact Docs plus actual independent delta
 review; no repeated user approval or partial freeze is requested. Next owner

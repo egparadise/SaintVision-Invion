@@ -2,7 +2,7 @@
   "version": "fleet5-b-rev3-fixtures:1",
   "level": "SCHEMA_STATIC_SYMBOLIC_ONLY_NOT_ED25519_OR_RUNTIME",
   "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
-  "passed": 241,
+  "passed": 242,
   "failed": 0,
   "realGo": 0,
   "realPG": 0,
@@ -1435,6 +1435,12 @@
       "name": "workload-closed-Memory",
       "actual": false,
       "expected": false,
+      "passed": true
+    },
+    {
+      "name": "named-table-writer-has-explicit-execute-grant",
+      "actual": true,
+      "expected": true,
       "passed": true
     },
     {
