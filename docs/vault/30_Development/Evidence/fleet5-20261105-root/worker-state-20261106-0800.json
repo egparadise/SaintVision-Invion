@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "fleet5-root-bounded-worker-state:1",
+  "atKST": "2026-11-06T08:06:43+09:00",
+  "BReviewer": {
+    "dispatch": "ctx_c1e01403f409",
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released",
+    "extraReleaseOrTermination": false
+  },
+  "BAuthor": {
+    "dispatch": "ctx_6f0f8253b8a7",
+    "metadata": "start_unknown/turn_start_unobserved/livenesslive/retained",
+    "actualRead": "bounded worker-read transcript after next instruction; sourceExacttrue/contentCompletefalse/40messages/clipped",
+    "observedActivity": "actual Root rev5 body received; actual assistant accepted rev5; new rev5 branch from2a08; actual14c review assets being read at07:59KST",
+    "claimOfFailureOrExit": false,
+    "retryRestartResendOrStop": false
+  },
+  "K1Author": {
+    "dispatch": "ctx_ceecb3824e33",
+    "metadata": "ready/input_accepted/livenesslive/retained",
+    "actualSourceProgress": "56651 corrected immutable source published and current exactCI under collection"
+  },
+  "memoryRemeasured": false,
+  "noUnknownOrUserProcessKilled": true
+}

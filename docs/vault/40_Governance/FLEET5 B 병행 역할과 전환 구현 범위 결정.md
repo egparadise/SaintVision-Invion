@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T06:13:36+09:00"
+updated: "2026-11-06T08:06:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -48,3 +48,22 @@ rev3는 protected operator-release authority와 제한된 online use key 분리,
 rev4 census는 helper/import/session alias의 transitive caller와 누락된 ORM 잠금까지 확대하고 known callsite를 빼면 실제 검사가 실패해야 한다. 권한 테이블에 runtime lock_sentinel UPDATE를 주는 방식은 철회하고 fixed-scope SECURITY DEFINER lock-only procedure로 정한다. 실제 role/RLS/search_path·canonical order와 writer별 EXECUTE matrix를 명시한다. context budget은 별도 protected context-budget-approver 역할/키/목적으로 제한하고 실제 key는 NULL이다. host·guest clockOffsetMillis와 uncertainty/source/freshness를 측정해 최대30초 skew 안인지 확인해야 하며 실제 clock은 변경하지 않는다.
 
 NOT-YET-CASed member revoke의 C target alias, exact ledger reread 전후 lost response, 모든 writer/grant 검사와 실제 approval interval, READMIT의 새 generation 조건도 닫는다. 단순 counter/boolean·없는 ledger·상징적 서명은 진척이나 운영 성공의 근거가 아니다. delegation expiry와 acknowledged gate invalidation이 Node 측 use-key 권한의 실제 한계이며 CP300초 lease와 같다고 주장하지 않는다. 자세한 원문 지시는 b-rev4-root-decision.json이고 [실제 독립 검토 원문](https://github.com/egparadise/SaintVision-Invion/blob/638109ab211bdfab7646a07b375003a636b3a33b/docs/vault/30_Development/History/2026-11-06_06-00-00_KST_FLEET5_B_contract_rev3_e9932f30_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)은 고정 Git source다.
+
+
+## 실제 rev4 판정과 rev5 쓰기·잠금·복구 결정
+
+2a08284a의 실제 독립 검토14c7c936은 B4-M1/M2와 L1–L4의 수정 필요다. Root는 Docs42124324426의 exact head/ref/전체 job 성공과 실제 원문을 대조하고 reply msg_03544733c9f3로 rev5를 정했다. 이전 승인 갱신·gate/키 전달/scope의 닫힌 부분은 설계 증거로 보존하되 전체 B 계약의 부분 동결·코드·등록을 수락하지 않는다. 현재 범위는 고유 DOCS/schema/static/source-analysis 보완이다.
+
+M1은 실제 SQL/ORM writer별로 procedure/principal/pool/column/전이 조건/transaction/잠금 계획을 전부 연결한다. 향후 공유 권한 테이블은 plain과 B 온라인 경로 모두 고정 범위 procedure를 통하며 broad legacy DML/SET ROLE로 우회하지 않는다. plain의 기존 동작과 일회용 bootstrap·Node 소유자 권한은 실제 DB profile을 확인하는 별도 wrapper로 보존한다. 지금 권한이나 제품을 변경한 것은 아니며 실제 refactor·두 경로 PG 검증은 설계 수락 이후의 별도 의무다.
+
+실제 runtime quarantine은 인증된 해당 tenant/Node/epoch/operation의 거부만 증가시키는 좁은 procedure에 연결한다. 이를 허용하기 위해 quarantine 해제·claim 해제·물리 중지 성공을 허용하지 않는다. channel 최초 provision·revoke/C+1/audit와 다섯 evidence append의 실제 원자 경계도 빠짐없이 연결한다. enrollment/cert binding/heartbeat/lost/retirement를 구분하고 observation의 online 전이는 quarantine/draining/retired를 해제할 수 없다. storage contribution의 create/pending/activate/revoke/revoked_at는 실제 등록 소유자의 folder 동의·철회 권리를 보존한다. 일반 operator/project 등급이 소유자를 대신하지 않으며 기존 활성화는 별도 B storage admission이 아니다. 철회는 catalogue/folder를 삭제하거나 C/R/policy를 재설정하지 않는다.
+
+M2의 진입점은 helper뿐 아니라 모든 canonical/matrix row locker다. constructor/instance/dotted import/SQL 상수는 실제 edge/table/mode로 해석하거나 UNKNOWN/BLOCK으로 남긴다. 필요한 알려진 경로에는 함수별 발견 대상·잠금·outer transaction·재검증·외부 I/O 경계를 명시한다. 순서는 control_epoch → tenant_controls → routing/fence → 정렬 transaction advisory key → 정렬 inv.nodes → public.nodes → contributions → channels → role/current → inv.projects → project_resource_limits → storage_budgets → shard_plans → approval_requests → runs → operator_grants → 명시 resource/claim/transfer/model/terminal → nonce/evidence/ledger/audit다. 늦게 발견한 앞 rank는 abort/replan하며 offline bootstrap/maintenance는 동시 B traffic 없는 별도 phase다.
+
+NO KEY UPDATE/SHARE/KEY SHARE와 ORM read/key_share/skip_locked/nowait, advisory를 실제 PostgreSQL 모드로 구분한다. 고정 SQLAlchemy dialect의 격리 compile fixture와 진짜 source mutation으로 semantic record/edge/mode/계획 검출을 시험한다. 이전 stored JSON 비교 negative는 comparator 검사로 보존하며 실제 source 변조 시험으로 바꾸어 부르지 않는다. 실제 PG trace/동시성 시험은 여전히 미실행이다.
+
+L1은 승인 계보의 어느 조상이든 명시적으로 revoke되면 모든 후손의 append/ARM/activation/delivery/refresh/token/current 경계에서 거부한다. 과거 조상의 시각 만료만으로 적법한 새 승인을 만료시키지는 않는다. L2는 invalidated gate ID와 release를 해당 Node/generation에서 terminal로 보존하고 release generation·expected prior record/hash·증가 sequence를 확인한다. 정확한 중복은 아직 일치하는 원래 ack를 반환할 수 있으나 과거 gate를 부활시키지 않는다. observe lane은 원래 durable record/ack와 nonce를 가진 새 서명 readback을 읽을 뿐 business를 허가하지 않는다. ack가 없거나 60초를 넘겨 정상 전이 증명이 안 되면 fenced/UNKNOWN의 B-RECOVERY1이다. 원래 ack에 새 시각을 붙이거나 자동 재ARM·일반 renew로 복구하지 않는다.
+
+L3은 기존 protected operator-release anchor 뒤에 caller/purpose/scope를 강제하는 signing service를 둔다. delivery controller는 raw operator private key를 갖지 않으며 실제 postcommit/ARM/key/recipient/challenge에 결속된 KEY_DELIVERY_PREPARE/RECEIPT만 요청할 수 있다. APPROVAL/RELEASE/DELEGATION/GATE 요청은 서명 전에 거부한다. 별도 budget key와 실제 custody는 NULL이다. L4는 golden manifest 비교와 별도로 실제 writer/소유자/권한 불변식, oneOf branch별 부정 입력, 시간이 흐르는 expiry/revoke/fence/stale/lost ack 전이를 검사한다. 서명은 SYMBOLIC이며 실제 새 B Go/crypto/PG/Docker/crash/장비0, A1–A16 PENDING과 모든 real binding NULL/HOLD를 유지한다.
+
+구체 지시 원문은 b-rev5-root-decision.json이며 실제 판정은 [고정 rev4 독립 검토](https://github.com/egparadise/SaintVision-Invion/blob/14c7c936e056c685e85ee8f34f6185aa27ed9a2c/docs/vault/30_Development/History/2026-11-06_07-45-00_KST_FLEET5_B_contract_rev4_2a08284a_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)다. K1의 새 temporal 코드/CI는 별도 카드이고 B 검증을 대신하지 않는다.

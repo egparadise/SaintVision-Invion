@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.387"
+version: "1.0.388"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T07:34:16+09:00"
+updated: "2026-11-06T08:06:43+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "oldc6f Core/report success but codeM1M2+5Low open; directactualverdictreply author; B rev4 reviewrunning/K1fix; physicalincomplete"
-active_card_next: "K1 Codex fromc6f isolated multi-time-history/current HELD/latest fixes +ownnewCI; Claude B rev4 verdict; Root one corrected-code delta review, no oldcandidateworker_done"
+active_card_status: "B rev4 actualrevision2M4L/rev5authorworking; K1 corrected56651 ownDocsSUCCESS/Coreinprogress/deltareviewrequired; physicalincomplete"
+active_card_next: "Root one actual corrected K1 Claude review atownCI gate; K1 Codex sameCore/artifact/report; B Codex rev5 sourcewriter/lock/gate-lineage fixes; no oldCI borrowing"
 ---
+
+## 2026-11-06T08:06:43+09:00 B rev4 실제 판정과 K1 temporal 수정 후보
+
+작업한 것과 확인: B rev4는 실제14c7c936/Docs42124324426에서2Medium·4Low 수정 필요다. Root는 실제 writer/owner 경로를 대조해 msg_03544733c9f3로 rev5의 권한·잠금·계보 revoke·durable gate/ACK·signing-service 보완을 지시했다. K1 수정56651cba는 ownDocs42126225708 성공과 허용49개 delta를 확인했고 ownCore42126222201 및 실제 새 코드 검토가 남는다. B reviewer는 실제 succeeded/settled/exited/released이고 새 generic 승인이 필요하지 않다. 다음 첫 행동/담당: K1 Codex는 같은 새 Core의 artifact/보고를 마무리하고 Root는 정확한 새 source에서 실제 Claude delta 검토를 한 번 배정한다. B Codex는 지정된 rev5를 보완한다. 운영/키/장비 작업과 원래48-task/VFCL 집계는 별도로 유지한다.
 
 ## 2026-11-06T07:34:16+09:00 고정 K1 CI 증거와 실제 수정 판정 분리
 

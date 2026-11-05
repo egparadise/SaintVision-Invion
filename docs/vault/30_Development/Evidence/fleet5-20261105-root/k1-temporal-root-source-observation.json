@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "fleet5-k1-temporal-root-source-observation:1",
+  "atKST": "2026-11-06T08:02:56+09:00",
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "branch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106",
+  "parent": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "packageTree": "d83210590fdc064613d106b5a333b7ff8f3fa2ca",
+  "sourceRemoteExact": true,
+  "permittedDeltaOnly": true,
+  "changedFiles": 49,
+  "sourceScopeCollectorCorrection": "Initial collector omitted explicitly requested L5 correction to author-owned original History. Exact diff read and permitted; no source or CI rerun. Old c6f/37fe refs remain immutable.",
+  "runs": {
+    "Core": {
+      "id": 42126222201,
+      "exactHeadRef": true,
+      "correlation": "FLEET5-K1-temporal-Core-56651cba697f-20261106T080044KST",
+      "status": "in_progress",
+      "conclusion": null,
+      "allJobsSuccess": false,
+      "jobs": [
+        {
+          "id": 127591007024,
+          "status": "completed",
+          "conclusion": "success",
+          "steps": []
+        },
+        {
+          "id": 127591007221,
+          "status": "in_progress",
+          "conclusion": null,
+          "steps": [
+            {
+              "name": "FLEET5 early native Go peer-policy lifecycle proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "FLEET5 fixed native Go two-cycle proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish FLEET5 fixed native proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Test Linux Node concurrency and crash boundaries",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Collect fixed-SHA S08 build acceptance observations",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Recompute S08 build acceptance verdict from raw artifacts",
+              "status": "pending",
+              "conclusion": null
+            }
+          ]
+        }
+      ]
+    },
+    "Docs": {
+      "id": 42126225708,
+      "exactHeadRef": true,
+      "correlation": "FLEET5-K1-temporal-Docs-56651cba697f-20261106T080044KST",
+      "status": "completed",
+      "conclusion": "success",
+      "allJobsSuccess": true,
+      "jobs": [
+        {
+          "id": 127591021794,
+          "status": "completed",
+          "conclusion": "success",
+          "steps": []
+        }
+      ]
+    }
+  },
+  "actualCodeAccepted": false,
+  "wholeProgramAccepted": false,
+  "ownerQuestion": "msg_06622c6bd640",
+  "rootDirectReply": "msg_cd3722b3686e",
+  "actualDeltaReview": "NOT DISPATCHED YET; exact-source CI-gate sequencing",
+  "nextAuthorAction": "finish same corrected-source Core/artifact and qualified report, no rerun/oldCI borrowing"
+}

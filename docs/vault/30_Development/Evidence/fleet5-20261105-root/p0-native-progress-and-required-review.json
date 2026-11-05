@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "b5c1d28b2547e2fba5b674e39360246fd853d043",
-    "Docs": 42121595773,
+    "SHA": "bdd565dab96fe07001c3b4fe9a67b8c52d58d782",
+    "Docs": 42122724537,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,19 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2734,
+    "independentlyMatchedNormalizedDestinationHashes": 2738,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T07:28:07+09:00"
+    "verifiedAtKST": "2026-11-06T07:37:32+09:00",
+    "collectorRecovery": {
+      "watchExit": 1,
+      "error": "gh run watch HTTP404 for exclude_pull_requests=true; direct actual API shows alljobsSUCCESS",
+      "workflowRerunOrRedispatch": false,
+      "verificationResumed": "exact head/ref/correlation/run+jobs+remote verified before sync"
+    }
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1856,6 +1862,21 @@
       "source": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
       "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-20261106-codex/core-test-counts.json",
       "SHA256": "b5b074cface25c17559162e81fe295ba9f71c229bacadd11dc9b6d16fa2c278f"
+    },
+    {
+      "source": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/review.json",
+      "SHA256": "120ac8b9b48afbbef3cb9ec7842e308a6f59c08e9d6c2f8f64a734bc74437838"
+    },
+    {
+      "source": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/adversarial-result.json",
+      "SHA256": "37418daf10ec72c387dc9eddce439d163844f5ac67923f73c6136c94e47ba63d"
+    },
+    {
+      "source": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/census-audit-result.json",
+      "SHA256": "ec36160cc15d1adfac164827a8c10f4a85c2e74522391bbb288ab801bd1736ba"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2440,7 +2461,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T07:34:16+09:00",
+  "latestRecordAtKST": "2026-11-06T08:06:43+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2754,14 +2775,19 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "isolated current/history fixes fromc6f; oldcode/report frozen; separate correctedsource CI +delta review, no worker_done",
+    "currentAuthorization": "corrected56651 ownCI+one actualdelta review; fullCore/artifact/report before finalK1acceptance",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
     "actualCodeAccepted": false,
     "sourceFullCoreAcceptanceScope": "CI pass for REJECTED c6f only; code M1/M2 stillopen",
     "qualifiedOldSourceReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
     "reportDocs": 42121661622,
-    "rootDirectRealVerdictReply": "msg_2a098fb1f4d3"
+    "rootDirectRealVerdictReply": "msg_2a098fb1f4d3",
+    "correctedSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "correctedSourceDocs": 42126225708,
+    "correctedSourceCore": 42126222201,
+    "correctedSourceCoreAtObservation": "IN PROGRESS",
+    "actualCorrectedDeltaReview": "NOT YET DISPATCHED"
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -2831,7 +2857,7 @@
   "K1FirstActualCodeReviewRevisionDecision": "k1-c6f-root-revision-decision.json",
   "BRev4ActualReviewDispatched": {
     "schemaVersion": "fleet5-b-rev4-root-review-gate:1",
-    "atKST": "2026-11-06T07:25:51+09:00",
+    "atKST": "2026-11-06T08:06:43+09:00",
     "source": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
     "base": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
     "sourceBranch": "agent/codex/fleet5-b-contract-rev4-20261106",
@@ -2846,9 +2872,9 @@
     "dependencyReason": "resource sequence: one active Claude code/contract reviewer; no generic approval needed",
     "reviewerIntended": "Claude",
     "reviewDispatch": "ctx_c1e01403f409",
-    "reviewState": "DISPATCHED_PENDING_ACTUAL_RESULT",
-    "actualVerdict": null,
-    "ownerQuestionPending": "msg_ede52e676ef7",
+    "reviewState": "COMPLETED_ACTUAL_REVISION_REQUIRED",
+    "actualVerdict": "REVISION REQUIRED B4-M1/M2 and L1-L4; no partialfreeze/codegrant",
+    "ownerQuestionPending": null,
     "priorActualReview": "638109ab211bdfab7646a07b375003a636b3a33b",
     "priorVerdict": "e993 REVISION REQUIRED B3-M1/M2/M3 and L1-L6",
     "concreteRootRev4Decision": "msg_94ff5bb7a0e6",
@@ -2866,20 +2892,105 @@
       "A1A16": "PENDING"
     },
     "reviewScope": "whole coupled rev4: source caller closure/unknowns, perNode approval renew+reapprove, closed gateAck/keychallenge/PoP/controllerreceipt/nonbusiness scope, canonical lock-only principals and all-writer grants, CAS alias/lostcommit, rawclock/capability",
-    "currentOwnerAuthorization": "DOCS/schema/static only; no partialfreeze or B code/registration until actual verdict",
+    "currentOwnerAuthorization": "narrow rev5 DOCS/schema/static/sourceanalysis only; no B code or canonicalregistration",
     "actualRealBindings": "NULL/HOLD",
     "canonicalRegistration": false,
     "wholeProductAcceptance": false,
     "actualOwnerHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/2a08284a97fb8cd40c9e6de5c923c7864a7f76af/docs/vault/30_Development/History/2026-11-06_FLEET5_B_contract_revision4_Codex.md",
-    "nextAction": "actual independent whole rev4 verdict/ownDocs then Root concrete acceptance or namedrevision; no B code yet",
+    "nextAction": "Codex actual rev5 source-writer/matrix/locks/gate-lineage/signing-capability/time fixtures then ownDocs and one actual delta review",
     "reviewTerminal": "term_76abbb46-339b-47c2-8603-04826dde6a8d",
     "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
     "dependencySettled": true,
     "dependencyWorkerDone": "msg_400b4fddfdf6",
     "actualReviewer": "Claude",
-    "workerStartReceipt": "ready after exact K1 reviewer succeeded/settled and guarded release/exited proof"
+    "workerStartReceipt": "ready after exact K1 reviewer succeeded/settled and guarded release/exited proof",
+    "actualIndependentReview": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "reviewDocs": 42124324426,
+    "reviewJob": 127584485150,
+    "rootVerifiedReviewExactHeadRefAllJobsSuccess": true,
+    "actualReviewTaskOutcome": "succeeded",
+    "actualReviewWorkerDone": "msg_13ef4231b8e7",
+    "reviewResource": "actual worker-show succeeded/settled/exited/released",
+    "answeredOwnerQuestion": "msg_ede52e676ef7",
+    "currentOwnerReply": "msg_03544733c9f3",
+    "closedDesignDirections": [
+      "per-Node approval renewal/reapproval",
+      "closed gateAck/keychallenge/PoP/controllerreceipt/nonbusiness scope",
+      "B3 L1/L2/L4/L5 directions",
+      "SD lock-only direction"
+    ],
+    "actualReviewHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/14c7c936e056c685e85ee8f34f6185aa27ed9a2c/docs/vault/30_Development/History/2026-11-06_07-45-00_KST_FLEET5_B_contract_rev4_2a08284a_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md"
   },
   "K1C6fFullCoreActualObservation": "k1-c6f-full-core-root-observation.json",
   "K1QualifiedOldCodeCIReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
-  "K1ActualVerdictDirectReply": "msg_2a098fb1f4d3"
+  "K1ActualVerdictDirectReply": "msg_2a098fb1f4d3",
+  "broadBRevision4ActualReview": {
+    "schemaVersion": "fleet5-b-rev4-root-review-gate:1",
+    "atKST": "2026-11-06T08:06:43+09:00",
+    "source": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
+    "base": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
+    "sourceBranch": "agent/codex/fleet5-b-contract-rev4-20261106",
+    "sourceDocs": 42118500179,
+    "rootVerifiedExactSourceHeadRefAllJobsSuccess": true,
+    "uniqueDocsOnlyAdds": 39,
+    "productDiffVs72028": 0,
+    "actualReviewTask": "task_72d23bdd01a8",
+    "dependency": [
+      "task_5627222e0f59"
+    ],
+    "dependencyReason": "resource sequence: one active Claude code/contract reviewer; no generic approval needed",
+    "reviewerIntended": "Claude",
+    "reviewDispatch": "ctx_c1e01403f409",
+    "reviewState": "COMPLETED_ACTUAL_REVISION_REQUIRED",
+    "actualVerdict": "REVISION REQUIRED B4-M1/M2 and L1-L4; no partialfreeze/codegrant",
+    "ownerQuestionPending": null,
+    "priorActualReview": "638109ab211bdfab7646a07b375003a636b3a33b",
+    "priorVerdict": "e993 REVISION REQUIRED B3-M1/M2/M3 and L1-L6",
+    "concreteRootRev4Decision": "msg_94ff5bb7a0e6",
+    "ownerReportedOnly": {
+      "statefulSchemaStaticRightsPasses": 476,
+      "sourcePythonGitObjects": 494,
+      "expandedFiles": 185,
+      "DBORMCandidates": 2933,
+      "helperEdges": 615,
+      "aliasBindings": 823,
+      "unresolvedStaticReceivers": 1374,
+      "causalCensusRemovals": 5,
+      "rawLogHashes": 14,
+      "actualNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+      "A1A16": "PENDING"
+    },
+    "reviewScope": "whole coupled rev4: source caller closure/unknowns, perNode approval renew+reapprove, closed gateAck/keychallenge/PoP/controllerreceipt/nonbusiness scope, canonical lock-only principals and all-writer grants, CAS alias/lostcommit, rawclock/capability",
+    "currentOwnerAuthorization": "narrow rev5 DOCS/schema/static/sourceanalysis only; no B code or canonicalregistration",
+    "actualRealBindings": "NULL/HOLD",
+    "canonicalRegistration": false,
+    "wholeProductAcceptance": false,
+    "actualOwnerHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/2a08284a97fb8cd40c9e6de5c923c7864a7f76af/docs/vault/30_Development/History/2026-11-06_FLEET5_B_contract_revision4_Codex.md",
+    "nextAction": "Codex actual rev5 source-writer/matrix/locks/gate-lineage/signing-capability/time fixtures then ownDocs and one actual delta review",
+    "reviewTerminal": "term_76abbb46-339b-47c2-8603-04826dde6a8d",
+    "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+    "dependencySettled": true,
+    "dependencyWorkerDone": "msg_400b4fddfdf6",
+    "actualReviewer": "Claude",
+    "workerStartReceipt": "ready after exact K1 reviewer succeeded/settled and guarded release/exited proof",
+    "actualIndependentReview": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "reviewDocs": 42124324426,
+    "reviewJob": 127584485150,
+    "rootVerifiedReviewExactHeadRefAllJobsSuccess": true,
+    "actualReviewTaskOutcome": "succeeded",
+    "actualReviewWorkerDone": "msg_13ef4231b8e7",
+    "reviewResource": "actual worker-show succeeded/settled/exited/released",
+    "answeredOwnerQuestion": "msg_ede52e676ef7",
+    "currentOwnerReply": "msg_03544733c9f3",
+    "closedDesignDirections": [
+      "per-Node approval renewal/reapproval",
+      "closed gateAck/keychallenge/PoP/controllerreceipt/nonbusiness scope",
+      "B3 L1/L2/L4/L5 directions",
+      "SD lock-only direction"
+    ],
+    "actualReviewHistoryImmutableURL": "https://github.com/egparadise/SaintVision-Invion/blob/14c7c936e056c685e85ee8f34f6185aa27ed9a2c/docs/vault/30_Development/History/2026-11-06_07-45-00_KST_FLEET5_B_contract_rev4_2a08284a_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md"
+  },
+  "broadBRevision5Decision": "b-rev5-root-decision.json",
+  "root426CIObserverRecovery": "root426-ci-observer-recovery.json",
+  "K1CorrectedTemporalSourceObservation": "k1-temporal-root-source-observation.json"
 }

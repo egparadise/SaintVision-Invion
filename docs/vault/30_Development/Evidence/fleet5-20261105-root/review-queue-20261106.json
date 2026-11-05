@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T07:34:16+09:00",
+  "atKST": "2026-11-06T08:06:43+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,15 +12,9 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": {
-    "task": "task_72d23bdd01a8",
-    "dispatch": "ctx_c1e01403f409",
-    "source": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
-    "scope": "ONE actual whole B rev4 coupled contract review",
-    "state": "ready actual dispatch"
-  },
+  "active": null,
   "pending": null,
-  "authorParallelWork": "K1 author directly received real c2b M1/M2/L1-L5 verdict and prepares isolated fix; oldc6f FULLCore completed and report37fe verified; Claude B rev4 reviewrunning",
+  "authorParallelWork": "B author actually read concrete rev5 reply and began new rev5 branch; K1 corrected56651 published with ownDocsSUCCESS/Core inprogress",
   "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "corrected K1 immutable source+CI; queue one delta review after current B review",
+  "nextActualReviewTrigger": "exact corrected K1 source56651 own CI gate; one actual Claude delta review; then B rev5 only after finalsource/Docs",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -60,5 +54,16 @@
     "resource": "succeeded/settled thenreleased/exited"
   },
   "K1OldCodeFullCore": "42113810160 SUCCESS; not corrected-code CI or codeacceptance",
-  "K1DirectReply": "msg_2a098fb1f4d3"
+  "K1DirectReply": "msg_2a098fb1f4d3",
+  "completedB4": {
+    "task": "task_72d23bdd01a8",
+    "dispatch": "ctx_c1e01403f409",
+    "source": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
+    "review": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+    "Docs": 42124324426,
+    "verdict": "REVISION REQUIRED B4-M1/M2 and L1-L4; no partialfreeze/codegrant",
+    "workerDone": "msg_13ef4231b8e7",
+    "resource": "succeeded/settled/exited/released"
+  },
+  "BRev5Reply": "msg_03544733c9f3"
 }
