@@ -1,0 +1,87 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_bab09fcf8dc7 / ctx_88febf51813a (coordinator relay: review Codex 22fa3628 and pin CP Docker Desktop target)",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T15:27:00+09:00", "2026-11-05T15:33:00+09:00"],
+  "provenanceClarificationForPriorReport": {
+    "priorCommit": "53f5722f",
+    "field": "worker-readiness-review.json firstWaveSummaryAvailable=false and intro sentence",
+    "meaning": "describes the INITIAL review stage 15:06-15:15 KST only; Codex packet b1bacdd3 was later actually received and reviewed in the exact-vector section of the same History",
+    "priorEvidenceOverwritten": false,
+    "rootAcceptanceScope": "observations and review findings, not execution acceptance"
+  },
+  "reviewedCommit": "22fa3628248280801281779b6a934fa6ff83e8f0",
+  "reviewedBase": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
+  "integrityChecks": {
+    "publicPlanBlobSHA256": {"expected": "846a5b5c14049048a63cdfa062330d9ac7b27f6b4ad5410cf1c667617e19182c", "matched": true},
+    "privateExecutionVectorsSHA256": {"expected": "a9c6d1e353f1e42fe80423f614625fe8f6ab97ac78722c0c3b71f85a91008c4f", "bytes": 24740, "matched": true},
+    "privateParametersSHA256Matched": true,
+    "sourceArchiveSHA256Matched": true,
+    "toolTreeHead": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "toolTreeTrackedChanges": 0,
+    "vectorSteps": 12,
+    "vectorStepsExecuted": 0,
+    "hostedDocsCI": {"run": 41980284535, "head": "22fa3628", "conclusion": "success"}
+  },
+  "wordingDelta": {
+    "files": ["deploy/lan/README.md", "deploy/lan/prepare-worker.sh", "tests/core/test_lan_worker_config.py"],
+    "numericGuardUnchanged": ">= (1,45)",
+    "verdict": "PASS",
+    "officialCrossCheck": {"desktop4290Engine": "v26.0.0", "desktop4280Engine": "v25.0.3"}
+  },
+  "priorFindingStatus": [
+    {"id": "P1", "status": "OPEN", "conflictsWithRootDecision": true, "evidence": "plan newCAPolicy=fresh development pilot self-signed; step 05 init has no external CA options; root chose fresh f5 external intermediate at first init (CA immutable after init)"},
+    {"id": "P2", "status": "OPEN", "evidence": "no DOCKER-USER/conntrack vector and no w1/w2 sudo -n read-only capability classification vector"},
+    {"id": "P3", "status": "PARTIAL", "evidence": "step 07 DOCKER_BUILDKIT=0 with abort if legacy builder unavailable; Go modules still network-fetched (go.sum pinned)"},
+    {"id": "P4", "status": "OPEN", "evidence": "postgres digest 1a6ab3f5 pinned; no PG_MAJOR/server_version major-16 evidence in plan or vectors"},
+    {"id": "P5", "status": "OPEN", "evidence": "6 Windows steps use r5-reviewed-source-03e17c31 .venv python and r5 known_hosts.pinned read-only; no -B/PYTHONDONTWRITEBYTECODE"},
+    {"id": "R2", "status": "OPEN", "severity": "Low", "evidence": "step 02 creates unmounted workspaces directory with no consumer"},
+    {"id": "R5", "status": "RESOLVED", "evidence": "History states hard filesystem quota is not configured"},
+    {"id": "P6-P8", "status": "NOT_RECHECKED_THIS_PASS"}
+  ],
+  "laterCorrectionDraftReceived": {"message": "msg_e0847905db9f", "publicPlanSHA256": "efb418758504f84e46269bb311ca0e730d77d4da8d81d4f5769238c781fe3faf", "privateVectorsSHA256": "f01fc3b1c722722ba6aa92cbb54a0ceae6ccd603a2e12b07660cb24ffbce5813", "correctionCommitPublished": false, "reviewed": false, "note": "verdicts in this file apply only to 22fa3628/846a5b5c/a9c6d1e3; Codex-reported P2 sudo -n auth-required BLOCKED not independently verified"},
+  "packetVerdict": {"wording": "PASS", "executionPacket": "NOT_PASS (P1, P2, P4, P5)", "nextReviewOn": "new hashes after owner folds root-directed fixes"},
+  "dockerDesktopTarget": {
+    "researchedAtKST": "2026-11-05T15:30:21+09:00/15:32:21+09:00",
+    "recommended": {"version": "4.98.0", "released": "2026-11-03", "windowsAmd64Build": 245422, "revalidateLatestAtExecution": true},
+    "installerURL": "https://desktop.docker.com/win/main/amd64/245422/Docker%20Desktop%20Installer.exe",
+    "installerHEAD": {"http": 200, "contentLength": 623748528, "lastModified": "Mon, 02 Nov 2026 17:15:08 GMT"},
+    "checksumURL": "https://desktop.docker.com/win/main/amd64/245422/checksums.txt",
+    "installerSHA256": "cd6273d9eaa4f07fa7593fc6813d37e1004381cebc3f26047a2554fa5db24388",
+    "authenticodeSignatureVerified": false,
+    "engine": {"lastStatedInReleaseNotes": "v29.9.2 (Desktop 4.96.1)", "engine29_3MinAPILoweredTo": "1.40", "docsExample": "Engine 29.9.3 API 1.56 minimum 1.40", "nodeAgentChosenAPI": "1.45", "compatible": true, "authoritativeGate": "post-install docker version server API and MinAPIVersion"},
+    "windows": {"required": "Windows 11 Pro/Enterprise/Education 23H2 build 22631+", "cpBuild": 26300, "meets": true, "lanmanServerAutomaticMeasured": false},
+    "wsl": {"installMinimum": "2.1.5", "cpVersion": "2.4.12", "meetsInstallMinimum": true, "cve_2026_112917_fixRequires": "WSL 3.0.3+", "cpMeetsFixRequirement": false, "updateNeedsAdminAndMayRestart": true},
+    "migrationConsiderations": [
+      "CP uses two-distro docker-desktop + docker-desktop-data layout; 4.30 introduced experimental provisioning without the data distro",
+      "4.31.0 known issue: data created with 4.8.0 or lower becomes invisible after upgrade (docker/for-win#14118)",
+      "~80 minor-version jump from 4.16.3; official backup guidance is docker_data.vhdx before reinstall/upgrade; backup not authorized in this task",
+      "engine restart stops 7 other-product running containers including clinical Saintview: needs product-owner window and separately authorized backup",
+      "keep per-machine install mode; plan for docker-users group, sign-out and WSL restart",
+      "host free RAM 0.55-1.13 GB vs .wslconfig 6GB: post-upgrade start headroom must be measured"
+    ],
+    "rollback4163": {
+      "officialPolicy": "versions older than six months are not available for download; 4.16.3 release-note entry has no download link",
+      "observedHEAD": {"atKST": "2026-11-05T15:31:34+09:00", "build": 96739, "http": 200, "contentLength": 623223120, "lastModified": "Mon, 30 Jan 2023 10:38:07 GMT"},
+      "observedChecksumSHA256": "5f6db3cf5a2084fc7c584c90792f38a0caac91c4eed4f8653dde7bb8148517f1",
+      "verdict": "currently reachable but not policy-guaranteed; signature unverified",
+      "fullRollbackAvailable": false,
+      "reason": "downgrade requires uninstalling newer version and Engine 29 data is not supported back on Engine 20.10; only a pre-upgrade authorized vhdx backup plus 4.16.3 reinstall would be a usable rollback, and no such backup exists"
+    },
+    "sources": [
+      "https://docs.docker.com/desktop/release-notes/",
+      "https://docs.docker.com/desktop/setup/install/windows-install/",
+      "https://docs.docker.com/desktop/troubleshoot-and-support/faqs/releases/",
+      "https://docs.docker.com/engine/release-notes/29/",
+      "https://docs.docker.com/reference/api/engine/",
+      "https://docs.docker.com/desktop/settings-and-maintenance/backup-and-restore/"
+    ]
+  },
+  "currentTaskMutations": {"downloadsOfInstallerBody": 0, "installs": 0, "stops": 0, "exports": 0, "backups": 0, "authenticationAttempts": 0, "r5PinsAutomationsRegistryBoards": 0},
+  "nextFirstAction": [
+    {"owner": "Codex", "action": "re-cut packet: f5 external intermediate at first init (P1), w1/w2 sudo -n read-only classification (P2), PG major evidence (P4), r5-separate venv/known_hosts (P5); deliver new hashes via root or active dispatch"},
+    {"owner": "Claude", "action": "exact-vector re-review on new hashes"},
+    {"owner": "root coordinator", "action": "keep CP upgrade a separate approval stage gated on product-owner window, authorized vhdx backup, WSL 3.0.3+, LanmanServer, installer hash/signature and post-install API measurement; fix policy-vs-quota Low in own docs"}
+  ]
+}
