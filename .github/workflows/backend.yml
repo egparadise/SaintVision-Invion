@@ -148,7 +148,12 @@ jobs:
               'restartCount': 4,
               'rolledBack': True,
           }
+          assert lifecycle['finalized'] is True
           assert lifecycle['finalizedAttestationVerified'] is True
+          assert lifecycle['installRestartReceipt'] is True
+          assert lifecycle['rolledBack'] is True
+          assert type(lifecycle['restartCount']) is int
+          assert type(lifecycle['bytecodeCacheCount']) is int
           PY
 
       - name: Kill the standalone leaf-runtime guard mutations

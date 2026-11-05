@@ -9,4 +9,8 @@ backend-contract-green.xml -text -whitespace
 backend-boolean-identity-red.txt -text -whitespace
 backend-boolean-identity-green.txt -text -whitespace
 # Downloaded JUnit and the explicitly redacted public derivative are evidence.
-d073-*.xml -text -whitespace
+d073-core-tests.redacted.xml -text -whitespace
+d073-lan-installer-tests.xml -text -whitespace
+d073-lan-pilot-database-real-pg.xml -text -whitespace
+low-b1-b2-red-corrected-fixture.txt -text -whitespace
+low-b1-b2-green.txt -text -whitespace

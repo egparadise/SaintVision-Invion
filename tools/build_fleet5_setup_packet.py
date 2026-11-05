@@ -38,6 +38,17 @@ def build(source):
         raise ValueError("An exact full source commit SHA is required")
     if git("rev-parse", source + "^{commit}").decode().strip() != source:
         raise ValueError("Source commit does not resolve exactly")
+    # Validate Git's authoritative modes before creating any output. A 120000
+    # blob is a symbolic link even if Windows has never materialized that link.
+    expected = {}
+    for entry in git("ls-tree", "-rz", "--full-tree", source).split(b"\0"):
+        if not entry:
+            continue
+        metadata, name = entry.split(b"\t", 1)
+        mode, kind, blob = metadata.split()
+        if kind != b"blob" or mode not in {b"100644", b"100755"}:
+            raise ValueError("Unsupported Git mode " + mode.decode() + "; source requires regular blobs")
+        expected[name.decode("utf-8")] = {"gitBlobSHA1": blob.decode(), "mode": mode.decode()}
     work = ROOT / ".work" / "fleet5-setup-integration"
     if any(p.is_symlink() for p in (ROOT / ".work", work)):
         raise ValueError("Task output directory must not be redirected")
@@ -46,15 +57,6 @@ def build(source):
     output.mkdir(exist_ok=False)  # Preserve any prior or partial attempt.
     archive = output / ("fleet5-candidate-source-" + source + ".zip")
     subprocess.run(["git", "archive", "--format=zip", "--output=" + str(archive), source], cwd=ROOT, check=True)
-    expected = {}
-    for entry in git("ls-tree", "-rz", "--full-tree", source).split(b"\0"):
-        if not entry:
-            continue
-        metadata, name = entry.split(b"\t", 1)
-        mode, kind, blob = metadata.split()
-        if kind != b"blob":
-            raise ValueError("Unsupported non-blob source tree entry")
-        expected[name.decode("utf-8")] = {"gitBlobSHA1": blob.decode(), "mode": mode.decode()}
     inventory = []
     with zipfile.ZipFile(archive) as bundle:
         files = [item for item in bundle.infolist() if not item.is_dir()]

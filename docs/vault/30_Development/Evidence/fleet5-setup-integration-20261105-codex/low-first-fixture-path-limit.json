@@ -1,0 +1,19 @@
+{
+  "scope": "INITIAL_DISPOSABLE_FIXTURE_FAILURE_ONLY",
+  "rawBytesPreservedIgnored": true,
+  "rawSHA256": "99c34155fa88f2e4b90d5cb4ae023f13db99e9ef980507269fc559f9e4638fbf",
+  "exit": 1,
+  "failed": 12,
+  "passed": 32,
+  "cause": "Three builder fixtures hit Windows Git path length; nine field type regressions were real",
+  "correction": "Only the disposable fixture repository sets core.longpaths=true; no host/global Git/OS setting changed",
+  "correctedSourceRed": {
+    "failed": 10,
+    "passed": 34,
+    "exit": 1
+  },
+  "green": {
+    "passed": 44,
+    "exit": 0
+  }
+}

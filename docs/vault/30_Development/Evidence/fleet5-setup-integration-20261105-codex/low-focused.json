@@ -1,0 +1,26 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_build_fleet5_setup_packet.py",
+    "tests/test_backend_leaf_runtime_contract.py",
+    "tests/test_fleet5_setup_packet.py",
+    "tests/test_core_workflow_cx01.py",
+    "tests/test_intranet_pki.py",
+    "--basetemp=.work/fleet5-setup-integration/b1-b2-final",
+    "--junitxml=.work/fleet5-setup-integration/b1-b2-final.xml"
+  ],
+  "startedAtKST": "2026-11-05T20:47:35.989107+09:00",
+  "finishedAtKST": "2026-11-05T20:49:08.965722+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "low-focused.txt",
+  "sourceAtStart": "18293b54de465c351c16ed6dfb4b3a8859797117",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

@@ -1,0 +1,51 @@
+{
+  "scope": "B3_ACTUAL_RAW_DIAGNOSTICS_BINDING_ONLY",
+  "observedAtKST": "2026-11-05T20:42:48.161402+09:00",
+  "reviewCommit": "f012b206f9505bf93fc5d57f7ca2713a68dbbb6f",
+  "baseReadbackCommit": "18293b54de465c351c16ed6dfb4b3a8859797117",
+  "hashSemantics": "SHA256 of complete original raw file bytes; Git SHA1 is blob object ID, both independently read back",
+  "diagnostics": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/backend-42011550328-failure-run.json",
+      "bytes": 8824,
+      "sha256": "d5e68d1c8e0ea70a74dd1974f40bf5213ebb6484b35243aec7656dd2ba729ec7",
+      "gitBlobSHA1": "3db4241c7d1159d3b49f77cfd8cbca92ab9e7bc6",
+      "workingBytesEqualCommittedBlob": true,
+      "originalBytesChanged": false,
+      "reviewedSourceBlobIds": {
+        "9a8f9a504bdbb39e6fc28c26c45427bab1d56543": "3db4241c7d1159d3b49f77cfd8cbca92ab9e7bc6",
+        "1e6491468dd0ba72f57e7fc807be1e57b307024c": "3db4241c7d1159d3b49f77cfd8cbca92ab9e7bc6"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/backend-contract-red.xml",
+      "bytes": 3195,
+      "sha256": "a44d2cb670c8f0f6d433ffd422fc2c862fb391d187747f10f1738262f8b3f317",
+      "gitBlobSHA1": "cfcd71b31dc098becf4abaabb57da0870c6141a1",
+      "workingBytesEqualCommittedBlob": true,
+      "originalBytesChanged": false,
+      "reviewedSourceBlobIds": {
+        "9a8f9a504bdbb39e6fc28c26c45427bab1d56543": "cfcd71b31dc098becf4abaabb57da0870c6141a1",
+        "1e6491468dd0ba72f57e7fc807be1e57b307024c": "cfcd71b31dc098becf4abaabb57da0870c6141a1"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/backend-contract-green.xml",
+      "bytes": 727,
+      "sha256": "109a5cf76bfaade6bb15415c3d8eeb3c2eee129395fecc8b3f9fff614fb96fc9",
+      "gitBlobSHA1": "f8788326622151884a047c1ece08b2e129c7908c",
+      "workingBytesEqualCommittedBlob": true,
+      "originalBytesChanged": false,
+      "reviewedSourceBlobIds": {
+        "9a8f9a504bdbb39e6fc28c26c45427bab1d56543": "f8788326622151884a047c1ece08b2e129c7908c",
+        "1e6491468dd0ba72f57e7fc807be1e57b307024c": "f8788326622151884a047c1ece08b2e129c7908c"
+      }
+    }
+  ],
+  "historicalClaimsRewritten": false,
+  "rawFilesRewritten": false,
+  "reviewedSources": [
+    "9a8f9a504bdbb39e6fc28c26c45427bab1d56543",
+    "1e6491468dd0ba72f57e7fc807be1e57b307024c"
+  ]
+}

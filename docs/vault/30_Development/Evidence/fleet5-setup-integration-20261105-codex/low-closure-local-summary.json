@@ -1,0 +1,49 @@
+{
+  "scope": "B1_B2_B3_BOUNDED_LOW_IMPLEMENTATION_ONLY",
+  "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+  "base": "18293b54de465c351c16ed6dfb4b3a8859797117",
+  "actualReviewerCommit": "f012b206f9505bf93fc5d57f7ca2713a68dbbb6f",
+  "observedAtKST": "2026-11-05T20:52:46.629843+09:00",
+  "B1": "Git mode/kind preflight before all output;120000 rejected with no OS symlink materialization/no .work output;regular644/755 exact source/packet readback accepted",
+  "B2": "exact6field equality preserved plus four isTrue checks and two type(x)isint checks; meaningful malformed values/keyset cases",
+  "B3": "three original raw diagnostic byte/SHA256/Gitblob bindings independently matched both exact reviewed9a8 and1e sources; original files/claims unchanged",
+  "red": {
+    "failed": 10,
+    "passed": 34,
+    "exit": 1,
+    "fixtureCorrectionDisclosed": true
+  },
+  "greenB1B2": {
+    "passed": 44,
+    "skipped": 0,
+    "exit": 0
+  },
+  "finalFocused": {
+    "passed": 75,
+    "skipped": 0,
+    "exit": 0,
+    "seconds": 80.03
+  },
+  "localGateExits": {
+    "low-b1-b2-green": 0,
+    "low-contracts": 0,
+    "low-docs": 0,
+    "low-focused": 0,
+    "low-frontend": 0,
+    "low-ontology-generation": 0,
+    "low-ontology": 0,
+    "low-paths": 0,
+    "low-ratchet": 0,
+    "low-sync": 0
+  },
+  "newSourceCI": "NOT_YET_DISPATCHED",
+  "newIndependentDeltaReview": "REQUEST_PENDING_ROOT",
+  "nativeGoP0Gate": "OPEN_IMPLEMENTATION_NOT_PUBLISHED_OR_ACCEPTED",
+  "newLongCoreFullEightFinalArchiveOrDeployment": false,
+  "oldPacketsUnmodified": true,
+  "sharedBoardsRegistryChanged": false,
+  "obsidianApply": false,
+  "low-b1-b2-red-corrected-fixture.txtSHA256": "62757a5d98a74b6a08225cba6a6a882c22c3aee7d92ce6401157b3158c9271ee",
+  "low-b1-b2-green.txtSHA256": "82c171447978658673dd50204e2da1b5beaf11723211a697e13b1965512d0ed1",
+  "raw-diagnostic-bindings-b3.jsonSHA256": "4abe8dc2898d9aa09fc0bfcf316caae76c2752f77e557fb0e51be23c5fba4d6d"
+}

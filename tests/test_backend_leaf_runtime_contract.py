@@ -48,3 +48,30 @@ def test_backend_refuses_absent_or_failed_node_finalization_attestation(proof):
         value["finalizedAttestationVerified"] = proof
     with pytest.raises(AssertionError):
         _validate_as_workflow(value)
+
+
+@pytest.mark.parametrize("field,bad", [
+    (field, bad)
+    for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+    for bad in (1, 1.0, False, "true", None)
+] + [
+    ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+] + [
+    ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+])
+def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+    value = dict(VERIFIED_LIFECYCLE)
+    value[field] = bad
+    with pytest.raises(AssertionError):
+        _validate_as_workflow(value)
+
+
+@pytest.mark.parametrize("field", list(VERIFIED_LIFECYCLE))
+def test_backend_requires_the_exact_lifecycle_key_set(field):
+    missing = dict(VERIFIED_LIFECYCLE)
+    del missing[field]
+    with pytest.raises(AssertionError):
+        _validate_as_workflow(missing)
+    extra = {**VERIFIED_LIFECYCLE, "unrecognized": True}
+    with pytest.raises(AssertionError):
+        _validate_as_workflow(extra)

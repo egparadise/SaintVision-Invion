@@ -1,0 +1,276 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_3529eefa626c / ctx_ba275b06ce0c (+ msg_a7b4f55a9ca8 delta 1e649146, msg_517aa4ba1530 1e packet, msg_c811f47cc4a1 P0)",
+  "reviewer": "Claude",
+  "author": "Codex (integration)",
+  "observedWindowKST": [
+    "2026-11-05T19:35:00+09:00",
+    "2026-11-05T20:40:00+09:00"
+  ],
+  "reviewed": {
+    "frozen": {
+      "commit": "9a8f9a504bdbb39e6fc28c26c45427bab1d56543",
+      "tree": "914ad2dd04c86067a6c68bbfa9988eb8496d46ea",
+      "intermediate": "bf32acda47e232f1279a58c433de887e6e522102"
+    },
+    "delta": {
+      "commit": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+      "nonDocs": [
+        ".github/workflows/backend.yml +1",
+        "tests/test_backend_leaf_runtime_contract.py params +1 and +\"true\""
+      ]
+    },
+    "readFrom": "Git objects only; author .work packets copied read-only"
+  },
+  "mergeAttribution": {
+    "R4": {
+      "commits": [
+        "17447988",
+        "e62a4828"
+      ],
+      "files": [
+        "deploy/lan/worker_workspace.py",
+        "tests/core/test_lan_workspace_upgrade.py"
+      ]
+    },
+    "DB": {
+      "commits": [
+        "864b4907",
+        "d18f076e"
+      ],
+      "files": [
+        "deploy/lan/prepare-pilot-database.sh",
+        "tests/integration/test_lan_pilot_database_real_pg.py",
+        ".github/workflows/core.yml",
+        "tests/test_core_workflow_cx01.py"
+      ]
+    },
+    "rotation": {
+      "commit": "2fb52bbe",
+      "files": [
+        "deploy/lan/worker_leaf_rotation.py",
+        "deploy/lan/leaf_rotation_standalone_runtime.py",
+        "tools/lan_pilot.py",
+        "tools/check_leaf_rotation_standalone_lifecycle.py",
+        "4 rotation test files"
+      ]
+    },
+    "firstWave": {
+      "commit": "22fa3628",
+      "files": [
+        "deploy/lan/prepare-worker.sh",
+        "tests/core/test_lan_worker_config.py"
+      ]
+    },
+    "readme": "equals 2fb52bbe README plus exact 22fa3628 delta",
+    "new": [
+      "tools/build_fleet5_setup_packet.py",
+      "tests/test_fleet5_setup_packet.py",
+      "tests/test_backend_leaf_runtime_contract.py",
+      ".github/workflows/backend.yml +1"
+    ],
+    "blobIdenticalToReviewed": true
+  },
+  "toolingPairs": {
+    "card150DiffVs59f": [
+      "toolGitBlobSHA1/prepare-pilot-database.sh",
+      "toolGitBlobSHA1/lan_pilot.py",
+      "toolSHA256/prepare-pilot-database.sh",
+      "toolSHA256/lan_pilot.py"
+    ],
+    "prepare": [
+      "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+      "a5695cab0a955d0aeeedf40f6459458ccef6210a"
+    ],
+    "lanPilot": [
+      "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+      "3d205d52a377b52163240b824c1e6a092346e867"
+    ],
+    "historicalFieldsUnchanged": true,
+    "worker": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+    "launcherPinMatches": true
+  },
+  "packet9a8f": {
+    "hashesMatched": {
+      "archive": "b29aad0995ffcc911137da4b07bbbb611cd7f7eb365cf6d02c3b9cc15120bc28",
+      "packet": "77848cdcd4f3cec244a656dfe168e2c0fc3e21ac1d3bfe5dfea6d4f217bd36e7",
+      "manifest": "663e11c172e28f816e661238ac6ce276ba03fc925d7204926dea97e34783d5a0",
+      "inventory": "f935f8c07e2c62008fcdb402de7fe96902727dc9b19430359403b930c91bfe2d",
+      "setupPlan": "c5eefcc99eadf8b79f4368135e913671c41b14102b7eecb2b646013d848a9bfd"
+    },
+    "archiveRegeneratedByClaudeSHA256": "b29aad0995ffcc911137da4b07bbbb611cd7f7eb365cf6d02c3b9cc15120bc28",
+    "entries": 4279,
+    "everyBlobRecomputed": true,
+    "modes": {
+      "100644": 4277,
+      "100755": 2
+    },
+    "symlinks": 0,
+    "submodules": 0,
+    "unsafePaths": 0,
+    "gitOrWorkPaths": 0,
+    "packetMembers": [
+      "source zip",
+      "candidate-source-manifest.json",
+      "source-inventory.json",
+      "setup-plan.json",
+      "NOTICE.txt"
+    ],
+    "testzip": "ok",
+    "secretScan": {
+      "filesWithPrivateKeyMarker": 20,
+      "completeBlocksBodyLen": "8-16 chars non-base64 placeholders",
+      "realKeyMaterial": false
+    },
+    "plan": {
+      "executed": false,
+      "queryExecuted": false,
+      "countsAllNull": true,
+      "settlement": "UNKNOWN_NO_F5_STATE",
+      "initialization": "ALL_FIVE_TOGETHER_AFTER_READY",
+      "independentLinuxSlots": 4,
+      "cpExcludedFromS05S07": true,
+      "topology": "FOUR_PLAIN_WORKSPACE_NODES_NO_SHARED_STORAGE_MOUNT",
+      "pc4ShareActive": false,
+      "resourceEnforcedAsHostQuota": false
+    },
+    "verifierSHA256": "7a4053fb28680d76d2c2f0927b5525519155a6fd32ec5386a250a26c2e3eb72a",
+    "appliesTo": "9a8f only; not a 1e64 artifact"
+  },
+  "booleanProbe": {
+    "probeSHA256": "406ce8729656f39c02c365dc9973c022fdf2f2a645be9fcb4ea32b88762bba0a",
+    "method": "AST-extract lifecycle asserts from each commit's backend.yml blob and exec with test values",
+    "9a8f": {
+      "attestInt1": "ACCEPT",
+      "attestFloat1": "ACCEPT",
+      "missing/False/str/None/int0/extra": "reject",
+      "gapPresent": true
+    },
+    "1e64": {
+      "attestInt1/Float1/str/None/int0/missing/False/extra": "reject",
+      "exact": "ACCEPT",
+      "gapClosed": true
+    },
+    "residualBothCommits": {
+      "finalized=1": "ACCEPT",
+      "installRestartReceipt=1": "ACCEPT",
+      "rolledBack=1.0": "ACCEPT",
+      "restartCount=4.0": "ACCEPT",
+      "bytecodeCacheCount=False|0.0": "ACCEPT"
+    }
+  },
+  "focusedTests": {
+    "files": [
+      "tests/test_backend_leaf_runtime_contract.py",
+      "tests/test_fleet5_setup_packet.py",
+      "tests/test_core_workflow_cx01.py",
+      "tests/test_intranet_pki.py"
+    ],
+    "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider",
+    "9a8f": "34 passed",
+    "1e64": "36 passed"
+  },
+  "rawBytes": {
+    "nestedGitattributes": "6 exact names -text -whitespace, no wildcards; root .gitattributes unchanged vs 59f",
+    "failedLog": {
+      "bytes": 20760,
+      "sha256": "ff05d630c94f0e83663008ca2e4864215aff3bcc1cbd0a8a17ea0d2dadb18290",
+      "equalsGhLogFailedBytes": true,
+      "equalsRecorded": true
+    },
+    "redTxtGreenTxt": "CRLF local captures; blob sha256 equal recorded",
+    "unrecordedHashes": [
+      "backend-42011550328-failure-run.json",
+      "backend-contract-red.xml",
+      "backend-contract-green.xml"
+    ]
+  },
+  "goRuntimeP0Candidate": {
+    "status": "CONFIRMED baseline defect (my static analysis + contract owner native Linux Go proof 5023ce7d)",
+    "facts": [
+      "tools/lan_pilot.py:2030-2049 (also ~2151/~3308) overlap and final policies share version=target_version with different expiresAt/clientFingerprints; same in 59f",
+      "deploy/lan/worker_leaf_rotation.py:199 _policy requires version==targetChannelVersion for both",
+      "services/node-agent/runtime/journal.go:341-366 PinPeerPolicy rejects same version with different hash (NODE-0041)",
+      "services/node-agent/transport/trust.go:67-93 policy() hashes raw and pins before expiry check; NewAuthority and per-connection Authorize call policy()",
+      "services/node-agent/cmd/inv-node/main.go:88-108 NewAuthority before TLS/storage/listener"
+    ],
+    "implication": "after overlap is pinned, writing same-version final policy should make Authorize fail and, after docker restart, NewAuthority fail before listener; affects first normal finalize, not only consecutive",
+    "pythonFixturesProve": false,
+    "owner": "ctx_6f0f8253b8a7 real Linux Go Journal+Authority proof and contract fix; floor must not be weakened",
+    "acceptedGoNormalCycle": false,
+    "nativeProof": {
+      "commit": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+      "probeCommit": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+      "result": "attempted 2, completed 0; same-version finals NODE-0041; expired v10 pinned before rejection",
+      "coreRun": {
+        "id": 42014770700,
+        "conclusion": "failure (intended proof failure)"
+      }
+    },
+    "p0ContractReview": "Evidence/fleet5-20261105-claude/p0-peer-phase-contract-review.json"
+  },
+  "verdicts": {
+    "9a8f_sourceIntegrationAndArtifact": "ACCEPT-WITH-FINDINGS (Boolean attestation gap present in 9a8f)",
+    "1e64_delta": "ACCEPT (Boolean gap closed only at 1e64)",
+    "lows": [
+      "B1 builder does not reject mode 120000 symlink blobs (none present)",
+      "B2 other five lifecycle fields type-lax",
+      "B3 three raw diagnostics lack recorded hashes"
+    ],
+    "p0Candidate": "CONFIRMED; both 9a8f and 1e64 acceptances carry the Go blocker; repair direction ACCEPT-AS-ARCHITECTURE with M1-M10 (separate review)",
+    "ci": "none accepted; Backend 42011550328 (d0735809) failure preserved; 1e64 Docs 42015020044 success, Backend 42015010474 in_progress at 20:14 KST (not counted); no all-8 for 9a8f or 1e64",
+    "physicalAcceptance": "none",
+    "1e64_intermediatePacket": "ACCEPT binding (non-executing, not final freeze)"
+  },
+  "currentTaskMutations": {
+    "productionOrSourceEdits": 0,
+    "stateReset": 0,
+    "physical": 0,
+    "remote": 0,
+    "CA": 0,
+    "privateKeys": 0,
+    "hostDockerWSL": 0,
+    "authorWorkspaceWrites": 0,
+    "localTempWorktrees": "added and removed"
+  },
+  "nextFirstAction": [
+    {
+      "owner": "root",
+      "action": "use 1e64 as next source; decide B1-B3; keep all-8/landing/deploy HOLD until P0 :3 repair implemented, Claude-reviewed and native Go two-cycle green; new exact SHA packet + 8 CI"
+    },
+    {
+      "owner": "ctx_6f0f8253b8a7",
+      "action": "implement schema :3 P0 repair per M1-M10 and publish native Go two-cycle proof"
+    },
+    {
+      "owner": "Codex",
+      "action": "optional B1/B2"
+    },
+    {
+      "owner": "Claude",
+      "action": "review P0 implementation delta and next candidate packet"
+    }
+  ],
+  "packet1e64": {
+    "status": "INTERMEDIATE non-executing; not final freeze",
+    "hashesMatched": {
+      "packet": "a17531b052d4fc757708cbb2463d4cce75c428acf46b6ba7e6903ed57eceb71e",
+      "manifest": "c1389e4dd8c0b347058cd2cf5235cb8585e97eaa79f42bd308d5d46fa92a5933",
+      "archive": "c45bba26c2da1a783c14af8d8b43dbbbf95288494c6a12a4197bb4a365bcad55"
+    },
+    "archiveRegeneratedByClaudeSHA256": "c45bba26c2da1a783c14af8d8b43dbbbf95288494c6a12a4197bb4a365bcad55",
+    "tree": "59e51e664b693ba6dcb1cdcaa788273db651bb1a",
+    "entries": 4290,
+    "everyBlobRecomputed": true,
+    "symlinks": 0,
+    "submodules": 0,
+    "unsafePaths": 0,
+    "gitOrWorkPaths": 0,
+    "inventoryRecomputed": true,
+    "setupPlanSameAs9a8f": "c5eefcc99eadf8b79f4368135e913671c41b14102b7eecb2b646013d848a9bfd",
+    "packetMembers": 5,
+    "realKeyMaterial": false,
+    "verifierSHA256": "7a4053fb28680d76d2c2f0927b5525519155a6fd32ec5386a250a26c2e3eb72a",
+    "appliesTo": "1e64 only; 9a8f packet is not a 1e64 artifact"
+  }
+}

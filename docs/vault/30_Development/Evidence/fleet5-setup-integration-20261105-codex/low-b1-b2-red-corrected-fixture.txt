@@ -1,0 +1,219 @@
+F.......FF........FF...FF...F....FF.........                             [100%]
+================================== FAILURES ===================================
+_ test_git_symlink_mode_refused_before_any_output_without_materializing_link __
+
+tmp_path = WindowsPath('D:/Project/SaintVisionI-Invion/fleet5-setup-integration-20261105/.work/fleet5-setup-integration/b1-b2-red-v2/test_git_symlink_mode_refused_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EB828F1480>
+
+    def test_git_symlink_mode_refused_before_any_output_without_materializing_link(tmp_path, monkeypatch):
+        sentinel = tmp_path / "outside-sentinel"
+        sentinel.write_bytes(b"untouched")
+        repo, source = _source(tmp_path, monkeypatch, "120000")
+        assert not (repo / "source-link").exists()
+        assert b"120000 blob" in _git(repo, "ls-tree", "-r", source)
+>       with redirect_stdout(io.StringIO()), pytest.raises(ValueError, match="120000"):
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_build_fleet5_setup_packet.py:54: Failed
+___ test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1] ___
+
+field = 'finalized', bad = 1
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+__ test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1.0] __
+
+field = 'finalized', bad = 1.0
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1] _
+
+field = 'installRestartReceipt', bad = 1
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1.0] _
+
+field = 'installRestartReceipt', bad = 1.0
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+__ test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-1] ___
+
+field = 'rolledBack', bad = 1
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-1.0] __
+
+field = 'rolledBack', bad = 1.0
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-4.0] _
+
+field = 'restartCount', bad = 4.0
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-False] _
+
+field = 'bytecodeCacheCount', bad = False
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+_ test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-0.0] _
+
+field = 'bytecodeCacheCount', bad = 0.0
+
+    @pytest.mark.parametrize("field,bad", [
+        (field, bad)
+        for field in ("finalized", "finalizedAttestationVerified", "installRestartReceipt", "rolledBack")
+        for bad in (1, 1.0, False, "true", None)
+    ] + [
+        ("restartCount", bad) for bad in (4.0, True, False, "4", None)
+    ] + [
+        ("bytecodeCacheCount", bad) for bad in (False, 0.0, True, "0", None)
+    ])
+    def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
+        value = dict(VERIFIED_LIFECYCLE)
+        value[field] = bad
+>       with pytest.raises(AssertionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AssertionError
+
+tests\test_backend_leaf_runtime_contract.py:65: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_build_fleet5_setup_packet.py::test_git_symlink_mode_refused_before_any_output_without_materializing_link
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1.0]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1.0]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-1]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-1.0]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-4.0]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-False]
+FAILED tests/test_backend_leaf_runtime_contract.py::test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-0.0]
+10 failed, 34 passed in 4.55s
