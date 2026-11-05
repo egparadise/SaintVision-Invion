@@ -1,0 +1,172 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-event:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "sequence": 12,
+      "previousEventSHA256": "f3655884e2f7d5332d99ee443c3f4ffc45f4560eba4c1981437c55b494f8cd87",
+      "operationId": "fixture-operation-migration",
+      "idempotencyKey": "ff94375804bae999f1ce639dd667aa960e33a8614e4529bfeeaf97c9577cb7ed",
+      "requestSHA256": "a9953410b0ae13350f48c68046d299305c1fed6cf4dbc73cc99bd2f726bcf13a",
+      "recordedAt": "2030-01-01T00:00:00Z",
+      "phase": "NEW_STARTED_UNVERIFIED",
+      "fenceEpoch": 1,
+      "leaseEnvelopeSHA256": "2fbecf53279796dd0b7e1721755bd77c45e435ae3e6d94bbfbe7e5db8e378a82",
+      "memberStates": [
+        {
+          "slot": "PC2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "NEW_STARTED_UNVERIFIED",
+          "oldContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+          "backupContainerId": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+          "newContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+          "latestEvidence": [
+            {
+              "artifactSHA256": "48d72dec588455306bf210d183d7718803730e546297154c7a63a062eb384c87",
+              "scopeSHA256": "9637ae0c5324096046767eb24bba53ba6b0399ab0997824630bf01bbfe5f5fa1",
+              "observedAt": "2030-01-01T00:00:00Z",
+              "validUntil": "2030-01-01T00:01:00Z",
+              "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+              "contractId": "saintvision-proof-member-progress-evidence:1",
+              "signatureDomainASCII": "saintvision/proof/member-progress-evidence/v1",
+              "producerRole": "owned-host-adapter",
+              "signerRole": "host-helper",
+              "contractSHA256": "90dfcf110ea84cda0a2ba18e62828b8c30b374226af793286f9dccbf750e2b28",
+              "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+              "typedSubject": {
+                "kind": "member-progress-evidence",
+                "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+                "migrationId": "fixture-first-migration",
+                "scope": {
+                  "tenantId": "fixture-tenant",
+                  "nodeId": "fixture-node-0",
+                  "recoveryEpoch": "fixture-existing-epoch"
+                },
+                "phase": "NEW_STARTED_UNVERIFIED",
+                "operationId": "fixture-operation-migration",
+                "sequence": 12
+              }
+            }
+          ]
+        },
+        {
+          "slot": "PC4",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "phase": "OLD_RESTART_NO",
+          "oldContainerId": "356d2f0efac3c9e236a6c1f7b0b92d8841b967806499e2e1c1976ead9bb82d1a",
+          "backupContainerId": null,
+          "newContainerId": null,
+          "latestEvidence": [
+            {
+              "artifactSHA256": "48d72dec588455306bf210d183d7718803730e546297154c7a63a062eb384c87",
+              "scopeSHA256": "8d52515782fd105603503ce77a64211e06accce7d4aa0920e8e078667be3b047",
+              "observedAt": "2030-01-01T00:00:00Z",
+              "validUntil": "2030-01-01T00:01:00Z",
+              "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+              "contractId": "saintvision-proof-member-progress-evidence:1",
+              "signatureDomainASCII": "saintvision/proof/member-progress-evidence/v1",
+              "producerRole": "owned-host-adapter",
+              "signerRole": "host-helper",
+              "contractSHA256": "90dfcf110ea84cda0a2ba18e62828b8c30b374226af793286f9dccbf750e2b28",
+              "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+              "typedSubject": {
+                "kind": "member-progress-evidence",
+                "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+                "migrationId": "fixture-first-migration",
+                "scope": {
+                  "tenantId": "fixture-tenant",
+                  "nodeId": "fixture-node-1",
+                  "recoveryEpoch": "fixture-existing-epoch"
+                },
+                "phase": "OLD_RESTART_NO",
+                "operationId": "fixture-operation-migration",
+                "sequence": 12
+              }
+            }
+          ]
+        }
+      ],
+      "effect": {
+        "kind": "start",
+        "targetSlot": "PC2",
+        "intentEventSHA256": "f3655884e2f7d5332d99ee443c3f4ffc45f4560eba4c1981437c55b494f8cd87",
+        "receipt": {
+          "artifactSHA256": "126ba249528c0f1efa7d95f2a3e594475675c6d6c963b6ad92cdd82119841377",
+          "scopeSHA256": "5f37f0f3185446dc64bb8e5b171e5a3317e7b4b375e14c848c47a93bf7a4e4b1",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "migration-event:/body/effect/receipt",
+          "contractId": "saintvision-proof-migration-effect-readback:1",
+          "signatureDomainASCII": "saintvision/proof/migration-effect-readback/v1",
+          "producerRole": "owned-engine-adapter",
+          "signerRole": "host-helper",
+          "contractSHA256": "3b43e95f7a331c0a325c8d068488a62b9d58fedc574306791e8e470b53dad557",
+          "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+          "typedSubject": {
+            "kind": "migration-effect-readback",
+            "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+            "migrationId": "fixture-first-migration",
+            "operationId": "fixture-operation-migration",
+            "sequence": 12,
+            "method": "startNew",
+            "effectKind": "start",
+            "targetSlot": "PC2",
+            "intentEventSHA256": "f3655884e2f7d5332d99ee443c3f4ffc45f4560eba4c1981437c55b494f8cd87",
+            "outcome": "known-success"
+          }
+        }
+      },
+      "evidence": [
+        {
+          "artifactSHA256": "f8d52b07820c144e3f9d6740b4eec1da469327f4acb2fb6c96769d10c7d5b62c",
+          "scopeSHA256": "d9d662500bb2245b278bff709297306c2266719d7a190fcd035e6e18668ae089",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "migration-event:/body/evidence/*",
+          "contractId": "saintvision-proof-migration-event-evidence:1",
+          "signatureDomainASCII": "saintvision/proof/migration-event-evidence/v1",
+          "producerRole": "owned-host-adapter",
+          "signerRole": "host-helper",
+          "contractSHA256": "5925266e634f3b632e3f06a96df65a12b8df1383ebd4de6e4a00f56ed329c374",
+          "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+          "typedSubject": {
+            "kind": "migration-event-evidence",
+            "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+            "migrationId": "fixture-first-migration",
+            "operationId": "fixture-operation-migration",
+            "sequence": 12,
+            "phase": "NEW_STARTED_UNVERIFIED",
+            "method": "startNew",
+            "recordKind": "outcome"
+          }
+        }
+      ],
+      "inventoryEnvelopeSHA256": null,
+      "terminalSealEnvelopeSHA256": null,
+      "failureReason": "none",
+      "method": "startNew",
+      "recordKind": "outcome",
+      "priorPhase": "NEW_START_INTENT",
+      "sealedHistory": false,
+      "inventoryPublishedHistory": false,
+      "targetSlot": "PC2"
+    },
+    "signer": {
+      "role": "host-helper",
+      "keySPKISHA256": "a91319a210bd60af85c5928b01dc3ff9d9fec8ffb5768d9abc1bd3ae7ea991e1",
+      "signatureHex": "f3e9788dd38e40151f0514b462eb7b62db3d92655448c9cd4a14926435f626d9f92e44e849bb8d06c22d684d7c16589e18f5a4e4aa8474e20ed759a2c79eb0a8"
+    }
+  }
+}

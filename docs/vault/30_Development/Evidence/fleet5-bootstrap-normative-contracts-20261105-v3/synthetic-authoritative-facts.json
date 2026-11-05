@@ -1,0 +1,73 @@
+{
+  "fixtureOnly": true,
+  "productionTrust": false,
+  "cohortId": "fixture-cohortId",
+  "nativeFixtureCohortSHA256": "6ca3e5e6472a6843e436a774db02b1d48442f7f22c9727b217790c4a019ffd3d",
+  "compatibilityFixtureSHA256": "9b584954bfe62ffa71dab7aaff6b7294e28271cffdc7c5aad908fbb3b1eb24cd",
+  "scheduleIds": [
+    "286d975e-75e2-4e54-b1fb-2805f7d68959",
+    "a3a9e396-3b48-4aaa-8b73-f8377670f968",
+    "3e08faa1-4e85-4877-8b13-5645178b41b8"
+  ],
+  "scheduleConfigsAndTargetsSHA256": "dc7bf6936b452cb0974ff36af4f4d2c7b78d433ec85aa6764c8b3eccdc4081e8",
+  "registeredSurfacesSHA256": "e4ef8dffe05aa97123b3484cad702cd8b72f8e48b5b4e88da3a1b87ac635540d",
+  "observedSurfaceSetSHA256": "cfbee4b95847b0465d687ccd27f03943d2a8afaa42abe9995ea27d71205a4893",
+  "cpInventoryRegistrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472",
+  "migrationOperationId": "fixture-operation-migration",
+  "nodes": {
+    "PC2": {
+      "observerNonce": "5cd00104e9ea494286ae5f43cc36cb826a5b80c4d9f9370d74de4d62e4bc31a3",
+      "execId": "19951afa96c893fd6275b713942993be3b62169e2fefe34d0647366368d0a002",
+      "observerArgv": [
+        "/inv-node",
+        "--observe-peer-policy-floor",
+        "--state",
+        "/fixture-goJournalPath",
+        "--peer-policy",
+        "/fixture-state/peer-policy.json",
+        "--tls-cert",
+        "/fixture-state/node-cert.pem",
+        "--tls-key",
+        "/fixture-state/node-key.pem",
+        "--tenant",
+        "fixture-tenant",
+        "--node",
+        "fixture-node-0",
+        "--epoch",
+        "fixture-existing-epoch",
+        "--peer-floor-nonce",
+        "5cd00104e9ea494286ae5f43cc36cb826a5b80c4d9f9370d74de4d62e4bc31a3"
+      ],
+      "processGenerationSHA256": "59bb99cb3a12e08f153d05340b51085dcc56ee25f7d9c3cc713e79e050af1fbf",
+      "servingContainerId": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+      "servingDaemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5"
+    },
+    "PC4": {
+      "observerNonce": "ef77a56438c9922245bebe5de6ac148857ffc308c882e7b21bf244266e6ab7ac",
+      "execId": "f2a1a4ecce940896ac94d888cfaceb3ff085ffc84ecb98d70135992eb63a0ba1",
+      "observerArgv": [
+        "/inv-node",
+        "--observe-peer-policy-floor",
+        "--state",
+        "/fixture-goJournalPath",
+        "--peer-policy",
+        "/fixture-state/peer-policy.json",
+        "--tls-cert",
+        "/fixture-state/node-cert.pem",
+        "--tls-key",
+        "/fixture-state/node-key.pem",
+        "--tenant",
+        "fixture-tenant",
+        "--node",
+        "fixture-node-1",
+        "--epoch",
+        "fixture-existing-epoch",
+        "--peer-floor-nonce",
+        "ef77a56438c9922245bebe5de6ac148857ffc308c882e7b21bf244266e6ab7ac"
+      ],
+      "processGenerationSHA256": "d7b1b80e3a0e860df8f20be50abd3b60a00c6660c52232607de6a9584da9d803",
+      "servingContainerId": "06784dd35657ce880ad5da7bbcf809353996d94ad7f536275f39f79d5fce4423",
+      "servingDaemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493"
+    }
+  }
+}

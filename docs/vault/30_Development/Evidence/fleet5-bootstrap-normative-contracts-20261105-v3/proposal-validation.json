@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "fleet5-v3-required-gates:1",
+  "base": "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+  "task": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "scope": "NONEXECUTING Low delta; no registered contracts/implementation/operations",
+  "gates": [
+    {
+      "name": "frozen-product",
+      "argv": [
+        "git",
+        "diff",
+        "--exit-code",
+        "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+        "--",
+        "deploy",
+        "services",
+        "tools",
+        "tests",
+        "contracts",
+        "packages",
+        ".github",
+        "skills",
+        "docs/task-registry.json"
+      ],
+      "startKST": "2026-11-06T02:16:16.424851+09:00",
+      "endKST": "2026-11-06T02:16:18.933822+09:00",
+      "exitCode": 0,
+      "output": "",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "frozen-cb3-prior-plans-boards",
+      "argv": [
+        "git",
+        "diff",
+        "--exit-code",
+        "cb3b8aee288ab41bd23b070d7bd0eb3bf34ad4c7",
+        "--",
+        "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v1",
+        "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v2",
+        "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105",
+        "docs/vault/30_Development/History/2026-11-05_FLEET5_bootstrap_normative_contract_proposal_Codex.md",
+        "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_contracts_v2_review_revision_Codex.md",
+        "docs/vault/30_Development/History/2026-11-05_FLEET5_legacy_capability_bootstrap_plan_Codex.md",
+        "docs/vault/00_Index",
+        "docs/vault/30_Development/Agent? ??"
+      ],
+      "startKST": "2026-11-06T02:16:18.934775+09:00",
+      "endKST": "2026-11-06T02:16:19.644133+09:00",
+      "exitCode": 0,
+      "output": "",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "docs",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-06T02:16:19.644577+09:00",
+      "endKST": "2026-11-06T02:16:51.992666+09:00",
+      "exitCode": 0,
+      "output": "PASS: 24 original hashes, 1214 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "rawOutputSHA256": "06dbe2cd40fd2d4c2d44459447893409de6e1211d49bf1ada6091bf4abb3cd4a"
+    },
+    {
+      "name": "ontology-generation",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "startKST": "2026-11-06T02:16:51.993340+09:00",
+      "endKST": "2026-11-06T02:16:54.281050+09:00",
+      "exitCode": 0,
+      "output": "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation\r\n",
+      "rawOutputSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150"
+    },
+    {
+      "name": "ontology",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startKST": "2026-11-06T02:16:54.281570+09:00",
+      "endKST": "2026-11-06T02:16:56.209238+09:00",
+      "exitCode": 0,
+      "output": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "rawOutputSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+    },
+    {
+      "name": "contract-bindings",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "startKST": "2026-11-06T02:16:56.209713+09:00",
+      "endKST": "2026-11-06T02:17:11.426083+09:00",
+      "exitCode": 0,
+      "output": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "rawOutputSHA256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed"
+    },
+    {
+      "name": "frontend-integrity",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startKST": "2026-11-06T02:17:11.426887+09:00",
+      "endKST": "2026-11-06T02:17:14.055917+09:00",
+      "exitCode": 0,
+      "output": "Scanning 94 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "rawOutputSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949"
+    },
+    {
+      "name": "single-source-ratchet",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-06T02:17:14.056448+09:00",
+      "endKST": "2026-11-06T02:17:18.425712+09:00",
+      "exitCode": 0,
+      "output": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "rawOutputSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+    },
+    {
+      "name": "doc-path-ratchet",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "f0278daffa616cae4485e4b1d4c07671715892dc"
+      ],
+      "startKST": "2026-11-06T02:17:18.426184+09:00",
+      "endKST": "2026-11-06T02:17:50.366743+09:00",
+      "exitCode": 0,
+      "output": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "rawOutputSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+    },
+    {
+      "name": "sync-check-only",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startKST": "2026-11-06T02:17:50.367486+09:00",
+      "endKST": "2026-11-06T02:18:14.215163+09:00",
+      "exitCode": 0,
+      "output": "CHECK: 2447 managed files, 144 pending exports, 0 conflicts. No writes.\r\n",
+      "rawOutputSHA256": "c5205f1477c6be3a92818a60bde91e1812d17e6a22d1ce8a6167443f0e28816b"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD"
+      ],
+      "startKST": "2026-11-06T02:18:14.215895+09:00",
+      "endKST": "2026-11-06T02:18:17.192170+09:00",
+      "exitCode": 0,
+      "output": "",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "thisWorkerCoreProductGoCryptoRuntimeCases": 0,
+  "ObsidianApply": false,
+  "artifactHashes": {
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/actual-bindings-HOLD.json": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/api-request.schema.json": "a11f4c09cfd1c01292f87c41915d08f6fe255b6da27dcbfeed4084edde20bc99",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/crossartifact-recipe-results.json": "ac7550dc3cd48d2538e86595ced02bf87e4f13d468d4b2fc320bfbd61ee6328f",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/document-authoring-provenance.json": "04dcb972f59a648b3d8e981155f4d192c7de76071636d06227069cb0c9963a4c",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/document-validation.json": "04524907d6231a7cc1c056e0a47575f9e4c7145ba82dff3e9191da13661be121",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/failure-receipt-positive.json": "fd4d028b657290989ae610b6a692ddf106b33c9e6a604550911de53e1c179767",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/info-negative-fixtures.json": "ce171db6952624add69343484ef9587f5a27c971afef783f3ef1331c45f16b9e",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/low-delta-contract.md": "7702bb2ce04bed9d927aa51e24c4dc8c814b4237c4a1677da805fc477f9d071a",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-event.schema.json": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-journal.schema.json": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/operation-lease.schema.json": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/proof-slot-registry.json": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/recipe-definitions.json": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/recipe-negative-fixtures.json": "faaffb5291cf876c0fc0b0ce105c6ab3fed3b764784220c3b526ff1a447ac10c",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/review-response.json": "af54bd03fde8301ee44d3ad80e79a78169bc642f88a287dec7a18151ecc8d1d4",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/runtime-inventory.schema.json": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/schema-dependency-document-hashes.json": "0f447260bc789cb97a6ba36cfb32b36d68de971916c42650ae2a4375efaa3bc2",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/successor-plan.schema.json": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-api-requests.json": "48e072e2c7b55323c324672717e1b0ef809f406e8d2344e5f761e6223c4cd9a4",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-authoritative-facts.json": "7965faf5352b445ee8ca2a22b9e50aeeaa9527ec0badbfc449346876c93c5785",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-migration-event.json": "c6459c3d77d4510cdea1d49bb49c393eaeddcd3a2e6ceac4f9a13d0fa6e8e1df",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-migration-journal.json": "0ae61d3ff90fe215d17137199b3c4f94a0b00363067e64ce4588732e88fcf202",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-operation-lease.json": "fa3c0ebb745faa9a0ca1580e632573b1135c6c5384cfafd8e0edcce0e302753b",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-postseal-predecessor.json": "01b47b1757325ce0cb389ba06904afc658e52e1d9ecdba2b85b22935af26e984",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-postseal-unknown.json": "2535553dee769181da04296895857de0ba7b3b71e9fd7dd9decdf06de127fce5",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-pretrusted-policy.json": "c4de48ca6fe32e6877e5bd0619db30a0c4ea963abd5edfe6146cd8564d4cac33",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-restore-lease.json": "a5fa366975a6338f06d61ecb854f5b086024c375be36d1a52e88158d5edf0fb7",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-runtime-inventory.json": "f7dc73bba2034025eb9d1c758d1977c6082eaac4020e26bc2fbff584ea3ab174",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-successor-plan.json": "8712805e11eecaad559d70e067bca4bfb7fb312b1970fcb430547ed482c159a8",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-terminal-seal-PC4.json": "6e9d5a72793c5427c36117459550bda8b9527d9820cbcfd44aa9a329533c9822",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-terminal-seal.json": "cadd069c45509c2c30f4bbbc87c155603aadcc5957a4f592abe388d8ee789302",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/terminal-seal.schema.json": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/transition-negative-fixtures.json": "6bba8f4285e835a11b6ec884c03250468a12a089bd0f9b85ce5fb6693ab5b233",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/transition-positive-fixtures.json": "4973577953c0bca75eae946964666222f101d2c081e2d78744f5c576d09757b1",
+    "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/trust-bootstrap-contract.json": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869"
+  },
+  "historySHA256": "57f1dd1981b1db83ab8232c88915be38136247132595c7ebc180aaaa8af59730",
+  "overallExitCode": 0
+}

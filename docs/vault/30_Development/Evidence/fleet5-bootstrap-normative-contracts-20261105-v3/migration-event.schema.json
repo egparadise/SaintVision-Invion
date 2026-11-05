@@ -1,0 +1,1538 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v3/migration-event.schema.json",
+  "allOf": [
+    {
+      "$ref": "../v2/migration-event.schema.json"
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "UNRECORDED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "UNRECORDED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "UNRECORDED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "RESERVED",
+                  "FENCE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "FENCE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "RESERVED",
+                  "FENCE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_RESTART_NO"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_STOP_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_RESTART_NO"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_STOPPED_QUIESCENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_STOPPED_QUIESCENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_STOPPED_QUIESCENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "CAPTURED",
+                  "PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "CAPTURED",
+                  "PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_CREATE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_CREATED",
+                  "NEW_START_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_START_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_CREATED",
+                  "NEW_START_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_STARTED_UNVERIFIED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_STARTED_UNVERIFIED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "NEW_STARTED_UNVERIFIED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "INVENTORY_PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "RESTART_RESTORE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "priorPhase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "targetSlot": {
+                "const": "PC2"
+              },
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "not": {
+                      "const": "none"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "targetSlot": {
+                    "const": "PC2"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "targetSlot": {
+                "const": "PC4"
+              },
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "not": {
+                      "const": "none"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "targetSlot": {
+                    "const": "PC4"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "recordKind": {
+                "const": "failure"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "receipt": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "properties": {
+                          "typedSubject": {
+                            "properties": {
+                              "outcome": {
+                                "enum": [
+                                  "unknown",
+                                  "known-failure",
+                                  "not-attempted"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "receipt": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "properties": {
+                          "typedSubject": {
+                            "properties": {
+                              "outcome": {
+                                "const": "known-success"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "NONEXECUTING v3 overlay; base v2 immutable. Offline resource registration required; no network schema discovery."
+}

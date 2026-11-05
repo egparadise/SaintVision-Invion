@@ -1,0 +1,619 @@
+{
+  "fixtureOnly": true,
+  "checks": [
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/acceptedP0/buildProvenance",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/acceptedP0/coreCI/attestation",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/acceptedP0/backendCI/attestation",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/acceptedP0/independentReview/receipt",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/image/distributionProof",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "recipe": "image-distribution",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/migrationHelper/buildProvenance",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/migrationHelper/coreCI/attestation",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/migrationHelper/backendCI/attestation",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/migrationHelper/independentReview/receipt",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/commonFence/buildProvenance",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/commonFence/coreCI/attestation",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/commonFence/backendCI/attestation",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/commonFence/independentReview/receipt",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/runtimeInventoryAPI/buildProvenance",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/schema3Helper/buildProvenance",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/schema3Helper/coreCI/attestation",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/schema3Helper/backendCI/attestation",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/schema3Helper/independentReview/receipt",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/newRenewalGuard/buildProvenance",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/newRenewalGuard/coreCI/attestation",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/newRenewalGuard/backendCI/attestation",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/newRenewalGuard/independentReview/receipt",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/nativeTwoCycleProof",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "recipe": "native-two-cycle",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/oldNewNoWriteCompatibility",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "recipe": "old-new-no-write",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/m2CapabilityProof",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "recipe": "m2-capability",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/rootG2Decision",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "recipe": "g2-planning-policy",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/independentPlanReview",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "recipe": "independent-plan-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/rootPublicationIntent",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "recipe": "root-publication-intent",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/scheduleDisabledReadback",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "recipe": "schedule-disabled-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/allLaunchSurfaces",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "recipe": "launch-surface-inventory",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/noOverlap",
+      "slotId": "successor-plan:/body/noOverlap",
+      "recipe": "no-overlap",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "successor-plan",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "migration-event",
+      "pointer": "/body/memberStates/0/latestEvidence/0",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "recipe": "member-progress-evidence",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "migration-event",
+      "pointer": "/body/memberStates/1/latestEvidence/0",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "recipe": "member-progress-evidence",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "migration-event",
+      "pointer": "/body/effect/receipt",
+      "slotId": "migration-event:/body/effect/receipt",
+      "recipe": "migration-effect-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "migration-event",
+      "pointer": "/body/evidence/0",
+      "slotId": "migration-event:/body/evidence/*",
+      "recipe": "migration-event-evidence",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "operation-lease",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/target/buildProvenance",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "recipe": "build-provenance",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/target/coreCI/attestation",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/target/backendCI/attestation",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "recipe": "ci-attestation",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/target/independentReview/receipt",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "recipe": "independent-code-review",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/image/distributionProof",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "recipe": "image-distribution",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/signedM2",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "recipe": "node-floor-v2",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/mtls",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "recipe": "unchanged-mtls",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/protectedStateEquality",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "recipe": "protected-tree-equality",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/execReceipt",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "recipe": "owned-engine-exec",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "recipe": "runtime-inspection-before",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/0/runtimeInspectionAfterM2",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "recipe": "runtime-inspection-after",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/signedM2",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "recipe": "node-floor-v2",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/mtls",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "recipe": "unchanged-mtls",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/protectedStateEquality",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "recipe": "protected-tree-equality",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/execReceipt",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "recipe": "owned-engine-exec",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "recipe": "runtime-inspection-before",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/members/1/runtimeInspectionAfterM2",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "recipe": "runtime-inspection-after",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "runtime-inventory",
+      "pointer": "/body/previousInventoryHead/readbackProof",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "terminal-seal",
+      "pointer": "/body/bootstrapM2",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "recipe": "node-floor-v2",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "terminal-seal",
+      "pointer": "/body/bootstrapMTLS",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "recipe": "unchanged-mtls",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "terminal-seal",
+      "pointer": "/body/bootstrapM2",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "recipe": "node-floor-v2",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "terminal-seal",
+      "pointer": "/body/bootstrapMTLS",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "recipe": "unchanged-mtls",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "operation-lease",
+      "pointer": "/body/expectedInventoryHead/readbackProof",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/rootExecutionDecision",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "recipe": "root-execution-decision",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/quiescence",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "recipe": "process-quiescence",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/signedM2",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "recipe": "node-floor-v2",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/mtls",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "recipe": "unchanged-mtls",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/protectedStateEquality",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "recipe": "protected-tree-equality",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/execReceipt",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "recipe": "owned-engine-exec",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/rootSealDecision",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "recipe": "root-seal-decision",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/rootRestoreDecision",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "recipe": "root-restart-restore",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/expectedInventoryHead/readbackProof",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "recipe": "inventory-head-readback",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    },
+    {
+      "artifact": "api-request",
+      "pointer": "/arguments/allDescendantsQuiescent",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "recipe": "descendant-quiescence",
+      "result": "MATCH_DERIVED_SOURCE_FIELDS"
+    }
+  ],
+  "source": "Published containing documents + explicit dummy authoritative facts, interpreted recipe DSL; NEVER compare typedSubject to self templates",
+  "registeredSlots": 77,
+  "embeddedChecks": 87,
+  "negativeCases": 501,
+  "cryptographicOrRuntimeVerification": false
+}

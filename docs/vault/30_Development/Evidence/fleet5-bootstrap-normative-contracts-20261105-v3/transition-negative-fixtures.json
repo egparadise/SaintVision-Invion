@@ -1,0 +1,3495 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "inspectAndValidate:readback",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "reserve:readback",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "setOldRestartNo:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "stopOld:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "captureFenced:readback",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "preserveOld:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "createNew:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "startNew:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "verifyBootstrap:readback",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "publishInventory:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_RESTORE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "seal:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:intent",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PROVENANCE_LOCKED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "FENCE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOP_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_STOPPED_QUIESCENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "CAPTURED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "OLD_PRESERVED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATE_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_CREATED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_START_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "NEW_STARTED_UNVERIFIED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLICATION_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "INVENTORY_PUBLISHED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEAL_INTENT",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "SEALED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "RESTART_POLICY_RESTORED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "READY_FOR_NEW_RENEWAL_PLAN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "BLOCKED_FORWARD_ONLY",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "QUIESCENCE_UNKNOWN",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC2",
+      "value": "PC4",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "restoreNewRestartPolicy:outcome",
+      "pointer": "/body/effect/targetSlot",
+      "topTarget": "PC4",
+      "value": "PC2",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "readState:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "readState:readback",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "release:outcome",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    },
+    {
+      "baseCase": "release:readback",
+      "pointer": "/body/priorPhase",
+      "value": "UNRECORDED",
+      "expected": "REJECT_SCHEMA"
+    }
+  ]
+}

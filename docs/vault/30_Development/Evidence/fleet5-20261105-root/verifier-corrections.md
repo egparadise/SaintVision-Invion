@@ -1,11 +1,11 @@
 ---
 doc_id: "EVIDENCE-FLEET5-20261105-ROOT-VERIFIER-CORRECTIONS"
 title: "FLEET5 운영 검증기 정정과 실패 보존"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T02:02:07+09:00"
+updated: "2026-11-06T02:33:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,3 +34,5 @@ source_of_truth: "Git"
 - 집계 draft에서 shared Card150의 네 tool pointer가 새 소스로 바뀌었으나 Root checkout 제품은 구59f이므로 잘못된 pin 조합이다. private 사본과 exact4필드 비교를 남기고 이 파일만 coordinator HEAD의 바이트로 복구했다. 새 도구 pin은 실제 결합 후보 담당자가 원래 metadata와 함께 검증하며 집계 보고가 제품 반영을 대신하지 않는다. 위 Unicode/격리의 당시 미확인 상태는 역사 관측으로 보존하고 최신4f 실제 코드 수락/전체CI 성공은 별도 receipt로 확정했다.
 
 - 최종 stage 검사에서 새로 집계한 과거 pytest traceback 두 원문에 E-line 후행 공백3개가 있어 exit2였다. 앞선 working-tree diff 검사는 untracked 파일을 포함하지 않았다. 원문 hash/바이트를 그대로 보존하고 해당 두 basename에만 blank-at-eol 예외를 명시했다. 다른 파일이나 whitespace 규칙은 바꾸지 않았으며 최종 staged 검사 성공을 별도로 확인한다.
+
+- Root414 첫 path ratchet은 집계한 B History의4f source 경로2개가 구59f 제품 checkout에 없어 exit1이었다. 원래100f는4f 계열 source에서 유효하다.4f Git object의 실제142/192·144/149행을 읽고 집계 사본만 immutable GitHub 링크로 정정했으며 source bytes hash와 wrapper hash/1.0.1을 기록했다. 제품 파일을 보고 branch로 복사하거나 baseline을 올리지 않았고 원래 제안과 검토 대상100f는 그대로다.

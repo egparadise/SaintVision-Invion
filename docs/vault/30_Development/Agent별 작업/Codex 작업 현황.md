@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.374"
+version: "1.0.375"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T02:10:53+09:00"
+updated: "2026-11-06T02:31:21+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "P0 source4f independently accepted and fullCI green; frozen report3af complete; actual combined assembly active; cb3 design Low closure and hardware blockers remain"
-active_card_next: "Integrator freezes new combined candidate and all8CI; Claude actual70f7502b ACCEPT optionalf0af tests; next combined delta review; planowner closes cb3 N-L4/N-L5; BroadB docs proposal; operations HOLD"
+active_card_status: "Combined72028 immutable and6of8 CI success; three separate actual Claude reviews cover combined packet/source, bootstrapv3 Low closure and BroadB architecture; real operations HOLD"
+active_card_next: "Integrator preserves72028 and collects terminalBackend/Core; Claude tasks_ba0ee0a71106/eaa694171f31/3516267fa05f return actual verdicts; Root replies pending18c3 and2259 with concrete design/ownership decision after review"
 ---
+
+## 2026-11-06 통합72028과 전환·BroadB 실제 검토 담당
+
+작업한 것:72028의 고정 source/tree/remote·4개 non-doc delta·f0af 미포함을 Git으로 확인하고 실제8개 CI의 exacthead를 대조했다. 확인한 것:02:25에6개 lane 성공/Backend·Core 진행 중이며 all8/결합 검토 수락은 아직 없다. 전환5d0753/Docs42073588927과 BroadB100f/Docs42074468349는 문서 전용이며 Root가 exacthead·전체 job 성공을 확인했다. 다음 첫 행동/담당: Claude task_ba0ee0a71106은 결합 source/packet, 별도 task_eaa694171f31은 전환 N-L4/N-L5+Info, 별도 task_3516267fa05f는 B-FRESH1 아키텍처를 실제 검토한다. Root는 pending msg_18c3e56963c1/msg_2259b60e2c6c를 실제 판정 전 열린 상태로 두고 결과 후 계약·ABI·구현 owner를 구체 결정한다. 기존3자동갱신 disabled/새 leaf0, 장비 차단과 원래48-task/VFCL 상태는 유지한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-06 P0 납품 수락과 다음 담당
 

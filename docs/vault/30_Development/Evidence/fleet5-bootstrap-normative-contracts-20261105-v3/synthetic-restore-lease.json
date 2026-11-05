@@ -1,0 +1,88 @@
+{
+  "fixtureOnly": true,
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-agent-mutation-fence:1",
+      "leaseId": "fixture-restore-lease",
+      "operationId": "fixture-operation-restore",
+      "operation": "new-restart-restore",
+      "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "migrationId": "fixture-first-migration",
+      "fenceEpoch": 2,
+      "priorFenceEnvelopeSHA256": "2fbecf53279796dd0b7e1721755bd77c45e435ae3e6d94bbfbe7e5db8e378a82",
+      "scopes": [
+        {
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+          "workerRootRegistrationSHA256": "132971adb56fab2d76427eae5e8abd8936f0829bc2602b15412de6c506b32b61",
+          "ownedVolumeMetadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0"
+        },
+        {
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-1",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "daemonIdentitySHA256": "3eca706059b9700da7d269fb1ff920f834b6b89b404f919621fa506c506e3493",
+          "workerRootRegistrationSHA256": "b6c50fc137df635ca1c6a697996dac9b6e2023be507b5a2a21c675d824f5c279",
+          "ownedVolumeMetadataSHA256": "8d3ebe2ce57debe13b9f70f6ee8387dab5314ed0b042c5666d46bd3a294b837b"
+        }
+      ],
+      "owner": {
+        "principal": "fixture-principal",
+        "uid": 1,
+        "gid": 1,
+        "hostBootIdentitySHA256": "ffa245663b566495661d8c689bcb1881c454c55933164577d59748c7c54fbd6b",
+        "pid": 1,
+        "processStartIdentitySHA256": "bb33cb5c01c227ef5a68bcb1e763d4dec40b1550bfdd388908a84871d16e3ead",
+        "ownerGeneration": 1
+      },
+      "tokenSHA256": "51479ac0e8f3e44fe83df15c8b93f8ea630bb69538a29da7510cb553bc5816c0",
+      "acquiredAt": "2030-01-01T00:00:00Z",
+      "expiresAt": "2030-01-01T00:01:00Z",
+      "mode": "HELD",
+      "permittedEntrypointsSHA256": "8b6d9251020964351b44a62959040866a1e235bc20a20954b8d97977cff017b7",
+      "descendantRegistrySHA256": "6c4724aa60b657112415aaa96677aa48a971378355ad73b279ecb251cecc95b7",
+      "terminalSeals": [
+        "b7fc0081a28262382739f672b702cc4e028ed2965c7b0ef6c933a61fd95d5ab2",
+        "f83d35b13135404f9cbf3bb24cb4fdb9b318a38e5509b09a7b394caf0dbde00d"
+      ],
+      "requiresHeldOSLocks": true,
+      "staleAgeReclaimAllowed": false,
+      "rawTokenPublished": false,
+      "expectedInventoryHead": {
+        "presence": "ABSENT",
+        "envelopeSHA256": null,
+        "readbackProof": {
+          "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+          "artifactSHA256": "8c1104608dc2fd6bd15286fa8db27c210258c25838e3f940535dba5a95ad4d44",
+          "scopeSHA256": "6b90d221800ffc037aaf80d884420fb992363e08bbb0b6a2f9589a772342e9bf",
+          "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+          "observedAt": "2030-01-01T00:00:00Z",
+          "validUntil": "2030-01-01T00:01:00Z",
+          "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+          "contractId": "saintvision-proof-inventory-head-readback:1",
+          "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+          "producerRole": "cp-inventory-reader",
+          "signerRole": "cp-inventory",
+          "typedSubject": {
+            "kind": "inventory-head-readback",
+            "cohortId": "fixture-cohortId",
+            "presence": "ABSENT",
+            "envelopeSHA256": null,
+            "registrationSHA256": "e4159b95d0ae4ccbb9b94b8cfdcf50d678315faf34faa8ed13736fc8ed5c9472"
+          }
+        }
+      }
+    },
+    "signer": {
+      "role": "root-fence",
+      "keySPKISHA256": "fedce441937296da6039763aceac162bdf79e5ee5ac5a8365bf6e49af95992c3",
+      "signatureHex": "7683bc82070a357105c9296838d32ca56a6fc83722f7a8600188cd12ee9c1d368f157b23f495f6906873328da42135b0782b4f0b25d4fee85f33c700ef01db1b"
+    }
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-doc-fixture.invalid/v3/migration-journal.schema.json",
+  "allOf": [
+    {
+      "$ref": "../v2/migration-journal.schema.json"
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "operationKind": {
+                "const": "RESTART_RESTORE"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              },
+              "phase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              },
+              "leaseState": {
+                "enum": [
+                  "HELD",
+                  "UNKNOWN",
+                  "RELEASED"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "operationKind": {
+                "const": "RESTART_RESTORE"
+              },
+              "phase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "leaseState": {
+                "const": "HELD"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "operationKind": {
+                "const": "MIGRATION"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "leaseState": {
+                "enum": [
+                  "HELD",
+                  "UNKNOWN"
+                ]
+              },
+              "phase": {
+                "not": {
+                  "enum": [
+                    "RESTART_RESTORE_INTENT",
+                    "RESTART_POLICY_RESTORED",
+                    "READY_FOR_NEW_RENEWAL_PLAN"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "body": {
+            "properties": {
+              "operationKind": {
+                "const": "MIGRATION"
+              },
+              "phase": {
+                "not": {
+                  "enum": [
+                    "BLOCKED_FORWARD_ONLY",
+                    "QUIESCENCE_UNKNOWN"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "properties": {
+              "leaseState": {
+                "const": "HELD"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "NONEXECUTING v3 overlay; base v2 immutable. Offline resource registration required; no network schema discovery."
+}

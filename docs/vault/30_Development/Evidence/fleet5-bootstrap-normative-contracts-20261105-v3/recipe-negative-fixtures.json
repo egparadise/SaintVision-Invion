@@ -1,0 +1,4113 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/acceptedP0/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "platformManifestDigest",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "configDigest",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "archiveSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "executableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/migrationHelper/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/commonFence/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/runtimeInventoryAPI/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/schema3Helper/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/newRenewalGuard/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/nativeTwoCycleProof",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/nativeTwoCycleProof",
+      "subjectField": "executableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/nativeTwoCycleProof",
+      "subjectField": "fixtureCohortSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/nativeTwoCycleProof",
+      "subjectField": "completedCycles",
+      "operation": "alter value and recompute scope hash",
+      "value": 3,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/oldNewNoWriteCompatibility",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/oldNewNoWriteCompatibility",
+      "subjectField": "newExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/oldNewNoWriteCompatibility",
+      "subjectField": "compatibilityFixtureSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/m2CapabilityProof",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/m2CapabilityProof",
+      "subjectField": "executableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/m2CapabilityProof",
+      "subjectField": "receiptSchema",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/rootG2Decision",
+      "subjectField": "cohortScopesSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/rootG2Decision",
+      "subjectField": "selection",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/rootG2Decision",
+      "subjectField": "pretrustedRegistrySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/independentPlanReview",
+      "subjectField": "planSubjectSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/rootPublicationIntent",
+      "subjectField": "planSubjectSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/scheduleDisabledReadback",
+      "subjectField": "cohortScopesSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/scheduleDisabledReadback",
+      "subjectField": "entryIdsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/scheduleDisabledReadback",
+      "subjectField": "configAndTargetsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/scheduleDisabledReadback",
+      "subjectField": "allDisabled",
+      "operation": "alter value and recompute scope hash",
+      "value": false,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/allLaunchSurfaces",
+      "subjectField": "cohortScopesSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/allLaunchSurfaces",
+      "subjectField": "registeredSurfacesSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/allLaunchSurfaces",
+      "subjectField": "observedSurfaceSetSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/noOverlap",
+      "subjectField": "cohortScopesSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/noOverlap",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/noOverlap",
+      "subjectField": "descendantSetSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/noOverlap",
+      "subjectField": "allQuiescent",
+      "operation": "alter value and recompute scope hash",
+      "value": false,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-successor-plan.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "phase",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/0/latestEvidence/0",
+      "subjectField": "sequence",
+      "operation": "alter value and recompute scope hash",
+      "value": 13,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "phase",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/memberStates/1/latestEvidence/0",
+      "subjectField": "sequence",
+      "operation": "alter value and recompute scope hash",
+      "value": 13,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "sequence",
+      "operation": "alter value and recompute scope hash",
+      "value": 13,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "method",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "effectKind",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "targetSlot",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "intentEventSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/effect/receipt",
+      "subjectField": "outcome",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "sequence",
+      "operation": "alter value and recompute scope hash",
+      "value": 13,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "phase",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "method",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-migration-event.json",
+      "proofPointer": "/body/evidence/0",
+      "subjectField": "recordKind",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-operation-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-operation-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-operation-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-operation-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/buildProvenance",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/buildProvenance",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/buildProvenance",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/coreCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "repository",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "workflow",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "headSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "ref",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "event",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "runId",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "runAttempt",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/backendCI/attestation",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/independentReview/receipt",
+      "subjectField": "component",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/independentReview/receipt",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/independentReview/receipt",
+      "subjectField": "artifactSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/independentReview/receipt",
+      "subjectField": "authorId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/target/independentReview/receipt",
+      "subjectField": "reviewerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "sourceSHA",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "platformManifestDigest",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "configDigest",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "archiveSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/image/distributionProof",
+      "subjectField": "executableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "nonce",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "certificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "peerPolicyVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 12,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "peerPolicySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "floorSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "journalIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "journalUID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "servingPID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "servingExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/signedM2",
+      "subjectField": "servingProcessSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "channelVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 4,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "nodeCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "controlCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "endpoint",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/mtls",
+      "subjectField": "authoritySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/protectedStateEquality",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/protectedStateEquality",
+      "subjectField": "volumeMetadataSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/protectedStateEquality",
+      "subjectField": "beforeTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/protectedStateEquality",
+      "subjectField": "afterTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/protectedStateEquality",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "execId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "commandSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "uid",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/execReceipt",
+      "subjectField": "exitCode",
+      "operation": "alter value and recompute scope hash",
+      "value": 1,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "configSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "mountsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "processGenerationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionBeforeM2",
+      "subjectField": "point",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "configSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "mountsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "processGenerationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/0/runtimeInspectionAfterM2",
+      "subjectField": "point",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "nonce",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "certificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "peerPolicyVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 12,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "peerPolicySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "floorSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "journalIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "journalUID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "servingPID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "servingExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/signedM2",
+      "subjectField": "servingProcessSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "channelVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 4,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "nodeCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "controlCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "endpoint",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/mtls",
+      "subjectField": "authoritySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/protectedStateEquality",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/protectedStateEquality",
+      "subjectField": "volumeMetadataSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/protectedStateEquality",
+      "subjectField": "beforeTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/protectedStateEquality",
+      "subjectField": "afterTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/protectedStateEquality",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "execId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "commandSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "uid",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/execReceipt",
+      "subjectField": "exitCode",
+      "operation": "alter value and recompute scope hash",
+      "value": 1,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "configSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "mountsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "processGenerationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionBeforeM2",
+      "subjectField": "point",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "imageId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "configSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "mountsSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "processGenerationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/members/1/runtimeInspectionAfterM2",
+      "subjectField": "point",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/previousInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/previousInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/previousInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-runtime-inventory.json",
+      "proofPointer": "/body/previousInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "nonce",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "certificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "peerPolicyVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 12,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "peerPolicySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "floorSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "journalIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "journalUID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingPID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingProcessSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "channelVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 4,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "nodeCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "controlCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "endpoint",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "authoritySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "nonce",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "certificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "peerPolicyVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 12,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "peerPolicySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "floorSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "journalIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "journalUID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingPID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapM2",
+      "subjectField": "servingProcessSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "channelVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 4,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "nodeCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "controlCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "endpoint",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-terminal-seal-PC4.json",
+      "proofPointer": "/body/bootstrapMTLS",
+      "subjectField": "authoritySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-restore-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-restore-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-restore-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "synthetic-restore-lease.json",
+      "proofPointer": "/body/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:inspectAndValidate",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:inspectAndValidate",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:inspectAndValidate",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:inspectAndValidate",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/arguments/rootExecutionDecision",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/arguments/rootExecutionDecision",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:reserve",
+      "proofPointer": "/arguments/rootExecutionDecision",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:setOldRestartNo",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:setOldRestartNo",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:setOldRestartNo",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:setOldRestartNo",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:stopOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:stopOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:stopOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:stopOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "oldContainerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "volumeMetadataSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "fenceEpoch",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:captureFenced",
+      "proofPointer": "/arguments/quiescence",
+      "subjectField": "allProcessesStopped",
+      "operation": "alter value and recompute scope hash",
+      "value": false,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:preserveOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:preserveOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:preserveOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:preserveOld",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:createNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:createNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:createNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:createNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:startNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:startNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:startNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:startNew",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "nonce",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "certificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "peerPolicyVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 12,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "peerPolicySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "floorSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "journalIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "journalUID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "servingPID",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "servingExecutableSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/signedM2",
+      "subjectField": "servingProcessSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "channelVersion",
+      "operation": "alter value and recompute scope hash",
+      "value": 4,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "nodeCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "controlCertificateDERSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "endpoint",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/mtls",
+      "subjectField": "authoritySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/protectedStateEquality",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/protectedStateEquality",
+      "subjectField": "volumeMetadataSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/protectedStateEquality",
+      "subjectField": "beforeTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/protectedStateEquality",
+      "subjectField": "afterTreeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/protectedStateEquality",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "daemonIdentitySHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "containerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "execId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "commandSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "uid",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:verifyBootstrap",
+      "proofPointer": "/arguments/execReceipt",
+      "subjectField": "exitCode",
+      "operation": "alter value and recompute scope hash",
+      "value": 1,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:publishInventory",
+      "proofPointer": "/arguments/expectedPriorInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/arguments/rootSealDecision",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/arguments/rootSealDecision",
+      "subjectField": "inventoryEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/arguments/rootSealDecision",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:seal",
+      "proofPointer": "/arguments/rootSealDecision",
+      "subjectField": "migrationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "planEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "scope",
+      "operation": "alter value and recompute scope hash",
+      "value": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "FOREIGN-NODE",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "newContainerId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "terminalSealEnvelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:restoreNewRestartPolicy",
+      "proofPointer": "/arguments/rootRestoreDecision",
+      "subjectField": "restartPolicy",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:readState",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:readState",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:readState",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:readState",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "cohortId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "presence",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "envelopeSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/expectedInventoryHead/readbackProof",
+      "subjectField": "registrationSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/arguments/allDescendantsQuiescent",
+      "subjectField": "operationId",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/arguments/allDescendantsQuiescent",
+      "subjectField": "fenceEpoch",
+      "operation": "alter value and recompute scope hash",
+      "value": 2,
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/arguments/allDescendantsQuiescent",
+      "subjectField": "descendantSetSHA256",
+      "operation": "alter value and recompute scope hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT_BY_RECIPE"
+    },
+    {
+      "document": "api:release",
+      "proofPointer": "/arguments/allDescendantsQuiescent",
+      "subjectField": "allQuiescent",
+      "operation": "alter value and recompute scope hash",
+      "value": false,
+      "expected": "REJECT_BY_RECIPE"
+    }
+  ]
+}

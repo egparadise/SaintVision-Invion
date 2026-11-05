@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "53ea33f6200a9845d5585827d3e3fada5aa253eb",
-    "Docs": 42071392363,
+    "SHA": "60bfc722ff46171af326e2a26cf8764a6dd108ef",
+    "Docs": 42072270609,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,14 +12,22 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2573,
+    "independentlyMatchedNormalizedDestinationHashes": 2575,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
+    "localGatesExit0": [
+      "check_docs",
+      "check_ontology",
+      "doc_path_ratchet(base53ea33f6)",
+      "doc_single_source_ratchet",
+      "sync_check",
+      "staged_diff_check"
+    ],
     "combinedProductAcceptance": false,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T02:08:38+09:00"
+    "verifiedAtKST": "2026-11-06T02:16:45+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -152,16 +160,40 @@
       "futureProductCasesNotRun": 40,
       "realBindings": null,
       "operations": "HOLD"
+    },
+    "latestV3": {
+      "schema": "fleet5-bootstrap-v3-root-review-gate:1",
+      "recordedAtKST": "2026-11-06T02:31:21+09:00",
+      "sourceSHA": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "sourceFiles": 37,
+      "sourceDocsOnly": true,
+      "Docs": 42073588927,
+      "rootVerifiedExactHeadAllJobsSuccess": true,
+      "priorV2Review": "b47371c386c4786223acdad08fa7bd28d2d8ddba",
+      "scope": "N-L4/N-L5 and N-I1/N-I2/N-I3 actual independent Low delta review; new closed schemas and recomputed recipe/crossartifact subjects",
+      "actualReviewTask": "task_eaa694171f31",
+      "actualReviewDispatch": "ctx_8434b4be8010",
+      "reviewerAgent": "Claude",
+      "separateWorkspace": "fleet5-bootstrap-v3-review-20261106",
+      "dispatchReceipt": "ready",
+      "pendingOwnerQuestion": "msg_18c3e56963c1",
+      "verdict": null,
+      "registeredProductContracts": false,
+      "implementationAuthorized": false,
+      "runtimeEquipmentCasesExecutedByProposal": 0,
+      "futureProductCasesNotRun": 40,
+      "realBindings": null,
+      "physicalOperations": "HOLD"
     }
   },
   "integrationLocalPrep": {
     "message": "msg_753d333c5bfe",
     "localCommit": "c91303105a9b82c63f4a091bb36bee9312c2cf51",
     "sourceBase": "50000697",
-    "status": "Actual combined assembly in progress at newly selected4f; own c913 test delta still requires actual combined review",
+    "status": "Actual NEW immutable combined72028 source frozen/pushed with archive/packet and all8 actual CI; independent combined review in progress",
     "ownFocused101PassAnd35WirePass": "ownerreported not root rerun",
     "pendingActualSelectedSourceQuestion": false,
-    "ci2OrFinalArchivePublished": false,
+    "ci2OrFinalArchivePublished": true,
     "selectionReply": "msg_28bae2556a31",
     "latestOwnerStatus": "msg_2aa759bc3bda",
     "localAssemblyShortRefOwnerReported": "773e8523",
@@ -177,7 +209,19 @@
       "sourceOrPredicateChanged": false,
       "originalFailuresRetained": true
     },
-    "remaining": "new immutable combined source/archive/packet, all8 exacthead CI and actual independent combined review; no deployment"
+    "remaining": "terminal all8/12jobs plus actual combined review and qualified report; physical conditions remain separate",
+    "combinedSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "combinedTree": "46df710b3ba9548ba15067517c9aa99fe1b2b3de",
+    "rootVerifiedSourceRemoteTreeFourNonDocsAndOptionalExclusion": true,
+    "actualCombinedReviewTask": "task_ba0ee0a71106",
+    "actualCombinedReviewDispatch": "ctx_53da843108e6",
+    "rootCIObservation": "2026-11-06T02:25:08+09:00",
+    "terminalSuccessLanes": 6,
+    "pendingLanes": [
+      "Backend",
+      "Core"
+    ],
+    "allEightTerminalSuccess": false
   },
   "imports": [
     {
@@ -1044,6 +1088,211 @@
       "source": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
       "path": "docs/vault/30_Development/History/2026-11-06_02-05-05_KST_FLEET5_P0_Low_token_tests_f0af_검토_Claude.md",
       "SHA256": "fd9d7bbbfe9cb231ae033a346376f27113461a21e93922bca97088b10e812ee7"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/actual-bindings-HOLD.json",
+      "SHA256": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/api-request.schema.json",
+      "SHA256": "a11f4c09cfd1c01292f87c41915d08f6fe255b6da27dcbfeed4084edde20bc99"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/crossartifact-recipe-results.json",
+      "SHA256": "ac7550dc3cd48d2538e86595ced02bf87e4f13d468d4b2fc320bfbd61ee6328f"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/document-authoring-provenance.json",
+      "SHA256": "04dcb972f59a648b3d8e981155f4d192c7de76071636d06227069cb0c9963a4c"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/document-validation.json",
+      "SHA256": "04524907d6231a7cc1c056e0a47575f9e4c7145ba82dff3e9191da13661be121"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/failure-receipt-positive.json",
+      "SHA256": "fd4d028b657290989ae610b6a692ddf106b33c9e6a604550911de53e1c179767"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/info-negative-fixtures.json",
+      "SHA256": "ce171db6952624add69343484ef9587f5a27c971afef783f3ef1331c45f16b9e"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/low-delta-contract.md",
+      "SHA256": "7702bb2ce04bed9d927aa51e24c4dc8c814b4237c4a1677da805fc477f9d071a"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-event.schema.json",
+      "SHA256": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/migration-journal.schema.json",
+      "SHA256": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/operation-lease.schema.json",
+      "SHA256": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/proof-slot-registry.json",
+      "SHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/proposal-validation.json",
+      "SHA256": "fab17377582498c846bb683fbfc216cb4bd3036da3cb9cf9d61756d899012c16"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/recipe-definitions.json",
+      "SHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/recipe-negative-fixtures.json",
+      "SHA256": "faaffb5291cf876c0fc0b0ce105c6ab3fed3b764784220c3b526ff1a447ac10c"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/review-response.json",
+      "SHA256": "af54bd03fde8301ee44d3ad80e79a78169bc642f88a287dec7a18151ecc8d1d4"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/runtime-inventory.schema.json",
+      "SHA256": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/schema-dependency-document-hashes.json",
+      "SHA256": "0f447260bc789cb97a6ba36cfb32b36d68de971916c42650ae2a4375efaa3bc2"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/successor-plan.schema.json",
+      "SHA256": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-api-requests.json",
+      "SHA256": "48e072e2c7b55323c324672717e1b0ef809f406e8d2344e5f761e6223c4cd9a4"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-authoritative-facts.json",
+      "SHA256": "7965faf5352b445ee8ca2a22b9e50aeeaa9527ec0badbfc449346876c93c5785"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-migration-event.json",
+      "SHA256": "c6459c3d77d4510cdea1d49bb49c393eaeddcd3a2e6ceac4f9a13d0fa6e8e1df"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-migration-journal.json",
+      "SHA256": "0ae61d3ff90fe215d17137199b3c4f94a0b00363067e64ce4588732e88fcf202"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-operation-lease.json",
+      "SHA256": "fa3c0ebb745faa9a0ca1580e632573b1135c6c5384cfafd8e0edcce0e302753b"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-postseal-predecessor.json",
+      "SHA256": "01b47b1757325ce0cb389ba06904afc658e52e1d9ecdba2b85b22935af26e984"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-postseal-unknown.json",
+      "SHA256": "2535553dee769181da04296895857de0ba7b3b71e9fd7dd9decdf06de127fce5"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-pretrusted-policy.json",
+      "SHA256": "c4de48ca6fe32e6877e5bd0619db30a0c4ea963abd5edfe6146cd8564d4cac33"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-restore-lease.json",
+      "SHA256": "a5fa366975a6338f06d61ecb854f5b086024c375be36d1a52e88158d5edf0fb7"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-runtime-inventory.json",
+      "SHA256": "f7dc73bba2034025eb9d1c758d1977c6082eaac4020e26bc2fbff584ea3ab174"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-successor-plan.json",
+      "SHA256": "8712805e11eecaad559d70e067bca4bfb7fb312b1970fcb430547ed482c159a8"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-terminal-seal-PC4.json",
+      "SHA256": "6e9d5a72793c5427c36117459550bda8b9527d9820cbcfd44aa9a329533c9822"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/synthetic-terminal-seal.json",
+      "SHA256": "cadd069c45509c2c30f4bbbc87c155603aadcc5957a4f592abe388d8ee789302"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/terminal-seal.schema.json",
+      "SHA256": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/transition-negative-fixtures.json",
+      "SHA256": "6bba8f4285e835a11b6ec884c03250468a12a089bd0f9b85ce5fb6693ab5b233"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/transition-positive-fixtures.json",
+      "SHA256": "4973577953c0bca75eae946964666222f101d2c081e2d78744f5c576d09757b1"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v3/trust-bootstrap-contract.json",
+      "SHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869"
+    },
+    {
+      "source": "5d0753e561149f1c4dface08583c232f10be15fc",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_bootstrap_contracts_v3_low_delta_Codex.md",
+      "SHA256": "57f1dd1981b1db83ab8232c88915be38136247132595c7ebc180aaaa8af59730"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/contract-proposal-and-source-surface.json",
+      "SHA256": "46861372c656b8361339c88ab4e9c28af15ac910867abcfc7537bb4919bc6158"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/current-structural-fixture.json",
+      "SHA256": "c68b134c5a36385440ffb1780b01c3dfc4c5ca82af06d021c5888db262c0a2e7"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gates.json",
+      "SHA256": "bb19597f1041c2ed0a01dfcb1da09b9574e22d95d52c048884226f4a43c1557e"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_B_role_storage_contract_proposal_Codex.md",
+      "SHA256": "6e3759827e72efbdf0ed9950d83a9229a3d04b389507c72e9606d5dbea3e79f4"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -1501,6 +1750,51 @@
       "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
       "path": "docs/vault/30_Development/Evidence/fleet5-p0-low-token-tests-20261106-codex/strict-json-to-json-loads.log",
       "reason": "raw logs/archives stay in immutable original source"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/.gitattributes",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/coexistence-expected-red.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-1.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-2.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-3.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-4.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-5.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-6.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
+    },
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/b-after-p0-proposal/publication-gate-7.log",
+      "reason": "original raw logs/attributes stay in immutable source; selected structured proposal evidence gathered"
     }
   ],
   "rootProductChanged": false,
@@ -1583,7 +1877,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T02:10:53+09:00",
+  "latestRecordAtKST": "2026-11-06T02:31:21+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -1606,14 +1900,38 @@
     "remainingOptionalInfo": "I-LT-1 no accept-at-exactly65536 case; failclosed availability-only; not a freeze blocker",
     "rootSelectionRelay": "msg_6eb564a23796",
     "ownerRelay": "msg_660aea8a1ff0",
-    "integrationCondition": "include reviewed three-line test delta if final source not frozen; combined CI must collect; preserve already frozen source otherwise"
+    "integrationCondition": "f0af optional independently accepted but excluded from immutable72028; no72028CI attributed to this patch; no cancel/respin solely for optional Info",
+    "includedInFrozen72028": false,
+    "rootVerifiedLauncherBlobEquals4fDiffersF0af": true
   },
   "broadBNextProposal": {
-    "status": "DOCS ONLY in progress; not implemented",
-    "sourceBasis": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
-    "existingStorageChannels": "shared inv.node_channels/ChannelProof; do not invent separate CAS counter",
-    "needed": "separately versioned role-aware observation and coherent renewal; preserve storage v1 integer and DER limits",
-    "actualBindings": null
+    "schema": "fleet5-b-fresh1-root-review-gate:1",
+    "recordedAtKST": "2026-11-06T02:31:21+09:00",
+    "sourceSHA": "100f6f132132199d1204a76190f04712dd82de00",
+    "sourceFiles": 13,
+    "sourceDocsOnly": true,
+    "runtimeSource": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+    "Docs": 42074468349,
+    "correlation": "fleet5-b-proposal-100f6f13-docs",
+    "rootVerifiedExactHeadCorrelationAllJobsSuccess": true,
+    "scope": "Actual independent B-FRESH1 architecture review; fresh homogeneous NEW5Node combined role; B-MIG1 separate design gate",
+    "actualReviewTask": "task_3516267fa05f",
+    "actualReviewDispatch": "ctx_42a6dd5132c6",
+    "reviewerAgent": "Claude",
+    "separateWorkspace": "fleet5-b-contract-review-20261106",
+    "dispatchReceipt": "ready",
+    "pendingOwnerQuestion": "msg_2259b60e2c6c",
+    "rootOwnerRelay": "msg_116d062dbd73",
+    "sourceDocsReviewerRelay": "msg_e8d9e76e8ede",
+    "verdict": null,
+    "architectureAndABIDecision": null,
+    "implementationAuthorized": false,
+    "ownerReportedSourceSurfacesMatched4f": 46,
+    "rootHasIndependentlyRerunAll46": false,
+    "roleFloor3Leaf4Bundle4": "proposal only, not registered or implemented",
+    "existingR4DefaultRefusalAndSharedNodeCASCounters": "preserved; no second storage counter; samplingv1 effective C/R31bit remains required",
+    "realBindings": null,
+    "physicalOperations": "HOLD"
   },
   "rootToolingPinsPreserved": {
     "sharedCard150RestoredToCoordinatorHEAD": true,
@@ -1621,5 +1939,20 @@
     "onlyFourDraftToolPointerFieldsDiffered": true,
     "rootProductChanged": false
   },
-  "physicalRefresh": "physical-readiness-refresh-20261106.json"
+  "physicalRefresh": "physical-readiness-refresh-20261106.json",
+  "sourceDocCitationAdaptations": [
+    {
+      "source": "100f6f132132199d1204a76190f04712dd82de00",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_B_role_storage_contract_proposal_Codex.md",
+      "sourceSHA256": "6e3759827e72efbdf0ed9950d83a9229a3d04b389507c72e9606d5dbea3e79f4",
+      "aggregatedSHA256": "916f6d6ba3f6542feca0e16db2cfdd7bc5891b356f0a29ae39df2e8b6fe1e7ab",
+      "change": "two table cells link to verified immutable4f Git source lines142/192 and144/149; Root report product remains older; wrapper metadata1.0.1; no proposal/code/baseline mutation"
+    }
+  ],
+  "root414InitialPathGate": {
+    "exitCode": 1,
+    "newBrokenCitations": 2,
+    "cause": "valid immutable4f source paths absent from older Root product checkout",
+    "boundedCorrection": "immutable GitHub links verified through local4f Git objects; no baseline raise"
+  }
 }

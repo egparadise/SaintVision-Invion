@@ -1,0 +1,119 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration-seal:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "70574bc35ca42d4d2822536c63b0e9ef16800079cee90f02ed239ce85c19c698",
+      "slot": "PC2",
+      "scope": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "fixture-node-0",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "sealedAt": "2030-01-01T00:00:00Z",
+      "bootstrapVerifiedEvent": {
+        "sequence": 14,
+        "envelopeSHA256": "c4d7853978160e2f26a7963b3035129ca029b6460817a7c9e42adb058eadb1b1"
+      },
+      "inventoryEnvelopeSHA256": "0e187212eec575868242ee392a9c045836f8f8019ba326869e16a25ba169f771",
+      "oldBackup": {
+        "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+        "id": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+        "name": "/fixture-backupReservedName",
+        "inspectSHA256": "6c40d73850201a708d457b00ea73735668a9feecfeadbbee065d01fed4512d96",
+        "imageId": "sha256:9c846ddff12d79db37088a75dfd8aa76b51bd41c67f0dbe1563e1143417cbf42",
+        "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+        "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+        "restartPolicy": "no"
+      },
+      "currentContainer": {
+        "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+        "id": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+        "name": "/fixture-new-node-0",
+        "inspectSHA256": "d0c55a1333dadfc2f3bd3c45ad3fc36d0844d01d1302d3c4f74f712855ad80be",
+        "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+        "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+        "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+        "restartPolicy": "no"
+      },
+      "volume": {
+        "name": "fixture-name",
+        "driver": "fixture-driver",
+        "metadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+        "mountIdentitySHA256": "c768647cb578fd5186ad18c2e2bd689f8b23764ce1ab84532bda65dbc577991f",
+        "protectedTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+        "goJournalPath": "/fixture-goJournalPath"
+      },
+      "finalProtectedTreeSHA256": "537900db9d6c5e32e919d37c2fd292cd3f0271c8705a326bf14e5901d4552a33",
+      "bootstrapM2": {
+        "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+        "artifactSHA256": "ca1aa74469c44db86c13fb1b387bf202349a6d30902cef746fe27b604c0c5a3b",
+        "scopeSHA256": "4e1a37bf94307bd74f42f4264fb6ea616e1415ce773e5f35e67b2c9d04b6ff61",
+        "signerKeySPKISHA256": "b9d4086fe187cbd7cad13f65dd0403de928a96fad5c679781eb23d802d2355fb",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:01:00Z",
+        "slotId": "terminal-seal:/body/bootstrapM2",
+        "contractId": "saintvision-proof-node-floor-v2:1",
+        "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+        "producerRole": "actual-serving-node",
+        "signerRole": "node-leaf",
+        "typedSubject": {
+          "kind": "node-floor-v2",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "nonce": "5cd00104e9ea494286ae5f43cc36cb826a5b80c4d9f9370d74de4d62e4bc31a3",
+          "certificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+          "peerPolicyVersion": 11,
+          "peerPolicySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+          "floorSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+          "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+          "journalUID": 1,
+          "servingPID": 1,
+          "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+          "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+        }
+      },
+      "bootstrapMTLS": {
+        "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+        "artifactSHA256": "5c4ec4c65c120f9610c488f5d2d17ff17e657a144e6a180c41089b7cc689f738",
+        "scopeSHA256": "18fb3f33d22ff4c5a1a75108c56e0672b99a18fc719c4249ea763737ded32095",
+        "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+        "observedAt": "2030-01-01T00:00:00Z",
+        "validUntil": "2030-01-01T00:01:00Z",
+        "slotId": "terminal-seal:/body/bootstrapMTLS",
+        "contractId": "saintvision-proof-unchanged-mtls:1",
+        "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+        "producerRole": "owned-mtls-client",
+        "signerRole": "host-helper",
+        "typedSubject": {
+          "kind": "unchanged-mtls",
+          "scope": {
+            "tenantId": "fixture-tenant",
+            "nodeId": "fixture-node-0",
+            "recoveryEpoch": "fixture-existing-epoch"
+          },
+          "channelVersion": 3,
+          "nodeCertificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+          "controlCertificateDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+          "endpoint": "fixture-endpoint",
+          "authoritySHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d"
+        }
+      },
+      "secondMigrationAllowed": false,
+      "backupRestartAllowed": false,
+      "backupDeletionAllowed": false,
+      "normalRenewalRequiresFreshLeaseAndM2": true
+    },
+    "signer": {
+      "role": "root-seal",
+      "keySPKISHA256": "a9aba5afb7ec1c77a64b7e629d6da1fb36da5a770a65c8666c837adf093e19e3",
+      "signatureHex": "03db1353aafb61a7b29a0799cae784c4979ba03bf095b0c682bf4e1e49826775619141c0d9c76081d1c4e31e5880022f97915b3f6b1030864793161ef05e39c8"
+    }
+  }
+}

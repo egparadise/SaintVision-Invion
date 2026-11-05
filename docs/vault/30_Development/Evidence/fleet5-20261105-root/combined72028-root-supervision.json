@@ -1,0 +1,175 @@
+{
+  "schema": "fleet5-combined-root-early-supervision:1",
+  "observedAtKST": "2026-11-06T02:25:08+09:00",
+  "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "remoteAndTreeVerified": true,
+  "nonDocsDeltaVs4f": [
+    "tests/test_backend_leaf_runtime_contract.py",
+    "tests/test_build_fleet5_setup_packet.py",
+    "tests/test_fleet5_setup_packet.py",
+    "tools/build_fleet5_setup_packet.py"
+  ],
+  "optionalF0afExcluded": true,
+  "launcherBlobs": {
+    "4f97ba71b1482ae70d72dda1833a28fddcd05994": "3c2c20cc1f5dadc7d2dde14e4d85adb2c645e51b",
+    "72028cbac903c4415d9979f980a6e0f9948e914f": "3c2c20cc1f5dadc7d2dde14e4d85adb2c645e51b",
+    "f0af307705b4923ebc3e231db5238af4c70aa389": "2b99768f5dac8396dd034ab44140fc11643c2456"
+  },
+  "actualCombinedReviewTask": "task_ba0ee0a71106",
+  "actualCombinedReviewDispatch": "ctx_53da843108e6",
+  "integratorRelay": "msg_7152d665d782",
+  "runs": [
+    {
+      "workflow": "Backend",
+      "run": 42071344810,
+      "status": "in_progress",
+      "conclusion": null,
+      "jobs": [
+        {
+          "id": 127399796732,
+          "name": "mlflow-live",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127399797373,
+          "name": "backend (3.14)",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "id": 127399797694,
+          "name": "backend (3.12)",
+          "status": "in_progress",
+          "conclusion": null
+        }
+      ]
+    },
+    {
+      "workflow": "Core",
+      "run": 42071358669,
+      "status": "in_progress",
+      "conclusion": null,
+      "jobs": [
+        {
+          "id": 127399847230,
+          "name": "core",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "id": 127399847818,
+          "name": "s01-storage-roundtrip",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend",
+      "run": 42071370665,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127399887397,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127399887757,
+          "name": "frontend",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Desktop",
+      "run": 42071383997,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127399940073,
+          "name": "desktop-browser",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Docs",
+      "run": 42071396345,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127399982620,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Portal",
+      "run": 42071150605,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127399094026,
+          "name": "portal-login-harness",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "Security",
+      "run": 42071418886,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127400058499,
+          "name": "security-critical-high",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "workflow": "A11y",
+      "run": 42071431273,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127400102957,
+          "name": "accessibility-e2e",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "allEightTerminalSuccess": false,
+  "combinedReviewVerdict": null,
+  "operations": "HOLD",
+  "wholeProgramComplete": false,
+  "archiveAndPacketOwnerReported": {
+    "sourceArchiveBytes": 46895143,
+    "sourceArchiveSHA256": "28a784282c5a121aba0eacef0299e638a239e22dbc913d0b2cce2c9b3872fbd8",
+    "sourceInventoryMembers": 4757,
+    "sourceInventorySHA256": "aa9667ce80ae4d7b59bd1ae86c22dc7fc674a98ee41953799bf6288b8e93b66e",
+    "packetBytes": 48259331,
+    "packetSHA256": "dedd5571cabb36811a113f14b9c59227fcdba9dad162edf9ca89d89e6452262f",
+    "manifestSHA256": "0d03e5c1a06bed083a0e223bada1281fea470ada6fdc901e6d7fa1f0cdb1186c",
+    "planSHA256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81",
+    "rootHasRehashedTheseRawArtifacts": false,
+    "actualIndependentCombinedReviewPending": true
+  }
+}

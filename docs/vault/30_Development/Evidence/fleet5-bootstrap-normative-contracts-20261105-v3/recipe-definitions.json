@@ -1,0 +1,901 @@
+{
+  "schemaVersion": "fleet5-static-subject-recipes:3",
+  "status": "NONEXECUTING_PROPOSAL",
+  "operators": {
+    "get": "exact RFC6901 pointer from named source; missing pointer BLOCK",
+    "const": "literal JSON scalar/array",
+    "sha256C2": "SHA256 strict C2 canonical evaluated value",
+    "sha256ArgvJSON": "SHA256 ordered JSON string array, compact ensure_ascii=False UTF8; reject NUL/surrogates; distinct from C2 Go HTML escaping"
+  },
+  "kindTag": "typedSubject.kind is literal recipe name; included in scopeSHA256",
+  "recipes": {
+    "build-provenance": {
+      "component": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/componentId"
+        }
+      },
+      "sourceSHA": {
+        "get": {
+          "source": "product",
+          "pointer": "/sourceSHA"
+        }
+      },
+      "artifactSHA256": {
+        "get": {
+          "source": "product",
+          "pointer": "/artifactSHA256"
+        }
+      }
+    },
+    "ci-attestation": {
+      "component": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/componentId"
+        }
+      },
+      "repository": {
+        "get": {
+          "source": "ci",
+          "pointer": "/repository"
+        }
+      },
+      "workflow": {
+        "get": {
+          "source": "ci",
+          "pointer": "/workflow"
+        }
+      },
+      "headSHA": {
+        "get": {
+          "source": "ci",
+          "pointer": "/headSHA"
+        }
+      },
+      "ref": {
+        "get": {
+          "source": "ci",
+          "pointer": "/ref"
+        }
+      },
+      "event": {
+        "get": {
+          "source": "ci",
+          "pointer": "/event"
+        }
+      },
+      "runId": {
+        "get": {
+          "source": "ci",
+          "pointer": "/runId"
+        }
+      },
+      "runAttempt": {
+        "get": {
+          "source": "ci",
+          "pointer": "/runAttempt"
+        }
+      },
+      "artifactSHA256": {
+        "get": {
+          "source": "ci",
+          "pointer": "/artifactSHA256"
+        }
+      }
+    },
+    "independent-code-review": {
+      "component": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/componentId"
+        }
+      },
+      "sourceSHA": {
+        "get": {
+          "source": "product",
+          "pointer": "/sourceSHA"
+        }
+      },
+      "artifactSHA256": {
+        "get": {
+          "source": "product",
+          "pointer": "/artifactSHA256"
+        }
+      },
+      "authorId": {
+        "get": {
+          "source": "product",
+          "pointer": "/independentReview/authorId"
+        }
+      },
+      "reviewerId": {
+        "get": {
+          "source": "product",
+          "pointer": "/independentReview/reviewerId"
+        }
+      }
+    },
+    "image-distribution": {
+      "sourceSHA": {
+        "get": {
+          "source": "plan",
+          "pointer": "/acceptedP0/sourceSHA"
+        }
+      },
+      "imageId": {
+        "get": {
+          "source": "image",
+          "pointer": "/dockerImageId"
+        }
+      },
+      "platformManifestDigest": {
+        "get": {
+          "source": "image",
+          "pointer": "/platformManifestDigest"
+        }
+      },
+      "configDigest": {
+        "get": {
+          "source": "image",
+          "pointer": "/configDigest"
+        }
+      },
+      "archiveSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/archiveSHA256"
+        }
+      },
+      "executableSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/executableSHA256"
+        }
+      }
+    },
+    "native-two-cycle": {
+      "sourceSHA": {
+        "get": {
+          "source": "plan",
+          "pointer": "/acceptedP0/sourceSHA"
+        }
+      },
+      "executableSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/executableSHA256"
+        }
+      },
+      "fixtureCohortSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/nativeFixtureCohortSHA256"
+        }
+      },
+      "completedCycles": {
+        "const": 2
+      }
+    },
+    "old-new-no-write": {
+      "sourceSHA": {
+        "get": {
+          "source": "plan",
+          "pointer": "/acceptedP0/sourceSHA"
+        }
+      },
+      "newExecutableSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/executableSHA256"
+        }
+      },
+      "compatibilityFixtureSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/compatibilityFixtureSHA256"
+        }
+      }
+    },
+    "m2-capability": {
+      "sourceSHA": {
+        "get": {
+          "source": "plan",
+          "pointer": "/acceptedP0/sourceSHA"
+        }
+      },
+      "executableSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/executableSHA256"
+        }
+      },
+      "receiptSchema": {
+        "const": "saintvision-node-peer-policy-floor:2"
+      }
+    },
+    "g2-planning-policy": {
+      "cohortScopesSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/cohortScopesSHA256"
+        }
+      },
+      "selection": {
+        "const": "preserve-permit-split-runtime"
+      },
+      "pretrustedRegistrySHA256": {
+        "get": {
+          "source": "policy",
+          "pointer": "/allowedRegistrySHA256"
+        }
+      }
+    },
+    "independent-plan-review": {
+      "planSubjectSHA256": {
+        "get": {
+          "source": "plan",
+          "pointer": "/planSubjectSHA256"
+        }
+      }
+    },
+    "root-publication-intent": {
+      "planSubjectSHA256": {
+        "get": {
+          "source": "plan",
+          "pointer": "/planSubjectSHA256"
+        }
+      }
+    },
+    "schedule-disabled-readback": {
+      "cohortScopesSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/cohortScopesSHA256"
+        }
+      },
+      "entryIdsSHA256": {
+        "sha256C2": {
+          "get": {
+            "source": "facts",
+            "pointer": "/scheduleIds"
+          }
+        }
+      },
+      "configAndTargetsSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/scheduleConfigsAndTargetsSHA256"
+        }
+      },
+      "allDisabled": {
+        "const": true
+      }
+    },
+    "launch-surface-inventory": {
+      "cohortScopesSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/cohortScopesSHA256"
+        }
+      },
+      "registeredSurfacesSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/registeredSurfacesSHA256"
+        }
+      },
+      "observedSurfaceSetSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/observedSurfaceSetSHA256"
+        }
+      }
+    },
+    "no-overlap": {
+      "cohortScopesSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/cohortScopesSHA256"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "facts",
+          "pointer": "/migrationOperationId"
+        }
+      },
+      "descendantSetSHA256": {
+        "sha256C2": {
+          "const": []
+        }
+      },
+      "allQuiescent": {
+        "const": true
+      }
+    },
+    "inventory-head-readback": {
+      "cohortId": {
+        "get": {
+          "source": "facts",
+          "pointer": "/cohortId"
+        }
+      },
+      "presence": {
+        "get": {
+          "source": "head",
+          "pointer": "/presence"
+        }
+      },
+      "envelopeSHA256": {
+        "get": {
+          "source": "head",
+          "pointer": "/envelopeSHA256"
+        }
+      },
+      "registrationSHA256": {
+        "get": {
+          "source": "facts",
+          "pointer": "/cpInventoryRegistrationSHA256"
+        }
+      }
+    },
+    "root-execution-decision": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/finalPlanEnvelopeSHA256"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "migrationId": {
+        "get": {
+          "source": "plan",
+          "pointer": "/migrationId"
+        }
+      }
+    },
+    "process-quiescence": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "daemonIdentitySHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/oldContainer/daemonIdentitySHA256"
+        }
+      },
+      "oldContainerId": {
+        "get": {
+          "source": "body",
+          "pointer": "/arguments/oldContainerId"
+        }
+      },
+      "volumeMetadataSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/volume/metadataSHA256"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "fenceEpoch": {
+        "get": {
+          "source": "body",
+          "pointer": "/expectedFenceEpoch"
+        }
+      },
+      "allProcessesStopped": {
+        "const": true
+      }
+    },
+    "node-floor-v2": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "nonce": {
+        "get": {
+          "source": "nodeFacts",
+          "pointer": "/observerNonce"
+        }
+      },
+      "certificateDERSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/authority/nodeLeafDERSHA256"
+        }
+      },
+      "peerPolicyVersion": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/version"
+        }
+      },
+      "peerPolicySHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/policySHA256"
+        }
+      },
+      "floorSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/floorRawSHA256"
+        }
+      },
+      "journalIdentitySHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/journalIdentitySHA256"
+        }
+      },
+      "journalUID": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/journalUID"
+        }
+      },
+      "servingPID": {
+        "const": 1
+      },
+      "servingExecutableSHA256": {
+        "get": {
+          "source": "image",
+          "pointer": "/executableSHA256"
+        }
+      },
+      "servingProcessSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/rawServingCmdlineSHA256"
+        }
+      }
+    },
+    "unchanged-mtls": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "channelVersion": {
+        "get": {
+          "source": "input",
+          "pointer": "/channel/version"
+        }
+      },
+      "nodeCertificateDERSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/authority/nodeLeafDERSHA256"
+        }
+      },
+      "controlCertificateDERSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/authority/controlLeafDERSHA256"
+        }
+      },
+      "endpoint": {
+        "get": {
+          "source": "input",
+          "pointer": "/channel/endpoint"
+        }
+      },
+      "authoritySHA256": {
+        "sha256C2": {
+          "get": {
+            "source": "input",
+            "pointer": "/authority"
+          }
+        }
+      }
+    },
+    "protected-tree-equality": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "volumeMetadataSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/volume/metadataSHA256"
+        }
+      },
+      "beforeTreeSHA256": {
+        "get": {
+          "source": "input",
+          "pointer": "/volume/protectedTreeSHA256"
+        }
+      },
+      "afterTreeSHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/volume/protectedTreeSHA256"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/operationId"
+        }
+      }
+    },
+    "owned-engine-exec": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "daemonIdentitySHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/daemonIdentitySHA256"
+        }
+      },
+      "containerId": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/id"
+        }
+      },
+      "execId": {
+        "get": {
+          "source": "nodeFacts",
+          "pointer": "/execId"
+        }
+      },
+      "commandSHA256": {
+        "sha256ArgvJSON": {
+          "get": {
+            "source": "nodeFacts",
+            "pointer": "/observerArgv"
+          }
+        }
+      },
+      "uid": {
+        "get": {
+          "source": "input",
+          "pointer": "/floor/journalUID"
+        }
+      },
+      "exitCode": {
+        "const": 0
+      }
+    },
+    "runtime-inspection-before": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "daemonIdentitySHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/daemonIdentitySHA256"
+        }
+      },
+      "containerId": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/id"
+        }
+      },
+      "imageId": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/imageId"
+        }
+      },
+      "configSHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/configSHA256"
+        }
+      },
+      "mountsSHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/mountsSHA256"
+        }
+      },
+      "processGenerationSHA256": {
+        "get": {
+          "source": "nodeFacts",
+          "pointer": "/processGenerationSHA256"
+        }
+      },
+      "point": {
+        "const": "before-M2"
+      }
+    },
+    "runtime-inspection-after": {
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "daemonIdentitySHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/daemonIdentitySHA256"
+        }
+      },
+      "containerId": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/id"
+        }
+      },
+      "imageId": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/imageId"
+        }
+      },
+      "configSHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/configSHA256"
+        }
+      },
+      "mountsSHA256": {
+        "get": {
+          "source": "current",
+          "pointer": "/currentContainer/mountsSHA256"
+        }
+      },
+      "processGenerationSHA256": {
+        "get": {
+          "source": "nodeFacts",
+          "pointer": "/processGenerationSHA256"
+        }
+      },
+      "point": {
+        "const": "after-M2"
+      }
+    },
+    "root-seal-decision": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/finalPlanEnvelopeSHA256"
+        }
+      },
+      "inventoryEnvelopeSHA256": {
+        "get": {
+          "source": "body",
+          "pointer": "/arguments/inventoryEnvelopeSHA256"
+        }
+      },
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "migrationId": {
+        "get": {
+          "source": "plan",
+          "pointer": "/migrationId"
+        }
+      }
+    },
+    "root-restart-restore": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/finalPlanEnvelopeSHA256"
+        }
+      },
+      "scope": {
+        "get": {
+          "source": "input",
+          "pointer": "/scope"
+        }
+      },
+      "newContainerId": {
+        "get": {
+          "source": "body",
+          "pointer": "/arguments/newContainerId"
+        }
+      },
+      "terminalSealEnvelopeSHA256": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/currentSealEnvelopeSHA256"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "restartPolicy": {
+        "const": "unless-stopped"
+      }
+    },
+    "descendant-quiescence": {
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "fenceEpoch": {
+        "get": {
+          "source": "body",
+          "pointer": "/expectedFenceEpoch"
+        }
+      },
+      "descendantSetSHA256": {
+        "sha256C2": {
+          "const": []
+        }
+      },
+      "allQuiescent": {
+        "const": true
+      }
+    },
+    "member-progress-evidence": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "body",
+          "pointer": "/planEnvelopeSHA256"
+        }
+      },
+      "migrationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/migrationId"
+        }
+      },
+      "scope": {
+        "get": {
+          "source": "progress",
+          "pointer": "/scope"
+        }
+      },
+      "phase": {
+        "get": {
+          "source": "progress",
+          "pointer": "/phase"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "sequence": {
+        "get": {
+          "source": "body",
+          "pointer": "/sequence"
+        }
+      }
+    },
+    "migration-effect-readback": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "body",
+          "pointer": "/planEnvelopeSHA256"
+        }
+      },
+      "migrationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/migrationId"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "sequence": {
+        "get": {
+          "source": "body",
+          "pointer": "/sequence"
+        }
+      },
+      "method": {
+        "get": {
+          "source": "body",
+          "pointer": "/method"
+        }
+      },
+      "effectKind": {
+        "get": {
+          "source": "body",
+          "pointer": "/effect/kind"
+        }
+      },
+      "targetSlot": {
+        "get": {
+          "source": "body",
+          "pointer": "/effect/targetSlot"
+        }
+      },
+      "intentEventSHA256": {
+        "get": {
+          "source": "body",
+          "pointer": "/effect/intentEventSHA256"
+        }
+      },
+      "outcome": {
+        "get": {
+          "source": "aliases",
+          "pointer": "/observedEffectOutcome"
+        }
+      }
+    },
+    "migration-event-evidence": {
+      "planEnvelopeSHA256": {
+        "get": {
+          "source": "body",
+          "pointer": "/planEnvelopeSHA256"
+        }
+      },
+      "migrationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/migrationId"
+        }
+      },
+      "operationId": {
+        "get": {
+          "source": "body",
+          "pointer": "/operationId"
+        }
+      },
+      "sequence": {
+        "get": {
+          "source": "body",
+          "pointer": "/sequence"
+        }
+      },
+      "phase": {
+        "get": {
+          "source": "body",
+          "pointer": "/phase"
+        }
+      },
+      "method": {
+        "get": {
+          "source": "body",
+          "pointer": "/method"
+        }
+      },
+      "recordKind": {
+        "get": {
+          "source": "body",
+          "pointer": "/recordKind"
+        }
+      }
+    }
+  }
+}
