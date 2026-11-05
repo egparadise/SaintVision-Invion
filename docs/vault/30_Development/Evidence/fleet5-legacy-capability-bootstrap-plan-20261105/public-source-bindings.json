@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "fleet5-bootstrap-public-bindings:1",
+  "task": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "scope": "Public Git object reads only; no imported product code, private or runtime reads",
+  "files": [
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "gitBlob": "2f90ea0181a064f76e35a76acc7be0ed639c7c14",
+      "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+      "bytes": 5388,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "services/node-agent/runtime/permit.go",
+      "gitBlob": "084b9113190abfaa7e0279a4eb7a4e786bd03dff",
+      "sha256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b",
+      "bytes": 5845,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "services/node-agent/runtime/journal.go",
+      "gitBlob": "970a9d673b9b36b06b0cba4733e45acec469f440",
+      "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "bytes": 12966,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/start-node.sh",
+      "gitBlob": "bd67b7910152a67ea01cf78fc83faf2628efaaa2",
+      "sha256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "bytes": 3745,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/Dockerfile.node",
+      "gitBlob": "76ffdf54d80485c082de647680711392f5b9bba3",
+      "sha256": "6f750372a41047188260bea2e7f7789d0fd76eddd7525d176fec0b0f2203ff9d",
+      "bytes": 62,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "tools/lan_pilot.py",
+      "gitBlob": "35c2668690b0681ab87da86099400e83f39d098b",
+      "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+      "bytes": 172541,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_replace.py",
+      "gitBlob": "1fee2f9ab6987821a644bc85cf032629b21ceaba",
+      "sha256": "6de735172c243fb8b373a7061f2ce098388d8a6f2fc0ae125921bcfe456a8a1a",
+      "bytes": 13717,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_replacement.py",
+      "gitBlob": "cc08219e81099610a52cd36f225550e76698b227",
+      "sha256": "aed3e41951c4481de3ccc94e3f5d755c11631bb8e0e09f949782288a1b932f67",
+      "bytes": 7050,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_workspace.py",
+      "gitBlob": "a9d9fe9498b3c343dbc28f8557d3d6f266ec063f",
+      "sha256": "da46ab67d0220b705c54bf889c3bf63e18b3bddb327bfe5881969121d43711c3",
+      "bytes": 11803,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_storage_bridge.py",
+      "gitBlob": "d833ba7df193608ca4bfd1bb7106c007bef09efa",
+      "sha256": "879775df9212157344c2ae276739ebd0c82d2b47f5e9f7eb52dd3010d765a815",
+      "bytes": 6090,
+      "readExit": 0
+    },
+    {
+      "commit": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "path": "deploy/lan/worker_config.py",
+      "gitBlob": "ba7b78d087523b8c671ab1ad81766ec9c6a8a3a0",
+      "sha256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+      "bytes": 8396,
+      "readExit": 0
+    },
+    {
+      "commit": "f6817f3d354bcae50f51c00c544295de3fd07662",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-peer-floor-audit-f027-review.json",
+      "gitBlob": "93c1ffde3b939e577a1a8c07173304405520c643",
+      "sha256": "feea802c65c8efebaa6e800db8a2c75f593bd7d6d6ae8e5013ecfba57b108936",
+      "bytes": 10013,
+      "readExit": 0
+    },
+    {
+      "commit": "f6817f3d354bcae50f51c00c544295de3fd07662",
+      "path": "docs/vault/30_Development/History/2026-11-05_21-20-00_KST_FLEET5_legacy_peer_floor_\uac10\uc0ac\uc640_binary_upgrade_\uacbd\ub85c_\uac80\ud1a0_Claude.md",
+      "gitBlob": "3d7d471200d18d033be6310e72ccfd0d8fc6b5c8",
+      "sha256": "a4733d120880a836fb2f0c3615c441e462c6f3d9137c9e60c68a48f889779225",
+      "bytes": 15019,
+      "readExit": 0
+    }
+  ],
+  "g2LegacyComparisons": [
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+      "exactBytesEqual": true,
+      "readExit": 0
+    },
+    {
+      "path": "services/node-agent/runtime/permit.go",
+      "source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "sha256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b",
+      "exactBytesEqual": true,
+      "readExit": 0
+    },
+    {
+      "path": "deploy/lan/start-node.sh",
+      "source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "sha256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "exactBytesEqual": true,
+      "readExit": 0
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "source03": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "executorB5": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+      "exactBytesEqual": true,
+      "readExit": 0
+    }
+  ]
+}

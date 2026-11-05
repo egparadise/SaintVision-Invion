@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "fleet5-proposed-image-only-inspect-comparison:1",
+  "nature": "NONEXECUTING candidate projection; exact Engine version/fixture and actual inspect values remain null/HOLD",
+  "rawOldInspectPreserved": true,
+  "allUnlistedFields": "Exact equality; unsupported unknown/nondefault configuration BLOCKS; no generic ignored prefix",
+  "exactConfiguration": ["Config except Image", "HostConfig except RestartPolicy", "Mounts every field", "NetworkSettings.Ports", "NetworkSettings.Networks exact network-name set and configured aliases/IPAM/link/driver options", "Driver", "Platform", "AppArmorProfile", "ProcessLabel", "MountLabel"],
+  "singleRuntimeImageChange": ["Image actual resolved content ID", "Config.Image exact reviewed new runtime reference resolving to that ID"],
+  "explicitLifecycleDeltas": {
+    "Id": "New generated immutable ID bound by intent and external reservation; old ID unchanged in retained backup",
+    "Name": "Old ID renamed only to reserved collision-free backup name; new ID owns exact original target name",
+    "Created": "New creation observation only; bound to exact new ID, never used to infer prior process death",
+    "State": "Exact allowed transition flags/PID/start-stop timestamps/exit code read back per state; unexpected paused/dead/OOM/restarting/exec state BLOCKS",
+    "RestartCount": "New observed counter stable across verification; old counter preserved; any unexpected advance BLOCKS",
+    "HostConfig.RestartPolicy": "Old and new no during cutover; only new original unless-stopped after explicit G8 acceptance",
+    "ResolvConfPath_HostnamePath_HostsPath_LogPath": "Engine-managed per-new-ID paths validated against frozen Engine contract, never operator path/mount substitution",
+    "GraphDriver.Data": "Closed Engine-version storage keys and target-image layer relationship verified; not a generic ignored map; actual Engine contract required",
+    "NetworkSettings.SandboxID_SandboxKey": "Generated per-new-ID observations under exact old network mode and unchanged external bindings",
+    "NetworkSettings.Networks.perExistingNetworkGeneratedFields": "Only EndpointID/IPAddress/IPPrefixLen/Gateway/GlobalIPv6Address/GlobalIPv6PrefixLen/IPv6Gateway/MacAddress/DNSNames under closed preexisting network set; validate frozen Engine rules and exact required host endpoint, never a broadened listener"
+  },
+  "containerLabelsAdded": false,
+  "ConfigCmdIncludingImageFlagChanged": false,
+  "resourceSecurityMountOrEndpointDriftAllowed": false,
+  "storageFlagOrMountOrDockerSocketAllowed": false,
+  "expectedConsumerPhases": {"beforeCreate":"exact old stopped container ID only", "afterCreate":"exact retained old stopped ID plus recorded new ID only; no third consumer/writer"},
+  "currentEngineVersionBinding": null,
+  "currentOldInspectBinding": null,
+  "futureProofRequired": "Engine create/reinspect fixture must enumerate every actual inspect field and show only runtime image plus individually bound lifecycle deltas; failure leaves HOLD"
+}
