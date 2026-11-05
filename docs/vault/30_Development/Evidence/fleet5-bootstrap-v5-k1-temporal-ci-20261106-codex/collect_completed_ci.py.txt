@@ -1,0 +1,108 @@
+"""Development report collector; read-only GitHub/public Git, no product effects.
+
+Run only after the exact original Core/Docs runs complete. Preserve failure; never
+reruns/cancels CI, invokes Orca, extracts unselected archive entries, or publishes
+the opaque archive or raw JUnit. Only parsed counts, hashes and event metadata
+are published; raw text remains in the ignored opaque artifact.
+"""
+import collections, datetime, hashlib, json, pathlib, re, subprocess, zipfile
+import xml.etree.ElementTree as ET
+
+root=pathlib.Path.cwd()
+evidence=pathlib.Path(__file__).resolve().parent
+source='56651cba697f2ab6fcd7166ca4e6ea11eac28113'
+branch='agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106'
+runs={42126222201:'Core',42126225708:'Docs'}
+def now():return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+def api(path):return json.loads(subprocess.check_output(['gh','api','repos/egparadise/SaintVision-Invion/'+path],text=True,encoding='utf-8'))
+def save(name,value):
+    (evidence/name).write_text(json.dumps(value,indent=2,ensure_ascii=True),encoding='utf-8',newline='\n')
+def digest(raw):return hashlib.sha256(raw).hexdigest()
+marker=re.compile(rb'-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----')
+
+snapshots=[]
+for run_id,label in runs.items():
+    run=api(f'actions/runs/{run_id}')
+    jobs=api(f'actions/runs/{run_id}/jobs?per_page=100')
+    assert run['head_sha']==source and run['head_branch']==branch
+    assert run['display_title']==f'FLEET5-K1-temporal-{label}-56651cba697f-20261106T080044KST'
+    assert run['status']=='completed', 'exact original run not terminal; no rerun'
+    assert jobs['jobs'] and all(j['status']=='completed' for j in jobs['jobs'])
+    snapshots.append({'run':run,'jobs':jobs,'checkedKST':now()})
+save('source-ci-final.json',snapshots)
+core=next(x for x in snapshots if x['run']['id']==42126222201)
+job=next(j for j in core['jobs']['jobs'] if j['name']=='core')
+race=next(s for s in job['steps'] if s['name']=='Test Linux Node concurrency and crash boundaries')
+assert race['conclusion']=='success'
+workflow=subprocess.check_output(['git','show',source+':.github/workflows/core.yml'])
+assert b'go test -race -json ./...' in workflow
+save('node-race-step-receipt.json',{'source':source,'run':42126222201,'job':job['id'],'step':race,'sourceWorkflowSHA256':digest(workflow),'command':'go test -race -json ./...','optionalProofSteps':[s for s in job['steps'] if s['number'] in [7,8,9,10]],'notProductionM2':True})
+
+artifacts=api('actions/runs/42126222201/artifacts?per_page=100')
+save('core-artifact-list.json',artifacts)
+found=[a for a in artifacts['artifacts'] if a['name']=='saintvision-core-evidence']
+assert len(found)==1
+artifact=found[0]
+assert not artifact['expired']
+assert artifact['workflow_run']['head_sha']==source
+scratch=root/'.work';scratch.mkdir(exist_ok=True)
+archive=scratch/f"k1-temporal-core-artifact-{artifact['id']}.zip"
+if not archive.exists():
+    raw=subprocess.check_output(['gh','api',f"repos/egparadise/SaintVision-Invion/actions/artifacts/{artifact['id']}/zip"])
+    with archive.open('xb') as stream:stream.write(raw)
+raw=archive.read_bytes()
+assert len(raw)==artifact['size_in_bytes']
+assert artifact['digest']=='sha256:'+digest(raw)
+receipt={'sourceSHA':source,'run':42126222201,'artifactID':artifact['id'],'artifactName':artifact['name'],'archiveBytes':len(raw),'archiveRawSHA256':digest(raw),'remoteDigest':artifact['digest'],'digestMatches':True,'createdAt':artifact['created_at'],'expiresAt':artifact['expires_at'],'atKST':now(),'opaqueArchiveKeptInIgnoredLocalScratch':archive.relative_to(root).as_posix(),'entries':[],'selected':[],'unselectedEntryPayloadsNotRead':True,'wholeProductAcceptance':False}
+selected=evidence/'core-ci-selected';selected.mkdir(exist_ok=True)
+counts={}
+with zipfile.ZipFile(archive) as bundle:
+    infos=bundle.infolist();assert len(infos)<200 and len({i.filename for i in infos})==len(infos)
+    assert sum(i.file_size for i in infos)<256*1024*1024
+    receipt['entries']=[{'name':i.filename,'bytes':i.file_size,'compressedBytes':i.compress_size} for i in infos]
+    for name in ['node-unit.jsonl','core-tests.xml','docker-host-tests.xml','build-product-runtime-real-pg.xml','lan-pilot-database-real-pg.xml']:
+        if name not in bundle.namelist():
+            receipt['selected'].append({'archiveEntry':name,'present':False,'rawExported':False,'reason':'not produced in this failed original run; no borrowed historical result'})
+            counts[name]={'status':'NOT_PRESENT_IN_FAILED_RUN','testcases':None,'passed':None,'failures':None,'errors':None,'skipped':None}
+            continue
+        value=bundle.read(name)
+        has_marker=bool(marker.search(value))
+        entry={'archiveEntry':name,'bytes':len(value),'rawSHA256':digest(value),'privateKeyMarkerDetected':has_marker,'rawExported':False,'publicationPolicy':'parsed metadata/counts and hashes only; no raw JUnit or opaque ZIP export'}
+        receipt['selected'].append(entry)
+        if name.endswith('.jsonl'):
+            assert not has_marker,'node log withheld; review before publishing selected log'
+            events=[json.loads(line) for line in value.splitlines() if line]
+            passes=[x for x in events if x.get('Action')=='pass' and x.get('Test')]
+            skipped=[x for x in events if x.get('Action')=='skip' and x.get('Test')]
+            metadata=[{k:v for k,v in x.items() if k!='Output'} for x in events if x.get('Action')!='output']
+            save('core-ci-selected/node-events-metadata.json',metadata)
+            reasons=[]
+            for skip in skipped:
+                outputs=[x.get('Output','') for x in events if x.get('Package')==skip['Package'] and x.get('Test')==skip['Test'] and x.get('Action')=='output']
+                reasons.append({'package':skip['Package'],'test':skip['Test'],'reason':''.join(outputs).strip()})
+            counts[name]={'passEvents':len(passes),'topLevelPassed':sum('/' not in x['Test'] for x in passes),'k1PassEvents':sum(x['Package'].endswith('/migrationverify') for x in passes),'k1TopLevelPassed':sum(x['Package'].endswith('/migrationverify') and '/' not in x['Test'] for x in passes),'failed':[x for x in metadata if x['Action']=='fail'],'skippedTestEvents':len(skipped),'skippedTests':reasons,'packageResults':[x for x in metadata if x['Action'] in ['pass','fail','skip'] and not x.get('Test')]}
+            assert not counts[name]['failed']
+        else:
+            tree=ET.fromstring(value)
+            cases=list(tree.iter('testcase'))
+            fail=sum(c.find('failure') is not None for c in cases)
+            errors=sum(c.find('error') is not None for c in cases)
+            skips=[c.find('skipped') for c in cases if c.find('skipped') is not None]
+            suites=[s.attrib for s in tree.iter('testsuite')]
+            marker_attrs=sum(bool(marker.search(v.encode())) for el in tree.iter() for v in el.attrib.values())
+            marker_text=sum(bool(marker.search((el.text or '').encode())) for el in tree.iter())
+            failed_cases=[{'name':c.get('name'),'classname':c.get('classname'),'failureMessage':c.find('failure').get('message','') if c.find('failure') is not None else None,'errorMessage':c.find('error').get('message','') if c.find('error') is not None else None} for c in cases if c.find('failure') is not None or c.find('error') is not None]
+            assert not marker.search(json.dumps(failed_cases).encode()), 'failure metadata withheld; inspect locally'
+            counts[name]={'testcases':len(cases),'passed':len(cases)-fail-errors-len(skips),'failures':fail,'errors':errors,'skipped':len(skips),'skipReasons':dict(collections.Counter(s.get('message','') for s in skips)),'suites':suites,'rawPrivateKeyMarkerLocations':{'attributes':marker_attrs,'textElements':marker_text},'rawExported':False,'failedCases':failed_cases}
+            assert sum(int(s['tests']) for s in suites)==len(cases)
+save('core-artifact-download-receipt.json',receipt)
+save('core-test-counts.json',counts)
+
+log=subprocess.check_output(['gh','run','view','42126222201','--job',str(job['id']),'--log'])
+log_path=scratch/'k1-temporal-core-completed.log';log_path.write_bytes(log)
+lines=[]
+for line in log.decode('utf-8').splitlines():
+    if re.search(r'\b\d+ passed\b|\b\d+ failed\b|\b\d+ skipped\b|go version go|PASS:|All checks passed|Successfully built',line) and not marker.search(line.encode()):lines.append(line)
+(evidence/'core-completed-log-selected.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8',newline='\n')
+save('core-completed-log-receipt.json',{'run':42126222201,'job':job['id'],'source':source,'rawBytes':len(log),'rawSHA256':digest(log),'rawKeptInIgnoredScratch':log_path.relative_to(root).as_posix(),'selectedSummaryLines':len(lines),'atKST':now(),'rawExported':False})
+print(json.dumps({'source':source,'artifact':artifact['id'],'zipSHA256':digest(raw),'counts':{k:{a:b for a,b in v.items() if a in ['passed','passEvents','topLevelPassed','k1PassEvents','k1TopLevelPassed','skipped','skippedTestEvents','testcases','failures','errors']} for k,v in counts.items()}}))

@@ -1,0 +1,4617 @@
+[
+  {
+    "Time": "2026-11-05T23:03:22.499579505Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover"
+  },
+  {
+    "Time": "2026-11-05T23:03:22.499760592Z",
+    "Action": "skip",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.45726429Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.49224849Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.50745234Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+    "Test": "TestPeerFloorArgumentsAreClosedAndUnambiguous"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.507949384Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+    "Test": "TestPeerFloorArgumentsAreClosedAndUnambiguous",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.52990468Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.531995999Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestOutputFloodIsBoundedAndDrainedConcurrently"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.532639715Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestOutputFloodIsBoundedAndDrainedConcurrently",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.532679113Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalSuccessfulInputReplayDoesNotWriteTwice"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.53315113Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalSuccessfulInputReplayDoesNotWriteTwice",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.533197944Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalPollDoesNotConsumeSequenceAndBoundsCursor"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.533342267Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalPollDoesNotConsumeSequenceAndBoundsCursor",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.533349278Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalFailedInputPoisonsSessionWithoutReplay"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.533481543Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Test": "TestTerminalFailedInputPoisonsSessionWithoutReplay",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.541040958Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementUsesExplicitTLSAndClaudeWireFields"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.550314204Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementUsesExplicitTLSAndClaudeWireFields",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:23.550351018Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementRequiresTenantAuthentication"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.550476303Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementRequiresTenantAuthentication",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:23.55048083Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementRefusesRedirects"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.557734022Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Test": "TestAnnouncementRefusesRedirects",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:23.75953611Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.786577058Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+    "Test": "TestDecodeModelExecutionManifestConsumesResolverWireContract"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.922932801Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+    "Test": "TestDecodeModelExecutionManifestConsumesResolverWireContract",
+    "Elapsed": 0.14
+  },
+  {
+    "Time": "2026-11-05T23:03:23.922948504Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+    "Test": "TestDecodeModelExecutionManifestRejectsScopeAndAuthorityDrift"
+  },
+  {
+    "Time": "2026-11-05T23:03:23.925027915Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+    "Test": "TestDecodeModelExecutionManifestRejectsScopeAndAuthorityDrift",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.510768981Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+    "Elapsed": 1.054
+  },
+  {
+    "Time": "2026-11-05T23:03:24.512281597Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.537097221Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+    "Elapsed": 1.045
+  },
+  {
+    "Time": "2026-11-05T23:03:24.542536569Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAllCopiedSourcePinsRemainExact"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.55665456Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAllCopiedSourcePinsRemainExact",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:24.556663213Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAPI2RejectsEveryOldFieldAndNodeCohortTypeConfusion"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.563241504Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+    "Elapsed": 1.033
+  },
+  {
+    "Time": "2026-11-05T23:03:24.918233538Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.918323276Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.929892286Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+    "Elapsed": 1.17
+  },
+  {
+    "Time": "2026-11-05T23:03:24.931362379Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.945606211Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestCountersDoNotDoubleCountGuest"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.947376492Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestCountersDoNotDoubleCountGuest",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.947392035Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestMissingMemoryNeverBecomesIdle"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.947405485Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestMissingMemoryNeverBecomesIdle",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.947409441Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestRealHostSampleAndCancellation"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.953684433Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.953785853Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/valid"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.954576011Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/valid",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.954588219Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/symlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.955100816Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/symlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.955602948Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/hardlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.955632382Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/hardlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.955637269Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/parent-link"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.956097214Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/parent-link",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.956104555Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/root-replaced"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.956716439Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/root-replaced",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.956723099Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/oversized"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.957225571Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/oversized",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.957232091Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/fifo"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.957722535Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary/fifo",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.957794076Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAndFileBoundary",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.957849593Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAncestorSymlinkAndFilesystemRootRejected"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.95833489Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Test": "TestRootAncestorSymlinkAndFilesystemRootRejected",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:24.963282391Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence"
+  },
+  {
+    "Time": "2026-11-05T23:03:24.963392343Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/unavailable_then_stopped"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.06410937Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/unavailable_then_stopped",
+    "Elapsed": 0.1
+  },
+  {
+    "Time": "2026-11-05T23:03:25.064122439Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/late_create_visible"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.098497214Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Test": "TestRealHostSampleAndCancellation",
+    "Elapsed": 0.15
+  },
+  {
+    "Time": "2026-11-05T23:03:25.164703424Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/late_create_visible",
+    "Elapsed": 0.1
+  },
+  {
+    "Time": "2026-11-05T23:03:25.164710565Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/persistent_unavailable"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.265341164Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/persistent_unavailable",
+    "Elapsed": 0.1
+  },
+  {
+    "Time": "2026-11-05T23:03:25.265357337Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/persistent_absence"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.365912429Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/persistent_absence",
+    "Elapsed": 0.1
+  },
+  {
+    "Time": "2026-11-05T23:03:25.365921382Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/foreign_owner"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366029432Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/foreign_owner",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366058735Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/malformed_response"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366133185Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/malformed_response",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366157671Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/cleanup_deadline"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366240604Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence/cleanup_deadline",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366281535Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCleanupObservationRequiresFreshPhysicalEvidence",
+    "Elapsed": 0.4
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366307453Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerLiveCompatibility"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366431326Z",
+    "Action": "skip",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerLiveCompatibility",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366436824Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.366496342Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/old-supported"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.368985129Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/old-supported",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.369049054Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/newer-supported"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.370307799Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/newer-supported",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.370361388Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/new-minimum"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.371699335Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/new-minimum",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.371712845Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/too-old"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.372746342Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/too-old",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.372771249Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/too-new-minimum"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.374247856Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/too-new-minimum",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.374252874Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/windows"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.375808667Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/windows",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.375843048Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/missing-minimum"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.376724681Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/missing-minimum",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.376733995Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/invalid-range"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.377673172Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/invalid-range",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.377686632Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/bad-number"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.378492173Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/bad-number",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.378501076Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/bad-json"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.379291704Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/bad-json",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.379298024Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/trailing-json"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.380095672Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation/trailing-json",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.380135271Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerNegotiationRefusesUnsupportedEngineBeforeMutation",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.380156082Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerConcurrentNegotiationAndUnavailableRetry"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.383177466Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerConcurrentNegotiationAndUnavailableRetry",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.383183034Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerOutputUsesNegotiatedVersion"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388093871Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestDockerOutputUsesNegotiatedVersion",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388099429Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388501213Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/other-device"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388570135Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/other-device",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388605057Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/broad-capability"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388662291Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/broad-capability",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388691454Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/all-devices"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388745204Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged/all-devices",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.388788117Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.3888103Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorExecutableDigestUsesDescriptorBytes"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.438189676Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorExecutableDigestUsesDescriptorBytes",
+    "Elapsed": 0.05
+  },
+  {
+    "Time": "2026-11-05T23:03:25.438198559Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationRetainsServingJournalLock"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.627807648Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationRetainsServingJournalLock",
+    "Elapsed": 0.19
+  },
+  {
+    "Time": "2026-11-05T23:03:25.627823151Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.627844112Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/missing"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.62964238Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/missing",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.629648619Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/symlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.631298978Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/symlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.631305367Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/hardlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.632977287Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/hardlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.632994914Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/mode"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.63458969Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/mode",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.634598593Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/bool"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.636496468Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/bool",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.636502517Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/float"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.63842027Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/float",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.63842676Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/duplicate"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.640305116Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/duplicate",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.640311595Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/unknown"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.642136432Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/unknown",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.642142471Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/hash-mismatch"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.644331886Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/hash-mismatch",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.644358405Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/identity"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.646099958Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/identity",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.646105186Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/policy-changed"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.647944805Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/policy-changed",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.647951875Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/directory-mode"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.649361057Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/directory-mode",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.649365914Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/relative"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.650760255Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState/relative",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.650809107Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationStrictExistingState",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:25.650835065Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationChecksJournalUID"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.65228631Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestActualPeerFloorObservationChecksJournalUID",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.652296134Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestValidPermitAndBoundBudget"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.656771147Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestValidPermitAndBoundBudget",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.656779079Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.661365326Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/fence"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.665542979Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/fence",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.665549428Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/node"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.670293418Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/node",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.670299878Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/extra"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.67491045Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/extra",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.674918422Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/resource"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.67903851Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/resource",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.679045891Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/lease"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.683145689Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly/lease",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.683179229Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestSingleGPUAllocationMustMatchTheSignedLeaseExactly",
+    "Elapsed": 0.03
+  },
+  {
+    "Time": "2026-11-05T23:03:25.683209133Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.683253689Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/token-overflow"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.686741082Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/token-overflow",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.686747932Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/other-tenant"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.690201365Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/other-tenant",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.690207534Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/unapproved-image"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.693629571Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/unapproved-image",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.693636011Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/duplicate-lease"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.69745242Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/duplicate-lease",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.69745899Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/local-limits"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.700896519Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/local-limits",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.700904741Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-key"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.702932558Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.702941581Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/other-node"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.706366202Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/other-node",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.706372271Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/writable-root"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.709426804Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/writable-root",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.709432342Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-allocation-node"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.712877964Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-allocation-node",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.712885184Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-allocation-epoch"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.716405266Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/wrong-allocation-epoch",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.716411746Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/root"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.719458498Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/root",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.719465388Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/capabilities"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.72249191Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/capabilities",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.722497298Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/short-lease"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.725934707Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/short-lease",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.72642361Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/nul-argument"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.730209264Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/nul-argument",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.730217025Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/old-epoch"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.733603008Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/old-epoch",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.733609168Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/unapproved-executable"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.736954371Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/unapproved-executable",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.736962943Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/host-network"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.739869368Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/host-network",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.739876308Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/privilege"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.742796123Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/privilege",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.742802993Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/insufficient-cpu"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.746115157Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/insufficient-cpu",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.746122488Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/insufficient-memory"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.749441853Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations/insufficient-memory",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.74948736Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPermitRejectsBoundaryViolations",
+    "Elapsed": 0.07
+  },
+  {
+    "Time": "2026-11-05T23:03:25.749522292Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.750669657Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/duplicate-key"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.752415577Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/duplicate-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.752426283Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/unknown-field"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.75497536Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/unknown-field",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.75498264Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/tampered-plan"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.75784503Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON/tampered-plan",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.75802058Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestByteBindingAndStrictJSON",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.758030845Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestClockBounds"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.761372683Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestClockBounds",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.761378411Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestQuarantineIsDurableIdempotentAndPrivate"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.766960911Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestQuarantineIsDurableIdempotentAndPrivate",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.766967871Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentQuarantineCreatesOneReceiptAndReplaysTheRest"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.775709278Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentQuarantineCreatesOneReceiptAndReplaysTheRest",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.775719863Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestQuarantineRejectsWrongIdentityAndInvalidShapeWithoutARecord"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.778475545Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestQuarantineRejectsWrongIdentityAndInvalidShapeWithoutARecord",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.778480883Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentDuplicateAndProcessRestart"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.808635582Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentDuplicateAndProcessRestart",
+    "Elapsed": 0.03
+  },
+  {
+    "Time": "2026-11-05T23:03:25.808645897Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestLostStartACKStopsWithoutRestart"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.823152313Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestLostStartACKStopsWithoutRestart",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.823226532Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestAmbiguousCreateNeverRetriesOrAcknowledges"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.961883121Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+    "Elapsed": 1.044
+  },
+  {
+    "Time": "2026-11-05T23:03:25.963131986Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.963148821Z",
+    "Action": "skip",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.96315482Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.963163944Z",
+    "Action": "skip",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.963171004Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.991489439Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.994236569Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/ascii"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.994730599Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/ascii",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.99475215Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/unicode"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.995254613Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/unicode",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.995263867Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/html"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.995719099Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/html",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.995727752Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/controls"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.996226539Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/controls",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.99623349Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/line-separators"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.996749132Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/line-separators",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.996773327Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/supplementary"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.997232536Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/supplementary",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.997238545Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/nested"
+  },
+  {
+    "Time": "2026-11-05T23:03:25.997773515Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors/nested",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:25.997815677Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPeerFloorCanonicalCrossLanguageVectors",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:25.997830099Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestAuthenticatedQuarantineRequestReachesDurableRecorder"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.035339806Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestAmbiguousCreateNeverRetriesOrAcknowledges",
+    "Elapsed": 0.21
+  },
+  {
+    "Time": "2026-11-05T23:03:26.035350872Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestStopObservationWithoutRemovalCannotRelease"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.050077363Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestStopObservationWithoutRemovalCannotRelease",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.050085154Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCrashIntentRecoveryNeverStarts"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.064594665Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCrashIntentRecoveryNeverStarts",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.064639351Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestJournalExclusiveLockAndEpochPin"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.066457838Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestJournalExclusiveLockAndEpochPin",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.066480752Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCorruptIntentBlocksFurtherExecution"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.072997285Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCorruptIntentBlocksFurtherExecution",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.073059718Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.073106176Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence/1"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.086529447Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence/1",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.086537368Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence/2"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.098273601Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence/2",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.098286319Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPerLeaseHighWaterRejectsStaleOrReusedFence",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.098290195Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.098304777Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop/timeout"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.105496634Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+    "Elapsed": 1.174
+  },
+  {
+    "Time": "2026-11-05T23:03:26.106586755Z",
+    "Action": "start",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.146928166Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestSeedEditCapture"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.19998072Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestAuthenticatedQuarantineRequestReachesDurableRecorder",
+    "Elapsed": 0.2
+  },
+  {
+    "Time": "2026-11-05T23:03:26.199990594Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.223550558Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/no-certificate"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.234216599Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/no-certificate",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.234228376Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-ca"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.247476242Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-ca",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.247482812Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-uri"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.259653326Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-uri",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.259659465Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/expired"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.270072202Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/expired",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.270079032Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-eku"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.279992716Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/wrong-eku",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.280019626Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/unpinned"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.292806601Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient/unpinned",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.29344235Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestMTLSAllowsOnlyPinnedScopedClient",
+    "Elapsed": 0.09
+  },
+  {
+    "Time": "2026-11-05T23:03:26.293489139Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPolicyRevocationOnExistingTLSConnection"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.310444263Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestSeedEditCapture",
+    "Elapsed": 0.16
+  },
+  {
+    "Time": "2026-11-05T23:03:26.310457252Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.310471553Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/symlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.311143476Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/symlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.311172519Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/hardlink"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.311684085Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/hardlink",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.311689804Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/fifo"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.312265644Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/fifo",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.312272645Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/oversized"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.312991066Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles/oversized",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.31304093Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestCaptureRejectsUnsafeFiles",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.313060449Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestInputHashAndManifest"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.314030502Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestInputHashAndManifest",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.314036692Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.314086776Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/../escape"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.314779069Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/../escape",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.314783796Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests//absolute"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.315435378Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests//absolute",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.315455558Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src//file"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.316060427Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src//file",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.316065354Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src\\file"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.316396994Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src\\file",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.316425547Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/CON"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.317352336Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/CON",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.317360127Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/trailing."
+  },
+  {
+    "Time": "2026-11-05T23:03:26.317607313Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPolicyRevocationOnExistingTLSConnection",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.317665098Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestClientCertificateOverlapAndRollback"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.318040433Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/trailing.",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.318047333Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/name:stream"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.31891167Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/name:stream",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.318954804Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/a%2fb"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.319665264Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/a%2fb",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.319676761Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/\\x00"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.320320793Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/src/\\x00",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.320328865Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/SRC/file"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.320967719Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/SRC/file",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.320988099Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/duplicate"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.324076963Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/duplicate",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.32408156Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/digest"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.324094169Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/digest",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.324099777Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/duplicate-key"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.324117393Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests/duplicate-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:26.324125825Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Test": "TestRejectUnsafePathsAndManifests",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.341810708Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestClientCertificateOverlapAndRollback",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.341818319Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestRevocationCancelsActiveRequest"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.459593616Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestRevocationCancelsActiveRequest",
+    "Elapsed": 0.12
+  },
+  {
+    "Time": "2026-11-05T23:03:26.459604893Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.45961673Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/expired-policy"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.476432829Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/expired-policy",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.476439839Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/same-version-change"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.49243872Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/same-version-change",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.492448265Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/malformed-policy"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.50832166Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/malformed-policy",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.508327879Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/oversize-body"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.575990788Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/oversize-body",
+    "Elapsed": 0.07
+  },
+  {
+    "Time": "2026-11-05T23:03:26.576017077Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/query"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.599404365Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/query",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.599490893Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/wrong-path"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.62023055Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor/wrong-path",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.620247935Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestInvalidPolicyAndFramingNeverReachExecutor",
+    "Elapsed": 0.16
+  },
+  {
+    "Time": "2026-11-05T23:03:26.620252302Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPlainHTTPIdentityHeadersHaveNoAuthority"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.630459324Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestPlainHTTPIdentityHeadersHaveNoAuthority",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:26.630467226Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestReceiptObservationWaitsForPriorHTTPResponseSlot"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.645873792Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestReceiptObservationWaitsForPriorHTTPResponseSlot",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.645886941Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageDisabledWithoutLocalConfiguration"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.663184862Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageDisabledWithoutLocalConfiguration",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.663193294Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageRechecksPeerAfterCollection"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.679646096Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageRechecksPeerAfterCollection",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:26.679656211Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageSlotDoesNotConsumeHeartbeatCapacity"
+  },
+  {
+    "Time": "2026-11-05T23:03:26.707105577Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Test": "TestStorageSlotDoesNotConsumeHeartbeatCapacity",
+    "Elapsed": 0.03
+  },
+  {
+    "Time": "2026-11-05T23:03:27.10741726Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop/timeout",
+    "Elapsed": 1.01
+  },
+  {
+    "Time": "2026-11-05T23:03:27.107425782Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop/cancelled"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.116732615Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop/cancelled",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:27.116782779Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTimeoutAndCancellationRequirePhysicalStop",
+    "Elapsed": 1.02
+  },
+  {
+    "Time": "2026-11-05T23:03:27.116807305Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCorruptReceiptCannotBeReplayed"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.129018619Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCorruptReceiptCannotBeReplayed",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:27.129026931Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestObservationNeverCreatesAnUnseenCommand"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.133514723Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestObservationNeverCreatesAnUnseenCommand",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:27.13352005Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPeerPolicyFloorSurvivesRestart"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.136864152Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestPeerPolicyFloorSurvivesRestart",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:27.136870191Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestRemoteCancellationWaitsForOnePhysicalStop"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.175083097Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestRemoteCancellationWaitsForOnePhysicalStop",
+    "Elapsed": 0.04
+  },
+  {
+    "Time": "2026-11-05T23:03:27.175095255Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestRemoteCancelCannotStartUnseenPermit"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.190085786Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestRemoteCancelCannotStartUnseenPermit",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:27.190092516Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCancelTombstoneSurvivesCrashBeforeReceipt"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.205374598Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCancelTombstoneSurvivesCrashBeforeReceipt",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:03:27.205381058Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentUnseenCancelAndLateExecute"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.273880426Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestConcurrentUnseenCancelAndLateExecute",
+    "Elapsed": 0.07
+  },
+  {
+    "Time": "2026-11-05T23:03:27.273893516Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCancelDoesNotTurnAmbiguousIntentIntoNeverStartedProof"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.328403604Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+    "Elapsed": 1.222
+  },
+  {
+    "Time": "2026-11-05T23:03:27.486204621Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCancelDoesNotTurnAmbiguousIntentIntoNeverStartedProof",
+    "Elapsed": 0.21
+  },
+  {
+    "Time": "2026-11-05T23:03:27.486214746Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCrashAfterRemovalRecoversDurableStoppedCandidate"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.703500087Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestCrashAfterRemovalRecoversDurableStoppedCandidate",
+    "Elapsed": 0.22
+  },
+  {
+    "Time": "2026-11-05T23:03:27.703513727Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.70352259Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry/false"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.706962198Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry/false",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:27.70697074Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry/true"
+  },
+  {
+    "Time": "2026-11-05T23:03:27.709984784Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry/true",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:03:27.709998995Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Test": "TestTerminalHelperUsesNegotiatedVersionWithoutMutationRetry",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:03:27.720739876Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+    "Elapsed": 1.758
+  },
+  {
+    "Time": "2026-11-05T23:03:28.083833729Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAPI2RejectsEveryOldFieldAndNodeCohortTypeConfusion",
+    "Elapsed": 3.53
+  },
+  {
+    "Time": "2026-11-05T23:03:28.083844585Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDerivedVectorsRejectPartialOrderAndSignerAuthority"
+  },
+  {
+    "Time": "2026-11-05T23:03:28.501358371Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDerivedVectorsRejectPartialOrderAndSignerAuthority",
+    "Elapsed": 0.42
+  },
+  {
+    "Time": "2026-11-05T23:03:28.501369077Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext"
+  },
+  {
+    "Time": "2026-11-05T23:03:28.730488204Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+    "Elapsed": 3.8120000000000003
+  },
+  {
+    "Time": "2026-11-05T23:03:29.464386847Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/wrong-operation"
+  },
+  {
+    "Time": "2026-11-05T23:03:34.698828589Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/wrong-operation",
+    "Elapsed": 5.23
+  },
+  {
+    "Time": "2026-11-05T23:03:34.698837692Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/released-epoch-as-restore"
+  },
+  {
+    "Time": "2026-11-05T23:03:39.956036138Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/released-epoch-as-restore",
+    "Elapsed": 5.26
+  },
+  {
+    "Time": "2026-11-05T23:03:39.956051991Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/partial-members"
+  },
+  {
+    "Time": "2026-11-05T23:03:45.320331301Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/partial-members",
+    "Elapsed": 5.36
+  },
+  {
+    "Time": "2026-11-05T23:03:45.32034425Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/member-order"
+  },
+  {
+    "Time": "2026-11-05T23:03:50.609506185Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/member-order",
+    "Elapsed": 5.29
+  },
+  {
+    "Time": "2026-11-05T23:03:50.609515869Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/wrong-head"
+  },
+  {
+    "Time": "2026-11-05T23:03:55.874359424Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/wrong-head",
+    "Elapsed": 5.26
+  },
+  {
+    "Time": "2026-11-05T23:03:55.874366244Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/digest-alone-readback"
+  },
+  {
+    "Time": "2026-11-05T23:04:01.173180624Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext/digest-alone-readback",
+    "Elapsed": 5.3
+  },
+  {
+    "Time": "2026-11-05T23:04:01.173194665Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentSetRequiresExactExternalCompleteContext",
+    "Elapsed": 32.67
+  },
+  {
+    "Time": "2026-11-05T23:04:01.173199732Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents"
+  },
+  {
+    "Time": "2026-11-05T23:04:03.189305674Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/foreign-referent"
+  },
+  {
+    "Time": "2026-11-05T23:04:07.210456095Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/foreign-referent",
+    "Elapsed": 4.02
+  },
+  {
+    "Time": "2026-11-05T23:04:07.210470807Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/unknown-clock-override"
+  },
+  {
+    "Time": "2026-11-05T23:04:07.26863161Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/unknown-clock-override",
+    "Elapsed": 0.06
+  },
+  {
+    "Time": "2026-11-05T23:04:07.268639782Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/missing-record"
+  },
+  {
+    "Time": "2026-11-05T23:04:07.269525289Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents/missing-record",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:07.269571267Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketRejectsExtraUnknownFieldsAndForeignReferents",
+    "Elapsed": 6.1
+  },
+  {
+    "Time": "2026-11-05T23:04:07.269591697Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRegeneratedEphemeralCryptoPacketAndCurrentDerivedSet"
+  },
+  {
+    "Time": "2026-11-05T23:04:21.991499964Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRegeneratedEphemeralCryptoPacketAndCurrentDerivedSet",
+    "Elapsed": 14.72
+  },
+  {
+    "Time": "2026-11-05T23:04:21.991506754Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRFC8032StrictVerification"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.110681751Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRFC8032StrictVerification",
+    "Elapsed": 0.12
+  },
+  {
+    "Time": "2026-11-05T23:04:22.110693027Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestEphemeralEd25519AndSPKI"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.126791868Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestEphemeralEd25519AndSPKI",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:04:22.12680013Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCompleteGraphDependencyOrderAndCoverage"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.50168307Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCompleteGraphDependencyOrderAndCoverage",
+    "Elapsed": 0.37
+  },
+  {
+    "Time": "2026-11-05T23:04:22.501692564Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestGraphRejectsMissingDuplicateCycleAndUnknown"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.501937505Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestGraphRejectsMissingDuplicateCycleAndUnknown",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.501942082Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.501984645Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"a\":1,\"a\":2}"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502088649Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"a\":1,\"a\":2}",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502103541Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"a\":1,\"\\u0061\":2}"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.50216442Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"a\":1,\"\\u0061\":2}",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502186173Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"x\":{\"k\":1,\"k\":1}}"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502244208Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/{\"x\":{\"k\":1,\"k\":1}}",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502259681Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1.0"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502321572Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1.0",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502327281Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1e0"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502398476Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1e0",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502404174Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1E2"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502460157Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/1E2",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502467117Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/-0"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.50252296Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/-0",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502539745Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/9007199254740992"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502600504Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/9007199254740992",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502605932Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/-9007199254740992"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502663868Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/-9007199254740992",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502672881Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/NaN"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502755233Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/NaN",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502768602Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/true_false"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502834239Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/true_false",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502839427Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502897663Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502913316Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\udc00\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502959985Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\udc00\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.502964892Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\\u0061\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503021155Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\\u0061\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503041525Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\\ud800\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503091069Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\\ud800\\ud800\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503112981Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\ufffd\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503158108Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"\ufffd\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503168463Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"a\\x00b\""
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503226248Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/\"a\\x00b\"",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503262632Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503418382Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation/[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503503327Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictJSONRejectsLostInformation",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503521224Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCanonicalGoBytes"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503620951Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCanonicalGoBytes",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503639228Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictCalendar"
+  },
+  {
+    "Time": "2026-11-05T23:04:22.50369459Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestStrictCalendar",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:22.503710153Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestHistoricalNativeIsTypedAndCannotBecomeCurrentProof"
+  },
+  {
+    "Time": "2026-11-05T23:04:33.019426654Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestHistoricalNativeIsTypedAndCannotBecomeCurrentProof",
+    "Elapsed": 10.52
+  },
+  {
+    "Time": "2026-11-05T23:04:33.019435527Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound"
+  },
+  {
+    "Time": "2026-11-05T23:04:35.200873489Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/lease-shorter"
+  },
+  {
+    "Time": "2026-11-05T23:04:36.32431003Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/lease-shorter",
+    "Elapsed": 1.12
+  },
+  {
+    "Time": "2026-11-05T23:04:36.324322348Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/plan-shorter"
+  },
+  {
+    "Time": "2026-11-05T23:04:37.490910035Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/plan-shorter",
+    "Elapsed": 1.17
+  },
+  {
+    "Time": "2026-11-05T23:04:37.490916724Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/wrong-challenge-nonce"
+  },
+  {
+    "Time": "2026-11-05T23:04:38.591242004Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/wrong-challenge-nonce",
+    "Elapsed": 1.1
+  },
+  {
+    "Time": "2026-11-05T23:04:38.591249515Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/wrong-challenge-epoch"
+  },
+  {
+    "Time": "2026-11-05T23:04:39.686769719Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound/wrong-challenge-epoch",
+    "Elapsed": 1.1
+  },
+  {
+    "Time": "2026-11-05T23:04:39.686787476Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeExpiryIsDeterministicLeasePlanBound",
+    "Elapsed": 6.67
+  },
+  {
+    "Time": "2026-11-05T23:04:39.686792293Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeCertificateNotAfterCapsDerivedReference"
+  },
+  {
+    "Time": "2026-11-05T23:04:46.058523559Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeCertificateNotAfterCapsDerivedReference",
+    "Elapsed": 6.37
+  },
+  {
+    "Time": "2026-11-05T23:04:46.058533884Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestMissingProofAuthenticationPrecedesDerivedEvaluation"
+  },
+  {
+    "Time": "2026-11-05T23:04:52.237705245Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestMissingProofAuthenticationPrecedesDerivedEvaluation",
+    "Elapsed": 6.18
+  },
+  {
+    "Time": "2026-11-05T23:04:52.237725915Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAll112OriginalSubjectsAndScopedPolicyAreDerived"
+  },
+  {
+    "Time": "2026-11-05T23:04:52.668220962Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestAll112OriginalSubjectsAndScopedPolicyAreDerived",
+    "Elapsed": 0.43
+  },
+  {
+    "Time": "2026-11-05T23:04:52.668232399Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestArgvSeparateFromC2AndProcessBytes"
+  },
+  {
+    "Time": "2026-11-05T23:04:52.668257326Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestArgvSeparateFromC2AndProcessBytes",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:52.668266329Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExactOfflineClosureAndOriginalShapeOnly"
+  },
+  {
+    "Time": "2026-11-05T23:04:53.34029546Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExactOfflineClosureAndOriginalShapeOnly",
+    "Elapsed": 0.67
+  },
+  {
+    "Time": "2026-11-05T23:04:53.340320147Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDerivedByteVectors"
+  },
+  {
+    "Time": "2026-11-05T23:04:53.344407752Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDerivedByteVectors",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:53.344422364Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestOfflineLoaderNeverResolves"
+  },
+  {
+    "Time": "2026-11-05T23:04:53.344442944Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestOfflineLoaderNeverResolves",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:53.344448813Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket"
+  },
+  {
+    "Time": "2026-11-05T23:04:54.27266216Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/revoked-key"
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065791864Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/revoked-key",
+    "Elapsed": 0.79
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065798624Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/member-order"
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065841006Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/member-order",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065872162Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/wrong-verifier"
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065913914Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/wrong-verifier",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:55.065921485Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-contracts"
+  },
+  {
+    "Time": "2026-11-05T23:04:55.767635902Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-contracts",
+    "Elapsed": 0.7
+  },
+  {
+    "Time": "2026-11-05T23:04:55.767643163Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/wrong-graph"
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465042198Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/wrong-graph",
+    "Elapsed": 0.7
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465052182Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-member"
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465094515Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-member",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465109006Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-registry"
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465153372Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-registry",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:56.46517273Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-verifier-review"
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465216825Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/missing-verifier-review",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:04:56.465235513Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/no-keys"
+  },
+  {
+    "Time": "2026-11-05T23:04:57.261542608Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/no-keys",
+    "Elapsed": 0.8
+  },
+  {
+    "Time": "2026-11-05T23:04:57.261555677Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/null-contract"
+  },
+  {
+    "Time": "2026-11-05T23:04:57.957614233Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/null-contract",
+    "Elapsed": 0.7
+  },
+  {
+    "Time": "2026-11-05T23:04:57.957620823Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/unknown-codec"
+  },
+  {
+    "Time": "2026-11-05T23:04:58.656516918Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket/unknown-codec",
+    "Elapsed": 0.7
+  },
+  {
+    "Time": "2026-11-05T23:05:00.070824379Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestExternalTrustIsRequiredAndNeverSelectedByPacket",
+    "Elapsed": 6.73
+  },
+  {
+    "Time": "2026-11-05T23:05:00.070833753Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind"
+  },
+  {
+    "Time": "2026-11-05T23:05:00.070849166Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/node-floor-v2"
+  },
+  {
+    "Time": "2026-11-05T23:05:05.291271071Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/node-floor-v2",
+    "Elapsed": 5.22
+  },
+  {
+    "Time": "2026-11-05T23:05:05.291277891Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/build-provenance"
+  },
+  {
+    "Time": "2026-11-05T23:05:09.661111169Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/build-provenance",
+    "Elapsed": 4.37
+  },
+  {
+    "Time": "2026-11-05T23:05:09.661119281Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/inventory-head-readback"
+  },
+  {
+    "Time": "2026-11-05T23:05:14.508772465Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind/inventory-head-readback",
+    "Elapsed": 4.85
+  },
+  {
+    "Time": "2026-11-05T23:05:14.508812564Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestRealSignedWrongScopedKeyFullDependentRebind",
+    "Elapsed": 14.44
+  },
+  {
+    "Time": "2026-11-05T23:05:14.508844572Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestEveryProofKeyAndSubjectIndependentOfGraph"
+  },
+  {
+    "Time": "2026-11-05T23:05:16.820579884Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestEveryProofKeyAndSubjectIndependentOfGraph",
+    "Elapsed": 2.31
+  },
+  {
+    "Time": "2026-11-05T23:05:16.820587225Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.009713201Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.026110314Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/tampered-signature"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.035388529Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/tampered-signature",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:05:19.035395419Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/role-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.037056381Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/role-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.037061668Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/spki-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.038754317Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/spki-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.03877693Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/extra-field"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.040364103Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/extra-field",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.040386586Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/whitespace"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.041986848Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/whitespace",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.042031544Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/lf"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.043602373Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/lf",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.043629062Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/wrong-contract"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.045236144Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/wrong-contract",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.04525315Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/wrong-operation"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.061861174Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/wrong-operation",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.061866302Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/expired"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.078485883Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/expired",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.07849025Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/future"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.095368192Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/future",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.095377516Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/future-publication"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.118591617Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/future-publication",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.118598176Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/noncanonical-time"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.12034834Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh/noncanonical-time",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.120399765Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/fresh",
+    "Elapsed": 0.11
+  },
+  {
+    "Time": "2026-11-05T23:05:19.12042308Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.135732347Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/tampered-signature"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.151066872Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/tampered-signature",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.151074704Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/role-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.152253974Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/role-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.152275997Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/spki-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.153073153Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/spki-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.153079102Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/extra-field"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.154204764Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/extra-field",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.154221809Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/whitespace"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.155398315Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/whitespace",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.155420108Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/lf"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.156573951Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/lf",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.156580781Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/wrong-contract"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.157696628Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/wrong-contract",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.157700934Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/wrong-operation"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.158832475Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/wrong-operation",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.15884966Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/expired"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.174895965Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/expired",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.174901393Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/future"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.190782485Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/future",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.190802464Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/future-publication"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.206868799Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/future-publication",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.206888408Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/noncanonical-time"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.208129961Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance/noncanonical-time",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.208168718Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/immutable-provenance",
+    "Elapsed": 0.09
+  },
+  {
+    "Time": "2026-11-05T23:05:19.208189568Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.226605481Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/tampered-signature"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.242454435Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/tampered-signature",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.242461115Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/role-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.243614197Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/role-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.243634638Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/spki-with-reused-key"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.244786237Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/spki-with-reused-key",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.244802041Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/extra-field"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.24587867Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/extra-field",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.245901293Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/whitespace"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.246949971Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/whitespace",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.246973866Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/lf"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.248030706Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/lf",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.248052809Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/wrong-contract"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.249106675Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/wrong-contract",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.249130229Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/wrong-operation"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.25018789Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/wrong-operation",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.250212266Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/expired"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.266065487Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/expired",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.266075952Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/future"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.281908262Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/future",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.281918297Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/future-publication"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.297820709Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/future-publication",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:19.297825727Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/noncanonical-time"
+  },
+  {
+    "Time": "2026-11-05T23:05:19.298943166Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval/noncanonical-time",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:19.298967512Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives/validity-bounded-approval",
+    "Elapsed": 0.09
+  },
+  {
+    "Time": "2026-11-05T23:05:19.46637497Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNormalizedWireSignatureFreshnessAndPublicationNegatives",
+    "Elapsed": 2.65
+  },
+  {
+    "Time": "2026-11-05T23:05:19.466390874Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.642958277Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signature"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.657927502Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signature",
+    "Elapsed": 0.01
+  },
+  {
+    "Time": "2026-11-05T23:05:21.657937097Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signed-nonce"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.675714617Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signed-nonce",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:21.675722869Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signed-cert"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.678178144Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/signed-cert",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.678184573Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/raw-c2-hash-substitution"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.67932043Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/raw-c2-hash-substitution",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.679325718Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/derived-expiry"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.697471542Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/derived-expiry",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:21.697483459Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/native-as-normalized"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.698901412Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/native-as-normalized",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.69890681Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/expired-operation"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.699833839Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/expired-operation",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.699856933Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/missing-challenge"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.717492113Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/missing-challenge",
+    "Elapsed": 0.02
+  },
+  {
+    "Time": "2026-11-05T23:05:21.717500716Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/missing-revocation-state"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.718869807Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/missing-revocation-state",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.718891289Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/wrong-operation"
+  },
+  {
+    "Time": "2026-11-05T23:05:21.71981367Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity/wrong-operation",
+    "Elapsed": 0
+  },
+  {
+    "Time": "2026-11-05T23:05:21.719853028Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeM2ExactOriginalWireAndDerivedValidity",
+    "Elapsed": 2.25
+  },
+  {
+    "Time": "2026-11-05T23:05:21.719874991Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCallerMutationsCannotChangeInstalledVerifier"
+  },
+  {
+    "Time": "2026-11-05T23:05:27.927236191Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCallerMutationsCannotChangeInstalledVerifier",
+    "Elapsed": 6.21
+  },
+  {
+    "Time": "2026-11-05T23:05:27.927260196Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableTwoEpochHistoryAndCurrent"
+  },
+  {
+    "Time": "2026-11-05T23:05:38.709469758Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableTwoEpochHistoryAndCurrent",
+    "Elapsed": 10.78
+  },
+  {
+    "Time": "2026-11-05T23:05:38.709484841Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic"
+  },
+  {
+    "Time": "2026-11-05T23:05:39.630791218Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-plan"
+  },
+  {
+    "Time": "2026-11-05T23:05:39.81943466Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-plan",
+    "Elapsed": 0.19
+  },
+  {
+    "Time": "2026-11-05T23:05:39.819447459Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/missing-expiry"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.023130385Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/missing-expiry",
+    "Elapsed": 0.2
+  },
+  {
+    "Time": "2026-11-05T23:05:40.023137756Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/number-expiry"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.219535477Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/number-expiry",
+    "Elapsed": 0.2
+  },
+  {
+    "Time": "2026-11-05T23:05:40.219543709Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-timing"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.419740979Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-timing",
+    "Elapsed": 0.2
+  },
+  {
+    "Time": "2026-11-05T23:05:40.419749982Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/string-age"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.631409492Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/string-age",
+    "Elapsed": 0.21
+  },
+  {
+    "Time": "2026-11-05T23:05:40.631420869Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-facts"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.825443025Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic/nil-facts",
+    "Elapsed": 0.19
+  },
+  {
+    "Time": "2026-11-05T23:05:40.825458809Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestSemanticInputsRejectMalformedRequiredTimeWithoutPanic",
+    "Elapsed": 2.12
+  },
+  {
+    "Time": "2026-11-05T23:05:40.825464687Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage"
+  },
+  {
+    "Time": "2026-11-05T23:05:40.825514681Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/no-EKU"
+  },
+  {
+    "Time": "2026-11-05T23:05:45.913977023Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/no-EKU",
+    "Elapsed": 5.09
+  },
+  {
+    "Time": "2026-11-05T23:05:45.913987749Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/client-only"
+  },
+  {
+    "Time": "2026-11-05T23:05:51.080959365Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/client-only",
+    "Elapsed": 5.17
+  },
+  {
+    "Time": "2026-11-05T23:05:51.08096936Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/no-digital-signature"
+  },
+  {
+    "Time": "2026-11-05T23:05:56.243037441Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage/no-digital-signature",
+    "Elapsed": 5.16
+  },
+  {
+    "Time": "2026-11-05T23:05:56.243053324Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeLeafRequiresExplicitSigningServerUsage",
+    "Elapsed": 15.42
+  },
+  {
+    "Time": "2026-11-05T23:05:56.24306379Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow"
+  },
+  {
+    "Time": "2026-11-05T23:05:58.419480705Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/within-five-second-skew"
+  },
+  {
+    "Time": "2026-11-05T23:05:59.525401786Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/within-five-second-skew",
+    "Elapsed": 1.11
+  },
+  {
+    "Time": "2026-11-05T23:05:59.525414074Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/exact-thirty-second-skew"
+  },
+  {
+    "Time": "2026-11-05T23:06:00.630743381Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/exact-thirty-second-skew",
+    "Elapsed": 1.11
+  },
+  {
+    "Time": "2026-11-05T23:06:00.63075581Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/before-skew"
+  },
+  {
+    "Time": "2026-11-05T23:06:01.780428324Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/before-skew",
+    "Elapsed": 1.15
+  },
+  {
+    "Time": "2026-11-05T23:06:01.780437978Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/exact-expiry"
+  },
+  {
+    "Time": "2026-11-05T23:06:02.8774876Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/exact-expiry",
+    "Elapsed": 1.1
+  },
+  {
+    "Time": "2026-11-05T23:06:02.87749452Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/after-expiry"
+  },
+  {
+    "Time": "2026-11-05T23:06:03.996395391Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow/after-expiry",
+    "Elapsed": 1.12
+  },
+  {
+    "Time": "2026-11-05T23:06:03.996408179Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestNativeSignedObservationChallengeWindow",
+    "Elapsed": 7.75
+  },
+  {
+    "Time": "2026-11-05T23:06:03.996412856Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses"
+  },
+  {
+    "Time": "2026-11-05T23:06:05.155501026Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-historical-lease"
+  },
+  {
+    "Time": "2026-11-05T23:06:08.369041726Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-historical-lease",
+    "Elapsed": 3.21
+  },
+  {
+    "Time": "2026-11-05T23:06:08.369049117Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-historical-window"
+  },
+  {
+    "Time": "2026-11-05T23:06:11.564942149Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-historical-window",
+    "Elapsed": 3.2
+  },
+  {
+    "Time": "2026-11-05T23:06:11.564950812Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/missing-historical-challenges"
+  },
+  {
+    "Time": "2026-11-05T23:06:15.827120967Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/missing-historical-challenges",
+    "Elapsed": 4.26
+  },
+  {
+    "Time": "2026-11-05T23:06:21.103988002Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/old-retained"
+  },
+  {
+    "Time": "2026-11-05T23:06:22.189665757Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/old-retained",
+    "Elapsed": 1.09
+  },
+  {
+    "Time": "2026-11-05T23:06:22.189677164Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/old-time-relabelled-new-nonce"
+  },
+  {
+    "Time": "2026-11-05T23:06:23.238149693Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/old-time-relabelled-new-nonce",
+    "Elapsed": 1.05
+  },
+  {
+    "Time": "2026-11-05T23:06:23.238156904Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-current-nonce"
+  },
+  {
+    "Time": "2026-11-05T23:06:24.314106327Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses/wrong-current-nonce",
+    "Elapsed": 1.08
+  },
+  {
+    "Time": "2026-11-05T23:06:28.562184433Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoryBindingsAndNontransferableCurrentWitnesses",
+    "Elapsed": 24.57
+  },
+  {
+    "Time": "2026-11-05T23:06:28.56219613Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketSnapshotSeversMapsAndByteSlices"
+  },
+  {
+    "Time": "2026-11-05T23:06:34.805213332Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPacketSnapshotSeversMapsAndByteSlices",
+    "Elapsed": 6.24
+  },
+  {
+    "Time": "2026-11-05T23:06:34.805224148Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoricalSignedConsumingTimeControlsFreshness"
+  },
+  {
+    "Time": "2026-11-05T23:06:40.410951042Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestDurableHistoricalSignedConsumingTimeControlsFreshness",
+    "Elapsed": 5.61
+  },
+  {
+    "Time": "2026-11-05T23:06:40.410958843Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentNativeExpiredAtNowAndContextCopy"
+  },
+  {
+    "Time": "2026-11-05T23:06:46.940405694Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentNativeExpiredAtNowAndContextCopy",
+    "Elapsed": 6.53
+  },
+  {
+    "Time": "2026-11-05T23:06:46.94041644Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentHeadReadbackRechecksKeyAtNow"
+  },
+  {
+    "Time": "2026-11-05T23:06:57.466456855Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentHeadReadbackRechecksKeyAtNow",
+    "Elapsed": 10.53
+  },
+  {
+    "Time": "2026-11-05T23:06:57.466468943Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact"
+  },
+  {
+    "Time": "2026-11-05T23:06:58.628058578Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/different-held-hash"
+  },
+  {
+    "Time": "2026-11-05T23:07:03.904279054Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/different-held-hash",
+    "Elapsed": 5.28
+  },
+  {
+    "Time": "2026-11-05T23:07:03.904288588Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/different-held-window"
+  },
+  {
+    "Time": "2026-11-05T23:07:09.164652502Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/different-held-window",
+    "Elapsed": 5.26
+  },
+  {
+    "Time": "2026-11-05T23:07:09.164663658Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-native-missing"
+  },
+  {
+    "Time": "2026-11-05T23:07:14.470253637Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-native-missing",
+    "Elapsed": 5.31
+  },
+  {
+    "Time": "2026-11-05T23:07:14.470265565Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-native-member-order"
+  },
+  {
+    "Time": "2026-11-05T23:07:19.803826702Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-native-member-order",
+    "Elapsed": 5.33
+  },
+  {
+    "Time": "2026-11-05T23:07:19.80383905Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-challenge-future"
+  },
+  {
+    "Time": "2026-11-05T23:07:25.121124309Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-challenge-future",
+    "Elapsed": 5.32
+  },
+  {
+    "Time": "2026-11-05T23:07:25.121134745Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-challenge-operation"
+  },
+  {
+    "Time": "2026-11-05T23:07:30.385473623Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact/current-challenge-operation",
+    "Elapsed": 5.26
+  },
+  {
+    "Time": "2026-11-05T23:07:30.385504829Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentLeaseAndChallengeBindingsAreExact",
+    "Elapsed": 32.92
+  },
+  {
+    "Time": "2026-11-05T23:07:30.385510337Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentEpochSelectorIgnoresUnrelatedScopes"
+  },
+  {
+    "Time": "2026-11-05T23:07:36.825826734Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentEpochSelectorIgnoresUnrelatedScopes",
+    "Elapsed": 6.44
+  },
+  {
+    "Time": "2026-11-05T23:07:36.825839112Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews"
+  },
+  {
+    "Time": "2026-11-05T23:07:37.804399161Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-33"
+  },
+  {
+    "Time": "2026-11-05T23:07:43.158574975Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-33",
+    "Elapsed": 5.35
+  },
+  {
+    "Time": "2026-11-05T23:07:43.158590377Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-34"
+  },
+  {
+    "Time": "2026-11-05T23:07:48.5232826Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-34",
+    "Elapsed": 5.36
+  },
+  {
+    "Time": "2026-11-05T23:07:48.523293135Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-35"
+  },
+  {
+    "Time": "2026-11-05T23:07:53.827634928Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews/cohort-35",
+    "Elapsed": 5.3
+  },
+  {
+    "Time": "2026-11-05T23:07:53.827650471Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestCurrentRejectsConsistentSupersededViews",
+    "Elapsed": 17
+  },
+  {
+    "Time": "2026-11-05T23:07:53.827657031Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPublicEphemeralProofVectors"
+  },
+  {
+    "Time": "2026-11-05T23:08:00.126243548Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestPublicEphemeralProofVectors",
+    "Elapsed": 6.3
+  },
+  {
+    "Time": "2026-11-05T23:08:00.12627861Z",
+    "Action": "run",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestVerifierConcurrentReadOnlyUse"
+  },
+  {
+    "Time": "2026-11-05T23:08:10.306493586Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Test": "TestVerifierConcurrentReadOnlyUse",
+    "Elapsed": 10.18
+  },
+  {
+    "Time": "2026-11-05T23:08:11.328819469Z",
+    "Action": "pass",
+    "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+    "Elapsed": 286.817
+  }
+]

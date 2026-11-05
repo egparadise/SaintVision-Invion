@@ -1,0 +1,218 @@
+{
+  "sourceSHA": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "run": 42126222201,
+  "artifactID": 13463945019,
+  "artifactName": "saintvision-core-evidence",
+  "archiveBytes": 13394626,
+  "archiveRawSHA256": "25512901100943d57c2e9e48cee7d6e55f6ae134bdcbba4c86ffde088290655e",
+  "remoteDigest": "sha256:25512901100943d57c2e9e48cee7d6e55f6ae134bdcbba4c86ffde088290655e",
+  "digestMatches": true,
+  "createdAt": "2026-11-05T23:36:45Z",
+  "expiresAt": "2026-12-05T23:36:42Z",
+  "atKST": "2026-11-06T08:42:16.869001+09:00",
+  "opaqueArchiveKeptInIgnoredLocalScratch": ".work/k1-temporal-core-artifact-13463945019.zip",
+  "entries": [
+    {
+      "name": "business-handoff-tests.xml",
+      "bytes": 2778,
+      "compressedBytes": 725
+    },
+    {
+      "name": "containment-tests.xml",
+      "bytes": 4363,
+      "compressedBytes": 1042
+    },
+    {
+      "name": "build-product-runtime-real-pg.xml",
+      "bytes": 2369,
+      "compressedBytes": 658
+    },
+    {
+      "name": "api-unconfigured.log",
+      "bytes": 2745,
+      "compressedBytes": 770
+    },
+    {
+      "name": "core-tests.xml",
+      "bytes": 1420710,
+      "compressedBytes": 170450
+    },
+    {
+      "name": "cx01-recovery-tests.xml",
+      "bytes": 3535,
+      "compressedBytes": 994
+    },
+    {
+      "name": "developer-42f9e747-6b59-40d6-9be9-fd1b1c3e7923.json",
+      "bytes": 1002,
+      "compressedBytes": 623
+    },
+    {
+      "name": "developer-5172d3ff-d944-4d0a-b077-971900740128.json",
+      "bytes": 541,
+      "compressedBytes": 360
+    },
+    {
+      "name": "developer-a5adecc0-cd6d-42a8-98bb-6dfbcd41d918.json",
+      "bytes": 1731,
+      "compressedBytes": 965
+    },
+    {
+      "name": "developer-d1a8cd03-88d7-4940-bf7c-bae1069e97eb.json",
+      "bytes": 1747,
+      "compressedBytes": 977
+    },
+    {
+      "name": "docker-compatibility.log",
+      "bytes": 1176,
+      "compressedBytes": 404
+    },
+    {
+      "name": "first-27cb7153-526f-45f5-b1a7-86649cab70e2.json",
+      "bytes": 1489,
+      "compressedBytes": 859
+    },
+    {
+      "name": "first-66705ede-231f-4205-8b85-e70719a627f3.json",
+      "bytes": 829,
+      "compressedBytes": 531
+    },
+    {
+      "name": "first-bd399044-ce5e-4aca-9fed-0dfc8685db5f.json",
+      "bytes": 1476,
+      "compressedBytes": 847
+    },
+    {
+      "name": "first-fbf5e2f8-9c73-4b25-8c37-3238d7dcaae9.json",
+      "bytes": 598,
+      "compressedBytes": 386
+    },
+    {
+      "name": "inv-discover",
+      "bytes": 10212675,
+      "compressedBytes": 5802212
+    },
+    {
+      "name": "inv-node",
+      "bytes": 13387338,
+      "compressedBytes": 7346661
+    },
+    {
+      "name": "lan-database-readiness-phases.json",
+      "bytes": 775,
+      "compressedBytes": 411
+    },
+    {
+      "name": "lan-installer-tests.xml",
+      "bytes": 2914,
+      "compressedBytes": 642
+    },
+    {
+      "name": "lan-pilot-database-real-pg.xml",
+      "bytes": 563,
+      "compressedBytes": 295
+    },
+    {
+      "name": "model-cancel.json",
+      "bytes": 1429,
+      "compressedBytes": 764
+    },
+    {
+      "name": "model-node-loss.json",
+      "bytes": 1429,
+      "compressedBytes": 772
+    },
+    {
+      "name": "model-output-recovery.json",
+      "bytes": 1493,
+      "compressedBytes": 810
+    },
+    {
+      "name": "model-replacement-node.json",
+      "bytes": 1971,
+      "compressedBytes": 963
+    },
+    {
+      "name": "model-single.json",
+      "bytes": 1484,
+      "compressedBytes": 803
+    },
+    {
+      "name": "model-stale.json",
+      "bytes": 1425,
+      "compressedBytes": 765
+    },
+    {
+      "name": "node-unit.jsonl",
+      "bytes": 538728,
+      "compressedBytes": 49312
+    },
+    {
+      "name": "p0-owned-docker-floor.json",
+      "bytes": 4022,
+      "compressedBytes": 1450
+    },
+    {
+      "name": "p0-real-stopped-reentry-settled.json",
+      "bytes": 3347,
+      "compressedBytes": 1144
+    },
+    {
+      "name": "shard-recovery-tests.xml",
+      "bytes": 3353,
+      "compressedBytes": 826
+    },
+    {
+      "name": "subject-boundary.json",
+      "bytes": 2219,
+      "compressedBytes": 479
+    },
+    {
+      "name": "workspace-tests.xml",
+      "bytes": 3642,
+      "compressedBytes": 912
+    }
+  ],
+  "selected": [
+    {
+      "archiveEntry": "node-unit.jsonl",
+      "bytes": 538728,
+      "rawSHA256": "c8dbc79bf159eb5da5d65dacfb02f1b2574199f78296aa35fae5c906298fea63",
+      "privateKeyMarkerDetected": false,
+      "rawExported": false,
+      "publicationPolicy": "parsed metadata/counts and hashes only; no raw JUnit or opaque ZIP export"
+    },
+    {
+      "archiveEntry": "core-tests.xml",
+      "bytes": 1420710,
+      "rawSHA256": "226bafd712b43faadfb01e374812524f81ecae3203efbedfdedc1a89f94e3184",
+      "privateKeyMarkerDetected": true,
+      "rawExported": false,
+      "publicationPolicy": "parsed metadata/counts and hashes only; no raw JUnit or opaque ZIP export"
+    },
+    {
+      "archiveEntry": "docker-host-tests.xml",
+      "present": false,
+      "rawExported": false,
+      "reason": "not produced in this failed original run; no borrowed historical result"
+    },
+    {
+      "archiveEntry": "build-product-runtime-real-pg.xml",
+      "bytes": 2369,
+      "rawSHA256": "10c5606b4f72e8527bebc8fbc19738b05447e12254537b81664dc09dec9fa1ce",
+      "privateKeyMarkerDetected": false,
+      "rawExported": false,
+      "publicationPolicy": "parsed metadata/counts and hashes only; no raw JUnit or opaque ZIP export"
+    },
+    {
+      "archiveEntry": "lan-pilot-database-real-pg.xml",
+      "bytes": 563,
+      "rawSHA256": "fc8115943b3670e6a1ecbb046348ae5e563ef72c0aefcdd3de1e37b21f70165b",
+      "privateKeyMarkerDetected": false,
+      "rawExported": false,
+      "publicationPolicy": "parsed metadata/counts and hashes only; no raw JUnit or opaque ZIP export"
+    }
+  ],
+  "unselectedEntryPayloadsNotRead": true,
+  "wholeProductAcceptance": false
+}

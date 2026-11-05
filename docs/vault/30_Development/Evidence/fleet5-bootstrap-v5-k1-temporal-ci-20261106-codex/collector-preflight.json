@@ -1,0 +1,9 @@
+{
+  "initialASTExit": 1,
+  "initialReason": "missing closing outer dictionary brace in final summary expression; no collector execution or CI change",
+  "initialOuterShellExit": 0,
+  "initialOuterShellQualification": "later read-only run-list command obscured AST status; not an AST pass",
+  "correctedASTExit": 0,
+  "correctedAtKST": "2026-11-06T08:13:09.754759+09:00",
+  "scope": "development report collector only; frozen product source unchanged"
+}

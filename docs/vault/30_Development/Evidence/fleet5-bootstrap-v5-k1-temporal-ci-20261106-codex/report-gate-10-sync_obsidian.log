@@ -1,0 +1,6 @@
+CONFLICTS: 8 unmanaged destination collisions remain; no vault files written.
+  grouped by reason:
+         6  no-baseline
+         2  both-diverged
+  full list (8): D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v5-k1-temporal-report-20261106\.work\obsidian-sync-conflicts.json
+  no-baseline = the tool has no manifest/state record for these; it cannot tell a real edit from an un-recorded prior sync. --adopt-identical records only matching files; it does not resolve divergent files.

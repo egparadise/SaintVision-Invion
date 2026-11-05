@@ -1,0 +1,19 @@
+{
+  "sourceSHA": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "run": 42126222201,
+  "job": 127591007221,
+  "step": {
+    "name": "Test Linux Node concurrency and crash boundaries",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 15,
+    "started_at": "2026-11-05T23:03:03Z",
+    "completed_at": "2026-11-05T23:08:11Z"
+  },
+  "workflowGitBlobSHA256": "466532d8819ae7ec04b3a8da45a5a6338b97ca1cfba5c550372afcb725e888ac",
+  "command": "go test -race -json ./...",
+  "observedKST": "2026-11-06T08:14:44.694354+09:00",
+  "fullCoreConclusion": null,
+  "artifactParsedCounts": null,
+  "wholePhysicalAcceptance": false
+}

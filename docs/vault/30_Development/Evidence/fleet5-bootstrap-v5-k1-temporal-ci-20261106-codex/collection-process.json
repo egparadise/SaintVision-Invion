@@ -1,0 +1,18 @@
+{
+  "sourceSHA": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "startedKST": "2026-11-06T08:22:37.658761+09:00",
+  "collectorScriptRawSHA256": "9242b40dfe9edcb5536dd3036883f00d2ff22d934f4858a18eefd6f50a7fe1a2",
+  "mode": "read-only exact GitHub CI plus local report evidence; no Orca polling, CI rerun/cancel, product writes or Git publication",
+  "state": "ORIGINAL_CI_FAILED_NO_COLLECTION_NO_RETRY",
+  "finishedKST": "2026-11-06T08:37:37.756108+09:00",
+  "observedRuns": [
+    {
+      "id": 42126222201,
+      "conclusion": "failure"
+    },
+    {
+      "id": 42126225708,
+      "conclusion": "success"
+    }
+  ]
+}

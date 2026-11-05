@@ -1,0 +1,12 @@
+[
+  "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\.venv\\Scripts\\python.exe",
+  "-X",
+  "utf8",
+  "-B",
+  "D:\\Project\\SaintVisionI-Invion\\fleet5-bootstrap-v5-k1-temporal-report-20261106\\tools\\sync_obsidian.py",
+  "--check",
+  "--state",
+  "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\root429-export-state-snapshot-k1-report.json",
+  "--conflicts-out",
+  "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\k1-report-root-state-check-conflicts.json"
+]

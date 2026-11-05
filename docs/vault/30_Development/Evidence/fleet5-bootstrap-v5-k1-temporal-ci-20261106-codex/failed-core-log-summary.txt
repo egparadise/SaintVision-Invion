@@ -1,0 +1,7 @@
+2026-11-05T23:29:37.1566325Z Timeout (0:00:45)!
+2026-11-05T23:33:12.1948615Z Timeout (0:00:45)!
+2026-11-05T23:36:37.6113525Z E       AssertionError: assert ('GRAPH-0003', 409, False) == ('RES-0007', 429, True)
+2026-11-05T23:36:37.6119168Z tests/integration/test_build_preparations_real_pg.py:458: AssertionError
+2026-11-05T23:36:38.7082900Z FAILED tests/integration/test_build_preparations_real_pg.py::test_prepare_rate_limit_is_enforced_before_repeated_failed_work - AssertionError: assert ('GRAPH-0003', 409, False) == ('RES-0007', 429, True)
+2026-11-05T23:36:38.7100694Z = 1 failed, 9214 passed, 46 skipped, 2 deselected, 2033 warnings in 1172.00s (0:19:32) =
+2026-11-05T23:36:41.4834625Z ##[error]Process completed with exit code 1.

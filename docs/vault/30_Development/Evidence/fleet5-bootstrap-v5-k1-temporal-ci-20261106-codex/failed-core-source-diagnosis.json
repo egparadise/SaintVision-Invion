@@ -1,0 +1,29 @@
+{
+  "sourceSHA": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "run": 42126222201,
+  "job": 127591007221,
+  "failedStep": 33,
+  "failure": "test_prepare_rate_limit_is_enforced_before_repeated_failed_work",
+  "actual": [
+    "GRAPH-0003",
+    409,
+    false
+  ],
+  "expected": [
+    "RES-0007",
+    429,
+    true
+  ],
+  "unchangedGitBlobSHA256SinceC6f": {
+    "tests/integration/test_build_preparations_real_pg.py": "709581f43e0a67435bda6079e577240022cf1bba9f3d020d8cc8800fe8213a30",
+    "services/control-plane/src/inv/build_preparations.py": "ede6e55e0090bc6dd25c014e40911f4de2ef97842b55ed0338087cdc37e91642",
+    ".github/workflows/core.yml": "466532d8819ae7ec04b3a8da45a5a6338b97ca1cfba5c550372afcb725e888ac"
+  },
+  "sourceHypothesis": "DB clock_timestamp is floored to minute; test does not fix a shared window; rollover could reset budget, not established from this run",
+  "rootEscalation": "msg_483f8575dd18",
+  "rootResponse": "msg_c399e00f3186",
+  "fixOwner": "Root assigns separate narrow CI-blocker investigation; outside K1 scope",
+  "ciRerun": false,
+  "sourceEdits": false,
+  "atKST": "2026-11-06T08:43:08.221972+09:00"
+}

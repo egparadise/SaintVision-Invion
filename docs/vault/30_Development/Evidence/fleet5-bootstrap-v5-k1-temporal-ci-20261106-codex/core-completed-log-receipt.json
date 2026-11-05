@@ -1,0 +1,11 @@
+{
+  "run": 42126222201,
+  "job": 127591007221,
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "rawBytes": 1136551,
+  "rawSHA256": "21ec1431814cf1403b717fbc67843dd802378f2f2e1bc8852fe1fd8dfc7dba34",
+  "rawKeptInIgnoredScratch": ".work/k1-temporal-core-completed.log",
+  "selectedSummaryLines": 42,
+  "atKST": "2026-11-06T08:42:18.967576+09:00",
+  "rawExported": false
+}

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-bootstrap-v5-k1-temporal-report-20261106\\docs\\vault\\30_Development\\Evidence\\fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex\\collect_completed_ci.py.txt"
+  ],
+  "exit": 0,
+  "scriptRawSHA256": "fe52d509ec4730014df10e2f1f2b16003c5901db38be590aa0d223693cf021b4",
+  "atKST": "2026-11-06T08:42:19.009301+09:00",
+  "originalCoreConclusion": "failure",
+  "ciRerun": false,
+  "priorQualifiedCollectionExit": 1,
+  "priorReason": "successful-run auxiliary XML assumption; docker-host-tests.xml absent after failed main pytest; missing entry now explicitly recorded NOT_PRESENT_IN_FAILED_RUN",
+  "autoCollectorStoppedOnFailedCore": true,
+  "noRawJUnitZipExport": true
+}

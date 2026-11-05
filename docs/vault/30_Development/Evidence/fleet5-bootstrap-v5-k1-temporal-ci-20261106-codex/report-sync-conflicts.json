@@ -1,0 +1,56 @@
+{
+  "command": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check"
+  ],
+  "exit": 3,
+  "reportSHA256": "6a14d0942a506c818f64eb933c44cef86e09848f792bcccc798bdf018df0cb14",
+  "conflictMetadata": {
+    "reasonCounts": {
+      "both-diverged": 2,
+      "no-baseline": 6
+    },
+    "conflicts": [
+      {
+        "path": "00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+        "reason": "both-diverged"
+      },
+      {
+        "path": "30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+        "reason": "both-diverged"
+      },
+      {
+        "path": "30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+        "reason": "no-baseline"
+      },
+      {
+        "path": "30_Development/Evidence/fleet5-20261105-root/verifier-corrections.md",
+        "reason": "no-baseline"
+      },
+      {
+        "path": "30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate-ci-72028cba.json",
+        "reason": "no-baseline"
+      },
+      {
+        "path": "30_Development/History/2026-11-05_FLEET5_compute_storage_contract_Codex.md",
+        "reason": "no-baseline"
+      },
+      {
+        "path": "30_Development/History/2026-11-05_FLEET5_setup_integration_Codex.md",
+        "reason": "no-baseline"
+      },
+      {
+        "path": "30_Development/History/2026-11-05_\uae30\uc8745\ub300_\uc624\ucf00\uc2a4\ud2b8\ub808\uc774\uc158_\ucc29\uc218_Codex.md",
+        "reason": "no-baseline"
+      }
+    ],
+    "adoptedIdentical": [],
+    "resolvedFromRepository": []
+  },
+  "noVaultFilesWritten": true,
+  "ownerPathsInConflictList": false,
+  "resolutionOwner": "Root; shared boards/Card150/root-owned pages outside author scope",
+  "atKST": "2026-11-06T08:47:38.433886+09:00"
+}

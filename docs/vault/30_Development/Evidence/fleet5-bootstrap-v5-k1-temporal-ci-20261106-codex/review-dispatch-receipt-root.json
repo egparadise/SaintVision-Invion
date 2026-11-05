@@ -1,0 +1,14 @@
+{
+  "rootMessage": "msg_c4f86971960b",
+  "sourceSHA": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "actualReviewerTask": "task_eeb63f89fecd",
+  "actualReviewerDispatch": "ctx_c6a8ddbbde6d",
+  "reviewer": "Claude via Root",
+  "state": "RUNNING_NO_ACTUAL_VERDICT",
+  "reviewSHA": null,
+  "reviewDocsRun": null,
+  "rootContextSHA": "c10e7f359d5ba6f6b3973fafdec223c5bffab2e0",
+  "rootDocsRun": 42127169716,
+  "rootContextEvidenceIsNotProductCI": true,
+  "recordedKST": "2026-11-06T08:25:14.703727+09:00"
+}

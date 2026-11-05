@@ -1,0 +1,15 @@
+{
+  "base": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "branch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-report-20261106",
+  "owner": "Codex",
+  "reviewer": "Claude via Root pending actual delta verdict",
+  "atKST": "2026-11-06T08:09:22.017196+09:00",
+  "rootReply": "msg_cd3722b3686e",
+  "indexVersion": "1.0.427",
+  "codexBoardVersion": "1.0.388",
+  "scope": "unique owner History/Evidence only; product diff zero",
+  "coreRun": 42126222201,
+  "docsRun": 42126225708,
+  "newReviewVerdict": null,
+  "workerDoneSent": false
+}

@@ -1,0 +1,9 @@
+{
+  "rootMessage": "msg_c4f86971960b",
+  "atKST": "2026-11-06T08:26:01.300242+09:00",
+  "currentCollectorScriptRawSHA256": "554684c058810e2eb4fa5e3d8036b7d49a616cd32921984bf22cc94a1172447f",
+  "ASTExit": 0,
+  "policy": "no raw JUnit/ZIP/selected Go stdout export; hashes, parsed counts/skips and Go event metadata only",
+  "queuedProcessQualification": "collection-process initial script hash records launch-time snapshot; executed report collector hash is recorded separately after execution",
+  "source56651Unchanged": true
+}

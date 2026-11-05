@@ -1,0 +1,205 @@
+{
+  "node-unit.jsonl": {
+    "passEvents": 343,
+    "topLevelPassed": 109,
+    "k1PassEvents": 165,
+    "k1TopLevelPassed": 42,
+    "failed": [],
+    "skippedTestEvents": 1,
+    "skippedTests": [
+      {
+        "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+        "test": "TestDockerLiveCompatibility",
+        "reason": "=== RUN   TestDockerLiveCompatibility\n    docker_linux_test.go:20: real Docker opt-in required\n--- SKIP: TestDockerLiveCompatibility (0.00s)"
+      }
+    ],
+    "packageResults": [
+      {
+        "Time": "2026-11-05T23:03:22.499760592Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T23:03:24.510768981Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+        "Elapsed": 1.054
+      },
+      {
+        "Time": "2026-11-05T23:03:24.537097221Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+        "Elapsed": 1.045
+      },
+      {
+        "Time": "2026-11-05T23:03:24.563241504Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+        "Elapsed": 1.033
+      },
+      {
+        "Time": "2026-11-05T23:03:24.929892286Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+        "Elapsed": 1.17
+      },
+      {
+        "Time": "2026-11-05T23:03:25.961883121Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+        "Elapsed": 1.044
+      },
+      {
+        "Time": "2026-11-05T23:03:25.963148821Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T23:03:25.963163944Z",
+        "Action": "skip",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-05T23:03:26.105496634Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+        "Elapsed": 1.174
+      },
+      {
+        "Time": "2026-11-05T23:03:27.328403604Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+        "Elapsed": 1.222
+      },
+      {
+        "Time": "2026-11-05T23:03:27.720739876Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+        "Elapsed": 1.758
+      },
+      {
+        "Time": "2026-11-05T23:03:28.730488204Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+        "Elapsed": 3.8120000000000003
+      },
+      {
+        "Time": "2026-11-05T23:08:11.328819469Z",
+        "Action": "pass",
+        "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+        "Elapsed": 286.817
+      }
+    ]
+  },
+  "core-tests.xml": {
+    "testcases": 9261,
+    "passed": 9214,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 46,
+    "skipReasons": {
+      "PowerShell and csc.exe shim require Windows": 13,
+      "PowerShell parser requires Windows": 2,
+      "PowerShell required": 9,
+      "Actual Windows PowerShell launcher": 10,
+      "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+      "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+      "run only through tools/placement_benchmark.py": 1,
+      "run only through tools/placement_lock_wait_diagnostic.py": 1,
+      "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+      "claude is not installed on this machine": 1,
+      "codex is not installed on this machine": 1,
+      "gemini is not installed on this machine": 1,
+      "antigravity is not installed on this machine": 1,
+      "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+    },
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "46",
+        "tests": "9261",
+        "time": "1171.857",
+        "timestamp": "2026-11-05T23:17:05.611017+00:00",
+        "hostname": "runnervmwuk1x"
+      }
+    ],
+    "rawPrivateKeyMarkerLocations": {
+      "attributes": 6,
+      "textElements": 0
+    },
+    "rawExported": false,
+    "failedCases": [
+      {
+        "name": "test_prepare_rate_limit_is_enforced_before_repeated_failed_work",
+        "classname": "tests.integration.test_build_preparations_real_pg",
+        "failureMessage": "AssertionError: assert ('GRAPH-0003', 409, False) == ('RES-0007', 429, True)\n  \n  At index 0 diff: 'GRAPH-0003' != 'RES-0007'\n  \n  Full diff:\n    (\n  -     'RES-0007',\n  ?       ^^    ^\n  +     'GRAPH-0003',\n  ?      + ^^^    ^\n  -     429,\n  ?      ^\n  +     409,\n  ?      ^\n  -     True,\n  +     False,\n    )",
+        "errorMessage": null
+      }
+    ]
+  },
+  "docker-host-tests.xml": {
+    "status": "NOT_PRESENT_IN_FAILED_RUN",
+    "testcases": null,
+    "passed": null,
+    "failures": null,
+    "errors": null,
+    "skipped": null
+  },
+  "build-product-runtime-real-pg.xml": {
+    "testcases": 13,
+    "passed": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "13",
+        "time": "50.364",
+        "timestamp": "2026-11-05T23:16:00.412094+00:00",
+        "hostname": "runnervmwuk1x"
+      }
+    ],
+    "rawPrivateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    },
+    "rawExported": false,
+    "failedCases": []
+  },
+  "lan-pilot-database-real-pg.xml": {
+    "testcases": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "2",
+        "time": "13.432",
+        "timestamp": "2026-11-05T23:16:51.507309+00:00",
+        "hostname": "runnervmwuk1x"
+      }
+    ],
+    "rawPrivateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    },
+    "rawExported": false,
+    "failedCases": []
+  }
+}

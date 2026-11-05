@@ -1,0 +1,22 @@
+[
+  {
+    "conclusion": "",
+    "databaseId": 42126222201,
+    "displayTitle": "FLEET5-K1-temporal-Core-56651cba697f-20261106T080044KST",
+    "headBranch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106",
+    "headSha": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "status": "in_progress",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42126222201",
+    "workflowName": "Core Build"
+  },
+  {
+    "conclusion": "",
+    "databaseId": 42126225708,
+    "displayTitle": "FLEET5-K1-temporal-Docs-56651cba697f-20261106T080044KST",
+    "headBranch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106",
+    "headSha": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "status": "queued",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42126225708",
+    "workflowName": "Documentation Build"
+  }
+]
