@@ -1,0 +1,11 @@
+{
+  "hashDomain": "exact UTF-8 LF public bytes",
+  "SHA256": {
+    "append-quiescence-gate.json": "e05e08f68986e561a9cf2b476580ba36bbeb0acb20435b416f06a6a457fe2ac5",
+    "final-document-checks.json": "10eea2aa4f37fb5d2cab7f31336c425b9e2b606666e2cf691f22c610d73a369a",
+    "known-hosts-copy-receipt.json": "b8d5def4fa32784adb5620a587564b44412ae43fc45bc0034be496f9f9d80a73",
+    "local-checks.json": "be8f417a4d7efcbbb4020c297ce9847ec91f5d4d3be1db319042c9d0026d49c5",
+    "low-closure-packet.json": "e756c5fbbbcb346198c515dab20f9a20f223a98da0b47a463e0c74b7ba6d0748",
+    "stage-and-firewall-contract.json": "645635d8259937e36ff99fb1adf77849cf19102cf87ee8f139d1e707d7a7f3e5"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "task": "task_05d9dcda1dca",
+  "checks": [
+    {
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "-m",
+        "pytest",
+        "tests/core/test_lan_worker_config.py",
+        "-q"
+      ],
+      "startKST": "2026-11-05T15:17:00.639564+09:00",
+      "endKST": "2026-11-05T15:17:06.157188+09:00",
+      "exit": 0
+    },
+    {
+      "name": "docs",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-05T15:20:49.032009+09:00",
+      "endKST": "2026-11-05T15:20:52.352179+09:00",
+      "exit": 0
+    },
+    {
+      "name": "ontology",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_ontology.py"
+      ],
+      "startKST": "2026-11-05T15:20:52.352179+09:00",
+      "endKST": "2026-11-05T15:20:55.378624+09:00",
+      "exit": 0
+    },
+    {
+      "name": "sync-check",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startKST": "2026-11-05T15:20:55.378624+09:00",
+      "endKST": "2026-11-05T15:21:00.829975+09:00",
+      "exit": 0
+    },
+    {
+      "name": "contract-bindings",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_contract_bindings.py"
+      ],
+      "startKST": "2026-11-05T15:21:00.829975+09:00",
+      "endKST": "2026-11-05T15:21:12.368752+09:00",
+      "exit": 0
+    },
+    {
+      "name": "frontend-integrity",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startKST": "2026-11-05T15:21:12.368752+09:00",
+      "endKST": "2026-11-05T15:21:13.065781+09:00",
+      "exit": 0
+    },
+    {
+      "name": "single-source",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-05T15:21:13.065781+09:00",
+      "endKST": "2026-11-05T15:21:13.672429+09:00",
+      "exit": 0
+    },
+    {
+      "name": "path-citations",
+      "argv": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "HEAD"
+      ],
+      "startKST": "2026-11-05T15:21:13.672429+09:00",
+      "endKST": "2026-11-05T15:21:18.285454+09:00",
+      "exit": 0
+    },
+    {
+      "name": "diff",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startKST": "2026-11-05T15:21:18.285454+09:00",
+      "endKST": "2026-11-05T15:21:18.479080+09:00",
+      "exit": 0
+    }
+  ],
+  "numericAPIGateUnchanged": true,
+  "existingTestsUpdatedOnlyExpectedMessage": true,
+  "newTestsAdded": 0,
+  "remoteMutationExecuted": false,
+  "obsidianApply": false
+}

@@ -1,0 +1,36 @@
+{
+  "task": "task_26607075f612",
+  "stages": {
+    "currentLowTask": "local plan/docs/known_hosts copy and hash checks only; remote auth/rules/CA/DB/Node/listener mutations prohibited",
+    "laterPreparationClassification": "only after exact Low packet review and separate admitted execution scope, outside preserved r5 intervals and actual headroom/ownership gates",
+    "stage03": "HOLD actual PG/bootstrap: root must resolve Core41982378091 failure and exactly-one same-head retry/source investigation; this worker does not retry or edit source",
+    "failureCause": "not proved; accepting a temporary initdb Unix server is a hypothesis only",
+    "stage04b": "fresh long-lived external issuer generation remains a later reviewed preparation; rootOnline=true/rootOffline=false development custody caveat, no offline root claim",
+    "stage05and09Enroll": "HOLD until actual P2 authorized operator appointment/date is fixed within about4days; six-day CP/Node leaves and48h legitimate renewal window must not start speculatively",
+    "publishAndObserve": "BLOCKED until actual P2 operator rules/proof and post-reboot/reload validity gates; no privileged Docker/helper/account bypass",
+    "append": "HOLD until same-state extension prereqs and actual zero-uncommitted/finalized gate are measured; current counts null and queryExecuted=false",
+    "unchanged": "pure source59f archive, bootstrap and R4 guard sources, all r5 state/CA/keys/epochs/profiles/containers/pins/three followups; no generic reapproval question"
+  },
+  "firewall": {
+    "mode": "re-prove rather than assume persistence; no OS mutation here",
+    "invalidatingEvents": [
+      "worker reboot/boot identity change",
+      "firewall service reload/restart",
+      "Docker daemon/network/backend restart or reload affecting published-port routing",
+      "any scoped rule/order/digest change or unknown event history"
+    ],
+    "beforePublishOrResume": "authorized operator re-reads correct current backend chain/order for exact Node IP/original destination18515 and CP-only rule; do not publish/resume on stale receipt",
+    "postStartProof": "same-time successful authenticated fresh-CA CP observation and failed known-worker3 TCP connect while Node listener is active, plus scoped deny counters/exit/timestamps and current boot/backend/rule hash",
+    "alternative": "a separately independently reviewed persistence mechanism plus post-event revalidation can be proposed later; none installed/assumed by this packet",
+    "attendedOnlyUntilPersistence": "do not leave new F5 Nodes active unattended or claim reboot-safe ingress without reviewed persistence; stop only new owned F5 Nodes at session end/before controlled reboot or reload; an unplanned event invalidates acceptance and requires authorized isolation/re-proof, not an assumed safe automatic resume",
+    "onInvalidation": "invalidate prior acceptance, block new publish/resume and append acceptance; operator isolates only new F5 resources under exact ownership and re-proves rules, never touches r5",
+    "currentProofExecuted": false,
+    "currentRuleChangeExecuted": false
+  },
+  "intendedCADevelopmentCustody": {
+    "rootOnline": true,
+    "rootOffline": false,
+    "CAExistsNow": false,
+    "meaning": "future encrypted root key stays online unless separately proved otherwise; no production/offline custody claim"
+  }
+}

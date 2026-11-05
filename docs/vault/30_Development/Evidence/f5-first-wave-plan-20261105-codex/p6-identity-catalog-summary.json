@@ -1,0 +1,10 @@
+{
+  "stateCount": 10,
+  "uniqueOldTenantCount": 9,
+  "uniqueOldEpochCount": 9,
+  "uniqueOldNodeCount": 20,
+  "uniqueOldCACertificateCount": 4,
+  "privateCatalogSHA256": "2462dd139859df5cf58e28a83b3c9d75ee14e49faa4ef5e30470b7300f880a99",
+  "comparisonGate": "new F5 tenant/epoch/Node IDs/CA certs must be disjoint against this complete bounded old-state catalog before install; actual generated NotAfter recorded",
+  "generatedNewValues": "not yet created"
+}

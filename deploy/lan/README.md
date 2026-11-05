@@ -120,7 +120,7 @@ download host therefore is not supported for this enrollment step.
 
 Before enrollment, each Ubuntu worker must meet all of these conditions:
 
-- Docker Engine/CLI 25 or newer and Docker **server API 1.45 or newer**. Check
+- Docker Engine/CLI 26 or newer and Docker **server API 1.45 or newer**. Check
   both `docker version` and `docker version --format '{{.Server.APIVersion}}'`;
   an Engine 25 installation exposing only API 1.44 must be upgraded.
 - NTP synchronized (`timedatectl show -p NTPSynchronized --value` prints
@@ -218,7 +218,7 @@ extract it into a fresh per-Node directory. The existing three Ubuntu Nodes do
 not require reinstallation; preserve their current keys, journals, containers,
 channels, and working directories.
 
-Docker Desktop must be 4.27 or newer (Docker Engine 25+), use Linux containers,
+Docker Desktop must be 4.29 or newer (Docker Engine 26+), use Linux containers,
 expose server API 1.45 or newer, and
 have WSL integration enabled for the `Ubuntu` distribution because both
 PowerShell entry points delegate into the shipped shell scripts. The configured
@@ -227,7 +227,13 @@ exact existing Node firewall rule or creates one limited to local TCP 18443 and
 the server address; it does not alter global profiles or add a port proxy.
 `finish-worker.sh` invokes `start-node.sh`, so do not call the latter directly.
 If the API is older, preparation stops with a `BLOCKED` message naming Docker
-API 1.45, Engine 25+, and Docker Desktop 4.27+; do not bypass that preflight.
+API 1.45, Engine 26+, and Docker Desktop 4.29+; do not bypass that preflight.
+Engine 26 and Desktop 4.29 are historical feature floors, not versions to install
+today. Select a currently supported compatible release for an actual upgrade and
+verify its real server API range. The [Docker API matrix](https://docs.docker.com/reference/api/engine/#api-version-matrix)
+maps Engine 26.0 to API 1.45 and Engine 25.0 to 1.44; the
+[Desktop 4.29 release notes](https://docs.docker.com/desktop/release-notes/#4290)
+list Engine 26.0.0. The API check remains authoritative.
 
 Bootstrap artifact routing uses the request's source address. A request for
 `worker.zip` or `node-cert.pem` that arrives as loopback or a WSL NAT address

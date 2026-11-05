@@ -1,0 +1,51 @@
+{
+  "task": "task_05d9dcda1dca",
+  "supplementsFrozenCorePlanSHA256": "5121cb834016ebf86fd7433bcca3c3c89446374965a05f71a069158afe44d35f",
+  "privateResolvedSupplementSHA256": "0dc48e5df75b18e6dd82e65de5475fc9c030be5e6e46a8c242db70e3c0232df1",
+  "requiredProcessEnvironment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "childInheritanceRequired": true,
+  "source": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067:tools/lan_pilot.py",
+  "sourceContract": {
+    "add_requested_nodes": "copies existing entries, skips already known address, appends fresh ID for new private endpoint; no old entry removal; requested port must equal every existing Node port",
+    "init": "same state/serverIP/DSN namespace; saves appended IDs before side effects; re-applies published migrations to own F5 DB; preserves epoch; provisioning INSERT tenants/nodes ON CONFLICT DO NOTHING",
+    "tenantControls": "F5 killSwitch=true is repinned and its control version increments; extension is a real new-state/DB mutation, not byte-identical F5 private-state reuse",
+    "CA": "ensure_pilot_pki checks supplied external chain bytes against existing pinned ca.pem and returns without new issuer/control/signing keys; differing chain fails",
+    "peerPolicy": "existing version/tenant/node/epoch and current control fingerprint must match, otherwise fail; only absent new-node policy is created",
+    "bundle": "use retained exact prebuilt image/archive+inspection without CP Docker; per-active-Node public archive files may be rewritten; no old Node reinstall or key/channel rotation is implied"
+  },
+  "firstInitVersusExtension": {
+    "firstInit": "new tenant/epoch/IDs/CA distinct from every old catalog entry",
+    "extension": "keep current F5 tenant/epoch/CA/old IDs/keys; only added IDs must be new/disjoint; regenerate a new expected-state receipt instead of demanding original F5 state hash remain unchanged",
+    "r5": "always separate namespace; r5 state/CA/keys/epochs/containers/schedules remain byte-identical"
+  },
+  "extensionPrerequisites": [
+    "separate exact-input independent review; source59f unchanged and current F5 DB/CA/channel/rotation state settled",
+    "current CP/Node leaves/policies valid with adequate execution margin; if not, complete legitimate same-key F5 renewal first, never implicit issuer or epoch replacement",
+    "worker3 runtime authority,worker4 endpoint,CP runtime/Ubuntu/policy remain blocked until actual evidence; no placeholder endpoint",
+    "same nodePort18515/downloadPort18115 cannot change after enrollment; future slot ports and firewall proofs rechecked",
+    "new Node container/key created only on its distinct verified physical host; all-five acceptance stays false until all5 real ready/fresh slots pass"
+  ],
+  "executed": false,
+  "existingContractTest": {
+    "command": [
+      "<main non-r5 Python3.14.7>",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/test_lan_pilot_multinode.py",
+      "-q"
+    ],
+    "codeBase": "c81add97d9705f810f6fa7d84fcf05fd9a9ee55a; only uncommitted supplemental docs/JSON differ",
+    "exit": 0,
+    "passed": 39,
+    "skipped": 3,
+    "failed": 0,
+    "skipReasons": "2 POSIX fake-driver cases and1 POSIX shell verifier; Windows host",
+    "evidence": "direct console, no separate raw stdout artifact captured",
+    "recordedAtKST": "2026-11-05T15:48:49.117828+09:00"
+  }
+}

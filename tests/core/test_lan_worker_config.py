@@ -107,7 +107,7 @@ def test_new_installer_scripts_reject_old_v2_bundle_directory():
 def test_prepare_worker_blocked_message_names_minimum_docker_versions():
     script=(Path(__file__).resolve().parents[2]/'deploy/lan/prepare-worker.sh').read_text()
     assert 'BLOCKED: Docker API 1.45 or newer is required' in script
-    assert 'Docker Engine 25+ / Docker Desktop 4.27+' in script
+    assert 'Docker Engine 26+ / Docker Desktop 4.29+' in script
 
 
 def test_credential_copy_uses_container_owner_and_keeps_host_bytes(tmp_path):
