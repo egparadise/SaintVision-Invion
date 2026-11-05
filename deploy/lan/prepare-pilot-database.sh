@@ -122,9 +122,11 @@ else
 fi
 
 ready=false
+# The image's init server accepts Unix SQL before database creation is complete.
+# Authenticated TCP SQL waits for the final server after that init server stops.
 for _attempt in $(seq 1 40); do
     if docker exec "$container" sh -ec \
-        'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d postgres -Atqc "SELECT 1"' \
+        'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d postgres -Atqc "SELECT 1"' \
         2>/dev/null | grep -qx 1; then
         ready=true
         break
