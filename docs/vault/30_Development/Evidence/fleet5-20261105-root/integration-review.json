@@ -20,7 +20,7 @@
     "domain": "Git blob LF"
   },
   "cpDiscoveryVerdict": "accepted measured observations; deployment proposal requires explicit technical corrections",
-  "workerIndependentReview": "active Claude followup; root does not substitute its verdict",
+  "workerIndependentReview": "actual Claude53f received; first-wave correction pending",
   "deploymentVerdict": "not accepted or executed",
   "corrections": [
     "candidate ports require actual free/ownership reservation",
@@ -75,5 +75,62 @@
     ],
     "syncCheck": "2289 managed files / 15 pending exports / 0 conflicts / no writes",
     "scope": "documentation delivery checks, not a product build or five-PC acceptance"
+  },
+  "independentReviewReceived": {
+    "sourceSHA": "53f5722f7af1734b86da5a91a5dd1bf86824c939",
+    "exactDocsCI": 41980046633,
+    "conclusion": "success",
+    "reviewedInitialWorker": "6ba9ee46",
+    "initialWorkerEvidence": "10/10 source blobs and6/6 Evidence verified by actual Claude",
+    "rootDocsDelta": "accepted with1Low; policy-vs-quota and unused folder clarified",
+    "executionPlan": "request changes P1-P8, not accepted"
+  },
+  "activeNextReview": {
+    "task": "task_bab09fcf8dc7",
+    "dispatch": "ctx_88febf51813a",
+    "stateAtDispatch": "ready",
+    "targets": [
+      "published22fa",
+      "P1-P8 future correction",
+      "official CP target and rollback asset availability"
+    ]
+  },
+  "continuingF5CADecision": "fresh external intermediate/chain at first init, distinct from every old CA; owner Codex root; no generation yet",
+  "actualIngressAuthorityObservation": {
+    "worker1": {
+      "sshExit": 0,
+      "sudoReadExit": 1,
+      "classification": "interactive-authentication-required"
+    },
+    "worker2": {
+      "sshExit": 0,
+      "sudoReadExit": 1,
+      "classification": "interactive-authentication-required"
+    },
+    "attemptsPerWorker": 1,
+    "passwordOrRetryOrMutation": false,
+    "evidenceMessage": "msg_4b331a28e326",
+    "requiredInput": "existing administrator SSH profile/path or actual operator execution of reviewed scoped commands"
+  },
+  "independentSourceGuardTask": {
+    "card": "FLEET5-STORAGE-WORKSPACE-GUARD-20261105",
+    "task": "task_30f1fb073ec1",
+    "dispatch": "ctx_64e306776a86",
+    "stateAtReceipt": "ready",
+    "workspace": "fleet5-storage-workspace-guard-20261105",
+    "base": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "owner": "Codex worker",
+    "reviewer": "Claude after publication; not claimed done",
+    "scope": "reproduce and fail closed before unsupported storage mount is dropped by workspace install; preserve recorded rollback",
+    "liveMutationAllowed": false
+  },
+  "reviewCheckpointLocalGates": {
+    "observedAtKST": "2026-11-05T15:35:37+09:00",
+    "docs": 0,
+    "ontology": 0,
+    "syncCheck": 0,
+    "singleSourceRatchet": 0,
+    "pathCitationRatchet": 0,
+    "syncObservation": "2292 managed /9 pending/0 conflicts before latest card metadata"
   }
 }

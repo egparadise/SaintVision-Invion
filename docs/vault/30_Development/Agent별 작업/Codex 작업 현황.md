@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.356"
+version: "1.0.357"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T15:10:44+09:00"
+updated: "2026-11-05T15:29:10+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Initial reports integrated; actual followup agents working; no new enrollment or resource offers"
-active_card_next: "Review hash-bound Linux1/2 packet and CP rollback prerequisites; resolve worker4 identity and worker3 runtime access without repeat project approval"
+active_card_status: "Actual independent review received; execution packet requires P1-P8 corrections; new Claude followup ready"
+active_card_next: "Consume corrected source/hash packet; verify actual ingress authority, CA renewal and build/DB evidence; independent review before new live action"
 ---
+
+별도 source 보강 FLEET5-STORAGE-WORKSPACE-GUARD-20261105를 task_30f1fb073ec1/ctx_64e306776a86에 ready 전달했다. 기존 공유 mount를 잃을 수 있는 upgrade를 재현하고 변경 전에 거절하며 rollback은 보존하는 범위다. 실제 구현/시험은 해당 owner 보고를 기다린다.
+
+
+## 2026-11-05 실제 독립 검토와 실행 수정 지시
+
+작업한 것: Claude53f5722f를 읽고 exact Docs41980046633 SUCCESS를 조회해 CP 기록 정정과 검토 보고를 통합했다. 확인한 것: 초기 readiness의 증거·상한 계산은 일치하지만 host 폴더 소비 경로와 강제 quota는 없으며, 첫 연결 packet에는 CA·ingress High 두 건과 P3~P8이 남아 있다. 다음 첫 행동/담당: Codex는 기존5대 캠페인에 이어 쓸 fresh external intermediate를 최초 init부터 지정한 수정본을 게시한다. Claude 후속 task_bab09fcf8dc7/ctx_88febf51813a는 게시22fa와 다음 수정본, 공식 CP target/rollback 조건을 검토한다. root는 자기 문서 Low를 정정하고 실제 검토 도착 후에만 실행 판정한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-05 준비 보고 수락과 후속 감독
 
