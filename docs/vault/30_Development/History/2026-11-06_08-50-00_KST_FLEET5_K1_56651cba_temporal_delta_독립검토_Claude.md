@@ -183,6 +183,11 @@ host-helper 키가 마지막 사용 뒤·Now 전인 625에 만료되는 경우�
     - 원인은 확정하지 않았다. 재현하지 않았다(DB 작업은 범위 밖).
   - step 40 `go test ./...`는 앞 실패 때문에 skipped다.
   - 선택 native proof와 S08 skip은 pass가 아니다.
+- **이 검토의 commit과 Docs:**
+  - 검토 commit `1f354892` 뒤에 evidence hash를 LF byte에 맞춘 `792838f3`를 올렸다.
+  - `792838f3`의 Docs `42132732743`(job `127613112980`)은 exact head에서 SUCCESS다.
+  - 이 기록을 더한 최종 commit의 Docs는 worker_done 보고에 적는다.
+- 10개 local 문서 gate는 08:50:22–08:51:28 KST에 모두 exit 0이다. 실행 기록은 `local-doc-gates.txt`에 있다. Obsidian apply는 하지 않았다.
 - **job log:** sha256 `ae92c0f5…54ae`(417144 byte). hash와 파싱 요약만 남겼다. raw log, ZIP, JUnit은 commit하지 않았다.
 
 ## 다음
