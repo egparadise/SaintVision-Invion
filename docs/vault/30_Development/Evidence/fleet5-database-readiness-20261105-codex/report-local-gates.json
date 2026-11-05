@@ -1,0 +1,57 @@
+[
+  {
+    "name": "check-docs",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_docs.py"
+    ],
+    "startKST": "2026-11-05T17:59:16.668592+09:00",
+    "endKST": "2026-11-05T17:59:19.968766+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-ontology",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_ontology.py"
+    ],
+    "startKST": "2026-11-05T17:59:19.969121+09:00",
+    "endKST": "2026-11-05T17:59:22.117531+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-single-source",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "startKST": "2026-11-05T17:59:22.117869+09:00",
+    "endKST": "2026-11-05T17:59:22.516839+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-path-citations",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067"
+    ],
+    "startKST": "2026-11-05T17:59:22.517232+09:00",
+    "endKST": "2026-11-05T17:59:25.848543+09:00",
+    "exit": 0
+  },
+  {
+    "name": "sync-check",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "startKST": "2026-11-05T17:59:25.848899+09:00",
+    "endKST": "2026-11-05T17:59:29.950933+09:00",
+    "exit": 0
+  }
+]

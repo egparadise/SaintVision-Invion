@@ -1,0 +1,119 @@
+{
+  "sourceSHA": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "coreRunID": 41993280120,
+  "docsRunID": 41993283674,
+  "overallConclusion": "success",
+  "jobs": [
+    {
+      "name": "core",
+      "conclusion": "success"
+    },
+    {
+      "name": "s01-storage-roundtrip",
+      "conclusion": "success"
+    }
+  ],
+  "mainPytest": {
+    "passed": 8877,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 46,
+    "deselected": 2,
+    "command": "python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+    "startedAt": "2026-11-05T08:29:27Z",
+    "completedAt": "2026-11-05T08:54:03Z",
+    "skipReasons": {
+      "PowerShell and csc.exe shim require Windows": 13,
+      "PowerShell parser requires Windows": 2,
+      "PowerShell required": 9,
+      "Actual Windows PowerShell launcher": 10,
+      "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+      "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+      "run only through tools/placement_benchmark.py": 1,
+      "run only through tools/placement_lock_wait_diagnostic.py": 1,
+      "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+      "claude is not installed on this machine": 1,
+      "codex is not installed on this machine": 1,
+      "gemini is not installed on this machine": 1,
+      "antigravity is not installed on this machine": 1,
+      "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+    },
+    "declaredSkipGate": "success"
+  },
+  "realDatabase": {
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "executedGate": "success"
+  },
+  "installer": {
+    "passed": 15,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "localFocused": {
+    "passed": 100,
+    "skipped": 5,
+    "failed": 0,
+    "errors": 0
+  },
+  "environment": {
+    "workflowRunner": "ubuntu-latest",
+    "workflowPython": "3.12",
+    "observedPythonVersions": [
+      "3.12.15"
+    ],
+    "image": "postgres@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a"
+  },
+  "artifactID": 13401436351,
+  "artifactDigest": "sha256:fe4be57a7f579e1f27077ef1c915babcfcaa559d2cded8c8f4a1f2c01d13894d",
+  "zipDigestMatchesAPI": true,
+  "sourceReview": {
+    "reviewer": "Claude",
+    "commit": "d7a4e450e569d61887475ad054117c708992743a",
+    "verdict": "ACCEPT source/proof"
+  },
+  "followupReview": {
+    "reviewer": "Claude",
+    "commit": "8ad8f6d9b053dadc62f572dc61fc5e1248810103",
+    "verdict": "ACCEPT source/binding",
+    "reportedOwnTests": "11 passed in 1.81s"
+  },
+  "priorRuns": [
+    {
+      "runID": 41985493178,
+      "conclusion": "failure",
+      "scope": "controlled generic readiness baseline"
+    },
+    {
+      "runID": 41987450905,
+      "conclusion": "failure",
+      "scope": "main8875pass2fail46skip2deselect"
+    }
+  ],
+  "originalGuardCause": "UNPROVEN",
+  "operationalAcceptance": "NOT_EXECUTED",
+  "sharedObsidianApply": false,
+  "observedAtKST": "2026-11-05T17:56:52.057310+09:00",
+  "localExecution": {
+    "checkout": "D:\\Project\\SaintVisionI-Invion\\fleet5-database-readiness-20261105",
+    "interpreter": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "pythonVersion": "3.14.7",
+    "shell": "PowerShell",
+    "sourceInput": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+    "finalReportOnly": true
+  },
+  "finalReportGates": {
+    "docs": 0,
+    "ontology": 0,
+    "singleSourceRatchet": 0,
+    "pathCitationRatchet": 0,
+    "syncCheck": 0,
+    "managed": 2275,
+    "pendingExports": 72,
+    "conflicts": 0,
+    "applyExecuted": false
+  }
+}

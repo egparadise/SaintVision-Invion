@@ -1,0 +1,515 @@
+{
+  "attempt": 1,
+  "conclusion": "success",
+  "createdAt": "2026-11-05T08:17:11Z",
+  "databaseId": 41993280120,
+  "headBranch": "agent/codex/fleet5-database-readiness-20261105",
+  "headSha": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T08:54:25Z",
+      "conclusion": "success",
+      "databaseId": 127130357202,
+      "name": "core",
+      "startedAt": "2026-11-05T08:17:14Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T08:17:17Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T08:17:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:24Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-05T08:17:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:26Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "startedAt": "2026-11-05T08:17:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:33Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-go@v5",
+          "number": 4,
+          "startedAt": "2026-11-05T08:17:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:34Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v4",
+          "number": 5,
+          "startedAt": "2026-11-05T08:17:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:46Z",
+          "conclusion": "success",
+          "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+          "number": 6,
+          "startedAt": "2026-11-05T08:17:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:52Z",
+          "conclusion": "success",
+          "name": "Start digest-pinned product ObjectStore service",
+          "number": 7,
+          "startedAt": "2026-11-05T08:17:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:18:01Z",
+          "conclusion": "success",
+          "name": "Create disposable CX01 PostgreSQL",
+          "number": 8,
+          "startedAt": "2026-11-05T08:17:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:18:03Z",
+          "conclusion": "success",
+          "name": "Regenerate contracts and detect drift",
+          "number": 9,
+          "startedAt": "2026-11-05T08:18:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:19:49Z",
+          "conclusion": "success",
+          "name": "Upgrade each published migration head",
+          "number": 10,
+          "startedAt": "2026-11-05T08:18:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:20:18Z",
+          "conclusion": "success",
+          "name": "Test Linux Node concurrency and crash boundaries",
+          "number": 11,
+          "startedAt": "2026-11-05T08:19:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:20:36Z",
+          "conclusion": "success",
+          "name": "Build Node and isolated synthetic workload image",
+          "number": 12,
+          "startedAt": "2026-11-05T08:20:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:20:56Z",
+          "conclusion": "success",
+          "name": "Verify Docker API negotiation and actual bounded execution",
+          "number": 13,
+          "startedAt": "2026-11-05T08:20:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:21:10Z",
+          "conclusion": "success",
+          "name": "Build pinned Python workload image for kernel integration",
+          "number": 14,
+          "startedAt": "2026-11-05T08:20:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:21:11Z",
+          "conclusion": "success",
+          "name": "Build owned LAN installer image and provide storage source root",
+          "number": 15,
+          "startedAt": "2026-11-05T08:21:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:21:36Z",
+          "conclusion": "success",
+          "name": "Build production API image and require explicit configuration",
+          "number": 16,
+          "startedAt": "2026-11-05T08:21:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:22:10Z",
+          "conclusion": "success",
+          "name": "Verify Workspace recovery boundary first",
+          "number": 17,
+          "startedAt": "2026-11-05T08:21:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:22:40Z",
+          "conclusion": "success",
+          "name": "Verify containment controls and physical cleanup",
+          "number": 18,
+          "startedAt": "2026-11-05T08:22:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:23:07Z",
+          "conclusion": "success",
+          "name": "Verify business handoff against the execution kernel",
+          "number": 19,
+          "startedAt": "2026-11-05T08:22:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:23:37Z",
+          "conclusion": "success",
+          "name": "Verify bounded shard replacement on two real Nodes",
+          "number": 20,
+          "startedAt": "2026-11-05T08:23:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:27:30Z",
+          "conclusion": "success",
+          "name": "Run provisioned LAN installer acceptance",
+          "number": 21,
+          "startedAt": "2026-11-05T08:23:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:27:31Z",
+          "conclusion": "success",
+          "name": "Require executed LAN installer evidence",
+          "number": 22,
+          "startedAt": "2026-11-05T08:27:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:28:10Z",
+          "conclusion": "success",
+          "name": "Run owned CX01 recovery drill evidence",
+          "number": 23,
+          "startedAt": "2026-11-05T08:27:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:28:10Z",
+          "conclusion": "success",
+          "name": "Require executed CX01 recovery evidence",
+          "number": 24,
+          "startedAt": "2026-11-05T08:28:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:29:13Z",
+          "conclusion": "success",
+          "name": "Verify build admission queue fairness on PostgreSQL",
+          "number": 25,
+          "startedAt": "2026-11-05T08:28:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:29:13Z",
+          "conclusion": "success",
+          "name": "Require executed build admission queue evidence",
+          "number": 26,
+          "startedAt": "2026-11-05T08:29:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:29:27Z",
+          "conclusion": "success",
+          "name": "Verify LAN pilot database scripts with real PostgreSQL",
+          "number": 27,
+          "startedAt": "2026-11-05T08:29:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:29:27Z",
+          "conclusion": "success",
+          "name": "Require executed LAN pilot database evidence",
+          "number": 28,
+          "startedAt": "2026-11-05T08:29:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:03Z",
+          "conclusion": "success",
+          "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+          "number": 29,
+          "startedAt": "2026-11-05T08:29:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:03Z",
+          "conclusion": "success",
+          "name": "Stop disposable product ObjectStore service",
+          "number": 30,
+          "startedAt": "2026-11-05T08:54:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:09Z",
+          "conclusion": "success",
+          "name": "Docker host hygiene (explicit lane)",
+          "number": 31,
+          "startedAt": "2026-11-05T08:54:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:09Z",
+          "conclusion": "success",
+          "name": "Require executed evidence and declared platform skips",
+          "number": 32,
+          "startedAt": "2026-11-05T08:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:09Z",
+          "conclusion": "skipped",
+          "name": "Collect fixed-SHA S08 build acceptance observations",
+          "number": 33,
+          "startedAt": "2026-11-05T08:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:09Z",
+          "conclusion": "skipped",
+          "name": "Recompute S08 build acceptance verdict from raw artifacts",
+          "number": 34,
+          "startedAt": "2026-11-05T08:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:12Z",
+          "conclusion": "success",
+          "name": "Run python -m build services/control-plane --outdir dist",
+          "number": 35,
+          "startedAt": "2026-11-05T08:54:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:13Z",
+          "conclusion": "success",
+          "name": "Run go test ./...",
+          "number": 36,
+          "startedAt": "2026-11-05T08:54:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:15Z",
+          "conclusion": "success",
+          "name": "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+          "number": 37,
+          "startedAt": "2026-11-05T08:54:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:16Z",
+          "conclusion": "success",
+          "name": "Cleanup disposable CX01 PostgreSQL",
+          "number": 38,
+          "startedAt": "2026-11-05T08:54:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:19Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 39,
+          "startedAt": "2026-11-05T08:54:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:19Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v4",
+          "number": 75,
+          "startedAt": "2026-11-05T08:54:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:19Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-go@v5",
+          "number": 76,
+          "startedAt": "2026-11-05T08:54:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:22Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 77,
+          "startedAt": "2026-11-05T08:54:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:22Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 78,
+          "startedAt": "2026-11-05T08:54:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:54:22Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 79,
+          "startedAt": "2026-11-05T08:54:22Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41993280120/job/127130357202"
+    },
+    {
+      "completedAt": "2026-11-05T08:17:55Z",
+      "conclusion": "success",
+      "databaseId": 127130357886,
+      "name": "s01-storage-roundtrip",
+      "startedAt": "2026-11-05T08:17:14Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T08:17:16Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T08:17:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:27Z",
+          "conclusion": "success",
+          "name": "Initialize containers",
+          "number": 2,
+          "startedAt": "2026-11-05T08:17:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:29Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 3,
+          "startedAt": "2026-11-05T08:17:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:31Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 4,
+          "startedAt": "2026-11-05T08:17:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:41Z",
+          "conclusion": "success",
+          "name": "Install pinned product-conformance test dependencies",
+          "number": 5,
+          "startedAt": "2026-11-05T08:17:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:45Z",
+          "conclusion": "success",
+          "name": "Start disposable MinIO candidate",
+          "number": 6,
+          "startedAt": "2026-11-05T08:17:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:45Z",
+          "conclusion": "success",
+          "name": "Create disposable S01 Storage test bucket",
+          "number": 7,
+          "startedAt": "2026-11-05T08:17:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:46Z",
+          "conclusion": "success",
+          "name": "Verify product ObjectStore adapter conformance",
+          "number": 8,
+          "startedAt": "2026-11-05T08:17:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:51Z",
+          "conclusion": "success",
+          "name": "Verify product S3 persistence and PostgreSQL tenant boundary",
+          "number": 9,
+          "startedAt": "2026-11-05T08:17:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:51Z",
+          "conclusion": "success",
+          "name": "Verify S01 Storage candidate SHA-256 roundtrip and cleanup",
+          "number": 10,
+          "startedAt": "2026-11-05T08:17:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:52Z",
+          "conclusion": "success",
+          "name": "Stop disposable S01 Storage service",
+          "number": 11,
+          "startedAt": "2026-11-05T08:17:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:53Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 12,
+          "startedAt": "2026-11-05T08:17:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:53Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 22,
+          "startedAt": "2026-11-05T08:17:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:53Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 23,
+          "startedAt": "2026-11-05T08:17:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:53Z",
+          "conclusion": "success",
+          "name": "Stop containers",
+          "number": 24,
+          "startedAt": "2026-11-05T08:17:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T08:17:53Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "startedAt": "2026-11-05T08:17:53Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41993280120/job/127130357886"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-05T08:54:26Z",
+  "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41993280120"
+}

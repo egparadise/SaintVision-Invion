@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-DATABASE-READINESS-20261105-CODEX"
 title: "FLEET5 disposable PostgreSQL readiness boundary"
-version: "1.0.0"
-status: "in_progress"
+version: "1.1.0"
+status: "review"
 author: "Codex"
-updated: "2026-11-05T17:12:12.637087+09:00"
+updated: "2026-11-05T17:56:54.007284+09:00"
 source_of_truth: "Git"
 ---
 
@@ -74,3 +74,19 @@ Root reply msg_a1cf4c1ac80b explicitly authorized ONLY the preparation script's 
 The new values bind the already-executed repair to current tooling. They do not claim a new9/30 observation or operational use of repaired code. Actual repaired real-PG2pass, strict executed gate and same image/test/entrypoint/phase proof remain source84bb evidence; its full Core8875pass/2fail/46skip/2deselect stays failed. Next: combined focused/regression gates, normal new source commit/push and exact-head Core+Docs; relay the two-field/unit follow-up to actual Claude reviewer through root before delivery.
 
 17:15 KST follow-up local command (full interpreter/arguments/times/direct exits in followup-local-gates.json) combined the earlier focused cases with workflow and PKI regressions:100 passed/5 prerequisite skips/0 failures/0 errors, exit0. The previously failing current-tooling HEAD binding passes without changing its assertions. Docs, ontology/SHACL, contract bindings, frontend integrity, duplicate and citation ratchets all returned0; sync --check returned0,2257 managed/54 pending/0 conflicts/no writes. No actual Linux/PG test was run locally; the same5 skips remain3 POSIX prerequisites plus2 explicit hosted image prerequisites. Both preceding failed Core runs remain preserved. Actual final-head CI and follow-up Claude review are next; no operational acceptance claim.
+
+Published follow-up `864b49076c5aa4daa52419e04cb0e883e4df2163` by normal commit/push, exit0. New exact-head [Core41993280120](https://github.com/egparadise/SaintVision-Invion/actions/runs/41993280120) and [Docs41993283674](https://github.com/egparadise/SaintVision-Invion/actions/runs/41993283674) dispatched successfully; terminal results pending. Preparation script and controlled actual-PG test remain exactly the independently accepted84bb blobs a5695cab/232528b3. Sending only the authorized two-field current-tooling map/unit-count delta plus new source SHA to root for actual Claude follow-up review. Next on wake: read actual verdict and terminal CI, collect new artifacts without overwriting prior failed evidence, bind source/image/test/entrypoint/phase hashes, then finalize report-only delivery. No worker_done or overall success claim yet.
+
+## Final executed delivery
+
+Source `864b49076c5aa4daa52419e04cb0e883e4df2163`: exact-head Core41993280120 and Docs41993283674 both completed **success**. Full main pytest:8877 passed/0 failed/0 errors/46 declared platform/opt-in skips/2 deselected; actual-PG LAN:2 passed/0 skipped; installer:15 passed/0 skipped. Both executed-evidence gates and the whole-suite declared-skip gate succeeded. Counts are separate executions and are not summed. full JUnit original SHA256899265ab16a724cfd0ac8d17aadf897f235dbb0238886f592fc21b07d011f3ac is retained in the private archive; public manifest/summary records its counts and exact skip-reason histogram. Hosted runner/Python identity, main command, start/end and actual observed versions are in final-delivery-summary.json. Local final focused100pass/5 prerequisite skips remains separate Windows evidence.
+
+Artifact13401436351 original ZIP/API digest match `sha256:fe4be57a7f579e1f27077ef1c915babcfcaa559d2cded8c8f4a1f2c01d13894d`. Actual-PG JUnit SHA25641b0133d2a9530af66058936a3de6ba8071aef0bd56914c46d0fed67b7ee8702; phase JSON SHA256a20e89ddcbc5fa11b287d0c797d665fab70d36f1fee86d917981f403172e204a. final-executed-boundary-verification.json passed: same regression blob, pinned image/imageId, shipped-entrypoint and hook as the actual failing baseline; repaired preparation bytes match source864b SHA25660bebe11. During controlled initialization Unix SQL succeeded/TCP was rejected/target DB was absent; preparation stayed pending, then after release final target TCP succeeded and role/auth verification returned0. Owned test resources were removed and re-inspected. This is actual disposable Linux PostgreSQL, not mocked or local Windows PG.
+
+Actual independent reviews: Claude d7a4e450 accepted source/proof; Claude `8ad8f6d9b053dadc62f572dc61fc5e1248810103` accepted84bb..864b source/binding and independently ran11 focused tests,1.81s. Read both committed verdicts and preserved exact copies; root separately reported its own11pass, which is not relabeled Claude work or added to any count. Root verified review-publication Docs41995694839 success. One optional Card150 schema-separation DESIGN Low is a future separate card; no redesign here. Reviewers correctly left Core pending at their own observation times; the success above is this worker's subsequent direct terminal/API/artifact observation.
+
+Implementation, local focused gates, exact source CI and independent source review are complete. Both prior failed runs remain failed, and original guard41982378091 attempt1 cause remains UNPROVEN. No guard retry, physical/runtime/admin/CA/key/live-pin/container/OS/account change, source59f archive mutation, common-board/task-registry write or Obsidian apply was performed. Only the root-authorized current-tooling metadata pair changed beyond the original unique-Evidence scope. Source scope, component hashes, remote readback and unchanged historic fields are in delivery-source-scope.json.
+
+Next Codex action: validate this report-only addition, normal report commit/push and its Documentation CI; do not rerun broad product tests without a source change. Next owner/root: consume the accepted864b source and report, consolidate latest boards/Obsidian, and build/review a distinct future source/archive revision before using repaired code operationally. Frozen59f and historic observation records remain as measured; operational5Node acceptance is outside this source task. Report-commit SHA/CI receipt will be sent through worker_done, avoiding a self-SHA edit loop.
+
+Final execution checkout is `D:/Project/SaintVisionI-Invion/fleet5-database-readiness-20261105`; local interpreter is the main repository `.venv/Scripts/python.exe`3.14.7, PowerShell. Hosted Core actually observed Python3.12.15 (workflow declares3.12/ubuntu-latest). Report-only docs, ontology, duplicate/citation ratchets and sync-check each returned0; read-only sync2275 managed/72 pending/0 conflicts/no writes. Source-focused tests were not needlessly rerun after only report additions. The final metadata records actual checkout/interpreter/commands/times, runtime distinctions and skip distribution; root retains shared export ownership.
