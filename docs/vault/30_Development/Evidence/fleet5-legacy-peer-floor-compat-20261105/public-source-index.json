@@ -1,0 +1,977 @@
+{
+  "schemaVersion": "fleet5-public-source-compat:1",
+  "kind": "source-only-no-execution",
+  "base": "9ec6d6bf4697745bfe41602bb720473b1ff9b22f",
+  "commits": {
+    "source03": {
+      "sha": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+      "files": [
+        {
+          "path": "services/node-agent/runtime/journal.go",
+          "gitBlob": "970a9d673b9b36b06b0cba4733e45acec469f440",
+          "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+          "bytes": 12966,
+          "functions": {
+            "PinPeerPolicy": {
+              "start": 341,
+              "end": 391,
+              "sha256": "64016481a2c2496d9d31cb8ddec6a466542e54a2e460e4e0b1f77c0c73091302"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/transport/trust.go",
+          "gitBlob": "d18f943daf83460265e0ae03a3b5d111ff810600",
+          "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+          "bytes": 5422,
+          "functions": {
+            "NewAuthority": {
+              "start": 49,
+              "end": 66,
+              "sha256": "1f1ad6136f2f2b99e01a6b0fc3463f9ee4fe42db71ed1880ba27819ea7450782"
+            },
+            "policy": {
+              "start": 67,
+              "end": 94,
+              "sha256": "ced012c78c85e6b35fce4680c8d41b2065b62bd018d9242c917b297f534e1afd"
+            },
+            "Authorize": {
+              "start": 103,
+              "end": 128,
+              "sha256": "85075183d453d6820b7fe02a4cd861fcebafd73ea96cc2f8a895509e4ed9c698"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/cmd/inv-node/main.go",
+          "gitBlob": "2f90ea0181a064f76e35a76acc7be0ed639c7c14",
+          "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+          "bytes": 5388,
+          "functions": {
+            "run": {
+              "start": 26,
+              "end": 148,
+              "sha256": "25bfb2c99fca4012243d967a889f1dc4ae4d399e9d89dd0b308f780931b1f513"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_leaf_rotation.py",
+          "gitBlob": "93616d16a4658f11f34ab7415ed1cac6f98dca7f",
+          "sha256": "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4",
+          "bytes": 34107,
+          "functions": {
+            "_policy": {
+              "start": 199,
+              "end": 211,
+              "sha256": "47a27a80a4db1515028c47b83e11c42c93b24e76c8c0cb7da921f44b6de7a40f"
+            },
+            "validate_bundle": {
+              "start": 214,
+              "end": 404,
+              "sha256": "47945964c151940723ad802a801fc10436ff2061820a64b1dbaf0381f14b02cd"
+            },
+            "install": {
+              "start": 508,
+              "end": 618,
+              "sha256": "c8aef68a5c028427aa024c522615c8631b2cecd513ab95d8af2b4686e102d89c"
+            },
+            "finalize": {
+              "start": 621,
+              "end": 675,
+              "sha256": "4b1fa4f89ea0f1e10cba43b3a8c569b217a1c88846518181f9d5e26414615063"
+            },
+            "docker_restart": {
+              "start": 743,
+              "end": 753,
+              "sha256": "c9620cea65f630a3e7617b50b4561e818a00baa0ecce345f792d027d36e00b08"
+            },
+            "main": {
+              "start": 756,
+              "end": 800,
+              "sha256": "2eb354d7932dbd7ffed0be17ab1988854ea05c534a75ae96364a188c2512efb9"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_config.py",
+          "gitBlob": "ba7b78d087523b8c671ab1ad81766ec9c6a8a3a0",
+          "sha256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+          "bytes": 8396,
+          "functions": {
+            "credential_archive": {
+              "start": 40,
+              "end": 59,
+              "sha256": "778b7ac7074ac8063bc45049886a95b4234f57058b3387cb2897d426ad13bdbe"
+            },
+            "install_files": {
+              "start": 62,
+              "end": 80,
+              "sha256": "806fc6e89e8902c6605bd702129ee069c5c8ee747f717013e602ea4003ddc8dc"
+            },
+            "check_running": {
+              "start": 108,
+              "end": 119,
+              "sha256": "f26ea755af9dd5085f8b8b4e3603a1288760d235332895762fd7df1ccf77c7cf"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "gitBlob": "35c2668690b0681ab87da86099400e83f39d098b",
+          "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+          "bytes": 172541,
+          "functions": {
+            "_write_rotation_public_material": {
+              "start": 1665,
+              "end": 1775,
+              "sha256": "2509bb185dbbc1115af55916df240843f089bdfc9c872a127143f9fc732cd99f"
+            },
+            "prepare_leaf_rotation_batch": {
+              "start": 2590,
+              "end": 2733,
+              "sha256": "b8c8748b8b704f75306ed83b500a5df09026682a96ca1bf8924f42ce26d08509"
+            },
+            "prepare_leaf_rotation": {
+              "start": 2840,
+              "end": 3062,
+              "sha256": "afe9b85e5b2a12e673768e959a3886029e03b0c31e5a4da3d56b3034a2267722"
+            },
+            "commit_leaf_rotation_batch": {
+              "start": 3192,
+              "end": 3277,
+              "sha256": "e5f2598edb9c339c501e8f748eb228e26abad7c7930ecd05fc23c978fce9f312"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+          "gitBlob": "66edef84d181b4b1d5968db36c767c2cb9132060",
+          "sha256": "b9291fa8069589c2faa4a535630c115505e05bcf5a8a59c1278b10e0fdd9ea3d",
+          "bytes": 25040,
+          "functions": {
+            "run_worker": {
+              "start": 523,
+              "end": 563,
+              "sha256": "ee45caf9d29fe7c45017f7dbe7363f21b12afb7840a59bbe437ae67c85d53f7a"
+            },
+            "main": {
+              "start": 566,
+              "end": 593,
+              "sha256": "91565ef7956b81b07ea47bb46e22141b7d3668c4d76fdd2f9c632537dadb3046"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+          "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+          "sha256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+          "bytes": 2830,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+          "gitBlob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+          "sha256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+          "bytes": 1762,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/README.md",
+          "gitBlob": "0218cae48c89b3696fd25d503028d5e7175a6109",
+          "sha256": "b40d2518590ada32208063822725ee7176de250c15a436745de05e730ba18a95",
+          "bytes": 30977,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+          "gitBlob": "e8f910f6b36d410722833f9c17d41169885cf34b",
+          "sha256": "39f763d2e18f17fc82563e2329ed8ccb12904dbbf6b28d138376a1b977c8cc97",
+          "bytes": 6786,
+          "functions": {
+            "main": {
+              "start": 94,
+              "end": 197,
+              "sha256": "369ca0215f74268a790f892f8ac16f3949a8896235c226041244f462ce6eb930"
+            }
+          },
+          "observerFlagPresent": false
+        }
+      ]
+    },
+    "executorB5": {
+      "sha": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+      "files": [
+        {
+          "path": "services/node-agent/runtime/journal.go",
+          "gitBlob": "970a9d673b9b36b06b0cba4733e45acec469f440",
+          "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+          "bytes": 12966,
+          "functions": {
+            "PinPeerPolicy": {
+              "start": 341,
+              "end": 391,
+              "sha256": "64016481a2c2496d9d31cb8ddec6a466542e54a2e460e4e0b1f77c0c73091302"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/transport/trust.go",
+          "gitBlob": "d18f943daf83460265e0ae03a3b5d111ff810600",
+          "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+          "bytes": 5422,
+          "functions": {
+            "NewAuthority": {
+              "start": 49,
+              "end": 66,
+              "sha256": "1f1ad6136f2f2b99e01a6b0fc3463f9ee4fe42db71ed1880ba27819ea7450782"
+            },
+            "policy": {
+              "start": 67,
+              "end": 94,
+              "sha256": "ced012c78c85e6b35fce4680c8d41b2065b62bd018d9242c917b297f534e1afd"
+            },
+            "Authorize": {
+              "start": 103,
+              "end": 128,
+              "sha256": "85075183d453d6820b7fe02a4cd861fcebafd73ea96cc2f8a895509e4ed9c698"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/cmd/inv-node/main.go",
+          "gitBlob": "2f90ea0181a064f76e35a76acc7be0ed639c7c14",
+          "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+          "bytes": 5388,
+          "functions": {
+            "run": {
+              "start": 26,
+              "end": 148,
+              "sha256": "25bfb2c99fca4012243d967a889f1dc4ae4d399e9d89dd0b308f780931b1f513"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_leaf_rotation.py",
+          "gitBlob": "93616d16a4658f11f34ab7415ed1cac6f98dca7f",
+          "sha256": "bca76df80a7bf80a6847e9b115679b1aa3e698d8b3a80ff843aacdd1370cd9b4",
+          "bytes": 34107,
+          "functions": {
+            "_policy": {
+              "start": 199,
+              "end": 211,
+              "sha256": "47a27a80a4db1515028c47b83e11c42c93b24e76c8c0cb7da921f44b6de7a40f"
+            },
+            "validate_bundle": {
+              "start": 214,
+              "end": 404,
+              "sha256": "47945964c151940723ad802a801fc10436ff2061820a64b1dbaf0381f14b02cd"
+            },
+            "install": {
+              "start": 508,
+              "end": 618,
+              "sha256": "c8aef68a5c028427aa024c522615c8631b2cecd513ab95d8af2b4686e102d89c"
+            },
+            "finalize": {
+              "start": 621,
+              "end": 675,
+              "sha256": "4b1fa4f89ea0f1e10cba43b3a8c569b217a1c88846518181f9d5e26414615063"
+            },
+            "docker_restart": {
+              "start": 743,
+              "end": 753,
+              "sha256": "c9620cea65f630a3e7617b50b4561e818a00baa0ecce345f792d027d36e00b08"
+            },
+            "main": {
+              "start": 756,
+              "end": 800,
+              "sha256": "2eb354d7932dbd7ffed0be17ab1988854ea05c534a75ae96364a188c2512efb9"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_config.py",
+          "gitBlob": "ba7b78d087523b8c671ab1ad81766ec9c6a8a3a0",
+          "sha256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+          "bytes": 8396,
+          "functions": {
+            "credential_archive": {
+              "start": 40,
+              "end": 59,
+              "sha256": "778b7ac7074ac8063bc45049886a95b4234f57058b3387cb2897d426ad13bdbe"
+            },
+            "install_files": {
+              "start": 62,
+              "end": 80,
+              "sha256": "806fc6e89e8902c6605bd702129ee069c5c8ee747f717013e602ea4003ddc8dc"
+            },
+            "check_running": {
+              "start": 108,
+              "end": 119,
+              "sha256": "f26ea755af9dd5085f8b8b4e3603a1288760d235332895762fd7df1ccf77c7cf"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "gitBlob": "35c2668690b0681ab87da86099400e83f39d098b",
+          "sha256": "1a8ccbc5c884c562ec6038a2fd20bcb88b6ecf544797f4fe4484ddd30349c49b",
+          "bytes": 172541,
+          "functions": {
+            "_write_rotation_public_material": {
+              "start": 1665,
+              "end": 1775,
+              "sha256": "2509bb185dbbc1115af55916df240843f089bdfc9c872a127143f9fc732cd99f"
+            },
+            "prepare_leaf_rotation_batch": {
+              "start": 2590,
+              "end": 2733,
+              "sha256": "b8c8748b8b704f75306ed83b500a5df09026682a96ca1bf8924f42ce26d08509"
+            },
+            "prepare_leaf_rotation": {
+              "start": 2840,
+              "end": 3062,
+              "sha256": "afe9b85e5b2a12e673768e959a3886029e03b0c31e5a4da3d56b3034a2267722"
+            },
+            "commit_leaf_rotation_batch": {
+              "start": 3192,
+              "end": 3277,
+              "sha256": "e5f2598edb9c339c501e8f748eb228e26abad7c7930ecd05fc23c978fce9f312"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+          "gitBlob": "66edef84d181b4b1d5968db36c767c2cb9132060",
+          "sha256": "b9291fa8069589c2faa4a535630c115505e05bcf5a8a59c1278b10e0fdd9ea3d",
+          "bytes": 25040,
+          "functions": {
+            "run_worker": {
+              "start": 523,
+              "end": 563,
+              "sha256": "ee45caf9d29fe7c45017f7dbe7363f21b12afb7840a59bbe437ae67c85d53f7a"
+            },
+            "main": {
+              "start": 566,
+              "end": 593,
+              "sha256": "91565ef7956b81b07ea47bb46e22141b7d3668c4d76fdd2f9c632537dadb3046"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+          "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+          "sha256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+          "bytes": 2830,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+          "gitBlob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+          "sha256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+          "bytes": 1762,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/README.md",
+          "gitBlob": "c1293bfd1be72854d17268fa51d3ca6ddc171a81",
+          "sha256": "3468bf154a85199023e5d8f587f20f94a00b50286ac1edc794bc4939a9321818",
+          "bytes": 35741,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+          "gitBlob": "e8f910f6b36d410722833f9c17d41169885cf34b",
+          "sha256": "39f763d2e18f17fc82563e2329ed8ccb12904dbbf6b28d138376a1b977c8cc97",
+          "bytes": 6786,
+          "functions": {
+            "main": {
+              "start": 94,
+              "end": 197,
+              "sha256": "369ca0215f74268a790f892f8ac16f3949a8896235c226041244f462ce6eb930"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/scheduled_leaf_renewal.py",
+          "gitBlob": "8d9f030d6067115616a55ada1f6d1638e9c5a093",
+          "sha256": "d428424862b37b483b278539348c7930959dffde32b2db18675aec382a7b8544",
+          "bytes": 28967,
+          "functions": {
+            "_command": {
+              "start": 108,
+              "end": 136,
+              "sha256": "4b798600e6f048da07a494588e8a0ca58bc789bb7e82e30271c1442850aeb297"
+            },
+            "load_plan": {
+              "start": 139,
+              "end": 175,
+              "sha256": "3104e298265b96f547951f79fc2462b7245650330309d66bb5e204b433c873cf"
+            },
+            "_run": {
+              "start": 375,
+              "end": 396,
+              "sha256": "f55ec56d8ddeeb8a6ab53f5cee598232d0d1998a303968d93a7d6a415fb20b01"
+            },
+            "execute": {
+              "start": 483,
+              "end": 614,
+              "sha256": "6fbd0bc11a1fb63c86fe64578211c4d9bca508e787f9ada140358b4a7410797d"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/Invoke-ScheduledLeafRenewal.ps1",
+          "gitBlob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+          "sha256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+          "bytes": 1740,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+          "gitBlob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+          "sha256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+          "bytes": 4672,
+          "functions": {},
+          "observerFlagPresent": false
+        }
+      ]
+    },
+    "accepted2fb": {
+      "sha": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+      "files": [
+        {
+          "path": "services/node-agent/runtime/journal.go",
+          "gitBlob": "970a9d673b9b36b06b0cba4733e45acec469f440",
+          "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+          "bytes": 12966,
+          "functions": {
+            "PinPeerPolicy": {
+              "start": 341,
+              "end": 391,
+              "sha256": "64016481a2c2496d9d31cb8ddec6a466542e54a2e460e4e0b1f77c0c73091302"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/transport/trust.go",
+          "gitBlob": "d18f943daf83460265e0ae03a3b5d111ff810600",
+          "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+          "bytes": 5422,
+          "functions": {
+            "NewAuthority": {
+              "start": 49,
+              "end": 66,
+              "sha256": "1f1ad6136f2f2b99e01a6b0fc3463f9ee4fe42db71ed1880ba27819ea7450782"
+            },
+            "policy": {
+              "start": 67,
+              "end": 94,
+              "sha256": "ced012c78c85e6b35fce4680c8d41b2065b62bd018d9242c917b297f534e1afd"
+            },
+            "Authorize": {
+              "start": 103,
+              "end": 128,
+              "sha256": "85075183d453d6820b7fe02a4cd861fcebafd73ea96cc2f8a895509e4ed9c698"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/cmd/inv-node/main.go",
+          "gitBlob": "2f90ea0181a064f76e35a76acc7be0ed639c7c14",
+          "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+          "bytes": 5388,
+          "functions": {
+            "run": {
+              "start": 26,
+              "end": 148,
+              "sha256": "25bfb2c99fca4012243d967a889f1dc4ae4d399e9d89dd0b308f780931b1f513"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_leaf_rotation.py",
+          "gitBlob": "efb08ee9611013f0bd656a2282172b22e20ecfe2",
+          "sha256": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+          "bytes": 51112,
+          "functions": {
+            "_policy": {
+              "start": 199,
+              "end": 211,
+              "sha256": "47a27a80a4db1515028c47b83e11c42c93b24e76c8c0cb7da921f44b6de7a40f"
+            },
+            "validate_bundle": {
+              "start": 214,
+              "end": 407,
+              "sha256": "ed669b70f4fb7d52fd2274d532477341ecf29976905f9af6670ebffcb489d31f"
+            },
+            "install": {
+              "start": 831,
+              "end": 965,
+              "sha256": "64287083a73f20d25a40a639850cdd0f1a18f680e3ccf5c4b93d1a45b47a8620"
+            },
+            "finalize": {
+              "start": 968,
+              "end": 1047,
+              "sha256": "cbe661973ea5fbbdc9ac242f95b9fbd499815e22a3f867c22af0ba61c475191e"
+            },
+            "docker_restart": {
+              "start": 1115,
+              "end": 1125,
+              "sha256": "c9620cea65f630a3e7617b50b4561e818a00baa0ecce345f792d027d36e00b08"
+            },
+            "main": {
+              "start": 1128,
+              "end": 1177,
+              "sha256": "d32d6017eb101ef42281617bdd291f1cb0e87b69080797ad8cef52b9c25e51db"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_config.py",
+          "gitBlob": "ba7b78d087523b8c671ab1ad81766ec9c6a8a3a0",
+          "sha256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+          "bytes": 8396,
+          "functions": {
+            "credential_archive": {
+              "start": 40,
+              "end": 59,
+              "sha256": "778b7ac7074ac8063bc45049886a95b4234f57058b3387cb2897d426ad13bdbe"
+            },
+            "install_files": {
+              "start": 62,
+              "end": 80,
+              "sha256": "806fc6e89e8902c6605bd702129ee069c5c8ee747f717013e602ea4003ddc8dc"
+            },
+            "check_running": {
+              "start": 108,
+              "end": 119,
+              "sha256": "f26ea755af9dd5085f8b8b4e3603a1288760d235332895762fd7df1ccf77c7cf"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "gitBlob": "3d205d52a377b52163240b824c1e6a092346e867",
+          "sha256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+          "bytes": 188941,
+          "functions": {
+            "_write_rotation_public_material": {
+              "start": 1965,
+              "end": 2075,
+              "sha256": "2509bb185dbbc1115af55916df240843f089bdfc9c872a127143f9fc732cd99f"
+            },
+            "prepare_leaf_rotation_batch": {
+              "start": 2890,
+              "end": 3051,
+              "sha256": "0efc4ec5d0254c6b1079601f97a1fb4fa5c0d798942f3a4810e3e4d9030cd2b0"
+            },
+            "prepare_leaf_rotation": {
+              "start": 3154,
+              "end": 3376,
+              "sha256": "afe9b85e5b2a12e673768e959a3886029e03b0c31e5a4da3d56b3034a2267722"
+            },
+            "commit_leaf_rotation_batch": {
+              "start": 3506,
+              "end": 3594,
+              "sha256": "d42f32113a1cd032da81462256345cb5c6aeb53aa8dd171ed0c07f9d108d2f6e"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+          "gitBlob": "99c02b6b31fe754fd5a28452ce94b65f06cae491",
+          "sha256": "0c6dfe7f9767eb77bfeac40ac2a7513687f149a4634020aa18fea2de74925c73",
+          "bytes": 25040,
+          "functions": {
+            "run_worker": {
+              "start": 523,
+              "end": 563,
+              "sha256": "ee45caf9d29fe7c45017f7dbe7363f21b12afb7840a59bbe437ae67c85d53f7a"
+            },
+            "main": {
+              "start": 566,
+              "end": 593,
+              "sha256": "91565ef7956b81b07ea47bb46e22141b7d3668c4d76fdd2f9c632537dadb3046"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+          "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+          "sha256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+          "bytes": 2830,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+          "gitBlob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+          "sha256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+          "bytes": 1762,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/README.md",
+          "gitBlob": "6efef2028af2c3461dbdff4cfd77f3dd520a12cf",
+          "sha256": "316de44aa45b295b0e924cbf9eb7716e2086231a96f5456022d8b08091f36193",
+          "bytes": 40597,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+          "gitBlob": "616e3ec9fc141de5916f458203ac808d3701829d",
+          "sha256": "3ad06a7e1c0a468688c92c266f37112f2e48123847dd50e6188c07f505e6697c",
+          "bytes": 7446,
+          "functions": {
+            "main": {
+              "start": 94,
+              "end": 217,
+              "sha256": "dcded4bcf45edd9870d50a8b1b04df1f5e7b60aa6d84961d954962a943b04173"
+            }
+          },
+          "observerFlagPresent": false
+        }
+      ]
+    },
+    "nativeFe7": {
+      "sha": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+      "files": [
+        {
+          "path": "services/node-agent/runtime/journal.go",
+          "gitBlob": "970a9d673b9b36b06b0cba4733e45acec469f440",
+          "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+          "bytes": 12966,
+          "functions": {
+            "PinPeerPolicy": {
+              "start": 341,
+              "end": 391,
+              "sha256": "64016481a2c2496d9d31cb8ddec6a466542e54a2e460e4e0b1f77c0c73091302"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/transport/trust.go",
+          "gitBlob": "d18f943daf83460265e0ae03a3b5d111ff810600",
+          "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+          "bytes": 5422,
+          "functions": {
+            "NewAuthority": {
+              "start": 49,
+              "end": 66,
+              "sha256": "1f1ad6136f2f2b99e01a6b0fc3463f9ee4fe42db71ed1880ba27819ea7450782"
+            },
+            "policy": {
+              "start": 67,
+              "end": 94,
+              "sha256": "ced012c78c85e6b35fce4680c8d41b2065b62bd018d9242c917b297f534e1afd"
+            },
+            "Authorize": {
+              "start": 103,
+              "end": 128,
+              "sha256": "85075183d453d6820b7fe02a4cd861fcebafd73ea96cc2f8a895509e4ed9c698"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "services/node-agent/cmd/inv-node/main.go",
+          "gitBlob": "2f90ea0181a064f76e35a76acc7be0ed639c7c14",
+          "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+          "bytes": 5388,
+          "functions": {
+            "run": {
+              "start": 26,
+              "end": 148,
+              "sha256": "25bfb2c99fca4012243d967a889f1dc4ae4d399e9d89dd0b308f780931b1f513"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_leaf_rotation.py",
+          "gitBlob": "efb08ee9611013f0bd656a2282172b22e20ecfe2",
+          "sha256": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+          "bytes": 51112,
+          "functions": {
+            "_policy": {
+              "start": 199,
+              "end": 211,
+              "sha256": "47a27a80a4db1515028c47b83e11c42c93b24e76c8c0cb7da921f44b6de7a40f"
+            },
+            "validate_bundle": {
+              "start": 214,
+              "end": 407,
+              "sha256": "ed669b70f4fb7d52fd2274d532477341ecf29976905f9af6670ebffcb489d31f"
+            },
+            "install": {
+              "start": 831,
+              "end": 965,
+              "sha256": "64287083a73f20d25a40a639850cdd0f1a18f680e3ccf5c4b93d1a45b47a8620"
+            },
+            "finalize": {
+              "start": 968,
+              "end": 1047,
+              "sha256": "cbe661973ea5fbbdc9ac242f95b9fbd499815e22a3f867c22af0ba61c475191e"
+            },
+            "docker_restart": {
+              "start": 1115,
+              "end": 1125,
+              "sha256": "c9620cea65f630a3e7617b50b4561e818a00baa0ecce345f792d027d36e00b08"
+            },
+            "main": {
+              "start": 1128,
+              "end": 1177,
+              "sha256": "d32d6017eb101ef42281617bdd291f1cb0e87b69080797ad8cef52b9c25e51db"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/worker_config.py",
+          "gitBlob": "ba7b78d087523b8c671ab1ad81766ec9c6a8a3a0",
+          "sha256": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+          "bytes": 8396,
+          "functions": {
+            "credential_archive": {
+              "start": 40,
+              "end": 59,
+              "sha256": "778b7ac7074ac8063bc45049886a95b4234f57058b3387cb2897d426ad13bdbe"
+            },
+            "install_files": {
+              "start": 62,
+              "end": 80,
+              "sha256": "806fc6e89e8902c6605bd702129ee069c5c8ee747f717013e602ea4003ddc8dc"
+            },
+            "check_running": {
+              "start": 108,
+              "end": 119,
+              "sha256": "f26ea755af9dd5085f8b8b4e3603a1288760d235332895762fd7df1ccf77c7cf"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "gitBlob": "3d205d52a377b52163240b824c1e6a092346e867",
+          "sha256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+          "bytes": 188941,
+          "functions": {
+            "_write_rotation_public_material": {
+              "start": 1965,
+              "end": 2075,
+              "sha256": "2509bb185dbbc1115af55916df240843f089bdfc9c872a127143f9fc732cd99f"
+            },
+            "prepare_leaf_rotation_batch": {
+              "start": 2890,
+              "end": 3051,
+              "sha256": "0efc4ec5d0254c6b1079601f97a1fb4fa5c0d798942f3a4810e3e4d9030cd2b0"
+            },
+            "prepare_leaf_rotation": {
+              "start": 3154,
+              "end": 3376,
+              "sha256": "afe9b85e5b2a12e673768e959a3886029e03b0c31e5a4da3d56b3034a2267722"
+            },
+            "commit_leaf_rotation_batch": {
+              "start": 3506,
+              "end": 3594,
+              "sha256": "d42f32113a1cd032da81462256345cb5c6aeb53aa8dd171ed0c07f9d108d2f6e"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+          "gitBlob": "99c02b6b31fe754fd5a28452ce94b65f06cae491",
+          "sha256": "0c6dfe7f9767eb77bfeac40ac2a7513687f149a4634020aa18fea2de74925c73",
+          "bytes": 25040,
+          "functions": {
+            "run_worker": {
+              "start": 523,
+              "end": 563,
+              "sha256": "ee45caf9d29fe7c45017f7dbe7363f21b12afb7840a59bbe437ae67c85d53f7a"
+            },
+            "main": {
+              "start": 566,
+              "end": 593,
+              "sha256": "91565ef7956b81b07ea47bb46e22141b7d3668c4d76fdd2f9c632537dadb3046"
+            }
+          },
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+          "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+          "sha256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+          "bytes": 2830,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+          "gitBlob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+          "sha256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+          "bytes": 1762,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "deploy/lan/README.md",
+          "gitBlob": "a92be16714f0bc7124a9ca4869f7abe15de02af4",
+          "sha256": "77947c1407aae0510deee490a02d6fc4180445f22d615cca4ad41aca878340f8",
+          "bytes": 41081,
+          "functions": {},
+          "observerFlagPresent": false
+        },
+        {
+          "path": "tools/check_leaf_rotation_standalone_lifecycle.py",
+          "gitBlob": "616e3ec9fc141de5916f458203ac808d3701829d",
+          "sha256": "3ad06a7e1c0a468688c92c266f37112f2e48123847dd50e6188c07f505e6697c",
+          "bytes": 7446,
+          "functions": {
+            "main": {
+              "start": 94,
+              "end": 217,
+              "sha256": "dcded4bcf45edd9870d50a8b1b04df1f5e7b60aa6d84961d954962a943b04173"
+            }
+          },
+          "observerFlagPresent": false
+        }
+      ]
+    }
+  },
+  "source03SchedulePaths": [],
+  "assertions": {
+    "services/node-agent/runtime/journal.go:all-four-exact-bytes": true,
+    "services/node-agent/transport/trust.go:all-four-exact-bytes": true,
+    "services/node-agent/cmd/inv-node/main.go:all-four-exact-bytes": true,
+    "_write_rotation_public_material:all-four-exact-function": true,
+    "prepare_leaf_rotation:all-four-exact-function": true,
+    "source03-B5-exact-worker": true,
+    "all-four-no-observer-flag": true,
+    "source03-lacks-B5-schedule-paths": true
+  },
+  "existingNativeProof": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-native-peer-phase/go-events.jsonl",
+      "sha256": "d06d86ef4cc16302a974f947506fb8eaf6871f1cec1bc2fcd1705b009716811f",
+      "gitBlob": "eb2d0b02bea75be2f6750cb06a678a307281ddf7"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-native-peer-phase/native-go-result.json",
+      "sha256": "d5c62571e08bb57e89924179d390aab21fba479eb484bfe8633283e092174c6b",
+      "gitBlob": "b26d69f21639d71851306ed9a3c6272092158b6b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-native-peer-phase/publication-receipt.json",
+      "sha256": "5380e9f34d3aeb588ffafc61f582fa2085cbf93b2ceca0ca2e5760ba51f6c744",
+      "gitBlob": "7d66a73d8d8f6164773981a734f6abd69f689036"
+    }
+  ],
+  "existingNativeProofResult": {
+    "attemptedNormalCycles": 2,
+    "baselineMismatchConfirmed": true,
+    "completedNormalCycles": 0,
+    "events": [
+      {
+        "accepted": true,
+        "durableFloorSHA256": "f1218b9490dbd2704e9f8db8dcde626953d910f5c336188828cdb76f7e560466",
+        "durableFloorVersion": 7,
+        "error": "",
+        "phase": "initial",
+        "policySHA256": "f1218b9490dbd2704e9f8db8dcde626953d910f5c336188828cdb76f7e560466",
+        "policyVersion": 7
+      },
+      {
+        "accepted": true,
+        "durableFloorSHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+        "durableFloorVersion": 8,
+        "error": "",
+        "phase": "cycle-1-overlap",
+        "policySHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+        "policyVersion": 8
+      },
+      {
+        "accepted": false,
+        "durableFloorSHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+        "durableFloorVersion": 8,
+        "error": "NODE-0041: peer policy rollback rejected",
+        "phase": "cycle-1-final",
+        "policySHA256": "73f0c7ee73289acb42b4863731da87a0268fee86f585855952b2d596b9a69580",
+        "policyVersion": 8
+      },
+      {
+        "accepted": true,
+        "durableFloorSHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+        "durableFloorVersion": 9,
+        "error": "",
+        "phase": "cycle-2-overlap",
+        "policySHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+        "policyVersion": 9
+      },
+      {
+        "accepted": false,
+        "durableFloorSHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+        "durableFloorVersion": 9,
+        "error": "NODE-0041: peer policy rollback rejected",
+        "phase": "cycle-2-final",
+        "policySHA256": "b9f1d6408c46712b513ee2b9b70a4171e6722ff1f0bca2ba2d72cfb0f24a3d87",
+        "policyVersion": 9
+      },
+      {
+        "accepted": false,
+        "durableFloorSHA256": "dff83ff0ab25b751d43b80a4392ddca371fd51cd19ccbc442f600fecc0174b1e",
+        "durableFloorVersion": 10,
+        "error": "NODE-0041: peer policy expired or unbounded",
+        "phase": "expired-after-pin-negative",
+        "policySHA256": "dff83ff0ab25b751d43b80a4392ddca371fd51cd19ccbc442f600fecc0174b1e",
+        "policyVersion": 10
+      }
+    ],
+    "operationalAcceptanceAssessed": false,
+    "proofValid": true,
+    "runtimeGOOS": "linux",
+    "sameDurableJournal": true,
+    "sameVersionDifferentHashFinalRejections": 2
+  },
+  "existingNativeProofPublication": {
+    "sourceSHA": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+    "headSHA": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+    "goTestExit": 1,
+    "classification": "expected-baseline-contract-mismatch",
+    "proofValid": true
+  }
+}

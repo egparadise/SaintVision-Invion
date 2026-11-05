@@ -1,0 +1,8 @@
+Command process completed exit0, Windows PowerShell, main repo CPython3.14.7 -B.
+Each native command's LASTEXITCODE was saved immediately and nonzero threw before the next gate.
+Only new audit History/Evidence paths were untracked; accepted code/shared board freeze diff returned0.
+PASS: 24 original hashes, 1210 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+CHECK: 2306 managed files, 103 pending exports, 0 conflicts. No writes.
+2026-11-05T20:50:08.7446503+09:00

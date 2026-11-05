@@ -1,0 +1,54 @@
+{
+    "schemaVersion":  "fleet5-legacy-audit-validation:1",
+    "observedKST":  "2026-11-05T20:51:49.0224380+09:00",
+    "task":  "task_fb415493ffa5",
+    "dispatch":  "ctx_373e829bc65e",
+    "base":  "9ec6d6bf4697745bfe41602bb720473b1ff9b22f",
+    "worktree":  "D:\\Project\\SaintVisionI-Invion\\fleet5-consecutive-leaf-rotation-20261105",
+    "branch":  "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "interpreter":  "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "pythonVersion":  "3.14.7",
+    "interpreterArgs":  [
+                            "-B"
+                        ],
+    "orcaVersion":  "1.4.248",
+    "sourceCollectorExit":  0,
+    "sourceCollectorAssertions":  8,
+    "docsExit":  0,
+    "pathCitationRatchetExit":  0,
+    "ontologyExit":  0,
+    "syncCheckExit":  0,
+    "syncSnapshot":  {
+                         "scope":  "Before validation receipts added",
+                         "observedKST":  "2026-11-05T20:50:08.7446503+09:00",
+                         "managed":  2306,
+                         "pending":  103,
+                         "writes":  0,
+                         "conflicts":  0
+                     },
+    "acceptedSourceAndSharedBoardsFreezeExit":  0,
+    "diffCheckExit":  0,
+    "broadTestsRun":  false,
+    "newCoreRun":  false,
+    "liveOrPrivateActionsPerformed":  false,
+    "hashes":  [
+                   {
+                       "sha256":  "64c767a18a1ad46137a0383010f247c349942c72449e5342c9ce0edd13d542e1",
+                       "path":  "audit_public_sources.py"
+                   },
+                   {
+                       "sha256":  "5220f52bbbe908c9b33bd3ff7a092c93a3715a533b69f3210addd927cbe3cb76",
+                       "path":  "public-source-index.json"
+                   },
+                   {
+                       "sha256":  "bf5628ae1601e91811803f864ed60e6be629566c8e5f176128338fa1e6f7a242",
+                       "path":  "findings.json"
+                   },
+                   {
+                       "sha256":  "04bfbe95e01c3522db98186ede848c41db1d8b315e62f9b4756a9916ce8db533",
+                       "path":  "document-gates.log"
+                   }
+               ],
+    "independentAuditReview":  "pending via root",
+    "exactReportDocs":  "Run receipt bound to the publication SHA supplied in worker_done; no self-reference commit loop"
+}

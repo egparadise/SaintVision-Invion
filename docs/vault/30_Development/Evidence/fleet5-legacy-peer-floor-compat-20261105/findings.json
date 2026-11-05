@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "fleet5-legacy-peer-floor-audit:1",
+  "card": "FLEET5-LEGACY-PEER-FLOOR-COMPAT-20261105",
+  "task": "task_fb415493ffa5",
+  "dispatch": "ctx_373e829bc65e",
+  "base": "9ec6d6bf4697745bfe41602bb720473b1ff9b22f",
+  "owner": "Codex",
+  "reviewer": "Claude via root pending",
+  "kind": "public-git-source-and-existing-proof-review-only",
+  "acceptedSource2fbFrozen": true,
+  "legacyNormalV1": {
+    "conditionalSourceDefectConfirmed": true,
+    "condition": "Unmodified public03/B5 normal generator/helper with identical Go Authority; overlap floor is pinned and final is consumed",
+    "overlapPeerVersion": "C+1",
+    "finalPeerVersion": "C+1",
+    "phaseRawHashesDiffer": true,
+    "goRejectsSameVersionDifferentHash": true,
+    "goPinsBeforeExpiryCheck": true,
+    "b5ExecutesConfiguredFinalizeSlots": true,
+    "actualPrivateFinalizeCommandBodyRead": false,
+    "actualHistoricalRenewalInferred": false
+  },
+  "m2": {
+    "interfaceSource": "Task-relayed owner message240; no frozen implementation inspected",
+    "oldPublicMainHasObserverFlag": false,
+    "oldRunningBinaryProvenanceMeasuredByThisWorker": false,
+    "newObserverSideloadCanMeetSameExecutableContract": false,
+    "unsignedRootSnapshotIsM2": false,
+    "floorResetOrLegacyFallbackAllowed": false,
+    "requiredBoundary": "Reviewed separate capability bootstrap/binary-only migration and replacement renewal plan; then authenticated actual-journal M2 before mutation"
+  },
+  "reportedNativeBaseline": {
+    "code": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+    "report": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+    "coreRun": 42014770700,
+    "coreConclusion": "failure-intentionally-preserved",
+    "proofExit": 1,
+    "completedNormalCycles": 0,
+    "sameVersionDifferentHashFinalRejections": 2,
+    "artifactId": 13409265588,
+    "rootPreviouslyVerifiedZipSHA256": "dc273e5069aca4d62d0a22cb2736ff745fdd98a75ba3c72d687439e7e86e9901",
+    "thisWorkerRedownloadedOrReran": false
+  },
+  "rootSnapshotContext": {
+    "reportedKST": "2026-11-05T20:34:00+09:00",
+    "physicalPCs": [2, 4],
+    "scope": "Exact pinned r5 selected containers; six historical Node containers per host",
+    "floorVersion": 1,
+    "floorHashEqualsActivePolicy": true,
+    "doubleReadStable": true,
+    "mode": "0600",
+    "uidMatchesIdentity": true,
+    "hostHelperJournalPresent": false,
+    "hostHelperArchiveCount": 0,
+    "containersRunningNotRestarting": true,
+    "signed": false,
+    "independentlyObservedByThisWorker": false,
+    "productionM2OrPastProofOrFutureRenewalSafety": false
+  },
+  "earlyFeedbackReceipts": {
+    "owner": "msg_3fc68bc4c5b0",
+    "root": "msg_8a638a946f1b",
+    "rootAcknowledgement": "msg_68e93c60b38e"
+  },
+  "runtimeOrScheduleOrPrivateConfigChanged": false,
+  "productCoreOrBroadTestsRerun": false,
+  "operationalAcceptanceAssessed": false,
+  "independentAuditReviewCompleted": false,
+  "nextOwner": "Root with P0 implementation owner ctx_6f0f8253b8a7",
+  "firstNextAction": "Explicit independently reviewed capability bootstrap/migration and replacement renewal plan BEFORE old scheduled attempt or any old-binary restart; freeze exact observer/binary/plan provenance and require authenticated actual floor before mutation"
+}
