@@ -1,0 +1,38 @@
+{
+ "requests": {
+  "count": 22,
+  "kinds": {
+   "cohort": 5,
+   "member": 17
+  },
+  "errors": [],
+  "genesisNoPrior": [
+   "request-01-inspectAndValidate"
+  ]
+ },
+ "responses": {
+  "count": 22,
+  "errors": [],
+  "nodeRef": 17,
+  "cohortRef": 5
+ },
+ "derivedDigestReferencedBy": {
+  "api-response": 5,
+  "api-request": 4
+ },
+ "publishedObjectOrderForwardRefs": [],
+ "hold": {
+  "nonNullBindingLeaves": [],
+  "status": "HOLD",
+  "executionAuthorized": false,
+  "candidateABIIsAccepted": false,
+  "contractAcceptance": null
+ },
+ "registryMentions": {
+  "cohort-projection-set": 0,
+  "migration-cohort-projection-set": 0,
+  "DERIVED_DIGEST": 0,
+  "derived": 1
+ },
+ "policyDerivedSetsAreTrustAnchors": false
+}

@@ -1,0 +1,12 @@
+{
+ "typedSubjectHexValues": 235,
+ "classes": {
+  "nonNodeValue": 193,
+  "currentV5Node:successor-plan": 18,
+  "currentV5Node:migration-event": 14,
+  "currentV5Node:runtime-inventory": 9,
+  "currentV5Node:terminal-seal": 1
+ },
+ "stale": [],
+ "v4NodeDigestsStillCurrent": 0
+}
