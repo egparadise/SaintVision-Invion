@@ -1,0 +1,54 @@
+{
+  "recordedAtKST": "2026-11-06T05:32:49+09:00",
+  "immutableSourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "checks": [
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev3-20261106-codex\\contract_fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/rev3-fixtures.log",
+      "sha256": "d34e2e9a2733b8a1c047b13b8eef1555415ce1268125295654f27767be3ecb72"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/unchanged-r4-positive.log",
+      "sha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/unchanged-coexistence-expected-red.log",
+      "sha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev3-20261106-codex\\verify_source_ledger.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/source-ledger-verification.log",
+      "sha256": "5fed2eead304db080db574177925c9d76acb19d99f6fd69b37707928e55d82be"
+    }
+  ],
+  "expectedR4RedIsTaskFailure": false,
+  "scope": "schema/static/SYMBOLIC only; actual crypto/Go/PG/Docker/physical0",
+  "updatedAtKST": "2026-11-06T05:34:21+09:00"
+}

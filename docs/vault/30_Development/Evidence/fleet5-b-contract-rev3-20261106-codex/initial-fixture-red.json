@@ -1,0 +1,1285 @@
+{
+  "version": "fleet5-b-rev3-fixtures:1",
+  "level": "SCHEMA_STATIC_SYMBOLIC_ONLY_NOT_ED25519_OR_RUNTIME",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "passed": 207,
+  "failed": 5,
+  "realGo": 0,
+  "realPG": 0,
+  "realDocker": 0,
+  "realPhysical": 0,
+  "cases": [
+    {
+      "name": "symbolic-chain-positive",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "name": "online-key-cannot-sign-release-even-with-rebound-hashes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "wrong-use-signer-rebound",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-C",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-R",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-P",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-configSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-policySha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-imageSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-exeSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-peerFloorSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "approval-scope-change-storageFloorSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "root-substitution-all-hashes-rebound",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-backward",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-zero",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-121",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-huge",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-future",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-bool",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "time-float",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "token-120-positive",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "name": "admission-shorter-than-token",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "fenced-business-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "unauthenticated-caller-label-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-full-string-'\\n'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-full-string-'\\r'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-full-string-'\\x00'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-full-string-'x'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-full-string-'\\u2028'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-63",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-65",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "hash-byte-loop-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "device8-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "inode16-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "token-shape-positive-only",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "token-full-string-'\\n'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "token-full-string-'\\x00'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "token-full-string-'extra'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "token-full-string-'\\u2028'",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-22ff22",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-7b2278223a225c7564383030227d",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-7b2278223a225c7530303030227d",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-7b2278223a312c2278223a327d",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-7b2278223a312e307d",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "strict-bytes-7b2278223a3165327d",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "legitimate-Unicode-C2-no-NFC",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "composed-differs-no-NFC",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "signature-domain-single-NUL-no-LF",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-[]",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-['node-0', 'node-0']",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-['foreign']",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-[0]",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-[999]",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-['node-0', None]",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selection-deny-None",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "selected-healthy-unrelated-offline",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "per-node-same-config-readmit",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "name": "readmit-during-fence-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-expired-approval-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-online-cannot-authorize",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "old-generation-token-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "new-protected-generation-release-positive",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "name": "readmit-changed-epoch",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-changed-C",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-changed-R",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-changed-P",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-changed-configSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "readmit-changed-policySha256",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "observe-without-business-/v1/heartbeats",
+      "actual": "OBSERVE_NO_BUSINESS",
+      "expected": "OBSERVE_NO_BUSINESS",
+      "passed": true
+    },
+    {
+      "name": "observe-without-business-/v1/snapshots",
+      "actual": "OBSERVE_NO_BUSINESS",
+      "expected": "OBSERVE_NO_BUSINESS",
+      "passed": true
+    },
+    {
+      "name": "observe-without-business-/v1/roles/observe",
+      "actual": "OBSERVE_NO_BUSINESS",
+      "expected": "OBSERVE_NO_BUSINESS",
+      "passed": true
+    },
+    {
+      "name": "receipts-fenced-or-expired-business-still-reconcile",
+      "actual": "RECONCILE_EXISTING_ONLY",
+      "expected": "RECONCILE_EXISTING_ONLY",
+      "passed": true
+    },
+    {
+      "name": "receipts-unseen-no-execution",
+      "actual": "DENY",
+      "expected": "DENY",
+      "passed": true
+    },
+    {
+      "name": "receipts-bad-epoch-deny",
+      "actual": "DENY",
+      "expected": "DENY",
+      "passed": true
+    },
+    {
+      "name": "receipts-no-TLS-deny",
+      "actual": "DENY",
+      "expected": "DENY",
+      "passed": true
+    },
+    {
+      "name": "safety-no-authority-/v1/executions/cancel",
+      "actual": "DENY",
+      "expected": "DENY",
+      "passed": true
+    },
+    {
+      "name": "typed-safety-/v1/executions/cancel",
+      "actual": "SAFETY_ONLY",
+      "expected": "SAFETY_ONLY",
+      "passed": true
+    },
+    {
+      "name": "safety-no-authority-/v1/builds/quarantine",
+      "actual": "DENY",
+      "expected": "DENY",
+      "passed": true
+    },
+    {
+      "name": "typed-safety-/v1/builds/quarantine",
+      "actual": "SAFETY_ONLY",
+      "expected": "SAFETY_ONLY",
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_0-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_0-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_1-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_1-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_2-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_2-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_3-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_3-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_4-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_4-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-REVOKE_C_JUMP",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-REVOKE_C_JUMP",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-EPOCH_CHANGE",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-EPOCH_CHANGE",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-APPROVAL_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-APPROVAL_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-OPERATION_GRANT_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-OPERATION_GRANT_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-TARGET_RELEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-TARGET_RELEASE_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-TARGET_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-TARGET_DELEGATION_EXPIRED",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-SOURCE_DELEGATION_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-ADMISSION_LEASE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-ROLE_USE_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-CANDIDATE_PROOF_EXPIRED",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "partial-AFTER_INTENT_kCAS_5-LOST_RESPONSE_UNKNOWN",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "invalid-authority-no-replay-AFTER_INTENT_kCAS_5-LOST_RESPONSE_UNKNOWN",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "raw-capability-positive-SYNTHETIC",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "name": "rebound-capability-contextKind",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-hostPhysicalAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-hostCommitAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-hostDiskAvailableBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-vmVcpus",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-vmRamBytes",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-vmKernelBootId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-nodeKernelBootId",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-sourceAncestry",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "rebound-capability-engineApi",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "closed-workload-positive-SYNTHETIC",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-CapAdd",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-UsernsMode",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-Sysctls",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-Runtime",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-VolumeDriver",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-CgroupParent",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-Mounts",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-VolumesFrom",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "workload-closed-UnknownFutureField",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "name": "callsite-count-consistent",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "explicit-expression-disposition-not-path-heuristic",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "epoch-first-kept",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    }
+  ]
+}

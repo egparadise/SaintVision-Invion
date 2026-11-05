@@ -1,0 +1,303 @@
+{
+  "WARNING": "SYNTHETIC/SYMBOLIC, ALL REAL BINDINGS NULL",
+  "chain": {
+    "release": {
+      "body": {
+        "tuple": {
+          "nodeId": "node-0",
+          "cohortId": "cohort",
+          "operationId": "operation",
+          "epoch": "epoch",
+          "C": 8,
+          "R": 2,
+          "P": 103,
+          "DER": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "configSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "policySha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "imageSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "peerFloorSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "storageFloorSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "root": {
+            "deviceMajorHex8": "00000008",
+            "deviceMinorHex8": "00000001",
+            "inodeHex16": "0000000000000100",
+            "filesystem": "ext4",
+            "contextId": "vm-fixture",
+            "uid": 0,
+            "modeOctal4": "0750"
+          },
+          "generation": "boot.pidstart.fresh-start-nonce",
+          "gateId": "gate-1"
+        },
+        "issuedAt": 1999999900,
+        "expiresAt": 2000003600,
+        "approvalId": "approval",
+        "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "useKeySha256": "02d449a31fbb267c8f352e9968a79e3e5fc95c1bbeaa502fd6454ebde5a4bedc"
+      },
+      "MOCK_signer": "protected-release",
+      "MOCK_input_sha256": "c6dc95183758797a563cdc75907124b9154c839d86ef86543dd2ba13d44be575"
+    },
+    "delegation": {
+      "body": {
+        "releaseSha256": "d2834bed0e53df2404a06a07ba3a629af5e37caf03876642c8a2c988f527baaf",
+        "nodeId": "node-0",
+        "generation": "boot.pidstart.fresh-start-nonce",
+        "useKeySha256": "02d449a31fbb267c8f352e9968a79e3e5fc95c1bbeaa502fd6454ebde5a4bedc",
+        "usePublicKeyHex64": "1111111111111111111111111111111111111111111111111111111111111111",
+        "caller": "cp.execution",
+        "purposes": [
+          "EXECUTION"
+        ],
+        "issuedAt": 1999999900,
+        "expiresAt": 2000001800
+      },
+      "MOCK_signer": "protected-release",
+      "MOCK_input_sha256": "63556a4eb72f7628e638534b706fd6ad14c37e3cd150a674d339350ec08fd224"
+    },
+    "use": {
+      "body": {
+        "schemaVersion": "saintvision-node-role-use:1",
+        "releaseSha256": "d2834bed0e53df2404a06a07ba3a629af5e37caf03876642c8a2c988f527baaf",
+        "delegationSha256": "19cd6f1806e3294a3f2976677ed71b913273821eef95585f6018dae526e024bb",
+        "tuple": {
+          "nodeId": "node-0",
+          "cohortId": "cohort",
+          "operationId": "operation",
+          "epoch": "epoch",
+          "C": 8,
+          "R": 2,
+          "P": 103,
+          "DER": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "configSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "policySha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "imageSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "peerFloorSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "storageFloorSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "root": {
+            "deviceMajorHex8": "00000008",
+            "deviceMinorHex8": "00000001",
+            "inodeHex16": "0000000000000100",
+            "filesystem": "ext4",
+            "contextId": "vm-fixture",
+            "uid": 0,
+            "modeOctal4": "0750"
+          },
+          "generation": "boot.pidstart.fresh-start-nonce",
+          "gateId": "gate-1"
+        },
+        "purpose": "EXECUTION",
+        "method": "POST",
+        "path": "/v1/executions",
+        "bodySha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "nonce": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "issuedAt": 2000000000,
+        "expiresAt": 2000000060
+      },
+      "MOCK_signer": "delegated-use",
+      "MOCK_input_sha256": "ab5905921943f4990e8069f4bf262367eb5bdfa70c5847d9430ebf6af45d532c"
+    }
+  },
+  "capability": {
+    "producer": {
+      "producerId": "independent-probe",
+      "artifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "version": "v1",
+      "observedAt": 2000000000,
+      "nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "proofSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "contextKind": "managed-separate-kernel-linux-vm-v1",
+    "hostId": "host-fixture",
+    "vmUuid": "vm-fixture",
+    "hostKernelId": "host-kernel",
+    "vmKernelBootId": "guest-kernel",
+    "nodeKernelBootId": "guest-kernel",
+    "hypervisor": "hyperv",
+    "hostOS": "windows",
+    "hostLogicalCpus": 8,
+    "hostCpuAvailableMilliCpus": 4000,
+    "hostPhysicalTotalBytes": 17179869184,
+    "hostPhysicalAvailableBytes": 8589934592,
+    "hostCommitLimitBytes": 34359738368,
+    "hostCommitAvailableBytes": 8589934592,
+    "hostDiskCapacityBytes": 107374182400,
+    "hostDiskAvailableBytes": 42949672960,
+    "vmVcpus": 2,
+    "vmRamBytes": 4294967296,
+    "vmDiskBytes": 21474836480,
+    "vmPhysicalAvailableBytes": 3221225472,
+    "vmCommitAvailableBytes": 3221225472,
+    "guestNativeFsAvailableBytes": 5368709120,
+    "root": {
+      "deviceMajorHex8": "00000008",
+      "deviceMinorHex8": "00000001",
+      "inodeHex16": "0000000000000100",
+      "filesystem": "ext4",
+      "contextId": "vm-fixture",
+      "uid": 0,
+      "modeOctal4": "0750"
+    },
+    "socketPath": "/var/run/docker.sock",
+    "engineApi": "1.45",
+    "engineVersion": "fixture-approved-engine",
+    "engineId": "guest-daemon",
+    "sourceAncestry": [
+      "ext4"
+    ],
+    "routes": [
+      {
+        "interfaceId": "vm-net",
+        "destination": "198.51.100.0/24",
+        "gateway": "198.51.100.1",
+        "producerRef": "independent-probe"
+      }
+    ],
+    "ports": [
+      {
+        "port": 7443,
+        "owner": "fixture-planned-node",
+        "reservedFor": "node-0"
+      }
+    ],
+    "endpointTests": [
+      {
+        "targetId": "fixture-cp",
+        "routeInterface": "vm-net",
+        "tcpLatencyMillis": 1,
+        "tlsPeerSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "status": "CONNECTED_TLS_VERIFIED",
+        "observedAt": 2000000000
+      }
+    ],
+    "vmCpuCapacityMilliCpus": 2000,
+    "vmCpuAvailableMilliCpus": 1500,
+    "hostProducer": {
+      "producerId": "independent-probe",
+      "artifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "version": "v1",
+      "observedAt": 2000000000,
+      "nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "proofSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "vmProducer": {
+      "producerId": "independent-probe",
+      "artifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "version": "v1",
+      "observedAt": 2000000000,
+      "nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "proofSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "launcherAdapterSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "SYNTHETIC_approvedBudget": {
+    "body": {
+      "contextId": "vm-fixture",
+      "hostId": "host-fixture",
+      "vmUuid": "vm-fixture",
+      "vcpus": 2,
+      "guestRamBytes": 4294967296,
+      "guestDiskBytes": 21474836480,
+      "hostMemoryHeadroomBytes": 2147483648,
+      "hostDiskHeadroomBytes": 10737418240,
+      "guestNativeFreeMinBytes": 1073741824,
+      "hostCpuSpareMinMilliCpus": 1000,
+      "expiresAt": 2000003600
+    },
+    "MOCK_signer": "protected-release",
+    "MOCK_input_sha256": "049c914b5ed93d0f38d3db6be7170545990c41c0a3e28b4afa3c8786b05c1bbf"
+  },
+  "workload": {
+    "NetworkMode": "none",
+    "ReadonlyRootfs": true,
+    "CapDrop": [
+      "ALL"
+    ],
+    "Privileged": false,
+    "IpcMode": "private",
+    "CgroupnsMode": "private",
+    "PidsLimit": 64,
+    "Runtime": "runc",
+    "RestartPolicy": {
+      "Name": "no",
+      "MaximumRetryCount": 0
+    },
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "512k",
+        "max-file": "1"
+      }
+    },
+    "SecurityOpt": [
+      "no-new-privileges:true"
+    ],
+    "Binds": [],
+    "Mounts": [],
+    "VolumesFrom": [],
+    "CapAdd": [],
+    "Devices": [],
+    "DeviceCgroupRules": [],
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": [],
+    "GroupAdd": [],
+    "Links": [],
+    "BlkioWeightDevice": [],
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteIOps": [],
+    "Ulimits": [],
+    "PortBindings": {},
+    "Sysctls": {},
+    "StorageOpt": {},
+    "Annotations": {},
+    "ContainerIDFile": "",
+    "VolumeDriver": "",
+    "PidMode": "",
+    "UTSMode": "",
+    "UsernsMode": "",
+    "Cgroup": "",
+    "CgroupParent": "",
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "Isolation": "",
+    "OomScoreAdj": 0,
+    "CpuShares": 0,
+    "BlkioWeight": 0,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "MemoryReservation": 0,
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "IOMaximumIOps": 0,
+    "IOMaximumBandwidth": 0,
+    "AutoRemove": false,
+    "PublishAllPorts": false,
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "ShmSize": 67108864,
+    "OomKillDisable": false,
+    "Init": false,
+    "MemorySwappiness": null,
+    "Memory": 536870912,
+    "MemorySwap": 536870912,
+    "NanoCpus": 1000000000,
+    "DeviceRequests": [],
+    "Tmpfs": "FIXTURE_EXACT_EXISTING_TMPFS",
+    "MaskedPaths": [
+      "FIXTURE_FROZEN_DAEMON_MASKS"
+    ],
+    "ReadonlyPaths": [
+      "FIXTURE_FROZEN_DAEMON_READONLY"
+    ]
+  }
+}

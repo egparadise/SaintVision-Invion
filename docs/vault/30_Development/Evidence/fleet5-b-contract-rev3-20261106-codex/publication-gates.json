@@ -1,0 +1,93 @@
+{
+  "recordedAtKST": "2026-11-06T05:33:44+09:00",
+  "checks": [
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-1.log",
+      "sha256": "9b5b8992b4a8df0a74f77187df69192c8b816aae867c058200eec90707627327"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-2.log",
+      "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-3.log",
+      "sha256": "c3be21864194f2a3d97f1481a490b9d34673ae01cac86c5ea228e680bae4d6d1"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-4.log",
+      "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-5.log",
+      "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-6.log",
+      "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-7.log",
+      "sha256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc"
+    },
+    {
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "02cfd260437e1d592cb4bf67e5d6764c4260363a"
+      ],
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev3-20261106-codex/publication-gate-8.log",
+      "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+    }
+  ],
+  "obsidianApply": false,
+  "productionChanges": false,
+  "updatedAtKST": "2026-11-06T05:36:58+09:00"
+}

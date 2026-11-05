@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "fleet5-b-rev3-record:1",
+  "recordedAtKST": "2026-11-06T05:12:56+09:00",
+  "task": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude delta review via Root PENDING",
+  "branch": "agent/codex/fleet5-b-contract-rev3-20261106",
+  "parentDocsSHA": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+  "immutableSourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "priorReviewSHA": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
+  "priorVerdicts": "100f and02cf REVISION REQUIRED, not accepted/frozen; preserve originals",
+  "rootDecision": "msg_f7caf4c96b16 R1-R7/L-a..h, NARROW REV3 DOCS/schema/static fixtures only; no partial freeze",
+  "guidance": [
+    {
+      "id": "INDEX-PROGRESS-001",
+      "version": "1.0.418",
+      "updated": "2026-11-06T04:35:10+09:00",
+      "sha256": "82ea9171ef503aebe10280bc04dc540f9aa9fc8d5153b9c922e5fcb5879d5ad1"
+    },
+    {
+      "id": "WORKBOARD-CODEX-001",
+      "version": "1.0.379",
+      "updated": "2026-11-06T04:35:10+09:00",
+      "sha256": "41b212a8bb78c88a1aa75fa226902c4b87d590f76e775ff29248b05f02744812"
+    }
+  ],
+  "canonicalFirstReads": "Rev2 initial-first-read-source-inventory.json preserved unchanged: exact doc IDs/versions/hashes and skills; agent-delivery1.1.0/core-reliability1.0.0",
+  "allRealBindings": null,
+  "realGo": 0,
+  "realPG": 0,
+  "realDocker": 0,
+  "realPhysical": 0,
+  "productionChanges": false,
+  "scope": "Unique Rev3 History/Evidence only; no shared boards/ADRs/registry/Obsidian apply; no private/physical/remote/PKI/Docker/WSL/install or protected pilot actions",
+  "latestRootContext": "Root board selects e50 separate testdelta for next combined check; this contract retains immutable accepted72028 source anchors, no CI borrowed for B",
+  "latestRootGovernance": {
+    "sourceSHA": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+    "scopeVersion": "1.1.0",
+    "RootMessage": "msg_ce255f72af29",
+    "decisionArtifact": "root-rev3-decision.json",
+    "DocsRun": 42103667573,
+    "DocsStatus": "Root verification pending at message, not borrowed as B acceptance"
+  }
+}

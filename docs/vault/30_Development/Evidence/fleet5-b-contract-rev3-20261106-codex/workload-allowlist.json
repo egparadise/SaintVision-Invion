@@ -1,0 +1,103 @@
+{
+  "version": "fleet5-b-workload-inspect-rev3:1",
+  "api": "1.45 approved Engine fixture required; unknown Engine/API/profile blocks",
+  "requiredExact": {
+    "NetworkMode": "none",
+    "ReadonlyRootfs": true,
+    "CapDrop": [
+      "ALL"
+    ],
+    "Privileged": false,
+    "IpcMode": "private",
+    "CgroupnsMode": "private",
+    "PidsLimit": 64,
+    "Runtime": "runc",
+    "RestartPolicy": {
+      "Name": "no",
+      "MaximumRetryCount": 0
+    },
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "512k",
+        "max-file": "1"
+      }
+    },
+    "SecurityOpt": [
+      "no-new-privileges:true"
+    ]
+  },
+  "neutralExact": {
+    "Binds": [],
+    "Mounts": [],
+    "VolumesFrom": [],
+    "CapAdd": [],
+    "Devices": [],
+    "DeviceCgroupRules": [],
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": [],
+    "GroupAdd": [],
+    "Links": [],
+    "BlkioWeightDevice": [],
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteIOps": [],
+    "Ulimits": [],
+    "PortBindings": {},
+    "Sysctls": {},
+    "StorageOpt": {},
+    "Annotations": {},
+    "ContainerIDFile": "",
+    "VolumeDriver": "",
+    "PidMode": "",
+    "UTSMode": "",
+    "UsernsMode": "",
+    "Cgroup": "",
+    "CgroupParent": "",
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "Isolation": "",
+    "OomScoreAdj": 0,
+    "CpuShares": 0,
+    "BlkioWeight": 0,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "MemoryReservation": 0,
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "IOMaximumIOps": 0,
+    "IOMaximumBandwidth": 0,
+    "AutoRemove": false,
+    "PublishAllPorts": false,
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "ShmSize": 67108864,
+    "OomKillDisable": false,
+    "Init": false,
+    "MemorySwappiness": null
+  },
+  "permitBound": [
+    "Memory",
+    "MemorySwap",
+    "NanoCpus",
+    "DeviceRequests"
+  ],
+  "specialExact": {
+    "Tmpfs": "exact existing /workspace,/tmp uid65532/gid65532/nosuid/nodev/noexec/size/mode",
+    "MaskedPaths": "exact approved Engine default list, no omissions/additions",
+    "ReadonlyPaths": "exact approved Engine default list",
+    "DeviceRequests": "exact existing permit-approved GPU request; closed nested Driver/Count/DeviceIDs/Capabilities/Options"
+  },
+  "unknownFields": "DENY; a new neutral field needs explicit version-bound fixture and review, never silently dropped",
+  "nullableCompatibility": "Only per-field exact neutral null equivalence explicitly captured in approved Engine fixtures; no generic false/null/empty coercion",
+  "topLevelMounts": "empty; Config.Volumes absent/empty; no anonymous image-declared volume",
+  "additionalSecurity": "Config user65532:65532, readonly rootfs, no host socket/state/contribution/path access, namespaces and nested decoder closed",
+  "newRealDockerEvidence": 0
+}

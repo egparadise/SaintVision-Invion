@@ -1,0 +1,271 @@
+{
+  "version": "fleet5-b-authority-rev3:1",
+  "implemented": false,
+  "principals": [
+    {
+      "role": "sv_b_ddl_owner",
+      "login": false,
+      "owns": "new B tables, no live pool",
+      "execute": []
+    },
+    {
+      "role": "sv_b_proc_owner",
+      "login": false,
+      "owns": "fixed-search-path SECURITY DEFINER B procedures, narrow DML grants on B authority/derived/business rows and channel CAS columns",
+      "execute": []
+    },
+    {
+      "role": "sv_b_operator",
+      "login": true,
+      "pool": "protected planner/release authority only, outside runtime/online issuer custody",
+      "execute": [
+        "b_plan",
+        "b_append_approval",
+        "b_commit_protected_release",
+        "b_fence_cohort",
+        "b_member_cas",
+        "b_activate_cohort",
+        "b_readmit_same_config",
+        "b_record_gate_invalidation"
+      ]
+    },
+    {
+      "role": "sv_b_verifier",
+      "login": true,
+      "pool": "independent Node+host proof verifier; no signing authority",
+      "execute": [
+        "b_append_verified_candidate",
+        "b_refresh_same_generation_lease",
+        "b_read_observation_scope"
+      ]
+    },
+    {
+      "role": "sv_b_use_issuer",
+      "login": true,
+      "pool": "authenticated online per-request use issuer; only delegated per-node/release use key",
+      "execute": [
+        "b_read_issuance_snapshot",
+        "b_record_request_issuance"
+      ]
+    },
+    {
+      "role": "sv_b_safety",
+      "login": true,
+      "pool": "scoped containment/safety authority, separate protected safety key",
+      "execute": [
+        "b_read_safety_scope",
+        "b_record_safety_request"
+      ]
+    },
+    {
+      "role": "sv_b_runtime",
+      "login": true,
+      "pool": "ordinary business only, existing non-owner inv_kernel-equivalent narrowly audited business privileges",
+      "execute": [
+        "b_read_current_scope",
+        "b_commit_business_nonce_evidence",
+        "b_commit_reconcile_receipt",
+        "b_read_observation_scope"
+      ]
+    }
+  ],
+  "allPrincipalAttributes": "NO SUPERUSER/BYPASSRLS/CREATEDB/CREATEROLE; no role membership or SET ROLE path from runtime/verifier/issuer/safety to operator/owners; distinct credentials, DSNs and connection pools; credentials/keys all NULL here",
+  "keyHierarchy": [
+    {
+      "key": "operator-release-anchor",
+      "custody": "protected operator, outside ordinary runtime and online verifier/use issuer; NOT per-request",
+      "signs": [
+        "RELEASE",
+        "DELEGATION",
+        "protected gate invalidation",
+        "explicit anchor rotation"
+      ],
+      "mustNotReuse": [
+        "CA",
+        "enrollment",
+        "root-fence",
+        "NodeTLS",
+        "CPTLS",
+        "use-key",
+        "safety-key"
+      ]
+    },
+    {
+      "key": "per-node-per-release-use-key",
+      "custody": "sv_b_use_issuer only",
+      "signs": [
+        "ROLE_USE within protected delegation"
+      ],
+      "cannotSign": [
+        "RELEASE",
+        "DELEGATION",
+        "admission",
+        "fence",
+        "arbitrary generation/config",
+        "extended validity"
+      ]
+    },
+    {
+      "key": "safety-key",
+      "custody": "separate protected safety service",
+      "signs": [
+        "exact CANCEL/QUARANTINE safety scope only"
+      ],
+      "cannotSign": [
+        "BUSINESS",
+        "RELEASE"
+      ]
+    }
+  ],
+  "tableGrantMatrix": [
+    {
+      "table": "inv.node_role_operations",
+      "writer": "operator",
+      "semantics": "frozen intent/approved tuples; bounded phase progress",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_cohorts",
+      "writer": "operator",
+      "semantics": "immutable membership+mutation fence",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_routing",
+      "writer": "operator",
+      "semantics": "all Node routing guards; immutable assignment",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_approvals",
+      "writer": "operator",
+      "semantics": "protected approval interval/config/member scope",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_candidates",
+      "writer": "verifier procedure",
+      "semantics": "immutable Node/host signed proof; NOT an eligible admission",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_releases",
+      "writer": "protected operator procedure",
+      "semantics": "signed RELEASE with existing candidate FK",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_delegations",
+      "writer": "protected operator procedure",
+      "semantics": "signed delegated-key scope with release FK",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_admissions",
+      "writer": "protected operator procedure",
+      "semantics": "ACTIVE immutable admission with real release/delegation/candidate FK",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_leases",
+      "writer": "verifier narrow refresh procedure",
+      "semantics": "append <=300s same-generation lease bounded by existing release/approval; no authority scope change",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_current",
+      "writer": "protected activation/readmit or narrow lease-refresh procedure",
+      "semantics": "active admission/lease pointers only; new generation operator only",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_member_cas",
+      "writer": "operator CAS procedure",
+      "semantics": "immutable per-member old/target ledger, same txn as C update",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_activation_ledger",
+      "writer": "operator activation procedure",
+      "semantics": "exact transaction result including release/admission IDs; lost response resolution",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_request_issuance",
+      "writer": "issuer narrow procedure",
+      "semantics": "derived business nonce/request hash, not approval/release authority",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_request_commits",
+      "writer": "runtime narrow procedure",
+      "semantics": "durable business nonce/evidence outcome; no provisioning",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_safety_requests",
+      "writer": "safety narrow procedure",
+      "semantics": "scoped containment request/outcome only",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_service_bindings",
+      "writer": "protected operator",
+      "semantics": "DB session login OID/mTLS caller->allowed tenant/purpose/operations",
+      "runtime": "SELECT and narrowly constant lock_sentinel UPDATE only for SELECT FOR SHARE where required, no authority field DML",
+      "rls": "ENABLE+FORCE RLS, tenant/service binding; add to actual collector/census/aggregate pin in future migration"
+    },
+    {
+      "table": "inv.node_role_key_deliveries",
+      "writer": "protected delivery controller through sv_b_operator b_record_key_delivery",
+      "semantics": "immutable issuer identity/public-key possession/delivery receipt bound to exact committed activation ledger/release/public hash; missing or unknown denies computed eligibility",
+      "runtime": "SELECT/lock only; no issuer self-approval",
+      "rls": "ENABLE+FORCE RLS; join actual census/collector/pin in future migration"
+    }
+  ],
+  "functionSecurity": "REVOKE EXECUTE PUBLIC; exact EXECUTE by listed role; owner sv_b_proc_owner NOLOGIN with only required table/column grants; SET search_path=pg_catalog, fully qualified SQL/functions, row_security=on; verify session_user/service binding, tenant, scope, grant and current rows, never trust caller GUC alone. No dynamic SQL authority bypass. DDL owner not pooled.",
+  "acyclicFks": [
+    "candidate -> existing operation/approval",
+    "release -> existing verified candidate/approval",
+    "delegation -> existing release",
+    "ACTIVE admission -> real committed release/delegation/candidate",
+    "lease -> ACTIVE admission",
+    "current -> ACTIVE admission/latest lease",
+    "activation ledger -> exact release/admission IDs"
+  ],
+  "activationTransaction": "Insert committed release/delegation first, ACTIVE admission next, lease/current pointers and activation ledger last; fresh all-five fence release same CP transaction. Per-Node readmit only no cohort mutation fence and unchanged approved tuple. Pre-release candidates never eligible.",
+  "directDml": "revoke authority DML from online/runtime; protected functions only. Shared channel ordinary direct writers must canonical gate or REFUSE_B. Unknown B writer refuses, required observe/business paths use canonical adapter.",
+  "leases": {
+    "newTimeUnit": "Unix UTC exact integer seconds",
+    "approvalMaxSeconds": 86400,
+    "admissionMaxSeconds": 300,
+    "roleUseMaxSeconds": 120,
+    "skewSeconds": 30,
+    "operationSeconds": 600,
+    "nestedExpiry": "token<=admission<=release/delegation<=approval<=cert/trust; expires>issued; target operation authority valid through now+630",
+    "plainV2Unchanged": true
+  },
+  "replay": {
+    "node": "generation-bound in-memory set, capacity4096, expiry+skew GC, no live eviction, cap failsclosed; restart nonce cryptographically fresh; no terminal frame fsync",
+    "cp": "business nonce/evidence durable narrow procedures; no arbitrary authority writes"
+  },
+  "realKeysAndProvenance": null,
+  "postCommitKeyCustody": "Target per-release private use key remains protected until exact activation ledger commit/fence release is confirmed. Online issuer obtains ONLY that delegated key; delivery/possession receipt must bind same fixed public hash and issuer identity. Lost response/receipt UNKNOWN, exact frozen handoff replay only; no replacement key generation. No actual key/provider exists in this proposal.",
+  "gateControl": "POST /v1/roles/gate, exact ARM_EXACT_RELEASE or INVALIDATE_EXACT_GATE, signed protected release authority only. Node ARMED gate alone never authorizes business; valid delegated role-use chain/current generation also required. Safety key cannot ARM. Restart defaults no active gate.",
+  "observationScope": "Scoped current identity or exact protected intent DER/epoch, permitted offline/fenced/revoked business state only for OBSERVE/RECONCILE. Mandatory DB epoch/tenant guards and Node CP mTLS/control-peer/epoch checks remain. Never business ChannelProof/admission. Invalid historical trust -> AUTHORITY_UNAVAILABLE, separate recovery gate."
+}

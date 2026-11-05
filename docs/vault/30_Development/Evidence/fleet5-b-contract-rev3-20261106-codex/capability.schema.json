@@ -1,0 +1,1179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+    },
+    "time": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deviceMajorHex8",
+        "deviceMinorHex8",
+        "inodeHex16",
+        "filesystem",
+        "contextId",
+        "uid",
+        "modeOctal4"
+      ],
+      "properties": {
+        "deviceMajorHex8": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 8,
+          "pattern": "^[0-9a-f]{8}(?![\\s\\S])"
+        },
+        "deviceMinorHex8": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 8,
+          "pattern": "^[0-9a-f]{8}(?![\\s\\S])"
+        },
+        "inodeHex16": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 16,
+          "pattern": "^[0-9a-f]{16}(?![\\s\\S])"
+        },
+        "filesystem": {
+          "enum": [
+            "ext4",
+            "xfs",
+            "btrfs"
+          ]
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "modeOctal4": {
+          "enum": [
+            "0700",
+            "0750"
+          ]
+        }
+      }
+    },
+    "tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "cohortId",
+        "operationId",
+        "epoch",
+        "C",
+        "R",
+        "P",
+        "DER",
+        "configSha256",
+        "policySha256",
+        "imageSha256",
+        "exeSha256",
+        "peerFloorSha256",
+        "storageFloorSha256",
+        "root",
+        "generation",
+        "gateId"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "C": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "R": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "P": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "DER": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "configSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "policySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "imageSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "exeSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "peerFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "storageFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producerId",
+        "artifactSha256",
+        "version",
+        "observedAt",
+        "nonce",
+        "proofSha256"
+      ],
+      "properties": {
+        "producerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "artifactSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "proofSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "contextKind",
+        "hostId",
+        "vmUuid",
+        "hostKernelId",
+        "vmKernelBootId",
+        "nodeKernelBootId",
+        "hypervisor",
+        "hostOS",
+        "hostLogicalCpus",
+        "hostCpuAvailableMilliCpus",
+        "hostPhysicalTotalBytes",
+        "hostPhysicalAvailableBytes",
+        "hostCommitLimitBytes",
+        "hostCommitAvailableBytes",
+        "hostDiskCapacityBytes",
+        "hostDiskAvailableBytes",
+        "vmVcpus",
+        "vmRamBytes",
+        "vmDiskBytes",
+        "vmPhysicalAvailableBytes",
+        "vmCommitAvailableBytes",
+        "guestNativeFsAvailableBytes",
+        "root",
+        "socketPath",
+        "engineApi",
+        "engineVersion",
+        "engineId",
+        "sourceAncestry",
+        "routes",
+        "ports",
+        "endpointTests",
+        "vmCpuCapacityMilliCpus",
+        "vmCpuAvailableMilliCpus",
+        "hostProducer",
+        "vmProducer",
+        "launcherAdapterSha256"
+      ],
+      "properties": {
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "producerId",
+            "artifactSha256",
+            "version",
+            "observedAt",
+            "nonce",
+            "proofSha256"
+          ],
+          "properties": {
+            "producerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "artifactSha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nonce": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "proofSha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          }
+        },
+        "contextKind": {
+          "const": "managed-separate-kernel-linux-vm-v1"
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmUuid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hostKernelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmKernelBootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nodeKernelBootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hypervisor": {
+          "enum": [
+            "hyperv",
+            "vmware",
+            "kvm"
+          ]
+        },
+        "hostOS": {
+          "enum": [
+            "windows",
+            "linux"
+          ]
+        },
+        "hostLogicalCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCpuAvailableMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostPhysicalTotalBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostPhysicalAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCommitLimitBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCommitAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostDiskCapacityBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostDiskAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmVcpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmRamBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmDiskBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmPhysicalAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmCommitAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "guestNativeFsAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "socketPath": {
+          "const": "/var/run/docker.sock"
+        },
+        "engineApi": {
+          "const": "1.45"
+        },
+        "engineVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "sourceAncestry": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "ext4",
+              "xfs",
+              "btrfs"
+            ]
+          }
+        },
+        "routes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "interfaceId",
+              "destination",
+              "gateway",
+              "producerRef"
+            ],
+            "properties": {
+              "interfaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "destination": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 64,
+                "pattern": "^[0-9A-Fa-f:.]+/[0-9]{1,3}(?![\\s\\S])"
+              },
+              "gateway": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "producerRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "port",
+              "owner",
+              "reservedFor"
+            ],
+            "properties": {
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "reservedFor": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        "endpointTests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "targetId",
+              "routeInterface",
+              "tcpLatencyMillis",
+              "tlsPeerSha256",
+              "status",
+              "observedAt"
+            ],
+            "properties": {
+              "targetId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "routeInterface": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "tcpLatencyMillis": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "tlsPeerSha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+              },
+              "status": {
+                "const": "CONNECTED_TLS_VERIFIED"
+              },
+              "observedAt": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        },
+        "vmCpuCapacityMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmCpuAvailableMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostProducer": {
+          "$ref": "#/$defs/producer"
+        },
+        "vmProducer": {
+          "$ref": "#/$defs/producer"
+        },
+        "launcherAdapterSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "roleUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "releaseSha256",
+        "delegationSha256",
+        "tuple",
+        "purpose",
+        "method",
+        "path",
+        "bodySha256",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-use:1"
+        },
+        "releaseSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "tuple": {
+          "$ref": "#/$defs/tuple"
+        },
+        "purpose": {
+          "enum": [
+            "EXECUTION",
+            "MODEL",
+            "TRANSFER",
+            "TERMINAL",
+            "STORAGE_COLLECT"
+          ]
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "enum": [
+            "/v1/executions",
+            "/v1/objects/read",
+            "/v1/terminals/frame",
+            "/v1/storage/sample"
+          ]
+        },
+        "bodySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "token": {
+      "type": "string",
+      "maxLength": 65536,
+      "pattern": "^v1\\.[A-Za-z0-9_-]+\\.[0-9a-f]{128}(?![\\s\\S])"
+    },
+    "displayLabel": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tuple",
+        "approvalId",
+        "candidateSha256",
+        "useKeySha256",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "tuple": {
+          "$ref": "#/$defs/tuple"
+        },
+        "approvalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "candidateSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "displayLabel": {
+          "type": "string",
+          "maxLength": 128
+        }
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "releaseSha256",
+        "nodeId",
+        "generation",
+        "useKeySha256",
+        "usePublicKeyHex64",
+        "caller",
+        "purposes",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "releaseSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "useKeySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "usePublicKeyHex64": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "caller": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "purposes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "EXECUTION",
+              "MODEL",
+              "TRANSFER",
+              "TERMINAL",
+              "STORAGE_COLLECT"
+            ]
+          }
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "nodeId",
+        "epoch",
+        "action",
+        "bodySha256",
+        "targetReference",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-safety:1"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "action": {
+          "enum": [
+            "CANCEL_EXACT_COMMAND",
+            "QUARANTINE_EXACT_OBLIGATION"
+          ]
+        },
+        "bodySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "targetReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "roleConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "operatorReleaseAnchorSha256",
+        "operatorReleasePublicPath",
+        "safetyAnchorSha256",
+        "safetyPublicPath",
+        "contextId",
+        "gateProtocol",
+        "useProtocol"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-config:2"
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "operatorReleaseAnchorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "operatorReleasePublicPath": {
+          "const": "/state/role-release-authority.pub"
+        },
+        "safetyAnchorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "safetyPublicPath": {
+          "const": "/state/role-safety-authority.pub"
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateProtocol": {
+          "const": "saintvision-node-role-release:1"
+        },
+        "useProtocol": {
+          "const": "saintvision-node-role-use:1"
+        }
+      }
+    },
+    "observeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nonce"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contextId",
+        "hostId",
+        "vmUuid",
+        "vcpus",
+        "guestRamBytes",
+        "guestDiskBytes",
+        "hostMemoryHeadroomBytes",
+        "hostDiskHeadroomBytes",
+        "guestNativeFreeMinBytes",
+        "hostCpuSpareMinMilliCpus",
+        "expiresAt"
+      ],
+      "properties": {
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmUuid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vcpus": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestRamBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestDiskBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostMemoryHeadroomBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostDiskHeadroomBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestNativeFreeMinBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostCpuSpareMinMilliCpus": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "signedEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "payloadBase64url",
+        "signatureHex128"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "RELEASE",
+            "DELEGATION",
+            "ROLE_USE",
+            "SAFETY",
+            "GATE_CONTROL"
+          ]
+        },
+        "payloadBase64url": {
+          "type": "string",
+          "maxLength": 65536,
+          "pattern": "^[A-Za-z0-9_-]+(?![\\s\\S])"
+        },
+        "signatureHex128": {
+          "type": "string",
+          "minLength": 128,
+          "maxLength": 128,
+          "pattern": "^[0-9a-f]{128}(?![\\s\\S])"
+        }
+      }
+    },
+    "gateControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "nodeId",
+        "epoch",
+        "generation",
+        "action",
+        "gateId",
+        "releaseSha256",
+        "method",
+        "path",
+        "bodySha256",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-gate:1"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "action": {
+          "enum": [
+            "ARM_EXACT_RELEASE",
+            "INVALIDATE_EXACT_GATE"
+          ]
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "releaseSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/roles/gate"
+        },
+        "bodySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  "$ref": "#/$defs/capability"
+}

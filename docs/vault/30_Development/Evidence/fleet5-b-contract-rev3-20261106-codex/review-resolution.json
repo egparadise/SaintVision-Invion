@@ -1,0 +1,65 @@
+{
+  "priorReview": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
+  "priorVerdict": "REVISION REQUIRED; preserved prior failure artifacts",
+  "rootDecision": "msg_f7caf4c96b16",
+  "status": "PROPOSED_RESOLUTION_PENDING_ACTUAL_DELTA_REVIEW",
+  "resolutions": {
+    "R1": [
+      "authority-abi.json",
+      "contract.schema.json release/delegation/roleConfig",
+      "contract_fixtures.py valid_chain"
+    ],
+    "R2": [
+      "History exact raw-path lane table",
+      "contract_fixtures.py lane"
+    ],
+    "R3": [
+      "authority-abi.json lifetimes",
+      "phase-authority-matrix.json READMIT/REFRESH",
+      "selected_valid/readmit fixtures"
+    ],
+    "R4": [
+      "authority-abi.json named principal/table/function matrix and acyclic FK stages",
+      "callsite-locks.json schema assets"
+    ],
+    "R5": [
+      "phase-authority-matrix.json 77 explicit cases: preintent plus k0..5,11 invalidation/expiry events",
+      "independent P101 C7 R2 and no new-intent recovery gate"
+    ],
+    "R6": [
+      "callsite-locks.csv 602 explicit expressions",
+      "callsite-locks.json 65 sources,27 individual resolutions,138 schema/RLS assets; static only"
+    ],
+    "R7": [
+      "capability.schema.json numeric raw host/VM/route/port/TLS/producer/budget schema",
+      "contract_fixtures.py cap_valid with protected synthetic approved budget"
+    ],
+    "L-a": [
+      "fullstring/schema length+end assertion/byte-loop/token decode cases"
+    ],
+    "L-b": [
+      "exact integer Unix seconds/positive and nested expiry bounds, no plainv2 reinterpretation"
+    ],
+    "L-c": [
+      "strictUTF8/no surrogate/control/canonical C2/noNFC Unicode vectors"
+    ],
+    "L-d": [
+      "authenticated caller->issuer purpose scope, not Node path semantic inference"
+    ],
+    "L-e": [
+      "in-memory ReplayModel cap/expiryGC/generation/stream sequence, durable CP business commits"
+    ],
+    "L-f": [
+      "workload-allowlist.json closed decoder and exact types"
+    ],
+    "L-g": [
+      "individual expression disposition plus RLS/schema/route/transitive assets; no heuristic complete claim"
+    ],
+    "L-h": [
+      "device major/minor hex8/inodehex16/fs/context, namespace-local mount identity"
+    ]
+  },
+  "actualGoPGDockerPhysical": 0,
+  "initialFixtureFailure": "5 valid fixtures failed because copied root schemas did not reference updated canonical root; initial-fixture-red.json preserved, switched nested roots/tuple to explicit $refs; no product edits",
+  "sourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f"
+}
