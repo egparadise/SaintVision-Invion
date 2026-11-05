@@ -1,0 +1,57 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_2aba347fdf39 / ctx_7b3724557215",
+  "reviewer": "Claude",
+  "author": "Codex (owner dispatch ctx_4194506d5037)",
+  "observedWindowKST": ["2026-11-05T18:00:00+09:00", "2026-11-05T18:40:00+09:00"],
+  "reviewed": {"head": "8b53fbfef107837602b1b2f700e1f8e7bae28638", "base": "59f0a3c2", "commits": ["a93ec9f1", "c540e484", "8b53fbfe"], "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105"},
+  "integrity": {
+    "workerSHA256": {"value": "3411ba485aad6ee0cc356191759584aecfca76ce1421aef68d138fabb7ef603f", "matched": true, "launcherPinMatches": true},
+    "lanPilot": {"sha256": "b282767fbb3d71bb07ae94ea2c80ea26262f32485d4c6575f9553484563fe4e9", "blob": "502edf7b85582ad40fee1c48703787d7b87ce421", "matched": true},
+    "card150ChangedFields": ["source.toolSHA256[tools/lan_pilot.py]", "source.toolGitBlobSHA1[tools/lan_pilot.py]"],
+    "card150PreparationPairUnchangedVs59f": true,
+    "dependencyClosure": {"workerImportsSameAs59f": true, "runtimeLockSHA256Unchanged": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c", "newPackages": 0, "lanPilotNewImport": "import worker_leaf_rotation as worker_rotation (already-imported module)"}
+  },
+  "nodeChecks": {
+    "finalizeOrder": "evidence -> collision precheck -> (first time) final policy + restart -> no-overwrite link publish -> finalized journal; deterministic replay; legacy finalized replay without restart and with exact original journal bytes",
+    "attestFinalized": "validate finalized window + archived evidence (install and commit receipt signatures) + active journal bytes == archive journalRaw + current policy == final; distinct schema saintvision-node-finalized-attestation:1",
+    "successorInstall": "only finalized + different rotationId; same tenant/node/epoch/IP/CA, version and cert continuity, current files == archive, archived leaves valid now, same Node key, createdAt increases, new archive absent; replacement at durable installing boundary; backup collision refused; unknown journal shapes refused"
+  },
+  "cpChecks": {
+    "retire": "switched|finalized only; every member exactly one signed attestation bound to this batch; current tenant/epoch/CA/member set/chain/CP leaf+key/Node leaf+final policy/credential/IP/locked DB channel row; CP-signed no-overwrite archive then atomic finalized journal; no unlink/reset",
+    "terminalReplay": "retire verifies archive and identical proof bytes; same-batch prepare/commit keep finalized; stage refused",
+    "successorPrepare": "archive + current authority reverified; same members/tenant/epoch/CA, CP and Node continuity and same keys, lifetime=min, overlap/final policies; journal replaced only after full publication; crash resume revalidated",
+    "offlineRecoveryFromFinalized": "refused (requires staging/staged)"
+  },
+  "ownRuns": {
+    "newTestFiles": {"where": "temporary detached worktree at 8b53, removed", "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider", "result": "79 passed, 10 skipped in 48.94s", "skips": "9 symlink capability (OS 1314) + 1 POSIX ownership; symlink refusal not executed by Claude, code-read only"},
+    "probes": {"fileSHA256": "72a0c6c4e283eded448b3a6a957bd60df1b14a4bb70d2bbc8b32b714039626e0", "committed": false, "result": "5 passed", "items": [
+      {"id": "P1", "case": "three consecutive 2-Node batches", "result": "versions [8,12]->[9,13]->[10,14], 3 archives"},
+      {"id": "P2", "case": "mixed stale prior-batch proof; duplicate proof", "result": "ValueError Node finalized attestation differs from the exact batch; duplicate refused; state snapshot unchanged"},
+      {"id": "P3", "case": "crash after archive, replay with re-serialized identical proofs", "result": "ValueError Finalized rotation archive collision, journal stays switched; original files succeed"},
+      {"id": "P4", "case": "equal .next beside Node archive (link/unlink crash)", "result": "residue persists after finalize replay and successor"},
+      {"id": "P7", "case": "attest prior rotation after successor install", "result": "refused"}
+    ]}
+  },
+  "findings": [
+    {"id": "L1", "severity": "Low", "summary": "_immutable early-returns when destination exists, so an equal .next from a link/unlink crash persists forever on Node and CP; conflicts with Low-closure classifier rule .next=orphan->BLOCK", "fix": "unlink equal temp (and fsync dir) on exists path, or classifier allowlists equal archive .next"},
+    {"id": "L2", "severity": "Low", "summary": "retire archives raw receipt bytes; crash replay with semantically identical but re-serialized proofs collides and leaves batch switched (fail-closed)", "fix": "canonicalize proofs before archiving/comparing"},
+    {"id": "L3", "severity": "Low", "summary": "README does not state that successors require identical member set, Node/CP keys, tenant/epoch/CA/IP, and that add/remove/revoke/re-IP/epoch/CA change blocks retirement and succession with no cohort-change path in this source"},
+    {"id": "contract", "severity": "note", "summary": "F5 append classifier and snapshot registry (59f phases prepared/staging/staged/switched) must add terminal finalized, CP and Node leaf-rotation-finalized archives and .next handling"}
+  ],
+  "hosted": {
+    "docs": {"run": 42001888497, "head": "8b53fbfe", "conclusion": "success"},
+    "core": {"run": 42001883513, "head": "8b53fbfe", "status": "in_progress", "checkedAtKST": "2026-11-05T18:34:41+09:00", "countedAsSuccess": false},
+    "a93Milestone": {"core": 41995694509, "docs": 41995699334, "conclusion": "success (reported)", "evidenceFor8b53": false}
+  },
+  "verdict": "ACCEPT (source); hosted Core 42001883513 pending; Lows L1-L3 non-blocking",
+  "notClaimed": ["live hardware", "arbitrary append", "cohort/membership change", "operational renewal acceptance", "Linux symlink/POSIX cases executed by Claude"],
+  "earlyFindingsMessage": "msg_abd41fa0c0d6 to dispatch ctx_4194506d5037",
+  "relayedRecordedNotJudged": ["root integrates with R4 1744/e62 and DB 864/d18, regenerates source pin/archive, never patches 59f", "not 100%: PC2/PC4 r5 online, PC1 key/Docker pending, PC3 Docker group pending, Windows CP old API 1.41", "PC4 share cap-drop read-only proof passed; fresh Ed25519 external issuer verified; no leaf issuance"],
+  "currentTaskMutations": {"live": 0, "privateR5": 0, "executor": 0, "clock": 0, "claim": 0, "admin": 0, "auth": 0, "remote": 0, "localTempWorktree": "added and removed"},
+  "nextFirstAction": [
+    {"owner": "root", "action": "confirm Core 42001883513 incl. Linux symlink/POSIX cases; decide L1-L3; assign classifier/registry finalized-phase contract; regenerate integrated source pin/archive"},
+    {"owner": "Codex", "action": "optional L1/L2 fixes and L3 README paragraph"},
+    {"owner": "Claude", "action": "review integrated source pin/archive and classifier contract delta"}
+  ]
+}
