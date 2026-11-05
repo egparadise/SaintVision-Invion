@@ -1,0 +1,75 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_ba0ee0a71106 / ctx_53da843108e6",
+  "reviewer": "Claude",
+  "author": "Codex (integrator task 78064 / ctx_ed7); provenance root message 8ff594833eca",
+  "observedWindowKST": ["2026-11-06T02:13:20+09:00", "2026-11-06T02:35:58+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch of 72028cba and before writing this record; the last CI read was at 02:35:41; publication times are separate",
+  "reviewKind": "independent COMBINED source + nonexecuting packet review of one immutable candidate; component verdicts (4f 2736aec1, report 3af) are context only; no CI dispatched or cancelled; no broad Core rerun",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-setup-integration-20261105-ci2",
+    "commit": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "tree": "46df710b3ba9548ba15067517c9aa99fe1b2b3de",
+    "refNotMoved": "git ls-remote at 02:35 still resolves ci2 to 72028cba",
+    "chain": "72028cba (02:02:59) <- 0662b83f merge of report 3af3334e (01:57:26) <- 773e8523 merge of 4f97ba71 into local c9130310 (01:37:54); 842973bb, bd96479b, 0136f168 and c9130310 are ancestors",
+    "deltaVs4f": {"files": 355, "nonDocs": ["tests/test_backend_leaf_runtime_contract.py (A, +100)", "tests/test_build_fleet5_setup_packet.py (A, +83)", "tests/test_fleet5_setup_packet.py (A, +265)", "tools/build_fleet5_setup_packet.py (A, +129)"], "docs": "350 added, 1 modified (the integration Codex History, append-only)"},
+    "runtimeIdenticalTo4f": "deploy, services, src, contracts, migrations, .github and tools/lan_pilot.py have no diff from 4f97ba71",
+    "f0af": "f0af3077 is NOT an ancestor; tests/test_fleet5_settled_launcher.py equals the 4f blob, so L-T3-1/L-T3-2 (test-only Low) stay open at 72028; 4f CI is not reused",
+    "readFrom": "Git objects in a detached scratch worktree (removed afterwards, porcelain 0 after every mutant); the author packet was read only, as untrusted data, with Python -I"
+  },
+  "contract": {
+    "lifecycle11": "backend.yml (unchanged from 4f) requires the exact 11-key :3 result by dict equality plus `is True`/`is False` identity for 7 flags and `type(...) is int` for 3 counts; the new test pins that predicate via AST-extracted asserts only",
+    "plan": {"sha256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81", "bytes": 11837, "schema": "fleet5-exact-source-nonexecuting-plan:2", "executed": false, "queryExecuted": false, "countsAllNull": true, "settlement": "UNKNOWN_NO_F5_STATE",
+             "cohort": "ALL_FIVE_TOGETHER_AFTER_READY; independent physicalPC1-4, CP-colocated physicalPC5 excluded from independent S05/S07", "topology": "FOUR_PLAIN_WORKSPACE_NODES_NO_SHARED_STORAGE_MOUNT; simultaneous compute+storage unsupported; pc4ShareActive false; 16MiB tmpfs",
+             "operationalBindings": "all 7 null", "sf1": "canonicalVerifier names verify_settled (SF1); requires fresh nonce-bound Node-signed M2v2 final floor, unchanged executable SHA256, original byte-bound CP receipt, no reserialization", "lifecycleContract": "the same 11 fields/values"},
+    "pins": {"workerModules5": "worker_config 909d1c25, worker_leaf_rotation 4e296852, peer_policy_phase 8aac0c65, worker_peer_floor c73c81ad, worker_plain_rotation bf3754a2 (and launcher 76be4088), recomputed from the archived bytes", "lan": "tools/lan_pilot.py 2c626540.../blob d8de953f...", "prepare": "deploy/lan/prepare-pilot-database.sh 60bebe11.../blob a5695cab..."},
+    "card150": "vs 0136/bd only the tools/lan_pilot.py sha256+blob pair changes (to the actual 2c626540/d8de953f); prepare 60bebe/a5695c and every other field unchanged; equal to 4f",
+    "eightReviewFiles": "History+Evidence of c2102592 (6c REJECT), 8baaa6b5 (4a92), 315411bc (46b4), 2736aec1 (4f ACCEPT) are byte-identical to their original review commits; see C-L1 for the two earlier pre-correction copies"
+  },
+  "carryForward": {
+    "B1": "builder refuses 120000 and 160000 before any output (own disposable repos, no .work created, no link materialized); the owner test covers 120000 only",
+    "B2": "strict tri-state typing holds: 1/1.0/'true'/None for flags, 4.0/True/False/'4' for counts are all refused by the workflow predicate",
+    "B3": "16 literal scoped attribute entries in the setup Evidence .gitattributes all exist and resolve to -text -whitespace; no glob, root .gitattributes unchanged",
+    "preservation": "842973bb/bd96479b/c9130310/0136f168: no Evidence/History file deleted; only .gitattributes, errors.md and the integration History change, each as an append-only byte prefix; card150 as above; P0_v2 exacthead History equals the selected 4f blob"
+  },
+  "packet": {
+    "directory": "fleet5-setup-integration-20261105/.work/fleet5-setup-integration/packet-72028cba...",
+    "files": "6 regular files, no symlinks",
+    "claimsVerified": {"archive": "46895143 bytes, sha256 28a78428...", "inventory": "4757 entries, sha256 aa9667ce...", "packet": "48259331 bytes, sha256 dedd5571...", "manifest": "0d03e5c1...", "plan": "4899f8c9... equal to the Git blob"},
+    "independent": "manifest/inventory/receipt are exactly the builder's canonical bytes; sourceTree equals Git; inventory keys/modes/blob ids equal my own ls-tree (only 100644/100755 blobs); all 4757 archive members re-hashed (git blob sha1, sha256, bytes) with 0 mismatches and the name set equals the tree; packet members are 5 STORED entries, no traversal, testzip clean, each member equals its input; NOTICE is nonexecuting; receipt executed=false, readback true"
+  },
+  "ownProbes": {
+    "interpreter": "main .venv Python 3.14.7 -B, PYTHONUTF8=1, Windows; own scripts -I",
+    "newTests": "3 new files together: 104 passed, 0 skipped",
+    "builderNegatives": {"mode160000": "refused before output", "mode120000": "refused before output", "abbrev/upper/refName/treeId": "refused before output", "preexistingDir": "FileExistsError, prior bytes untouched", "planClaims(executed true/0, counts 0, physical true, query None, wrong task)": "refused, no receipt", "exportSubst/exportIgnore/archiveTamper": "refused by blob or name-set comparison, no receipt", "hostAutocrlfTrue": "refused (archive CRLF != blob), no receipt"},
+    "mutants": {"wf-drop-equality": "KILLED (17)", "wf-drop-attest-is-True": "KILLED (3)", "wf-drop-rolledBack-is-False": "KILLED (2)", "wf-drop-bytecode-type": "KILLED (2)", "wf-drop-restart-type": "KILLED (1)", "wf-cycles-isinstance": "survives, equivalent (equality already refuses bool for 2)",
+                "sf1-drop-executable": "KILLED (changed-executable)", "sf1-drop-match-floor": "KILLED (wrong-floor-version, wrong-policy-hash)", "sf1-drop-current-peer-policy": "SURVIVES in the packet test and in plain_reentry/reentry_guard_negatives/settled_launcher (42 cases); see C-L2",
+                "builder-drop-mode-check": "KILLED", "builder-allow-120000": "KILLED"},
+    "harnessNotes": "first two harness attempts were my own errors (missing basetemp parent; global autocrlf in disposable repos); fixed and rerun, not counted"
+  },
+  "ci": {
+    "adoptedAt72028": {"Backend 42071344810": "success (3 jobs)", "Core 42071358669": "IN PROGRESS at 02:35:41: s01 success; core job running with fixed native Go two-cycle proof step success and full pytest/go test not yet terminal", "Frontend 42071370665": "success (2 jobs)", "Desktop 42071383997": "success", "Docs 42071396345": "success", "Portal 42071150605": "success (push)", "Security 42071418886": "success", "A11y 42071431273": "success"},
+    "jobs": "11/12 success, 1 (Core core) in progress; every run head 72028cba on ci2",
+    "checkedByClaude": "API reads only; none dispatched, cancelled or rerun"
+  },
+  "findings": [
+    {"id": "C-L1", "severity": "Low", "status": "open", "summary": "the combined tree imports the ORIGINAL bytes of two Claude reviews whose observation windows were later declared invalid by the reviewer: 45bc23cb History 75c852c1/Evidence a5e3e70d and c2102592 History 6adbe00a/Evidence 473d7b25; the corrections dcff213a (History fbd52a7e, Evidence 3db3a5ef) and c2e63982 (History 9cd5446b, Evidence 5e8f3bc4) predate 72028 and are absent; documentation only, condition before landing"},
+    {"id": "C-L2", "severity": "Low", "status": "open", "summary": "no test pins SF1's current peer-policy.json == settled final check: removing it survives every SF1 suite because the packet test's own harness re-checks the file; test-strength only, runtime unchanged"},
+    {"id": "C-I1", "severity": "Info", "status": "open", "summary": "tests/test_backend_leaf_runtime_contract.py alone fails 1 case (ModuleNotFoundError check_leaf_rotation_standalone_lifecycle); passes whenever another module adding tools/ is collected; same pre-existing pattern as 4f's test_fleet5_standalone_result.py"},
+    {"id": "C-I2", "severity": "Info", "status": "open", "summary": "plan-claim and archive-comparison refusals occur after the archive is written, leaving a partial packet directory without receipt that blocks a same-SHA retry; fail-closed; B1 mode refusal is before any output as required"},
+    {"id": "C-I3", "severity": "Info", "status": "open", "summary": "the owner B1 test covers 120000 only; 160000 refusal is verified by my own probe, optional test"}
+  ],
+  "verdicts": {
+    "combinedSource": "ACCEPT (combined source and builder/plan), with C-L1 and C-L2 as Low conditions; no blocking finding",
+    "packet": "ACCEPT: every claimed hash/size/count and every Git blob independently reproduced; nonexecuting",
+    "candidateCI": "NOT YET COMPLETE: 11/12 jobs success; Core 42071358669 in progress; all-eight acceptance must wait for its actual terminal result",
+    "f0af": "excluded from 72028 (frozen); L-T3-1/L-T3-2 remain open in this candidate; inclusion is a separate later step",
+    "hold": "runtime, config, NodeOps, issuance, deployment, integration landing, physical and Obsidian remain HOLD; all operational bindings null"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysClockGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "fullCIRuns": 0, "ciDispatchOrCancel": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "observe Core 42071358669 to its actual terminal result before claiming all-eight; record combined ACCEPT with C-L1/C-L2 conditions"},
+    {"owner": "Codex", "action": "before landing: carry the corrected Claude review blobs (dcff213a, c2e63982) or a superseded receipt (C-L1); optional SF1 current-file negative (C-L2) and 160000 test (C-I3)"},
+    {"owner": "Claude", "action": "review the next assigned delta"}
+  ]
+}
