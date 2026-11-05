@@ -1,0 +1,33 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/core/test_lan_worker_config.py",
+    "tests/core/test_lan_workspace_upgrade.py",
+    "tests/test_core_workflow_cx01.py",
+    "tests/test_lan_pilot_multinode.py",
+    "tests/test_lan_leaf_rotation.py",
+    "tests/test_lan_leaf_rotation_standalone_runtime.py",
+    "tests/test_lan_leaf_rotation_consecutive.py",
+    "tests/test_lan_leaf_rotation_batch_successor.py",
+    "tests/test_leaf_rotation_archive_residue.py",
+    "tests/test_rotation_predecessor_residue.py",
+    "tests/test_fleet5_setup_packet.py",
+    "tests/core/test_serving_anchors.py",
+    "tests/test_route_coverage.py",
+    "--junitxml=.work/fleet5-setup-integration/assembled-focused.xml"
+  ],
+  "startedAtKST": "2026-11-05T19:25:25.021135+09:00",
+  "finishedAtKST": "2026-11-05T19:27:05.041711+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "assembled-focused.txt",
+  "sourceAtStart": "43a03a93b7696b926fc3944a3457e24a41d7cfc9",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

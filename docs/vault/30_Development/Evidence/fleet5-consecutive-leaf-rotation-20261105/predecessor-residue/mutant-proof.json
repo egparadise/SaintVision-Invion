@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "fleet5-predecessor-guard-mutation-proof:1",
+  "method": "Remove exactly one production guard call via AST in memory; no repository source mutation",
+  "sourceWorkerSHA256": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+  "sourceLanPilotSHA256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077",
+  "witnesses": [
+    {
+      "target": "Node _finalized_successor",
+      "exit": 1,
+      "result": "DID NOT RAISE ValueError; successor advanced with residue"
+    },
+    {
+      "target": "CP _finalized_predecessor",
+      "exit": 1,
+      "result": "DID NOT RAISE ValueError; successor advanced with residue"
+    }
+  ],
+  "greenExit": 0,
+  "greenTests": 2,
+  "driverSHA256": "3b89f35efe75946f28714c1ecee50fde44ffc7a578e46db9886805b2980444fc",
+  "driver": "\"\"\"Remove one production guard call in memory, then run its liveness witness.\"\"\"\nimport ast\nimport inspect\nfrom pathlib import Path\nimport sys\n\nroot = Path(__file__).resolve().parent\nsys.path.insert(0, str(root/'tests'))\nimport test_lan_leaf_rotation_consecutive as fixture\nimport pytest\n\nkind = sys.argv[1]\nmodule = fixture.rotation if kind == 'node' else fixture.lan_pilot\nname = '_finalized_successor' if kind == 'node' else '_finalized_predecessor'\ntree = ast.parse(inspect.getsource(getattr(module, name)))\n\nclass RemoveGuard(ast.NodeTransformer):\n    count = 0\n    def visit_Expr(self, node):\n        if isinstance(node.value, ast.Call):\n            function = node.value.func\n            called = function.id if isinstance(function, ast.Name) else getattr(function,'attr','')\n            if called == '_require_settled_archive':\n                self.count += 1\n                return None\n        return self.generic_visit(node)\n\nremove = RemoveGuard()\ntree = remove.visit(tree)\nassert remove.count == 1, 'must remove exactly the selected entry point guard'\nexec(compile(ast.fix_missing_locations(tree), module.__file__, 'exec'), module.__dict__)\ntarget = 'node' if kind == 'node' else 'cp'\nraise SystemExit(pytest.main([f'tests/test_rotation_predecessor_residue.py::test_{target}_successor_requires_verified_predecessor_replay','-q','-p','no:cacheprovider']))\n"
+}

@@ -1,0 +1,21 @@
+........................................................................ [ 19%]
+...............................ss.s..................................... [ 39%]
+.........................................ssssss......................... [ 59%]
+.s............ssss.........................................sssss........ [ 78%]
+..ssss.................................................................. [ 98%]
+......                                                                   [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_pilot_multinode.py:720: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:751: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:895: POSIX shell verifier runs in hosted Linux
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:615: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:629: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:642: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:658: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:382: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:487: symlink capability unavailable: 1314
+SKIPPED [5] tests\test_lan_leaf_rotation_batch_successor.py:559: OS cannot create test symlinks
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:116: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:128: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:161: OS cannot create test symlinks
+343 passed, 23 skipped in 87.65s (0:01:27)

@@ -1819,6 +1819,7 @@ def _finalized_predecessor(path, state, journal, *, candidate=None):
         raise ValueError("Another leaf rotation batch owns the pilot state")
     old_path = Path(journal["bundlePath"])
     old_raw, old, old_bundles = _batch_material(old_path)
+    worker_rotation._require_settled_archive(_batch_archive_path(path, old))
     with psycopg.connect(state["adminDSN"]) as conn:
         _verify_batch_archive(path, state, journal, old_raw, old, old_bundles, conn)
     if candidate is not None:
