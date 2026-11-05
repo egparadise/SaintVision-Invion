@@ -1,0 +1,102 @@
+### HEAD @ 2026-11-06T04:05:29+0900
+e50c148287779add421265868ef16909ed984650
+Python 3.14.7
+
+### C-I1 alone + sys.path probe @ 2026-11-06T04:05:29+0900
+CI1PROBE collected: ['tests/test_backend_leaf_runtime_contract.py']
+CI1PROBE tools-dir-on-sys.path-after-collection: []
+........................................................................
+CI1PROBE module: <private-scratch>\e50\tools\check_leaf_rotation_standalone_lifecycle.py
+CI1PROBE bare-module-loaded: False
+CI1PROBE tools-dir-on-sys.path-at-end: []
+
+72 passed in 0.21s
+EXIT=0
+
+### C-I1 parent a52782e8 import alone (expected red) @ 2026-11-06T04:05:31+0900
+E       ModuleNotFoundError: No module named 'check_leaf_rotation_standalone_lifecycle'
+tests\test_backend_leaf_runtime_contract.py:86: ModuleNotFoundError
+1 failed, 71 passed in 0.29s
+EXIT=1
+
+### owning suite tests/test_build_fleet5_setup_packet.py @ 2026-11-06T04:05:33+0900
+4 passed in 2.38s
+EXIT=0
+
+### owning suite tests/test_fleet5_plain_reentry.py @ 2026-11-06T04:05:37+0900
+19 passed in 5.22s
+EXIT=0
+
+### owning suite tests/test_fleet5_settled_launcher.py @ 2026-11-06T04:05:43+0900
+11 passed in 3.77s
+EXIT=0
+
+### combined reverse order @ 2026-11-06T04:05:49+0900
+106 passed in 9.31s
+EXIT=0
+
+### SF1 mutant: remove only current peer-policy byte term @ 2026-11-06T04:05:59+0900
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+-            or legacy._regular(root/'peer-policy.json') != files['peer-policy-final.json']
+E       Failed: DID NOT RAISE ValueError
+1 failed in 1.75s
+EXIT=1
+
+### SF1 mutant: whole plain_reentry suite @ 2026-11-06T04:06:03+0900
+FAILED tests/test_fleet5_plain_reentry.py::test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift
+1 failed, 18 passed in 4.41s
+
+### SF1 mutant: context variant WITHOUT held observation (temp file, removed) @ 2026-11-06T04:06:09+0900
+UNHELD-DIAG: Actual durable peer floor differs from the frozen phase
+1 passed in 1.58s
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+
+### B1 mutant: admit 160000 commit entries @ 2026-11-06T04:06:12+0900
+2c1d7dd0e62c766adcde0251b78377a541dd63ecac6e33cf093a26e454914971 *tools/build_fleet5_setup_packet.py
+-        if kind != b"blob" or mode not in {b"100644", b"100755"}:
++        if mode not in {b"100644", b"100755", b"160000"}:
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: '160000'
+E         Actual message: 'Source archive omits, adds or duplicates Git tree paths'
+FAILED tests/test_build_fleet5_setup_packet.py::test_nonregular_git_modes_refused_before_any_output_without_materializing_target[160000-source-submodule-commit]
+1 failed, 3 passed in 2.61s
+2c1d7dd0e62c766adcde0251b78377a541dd63ecac6e33cf093a26e454914971 *tools/build_fleet5_setup_packet.py
+
+### four-file blobs and LF sha256 @ 2026-11-06T04:06:17+0900
+44f9a0424ac71c80fc2c76b678d7a41badb04170 0c05b34489ea18a0f7ae6c19b955c06ec44819f930412a0d6ed6f7e2966dafb8 tests/test_backend_leaf_runtime_contract.py
+2a2d2a68145c097bd47a2864e5724af579d09c78 a1816166d02801b7b19ebbb2a8b7f752b932777b553b0a509f6bff902e8624a6 tests/test_build_fleet5_setup_packet.py
+ffe7839f14fd723b5e4fde8edfa0edf8c1b3a647 c9a7fbca005f4a537a1c7c2ffad4046a9d2396561839776f5fc4b909bf0a0f05 tests/test_fleet5_plain_reentry.py
+2b99768f5dac8396dd034ab44140fc11643c2456 ad3a01e761729a18f7c8d194c176a5a69c5257ba298c944bc47bee538d93dd81 tests/test_fleet5_settled_launcher.py
+f0af launcher blob: 2b99768f5dac8396dd034ab44140fc11643c2456
+
+### delta and runtime @ 2026-11-06T04:06:18+0900
+M	tests/test_backend_leaf_runtime_contract.py
+M	tests/test_build_fleet5_setup_packet.py
+M	tests/test_fleet5_plain_reentry.py
+M	tests/test_fleet5_settled_launcher.py
+non-doc/test diff vs 72028:
+0
+a52782e8 ancestor: yes
+
+### END @ 2026-11-06T04:06:19+0900
+
+### context: sibling SF1 credential terms -> False, every test file referencing verify_settled/verify-settled/'current credentials differ' @ 2026-11-06T04:10:39+0900
+files: tests/integration/test_workspace_upgrade.py tests/test_fleet5_plain_reentry.py tests/test_fleet5_reentry_guard_negatives.py tests/test_fleet5_settled_launcher.py tests/test_fleet5_setup_packet.py
+## term->False: legacy._regular(root/'node-cert.pem') != files['node-cert.pem']
+-    if (legacy._regular(root/'node-cert.pem') != files['node-cert.pem']
++    if (False
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:82: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:117: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:134: Opt-in Linux Docker installer acceptance
+SKIPPED [2] tests\integration\test_workspace_upgrade.py:185: Opt-in Linux Docker installer acceptance
+72 passed, 5 skipped in 35.69s
+## term->False: legacy._regular(root/'ca.pem') != files['ca.pem']
+-            or legacy._regular(root/'ca.pem') != files['ca.pem']):
++            or False):
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:82: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:117: Opt-in Linux Docker installer acceptance
+SKIPPED [1] tests\integration\test_workspace_upgrade.py:134: Opt-in Linux Docker installer acceptance
+SKIPPED [2] tests\integration\test_workspace_upgrade.py:185: Opt-in Linux Docker installer acceptance
+72 passed, 5 skipped in 34.67s
+bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5 *deploy/lan/worker_plain_rotation.py
+### END2 @ 2026-11-06T04:12:00+0900
