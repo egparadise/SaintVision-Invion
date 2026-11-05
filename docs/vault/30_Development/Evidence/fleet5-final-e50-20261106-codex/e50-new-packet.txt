@@ -1,0 +1,10 @@
+{
+  "directory": "D:\\Project\\SaintVisionI-Invion\\fleet5-setup-integration-20261105\\.work\\fleet5-setup-integration\\packet-e50c148287779add421265868ef16909ed984650",
+  "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+  "packet": "fleet5-nonexecuting-setup-e50c148287779add421265868ef16909ed984650.zip",
+  "bytes": 48826426,
+  "sha256": "63ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b",
+  "manifestSHA256": "ae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146",
+  "packetReadbackVerified": true,
+  "executed": false
+}

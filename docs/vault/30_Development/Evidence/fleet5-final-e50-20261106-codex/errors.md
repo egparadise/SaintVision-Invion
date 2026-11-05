@@ -1,0 +1,5 @@
+Initial final-report import setup exited1 with FileNotFoundError because the new reviewer Evidence directory was not created before writing its first file. The two earlier C-L1 imports were already exact Git bytes; no source/ref/packet was changed. The corrected setup creates only parent directories and reimports the same exact reviewer bytes; this is a documentation setup error, not a test or CI outcome.
+
+Initial generic Codex*.md discovery selected the separate VF board; it is explicitly excluded in the version receipt and replaced with the actual Codex work board path and version. No board was modified.
+
+Interim metadata collection exited1 after an incorrect guessed DB tooling Python path produced Git exit128 and the fallback lookup found nothing. No interim file/source/CI/ref/packet was changed. The canonical closure identifies the real deploy/lan/prepare-pilot-database.sh; the corrected metadata collector reads the actual e50 Git blob and preserves the required60bebe/a5695c pair. This is a report collector path error, not a source fix or CI outcome.

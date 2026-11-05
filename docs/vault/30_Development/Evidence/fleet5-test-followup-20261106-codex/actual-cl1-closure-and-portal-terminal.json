@@ -1,0 +1,55 @@
+{
+  "recordedAtKST": "2026-11-06T03:32:44.619985+09:00",
+  "cl1": {
+    "report": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+    "actualIndependentReview": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+    "task": "task_371ef98413c2 / ctx_40f8f20ce8ce",
+    "verdict": "C-L1 CLOSED; a527 report ACCEPT for C-L1 scope; no new finding",
+    "codeOrPacketOrWholeProductReacceptance": false
+  },
+  "actualPinnedWorkflowObservations": [
+    {
+      "scope": "C-L1-only reviewer Docs",
+      "actualObservation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42084583685,
+        "headSha": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+        "headBranch": "agent/claude/fleet5-20261105-cp-and-inventory",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "raw": "ci-actual-42084583685.json"
+    },
+    {
+      "scope": "automatic test-only followup Portal push; not new all8",
+      "actualObservation": {
+        "status": "MEASURED_PASS",
+        "workflow": "portal-login-harness.yml",
+        "runId": 42084627956,
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "headBranch": "agent/codex/fleet5-test-followup-20261106",
+        "event": "push",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "portal-login-harness": "success"
+        }
+      },
+      "raw": "ci-actual-42084627956.json"
+    }
+  ],
+  "testOnlyFollowup": "e50c148287779add421265868ef16909ed984650",
+  "testOnlyIndependentReview": "PENDING under existing request msg_8b100e0eb432; no repeated combined-review-availability request",
+  "rootFinalSourceSelection": "PENDING",
+  "originalSourceAndAll8AndPacket": "72028cbac903c4415d9979f980a6e0f9948e914f unchanged",
+  "newAllEightOrArchive": false,
+  "physicalOrProductAcceptance": false,
+  "queryExecuted": false,
+  "counts": null,
+  "operations": "HOLD"
+}

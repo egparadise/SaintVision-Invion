@@ -1,0 +1,52 @@
+{
+  "recordedAtKST": "2026-11-06T04:27:58.256960+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "tree": "793c5db25147dd75f7bf496c2015aa969fc3dbae",
+  "outputDirectory": "D:\\Project\\SaintVisionI-Invion\\fleet5-setup-integration-20261105\\.work\\fleet5-setup-integration\\packet-e50c148287779add421265868ef16909ed984650",
+  "manifest": {
+    "archiveInventory": {
+      "entries": 4864,
+      "everyGitBlobCompared": true,
+      "name": "source-inventory.json",
+      "sha256": "d92d86c4ed68eb3f5d684f3aee0fdb04a1e82fe7141f0bf584402591a98e7d5d"
+    },
+    "candidateCI": "separate exact-source all-eight workflow evidence required",
+    "createdAtKST": "2026-11-06T04:26:49.352497+09:00",
+    "independentCombinedReview": "separate actual reviewer report required; this builder makes no review assertion",
+    "physicalAcceptance": false,
+    "schemaVersion": "fleet5-exact-source-packet-manifest:1",
+    "setupPlan": {
+      "executed": false,
+      "packetPath": "setup-plan.json",
+      "sha256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81",
+      "sourcePath": "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/setup-plan-plain-v3-candidate.json"
+    },
+    "source59fFrozenArchiveOpenedOrModified": false,
+    "sourceArchive": {
+      "bytes": 47428827,
+      "name": "fleet5-candidate-source-e50c148287779add421265868ef16909ed984650.zip",
+      "sha256": "acdbd6669956cf49d2e38163c5af99d51e886a5bb9209df78fa7549758ad3f07"
+    },
+    "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+    "sourceTree": "793c5db25147dd75f7bf496c2015aa969fc3dbae",
+    "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
+    "wholeProductAcceptance": false
+  },
+  "receipt": {
+    "bytes": 48826426,
+    "executed": false,
+    "manifestSHA256": "ae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146",
+    "packet": "fleet5-nonexecuting-setup-e50c148287779add421265868ef16909ed984650.zip",
+    "packetReadbackVerified": true,
+    "sha256": "63ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b",
+    "sourceCommit": "e50c148287779add421265868ef16909ed984650"
+  },
+  "metadataPublicCopiesExact": true,
+  "planComparedToActualE50GitBlob": true,
+  "planBytesUnchangedFrom72028ButDerivedFromE50Archive": true,
+  "queryExecuted": false,
+  "counts": null,
+  "physicalOrProductAcceptance": false,
+  "packetIndependentReview": "PENDING; new bounded packet/provenance review required",
+  "sourceCI": "PENDING; no72028 result attributed to e50"
+}

@@ -1,0 +1,25 @@
+---
+doc_id: "HISTORY-FLEET5-FINAL-E50-20261106-CODEX"
+title: "FLEET5 selected immutable e50 source CI and nonexecuting packet"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+reviewer: "Claude"
+audience: "agent"
+updated: "2026-11-06T04:24:23.211463+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+base_sha: "e50c148287779add421265868ef16909ed984650"
+---
+
+Task FLEET5-SETUP-INTEGRATION-20261105 / task_78064fb4b7ff / ctx_ed7ec73163d6; owner Codex, independent reviewer Claude through Root. Root actual msg_93007a9642f1 SELECTS final source e50c148287779add421265868ef16909ed984650 and freezes agent/codex/fleet5-test-followup-20261106. Separate docs-only report branch is agent/codex/fleet5-final-e50-report-20261106; no source ref advance. Actual b9db061a1add77e862193589336fe2b19f5a270e TEST-ONLY e50 ACCEPT and97edf991c4d96a2ba08c8817be2e249d45c053eb C-L1-only a527 CLOSED/ACCEPT are imported as original Git bytes with original scopes. Their verdicts do not substitute for new exact e50 all8 or a new packet review. Original255c combined72028 scope stays unchanged. Root canonical Index/Codex versions reread now are recorded verbatim in selection-and-review-imports.json; original task mandatory canonical/agent-delivery1.1.0/core-reliability1.0.0 reading remains in the integration History.
+
+Authorized scope: create separately named e50 Git-blob source archive/inventory/manifest/plain-v3 nonexecuting plan/packet/receipt; adopt exact e50 Docs42084668698 and automatic Portal42084627956, run remaining six source workflows once with unique correlations and explicit Core fixed native input; capture actual terminal jobs, hosted Linux four-file collection, real installer/PG/native Unicode/default pinned/mutants and raw evidence digests. Do not attribute72028 CI or counts to e50. Request bounded new packet/provenance delta review at a concrete source/report; no duplicate runtime code review absent change. Subsequent R-L1 node-cert/CA owning tests belong to one distinct TEST-ONLY branch after source CI dispatch and never enter this e50 ref or packet.
+
+All actual F5 query/count/Node/image/executable/lease bindings remain false/null/HOLD; four independent Linux plain workers plus CP-colocated fifth, CP excluded from independent S05/S07, no combined compute+shared-storage support inferred. R-I1 Linux collection awaits actual CI; R-I2 broad exception, R-I3 exact65536/C-I2 partial-output remain carried Info. No remote, physical, CA/leaf issuance, enrollment/init, Docker/WSL/UAC/runtime/system trust, secrets/config-body read, landing/deploy/old3/Obsidian action. Source72028/ci2/842/c913 and all original archives/packets remain frozen. Use sequential low-memory local checks and hosted CI; no unrelated process kills.
+
+New e50 packet build actually exits0: source archive47,428,827B/SHA256acdbd6669956cf49d2e38163c5af99d51e886a5bb9209df78fa7549758ad3f07,4864 actual Git-blob inventory entries/everyGitBlobCompared=true/inventorySHAd92d86c4ed68eb3f5d684f3aee0fdb04a1e82fe7141f0bf584402591a98e7d5d. New nonexecuting packet48,826,426B/SHA25663ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b, manifestSHAae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146; readback verified. Plan is newly read from the actual e50 archive and byte-compared to its exact committed Git blob; its SHA4899f8c9 is unchanged because the public plan bytes are unchanged, not copied from an old packet. Public e50-named metadata copies are byte-identical to new task-owned packet files; original72028/59f packets are never opened or modified by this build.
+
+Actual e50/ref8 workflow IDs: Backend42093699470/Core42093714198/Frontend42093726119/Desktop42093738328/Docs42084668698/Portal42084627956/Security42093764277/A11y42093775632. Docs/Portal are unique existing exact-source/ref/event successes adopted, no duplicate request; other6 dispatched once with stored unique correlation and explicit Core run_fleet5_peer_phase_fixed_proof=true. Twelve actual jobs are observed, but Backend/Core/A11y are still pending at this snapshot and all8 is false. Root receives exact source/tree/newpacket/actual8 IDs as msg_f1bc9e8405da. No72028 CI/count is attributed to e50. Hosted Core and both Backend must actually execute all four owned files with zero skips, plus required native/Unicode/pinned/mutants/installer/PG evidence; packet delta review is also pending.
+
+New packet/report local required docs, ontology, contracts, frontend integrity, path-citation ratchet(base e50), duplicate ratchet and sync --check all actually exit0. Sync reports787 pending exports/0 conflicts/no writes; no Obsidian apply. Initial report setup/collector path errors are retained in errors.md and never classified as source test or CI failures. Staged report product diff vs immutable e50 is empty; imported5 reviewer files match original Git bytes. This interim report may receive exact Docs while source Backend/Core finish; new packet review and actual hosted terminal counts are still required before final bounded delivery.

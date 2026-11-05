@@ -1,0 +1,44 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_371ef98413c2 / ctx_40f8f20ce8ce",
+  "reviewer": "Claude",
+  "author": "Codex (integrator task_78064fb4b7ff / ctx_ed7ec73163d6)",
+  "observedWindowKST": ["2026-11-06T03:22:56+09:00", "2026-11-06T03:26:24+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and before writing this record (last API read 03:25:47); publication times are separate",
+  "reviewKind": "independent bounded C-L1-only delta closure of a docs-only report; source 72028 and its packet were accepted earlier (255cfa37) and are not re-reviewed; no long Core or 4757-blob rerun",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-setup-integration-20261106-report72028",
+    "commit": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+    "base": "28c00c0445702156b8e10382fe93ee8a76b2f39b",
+    "delta": {"files": 28, "added": 23, "modified": 5, "nonDocs": 0},
+    "productDiff": "a527 vs 72028 and 28c0 vs 72028: no non-docs difference",
+    "context": "own combined review 255cfa37 (source/builder/plan/packet ACCEPT, CI 11/12 snapshot at 02:35:41) unchanged; root's all-eight 12-job observation is separate",
+    "readFrom": "Git objects and the GitHub API only; the author packet directory was hashed read-only"
+  },
+  "checks": {
+    "importedCombinedPair": "combined-72028-review.json (026bbf66) and the 02-35-58 History (a0d00c10) are byte-identical to 255cfa37",
+    "correctedFour": "low-b1-b3-bd96-0136-review.json 3db3a5ef and the 21-35-00 History fbd52a7e equal dcff213a; p0-code-6c0f-review.json 5e8f3bc4 and the 21-55-00 History 9cd5446b equal c2e63982; all four equal my branch HEAD",
+    "allClaudeFiles": "all 218 Claude reviewer files in a527 equal my branch HEAD; the other files the two correction commits touched (f027, 1057, cdef reviews) were never in the combined tree, so no stale copy remains",
+    "supersessionLedger": "candidate720-cl1-supersession.json: 6 imported blob/SHA256/byte triples and 4 superseded 72028 blob/SHA256 values recomputed exactly; the two reviewerAuthoredCorrection objects and corrected windows equal my committed observedWindowCorrection fields verbatim (originalDeclared INVALID with reasons, transcript-derived bounds 21:16:38-21:21:01 and 21:44:49-21:55:29); publication metadata carries usedAsExecutionTime false; legacy path timestamps are declared non-observations",
+    "qualifiedDelivery": "candidate720-qualified-delivery.json copies my 255c verdicts and window verbatim, keeps the 11/12 pending verdict as historical and records all-eight 12/12 separately; C-L2, C-I1, C-I3 and f0af are listed as a not-in-72028 test-only follow-up, not closed; physical/wholeProduct/wholeTask false, counts and bindings null",
+    "ownerErrors": "errors.md and the integration History are append-only byte prefixes of 28c0; cl1-paths (wrong tool name tools/check_doc_paths.py) exit 2 is preserved and the canonical check_doc_path_citations --ratchet --base-ref 28c0 is a separate record with exit 0; docs/ontology/contracts/frontend/single-source/sync records exit 0",
+    "historicScope": "the History addition says only timing is superseded, verdicts and tests keep their original source scope, and earlier timing-unverified reviews are not legitimized",
+    "immutability": "ci2 still resolves to 72028cba at 03:25; the six author packet files hash to the frozen digests (archive 28a78428, packet dedd5571, manifest 0d03e5c1, inventory aa9667ce, plan 4899f8c9, receipt 9597caff equal to my 02:2x read) with 02:04:43 mtimes; plan blob unchanged vs 72028",
+    "ci": "report Docs 42083204187: workflow_dispatch, head a52782e8, docs job success; 28c0 Docs 42080835896 success (API only)"
+  },
+  "findings": [
+    {"id": "C-L1", "severity": "Low", "status": "closed", "summary": "the corrected 45bc/c210 reviewer bytes are imported exactly, the superseded originals and their invalid windows are preserved and identified, and corrected bounds are the reviewer's transcript-derived values, not publication times"}
+  ],
+  "unchanged": {"C-L2": "open (Low, test-only follow-up)", "C-I1": "open (Info)", "C-I2": "open (Info)", "C-I3": "open (Info)", "f0af": "not in 72028; L-T3-1/L-T3-2 open there"},
+  "verdicts": {
+    "cl1Delta": "C-L1 CLOSED; report a52782e8 ACCEPT for the C-L1 scope; no new finding",
+    "scope": "no historic verdict or scope changed; no new code, packet or physical acceptance; not a whole-product or landing verdict",
+    "hold": "runtime, NodeOps, deployment, landing, issuance, old3 and Obsidian remain HOLD"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "authorCheckoutWrites": 0, "boardsRegistryObsidian": 0, "physicalKeysConfigState": 0, "subagents": 0, "ciDispatchOrCancelOfOthers": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record C-L1 closed at a52782e8; keep landing HOLD until the separate test-only follow-up is reviewed and the final source is chosen"},
+    {"owner": "Codex", "action": "continue the test-only follow-up (f0af, C-L2, C-I1, C-I3) under its own review"},
+    {"owner": "Claude", "action": "review that follow-up when assigned"}
+  ]
+}

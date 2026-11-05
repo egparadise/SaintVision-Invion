@@ -1,0 +1,37 @@
+{
+  "recordedAtKST": "2026-11-06T03:30:39.248961+09:00",
+  "testOnlySource": "e50c148287779add421265868ef16909ed984650",
+  "branch": "agent/codex/fleet5-test-followup-20261106",
+  "exactDocs": {
+    "status": "MEASURED_PASS",
+    "workflow": "docs.yml",
+    "runId": 42084668698,
+    "headSha": "e50c148287779add421265868ef16909ed984650",
+    "headBranch": "agent/codex/fleet5-test-followup-20261106",
+    "event": "workflow_dispatch",
+    "runConclusion": "success",
+    "jobCount": 1,
+    "jobConclusions": {
+      "docs": "success"
+    }
+  },
+  "requiredCl1Report": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+  "cl1ExactDocs": 42083204187,
+  "cl1DeltaClosure": "PENDING; already requested as msg_8944e72a3aae",
+  "testOnlyIndependentReview": "PENDING; Root must arrange",
+  "rootFinalSourceChoice": "PENDING; no new all8/archive until selected",
+  "runtimeAndOriginalAllEightSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "originalAllEightAndPacketNotRelabelled": true,
+  "automaticPortalPushRun": {
+    "id": 42084627956,
+    "lastObservedStatus": "in_progress",
+    "lastObservedConclusion": null,
+    "manuallyDispatched": false,
+    "claimedPassed": false
+  },
+  "wholeTaskDone": false,
+  "queryExecuted": false,
+  "counts": null,
+  "physicalOrProductAcceptance": false,
+  "operations": "HOLD; no landing/physical/issuance/runtime/old3/Obsidian actions."
+}

@@ -1,0 +1,50 @@
+{
+  "recordedAtKST": "2026-11-06T04:24:23.211463+09:00",
+  "rootMessage": "msg_93007a9642f1",
+  "task": "task_78064fb4b7ff / ctx_ed7ec73163d6",
+  "baseSource": "e50c148287779add421265868ef16909ed984650",
+  "reportBranch": "agent/codex/fleet5-final-e50-report-20261106",
+  "imports": [
+    {
+      "commit": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/cl1-closure-a527-review.json",
+      "blob": "908b2814ad25a68000e6225fdbff13cbc7846cd7"
+    },
+    {
+      "commit": "97edf991c4d96a2ba08c8817be2e249d45c053eb",
+      "path": "docs/vault/30_Development/History/2026-11-06_03-26-24_KST_FLEET5_C-L1_closure_a527_검토_Claude.md",
+      "blob": "0886157a89c9d1555f0b7c73681264da6964cf50"
+    },
+    {
+      "commit": "b9db061a1add77e862193589336fe2b19f5a270e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-test-followup-20261106-claude/e50c-review-raw.txt",
+      "blob": "4b6acbc415bd330aa1f1518c5d9515977c20dee1"
+    },
+    {
+      "commit": "b9db061a1add77e862193589336fe2b19f5a270e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-test-followup-20261106-claude/e50c-review.json",
+      "blob": "b899d7da858fee73748dff52c01b5dee8940e81e"
+    },
+    {
+      "commit": "b9db061a1add77e862193589336fe2b19f5a270e",
+      "path": "docs/vault/30_Development/History/2026-11-06_04-13-00_KST_FLEET5_test_followup_e50c_검토_Claude.md",
+      "blob": "4fa897c00abfce59baa8c331e366e840b67c7a3d"
+    }
+  ],
+  "rootCanonicalVersions": [
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\00_Index\\전체 개발 진행 현황.md",
+      "frontmatter": "\ndoc_id: \"INDEX-PROGRESS-001\"\ntitle: \"전체 개발 진행 현황\"\nversion: \"1.0.417\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-06T04:06:14+09:00\"\nsource_of_truth: \"Git\"\nlatest_codex_card: \"72028 bounded delivery accepted/all8/12/C-L1 closed; v4 Low closed but auxABI M1 revision5; e50 actual review active; B02cfd new wire review queued; physical incomplete\"\n"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\30_Development\\Agent별 작업\\Codex 작업 현황.md",
+      "frontmatter": "\ndoc_id: \"WORKBOARD-CODEX-001\"\ntitle: \"Codex 작업 현황\"\nversion: \"1.0.378\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-06T04:06:14+09:00\"\nsource_of_truth: \"Git\"\nactive_card: \"FLEET5-20261105 five physical node orchestration\"\nactive_card_status: \"72028 bounded delivery accepted; v4Low closed but auxM1 v5 docs revision; e50review6b active; B02cf reviewd4 pending after6b; OS setup feedback pending\"\nactive_card_next: \"Handle e50 actual verdict/source choice then start readyB taskd4; bootstrapCodex v5 unsigned aggregate M1/I1-I3; actual reviews before registration/code/physical actions\"\n"
+    }
+  ],
+  "sourceAndOldPacketsFrozen": true,
+  "physicalAcceptance": false,
+  "initialMisselectedBoardExcluded": {
+    "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\30_Development\\Agent별 작업\\Codex VF 작업 현황.md",
+    "frontmatter": "\ndoc_id: \"WORKBOARD-VF-CODEX-001\"\ntitle: \"Codex VF 작업 현황\"\nversion: \"1.0.25\"\nstatus: \"in_progress\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T13:24:00+09:00\"\nsource_of_truth: \"Git\"\n"
+  }
+}

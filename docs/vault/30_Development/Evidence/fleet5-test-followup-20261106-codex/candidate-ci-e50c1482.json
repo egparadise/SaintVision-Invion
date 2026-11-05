@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+  "branch": "agent/codex/fleet5-test-followup-20261106",
+  "workflows": {
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/f1e8af9934e5491b869da614348de2bd",
+      "dispatchRequestedAtKST": "2026-11-06T03:29:06.489865+09:00",
+      "workflowInputs": {
+        "correlation_id": "post-landing-verify/f1e8af9934e5491b869da614348de2bd"
+      },
+      "dispatchReturnedSuccess": true,
+      "event": "workflow_dispatch",
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42084668698,
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "headBranch": "agent/codex/fleet5-test-followup-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42084668698,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084668698",
+      "headSha": "e50c148287779add421265868ef16909ed984650",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127446456588,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T18:29:12Z",
+          "completedAt": "2026-11-05T18:29:44Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084668698/job/127446456588"
+        }
+      ],
+      "rawObservation": "ci-42084668698-20261106T032954.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-test-followup-20261106",
+    "refTipSha": "e50c148287779add421265868ef16909ed984650"
+  },
+  "observedAtKST": "2026-11-06T03:29:50.485761+09:00",
+  "intermediateScope": [
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Docs-only followup gate; no new all8/archive before independent followup review and Root source selection; original72028 source CI and packet stay separate",
+  "jobCountObserved": 1
+}
