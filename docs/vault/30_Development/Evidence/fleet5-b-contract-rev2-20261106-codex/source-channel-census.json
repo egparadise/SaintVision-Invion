@@ -1,0 +1,512 @@
+{
+  "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "method": "all tracked services/packages/tools/deploy source, lexical channel symbols; classification and transitive writers tracked separately",
+  "files": [
+    {
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "hits": [
+        {
+          "line": 39,
+          "text": "from .node_channels import NodeChannels"
+        },
+        {
+          "line": 532,
+          "text": "channel = NodeChannels(database).snapshot("
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/capacity.py",
+      "sha256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "hits": [
+        {
+          "line": 22,
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/containment.py",
+      "sha256": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+      "hits": [
+        {
+          "line": 175,
+          "text": "\"\"\"SELECT 1 FROM inv.nodes n JOIN inv.node_channels c USING(tenant_id,node_id)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/gpu.py",
+      "sha256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+      "hits": [
+        {
+          "line": 81,
+          "text": "JOIN inv.node_channels c USING(tenant_id,node_id)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0005_node_channels.sql",
+      "sha256": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+      "hits": [
+        {
+          "line": 2,
+          "text": "CREATE TABLE inv.node_channels ("
+        },
+        {
+          "line": 19,
+          "text": "ALTER TABLE inv.node_channels ENABLE ROW LEVEL SECURITY;"
+        },
+        {
+          "line": 20,
+          "text": "ALTER TABLE inv.node_channels FORCE ROW LEVEL SECURITY;"
+        },
+        {
+          "line": 21,
+          "text": "CREATE POLICY tenant_isolation ON inv.node_channels"
+        },
+        {
+          "line": 39,
+          "text": "CREATE TRIGGER channel_monotonic BEFORE UPDATE OR DELETE ON inv.node_channels"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0019_runtime_role.sql",
+      "sha256": "7eb1d0b9c6608a8eb2e3d69ee7838dd99daa5124eefd53f8fa0ff0a7490be662",
+      "hits": [
+        {
+          "line": 24,
+          "text": "REVOKE INSERT,UPDATE,DELETE ON inv.node_channels,inv.node_channel_audit FROM inv_kernel;"
+        },
+        {
+          "line": 25,
+          "text": "GRANT UPDATE(lock_sentinel) ON inv.node_channels TO inv_kernel;"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "hits": [
+        {
+          "line": 15,
+          "text": "from .node_channels import ChannelProof, endpoint_parts"
+        },
+        {
+          "line": 23,
+          "text": "channels: tuple[ChannelProof, ...]"
+        },
+        {
+          "line": 52,
+          "text": "or any(not isinstance(v, ChannelProof) for v in channels)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_runtime.py",
+      "sha256": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+      "hits": [
+        {
+          "line": 29,
+          "text": "from .node_channels import assert_channel"
+        },
+        {
+          "line": 103,
+          "text": "assert_channel(conn, channel)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_source.py",
+      "sha256": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+      "hits": [
+        {
+          "line": 7,
+          "text": "from .node_channels import ChannelProof, assert_channel, proof"
+        },
+        {
+          "line": 23,
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE\", (node_id,)"
+        },
+        {
+          "line": 30,
+          "text": "assert_channel(conn, channel)"
+        },
+        {
+          "line": 60,
+          "text": "channel = ChannelProof(**row[\"channel\"])"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_certificates.py",
+      "sha256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "hits": [
+        {
+          "line": 50,
+          "text": "LEFT JOIN inv.node_channels c ON c.tenant_id=n.tenant_id AND c.node_id=n.node_id"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "sha256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "hits": [
+        {
+          "line": 84,
+          "text": "class ChannelProof:"
+        },
+        {
+          "line": 94,
+          "text": "return ChannelProof("
+        },
+        {
+          "line": 104,
+          "text": "def assert_channel(conn, expected):"
+        },
+        {
+          "line": 106,
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE\","
+        },
+        {
+          "line": 120,
+          "text": "class NodeChannels:"
+        },
+        {
+          "line": 142,
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (node.node_id,)"
+        },
+        {
+          "line": 147,
+          "text": "assert_channel(conn, result)"
+        },
+        {
+          "line": 151,
+          "text": "def provision_channel("
+        },
+        {
+          "line": 175,
+          "text": "\"SELECT version FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\","
+        },
+        {
+          "line": 184,
+          "text": "\"\"\"INSERT INTO inv.node_channels(tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,certificate_not_after,enabled)"
+        },
+        {
+          "line": 205,
+          "text": "def revoke_channel(conn, node: NodePrincipal, *, expected_version):"
+        },
+        {
+          "line": 212,
+          "text": "\"SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\","
+        },
+        {
+          "line": 219,
+          "text": "\"UPDATE inv.node_channels SET enabled=false,version=%s WHERE tenant_id=%s AND node_id=%s\","
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_execution.py",
+      "sha256": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+      "hits": [
+        {
+          "line": 93,
+          "text": "from .node_channels import assert_channel"
+        },
+        {
+          "line": 112,
+          "text": "assert_channel(conn, channel)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_resource_usage.py",
+      "sha256": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+      "hits": [
+        {
+          "line": 77,
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transfer.py",
+      "sha256": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+      "hits": [
+        {
+          "line": 9,
+          "text": "from .node_channels import NodeChannels, assert_channel"
+        },
+        {
+          "line": 18,
+          "text": "self.channels = NodeChannels(database)"
+        },
+        {
+          "line": 28,
+          "text": "authorize = lambda conn: assert_channel(conn, channel)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "hits": [
+        {
+          "line": 16,
+          "text": "from .node_channels import NodeChannels, certificate_identity, endpoint_parts"
+        },
+        {
+          "line": 231,
+          "text": "self.channels = NodeChannels(database)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/observation.py",
+      "sha256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "hits": [
+        {
+          "line": 8,
+          "text": "from .node_channels import NodeChannels, assert_channel"
+        },
+        {
+          "line": 14,
+          "text": "self.channels = NodeChannels(database)"
+        },
+        {
+          "line": 58,
+          "text": "assert_channel(conn, proof)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "hits": [
+        {
+          "line": 24,
+          "text": "\"SELECT node_id FROM inv.node_channels WHERE enabled AND recovery_epoch=%s::uuid ORDER BY node_id LIMIT 6\","
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/placement.py",
+      "sha256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+      "hits": [
+        {
+          "line": 380,
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "sha256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "hits": [
+        {
+          "line": 21,
+          "text": "from .node_channels import ChannelProof, assert_channel, proof"
+        },
+        {
+          "line": 36,
+          "text": "\"channel\": ChannelProof(**value[\"channel\"]),"
+        },
+        {
+          "line": 79,
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (row[\"node_id\"],)"
+        },
+        {
+          "line": 86,
+          "text": "assert_channel(conn, binding)"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "hits": [
+        {
+          "line": 29,
+          "text": "from .node_channels import ChannelProof, certificate_identity, endpoint_parts"
+        },
+        {
+          "line": 76,
+          "text": "channel: ChannelProof"
+        },
+        {
+          "line": 88,
+          "text": "if not isinstance(self.channel, ChannelProof):"
+        },
+        {
+          "line": 183,
+          "text": "channel: ChannelProof"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/terminal.py",
+      "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "hits": [
+        {
+          "line": 22,
+          "text": "from .node_channels import NodeChannels, assert_channel"
+        },
+        {
+          "line": 275,
+          "text": "channel = NodeChannels(self.db).snapshot(node, observation_only=True)"
+        },
+        {
+          "line": 288,
+          "text": "assert_channel(conn, channel)"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_lan_storage_readiness.py",
+      "sha256": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "hits": [
+        {
+          "line": 110,
+          "text": "FROM inv.nodes n LEFT JOIN inv.node_channels c"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_remote_workspace.py",
+      "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "hits": [
+        {
+          "line": 27,
+          "text": "from inv.node_channels import NodeChannels"
+        },
+        {
+          "line": 116,
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']),observation_only=True)"
+        }
+      ]
+    },
+    {
+      "path": "tools/five_node_lab_preflight.py",
+      "sha256": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "hits": [
+        {
+          "line": 172,
+          "text": "LEFT JOIN inv.node_channels AS c"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_console.py",
+      "sha256": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+      "hits": [
+        {
+          "line": 87,
+          "text": "FROM inv.nodes n LEFT JOIN inv.node_channels c ON (c.tenant_id,c.node_id)=(n.tenant_id,n.node_id) AND c.recovery_epoch=n.recovery_epoch"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "hits": [
+        {
+          "line": 23,
+          "text": "from inv.node_channels import NodeChannels"
+        },
+        {
+          "line": 83,
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']),observation_only=True)"
+        },
+        {
+          "line": 137,
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']))"
+        },
+        {
+          "line": 172,
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']))"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "hits": [
+        {
+          "line": 40,
+          "text": "from inv.node_channels import certificate_identity, node_uri, provision_channel, revoke_channel"
+        },
+        {
+          "line": 1339,
+          "text": "\"SELECT certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s\","
+        },
+        {
+          "line": 1345,
+          "text": "provision_channel("
+        },
+        {
+          "line": 1541,
+          "text": "\"FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s\" + suffix,"
+        },
+        {
+          "line": 3574,
+          "text": "committed_version = provision_channel("
+        },
+        {
+          "line": 3734,
+          "text": "committed_version = provision_channel("
+        },
+        {
+          "line": 3795,
+          "text": "\"SELECT version,enabled FROM inv.node_channels \""
+        },
+        {
+          "line": 3802,
+          "text": "version = revoke_channel("
+        },
+        {
+          "line": 3856,
+          "text": "\"SELECT version,enabled FROM inv.node_channels \" \"WHERE tenant_id=%s AND node_id=%s\","
+        },
+        {
+          "line": 3863,
+          "text": "version = revoke_channel("
+        }
+      ]
+    },
+    {
+      "path": "tools/remote_workspace_entry.py",
+      "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "hits": [
+        {
+          "line": 31,
+          "text": "from inv.node_channels import provision_channel, NodeChannels"
+        },
+        {
+          "line": 83,
+          "text": "provision_channel(conn,NodePrincipal(config['tenantId'],config['nodeId']),epoch=config['epoch'],"
+        },
+        {
+          "line": 205,
+          "text": "duplicate = a.client.exchange(NodeChannels(a.e.db).snapshot(a.node,observation_only=True),envelope,observation_only=True)"
+        }
+      ]
+    },
+    {
+      "path": "tools/s01_readiness_preflight.py",
+      "sha256": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de",
+      "hits": [
+        {
+          "line": 31,
+          "text": "from inv.node_channels import certificate_identity"
+        },
+        {
+          "line": 960,
+          "text": "LEFT JOIN inv.node_channels c"
+        }
+      ]
+    }
+  ]
+}

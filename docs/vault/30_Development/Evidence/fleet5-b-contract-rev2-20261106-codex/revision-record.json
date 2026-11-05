@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "fleet5-b-revision-record:2",
+  "recordedAtKST": "2026-11-06T03:32:47+09:00",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude revision review via Root pending",
+  "taskId": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "branch": "agent/codex/fleet5-b-contract-rev2-20261106",
+  "baseSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "originalProposalSHA": "100f6f132132199d1204a76190f04712dd82de00",
+  "originalReviewSHA": "2bb959a3365c2b59c8818ed746480c9183b4c0fc",
+  "rootDecision": "msg_fa19f6e8d717",
+  "selection": "B-FRESH1 homogeneous five; B-MIG1 DESIGN-FIRST",
+  "authority": "REVISION DOCS ONLY, no implementation/ADR/registry/NodeOps before actual review and Root reply",
+  "scope": "Unique History/Evidence, exact Git-object inventory, closed schema and synthetic predicate/phase/lock fixtures; no application edits or external operations",
+  "guidance": [
+    {
+      "docId": "INDEX-PROGRESS-001",
+      "version": "1.0.415",
+      "updated": "2026-11-06T03:03:02+09:00",
+      "sha256": "63012ac6587c8520499d5d1df6a0c56ef0ba3968aa5a3ce20fcf94e81c1b8e8a"
+    },
+    {
+      "docId": "WORKBOARD-CODEX-001",
+      "version": "1.0.376",
+      "updated": "2026-11-06T03:03:02+09:00",
+      "sha256": "7264ad809e831a3b7ec3761845829419ebb262f65da1ad7111baaecf4c18682a"
+    }
+  ],
+  "productionChanges": false,
+  "implementationAccepted": false,
+  "allRealBindings": {
+    "nodes": null,
+    "contexts": null,
+    "paths": null,
+    "endpoints": null,
+    "addresses": null,
+    "images": null,
+    "executables": null,
+    "leases": null,
+    "deploymentArchives": null,
+    "physicalAcceptance": null
+  },
+  "newBEvidenceCounts": {
+    "realGo": 0,
+    "realPostgres": 0,
+    "LinuxDocker": 0,
+    "physicalPC": 0
+  },
+  "existingBaseline": "Root accepted72028 all8/12; excluded optional f0af Low; not B evidence",
+  "absoluteBoundaries": "No remote/physical/private/PKI/init/install/Docker/WSL/UAC/trust/workload/offer/policy/oldpilot/state/claims/locks/clocks/schedule/pin/cleanup operations; no shared boards/registry/ADR/source originals/Obsidian apply"
+}

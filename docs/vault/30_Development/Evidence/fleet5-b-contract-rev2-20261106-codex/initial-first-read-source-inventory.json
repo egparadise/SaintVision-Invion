@@ -1,0 +1,1920 @@
+{
+  "taskId": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTaskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Claude via root; pending",
+  "startedAtKST": "2026-11-05T19:12:03+09:00",
+  "startTimestampBasis": "Git branch reflog; no earlier inferred timestamp",
+  "recordedAtKST": "2026-11-05T19:18:52.656396+09:00",
+  "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+  "baseSourceSHA": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "productionSourceChanged": false,
+  "documentsRead": [
+    {
+      "path": "docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "docId": "INDEX-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256GitNormalized": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be"
+    },
+    {
+      "path": "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "docId": "GUIDE-001",
+      "version": "1.1.0",
+      "sha256GitNormalized": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f"
+    },
+    {
+      "path": "docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "docId": "ROADMAP-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256GitNormalized": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018"
+    },
+    {
+      "path": "docs/vault/30_Development/Codex Node 저장소 설정 설치와 교체 절차.md",
+      "docId": "RUNBOOK-STORAGE-POLICY-001",
+      "version": "1.4.0",
+      "sha256GitNormalized": "f464d2c7153cc2cbd854088f91b94b564b5e7e010ccf4a37bfbb04eb5d426060"
+    },
+    {
+      "path": "docs/vault/30_Development/Codex 로컬 폴더 점검과 Node 증명 계약.md",
+      "docId": "CONTRACT-STORAGE-SAMPLE-001",
+      "version": "1.9.0",
+      "sha256GitNormalized": "22e5c422e732cdd1662269438db3ae39ec411ebbfdbbac1c3437f2e5d763e899"
+    },
+    {
+      "path": "docs/vault/30_Development/Storage 최종 개발 계획.md",
+      "docId": "PLAN-STORAGE-001",
+      "version": "1.0.0",
+      "sha256GitNormalized": "08c0f51bd080195f7205f7ef54bcb565f51ca9c32a2383a42ac3db12cbecd660"
+    },
+    {
+      "path": "docs/vault/40_Governance/ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계.md",
+      "docId": "ADR-100",
+      "version": "1.0.0",
+      "sha256GitNormalized": "7e548ac03a9a5745dc67609aa5f2d17af614aadcc52ba4fbd3e70dcad90d10d6"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "docId": "GOV-AGENT-001",
+      "version": "1.1.3",
+      "sha256GitNormalized": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "docId": "GOV-CONTINUOUS-001",
+      "version": "1.1.0",
+      "sha256GitNormalized": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+      "docId": "GOV-CONTINUITY-001",
+      "version": "1.0.0",
+      "sha256GitNormalized": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84"
+    },
+    {
+      "path": "docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "docId": "GOV-GIT-001",
+      "version": "1.1.4",
+      "sha256GitNormalized": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9"
+    },
+    {
+      "path": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "docId": "ADR-INDEX-001",
+      "version": "1.37.0",
+      "sha256GitNormalized": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77"
+    },
+    {
+      "readOnlyRootVault": true,
+      "path": "00_Index/전체 개발 진행 현황.md",
+      "docId": "INDEX-PROGRESS-001",
+      "version": "1.0.402",
+      "sha256GitNormalized": "f44684cd003b2a949f7c3d6911803a367c319b2ba65e2985e53f31eae5c70538"
+    },
+    {
+      "readOnlyRootVault": true,
+      "path": "30_Development/Agent별 작업/Codex 작업 현황.md",
+      "docId": "WORKBOARD-CODEX-001",
+      "version": "1.0.363",
+      "sha256GitNormalized": "ba5b52b238cfbbfb197f160c21d99f11b258467dea916773a053a7044ffcc3a7"
+    }
+  ],
+  "sourceSurfaces": [
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "sha256GitNormalized": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+      "lineCount": 267,
+      "anchors": [
+        {
+          "line": 16,
+          "text": "PROFILE = 'lan-workspace-v1'"
+        },
+        {
+          "line": 20,
+          "text": "def docker(*args, timeout=30):"
+        },
+        {
+          "line": 27,
+          "text": "def inspect(name):"
+        },
+        {
+          "line": 36,
+          "text": "def atomic(path, value):"
+        },
+        {
+          "line": 46,
+          "text": "def exclusive_lock(path):"
+        },
+        {
+          "line": 53,
+          "text": "def validate_target(manifest, value):"
+        },
+        {
+          "line": 70,
+          "text": "def validate_install_target(manifest, value):"
+        },
+        {
+          "line": 75,
+          "text": "if any(arg.split('=', 1)[0] in ('--storage-policy', '-storage-policy') for arg in args):"
+        },
+        {
+          "line": 95,
+          "text": "def idle(node):"
+        },
+        {
+          "line": 102,
+          "text": "def verify_credentials(folder, state):"
+        },
+        {
+          "line": 123,
+          "text": "def load_image(folder, spec, archive):"
+        },
+        {
+          "line": 141,
+          "text": "def rollback(manifest, state, record):"
+        },
+        {
+          "line": 176,
+          "text": "def install(folder, state, *, undo=False):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_storage.py",
+      "sha256GitNormalized": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "lineCount": 348,
+      "anchors": [
+        {
+          "line": 19,
+          "text": "TARGET = \"/contribution\""
+        },
+        {
+          "line": 20,
+          "text": "POLICY = \"/state/storage-policy.json\""
+        },
+        {
+          "line": 23,
+          "text": "def reject():"
+        },
+        {
+          "line": 27,
+          "text": "def digest(raw):"
+        },
+        {
+          "line": 31,
+          "text": "def regular(path):"
+        },
+        {
+          "line": 50,
+          "text": "def strict(raw):"
+        },
+        {
+          "line": 62,
+          "text": "def source_identity(source, private):"
+        },
+        {
+          "line": 88,
+          "text": "def prepare(manifest, policy_path, source, expected_hash, image):"
+        },
+        {
+          "line": 155,
+          "text": "def current(plan):"
+        },
+        {
+          "line": 163,
+          "text": "def mount_args(plan):"
+        },
+        {
+          "line": 171,
+          "text": "def docker(*args, input=None):"
+        },
+        {
+          "line": 178,
+          "text": "def target(plan, inspected, running=False):"
+        },
+        {
+          "line": 191,
+          "text": "if args.count(\"--storage-policy\") != 1 or args["
+        },
+        {
+          "line": 192,
+          "text": "args.index(\"--storage-policy\") + 1 : args.index(\"--storage-policy\") + 2"
+        },
+        {
+          "line": 197,
+          "text": "len(inspected[\"Mounts\"]) != 2"
+        },
+        {
+          "line": 209,
+          "text": "or specifications[0].get(\"BindOptions\", {}).get(\"NonRecursive\") is not True"
+        },
+        {
+          "line": 220,
+          "text": "def install(container, plan):"
+        },
+        {
+          "line": 227,
+          "text": "entry = tarfile.TarInfo(\"storage-policy.json\")"
+        },
+        {
+          "line": 240,
+          "text": "or e.name != \"storage-policy.json\""
+        },
+        {
+          "line": 251,
+          "text": "def receipt(plan, inspected, logs):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_storage_bridge.py",
+      "sha256GitNormalized": "879775df9212157344c2ae276739ebd0c82d2b47f5e9f7eb52dd3010d765a815",
+      "lineCount": 149,
+      "anchors": [
+        {
+          "line": 19,
+          "text": "def bridge(mode, bundle, source, policy_hash, request_hash=None):"
+        },
+        {
+          "line": 32,
+          "text": "raw = storage.regular(bundle / \"storage-policy.json\")"
+        },
+        {
+          "line": 37,
+          "text": "manifest, bundle / \"storage-policy.json\", source, policy_hash, manifest[\"agentImage\"]"
+        },
+        {
+          "line": 61,
+          "text": "or plan[\"policyPath\"] != str(stage / \"storage-policy.json\")"
+        },
+        {
+          "line": 79,
+          "text": "policy = stage / \"storage-policy.json\""
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_replacement.py",
+      "sha256GitNormalized": "aed3e41951c4481de3ccc94e3f5d755c11631bb8e0e09f949782288a1b932f67",
+      "lineCount": 203,
+      "anchors": [
+        {
+          "line": 19,
+          "text": "def canonical(value):"
+        },
+        {
+          "line": 23,
+          "text": "def inspected(name):"
+        },
+        {
+          "line": 31,
+          "text": "def state_archive(container):"
+        },
+        {
+          "line": 54,
+          "text": "def state_digest(raw, manifest, *, exclude=()):"
+        },
+        {
+          "line": 103,
+          "text": "def stopped_target(plan, value, volume, consumers):"
+        },
+        {
+          "line": 137,
+          "text": "def capture(plan):"
+        },
+        {
+          "line": 176,
+          "text": "def recheck(plan, receipt):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_replace.py",
+      "sha256GitNormalized": "6de735172c243fb8b373a7061f2ce098388d8a6f2fc0ae125921bcfe456a8a1a",
+      "lineCount": 402,
+      "anchors": [
+        {
+          "line": 21,
+          "text": "def sync_directory(path):"
+        },
+        {
+          "line": 29,
+          "text": "def save(path, value):"
+        },
+        {
+          "line": 44,
+          "text": "def locked(directory):"
+        },
+        {
+          "line": 65,
+          "text": "def optional(name):"
+        },
+        {
+          "line": 78,
+          "text": "def validate_volume(previous, current, expected_hash):"
+        },
+        {
+          "line": 90,
+          "text": "def command(plan):"
+        },
+        {
+          "line": 120,
+          "text": "\"--storage-policy\","
+        },
+        {
+          "line": 125,
+          "text": "def preserved(plan, container):"
+        },
+        {
+          "line": 130,
+          "text": "\"state/storage-policy.json\","
+        },
+        {
+          "line": 136,
+          "text": "def start_and_confirm(name, container_id, checkpoint):"
+        },
+        {
+          "line": 144,
+          "text": "def old_target(record, value):"
+        },
+        {
+          "line": 159,
+          "text": "def new_target(plan, record, value):"
+        },
+        {
+          "line": 190,
+          "text": "def run(plan, receipt, *, checkpoint=lambda phase: None):"
+        },
+        {
+          "line": 234,
+          "text": "if \"--storage-policy\" not in prior_cmd:"
+        },
+        {
+          "line": 241,
+          "text": "if entry.name == \"state/storage-policy.json\":"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "sha256GitNormalized": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
+      "lineCount": 172,
+      "anchors": [
+        {
+          "line": 20,
+          "text": "def validate_topology(manifest):"
+        },
+        {
+          "line": 40,
+          "text": "def credential_archive(directory):"
+        },
+        {
+          "line": 62,
+          "text": "def install_files(container, directory):"
+        },
+        {
+          "line": 83,
+          "text": "def repair_target(manifest, container):"
+        },
+        {
+          "line": 108,
+          "text": "def check_running(container):"
+        },
+        {
+          "line": 122,
+          "text": "def same_identity(previous, current):"
+        },
+        {
+          "line": 128,
+          "text": "def image_id(manifest, image):"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "sha256GitNormalized": "42feb116beb20f1a915a70a6b56420d99a77f4f73f53f3b7c4830cdb5b83fb37",
+      "lineCount": 83,
+      "anchors": [
+        {
+          "line": 11,
+          "text": "def run(*args, **kwargs):"
+        },
+        {
+          "line": 16,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256GitNormalized": "9219cd817778278cb5e92ef4d4ed08b666d6dfe7ab727ee9e660cf1d8a0ca68b",
+      "lineCount": 1171,
+      "anchors": [
+        {
+          "line": 73,
+          "text": "def _version_tuple(value: str) -> tuple[int, int, int]:"
+        },
+        {
+          "line": 80,
+          "text": "def runtime_preflight() -> dict:"
+        },
+        {
+          "line": 101,
+          "text": "def _utc(value: object) -> datetime:"
+        },
+        {
+          "line": 110,
+          "text": "def _canonical(value: object) -> bytes:"
+        },
+        {
+          "line": 116,
+          "text": "def _digest(data: bytes) -> str:"
+        },
+        {
+          "line": 120,
+          "text": "def _regular(path: Path, *, limit: int = 65536) -> bytes:"
+        },
+        {
+          "line": 127,
+          "text": "def _certificates(raw: bytes) -> list[x509.Certificate]:"
+        },
+        {
+          "line": 134,
+          "text": "def _verify_signature(issuer: x509.Certificate, certificate: x509.Certificate) -> None:"
+        },
+        {
+          "line": 141,
+          "text": "def _leaf("
+        },
+        {
+          "line": 170,
+          "text": "def _historical_expired_leaf("
+        },
+        {
+          "line": 199,
+          "text": "def _policy(raw: bytes, *, manifest: dict, fingerprints: list[str], expires: str) -> dict:"
+        },
+        {
+          "line": 214,
+          "text": "def validate_bundle("
+        },
+        {
+          "line": 410,
+          "text": "def _atomic(path: Path, data: bytes) -> None:"
+        },
+        {
+          "line": 433,
+          "text": "def _exclusive(path: Path):"
+        },
+        {
+          "line": 445,
+          "text": "def _owned_directory(path: Path) -> None:"
+        },
+        {
+          "line": 458,
+          "text": "def _history_bytes(path: Path, *, limit: int = 65536) -> bytes:"
+        },
+        {
+          "line": 465,
+          "text": "def _immutable(path: Path, raw: bytes, *, publish: bool) -> None:"
+        },
+        {
+          "line": 510,
+          "text": "def _finalized_evidence("
+        },
+        {
+          "line": 577,
+          "text": "def _finalized_successor("
+        },
+        {
+          "line": 678,
+          "text": "def _finalization_body("
+        },
+        {
+          "line": 697,
+          "text": "def verify_finalized_attestation(value: dict, manifest_raw: bytes, files: dict) -> dict:"
+        },
+        {
+          "line": 729,
+          "text": "def attest_finalized(bundle: Path, worker_root: Path, *, now: datetime | None = None) -> dict:"
+        },
+        {
+          "line": 755,
+          "text": "def _supersede_expired_journal("
+        },
+        {
+          "line": 821,
+          "text": "def install("
+        },
+        {
+          "line": 958,
+          "text": "def finalize("
+        },
+        {
+          "line": 1040,
+          "text": "def rollback("
+        },
+        {
+          "line": 1105,
+          "text": "def docker_restart(worker_root: Path) -> None:"
+        },
+        {
+          "line": 1118,
+          "text": "def main() -> None:"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/start-node.sh",
+      "sha256GitNormalized": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "lineCount": 63,
+      "anchors": [
+        {
+          "line": 30,
+          "text": "python3 worker_storage.py prepare manifest.json storage-policy.json \"$1\" \"$2\" \"$actual_image\" > storage-plan.json"
+        },
+        {
+          "line": 33,
+          "text": "storage_flags=(--storage-policy /state/storage-policy.json)"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/finish-worker.sh",
+      "sha256GitNormalized": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+      "lineCount": 23,
+      "anchors": [
+        {
+          "line": 13,
+          "text": "[[ -f storage-policy.json && ! -L storage-policy.json ]] || exit 1"
+        },
+        {
+          "line": 21,
+          "text": "cp -- storage-policy.json \"$worker_root/\""
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/repair-node.sh",
+      "sha256GitNormalized": "3538d6a20c92cc83736b3cb8413a01aa237d2df7a8d411dce68b3b912010b19b",
+      "lineCount": 15,
+      "anchors": []
+    },
+    {
+      "path": "deploy/lan/Enable-Workspace.ps1",
+      "sha256GitNormalized": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "lineCount": 12,
+      "anchors": []
+    },
+    {
+      "path": "deploy/lan/Enable-ExecutionTests.ps1",
+      "sha256GitNormalized": "485067ad443ed85a1178aa90d6407db4445f4987d4d1f2712b75d868a4954aa6",
+      "lineCount": 8,
+      "anchors": []
+    },
+    {
+      "path": "deploy/lan/Replace-Storage.ps1",
+      "sha256GitNormalized": "cbb07e36a3d42caa750170891c05d1a4686608984606acf684bce4cc59343fae",
+      "lineCount": 60,
+      "anchors": [
+        {
+          "line": 29,
+          "text": "foreach ($svFile in @('manifest.json','storage-policy.json','worker_storage_bridge.py')) {"
+        },
+        {
+          "line": 36,
+          "text": "if ((Get-FileHash -LiteralPath (Join-Path $svBundle 'storage-policy.json') -Algorithm SHA256).Hash -ne $svPolicyHash) {"
+        }
+      ]
+    },
+    {
+      "path": "deploy/lan/Start-Worker.ps1",
+      "sha256GitNormalized": "635a45184c82ce32d2dcf0ce95e8f9e32453e1ac48c5f5604cc771e10ace163e",
+      "lineCount": 61,
+      "anchors": [
+        {
+          "line": 26,
+          "text": "$svPolicy = Join-Path $PSScriptRoot 'storage-policy.json'"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_workspace.py",
+      "sha256GitNormalized": "4f5d3045243bf07261aaf0cc2daf834b562495f5d50c8897472875fd55768291",
+      "lineCount": 98,
+      "anchors": [
+        {
+          "line": 19,
+          "text": "PROFILE = 'lan-workspace-v1'"
+        },
+        {
+          "line": 22,
+          "text": "def sha(path):"
+        },
+        {
+          "line": 30,
+          "text": "def bundle(args):"
+        },
+        {
+          "line": 66,
+          "text": "installerHashes={name:sha(ROOT/'deploy/lan'/name) for name in ('worker_config.py','worker_workspace.py','Enable-Workspace.ps1')},"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "sha256GitNormalized": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "lineCount": 213,
+      "anchors": [
+        {
+          "line": 30,
+          "text": "def bundle(args):"
+        },
+        {
+          "line": 61,
+          "text": "def permit(state,image,mode):"
+        },
+        {
+          "line": 81,
+          "text": "def context(path):"
+        },
+        {
+          "line": 88,
+          "text": "def verify_result(state,envelope,result):"
+        },
+        {
+          "line": 102,
+          "text": "def execute(args):"
+        },
+        {
+          "line": 127,
+          "text": "def _execute(args):"
+        },
+        {
+          "line": 170,
+          "text": "def transmit_fault(args):"
+        },
+        {
+          "line": 183,
+          "text": "def recover(args):"
+        },
+        {
+          "line": 197,
+          "text": "def write_report(path,data):"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256GitNormalized": "e1437600dad2231f40b24cb44d7c3edf1c147e42bc68d39dad2ebb0c9b51f574",
+      "lineCount": 4189,
+      "anchors": [
+        {
+          "line": 102,
+          "text": "def run(args, **kwargs):"
+        },
+        {
+          "line": 113,
+          "text": "def write(path, data):"
+        },
+        {
+          "line": 121,
+          "text": "def atomic_write(path, data):"
+        },
+        {
+          "line": 149,
+          "text": "def exclusive_file(path):"
+        },
+        {
+          "line": 161,
+          "text": "def private_directory(path):"
+        },
+        {
+          "line": 181,
+          "text": "def _read_pgpass(path, *, host, port, dbname, user):"
+        },
+        {
+          "line": 203,
+          "text": "def validate_pilot_database_name(value):"
+        },
+        {
+          "line": 214,
+          "text": "def pilot_runtime_role(database):"
+        },
+        {
+          "line": 219,
+          "text": "def _require_same_external_database(admin_dsn, runtime_dsn):"
+        },
+        {
+          "line": 233,
+          "text": "def read_external_dsn(path, expected_user):"
+        },
+        {
+          "line": 263,
+          "text": "def external_dsn_password(value, expected_user):"
+        },
+        {
+          "line": 274,
+          "text": "def _dsn_with_passfile(value, expected_user, passfile):"
+        },
+        {
+          "line": 303,
+          "text": "def bind_db_auth(args):"
+        },
+        {
+          "line": 389,
+          "text": "def _pem_certificates(raw):"
+        },
+        {
+          "line": 396,
+          "text": "def _load_external_ca(key_path, password_path, chain_path):"
+        },
+        {
+          "line": 430,
+          "text": "def ensure_pilot_pki(path, state, args):"
+        },
+        {
+          "line": 487,
+          "text": "def load_pilot_ca_key(path, *, key_path=None, password_path=None, chain_path=None):"
+        },
+        {
+          "line": 507,
+          "text": "def load_prebuilt_image(archive_path, inspect_path, tag, target):"
+        },
+        {
+          "line": 636,
+          "text": "def configured_nodes(state):"
+        },
+        {
+          "line": 692,
+          "text": "def active_configured_nodes(state):"
+        },
+        {
+          "line": 701,
+          "text": "def normalized_state(state):"
+        },
+        {
+          "line": 713,
+          "text": "def load(path):"
+        },
+        {
+          "line": 717,
+          "text": "def save(path, data):"
+        },
+        {
+          "line": 726,
+          "text": "def validate_node_ips(server_ip, node_ips, *, allow_server_node_colocation=False):"
+        },
+        {
+          "line": 743,
+          "text": "def add_requested_nodes(state, node_ips, *, node_port=None):"
+        },
+        {
+          "line": 763,
+          "text": "def revoked_colocation_state(state):"
+        },
+        {
+          "line": 778,
+          "text": "def node_by_id(state, node_id):"
+        },
+        {
+          "line": 785,
+          "text": "def node_from_csr(state, raw):"
+        },
+        {
+          "line": 795,
+          "text": "def node_state_directory(path, node):"
+        },
+        {
+          "line": 805,
+          "text": "def node_policy_path(path, state, node):"
+        },
+        {
+          "line": 811,
+          "text": "def node_public_directory(path, node):"
+        },
+        {
+          "line": 817,
+          "text": "def node_certificate_path(path, state, node):"
+        },
+        {
+          "line": 827,
+          "text": "def ensure_node_policy(path, state, node):"
+        },
+        {
+          "line": 853,
+          "text": "def manifest_for_node(state, node, inspected, tag):"
+        },
+        {
+          "line": 876,
+          "text": "def artifact_for_client(state, public, client_ip, request_path):"
+        },
+        {
+          "line": 901,
+          "text": "def runtime(state):"
+        },
+        {
+          "line": 905,
+          "text": "def tls(path):"
+        },
+        {
+          "line": 914,
+          "text": "def provision_observation_node(conn, state):"
+        },
+        {
+          "line": 931,
+          "text": "def init(args):"
+        },
+        {
+          "line": 1191,
+          "text": "def bundle(args):"
+        },
+        {
+          "line": 1295,
+          "text": "def enroll(args):"
+        },
+        {
+          "line": 1360,
+          "text": "def _canonical_json(value):"
+        },
+        {
+          "line": 1366,
+          "text": "def _rotation_digest(raw):"
+        },
+        {
+          "line": 1370,
+          "text": "def _utc_z(value):"
+        },
+        {
+          "line": 1374,
+          "text": "def _load_revocations(path):"
+        },
+        {
+          "line": 1394,
+          "text": "def _validate_current_control_leaf(certificate, intermediate, *, state, now):"
+        },
+        {
+          "line": 1413,
+          "text": "def _validate_expired_historical_leaf("
+        },
+        {
+          "line": 1440,
+          "text": "def _load_offline_authorization(path):"
+        },
+        {
+          "line": 1500,
+          "text": "def _rotation_material(path):"
+        },
+        {
+          "line": 1530,
+          "text": "def _channel_row(conn, state, node, *, lock=False):"
+        },
+        {
+          "line": 1542,
+          "text": "def _batch_journal_path(path):"
+        },
+        {
+          "line": 1546,
+          "text": "def _load_batch_journal(path):"
+        },
+        {
+          "line": 1563,
+          "text": "def _batch_material(path):"
+        },
+        {
+          "line": 1647,
+          "text": "def _write_batch_journal(path, *, manifest_raw, manifest, bundle, phase, staged):"
+        },
+        {
+          "line": 1660,
+          "text": "def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):"
+        },
+        {
+          "line": 1671,
+          "text": "def _batch_archive_path(path, batch):"
+        },
+        {
+          "line": 1677,
+          "text": "def _current_finalized_batch(path, state, batch, bundles, conn):"
+        },
+        {
+          "line": 1761,
+          "text": "def _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn):"
+        },
+        {
+          "line": 1817,
+          "text": "def _finalized_predecessor(path, state, journal, *, candidate=None):"
+        },
+        {
+          "line": 1895,
+          "text": "def retire_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 1964,
+          "text": "def _write_rotation_public_material("
+        },
+        {
+          "line": 2077,
+          "text": "def _write_fully_expired_rotation_public_material("
+        },
+        {
+          "line": 2197,
+          "text": "def prepare_leaf_rotation_recovery_batch(args):"
+        },
+        {
+          "line": 2496,
+          "text": "def prepare_fully_expired_leaf_rotation_recovery_batch(args):"
+        },
+        {
+          "line": 2889,
+          "text": "def prepare_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3053,
+          "text": "def abandon_expired_prepared_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3153,
+          "text": "def prepare_leaf_rotation(args):"
+        },
+        {
+          "line": 3378,
+          "text": "def _validate_rotation_receipt(path, state, bundle, receipt_path):"
+        },
+        {
+          "line": 3428,
+          "text": "def stage_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3505,
+          "text": "def commit_leaf_rotation_batch(args):"
+        },
+        {
+          "line": 3596,
+          "text": "def commit_leaf_rotation(args):"
+        },
+        {
+          "line": 3704,
+          "text": "def revoke_server_node_colocation(args):"
+        },
+        {
+          "line": 3758,
+          "text": "def revoke_node_certificate(args):"
+        },
+        {
+          "line": 3806,
+          "text": "def node_status_rows(state):"
+        },
+        {
+          "line": 3848,
+          "text": "def status(args):"
+        },
+        {
+          "line": 3865,
+          "text": "def observe(args):"
+        },
+        {
+          "line": 3902,
+          "text": "def serve(args):"
+        },
+        {
+          "line": 3989,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_workspace_package.py",
+      "sha256GitNormalized": "c4956d9ad6a284a22743e2e63ade020a164a8673e9885424806144845a2bb7bd",
+      "lineCount": 157,
+      "anchors": [
+        {
+          "line": 16,
+          "text": "INSTALLERS = ('worker_config.py', 'worker_workspace.py', 'Enable-Workspace.ps1')"
+        },
+        {
+          "line": 24,
+          "text": "def digest(path):"
+        },
+        {
+          "line": 29,
+          "text": "def bounded(archive, name, limit):"
+        },
+        {
+          "line": 40,
+          "text": "def archive_checksums(archive, manifest, limit):"
+        },
+        {
+          "line": 62,
+          "text": "def inspect_package(state_path, identity, *, source_root=ROOT, now=None,"
+        },
+        {
+          "line": 111,
+          "text": "== manifest['installerHashes'].get(name)"
+        },
+        {
+          "line": 137,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_workspace_upgrade.py",
+      "sha256GitNormalized": "f46da4fb47e4b2a15ccfe6495b2b110c8c718d42d88c8865d9dcab99378025d0",
+      "lineCount": 45,
+      "anchors": []
+    },
+    {
+      "path": "tools/check_storage_bundle.py",
+      "sha256GitNormalized": "860debab6c5f83a920dc71971672138c1e352c4c914424119d0cdab660f18df4",
+      "lineCount": 164,
+      "anchors": [
+        {
+          "line": 18,
+          "text": "def run(args, timeout=60):"
+        },
+        {
+          "line": 25,
+          "text": "def main(prepared, bridge_only=False):"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_lan_storage_readiness.py",
+      "sha256GitNormalized": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "lineCount": 152,
+      "anchors": [
+        {
+          "line": 27,
+          "text": "def relation_access(conn, name):"
+        },
+        {
+          "line": 56,
+          "text": "def bundle_view(public):"
+        },
+        {
+          "line": 76,
+          "text": "def evaluate(report):"
+        },
+        {
+          "line": 96,
+          "text": "def inspect(state_path):"
+        },
+        {
+          "line": 135,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_remote_workspace.py",
+      "sha256GitNormalized": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "lineCount": 198,
+      "anchors": [
+        {
+          "line": 33,
+          "text": "def copy_private(name, files):"
+        },
+        {
+          "line": 45,
+          "text": "def boundary(state):"
+        },
+        {
+          "line": 56,
+          "text": "def self_node(work, network, name, agent, image):"
+        },
+        {
+          "line": 93,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/remote_workspace_entry.py",
+      "sha256GitNormalized": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "lineCount": 261,
+      "anchors": [
+        {
+          "line": 50,
+          "text": "def write(path, data):"
+        },
+        {
+          "line": 57,
+          "text": "def client():"
+        },
+        {
+          "line": 62,
+          "text": "def database(config):"
+        },
+        {
+          "line": 66,
+          "text": "def initialize(config):"
+        },
+        {
+          "line": 88,
+          "text": "def setup(config, mode):"
+        },
+        {
+          "line": 131,
+          "text": "def cancel(a):"
+        },
+        {
+          "line": 136,
+          "text": "def receipt(a):"
+        },
+        {
+          "line": 141,
+          "text": "def child(config, mode):"
+        },
+        {
+          "line": 152,
+          "text": "def execute(config, mode):"
+        },
+        {
+          "line": 230,
+          "text": "def main():"
+        }
+      ]
+    },
+    {
+      "path": "tools/five_node_lab_preflight.py",
+      "sha256GitNormalized": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "lineCount": 446,
+      "anchors": [
+        {
+          "line": 21,
+          "text": "def five_node_inventory_revision(payload: dict[str, Any]) -> str:"
+        },
+        {
+          "line": 34,
+          "text": "def _require_exact_keys(value: dict[str, Any], expected: set[str], *, where: str) -> None:"
+        },
+        {
+          "line": 42,
+          "text": "def validate_five_node_inventory(payload: Any) -> dict[str, Any]:"
+        },
+        {
+          "line": 142,
+          "text": "def load_five_node_inventory(path: Path) -> dict[str, Any]:"
+        },
+        {
+          "line": 181,
+          "text": "def _seconds_since(value: datetime | None, now: datetime) -> float | None:"
+        },
+        {
+          "line": 187,
+          "text": "def _endpoint_ip(endpoint: str | None) -> str | None:"
+        },
+        {
+          "line": 199,
+          "text": "def _assert_database_identity(node: dict[str, Any], row: dict[str, Any]) -> None:"
+        },
+        {
+          "line": 241,
+          "text": "def _resource_snapshot_complete(snapshot: dict[str, Any] | None) -> bool:"
+        },
+        {
+          "line": 255,
+          "text": "def _node_preflight(node: dict[str, Any], row: dict[str, Any] | None) -> dict[str, Any]:"
+        },
+        {
+          "line": 338,
+          "text": "def five_node_lab_dry_run("
+        },
+        {
+          "line": 423,
+          "text": "def write_registration_mtls_preflight("
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256GitNormalized": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9",
+      "lineCount": 148,
+      "anchors": [
+        {
+          "line": 20,
+          "text": "func main() {"
+        },
+        {
+          "line": 26,
+          "text": "func run() error {"
+        },
+        {
+          "line": 51,
+          "text": "flag.StringVar(&storagePolicy, \"storage-policy\", \"\", \"optional private approved storage sample configuration\")"
+        },
+        {
+          "line": 97,
+          "text": "var storageInstallation *node.StoragePolicyPin"
+        },
+        {
+          "line": 106,
+          "text": "storageInstallation = &receipt"
+        },
+        {
+          "line": 115,
+          "text": "if storageInstallation != nil {"
+        },
+        {
+          "line": 116,
+          "text": "startup[\"storagePolicy\"] = storageInstallation"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/storage.go",
+      "sha256GitNormalized": "9bf91ac747df5e9ceb14ffa990d73e8384ddb024f1ecec66630f00d0c00e6e12",
+      "lineCount": 89,
+      "anchors": [
+        {
+          "line": 30,
+          "text": "func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config, pin func(node.StoragePolicyPin) error) (*ConfiguredStorage, error) {"
+        },
+        {
+          "line": 35,
+          "text": "if err != nil || wire.Validate(\"NodeStorageRootConfig\", raw) != nil {"
+        },
+        {
+          "line": 38,
+          "text": "var policy contracts.NodeStorageRootConfig"
+        },
+        {
+          "line": 66,
+          "text": "func (s *ConfiguredStorage) Installation() node.StoragePolicyPin { return s.receipt }"
+        },
+        {
+          "line": 67,
+          "text": "func (s *ConfiguredStorage) Close() error                        { return s.sampler.Close() }"
+        },
+        {
+          "line": 68,
+          "text": "func (s *ConfiguredStorage) current() bool {"
+        },
+        {
+          "line": 72,
+          "text": "func (s *ConfiguredStorage) Sample(ctx context.Context, raw []byte) (map[string]string, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/server.go",
+      "sha256GitNormalized": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "lineCount": 354,
+      "anchors": [
+        {
+          "line": 37,
+          "text": "func HandlerWithStorage(authority *Authority, runner Executor, objects *transfer.Source, storage StorageSampler) http.Handler {"
+        },
+        {
+          "line": 43,
+          "text": "func Handler(authority *Authority, runner Executor, objects ...*transfer.Source) http.Handler {"
+        },
+        {
+          "line": 50,
+          "text": "func reject(w http.ResponseWriter, status int) {"
+        },
+        {
+          "line": 55,
+          "text": "func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {"
+        },
+        {
+          "line": 316,
+          "text": "func (c *limitedConn) Close() error { err := c.Conn.Close(); c.once.Do(c.release); return err }"
+        },
+        {
+          "line": 317,
+          "text": "func (l *limitedListener) Accept() (net.Conn, error) {"
+        },
+        {
+          "line": 331,
+          "text": "func Serve(ctx context.Context, listener net.Listener, config *tls.Config, handler http.Handler) error {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/transport/trust.go",
+      "sha256GitNormalized": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "lineCount": 154,
+      "anchors": [
+        {
+          "line": 19,
+          "text": "func Identity(tenant, nodeID, epoch string) string {"
+        },
+        {
+          "line": 22,
+          "text": "func ControlIdentity(tenant, epoch string) string {"
+        },
+        {
+          "line": 25,
+          "text": "func SafeFile(path string, secret bool) ([]byte, error) {"
+        },
+        {
+          "line": 49,
+          "text": "func NewAuthority(config node.Config, ca, policy string, pin func(int64, string) error) (*Authority, error) {"
+        },
+        {
+          "line": 67,
+          "text": "func (a *Authority) policy() (contracts.NodePeerPolicy, error) {"
+        },
+        {
+          "line": 95,
+          "text": "func hasUsage(cert *x509.Certificate, usage x509.ExtKeyUsage) bool {"
+        },
+        {
+          "line": 103,
+          "text": "func (a *Authority) Authorize(state *tls.ConnectionState) error {"
+        },
+        {
+          "line": 129,
+          "text": "func (a *Authority) TLS(certPath, keyPath string) (*tls.Config, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/runtime/storage_policy.go",
+      "sha256GitNormalized": "8a15937331502f5f94abc2e489d0f0c9cfe48473b857e6bd266218a69b8cb33f",
+      "lineCount": 77,
+      "anchors": [
+        {
+          "line": 25,
+          "text": "func (p StoragePolicyPin) valid() bool {"
+        },
+        {
+          "line": 31,
+          "text": "func (j *Journal) PinStoragePolicy(next StoragePolicyPin) error {"
+        },
+        {
+          "line": 53,
+          "text": "file, err := os.CreateTemp(j.root, \".storage-policy-\")"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/runtime/docker.go",
+      "sha256GitNormalized": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb",
+      "lineCount": 422,
+      "anchors": [
+        {
+          "line": 52,
+          "text": "func (d *Docker) apiVersion(ctx context.Context) (string, error) {"
+        },
+        {
+          "line": 104,
+          "text": "func NewDocker(socket string) (*Docker, error) {"
+        },
+        {
+          "line": 113,
+          "text": "func (d *Docker) request(ctx context.Context, method, path string, body any, out any) error {"
+        },
+        {
+          "line": 155,
+          "text": "func labels(r Record) map[string]string {"
+        },
+        {
+          "line": 167,
+          "text": "func gpuRequests(plan contracts.SandboxLaunchSpec) []deviceRequest {"
+        },
+        {
+          "line": 180,
+          "text": "func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {"
+        },
+        {
+          "line": 266,
+          "text": "func equal(a, b []string) bool {"
+        },
+        {
+          "line": 278,
+          "text": "func equalDeviceRequests(actual, expected []deviceRequest) bool {"
+        },
+        {
+          "line": 323,
+          "text": "func owned(value inspection, r Record) error {"
+        },
+        {
+          "line": 334,
+          "text": "func (d *Docker) Start(ctx context.Context, id string) error {"
+        },
+        {
+          "line": 340,
+          "text": "func (d *Docker) Inspect(ctx context.Context, name string, r Record) (State, error) {"
+        },
+        {
+          "line": 353,
+          "text": "func (d *Docker) Stop(ctx context.Context, id string) error {"
+        },
+        {
+          "line": 359,
+          "text": "func (d *Docker) Remove(ctx context.Context, id string, r Record) error {"
+        },
+        {
+          "line": 369,
+          "text": "func stopped(s State) bool {"
+        },
+        {
+          "line": 373,
+          "text": "func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.NodeOutput, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/storage/root_linux.go",
+      "sha256GitNormalized": "f174c3b9e6971c273ddf53c77e119e6f335708cf66b96bba0a908aeae1609596",
+      "lineCount": 163,
+      "anchors": [
+        {
+          "line": 23,
+          "text": "func directory(path string) (*os.File, error) {"
+        },
+        {
+          "line": 44,
+          "text": "func openRoot(path string) (*readRoot, error) {"
+        },
+        {
+          "line": 59,
+          "text": "func (r *readRoot) close() error    { return r.file.Close() }"
+        },
+        {
+          "line": 60,
+          "text": "func same(a, b syscall.Stat_t) bool { return a.Dev == b.Dev && a.Ino == b.Ino }"
+        },
+        {
+          "line": 61,
+          "text": "func (r *readRoot) current() error {"
+        },
+        {
+          "line": 73,
+          "text": "func (r *readRoot) open(path string) (*os.File, error) {"
+        },
+        {
+          "line": 102,
+          "text": "func (r *readRoot) hash(ctx context.Context, path string) (string, int64, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/storage/sample.go",
+      "sha256GitNormalized": "296892a8a2b3a80c9146daf9922fe195a3c0808de81da08b8b11b28798f9a7c8",
+      "lineCount": 174,
+      "anchors": [
+        {
+          "line": 28,
+          "text": "config contracts.NodeStorageRootConfig"
+        },
+        {
+          "line": 32,
+          "text": "func Open(raw []byte) (*Sampler, error) {"
+        },
+        {
+          "line": 33,
+          "text": "if wire.Validate(\"NodeStorageRootConfig\", raw) != nil {"
+        },
+        {
+          "line": 36,
+          "text": "var config contracts.NodeStorageRootConfig"
+        },
+        {
+          "line": 46,
+          "text": "func (s *Sampler) Close() error { return s.root.close() }"
+        },
+        {
+          "line": 49,
+          "text": "func (s *Sampler) CheckCertificate(pair *tls.Certificate) error {"
+        },
+        {
+          "line": 54,
+          "text": "func endpoint(value string) bool {"
+        },
+        {
+          "line": 67,
+          "text": "func validPath(path string) bool {"
+        },
+        {
+          "line": 84,
+          "text": "func keyFor(pair *tls.Certificate, channel contracts.NodeStorageChannel, now time.Time) (ed25519.PrivateKey, error) {"
+        },
+        {
+          "line": 111,
+          "text": "func (s *Sampler) Collect(ctx context.Context, raw []byte, pair *tls.Certificate) (map[string]string, error) {"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "sha256GitNormalized": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "lineCount": 399,
+      "anchors": [
+        {
+          "line": 27,
+          "text": "def refused():"
+        },
+        {
+          "line": 31,
+          "text": "def decode_challenge(value):"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "sha256GitNormalized": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "lineCount": 388,
+      "anchors": [
+        {
+          "line": 78,
+          "text": "def derive_request_id(*, tenant_id, project_id, run_id, key) -> str:"
+        },
+        {
+          "line": 350,
+          "text": "def configured_storage_sample_collector(database, configuration, catalogue_engine):"
+        },
+        {
+          "line": 355,
+          "text": "without its own ``--storage-policy`` answers 503 to the sample call -- so the"
+        }
+      ]
+    },
+    {
+      "path": "contracts/v1alpha1/core.schema.json",
+      "sha256GitNormalized": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "lineCount": 7594,
+      "anchors": [
+        {
+          "line": 6176,
+          "text": "\"NodeStorageChannel\": {"
+        },
+        {
+          "line": 6263,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        },
+        {
+          "line": 6359,
+          "text": "\"NodeStorageRootConfig\": {"
+        },
+        {
+          "line": 6363,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        }
+      ]
+    },
+    {
+      "path": "packages/contracts-go/contracts.go",
+      "sha256GitNormalized": "f18069a8dc8ae6190879be48c32435e6e572802971ac4a44034dfaa71c71a75b",
+      "lineCount": 1589,
+      "anchors": [
+        {
+          "line": 1349,
+          "text": "type NodeStorageChannel struct {"
+        },
+        {
+          "line": 1367,
+          "text": "Channel NodeStorageChannel `json:\"channel\"`"
+        },
+        {
+          "line": 1388,
+          "text": "type NodeStorageRootConfig struct {"
+        },
+        {
+          "line": 1389,
+          "text": "Channel NodeStorageChannel `json:\"channel\"`"
+        }
+      ]
+    },
+    {
+      "path": "services/node-agent/internal/wire/core.schema.json",
+      "sha256GitNormalized": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "lineCount": 7594,
+      "anchors": [
+        {
+          "line": 6176,
+          "text": "\"NodeStorageChannel\": {"
+        },
+        {
+          "line": 6263,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        },
+        {
+          "line": 6359,
+          "text": "\"NodeStorageRootConfig\": {"
+        },
+        {
+          "line": 6363,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/generated/core.schema.json",
+      "sha256GitNormalized": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "lineCount": 7594,
+      "anchors": [
+        {
+          "line": 6176,
+          "text": "\"NodeStorageChannel\": {"
+        },
+        {
+          "line": 6263,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        },
+        {
+          "line": 6359,
+          "text": "\"NodeStorageRootConfig\": {"
+        },
+        {
+          "line": 6363,
+          "text": "\"$ref\": \"#/$defs/NodeStorageChannel\""
+        }
+      ]
+    },
+    {
+      "path": "tests/core/test_lan_workspace_upgrade.py",
+      "sha256GitNormalized": "ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d",
+      "lineCount": 257,
+      "anchors": [
+        {
+          "line": 18,
+          "text": "def target():"
+        },
+        {
+          "line": 33,
+          "text": "def test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation(fault):"
+        },
+        {
+          "line": 46,
+          "text": "def test_configuration_check_does_not_change_live_inspection():"
+        },
+        {
+          "line": 53,
+          "text": "def test_owned_workload_blocks_upgrade_even_if_stopped(monkeypatch):"
+        },
+        {
+          "line": 63,
+          "text": "def test_completed_upgrade_refuses_automatic_downgrade(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 69,
+          "text": "def test_archive_corruption_rejected_before_load(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 77,
+          "text": "def installation(tmp_path, monkeypatch):"
+        },
+        {
+          "line": 98,
+          "text": "for filename in ('journal', 'node-key.pem', 'storage-policy.json', 'workspace-ready.json'):"
+        },
+        {
+          "line": 160,
+          "text": "def test_install_rejects_unpreserved_storage_before_any_docker_mutation(installation, configuration):"
+        },
+        {
+          "line": 164,
+          "text": "args += ['--storage-policy', '/state/storage-policy.json']"
+        },
+        {
+          "line": 166,
+          "text": "args += ['--storage-policy=/state/storage-policy.json']"
+        },
+        {
+          "line": 168,
+          "text": "args += ['-storage-policy', '/state/storage-policy.json']"
+        },
+        {
+          "line": 170,
+          "text": "args += ['-storage-policy=/state/storage-policy.json']"
+        },
+        {
+          "line": 172,
+          "text": "args += ['--storage-policy=']"
+        },
+        {
+          "line": 200,
+          "text": "def test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts(installation, profile, socket_mounted):"
+        },
+        {
+          "line": 232,
+          "text": "def test_install_rollback_restores_recorded_backup_including_storage(installation, storage_backup):"
+        },
+        {
+          "line": 239,
+          "text": "backup['Config']['Cmd'] += ['--storage-policy', '/state/storage-policy.json']"
+        }
+      ]
+    },
+    {
+      "path": "tests/core/test_lan_storage.py",
+      "sha256GitNormalized": "ff8c9d60b12d5666f23fb8e14b52702448cd9df017f1262b8b17ac33b29f2a8d",
+      "lineCount": 276,
+      "anchors": [
+        {
+          "line": 18,
+          "text": "def plan(tmp_path):"
+        },
+        {
+          "line": 43,
+          "text": "path = private / \"storage-policy.json\""
+        },
+        {
+          "line": 50,
+          "text": "def target(p):"
+        },
+        {
+          "line": 64,
+          "text": "\"--storage-policy\": storage.POLICY,"
+        },
+        {
+          "line": 77,
+          "text": "Mounts=[dict(Target=storage.TARGET, BindOptions=dict(NonRecursive=True))],"
+        },
+        {
+          "line": 92,
+          "text": "def startup(p):"
+        },
+        {
+          "line": 112,
+          "text": "def test_mount_is_fixed_readonly_nonrecursive_and_one_argument(plan):"
+        },
+        {
+          "line": 135,
+          "text": "def test_policy_rejects_wrong_scope_and_mount_shadowing(plan, fault):"
+        },
+        {
+          "line": 165,
+          "text": "def test_source_scope_and_changes_are_rejected(plan, fault, tmp_path):"
+        },
+        {
+          "line": 201,
+          "text": "def test_container_substitution_never_passes(plan, fault):"
+        },
+        {
+          "line": 206,
+          "text": "c[\"HostConfig\"][\"Mounts\"][0][\"BindOptions\"][\"NonRecursive\"] = False"
+        },
+        {
+          "line": 226,
+          "text": "def test_policy_archive_and_return_copy_match_without_touching_keys(plan, monkeypatch):"
+        },
+        {
+          "line": 243,
+          "text": "assert tar.getnames() == [\"storage-policy.json\"]"
+        },
+        {
+          "line": 253,
+          "text": "def test_receipt_matches_exact_configuration_and_is_not_operational_acceptance(plan, fault):"
+        }
+      ]
+    },
+    {
+      "path": "tests/core/test_lan_replacement.py",
+      "sha256GitNormalized": "69f4b143662d0239dd21eea1e237717f2c60153c9c6e667dc8c42de5b6855b6c",
+      "lineCount": 163,
+      "anchors": [
+        {
+          "line": 12,
+          "text": "def stopped(p):"
+        },
+        {
+          "line": 38,
+          "text": "def test_only_clean_stopped_owned_observation_container(plan, fault):"
+        },
+        {
+          "line": 65,
+          "text": "def archive(p, fault=None):"
+        },
+        {
+          "line": 99,
+          "text": "def test_state_archive_rejects_identity_and_unsafe_entries(plan, fault):"
+        },
+        {
+          "line": 104,
+          "text": "def test_state_fingerprint_binds_private_bytes_without_returning_them(plan):"
+        },
+        {
+          "line": 111,
+          "text": "def test_receipt_recheck_rejects_every_stale_boundary(plan, monkeypatch, fault):"
+        },
+        {
+          "line": 127,
+          "text": "def test_capture_detects_changes_during_inspection(plan, monkeypatch, fault):"
+        }
+      ]
+    },
+    {
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "sha256GitNormalized": "0c42da94e78a99a8f1ba0e35678f77005db834f79ad83c563fbe09f95fe4db99",
+      "lineCount": 118,
+      "anchors": [
+        {
+          "line": 23,
+          "text": "def installation(tmp_path,monkeypatch):"
+        },
+        {
+          "line": 80,
+          "text": "def test_real_upgrade_preserves_credentials_journal_and_replays(installation):"
+        },
+        {
+          "line": 95,
+          "text": "def test_real_failed_start_restores_prior_container_and_journal(installation,monkeypatch):"
+        },
+        {
+          "line": 112,
+          "text": "def test_real_trust_mismatch_does_not_stop_node(installation):"
+        }
+      ]
+    },
+    {
+      "path": "tests/integration/test_lan_storage_install.py",
+      "sha256GitNormalized": "4f4bb8e2c7d6d01a9b714349a56780d716f6bc22d063ea9c32a01e8c9b59b1f1",
+      "lineCount": 316,
+      "anchors": [
+        {
+          "line": 31,
+          "text": "def installation(tmp_path):"
+        },
+        {
+          "line": 94,
+          "text": "(folder / \"storage-policy.json\").write_text(json.dumps(policy))"
+        },
+        {
+          "line": 120,
+          "text": "def start(a, hash_value=None):"
+        },
+        {
+          "line": 122,
+          "text": "hash_value or hashlib.sha256((a[\"folder\"] / \"storage-policy.json\").read_bytes()).hexdigest()"
+        },
+        {
+          "line": 131,
+          "text": "def test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt(installation):"
+        },
+        {
+          "line": 152,
+          "text": "def test_real_bad_policy_hash_creates_no_node_or_volume(installation):"
+        },
+        {
+          "line": 164,
+          "text": "def test_real_replacement_preflight_preserves_state_and_rejects_stale_restart(installation):"
+        },
+        {
+          "line": 195,
+          "text": "def test_real_storage_replacement_resumes_without_rollback_or_key_loss(installation, interruption):"
+        },
+        {
+          "line": 205,
+          "text": "previous_policy = (a[\"folder\"] / \"storage-policy.json\").read_bytes()"
+        },
+        {
+          "line": 209,
+          "text": "(a[\"folder\"] / \"storage-policy.json\").write_text(json.dumps(policy))"
+        },
+        {
+          "line": 214,
+          "text": "storage.digest((a[\"folder\"] / \"storage-policy.json\").read_bytes()),"
+        },
+        {
+          "line": 264,
+          "text": "def test_real_storage_bridge_prepares_hash_bound_request_and_resumes(installation, tmp_path):"
+        },
+        {
+          "line": 274,
+          "text": "policy_file = a[\"folder\"] / \"storage-policy.json\""
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/core.yml",
+      "sha256GitNormalized": "5396f20b650cf0307de046ca4b7bee771f1b15412183462cc210e7db4cc98e5e",
+      "lineCount": 522,
+      "anchors": [
+        {
+          "line": 230,
+          "text": "run: python -m pytest -q tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=dist/lan-installer-tests.xml -o faulthandler_timeout=45"
+        },
+        {
+          "line": 235,
+          "text": "root = ET.parse('dist/lan-installer-tests.xml').getroot()"
+        }
+      ]
+    }
+  ],
+  "registryVersion": "1.0.1",
+  "registryChanged": false
+}

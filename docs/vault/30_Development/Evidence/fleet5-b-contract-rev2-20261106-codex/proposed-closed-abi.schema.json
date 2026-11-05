@@ -1,0 +1,885 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:proposal:fleet5-b-rev2",
+  "title": "PROPOSED CLOSED ABI, not registered product schemas",
+  "$defs": {
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "device",
+        "inode",
+        "filesystem",
+        "uid",
+        "mode",
+        "sourceIdentitySha256",
+        "guestBootId",
+        "guestMountNamespace",
+        "guestMountId",
+        "nodeMountNamespace",
+        "nodeMountId"
+      ],
+      "properties": {
+        "device": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "inode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "filesystem": {
+          "enum": [
+            "ext4",
+            "xfs",
+            "btrfs"
+          ]
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "enum": [
+            "0700",
+            "0750"
+          ]
+        },
+        "sourceIdentitySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "guestBootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "guestMountNamespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "guestMountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "nodeMountNamespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "nodeMountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "executionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "physicalDomainRef",
+        "contextRef",
+        "guestMachineSha256",
+        "bootId",
+        "daemonIdSha256",
+        "socketPath",
+        "socketIdentitySha256",
+        "launcherAdapterSha256",
+        "probeArtifactSha256",
+        "linux",
+        "apiVersion",
+        "nativeMountAncestryVerified",
+        "noLinkParentsVerified",
+        "sourceContained",
+        "endpointProbeVerified",
+        "hostToNodeRootVerified",
+        "capabilityEvidenceSha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "native-linux-v1",
+            "managed-linux-vm-v1",
+            "wsl2-ext4-dedicated-engine-v1"
+          ]
+        },
+        "physicalDomainRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "contextRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "guestMachineSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "daemonIdSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "socketPath": {
+          "const": "/var/run/docker.sock"
+        },
+        "socketIdentitySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "launcherAdapterSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "probeArtifactSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "linux": {
+          "const": true
+        },
+        "apiVersion": {
+          "const": "1.45"
+        },
+        "nativeMountAncestryVerified": {
+          "const": true
+        },
+        "noLinkParentsVerified": {
+          "const": true
+        },
+        "sourceContained": {
+          "const": true
+        },
+        "endpointProbeVerified": {
+          "const": true
+        },
+        "hostToNodeRootVerified": {
+          "const": true
+        },
+        "capabilityEvidenceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant_id",
+        "node_id",
+        "recovery_epoch",
+        "version",
+        "endpoint",
+        "certificate_sha256"
+      ],
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "node_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "recovery_epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "certificate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "contributionId",
+        "rootVersion",
+        "policySha256",
+        "imageSha256",
+        "exeSha256",
+        "configSha256",
+        "argvSha256",
+        "generation",
+        "contextSha256",
+        "root",
+        "peerFloorSha256",
+        "storageFloorSha256"
+      ],
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "contributionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "rootVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "imageSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "exeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "argvSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "contextSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "peerFloorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "storageFloorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "admissionId",
+        "operationId",
+        "cohortId",
+        "operatorApprovalRef",
+        "provisioningGrantRef",
+        "assignmentId",
+        "current",
+        "servingCid",
+        "servingPid",
+        "servingUid",
+        "pidStartTicks",
+        "bootId",
+        "servingNonce",
+        "observedAt",
+        "expiresAt",
+        "nonce",
+        "nodeProofSha256",
+        "hostProofSha256",
+        "peerP",
+        "storageC",
+        "storageR",
+        "role",
+        "roleFloorSchema",
+        "policyBytesSha256",
+        "plannedReleaseId"
+      ],
+      "properties": {
+        "admissionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "operatorApprovalRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "provisioningGrantRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "assignmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "current": {
+          "$ref": "#/$defs/current"
+        },
+        "servingCid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingPid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "servingUid": {
+          "const": 0
+        },
+        "pidStartTicks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "bootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "servingNonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nodeProofSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "hostProofSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "peerP": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "storageC": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "storageR": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "roleFloorSchema": {
+          "const": "saintvision-node-peer-policy-floor:3"
+        },
+        "policyBytesSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "plannedReleaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "executionProfile",
+        "roleFloor",
+        "normalLeafContract",
+        "runtimeInventorySha256",
+        "policySha256",
+        "contextSha256",
+        "roleArguments",
+        "baseServingArgvSha256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 4
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "executionProfile": {
+          "const": "lan-workspace-v1"
+        },
+        "roleFloor": {
+          "const": 3
+        },
+        "normalLeafContract": {
+          "const": 4
+        },
+        "runtimeInventorySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "contextSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "roleArguments": {
+          "const": [
+            "--serve",
+            "--storage-policy",
+            "/state/storage-policy.json",
+            "--socket",
+            "/var/run/docker.sock",
+            "--role-config",
+            "/state/node-role.json"
+          ]
+        },
+        "baseServingArgvSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "roleConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "executionContextSha256",
+        "releaseAuthorityPublicKeySha256",
+        "releaseAuthorityPublicKeyPath",
+        "roleUseProtocol",
+        "maxRoleUseSeconds",
+        "operationId",
+        "cohortId",
+        "operatorApprovalRef"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-config:1"
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "executionContextSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "releaseAuthorityPublicKeySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "releaseAuthorityPublicKeyPath": {
+          "const": "/state/role-release-authority.pub"
+        },
+        "roleUseProtocol": {
+          "const": "saintvision-node-role-use:1"
+        },
+        "maxRoleUseSeconds": {
+          "const": 120
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "operatorApprovalRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "roleUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "releaseId",
+        "admissionId",
+        "operationId",
+        "cohortId",
+        "channel",
+        "servingGeneration",
+        "roleConfigSha256",
+        "policySha256",
+        "purpose",
+        "method",
+        "path",
+        "requestBodySha256",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-use:1"
+        },
+        "releaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "admissionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "servingGeneration": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "roleConfigSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "purpose": {
+          "enum": [
+            "EXECUTION",
+            "TRANSFER",
+            "TERMINAL",
+            "MODEL",
+            "STORAGE_COLLECT"
+          ]
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "enum": [
+            "/v1/executions",
+            "/v1/executions/receipts",
+            "/v1/objects/read",
+            "/v1/terminals/frame",
+            "/v1/storage/sample"
+          ]
+        },
+        "requestBodySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "EXECUTION",
+                  "MODEL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "/v1/executions",
+                  "/v1/executions/receipts"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "TRANSFER"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "/v1/objects/read"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "TERMINAL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "/v1/terminals/frame"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "STORAGE_COLLECT"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "/v1/storage/sample"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "roleFloor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "channelConfig",
+        "nonce",
+        "observedAt",
+        "peerP",
+        "peerFloorSha256",
+        "storageFloorSha256",
+        "storageC",
+        "storageR",
+        "contributionId",
+        "policySha256",
+        "rootMeasured",
+        "servingPid",
+        "servingUid",
+        "pidStartTicks",
+        "bootId",
+        "servingNonce",
+        "rawArgvSha256",
+        "executableDescriptorSha256",
+        "roleConfigSha256",
+        "contextConfigSha256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-peer-policy-floor:3"
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "channelConfig": {
+          "$ref": "#/$defs/channel"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "peerP": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "peerFloorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "storageFloorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "storageC": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "storageR": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "contributionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rootMeasured": {
+          "$ref": "#/$defs/root"
+        },
+        "servingPid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "servingUid": {
+          "const": 0
+        },
+        "pidStartTicks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "bootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "servingNonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rawArgvSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executableDescriptorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "roleConfigSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "contextConfigSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "roleUseSignedToken": {
+      "type": "string",
+      "pattern": "^v1\\.[A-Za-z0-9_-]+\\.[0-9a-f]{128}$",
+      "maxLength": 65536
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/admission"
+    },
+    {
+      "$ref": "#/$defs/executionContext"
+    },
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/roleConfig"
+    },
+    {
+      "$ref": "#/$defs/roleUse"
+    },
+    {
+      "$ref": "#/$defs/roleFloor"
+    }
+  ]
+}

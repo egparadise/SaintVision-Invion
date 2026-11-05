@@ -1,0 +1,57 @@
+{
+  "recordedAtKST": "2026-11-06T03:43:21+09:00",
+  "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "checks": [
+    {
+      "name": "schema-predicate",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev2-20261106-codex\\validate_revision_fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev2-20261106-codex/schema-predicate.log",
+      "logSha256": "3d3d039b3b259fdea9072521509015eb88e057c65998fe7a7a83f2f703723f77"
+    },
+    {
+      "name": "unchanged-guard",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev2-20261106-codex/unchanged-guard.log",
+      "logSha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "name": "coexistence-expected-red",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev2-20261106-codex/coexistence-expected-red.log",
+      "logSha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    },
+    {
+      "name": "source-audit",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev2-20261106-codex\\build_source_audit.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev2-20261106-codex/source-audit.log",
+      "logSha256": "61d96199e786970062ca50429ffd0f40c1b91cd4dd61cd00ea55b03e3357afed"
+    }
+  ],
+  "expectedRedIsTaskFailure": false,
+  "newRealBEvidence": 0
+}

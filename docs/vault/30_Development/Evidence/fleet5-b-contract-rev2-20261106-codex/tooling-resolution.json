@@ -1,0 +1,8 @@
+{
+  "recordedAtKST": "2026-11-06T03:43:53+09:00",
+  "issue": "Initial Git-object AST census encountered UTF-8 BOM in an existing tracked Python file and exited1 before completing",
+  "resolution": "Decode source text with utf-8-sig for AST only; hash original Git bytes unchanged; rerun succeeded46/46 original surfaces, zero missing anchors,90 related files and32 direct-channel files",
+  "impact": "No source or configuration edits, no application execution; preliminary failure is not a product runtime test",
+  "failedApplyPatches": "Several edit patches with a nonmatching context were rejected atomically; no partial production edit occurred",
+  "remaining": "Actual independent revision review and Root contract freeze; all new real B evidence0"
+}

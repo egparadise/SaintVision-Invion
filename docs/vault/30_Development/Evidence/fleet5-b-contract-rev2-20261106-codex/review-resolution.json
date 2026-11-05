@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "fleet5-b-review-resolution:2",
+  "originalProposal": "100f6f132132199d1204a76190f04712dd82de00",
+  "originalReview": "2bb959a3365c2b59c8818ed746480c9183b4c0fc",
+  "revisionReview": "PENDING_ACTUAL_INDEPENDENT",
+  "findings": [
+    {
+      "id": "B1",
+      "section": "D1",
+      "proposedResolution": "CP dedicated Linux context, no host remap, homogeneous five",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "B2",
+      "section": "D2",
+      "proposedResolution": "closed persistence/writer/current joins, caller classification, generation-bound grant",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "B3",
+      "section": "D3",
+      "proposedResolution": "pure dual prevalidation, explicit S4a, exact monotonic replay",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "B4",
+      "section": "D4",
+      "proposedResolution": "all-five durable fence before exposure, all partial states deny, ledger replay",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "B5",
+      "section": "D5",
+      "proposedResolution": "canonical lock graph, outer helper and direct writer closure, actual PG future",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "L1",
+      "section": "deployment",
+      "proposedResolution": "workload Mounts/VolumesFrom/top-level Mounts closed",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "L2",
+      "section": "D3",
+      "proposedResolution": "extra floors immutable verified history or BLOCK",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "L3",
+      "section": "policy",
+      "proposedResolution": "same key does not deny stale signatures; exact C/DER/nonce/current row does",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    },
+    {
+      "id": "L4",
+      "section": "policy",
+      "proposedResolution": "operator exact A/B bytes+grant; revoke increments C and invalidates old intent",
+      "implemented": false,
+      "reviewClosure": "pending actual revision review"
+    }
+  ],
+  "acceptanceMatrix": [
+    {
+      "id": "A1",
+      "requirement": "Default R4/plain :2/:3/legacy preserved",
+      "currentEvidenceLevel": "baseline source + targeted unchanged guard fixture",
+      "requiredFutureEvidence": "real existing P0 separate; B changes pending",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A2",
+      "requirement": "Closed manifest4/options/unknown/alias/single-dash/equal/duplicate reject",
+      "currentEvidenceLevel": "schema fixture",
+      "requiredFutureEvidence": "future generated and real runtime",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A3",
+      "requirement": "Exact three mounts; wrong/RW/extra/socket reject",
+      "currentEvidenceLevel": "fixture",
+      "requiredFutureEvidence": "real Linux Docker",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A4",
+      "requirement": "RO write failure/nonrecursive/rprivate enforced",
+      "currentEvidenceLevel": "none",
+      "requiredFutureEvidence": "real Linux Docker",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A5",
+      "requirement": "No workload host/contrib/state/socket; all Mounts/VolumesFrom empty",
+      "currentEvidenceLevel": "schema predicate only",
+      "requiredFutureEvidence": "real Linux Docker malicious and true inspect",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A6",
+      "requirement": "Role3 actual PID/rawargv/exe/root FD/peer+storagefloor/extras",
+      "currentEvidenceLevel": "schema only",
+      "requiredFutureEvidence": "actual Go/kernel crash tests",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A7",
+      "requirement": "Go/Python distinct canonical Unicode +31/53 bounds",
+      "currentEvidenceLevel": "schema numeric only",
+      "requiredFutureEvidence": "real Go + Python vectors",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A8",
+      "requirement": "same C changed hash/backward P/C/R/R-bump deny",
+      "currentEvidenceLevel": "predicate only",
+      "requiredFutureEvidence": "Go+CP exact pins",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A9",
+      "requirement": "Prevalidate before pin; S4a crash after each pin",
+      "currentEvidenceLevel": "phase predicate only",
+      "requiredFutureEvidence": "actual Go crash/fsync",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A10",
+      "requirement": "Two complete leaf4 shared C/DER cycles; same-key stale challenge deny",
+      "currentEvidenceLevel": "mock current joins only",
+      "requiredFutureEvidence": "real Go+PG two cycles",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A11",
+      "requirement": "Partial batch all-five quarantine",
+      "currentEvidenceLevel": "phase mock",
+      "requiredFutureEvidence": "actual PG batch",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A12",
+      "requirement": "Canonical lock/deadlock/abort/lost response",
+      "currentEvidenceLevel": "static DAG/mock ledger",
+      "requiredFutureEvidence": "actual PG concurrency",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A13",
+      "requirement": "All caller current admission missing/stale deny",
+      "currentEvidenceLevel": "static census + predicate fixture",
+      "requiredFutureEvidence": "real CP full suite",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A14",
+      "requirement": "CP context capability/source mapping",
+      "currentEvidenceLevel": "schema negative fixtures",
+      "requiredFutureEvidence": "actual guest Linux proof then physical separate",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A15",
+      "requirement": "Create/copy/start/ack/CAS crash/lost; one volume consumer/no old restore",
+      "currentEvidenceLevel": "phase predicate only",
+      "requiredFutureEvidence": "actual Go+Docker+PG fault injection",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    },
+    {
+      "id": "A16",
+      "requirement": "Package/schema/runtime regeneration/full CI/independent exact review",
+      "currentEvidenceLevel": "DOCS gates only",
+      "requiredFutureEvidence": "future exact runtime CI and actual code review",
+      "BImplementationStatus": "PENDING_NOT_ACCEPTED",
+      "newRealGo": 0,
+      "newRealPG": 0,
+      "newDocker": 0,
+      "newPhysical": 0
+    }
+  ]
+}

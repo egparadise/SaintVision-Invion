@@ -1,0 +1,1280 @@
+{
+  "schemaVersion": "fleet5-b-revision-fixture-result:2",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "level": "SCHEMA_SYNTHETIC_PREDICATE_AND_STATIC_SOURCE_ONLY",
+  "realGo": 0,
+  "realPG": 0,
+  "realDocker": 0,
+  "realPhysical": 0,
+  "cases": [
+    {
+      "case": "native-context-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-kind-windows-desktop-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-kind-drvfs-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-kind-9p-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-kind-desktop-remap-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-kind-unknown-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-nativeMountAncestryVerified-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-noLinkParentsVerified-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-sourceContained-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-endpointProbeVerified-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-hostToNodeRootVerified-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-apiVersion-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-socketPath-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-linux-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "context-unknown-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-bindings-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-option-alias-equal-duplicate-unknown-deny-16",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-option-alias-equal-duplicate-unknown-deny-17",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-option-alias-equal-duplicate-unknown-deny-18",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-option-alias-equal-duplicate-unknown-deny-19",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-option-alias-equal-duplicate-unknown-deny-20",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-binding-schemaVersion-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-binding-roleFloor-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-binding-normalLeafContract-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-binding-role-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-binding-allowStorage-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "closed-admission-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-admissionId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-operationId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-cohortId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-operatorApprovalRef",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-provisioningGrantRef",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-assignmentId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-current",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-servingCid",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-servingPid",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-servingUid",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-pidStartTicks",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-bootId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-servingNonce",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-observedAt",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-expiresAt",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-nonce",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-nodeProofSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-hostProofSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-peerP",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-storageC",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-storageR",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-role",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-roleFloorSchema",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-policyBytesSha256",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-missing-plannedReleaseId",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-independent-success-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-config-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-config-maxRoleUseSeconds-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-config-releaseAuthorityPublicKeyPath-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-config-allowUnknown-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-purpose-deny-58",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-purpose-deny-59",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-method-deny-60",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-path-deny-61",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-path-deny-62",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-use-success-deny-63",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-positive-TRANSFER",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-cross-deny-TRANSFER",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-positive-TERMINAL",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-cross-deny-TERMINAL",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-positive-STORAGE_COLLECT",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-cross-deny-STORAGE_COLLECT",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-positive-MODEL",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "role-purpose-path-cross-deny-MODEL",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "token-shape-positive-only",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "token-alias-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "token-duplicate-segment-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "token-padded-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "token-overlong-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-bound-peerP-9007199254740992",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-bound-storageC-2147483648",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-bound-storageR-2147483648",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "admission-bound-peerP-True",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-all-five-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "offline-member-blocks-new-all-five-activation",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "offline-unselected-worker-does-not-block-healthy-worker",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "offline-selected-worker-denied",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "namespace-local-mount-ids-not-compared",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-nodeOnline-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-publicNodeActive-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-heartbeatFresh-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-contributionActive-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-channelEnabled-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-certificateTimeValid-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-grantCurrent-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-assignmentCurrent-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-latestPointerMatches-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-mockNodeSignatureValid-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-mockHostProofValid-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-mockCASLedgerMatches-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-join-extraFloorsVerifiedHistorical-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-policySha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-imageSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-exeSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-configSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-argvSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-generation-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-contextSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-peerFloorSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-drift-storageFloorSha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-channel-version-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-channel-certificate_sha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-channel-recovery_epoch-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-channel-endpoint-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-root-rootVersion-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "current-root-contributionId-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-device-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-inode-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-filesystem-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-uid-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-mode-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-sourceIdentitySha256-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "root-substitution-guestBootId-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-expiresAt-2000000000",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-observedAt-1999999969",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-observedAt-2000000001",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-peerP-8",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-storageC-8",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-storageR-2",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "stale-floor-proof-policyBytesSha256-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "old-release-after-restart-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "cohort-actualCPClientBAllAdapters-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "cohort-releaseCurrent-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "cohort-epochCurrent-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "cohort-mockNonceUnused-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "four-members-no-plain-PC5-fallback",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "duplicate-node-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "exact-three-mounts-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "RW-contribution",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "recursive-contribution",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "shared-propagation",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "substituted-root",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "alternate-socket",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "wrong-state-owner-volume",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "extra-mount-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "missing-contribution-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-empty-host-mount-surfaces-positive",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-Binds-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-Mounts-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-VolumesFrom-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-Devices-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-PortBindings-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "workload-top-level-Mounts-deny",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S0",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S1",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S2",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S3",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S4a",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S4b",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S5-staging",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S5-staged",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S6-switching",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S6-switched",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S7-final",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-S8-activation",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "phase-no-premature-readmission-abort-lost-unknown",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "before-CAS",
+      "actual": "RETRY_EXACT_CAS",
+      "expected": "RETRY_EXACT_CAS",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "lost-reply-committed",
+      "actual": "REPLAY_CONFIRMED",
+      "expected": "REPLAY_CONFIRMED",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "target-no-ledger",
+      "actual": "BLOCK_UNKNOWN",
+      "expected": "BLOCK_UNKNOWN",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "old-with-ledger",
+      "actual": "BLOCK_UNKNOWN",
+      "expected": "BLOCK_UNKNOWN",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "wrong-operation",
+      "actual": "BLOCK_UNKNOWN",
+      "expected": "BLOCK_UNKNOWN",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "revoke-C-jump",
+      "actual": "BLOCK_UNKNOWN",
+      "expected": "BLOCK_UNKNOWN",
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "S4a-exact-forward",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "S4b-exact-replay",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "final-exact-replay",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "old-config",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "changed-intent",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "half-copy",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "before-copy",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "unknown-floor",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SCHEMA_OR_MOCK_PREDICATE"
+    },
+    {
+      "case": "proposed-lock-DAG",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SOURCE_STATIC_ONLY"
+    },
+    {
+      "case": "channel-before-node-negative",
+      "actual": false,
+      "expected": false,
+      "passed": true,
+      "level": "SOURCE_STATIC_ONLY"
+    },
+    {
+      "case": "no-unclassified-source-occurrences",
+      "actual": true,
+      "expected": true,
+      "passed": true,
+      "level": "SOURCE_STATIC_ONLY"
+    }
+  ],
+  "passed": 181,
+  "failed": 0
+}

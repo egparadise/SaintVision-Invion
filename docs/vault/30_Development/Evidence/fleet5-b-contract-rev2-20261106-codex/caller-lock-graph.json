@@ -1,0 +1,3029 @@
+{
+  "schemaVersion": "fleet5-b-source-caller-lock-audit:2",
+  "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "scope": "All tracked production/tool/schema source in eight roots; exact lexical channel census plus related Node/epoch/contribution paths and wrappers. Static inventory, not execution or whole-program dynamic-call proof.",
+  "scanRoots": [
+    "src/",
+    "apps/",
+    "services/",
+    "packages/",
+    "contracts/",
+    "tools/",
+    "deploy/",
+    "migrations/"
+  ],
+  "directRegex": "node_channels|NodeChannels|provision_channel|revoke_channel|assert_channel|ChannelProof",
+  "relatedRegex": "inv\\.nodes|inv\\.control_epoch|public\\.nodes|public\\.storage_contributions|StorageContribution|register_contribution|activate_contribution|revoke_contribution|enroll_node|record_heartbeat|mark_lost_nodes",
+  "sourceFileCount": 90,
+  "directChannelFileCount": 32,
+  "unclassified": [],
+  "files": [
+    {
+      "path": "apps/web/src/features/desktop/ResourceExplorer.tsx",
+      "sha256": "f498e74ef31aff7f2d25a8382adc75467738c0ea2902466436ad423b4f0a654c",
+      "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY",
+      "hits": [
+        {
+          "line": 137,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution,",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 145,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "getStorageContributions,",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 146,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "registerStorageContribution,",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 147,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "activateStorageContribution,",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 148,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "revokeStorageContribution,",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 225,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const [contributions, setContributions] = useState<StorageContribution[]>([]);",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 423,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "getStorageContributions(),",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 512,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await registerStorageContribution(",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 533,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await activateStorageContribution(id);",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 544,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await revokeStorageContribution(id);",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/src/features/desktop/fabricControlApi.ts",
+      "sha256": "07bc173e3547e664d7aee8cc3ff9dc6f47f4b605834fad54372316bd40ce0ff0",
+      "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY",
+      "hits": [
+        {
+          "line": 52,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "export type StorageContribution = ContributionResponse;",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 90,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "export async function getStorageContributions(",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 98,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "export async function registerStorageContribution(",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 121,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "export async function activateStorageContribution(",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 132,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "export async function revokeStorageContribution(",
+          "classification": "UI_DIAGNOSTIC_DISPLAY_NO_ELIGIBILITY_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/accessibility-status-and-guards.test.tsx",
+      "sha256": "bb0f55d7c30d061ae938da2ade2288af9d3b2c7febc3c5e3e62ec0fc06b0384c",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 52,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/app-node-certificate-freshness.test.tsx",
+      "sha256": "69c9208f1e6ccd188057c3ec07dad1dc6c009d89a7995d49d4ead8cca88f4360",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 70,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabric, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/auth-app-oidc-integration.test.tsx",
+      "sha256": "4c75fe5a08b1e583b17b2ce5875e8738f190d8ed20e270aca71e8aad510b106c",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 43,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/fabric-control-plane.test.tsx",
+      "sha256": "1624c72337af8df7dc9ed9333e7c938edfad23fdb50c2572b7d9c99e97e2de9e",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 6,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "getStorageContributions,",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 7,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "registerStorageContribution,",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 8,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "activateStorageContribution,",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 9,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "revokeStorageContribution,",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 83,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "it('1. getStorageContributions fetches contributions with optional nodeId filter', async () => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 86,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await getStorageContributions('nod_01JABCDEF01');",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 91,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "expect(await getStorageContributions()).toEqual(storageContributionsFixture);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 95,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "it('2. registerStorageContribution sends POST with idempotencyKey option', async () => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 111,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await registerStorageContribution(",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 130,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "it('3. activateStorageContribution sends POST activation', async () => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 146,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await activateStorageContribution('sc_test1');",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 153,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "it('4. revokeStorageContribution sends DELETE', async () => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 169,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "const res = await revokeStorageContribution('sc_test1');",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/freshness-and-staleness-wiring.test.tsx",
+      "sha256": "e983b17d3e53878f55ef2121985110432a7793bb06014423f8b6947530ed112f",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 16,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "getStorageContributions: vi.fn().mockResolvedValue({ contributions: [] }),",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/late-mutation-generation-regression.test.tsx",
+      "sha256": "3f62a5cc2b1f70f3471493bca89fde62915d75387c5dade55a2078d64de583c5",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 28,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/resource-explorer-dom.test.tsx",
+      "sha256": "50963a97aa22b571651a2ed7461dd850ca494e34e47c3453b4925cbea3f977a3",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 170,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockReturnValue(pendingContribs.promise);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 658,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'registerStorageContribution').mockRejectedValue(new Error('403 Forbidden: Quota exceeded'));",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 659,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue({ items: [] });",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 1159,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 1160,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'registerStorageContribution').mockImplementation(async (_data, key) => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 1216,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        },
+        {
+          "line": 1217,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "vi.spyOn(fabricApi, 'registerStorageContribution').mockImplementation(async (data, _key) => {",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "apps/web/tests/write-actions-integrity-wiring.test.tsx",
+      "sha256": "aea068a9130f1b17bb094c8a6f0f3b33406340ae7ad1957653bfa0abf14b7a44",
+      "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY",
+      "hits": [
+        {
+          "line": 19,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "getStorageContributions: vi.fn().mockResolvedValue({ contributions: [] }),",
+          "classification": "FIXTURE_ONLY_NO_REAL_B_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0005_node_channels.py",
+      "sha256": "28e6d2e4eefd989345700ab173bf2b2f251bd18d7b09a5665014c18be804f6d0",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 4,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "revision = \"0005_node_channels\"",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 11,
+          "symbol": "upgrade",
+          "kind": "DIRECT_CHANNEL",
+          "text": "script = files(\"inv\").joinpath(\"migrations/0005_node_channels.sql\").read_text(\"utf-8\")",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0006_control_api.py",
+      "sha256": "3a56f7c3957b7601ef302b0a2b294d681bb0ffcdaf367f3f2f576011f168d424",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 5,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "down_revision = \"0005_node_channels\"",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0008_node_certificate_lookup.py",
+      "sha256": "60cacbeae108ba06fb08a5e9b8717398fa439de76e2f8d38f0cc45c10321f926",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 54,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM public.nodes n",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0031_resource_offer_integrity.py",
+      "sha256": "0d562a32693efc1ab3c3791cff7ce0210fe63b8c44aa8faa2413e05d44019d06",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 40,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "PERFORM n.node_id FROM public.nodes n WHERE n.tenant_id=p_tenant AND n.node_id=node_id_value FOR UPDATE;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 56,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "PERFORM n.node_id FROM inv.nodes n WHERE n.tenant_id=p_tenant AND n.node_id=node_id_value FOR UPDATE;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0032_workspace_readiness_merge.py",
+      "sha256": "b8b902c2683a7e1889cb92de9e1b13d5ebcea63705260ecd4ae2ee37c685eaf7",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 21,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "JOIN inv.control_epoch e ON e.singleton AND e.epoch=s.recovery_epoch",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 30,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "JOIN inv.control_epoch e ON e.singleton AND e.epoch=rp.recovery_epoch",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0037_storage_sample_commit.py",
+      "sha256": "2d697c7d1221b3659563798efd8e4b03bac644c096e17f32c303bd83f0c92fe3",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 22,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,contribution_id) REFERENCES public.storage_contributions(tenant_id,contribution_id),",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 54,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "GRANT SELECT(tenant_id,node_id,status) ON public.nodes TO inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 55,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "GRANT SELECT(tenant_id,contribution_id,node_id,status,registered_by_user_id,normalized_path,version) ON public.storage_contributions TO inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "migrations/versions/0040_model_run_input.py",
+      "sha256": "a92545fdd2ab3f2dde2ba82b4f512c9cc150e7b86fc9dcba30b1b87a3a6c93bf",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 21,
+          "symbol": "upgrade",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/build_adapter.py",
+      "sha256": "313acf3d081b940f81be46bbfe689ea2b1a1271359a3bf7f5639f49ace877e72",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 133,
+          "symbol": "_lock_live_build_authority",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes WHERE node_id=%s\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "sha256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+      "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE",
+      "hits": [
+        {
+          "line": 293,
+          "symbol": "_mark_node_quarantined",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "require ``inv.nodes.status = 'online'``, so a committed transition prevents the same",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 299,
+          "symbol": "_mark_node_quarantined",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 305,
+          "symbol": "_mark_node_quarantined",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 39,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import NodeChannels",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 532,
+          "symbol": "configured_tenant_product_runtime",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel = NodeChannels(database).snapshot(",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/capacity.py",
+      "sha256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 19,
+          "symbol": "project_capacity",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.project_nodes p JOIN inv.nodes n USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 22,
+          "symbol": "project_capacity",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/containment.py",
+      "sha256": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+      "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE",
+      "hits": [
+        {
+          "line": 65,
+          "symbol": "_view",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT n.status,c.version FROM inv.nodes n JOIN inv.node_controls c USING(tenant_id,node_id) WHERE n.node_id=%s\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 109,
+          "symbol": "change",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE\", (node_id,)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 175,
+          "symbol": "change",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"\"\"SELECT 1 FROM inv.nodes n JOIN inv.node_channels c USING(tenant_id,node_id)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 196,
+          "symbol": "change",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute(\"UPDATE inv.nodes SET status=%s WHERE node_id=%s\", (target, node_id))",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 234,
+          "symbol": "once",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "JOIN inv.nodes n USING(tenant_id,node_id)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 260,
+          "symbol": "once",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "JOIN inv.nodes n USING(tenant_id,node_id) WHERE l.run_id=%s AND l.released_at IS NULL AND n.status='draining'\"\"\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/control.py",
+      "sha256": "85bdc50771615fc5ec49f639e1fb3e16f2a7eaa719c8f92630598ac37c03a550",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 249,
+          "symbol": "nodes",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT n.node_id,n.status,n.heartbeat_at FROM inv.nodes n JOIN inv.project_nodes p USING(tenant_id,node_id) WHERE p.project_id=%s AND p.enabled ORDER BY n.node_id LIMIT 200\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/db.py",
+      "sha256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+      "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 202,
+          "symbol": "transaction",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 79,
+          "symbol": "_can_start",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"\"\"SELECT 1 FROM inv.nodes WHERE node_id=%s AND status='online'",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/gpu.py",
+      "sha256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 79,
+          "symbol": "current_single_gpu_allocation",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes n",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 81,
+          "symbol": "current_single_gpu_allocation",
+          "kind": "DIRECT_CHANNEL",
+          "text": "JOIN inv.node_channels c USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/leases.py",
+      "sha256": "e968852cea4fecd011a97e3b665302cc31e3ddec22d505f0f4ce9af2420987b6",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 44,
+          "symbol": "lock_resources",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT node_id FROM inv.nodes WHERE node_id=%s FOR UPDATE\", (node,)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 255,
+          "symbol": "_reserve_prepared_locked",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AND recovery_epoch=%s::uuid AS ready FROM inv.nodes WHERE node_id=%s\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 391,
+          "symbol": "assert_fences",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute(\"SELECT epoch FROM inv.control_epoch WHERE singleton\").fetchone()[",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0001_core.sql",
+      "sha256": "708cf74734471961a49d527d1d2b0d6e4441e00ddf6739795492dfcd8f4063e9",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 4,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "CREATE TABLE inv.control_epoch (singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton), epoch uuid NOT NULL);",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 14,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "CREATE TABLE inv.nodes (",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 28,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY (tenant_id, node_id) REFERENCES inv.nodes(tenant_id, node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0002_approvals.sql",
+      "sha256": "394c6753fb5c3ea93c8c13db9c38c9d03f96b3f9786f2ec490e8e0591a9fb0de",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 89,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AND a.recovery_epoch=(SELECT epoch FROM inv.control_epoch WHERE singleton)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0003_tool_claims.sql",
+      "sha256": "84884ea924b5481547c345722db1bcfe0086425cd86d2824a57c4d089268c131",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 15,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0005_node_channels.sql",
+      "sha256": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 2,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "CREATE TABLE inv.node_channels (",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 10,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 17,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 19,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "ALTER TABLE inv.node_channels ENABLE ROW LEVEL SECURITY;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 20,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "ALTER TABLE inv.node_channels FORCE ROW LEVEL SECURITY;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 21,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "CREATE POLICY tenant_isolation ON inv.node_channels",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 39,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "CREATE TRIGGER channel_monotonic BEFORE UPDATE OR DELETE ON inv.node_channels",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0006_control_api.sql",
+      "sha256": "d9284d26f0e23ffe72fe591a132efc07b7384d459ac3ed988cb1326968df6609",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 33,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 39,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "ALTER TABLE inv.nodes ADD COLUMN probe_started_at timestamptz;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 43,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "PRIMARY KEY(tenant_id,nonce), FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0009_node_snapshots.sql",
+      "sha256": "799e8f36beeba9f18fd9d5f36d45472c95f8ffb002aa707ccc0cc6adb271d26a",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 6,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes(tenant_id,node_id)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0018_workspace_resume.sql",
+      "sha256": "e7e42b113060001e052a96365c583c589499580e87d46861161ad7cf4e64c572",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 32,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AND source_attempt=NEW.attempt AND recovery_epoch=(SELECT epoch FROM inv.control_epoch WHERE singleton))",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 36,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AND source_attempt=NEW.attempt-1 AND recovery_epoch=(SELECT epoch FROM inv.control_epoch WHERE singleton);",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0019_runtime_role.sql",
+      "sha256": "7eb1d0b9c6608a8eb2e3d69ee7838dd99daa5124eefd53f8fa0ff0a7490be662",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 16,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "REVOKE INSERT,UPDATE,DELETE ON inv.control_epoch,inv.evidence,inv.checkpoints FROM inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 19,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "GRANT UPDATE(singleton) ON inv.control_epoch TO inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 24,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "REVOKE INSERT,UPDATE,DELETE ON inv.node_channels,inv.node_channel_audit FROM inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 25,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "GRANT UPDATE(lock_sentinel) ON inv.node_channels TO inv_kernel;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0020_shard_recovery.sql",
+      "sha256": "10fad974bb14b864950db9266b3634a9e314a52fc48d8214cbaabbabf07abc54",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 21,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 52,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "OR NEW.recovery_epoch IS DISTINCT FROM (SELECT epoch FROM inv.control_epoch WHERE singleton)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0021_business_kernel.sql",
+      "sha256": "494f1e0dc9ead74b964e78b97fae23fa0635b00e7cac238e7a53a43370031fed",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 123,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AND NEW.recovery_epoch=(SELECT epoch FROM inv.control_epoch WHERE singleton)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+      "sha256": "eaee2ad2a2cac146acf2f4f823ad73e5fb34a0b831bdb6d647c5beafbfed6c22",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 12,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "PRIMARY KEY(tenant_id,node_id), FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 30,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes,",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 35,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "INSERT INTO inv.node_controls(tenant_id,node_id) SELECT tenant_id,node_id FROM inv.nodes;",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 46,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "CREATE TRIGGER containment_seed AFTER INSERT ON inv.nodes FOR EACH ROW EXECUTE FUNCTION inv.seed_containment_control();",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0023_containment_approvals.sql",
+      "sha256": "0e8deef463f1bd3b77f0d0492031a40c19035d08e9bed22a022d2d443c63e92f",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 30,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FOREIGN KEY(tenant_id,node_id) REFERENCES inv.nodes,",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0025_workspace_start.sql",
+      "sha256": "14e0cde39c2492790c77e01557c202fa17fa03488bdcf853aea7dd8a5ae60fec",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 26,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "OR NEW.recovery_epoch<>(SELECT epoch FROM inv.control_epoch WHERE singleton)",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_commit.py",
+      "sha256": "b4c0ffcb5ae9ccf8325b93f8c642a7b71b1618841cdc5467c54a8530f45eb971",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 59,
+          "symbol": "_capture",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AS available FROM inv.nodes WHERE node_id=%s\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 63,
+          "symbol": "_capture",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status FROM public.nodes WHERE node_id=%s FOR SHARE\", (node_id,)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 170,
+          "symbol": "capture_locations",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM public.storage_contributions WHERE contribution_id=%s FOR SHARE\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_locality.py",
+      "sha256": "b621d053a793b57b0ba8f8478038509dbacf03fab30db1f73cf98688073a48ef",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 29,
+          "symbol": "_capture",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "AS available FROM inv.nodes WHERE node_id=%s FOR SHARE\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 37,
+          "symbol": "_capture",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status FROM public.nodes WHERE node_id=%s FOR SHARE\", (node,)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY",
+      "hits": [
+        {
+          "line": 15,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import ChannelProof, endpoint_parts",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 23,
+          "symbol": "RemoteModelBytes",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channels: tuple[ChannelProof, ...]",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 52,
+          "symbol": "read",
+          "kind": "DIRECT_CHANNEL",
+          "text": "or any(not isinstance(v, ChannelProof) for v in channels)",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_runtime.py",
+      "sha256": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 29,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import assert_channel",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 103,
+          "symbol": "approved_model",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, channel)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/model_source.py",
+      "sha256": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 7,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import ChannelProof, assert_channel, proof",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 23,
+          "symbol": "capture_channels",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE\", (node_id,)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 30,
+          "symbol": "capture_channels",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, channel)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 60,
+          "symbol": "frozen_sources",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel = ChannelProof(**row[\"channel\"])",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_certificates.py",
+      "sha256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY",
+      "hits": [
+        {
+          "line": 49,
+          "symbol": "serve",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes n JOIN inv.project_nodes p USING(tenant_id,node_id)",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 50,
+          "symbol": "serve",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels c ON c.tenant_id=n.tenant_id AND c.node_id=n.node_id",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "sha256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 84,
+          "symbol": "ChannelProof",
+          "kind": "DIRECT_CHANNEL",
+          "text": "class ChannelProof:",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 94,
+          "symbol": "proof",
+          "kind": "DIRECT_CHANNEL",
+          "text": "return ChannelProof(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 104,
+          "symbol": "assert_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "def assert_channel(conn, expected):",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 106,
+          "symbol": "assert_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 120,
+          "symbol": "NodeChannels",
+          "kind": "DIRECT_CHANNEL",
+          "text": "class NodeChannels:",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 131,
+          "symbol": "snapshot",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT *,clock_timestamp() AS now FROM inv.nodes WHERE node_id=%s FOR SHARE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 142,
+          "symbol": "snapshot",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (node.node_id,)",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 147,
+          "symbol": "snapshot",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, result)",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 151,
+          "symbol": "provision_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "def provision_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 164,
+          "symbol": "provision_channel",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 169,
+          "symbol": "provision_channel",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 175,
+          "symbol": "provision_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT version FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 184,
+          "symbol": "provision_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"\"\"INSERT INTO inv.node_channels(tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,certificate_not_after,enabled)",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 205,
+          "symbol": "revoke_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "def revoke_channel(conn, node: NodePrincipal, *, expected_version):",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 208,
+          "symbol": "revoke_channel",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 212,
+          "symbol": "revoke_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 219,
+          "symbol": "revoke_channel",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"UPDATE inv.node_channels SET enabled=false,version=%s WHERE tenant_id=%s AND node_id=%s\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_execution.py",
+      "sha256": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 93,
+          "symbol": "record",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import assert_channel",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 102,
+          "symbol": "record",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 112,
+          "symbol": "record",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, channel)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_resource_usage.py",
+      "sha256": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 60,
+          "symbol": "node_resource_usage",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT 1 FROM inv.project_nodes p JOIN inv.nodes n USING(tenant_id,node_id) \"",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 75,
+          "symbol": "node_resource_usage",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.resources r JOIN inv.nodes n USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 77,
+          "symbol": "node_resource_usage",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transfer.py",
+      "sha256": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 9,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import NodeChannels, assert_channel",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 18,
+          "symbol": "__init__",
+          "kind": "DIRECT_CHANNEL",
+          "text": "self.channels = NodeChannels(database)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 28,
+          "symbol": "fetch",
+          "kind": "DIRECT_CHANNEL",
+          "text": "authorize = lambda conn: assert_channel(conn, channel)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE",
+      "hits": [
+        {
+          "line": 16,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import NodeChannels, certificate_identity, endpoint_parts",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 231,
+          "symbol": "__init__",
+          "kind": "DIRECT_CHANNEL",
+          "text": "self.channels = NodeChannels(database)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 242,
+          "symbol": "_quarantine_gpu_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status FROM inv.nodes WHERE node_id=%s FOR UPDATE\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 248,
+          "symbol": "_quarantine_gpu_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/observation.py",
+      "sha256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE",
+      "hits": [
+        {
+          "line": 8,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import NodeChannels, assert_channel",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 14,
+          "symbol": "__init__",
+          "kind": "DIRECT_CHANNEL",
+          "text": "self.channels = NodeChannels(database)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 54,
+          "symbol": "accept",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE\", (node.node_id,)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 58,
+          "symbol": "accept",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, proof)",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 88,
+          "symbol": "accept",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status=CASE WHEN status='offline' THEN 'online' ELSE status END WHERE node_id=%s RETURNING status\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 141,
+          "symbol": "mark_offline",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\"",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        },
+        {
+          "line": 146,
+          "symbol": "mark_offline",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\",",
+          "classification": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF",
+      "hits": [
+        {
+          "line": 24,
+          "symbol": "once",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT node_id FROM inv.node_channels WHERE enabled AND recovery_epoch=%s::uuid ORDER BY node_id LIMIT 6\",",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/placement.py",
+      "sha256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 210,
+          "symbol": "reserve",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"\"\"SELECT n.node_id,n.clock_skew_seconds,s.received_at,s.snapshot FROM inv.nodes n",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 378,
+          "symbol": "_selected_guard",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.resources r JOIN inv.nodes n USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 380,
+          "symbol": "_selected_guard",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels c USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 505,
+          "symbol": "_speculate",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes n JOIN inv.node_resource_snapshots s USING(tenant_id,node_id)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 224,
+          "symbol": "_authority",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM public.storage_contributions",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "sha256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 21,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import ChannelProof, assert_channel, proof",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 36,
+          "symbol": "decode_challenge",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"channel\": ChannelProof(**value[\"channel\"]),",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 51,
+          "symbol": "_scope",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT node_id FROM public.storage_contributions WHERE contribution_id=%s\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 57,
+          "symbol": "_scope",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE\", (hint[\"node_id\"],)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 60,
+          "symbol": "_scope",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status FROM public.nodes WHERE node_id=%s FOR SHARE\", (hint[\"node_id\"],)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 64,
+          "symbol": "_scope",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM public.storage_contributions WHERE contribution_id=%s FOR UPDATE\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 79,
+          "symbol": "_scope",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT * FROM inv.node_channels WHERE node_id=%s\", (row[\"node_id\"],)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 86,
+          "symbol": "_scope",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, binding)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY",
+      "hits": [
+        {
+          "line": 29,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import ChannelProof, certificate_identity, endpoint_parts",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 76,
+          "symbol": "Challenge",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel: ChannelProof",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 88,
+          "symbol": "validate",
+          "kind": "DIRECT_CHANNEL",
+          "text": "if not isinstance(self.channel, ChannelProof):",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        },
+        {
+          "line": 183,
+          "symbol": "ConfiguredSampler",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel: ChannelProof",
+          "classification": "CODEC_OR_DIAGNOSTIC_NO_ELIGIBILITY_AUTHORITY"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_view.py",
+      "sha256": "8e24d14ed469a93c9bdaa2424a41883a7c61094f46374d86e586e1eb2f6a9450",
+      "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF",
+      "hits": [
+        {
+          "line": 49,
+          "symbol": "result",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT registered_by_user_id FROM public.storage_contributions WHERE contribution_id=%s FOR SHARE\",",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/terminal.py",
+      "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 22,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from .node_channels import NodeChannels, assert_channel",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 73,
+          "symbol": "_current",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR SHARE\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 275,
+          "symbol": "frame",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel = NodeChannels(self.db).snapshot(node, observation_only=True)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        },
+        {
+          "line": 288,
+          "symbol": "frame",
+          "kind": "DIRECT_CHANNEL",
+          "text": "assert_channel(conn, channel)",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "services/control-plane/src/inv/tooling.py",
+      "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+      "hits": [
+        {
+          "line": 205,
+          "symbol": "claim",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes WHERE node_id=%s\"\"\",",
+          "classification": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/api/v1/model_verify.py",
+      "sha256": "133cc2b826ffe56e1ed938946bd87101ce6dd39f1f2eb50eefdba9a26f0bc258",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 66,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "from ...db.models.storage import DataLocation, StorageContribution",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 271,
+          "symbol": "_require_current_snapshot",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = session.get(StorageContribution, observation.contribution_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/api/v1/nodes.py",
+      "sha256": "a7ea2a0918be13eb2dfa9d083fcfa059d445a73e7d14df1cdb2f581b5880347a",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 50,
+          "symbol": "enroll_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def enroll_node(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 94,
+          "symbol": "enroll_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "node = node_service.enroll_node(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 182,
+          "symbol": "post_heartbeat",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "outcome = node_service.record_heartbeat(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 238,
+          "symbol": "sweep_liveness",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "changed = node_service.mark_lost_nodes(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/api/v1/storage.py",
+      "sha256": "11a85cf207579402f0223c0bb8f82e5a73157e39d30b25f81017e07bc063290c",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 85,
+          "symbol": "register_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def register_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 124,
+          "symbol": "register_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = storage_service.register_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 184,
+          "symbol": "activate_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def activate_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 189,
+          "symbol": "activate_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = storage_service.activate_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 202,
+          "symbol": "revoke_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def revoke_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 209,
+          "symbol": "revoke_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = storage_service.revoke_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/db/models/__init__.py",
+      "sha256": "49a32e3e7e289e394e2e8eaba5e6cd24142e325cbecb79b7bfc9adc052b3fd1f",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 163,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution,",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 450,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"StorageContribution\",",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/db/models/storage.py",
+      "sha256": "555f912bb380ae569f39d95554bd85ec51745fa5fc13ee84a13f630ecb445a31",
+      "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED",
+      "hits": [
+        {
+          "line": 3,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "Only folders a user explicitly contributes become a StorageContribution",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        },
+        {
+          "line": 35,
+          "symbol": "StorageContribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "class StorageContribution(Base):",
+          "classification": "SCHEMA_PERMISSION_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/identity/node_auth.py",
+      "sha256": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 27,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "Codex's ``node_channels`` holds the same fingerprint for the outbound direction",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/locality.py",
+      "sha256": "9f063e1bb4dc3e8242857dcb840cd9d7ed7c2bad0705357f6b7c92fb5b862f0f",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 34,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 377,
+          "symbol": "cache_usage",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = session.get(StorageContribution, contribution_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/nodes.py",
+      "sha256": "bc4114596d7c399e73e1c126fec223be59813b5af422b848fac42b8dc42308b0",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 83,
+          "symbol": "enroll_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def enroll_node(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 168,
+          "symbol": "record_heartbeat",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def record_heartbeat(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 305,
+          "symbol": "mark_lost_nodes",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def mark_lost_nodes(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/pilot.py",
+      "sha256": "60af6098256c2951b550c77874f4a3b2a492456c3c74cc9a136bef6064d371cb",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 38,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 249,
+          "symbol": "record_storage_check",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = session.get(StorageContribution, contribution_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 306,
+          "symbol": "contributions_needing_attention",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution, latest.c.last_checked)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 309,
+          "symbol": "contributions_needing_attention",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "latest.c.contribution_id == StorageContribution.contribution_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 313,
+          "symbol": "contributions_needing_attention",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 314,
+          "symbol": "contributions_needing_attention",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/replica_observation.py",
+      "sha256": "716ac08f41c2427f83a61433b557ace5ed72bad2330597aae3fd8a48e0e4b909",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 6,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "from ..db.models.storage import DataLocation, StorageContribution",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 21,
+          "symbol": "observe_replicas",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ".join(StorageContribution, and_(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 22,
+          "symbol": "observe_replicas",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == DataLocation.tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 23,
+          "symbol": "observe_replicas",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.contribution_id == DataLocation.contribution_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 31,
+          "symbol": "observe_replicas",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.registered_by_user_id == reader_user_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 32,
+          "symbol": "observe_replicas",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/resolver.py",
+      "sha256": "12c1c53ac105ee74c31d3897a450d84f4fb399531836927a7b4a9bb6d34f3ba0",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 32,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "from ..db.models.storage import DataLocation, StorageContribution",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 63,
+          "symbol": "resolve_location",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution.contribution_id).where(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 64,
+          "symbol": "resolve_location",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 65,
+          "symbol": "resolve_location",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.registered_by_user_id == reader_user_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 66,
+          "symbol": "resolve_location",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 241,
+          "symbol": "_reader_scoped",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution.contribution_id).where(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 242,
+          "symbol": "_reader_scoped",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 243,
+          "symbol": "_reader_scoped",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.registered_by_user_id == reader_user_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 244,
+          "symbol": "_reader_scoped",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "src/saintvision/services/storage.py",
+      "sha256": "902a9cc9e2b41b007533429663d5d6419d3a7990138687d1963319e7267961de",
+      "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 23,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "from ..db.models import DataLocation, Node, StorageContribution",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 47,
+          "symbol": "register_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def register_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 54,
+          "symbol": "register_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ") -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 76,
+          "symbol": "register_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = StorageContribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 94,
+          "symbol": "activate_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def activate_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 96,
+          "symbol": "activate_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ") -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 114,
+          "symbol": "revoke_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def revoke_contribution(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 116,
+          "symbol": "revoke_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ") -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 268,
+          "symbol": "list_contributions",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "query = select(StorageContribution).where(StorageContribution.tenant_id == tenant_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 270,
+          "symbol": "list_contributions",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "query = query.where(StorageContribution.registered_by_user_id == reader_user_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 272,
+          "symbol": "list_contributions",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "query = query.where(StorageContribution.node_id == node_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 274,
+          "symbol": "list_contributions",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "query = query.where(StorageContribution.contribution_id > after)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 276,
+          "symbol": "list_contributions",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "query.order_by(StorageContribution.contribution_id).limit(effective + 1)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 299,
+          "symbol": "list_locations",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution.contribution_id).where(",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 300,
+          "symbol": "list_locations",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 301,
+          "symbol": "list_locations",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.registered_by_user_id == reader_user_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 302,
+          "symbol": "list_locations",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 319,
+          "symbol": "_load_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "def _load_contribution(session, *, tenant_id: uuid.UUID, contribution_id: str) -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 320,
+          "symbol": "_load_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "contribution = session.get(StorageContribution, contribution_id)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 328,
+          "symbol": "_owned_for_update",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ") -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 338,
+          "symbol": "_owned_for_update",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution)",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 340,
+          "symbol": "_owned_for_update",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 341,
+          "symbol": "_owned_for_update",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.contribution_id == contribution_id,",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 352,
+          "symbol": "locked_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": ") -> StorageContribution:",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        },
+        {
+          "line": 361,
+          "symbol": "locked_contribution",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "* ``revoke_contribution`` updates this same row, so the lock makes the two",
+          "classification": "PUBLIC_ORM_OR_ROUTE_GUARDED_WRITER_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/alarm_check.py",
+      "sha256": "76b90792ab00d06aa54c71645a0f4f4d8c4fdc67d0f64839fbb88cba866784f5",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 19,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "Two node tables exist: the kernel ``inv.nodes`` (status ``online``/``offline``,",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 22,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "``public.nodes`` (status ``active``\u2026, ``last_heartbeat_at``). Node liveness and",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 231,
+          "symbol": "evaluate",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT count(*) FROM inv.nodes WHERE status = 'online' \"",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 249,
+          "symbol": "evaluate",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "text(\"SELECT node_id, clock_skew_seconds FROM inv.nodes WHERE status = 'online' ORDER BY node_id\")",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_lan_storage_readiness.py",
+      "sha256": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 17,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"public.storage_contributions\", \"public.storage_checks\",",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 22,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"public.storage_contributions\": (\"tenant_id\", \"contribution_id\", \"node_id\", \"status\", \"registered_by_user_id\", \"normalized_path\", \"version\"),",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 106,
+          "symbol": "inspect",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "epoch = conn.execute(\"SELECT epoch FROM inv.control_epoch WHERE singleton\").fetchone()",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 110,
+          "symbol": "inspect",
+          "kind": "DIRECT_CHANNEL",
+          "text": "FROM inv.nodes n LEFT JOIN inv.node_channels c",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_migration_upgrade.py",
+      "sha256": "27568ded37316b1a5397ae68aaebde37faeecae1f8c5fc77416ef5e961f8b4fa",
+      "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE",
+      "hits": [
+        {
+          "line": 107,
+          "symbol": "main",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute(\"INSERT INTO inv.control_epoch(singleton,epoch) VALUES(true,%s)\", (epoch,))",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        },
+        {
+          "line": 110,
+          "symbol": "main",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute(\"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'online',%s)\", (sentinel,node,epoch))",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        },
+        {
+          "line": 165,
+          "symbol": "main",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT has_column_privilege('inv_kernel','inv.control_epoch','epoch','UPDATE')\"",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        }
+      ]
+    },
+    {
+      "path": "tools/check_remote_workspace.py",
+      "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 27,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from inv.node_channels import NodeChannels",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 116,
+          "symbol": "main",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']),observation_only=True)",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/collect_s04_kernel_approval_evidence.py",
+      "sha256": "678ff3ddd5e5e0ebc2608ae6ac151c17b9b75a4f552ff25c5e22e99522935aa7",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 6,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "NOT_REGISTERED because ``inv.control_epoch`` stores only the current value.",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/five_node_lab_preflight.py",
+      "sha256": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 171,
+          "symbol": "module/schema",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes AS n",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 172,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels AS c",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_console.py",
+      "sha256": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+      "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF",
+      "hits": [
+        {
+          "line": 87,
+          "symbol": "snapshot",
+          "kind": "DIRECT_CHANNEL",
+          "text": "FROM inv.nodes n LEFT JOIN inv.node_channels c ON (c.tenant_id,c.node_id)=(n.tenant_id,n.node_id) AND c.recovery_epoch=n.recovery_epoch",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 23,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from inv.node_channels import NodeChannels",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 83,
+          "symbol": "context",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']),observation_only=True)",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 137,
+          "symbol": "_execute",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']))",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 172,
+          "symbol": "transmit_fault",
+          "kind": "DIRECT_CHANNEL",
+          "text": "channel=NodeChannels(runtime(state)).snapshot(NodePrincipal(state['tenantId'],state['nodeId']))",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 40,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from inv.node_channels import certificate_identity, node_uri, provision_channel, revoke_channel",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 921,
+          "symbol": "provision_observation_node",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'offline',%s) ON CONFLICT DO NOTHING\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 1146,
+          "symbol": "init",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "prior = conn.execute(\"SELECT epoch FROM inv.control_epoch\").fetchone()",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 1150,
+          "symbol": "init",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"INSERT INTO inv.control_epoch VALUES(true,%s) ON CONFLICT DO NOTHING\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 1339,
+          "symbol": "enroll",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 1345,
+          "symbol": "enroll",
+          "kind": "DIRECT_CHANNEL",
+          "text": "provision_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 1541,
+          "symbol": "_channel_row",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s\" + suffix,",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3574,
+          "symbol": "stage_leaf_rotation_batch",
+          "kind": "DIRECT_CHANNEL",
+          "text": "committed_version = provision_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3734,
+          "symbol": "commit_leaf_rotation",
+          "kind": "DIRECT_CHANNEL",
+          "text": "committed_version = provision_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3795,
+          "symbol": "revoke_server_node_colocation",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT version,enabled FROM inv.node_channels \"",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3802,
+          "symbol": "revoke_server_node_colocation",
+          "kind": "DIRECT_CHANNEL",
+          "text": "version = revoke_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3856,
+          "symbol": "revoke_node_certificate",
+          "kind": "DIRECT_CHANNEL",
+          "text": "\"SELECT version,enabled FROM inv.node_channels \" \"WHERE tenant_id=%s AND node_id=%s\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3863,
+          "symbol": "revoke_node_certificate",
+          "kind": "DIRECT_CHANNEL",
+          "text": "version = revoke_channel(",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 3889,
+          "symbol": "node_status_rows",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT node_id,status,heartbeat_at FROM inv.nodes WHERE node_id=%s\",",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/operational_readiness.py",
+      "sha256": "fa75f08f95abbcca0b19edfdd8010a768e3ec4010efb8bc8883f9c7336a4414c",
+      "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF",
+      "hits": [
+        {
+          "line": 114,
+          "symbol": "inputs",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "1 if _scalar(conn, \"SELECT count(*) FROM inv.control_epoch WHERE singleton\") else 0,",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 180,
+          "symbol": "inputs",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT count(*) FROM public.nodes WHERE tenant_id=%s AND status='active'\",",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 188,
+          "symbol": "inputs",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "_scalar(conn, \"SELECT count(*) FROM inv.nodes WHERE tenant_id=%s\", (tenant,)),",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 196,
+          "symbol": "inputs",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT count(*) FROM public.storage_contributions \"",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 466,
+          "symbol": "admission",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "epoch = _scalar(conn, \"SELECT epoch FROM inv.control_epoch WHERE singleton\")",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 480,
+          "symbol": "admission",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT count(*) FROM inv.nodes WHERE tenant_id=%s AND status='online' \"",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        },
+        {
+          "line": 481,
+          "symbol": "admission",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"AND recovery_epoch = (SELECT epoch FROM inv.control_epoch WHERE singleton) \"",
+          "classification": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF"
+        }
+      ]
+    },
+    {
+      "path": "tools/provision_account.py",
+      "sha256": "2dbe6442faa52d29c426dec296ec67004103e877ed04a2d34b916b2dea79acad",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 66,
+          "symbol": "_state",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "epoch = one(\"SELECT epoch FROM inv.control_epoch WHERE singleton\")",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/provision_credentials.py",
+      "sha256": "016b1af5ec6e575dd49ce13bc0107c917c345f1eba31a6b9817ef64d6819a6e8",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 187,
+          "symbol": "provision",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/rehearse_independent_restore.py",
+      "sha256": "2c6ca111e24dccd40b657b53af2df06377f629ec4ce415569e75d1e7c538be70",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 205,
+          "symbol": "rehearse",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "nodes = conn.execute('SELECT count(*) AS n FROM inv.nodes').fetchone()['n']",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 210,
+          "symbol": "rehearse",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "if conn.execute('SELECT count(*) FROM inv.nodes').fetchone()[0] != 0:",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/rehearse_lan_upgrade.py",
+      "sha256": "7a7d1003090b0146ca8871939bb592019d8b1c6224b9e5a87caa10809e0f5f48",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 237,
+          "symbol": "rehearse",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "row = conn.execute(\"SELECT node_id FROM inv.nodes WHERE node_id=%s\", (state[\"nodeId\"],)).fetchone()",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/remote_workspace_entry.py",
+      "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 31,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from inv.node_channels import provision_channel, NodeChannels",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 80,
+          "symbol": "initialize",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute('INSERT INTO inv.control_epoch VALUES(true,%s)',(config['epoch'],))",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 82,
+          "symbol": "initialize",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "conn.execute(\"INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch,clock_skew_seconds) VALUES(%s,%s,'online',%s,0)\",(config['tenantId'],config['nodeId'],config['epoch']))",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 83,
+          "symbol": "initialize",
+          "kind": "DIRECT_CHANNEL",
+          "text": "provision_channel(conn,NodePrincipal(config['tenantId'],config['nodeId']),epoch=config['epoch'],",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 205,
+          "symbol": "execute",
+          "kind": "DIRECT_CHANNEL",
+          "text": "duplicate = a.client.exchange(NodeChannels(a.e.db).snapshot(a.node,observation_only=True),envelope,observation_only=True)",
+          "classification": "OPERATOR_OR_TRANSACTION_ENTRY_CANONICAL_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "sha256": "456850d76284749e6e8b3125876699336004695c51203f25afe52539e47eebfe",
+      "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE",
+      "hits": [
+        {
+          "line": 1101,
+          "symbol": "run_acceptance",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "\"\"\"INSERT INTO inv.nodes(tenant_id, node_id, status)",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        },
+        {
+          "line": 1145,
+          "symbol": "run_acceptance",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "# whose FK REFERENCES inv.nodes has NO ON DELETE CASCADE. Delete order: node_controls -> resources -> nodes.",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        },
+        {
+          "line": 1157,
+          "symbol": "run_acceptance",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "cur.execute(\"DELETE FROM inv.nodes WHERE tenant_id=%s AND node_id=%s\", (tenant_id, created_node_id))",
+          "classification": "DISPOSABLE_TEST_ONLY_MUST_REFUSE_REAL_B_DATABASE"
+        }
+      ]
+    },
+    {
+      "path": "tools/s01_readiness_preflight.py",
+      "sha256": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 31,
+          "symbol": "module/schema",
+          "kind": "DIRECT_CHANNEL",
+          "text": "from inv.node_channels import certificate_identity",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 959,
+          "symbol": "probe_pilot_capabilities",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "FROM inv.nodes n",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 960,
+          "symbol": "probe_pilot_capabilities",
+          "kind": "DIRECT_CHANNEL",
+          "text": "LEFT JOIN inv.node_channels c",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    },
+    {
+      "path": "tools/storage_check.py",
+      "sha256": "d8d56aaf3bfc6d16778d5d8945841ccca41afbcfc40c5f55088691eb3d4dab23",
+      "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+      "hits": [
+        {
+          "line": 43,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "from saintvision.db.models import DataLocation, StorageContribution",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 61,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "select(StorageContribution).where(",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 62,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.tenant_id == tenant,",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 63,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.contribution_id == args.contribution,",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 64,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.node_id == args.node,",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        },
+        {
+          "line": 65,
+          "symbol": "run",
+          "kind": "RELATED_NODE_EPOCH_CONTRIBUTION",
+          "text": "StorageContribution.status == \"active\",",
+          "classification": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+        }
+      ]
+    }
+  ],
+  "defaultUnknownCaller": "DENY_B_UNTIL_CLASSIFIED_AND_REVIEWED",
+  "lockRanks": [
+    {
+      "rank": 0,
+      "name": "operation_cohort_routing"
+    },
+    {
+      "rank": 1,
+      "name": "control_epoch"
+    },
+    {
+      "rank": 2,
+      "name": "inv_nodes_sorted"
+    },
+    {
+      "rank": 3,
+      "name": "public_nodes_sorted"
+    },
+    {
+      "rank": 4,
+      "name": "contributions_sorted"
+    },
+    {
+      "rank": 5,
+      "name": "shared_channels_sorted"
+    },
+    {
+      "rank": 6,
+      "name": "role_assignment_current_admission"
+    },
+    {
+      "rank": 7,
+      "name": "runs"
+    },
+    {
+      "rank": 8,
+      "name": "approvals_grants"
+    },
+    {
+      "rank": 9,
+      "name": "resource_claims"
+    },
+    {
+      "rank": 10,
+      "name": "transfer_model_terminal"
+    },
+    {
+      "rank": 11,
+      "name": "nonce_evidence_cas_ledger_audit"
+    }
+  ],
+  "lockEdges": [
+    [
+      "operation_cohort_routing",
+      "control_epoch"
+    ],
+    [
+      "control_epoch",
+      "inv_nodes_sorted"
+    ],
+    [
+      "inv_nodes_sorted",
+      "public_nodes_sorted"
+    ],
+    [
+      "public_nodes_sorted",
+      "contributions_sorted"
+    ],
+    [
+      "contributions_sorted",
+      "shared_channels_sorted"
+    ],
+    [
+      "shared_channels_sorted",
+      "role_assignment_current_admission"
+    ],
+    [
+      "role_assignment_current_admission",
+      "runs"
+    ],
+    [
+      "runs",
+      "approvals_grants"
+    ],
+    [
+      "approvals_grants",
+      "resource_claims"
+    ],
+    [
+      "resource_claims",
+      "transfer_model_terminal"
+    ],
+    [
+      "transfer_model_terminal",
+      "nonce_evidence_cas_ledger_audit"
+    ]
+  ],
+  "currentSourceInversions": [
+    {
+      "path": "tools/lan_pilot.py",
+      "outer": "_channel_row(lock=True)",
+      "inner": "provision_channel",
+      "risk": "channel before Node; B must reroute/refuse"
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "outer": "lock_run",
+      "inner": "_scope Node/contribution/channel",
+      "risk": "business before B prefix; discover then ordered new transaction"
+    },
+    {
+      "path": "services/control-plane/src/inv/node_execution.py",
+      "outer": "lock_run",
+      "inner": "Node/channel",
+      "risk": "receipt/state writer must gate or typed stop exception with same order"
+    },
+    {
+      "path": "services/control-plane/src/inv/db.py",
+      "outer": "transaction control_epoch FOR SHARE",
+      "inner": "business/fence",
+      "risk": "new B transaction entry must acquire fence/routing BEFORE epoch; generic helper refuses B until adapted"
+    }
+  ],
+  "transitiveEntryClosure": [
+    {
+      "entry": "src/saintvision/api/v1/storage.py -> services/storage.py",
+      "rule": "registration/activation/revoke/catalogue gates or REFUSE_B; current read_write mode cannot authorize B"
+    },
+    {
+      "entry": "src/saintvision/api/v1/nodes.py -> services/nodes.py",
+      "rule": "enroll/heartbeat/lost/status capability changes canonical B routing/writer gate or REFUSE_B"
+    },
+    {
+      "entry": "control/dispatch/leases/placement/tool_gateway/build_adapter/build_product_runtime/build_execution/model_runtime",
+      "rule": "all reservations/dispatch/build/model source and target Nodes use ordered role eligibility; no observation_only exemption"
+    },
+    {
+      "entry": "storage_check_collect -> storage_commit.locked_issue -> storage_sampling -> NodeClient",
+      "rule": "gate before state, typed collect authorization, after-reply recheck, ordered commit"
+    },
+    {
+      "entry": "terminal -> NodeChannels.snapshot(observation_only=True) -> NodeClient",
+      "rule": "business connect/frame/resume require role grant; stop/release typed safety only"
+    },
+    {
+      "entry": "node_transfer -> snapshots -> NodeClient/read_chunk -> authorize callbacks",
+      "rule": "gate before snapshot business mutation; callback uses already ordered transaction; current proof after network"
+    },
+    {
+      "entry": "model_runtime/model_source/model_remote -> capture_channels/frozen_sources",
+      "rule": "all source plus execution Nodes sorted; codec cannot grant authority; approval-creation path also gated"
+    },
+    {
+      "entry": "tools/lan_pilot provision/revoke/normal/batch -> all deploy/lan wrappers in 46 inventory",
+      "rule": "new role :4 exact planner/intent/fence; old :3 and Windows storage remap helpers REFUSE_B"
+    },
+    {
+      "entry": "epoch restore/recovery/db operator direct SQL/migrations",
+      "rule": "all affected B fences first or REFUSE_B; guarded privileges, no GUC-only bypass"
+    }
+  ],
+  "retry": {
+    "lockTimeoutMs": 2000,
+    "statementTimeoutMs": 5000,
+    "sqlstates": [
+      "40P01",
+      "40001",
+      "55P03"
+    ],
+    "action": "rollback transaction, retain committed global intent/fence, NEW ordered transaction reads exact tuple AND CAS ledger; bounded replay only"
+  },
+  "evidenceLevel": "SOURCE_STATIC_ONLY_NO_REAL_PG_CONCURRENCY"
+}

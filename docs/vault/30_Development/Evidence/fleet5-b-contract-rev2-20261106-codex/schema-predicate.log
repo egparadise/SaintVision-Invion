@@ -1,0 +1,1 @@
+{"schemaVersion": "fleet5-b-revision-fixture-result:2", "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]", "level": "SCHEMA_SYNTHETIC_PREDICATE_AND_STATIC_SOURCE_ONLY", "realGo": 0, "realPG": 0, "realDocker": 0, "realPhysical": 0, "passed": 181, "failed": 0}

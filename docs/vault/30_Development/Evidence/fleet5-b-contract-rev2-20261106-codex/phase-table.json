@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "fleet5-b-phase-proposal:2",
+  "phases": [
+    {
+      "phase": "S0",
+      "peerFloor": "P",
+      "storageFloor": "C",
+      "sharedCPChannel": "C",
+      "nodeDER": "A",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": false,
+      "eligibility": "previously released only; fresh none",
+      "replay": "none"
+    },
+    {
+      "phase": "S1",
+      "peerFloor": "P",
+      "storageFloor": "C",
+      "sharedCPChannel": "C",
+      "nodeDER": "A",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": false,
+      "eligibility": "no new authority",
+      "replay": "failed pure preflight no mutation"
+    },
+    {
+      "phase": "S2",
+      "peerFloor": "P",
+      "storageFloor": "C",
+      "sharedCPChannel": "C",
+      "nodeDER": "A",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "same frozen intent only"
+    },
+    {
+      "phase": "S3",
+      "peerFloor": "P or incomplete config",
+      "storageFloor": "C",
+      "sharedCPChannel": "C",
+      "nodeDER": "A or staged B",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "half-copy/before-copy/unknown/restarted BLOCK"
+    },
+    {
+      "phase": "S4a",
+      "peerFloor": "P+1",
+      "storageFloor": "C",
+      "sharedCPChannel": "C",
+      "nodeDER": "B",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "same exact B intent/config -> storage C+1 only"
+    },
+    {
+      "phase": "S4b",
+      "peerFloor": "P+1",
+      "storageFloor": "C+1",
+      "sharedCPChannel": "C",
+      "nodeDER": "B",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "same exact tuple only"
+    },
+    {
+      "phase": "S5-staging",
+      "peerFloor": "per member P/P+1",
+      "storageFloor": "per member C/C+1",
+      "sharedCPChannel": "k C+1,5-k C",
+      "nodeDER": "per member A/B",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "per-member same-tx ledger+tuple replay; no inferred CAS"
+    },
+    {
+      "phase": "S5-staged",
+      "peerFloor": "all P+1",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "A",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "no per-member readmission"
+    },
+    {
+      "phase": "S6-switching",
+      "peerFloor": "all P+1",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "A or partially B",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "actual all-adapter B-client witnesses required"
+    },
+    {
+      "phase": "S6-switched",
+      "peerFloor": "all P+1",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "B verified",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "same frozen operation"
+    },
+    {
+      "phase": "S7-final",
+      "peerFloor": "per member P+1/P+2",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "B verified",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "all five final signed observations required"
+    },
+    {
+      "phase": "S8-activation",
+      "peerFloor": "all P+2",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "B verified",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY until transaction commit",
+      "replay": "stable all-current rows/evidence -> immutable release+fence release"
+    },
+    {
+      "phase": "S9-released",
+      "peerFloor": "all P+2",
+      "storageFloor": "all C+1",
+      "sharedCPChannel": "all C+1",
+      "nodeDER": "all B",
+      "CPClient": "B verified",
+      "contributionR": "R unchanged",
+      "cohortFence": false,
+      "eligibility": "COMPUTED_CURRENT_ONLY",
+      "replay": "any mismatch/expiry/fence -> DENY, never older history"
+    },
+    {
+      "phase": "abort-lost-unknown",
+      "peerFloor": "last committed",
+      "storageFloor": "last committed",
+      "sharedCPChannel": "read tuple AND CAS ledger",
+      "nodeDER": "last actual",
+      "CPClient": "last actual",
+      "contributionR": "R unchanged",
+      "cohortFence": true,
+      "eligibility": "DENY_ALL_FIVE",
+      "replay": "new ordered transaction; unexpected/changed -> BLOCK; no old restore"
+    }
+  ],
+  "pinOrder": [
+    "pure dual validation before journal create/pin",
+    "P fsync",
+    "storage fsync",
+    "business-gated listener"
+  ],
+  "atomicityClaims": [
+    "member CAS+matching ledger same CP transaction",
+    "all-five activation CP transaction only"
+  ],
+  "notAtomic": [
+    "two journal files",
+    "five member CAS operations",
+    "Docker/filesystem/DB/network"
+  ],
+  "rollback": "before intent no-op; after intent preserve container+journal+intent/fence and exact forward-only recovery; no old-credential/container restore",
+  "exposurePrecondition": "durable all-five fence + prior grant expiry including skew + fresh all-five quiescence/no active resource lease or extra state consumer; unreachable/nonquiescent BLOCK"
+}

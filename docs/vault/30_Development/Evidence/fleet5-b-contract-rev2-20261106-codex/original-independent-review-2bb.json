@@ -1,0 +1,145 @@
+{
+ "schemaVersion": "fleet5-b-proposal-review:1",
+ "reviewer": "Claude (Orca worker term_345603aa-31e9-4ed3-8189-be471591a49d)",
+ "orcaTask": "task_3516267fa05f",
+ "dispatch": "ctx_42a6dd5132c6",
+ "ownerTask": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105 task_a8fd2969f0b3/ctx_6f0f8253b8a7 (Codex)",
+ "reviewBranch": "egparadise/fleet5-b-contract-review-20261106",
+ "reviewBaseSHA": "60bfc722ff46171af326e2a26cf8764a6dd108ef",
+ "boardsRead": {
+  "INDEX-PROGRESS-001": "1.0.413"
+ },
+ "target": {
+  "sha": "100f6f132132199d1204a76190f04712dd82de00",
+  "parent": "3af3334ec7577f96b1d377164675e544504407ad",
+  "runtimeSourceSHA": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "diffVsParent": "13 files, docs/vault only (+2230)",
+  "historyBlobSHA1": "67a24c18c6d28999111f0b45f0eeb738b4ac6788",
+  "historySHA256": "6e3759827e72efbdf0ed9950d83a9229a3d04b389507c72e9606d5dbea3e79f4",
+  "surfaceJsonSHA256": "46861372c656b8361339c88ab4e9c28af15ac910867abcfc7537bb4919bc6158"
+ },
+ "sourceDocsCI": {
+  "runId": 42074468349,
+  "workflow": "Documentation Build",
+  "event": "workflow_dispatch",
+  "headSha": "100f6f132132199d1204a76190f04712dd82de00",
+  "jobs": [
+   {
+    "id": 127410856859,
+    "name": "docs",
+    "conclusion": "success"
+   }
+  ],
+  "conclusion": "success",
+  "createdAtUTC": "2026-11-05T17:25:26Z",
+  "updatedAtUTC": "2026-11-05T17:25:59Z",
+  "verifiedBy": "gh run view 42074468349 by this reviewer; Root msg_e8d9e76e8ede reported the same"
+ },
+ "clockObservations": {
+  "note": "Git Bash TZ=Asia/Seoul not honoured on this host; values are UTC shell date, KST = UTC+9",
+  "probeStartUTC": "2026-11-05T17:31:59Z",
+  "probeEndUTC": "2026-11-05T17:32:00Z",
+  "pytestUTC": [
+   "2026-11-05T17:36:01Z",
+   "2026-11-05T17:36:04Z"
+  ],
+  "hashSnapshotUTC": "2026-11-05T17:38:18Z"
+ },
+ "environment": {
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe 3.14.7",
+  "PYTHONUTF8": "1",
+  "sourceTree": "git archive 100f6f13 extracted into session scratchpad; original worktrees untouched",
+  "docker": "not used",
+  "pki": "not used",
+  "liveNodes": "not used",
+  "postgres": "not used"
+ },
+ "checks": [
+  {
+   "id": "surface-bytes",
+   "command": "python -I verify_surface.py <scratch> <worktree>",
+   "exit": 0,
+   "result": {
+    "surfaces": 46,
+    "bytesMatch4f": 46,
+    "identicalIn100f": 46,
+    "identicalIn60bfc722": 30,
+    "differFrom60bfc722": 16,
+    "anchors": 341,
+    "anchorsExact": 329,
+    "anchorsMatchOnlyAfterStrip": 12,
+    "anchorsWrong": 0
+   }
+  },
+  {
+   "id": "probe-default",
+   "command": "python -B tests/proofs/fleet5_compute_storage_contract_probe.py",
+   "cwd": "scratch extract of 100f6f13",
+   "expectedExit": 0,
+   "exit": 0,
+   "stdoutSHA256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7",
+   "equalsOwnerFixtureAsJSON": true,
+   "byteEqualOwnerFixture": false,
+   "byteDifference": "stdout CRLF (17 CR) on Windows vs owner LF file; content equal after newline normalisation"
+  },
+  {
+   "id": "probe-require-coexistence",
+   "command": "python -B tests/proofs/fleet5_compute_storage_contract_probe.py --require-coexistence",
+   "expectedExit": 1,
+   "exit": 1,
+   "stdoutSHA256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b",
+   "byteEqualOwnerLog": true,
+   "meaning": "unchanged R4 guard rejects storage+workspace coexistence; gap evidence, not Linux mount or active storage proof"
+  },
+  {
+   "id": "probe-unit",
+   "command": "python -B -m pytest -q -p no:cacheprovider tests/core/test_fleet5_compute_storage_contract_proof.py",
+   "exit": 0,
+   "result": "1 passed"
+  }
+ ],
+ "verdict": "REVISION REQUIRED",
+ "directionAssessment": "Shared C / ChannelProof reuse, no second storage counter, separate role floor :3 and leaf :4, unchanged plain :2/:3 and R4 default refusal are sound against 4f source",
+ "blockers": [
+  {
+   "id": "B1",
+   "severity": "High (decision)",
+   "title": "CP-colocated Docker Desktop contribution source namespace undefined while B-FRESH1 requires homogeneous five combined members"
+  },
+  {
+   "id": "B2",
+   "severity": "Medium",
+   "title": "CP role-admission record has no persistence, writer authority, (C,R,policy,executable) key, invalidation or closed caller list"
+  },
+  {
+   "id": "B3",
+   "severity": "Medium",
+   "title": "Peer pin (NewAuthority) precedes storage CheckCertificate/PinStoragePolicy; partial pin states missing from phase table"
+  },
+  {
+   "id": "B4",
+   "severity": "Medium",
+   "title": "Five-Node renewal is the batch path with per-Node CAS during staging; storage readmission per batch phase undefined"
+  },
+  {
+   "id": "B5",
+   "severity": "Medium",
+   "title": "Renewal CAS lock order (node_channels then inv.nodes) inverts storage issue order (inv.nodes then node_channels); adding storage_contributions recheck needs a global lock order"
+  }
+ ],
+ "low": [
+  "L1 workload inspection lacks HostConfig.Mounts/VolumesFrom/top-level Mounts assertion",
+  "L2 retained .storage-<cid> floors: observer rule for extra files",
+  "L3 same Ed25519 key across DER A/B: old-challenge rejection relies on channel binding+nonce; needs explicit test",
+  "L4 policy B authorship/approval and revoke-driven C jumps unspecified"
+ ],
+ "notClaimed": [
+  "no B implementation, contract registration or ADR",
+  "no Go, crypto, OS lock, Engine, Linux Docker or hardware execution for B (all 0)",
+  "no live Node/CP/PKI/Docker/SSH/schedule access",
+  "no deadlock reproduction (B5 is source-order analysis)",
+  "all real identities/leases/images/source paths/deploy hashes NULL/HOLD"
+ ],
+ "surfaceVerifierScriptSHA256": "d1be1c68eed4ba345a798a49826876f9d7652c9a2b963684720dedd665295c9e",
+ "surfaceVerifierScript": "import json, subprocess, hashlib, sys\nS=sys.argv[1]; REPO=sys.argv[2]\nd=json.load(open(S+'/contract-proposal-and-source-surface.json',encoding='utf-8'))\ndef blob(rev,p):\n    r=subprocess.run(['git','-C',REPO,'show',f'{rev}:{p}'],capture_output=True)\n    return r.returncode, r.stdout\ndef bsha(rev,p):\n    r=subprocess.run(['git','-C',REPO,'rev-parse',f'{rev}:{p}'],capture_output=True,text=True)\n    return r.stdout.strip()\ntot=0;bad=[];anc=0;ancexact=0;ancstrip=0\nfor s in d['sourceSurface']:\n    p=s['path']\n    rc,b=blob('4f97ba71b1482ae70d72dda1833a28fddcd05994',p)\n    rc2,b2=blob('100f6f132132199d1204a76190f04712dd82de00',p)\n    rc3,b3=blob('60bfc722ff46171af326e2a26cf8764a6dd108ef',p)\n    sh=hashlib.sha256(b).hexdigest()\n    ok = rc==0 and sh==s['sha256'] and bsha('4f97ba71',p)==s['gitBlobSHA1'] and b==b2\n    same60 = (b==b3)\n    if not ok: bad.append((p,rc,sh==s['sha256'],b==b2))\n    lines=b.decode('utf-8').split('\\n')\n    for a in s['anchors']:\n        anc+=1\n        L=lines[a['line']-1] if a['line']<=len(lines) else None\n        if L==a['text']: ancexact+=1\n        elif L is not None and L.strip()==a['text']: ancstrip+=1\n        else: bad.append((p,a['line'],a['text'],L))\n    tot+=1\n    print(f\"{p} 4f={'OK' if ok else 'BAD'} same60bf={same60} anchors={len(s['anchors'])}\")\nprint('surfaces',tot,'anchors',anc,'exact',ancexact,'stripMatch',ancstrip,'bad',len(bad))\nfor x in bad: print('BAD',x)\n"
+}

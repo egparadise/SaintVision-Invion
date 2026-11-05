@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "fleet5-b-persistence-proposal:2",
+  "implemented": false,
+  "sharedChannelTable": "inv.node_channels",
+  "secondChannelTableOrCounter": false,
+  "tables": [
+    {
+      "table": "inv.node_role_cohorts",
+      "key": "cohort_id",
+      "authorityFields": [
+        "immutable five-member domain and role assignment",
+        "durable operation fence/state",
+        "routing guards exist for plain and B Nodes"
+      ],
+      "writer": "operator guarded transition only; runtime read/lock"
+    },
+    {
+      "table": "inv.node_role_operations",
+      "key": "operation_id",
+      "authorityFields": [
+        "immutable signed intent and approval/grant refs",
+        "current/target tuples",
+        "raw A/B policy hashes and archive refs",
+        "preflight and CP client-switch evidence refs"
+      ],
+      "writer": "operator insert frozen; guarded monotonic progress only"
+    },
+    {
+      "table": "inv.node_role_members",
+      "key": "cohort_id,node_id",
+      "authorityFields": [
+        "immutable membership/order/failure-domain/context assignment",
+        "expected P/C/R/DER/root/config and exact target"
+      ],
+      "writer": "operator insert before intent; no membership change"
+    },
+    {
+      "table": "inv.node_role_admissions",
+      "key": "admission_id",
+      "authorityFields": [
+        "closed admission schema plus immutable signed proof bytes",
+        "unique operation,node,generation,nonce",
+        "FK operation/member/grant/assignment/release"
+      ],
+      "writer": "operator attestor append only; inv_kernel SELECT/FOR SHARE only"
+    },
+    {
+      "table": "inv.node_role_current",
+      "key": "tenant_id,node_id",
+      "authorityFields": [
+        "current assignment and exact latest verified incarnation/admission FK",
+        "no independent success boolean",
+        "current generation change invalidates that Node; active operation retains global fence"
+      ],
+      "writer": "guarded operator attestor CAS only; no old history adoption"
+    },
+    {
+      "table": "inv.node_role_member_cas",
+      "key": "operation_id,node_id",
+      "authorityFields": [
+        "immutable old/target C and DER/policy hashes",
+        "same transaction as shared channel CAS",
+        "single matching ledger required for replay"
+      ],
+      "writer": "guarded operator CAS function only"
+    },
+    {
+      "table": "inv.node_role_releases",
+      "key": "release_id",
+      "authorityFields": [
+        "all five final admission/evidence hashes",
+        "actual CP B-client witness hashes for all adapters",
+        "activation stable current-row digest, short expiry"
+      ],
+      "writer": "guarded activation transaction append only"
+    },
+    {
+      "table": "inv.node_role_grants",
+      "key": "grant_id",
+      "authorityFields": [
+        "approved operator principal, operation, members/targets, purpose, expiry/revocation",
+        "no session GUC/HTTP self approval"
+      ],
+      "writer": "separate authorized approval writer only"
+    }
+  ],
+  "writerFunctions": [
+    "plan_fresh_role_operation",
+    "record_independently_verified_role_admission",
+    "cas_role_member_shared_channel",
+    "record_actual_cp_client_switch",
+    "activate_all_five_role_cohort",
+    "revoke_or_fence_role_cohort"
+  ],
+  "runtimePrivilege": "Read/lock only, no authority DML; narrowly constant lock_sentinel only if needed",
+  "directWriters": "B-aware guarded writer/function/trigger permissions or REFUSE_B; inv_operator generic SQL not automatic approval",
+  "eligibility": "All-five stable snapshot at activation and all-five denial during an active global operation; after release, current-row/generation/expiry checks for selected business Nodes only. Unrelated offline worker does not invalidate healthy selected workers. Immutable five-member release remains required.",
+  "generationProtocol": "operator signed release plus typed role-use envelope tied to actual boot/PID-start/process nonce, request hash/purpose/current channel, <=120s; existing kernel permit and storage v1 body/domain unchanged",
+  "clock": {
+    "trustedSkewBudgetSeconds": 30,
+    "operationBudgetSeconds": 600,
+    "nextNotBeforeAtMost": "now-30",
+    "nextNotAfterAtLeast": "now+630"
+  },
+  "historyRule": "Only exact active contribution floor; extra floors must match explicitly approved immutable historical archive, otherwise BLOCK; preserve bytes, never delete/adopt",
+  "policyPlanner": "Authorized operator only; immutable exact A/B bytes+fixed current/target ChannelProof/DER+same R/root in signed intent; runtime cannot generate or reauthorize",
+  "revocation": "C++ disabled/current generation/context/root/epoch/grant drift -> current joins deny, fence retained, old B/intent invalid; no automatic new grant",
+  "admissionReleaseOrdering": "Admission plannedReleaseId reserves the future release identity; no FK to an already existing release. Activation atomically inserts release with all-five final admission evidence and exact planned ID; effective current joins require that committed record.",
+  "quiescence": "Commit durable global fence, stop new role-use issuance, wait prior <=120s grants plus skew expiry, prove all-five no in-flight execution/transfer/terminal/sampling/active leases or second state consumers before any live exposure. Unknown blocks."
+}

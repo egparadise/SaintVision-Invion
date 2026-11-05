@@ -1,0 +1,62 @@
+{
+  "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "original46Unchanged": true,
+  "additionalSurfaces": [
+    {
+      "path": "contracts/v1alpha1/core.schema.json",
+      "sha256": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "packages/contracts-ts/src/index.ts",
+      "sha256": "54cc4b33b51578019bc5ace632801c2ed379ef624146efa1729c15fd3f45fb56",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "packages/contracts-go/contracts.go",
+      "sha256": "f18069a8dc8ae6190879be48c32435e6e572802971ac4a44034dfaa71c71a75b",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/control-plane/src/inv/generated/models.py",
+      "sha256": "0f6379a83e508c29dcce9b6d5a2f7499522841722ef9ad19a73679e0b7e6dddc",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/control-plane/src/inv/generated/core.schema.json",
+      "sha256": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "tools/generate_contracts.py",
+      "sha256": "dd1227cbe6587b4a1d748658afea0dbc4532ac1223f1d7ac13fcab0214343160",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "tools/build_leaf_rotation_runtime.py",
+      "sha256": "e1e7008769dd86ebcd768b9acb9881f212fba298ce55c0af4980f4ed56deb74d",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/node-agent/transport/server.go",
+      "sha256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/node-agent/transport/trust.go",
+      "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/node-agent/runtime/journal.go",
+      "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "neededFor": "New role floor/config/request envelope/current-admission/canonical signatures or generated runtime bindings; owner Codex hard ABI, coordinated generated files; implementation pending"
+    }
+  ],
+  "regeneration": "canonical core schema -> generated TS/Go/Python/wire copies; exact bundle/runtime module inventories and wrappers must be regenerated and revalidated together"
+}
