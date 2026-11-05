@@ -1,0 +1,62 @@
+{
+  "task": "task_05d9dcda1dca",
+  "branch": "agent/codex/fleet5-first-wave-plan-20261105",
+  "baseSHA": "6ba9ee4686ab2ec1b2e566b13edef016fa4f8d4e",
+  "planAndWordingCommit": "22fa3628248280801281779b6a934fa6ff83e8f0",
+  "commitExit": 0,
+  "pushExit": 0,
+  "exactDocsCI": {
+    "databaseId": 41980284535,
+    "headSha": "22fa3628248280801281779b6a934fa6ff83e8f0",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/41980284535",
+    "createdAt": "2026-11-05T06:25:12Z",
+    "updatedAt": "2026-11-05T06:25:47Z"
+  },
+  "docsJobs": [
+    {
+      "id": 127088563899,
+      "name": "docs",
+      "conclusion": "success"
+    }
+  ],
+  "observedKST": "2026-11-05T15:26:46.130998+09:00",
+  "artifactSHA256": {
+    "final-document-checks.json": "8671d04c0ad38ff412cfdc36008dd032c9ceb625dfb3c6af49c656b57dd450bc",
+    "first-wave-plan.json": "846a5b5c14049048a63cdfa062330d9ac7b27f6b4ad5410cf1c667617e19182c",
+    "local-checks.json": "1dd25cb750d4411e8177c1270301ccb9652d91e58fd5c88dc1db1834bd7e87de",
+    "packet-digests.json": "26d2d9e3a849980eb37db96f9815ebd7d388de51c1a8da6398e9823964b0f456",
+    "preservation-check.json": "2e9f7c684b81b57c8327fb65b8719c61aa1f05b7b7eafaa0591a5162b95ab7a4",
+    "wording-verification.json": "c00da0aac7bce81db4ece95f00e98424e55c6856c93d6a76593ee984ba69accf"
+  },
+  "existingWorkerConfigTests": "32 passed, exit0; no new tests; existing expected message updated",
+  "numericAPIGate": "unchanged >=1.45",
+  "independentReview": "pending; exact-source coordinator relay requested",
+  "earlyReviewMessage": "msg_905adca708cc",
+  "refinedReviewMessage": "msg_911d9107aef1",
+  "rootEarlyPlanMessage": "msg_08d4741e1c6b",
+  "latestExactReviewRelay": {
+    "exit": 1,
+    "code": "task_not_found",
+    "reason": "only coordinator or starter can give non-helper sibling Dispatch more work",
+    "effectsApplied": false,
+    "requestId": "d8517fb4-f49b-4e04-aef9-0c4707bc7ea7",
+    "coordinatorEscalation": "msg_e6e7ea4ee9b5"
+  },
+  "runtimeActionExecuted": false,
+  "automationChanged": false,
+  "newAdminAuthenticationAttempted": false,
+  "commonBoardsOrRegistryChanged": false,
+  "obsidianApply": false,
+  "fiveNodePass": false,
+  "phaseOneActualInstallPerformed": false,
+  "nextOwner": "Codex coordinator plus Claude exact packet review, then actual resource/port/network/generated-identity/build gates before any isolated worker1/2 action",
+  "receiptOwnCIPolicy": "final receipt commit has a separate exact hosted Docs run reported in worker_done; no self-SHA recursion",
+  "finalSyncCheck": {
+    "exit": 0,
+    "summary": "CHECK: 2294 managed files, 12 pending exports, 0 conflicts. No writes.",
+    "apply": false,
+    "observedKST": "2026-11-05T15:26:53.978416+09:00"
+  }
+}
