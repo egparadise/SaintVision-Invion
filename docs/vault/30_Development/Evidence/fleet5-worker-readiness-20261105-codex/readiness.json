@@ -1,0 +1,462 @@
+{
+  "schemaVersion": "fleet5-worker-readiness:1",
+  "taskId": "FLEET5-20261105-WORKER-READINESS",
+  "orcaTaskId": "task_4cfe9dbaa805",
+  "dispatchId": "ctx_a8d8ef2a7042",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "reviewState": "pending",
+  "operationalAcceptance": "not-performed",
+  "productSource": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "reportSource": "f020a664619ac8961fedd9fbb2b4ae5512fe8173",
+  "worktreeBase": "9b9061ed1b7bbc5b91ea2a035ea2a54fac6f010f",
+  "branch": "agent/codex/fleet5-worker-readiness-20261105",
+  "workers": [
+    {
+      "slot": "worker1",
+      "sshExit": 0,
+      "startKST": "2026-11-05T14:44:30.433641+09:00",
+      "endKST": "2026-11-05T14:44:30.935302+09:00",
+      "sessionSeconds": 0.5,
+      "hostnameMatchesProtectedInventory": true,
+      "os": "Ubuntu 26.04.1 LTS",
+      "architecture": "x86_64",
+      "kernel": "7.0.0-31-generic",
+      "python": "3.14.4",
+      "logicalCPUCount": 12,
+      "memoryTotalBytes": 15938523136,
+      "memoryAvailableBytes": 12175622144,
+      "rootStorageTotalBytes": 249792131072,
+      "rootStorageAvailableBytes": 209898684416,
+      "docker": {
+        "clientVersion": "29.1.3",
+        "serverVersion": "29.1.3",
+        "serverAPI": "1.52",
+        "serverMinAPI": "1.44",
+        "serverOS": "linux"
+      },
+      "dockerVersionExit": 0,
+      "clockDeltaFromLocalStartSeconds": 1.121061,
+      "clockDeltaFromLocalEndSeconds": 0.6210610000000001,
+      "ntpSynchronized": true,
+      "subcommandExits": {
+        "os": 0,
+        "cpu": 0,
+        "memory": 0,
+        "disk": 0,
+        "dockerVersion": 0,
+        "ntp": 0,
+        "openssl": 0,
+        "bash": 0
+      },
+      "existingProjectFolderChecks": [
+        {
+          "exists": true,
+          "symlink": false,
+          "mode": "0o700",
+          "read": true,
+          "write": true,
+          "execute": true
+        },
+        {
+          "exists": true,
+          "symlink": false,
+          "mode": "0o700",
+          "read": true,
+          "write": true,
+          "execute": true
+        }
+      ],
+      "recordedAllowedResources": {
+        "cpuMillis": 9000,
+        "memoryBytes": 11953892352,
+        "gpuDevices": 1,
+        "storageBytes": 187344098304
+      },
+      "recordedAllowedFolderCount": 0,
+      "currentGPUCapability": "unmeasured",
+      "workspaceReady": false
+    },
+    {
+      "slot": "worker2",
+      "sshExit": 0,
+      "startKST": "2026-11-05T14:44:30.434641+09:00",
+      "endKST": "2026-11-05T14:44:30.785720+09:00",
+      "sessionSeconds": 0.35999999998603016,
+      "hostnameMatchesProtectedInventory": true,
+      "os": "Ubuntu 24.04.1 LTS",
+      "architecture": "x86_64",
+      "kernel": "6.8.0-48-generic",
+      "python": "3.12.3",
+      "logicalCPUCount": 12,
+      "memoryTotalBytes": 16480641024,
+      "memoryAvailableBytes": 13928435712,
+      "rootStorageTotalBytes": 249792131072,
+      "rootStorageAvailableBytes": 210625785856,
+      "docker": {
+        "clientVersion": "29.8.1",
+        "serverVersion": "29.8.1",
+        "serverAPI": "1.56",
+        "serverMinAPI": "1.40",
+        "serverOS": "linux"
+      },
+      "dockerVersionExit": 0,
+      "clockDeltaFromLocalStartSeconds": 1.076465,
+      "clockDeltaFromLocalEndSeconds": 0.7164650000139698,
+      "ntpSynchronized": true,
+      "subcommandExits": {
+        "os": 0,
+        "cpu": 0,
+        "memory": 0,
+        "disk": 0,
+        "dockerVersion": 0,
+        "ntp": 0,
+        "openssl": 0,
+        "bash": 0
+      },
+      "existingProjectFolderChecks": [
+        {
+          "exists": true,
+          "symlink": false,
+          "mode": "0o700",
+          "read": true,
+          "write": true,
+          "execute": true
+        },
+        {
+          "exists": true,
+          "symlink": false,
+          "mode": "0o700",
+          "read": true,
+          "write": true,
+          "execute": true
+        },
+        {
+          "exists": true,
+          "symlink": false,
+          "mode": "0o700",
+          "read": true,
+          "write": true,
+          "execute": true
+        }
+      ],
+      "recordedAllowedResources": {
+        "cpuMillis": 9000,
+        "memoryBytes": 12360480768,
+        "gpuDevices": 1,
+        "storageBytes": 187344098304
+      },
+      "recordedAllowedFolderCount": 1,
+      "currentGPUCapability": "unmeasured",
+      "workspaceReady": false
+    },
+    {
+      "slot": "worker3",
+      "sshExit": 0,
+      "startKST": "2026-11-05T14:44:30.493025+09:00",
+      "endKST": "2026-11-05T14:44:30.877245+09:00",
+      "sessionSeconds": 0.375,
+      "hostnameMatchesProtectedInventory": true,
+      "os": "Ubuntu 26.04.1 LTS",
+      "architecture": "x86_64",
+      "kernel": "7.0.0-31-generic",
+      "python": "3.14.4",
+      "logicalCPUCount": 12,
+      "memoryTotalBytes": 15938240512,
+      "memoryAvailableBytes": 13776588800,
+      "rootStorageTotalBytes": 249792131072,
+      "rootStorageAvailableBytes": 216340242432,
+      "docker": null,
+      "dockerVersionExit": 1,
+      "clockDeltaFromLocalStartSeconds": 1.106302,
+      "clockDeltaFromLocalEndSeconds": 0.7313019999999999,
+      "ntpSynchronized": true,
+      "subcommandExits": {
+        "os": 0,
+        "cpu": 0,
+        "memory": 0,
+        "disk": 0,
+        "dockerVersion": 1,
+        "ntp": 0,
+        "openssl": 0,
+        "bash": 0
+      },
+      "existingProjectFolderChecks": [],
+      "recordedAllowedResources": {
+        "cpuMillis": 9000,
+        "memoryBytes": 11953680384,
+        "gpuDevices": 1,
+        "storageBytes": 187344098304
+      },
+      "recordedAllowedFolderCount": 0,
+      "currentGPUCapability": "unmeasured",
+      "workspaceReady": false
+    }
+  ],
+  "worker3Diagnostic": {
+    "startKST": "2026-11-05T14:47:51.735229+09:00",
+    "endKST": "2026-11-05T14:47:52.168434+09:00",
+    "sshExit": 0,
+    "category": "system-docker-socket-access-denied",
+    "dockerCLI": "29.8.1",
+    "systemDaemonActive": true,
+    "systemDaemonExit": 0,
+    "userDaemonState": "inactive",
+    "userDaemonExit": 4,
+    "context": "default",
+    "contextExit": 0,
+    "contextScheme": "unix",
+    "contextInspectExit": 0,
+    "dockerHostOverride": false,
+    "systemSocketMode": "0660",
+    "systemSocketGroup": "docker",
+    "currentUserDockerGroupMember": false,
+    "currentUserCanReadOrWriteSocket": false,
+    "rootlessSocketExists": false,
+    "serverAPI": "unmeasured",
+    "noninteractiveOperatorProbe": {
+      "startKST": "2026-11-05T14:50:34.568888+09:00",
+      "endKST": "2026-11-05T14:50:34.968904+09:00",
+      "exit": 1,
+      "category": "interactive-authentication-required; noninteractive route unavailable",
+      "serverAPI": "unmeasured",
+      "passwordAttempted": false,
+      "retryAttempted": false
+    }
+  },
+  "r5": {
+    "samples": [
+      {
+        "index": 0,
+        "startKST": "2026-11-05T14:44:30.435640+09:00",
+        "endKST": "2026-11-05T14:44:31.032024+09:00",
+        "overviewHTTP": 200,
+        "webHTTP": 200,
+        "source": "live-postgresql-mtls",
+        "exactPinnedNodeSetMatches": true,
+        "nodeCount": 2,
+        "runs": 0,
+        "offers": 0,
+        "killSwitch": true,
+        "userWorkloadSubmission": false,
+        "nodes": [
+          {
+            "status": "online",
+            "fresh": true,
+            "lastHeartbeatAt": "2026-11-05T05:44:30.427091+00:00",
+            "lastSnapshotAt": "2026-11-05T05:44:30.427091+00:00",
+            "observationAgeSeconds": 1.2,
+            "certificateNotAfter": null,
+            "profileVersion": "lan-observe-v1"
+          },
+          {
+            "status": "online",
+            "fresh": true,
+            "lastHeartbeatAt": "2026-11-05T05:44:30.463507+00:00",
+            "lastSnapshotAt": "2026-11-05T05:44:30.463507+00:00",
+            "observationAgeSeconds": 1.1,
+            "certificateNotAfter": null,
+            "profileVersion": "lan-observe-v1"
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "startKST": "2026-11-05T14:44:43.046451+09:00",
+        "endKST": "2026-11-05T14:44:43.467324+09:00",
+        "overviewHTTP": 200,
+        "webHTTP": 200,
+        "source": "live-postgresql-mtls",
+        "exactPinnedNodeSetMatches": true,
+        "nodeCount": 2,
+        "runs": 0,
+        "offers": 0,
+        "killSwitch": true,
+        "userWorkloadSubmission": false,
+        "nodes": [
+          {
+            "status": "online",
+            "fresh": true,
+            "lastHeartbeatAt": "2026-11-05T05:44:38.181779+00:00",
+            "lastSnapshotAt": "2026-11-05T05:44:38.181779+00:00",
+            "observationAgeSeconds": 6.0,
+            "certificateNotAfter": null,
+            "profileVersion": "lan-observe-v1"
+          },
+          {
+            "status": "online",
+            "fresh": true,
+            "lastHeartbeatAt": "2026-11-05T05:44:38.183063+00:00",
+            "lastSnapshotAt": "2026-11-05T05:44:38.183063+00:00",
+            "observationAgeSeconds": 6.0,
+            "certificateNotAfter": null,
+            "profileVersion": "lan-observe-v1"
+          }
+        ]
+      }
+    ],
+    "actualSampleStartIntervalSeconds": 12.610811,
+    "collectorWaitThroughSecondResponseSeconds": 12.437999999965541,
+    "advancing": [
+      {
+        "lastHeartbeatAt": true,
+        "lastSnapshotAt": true
+      },
+      {
+        "lastHeartbeatAt": true,
+        "lastSnapshotAt": true
+      }
+    ],
+    "uniquePublicLeafCount": 3,
+    "allLeavesDateValid": true,
+    "publicLeafIssuerSignatureChecks": [
+      {
+        "role": "control-plane",
+        "issuerSignatureVerified": true,
+        "notAfterUTC": "2026-11-10T05:15:35Z"
+      },
+      {
+        "role": "node",
+        "issuerSignatureVerified": true,
+        "notAfterUTC": "2026-11-10T05:19:30Z"
+      },
+      {
+        "role": "node",
+        "issuerSignatureVerified": true,
+        "notAfterUTC": "2026-11-10T05:19:42Z"
+      }
+    ],
+    "earliestExpiryKST": "2026-11-10T14:15:35+09:00",
+    "renewalWindowStartKST": "2026-11-08T14:15:35+09:00",
+    "overviewTrustMetadata": "absent-in-pinned-source03; validated-from-public-files"
+  },
+  "protectedHashComparison": {
+    "filesChecked": 2241,
+    "changedCount": 0
+  },
+  "inventoryLint": {
+    "id": "inventory-lint",
+    "status": "BLOCKED",
+    "code": "inventory-values-missing",
+    "facts": {
+      "nodeCount": 5,
+      "missingFieldCount": 74,
+      "invalidFieldCount": 0
+    }
+  },
+  "worker4": {
+    "os": "Linux (user confirmed)",
+    "friendlyLabelKnown": true,
+    "endpoint": "unknown",
+    "runtime": "unmeasured",
+    "permissions": "missing",
+    "probePerformed": false
+  },
+  "cpColocated": {
+    "os": "current Windows PC (user confirmed)",
+    "assessmentOwner": "Claude/coordinator",
+    "measuredByThisWorker": false
+  },
+  "actionsExecuted": {
+    "enrollment": false,
+    "installation": false,
+    "resourceOffer": false,
+    "workload": false,
+    "serviceOrContainerChange": false,
+    "sshOrAccountChange": false,
+    "automationChange": false,
+    "cycleOrTransitionOrRecovery": false,
+    "restart": false,
+    "obsidianApply": false
+  },
+  "sshSessionCounts": {
+    "worker1": 1,
+    "worker2": 1,
+    "worker3": 3,
+    "worker3AdditionalAuthorizationMessages": [
+      "msg_6f907ef95323",
+      "msg_b86151021c9d"
+    ]
+  },
+  "ownedListenerObservation": {
+    "observedAtKST": "2026-11-05T14:44:32.7831117+09:00",
+    "collectorExit": 0,
+    "ownedProcesses": [
+      {
+        "pid": 40748,
+        "parentPid": 33976,
+        "name": "python.exe",
+        "created": "/Date(1793776817050)/",
+        "commandSHA256": "0c70e22670310fe9673cbb00cb9163ef5add304bf615e8d6ad98b1ce3c718261"
+      },
+      {
+        "pid": 52720,
+        "parentPid": 40748,
+        "name": "python.exe",
+        "created": "/Date(1793776817142)/",
+        "commandSHA256": "0c70e22670310fe9673cbb00cb9163ef5add304bf615e8d6ad98b1ce3c718261"
+      },
+      {
+        "pid": 3756,
+        "parentPid": 33976,
+        "name": "python.exe",
+        "created": "/Date(1793776818116)/",
+        "commandSHA256": "c2ccc3c34f57b77d4319d5fb32968d55204e0eb5feedf650f0d10616afa3c256"
+      },
+      {
+        "pid": 54216,
+        "parentPid": 3756,
+        "name": "python.exe",
+        "created": "/Date(1793776818178)/",
+        "commandSHA256": "c2ccc3c34f57b77d4319d5fb32968d55204e0eb5feedf650f0d10616afa3c256"
+      },
+      {
+        "pid": 25608,
+        "parentPid": 33976,
+        "name": "node.exe",
+        "created": "/Date(1793776818674)/",
+        "commandSHA256": "b3d4f3cdcdd123a6fa5c66ed469c65cfb7937db466b6bb5ff76f55c9ff495a3d"
+      },
+      {
+        "pid": 49276,
+        "parentPid": 36884,
+        "name": "python.exe",
+        "created": "/Date(1793790774029)/",
+        "commandSHA256": "8e0b7a983cbb196098fb2a17fd73cbb0e8d021433ceb94714fb1d8180105ff65"
+      },
+      {
+        "pid": 11276,
+        "parentPid": 49276,
+        "name": "python.exe",
+        "created": "/Date(1793790774097)/",
+        "commandSHA256": "8e0b7a983cbb196098fb2a17fd73cbb0e8d021433ceb94714fb1d8180105ff65"
+      }
+    ],
+    "listeners": [
+      {
+        "LocalAddress": "127.0.0.1",
+        "LocalPort": 55448,
+        "OwningProcess": 15408
+      },
+      {
+        "LocalAddress": "127.0.0.1",
+        "LocalPort": 18082,
+        "OwningProcess": 54216
+      },
+      {
+        "LocalAddress": "127.0.0.1",
+        "LocalPort": 3000,
+        "OwningProcess": 25608
+      }
+    ],
+    "survivingTunnel": {
+      "pid": 15408,
+      "name": "ssh.exe",
+      "commandSHA256": "1e75f592ee8cd433d4021a177146e704aebc3462913b487de8984a6bbcd249fe"
+    },
+    "previousHelperPIDsAbsent": [
+      33976,
+      36884
+    ]
+  }
+}

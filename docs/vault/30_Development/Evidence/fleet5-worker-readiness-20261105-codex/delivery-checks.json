@@ -1,0 +1,94 @@
+{
+  "taskId": "FLEET5-20261105-WORKER-READINESS",
+  "environment": "Windows PowerShell; current worktree; existing Python3.14.7; docs-only uncommitted Evidence/History",
+  "checks": [
+    {
+      "name": "docs",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-05T14:54:22.376620+09:00",
+      "endKST": "2026-11-05T14:54:45.556193+09:00",
+      "exit": 0
+    },
+    {
+      "name": "ontology",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_ontology.py"
+      ],
+      "startKST": "2026-11-05T14:54:45.556193+09:00",
+      "endKST": "2026-11-05T14:54:51.523538+09:00",
+      "exit": 0
+    },
+    {
+      "name": "obsidian-check",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "startKST": "2026-11-05T14:54:51.523538+09:00",
+      "endKST": "2026-11-05T14:54:59.073517+09:00",
+      "exit": 0
+    },
+    {
+      "name": "contract-bindings",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_contract_bindings.py"
+      ],
+      "startKST": "2026-11-05T14:54:59.074518+09:00",
+      "endKST": "2026-11-05T14:55:17.364632+09:00",
+      "exit": 0
+    },
+    {
+      "name": "frontend-integrity",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startKST": "2026-11-05T14:55:17.365630+09:00",
+      "endKST": "2026-11-05T14:55:18.989709+09:00",
+      "exit": 0
+    },
+    {
+      "name": "single-source",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-05T14:55:18.989709+09:00",
+      "endKST": "2026-11-05T14:55:19.356729+09:00",
+      "exit": 0
+    },
+    {
+      "name": "path-citations",
+      "command": [
+        "<existing-source03-Python3.14.7>",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "HEAD"
+      ],
+      "startKST": "2026-11-05T14:55:19.357730+09:00",
+      "endKST": "2026-11-05T14:55:23.538072+09:00",
+      "exit": 0
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startKST": "2026-11-05T14:55:23.538072+09:00",
+      "endKST": "2026-11-05T14:55:23.609679+09:00",
+      "exit": 0
+    }
+  ],
+  "obsidianApply": false,
+  "independentReview": "pending"
+}
