@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_docs.py"
+  ],
+  "startedAtKST": "2026-11-06T05:38:15.408139+09:00",
+  "finishedAtKST": "2026-11-06T05:39:12.976727+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "e50-review-closure-docs.txt",
+  "sourceAtStart": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

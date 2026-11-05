@@ -1,0 +1,225 @@
+{
+  "recordedAtKST": "2026-11-06T04:47:45.655116+09:00",
+  "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+  "scope": "Early exact-source CI artifact verification; no full workflow/all8 or live physical acceptance inferred",
+  "artifacts": [
+    {
+      "id": 13445873494,
+      "name": "fleet5-native-peer-phase-fixed-proof-e50c148287779add421265868ef16909ed984650",
+      "source": "e50c148287779add421265868ef16909ed984650",
+      "runId": 42093714198,
+      "zipSHA256": "449d294282180d48fc07c3b022f43a41c7434bbeb816f048bd861bd124d1732a",
+      "metadataDigestMatches": true,
+      "members": [
+        {
+          "name": "canonical-go-results.json",
+          "bytes": 2679,
+          "sha256": "265f1c8d8c7883a275a9b6dbffcd00a0fef5e2839972e87476eb8abf528814cd"
+        },
+        {
+          "name": "go-guard-events.jsonl",
+          "bytes": 30132,
+          "sha256": "73f0577f4213791b6890e4a10f16d529dc1d9d622cb93dbd608a76d67d08b972"
+        },
+        {
+          "name": "native-fixed-result.json",
+          "bytes": 7733,
+          "sha256": "fddc265c46bed61cbdf6487de104c279f43b2802707fcfcd7686022b72066bb3"
+        },
+        {
+          "name": "native-server.log",
+          "bytes": 160,
+          "sha256": "f7290869d82f3a678ca1c70e80033909c1c0840449ae0bc6f3f22d2c41d2e9f8"
+        }
+      ],
+      "verified": {
+        "actualNativeCycles": 2,
+        "peerVersions": [
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "channelVersions": [
+          8,
+          9
+        ],
+        "allRequiredGuardsTrue": true,
+        "GoTestPassEvents": 27,
+        "GoPackagePassEvents": 3,
+        "GoFailOrSkipEvents": 0,
+        "actualUnicodeV2SignaturesVerified": 7,
+        "CIExecutableSHA256Only": [
+          "17fa59b6a168c3ae41f000a8d2e380d4caeb27e26d3234d811667cfa74fae574"
+        ],
+        "GoToolchain": "completed job log not yet read; never inferred from configuration",
+        "operationalAcceptance": false
+      }
+    },
+    {
+      "id": 13447405275,
+      "name": "fleet5-settled-pinned-3.12-e50c148287779add421265868ef16909ed984650",
+      "source": "e50c148287779add421265868ef16909ed984650",
+      "runId": 42093699470,
+      "zipSHA256": "73ade0d35524db558b53e1efe34cfb5d4d100a28cdee227e6b09deaa26c9e681",
+      "metadataDigestMatches": true,
+      "members": [
+        {
+          "name": "leaf-runtime-settled-pinned.json",
+          "bytes": 5361,
+          "sha256": "467f79050c440268274224efec506b102f793894a410433e1b6805b0e162eed6"
+        },
+        {
+          "name": "fleet5-t123-mutations/baseline.log",
+          "bytes": 99,
+          "sha256": "54a949e8ead3e075b5bde8549f2bc828eee5e5f3729e335b9f5f813ae035dc86"
+        },
+        {
+          "name": "leaf-runtime-lifecycle.json",
+          "bytes": 335,
+          "sha256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845"
+        },
+        {
+          "name": "fleet5-t123-mutations/exec-field-optional.log",
+          "bytes": 2786,
+          "sha256": "e28873304b6d7ace275cb736c55a93eb2555ac7d342bbe7014cc3fe5423f6da0"
+        },
+        {
+          "name": "fleet5-t123-mutations/guard-no-post-recheck.log",
+          "bytes": 864,
+          "sha256": "1f13de716c176e918298a7462e5ff0905b893b08b13da96f26d1981bad028d8d"
+        },
+        {
+          "name": "fleet5-t123-mutations/mutation-result.json",
+          "bytes": 4841,
+          "sha256": "ba5b7576e9b73a51efcb5a804ebc00609839d654a1d3a4328c4bc876d7412516"
+        },
+        {
+          "name": "fleet5-t123-mutations/rs1-allow-current-in-final.log",
+          "bytes": 805,
+          "sha256": "9d19861d11d1c362ca4ce33ea7dd642d55cc1ea41914112501cc7be69e23c75e"
+        },
+        {
+          "name": "fleet5-t123-mutations/rs1-no-post-ack-match.log",
+          "bytes": 1799,
+          "sha256": "ffa2ea43deff4ae8784bc5d3521635ee1272d11eca20155aa02cba3384072a2c"
+        },
+        {
+          "name": "fleet5-t123-mutations/rs1-skip-stopped-reread.log",
+          "bytes": 1298,
+          "sha256": "5986a79ae8bf93fac580ebd410385e078422e2f01c15ed1c02674884ee6565fe"
+        }
+      ],
+      "verified": {
+        "pythonMatrix": "3.12",
+        "defaultPinnedCases": 10,
+        "sourcePinsComparedToActualE50Git": 7,
+        "lifecycleExactTypedFields": 11,
+        "normalFixtureCycles": 2,
+        "fixtureRestarts": 4,
+        "realPinnedCrypto": true,
+        "defaultCallbackBypassed": false,
+        "stateAndSourceUnchanged": true,
+        "actualGoOrPhysicalAcceptance": false,
+        "mutations": {
+          "baselinePassed": 13,
+          "baselineSkips": 0,
+          "actualIntendedMutantsKilled": 5,
+          "allLogHashesMatched": true,
+          "allOriginalSourcePinsMatchedE50": true
+        }
+      }
+    },
+    {
+      "id": 13444954137,
+      "name": "fleet5-settled-pinned-3.14-e50c148287779add421265868ef16909ed984650",
+      "source": "e50c148287779add421265868ef16909ed984650",
+      "runId": 42093699470,
+      "zipSHA256": "bf753be13bc1a37d2084762974a87ad34ccffd142ea3b414825569492a87ce9a",
+      "metadataDigestMatches": true,
+      "members": [
+        {
+          "name": "leaf-runtime-settled-pinned.json",
+          "bytes": 5361,
+          "sha256": "5ac306befcb119532a82bb9d0e228a0c24a96f8b00caf8d45c3489753a7a65f8"
+        },
+        {
+          "name": "leaf-runtime-lifecycle.json",
+          "bytes": 335,
+          "sha256": "f635821685fa65affde29dc9ae323f46be767437be67b5066c5a4edab550b845"
+        }
+      ],
+      "verified": {
+        "pythonMatrix": "3.14",
+        "defaultPinnedCases": 10,
+        "sourcePinsComparedToActualE50Git": 7,
+        "lifecycleExactTypedFields": 11,
+        "normalFixtureCycles": 2,
+        "fixtureRestarts": 4,
+        "realPinnedCrypto": true,
+        "defaultCallbackBypassed": false,
+        "stateAndSourceUnchanged": true,
+        "actualGoOrPhysicalAcceptance": false
+      }
+    },
+    {
+      "id": 13445399291,
+      "name": "saintvision-s01-storage-evidence-42093714198",
+      "source": "e50c148287779add421265868ef16909ed984650",
+      "runId": 42093714198,
+      "zipSHA256": "a57f51b998aa7862328c8d7a85b5b72c763b3962b28a44b56c26956f9cffa0ac",
+      "metadataDigestMatches": true,
+      "members": [
+        {
+          "name": "s01-minio-image.txt",
+          "bytes": 89,
+          "sha256": "7a8a0240ecec797856d7955f7959f7c2f863ea45683d709bd2b4e7ff313d429b"
+        },
+        {
+          "name": "s01-storage-roundtrip.json",
+          "bytes": 315,
+          "sha256": "9f6d9c782318de0bdc785004391466b48b76920fdf5017c41de197ed65c89b08"
+        },
+        {
+          "name": "s01-storage-roundtrip.xml",
+          "bytes": 205,
+          "sha256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1"
+        },
+        {
+          "name": "s3-product-object-store.xml",
+          "bytes": 512,
+          "sha256": "cb849a0f6b1698eeb8e9594a0fd638f0bf8859a3384152826c3e2a8cb8407942"
+        },
+        {
+          "name": "s3-product-postgres.xml",
+          "bytes": 736,
+          "sha256": "b6633ce0720f8ed43adc1071e7127b013514bed5e11a2fb3a63d5efb4fc40c34"
+        }
+      ],
+      "verified": {
+        "roundtripSource": "e50c148287779add421265868ef16909ed984650",
+        "roundtripStatus": "PASS",
+        "XML": {
+          "s01-storage-roundtrip.xml": {
+            "passed": 1,
+            "skipped": 0
+          },
+          "s3-product-object-store.xml": {
+            "passed": 2,
+            "skipped": 0
+          },
+          "s3-product-postgres.xml": {
+            "passed": 3,
+            "skipped": 0
+          }
+        },
+        "physicalOrCombinedComputeStorageAcceptance": false
+      }
+    }
+  ],
+  "newPacketReview": "separate required actual reviewer gate",
+  "queryExecuted": false,
+  "counts": null,
+  "operationalBindings": null
+}

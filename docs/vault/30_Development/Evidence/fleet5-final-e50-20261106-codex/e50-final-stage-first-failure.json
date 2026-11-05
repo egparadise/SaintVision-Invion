@@ -1,0 +1,11 @@
+{
+  "recordedAtKST": "2026-11-06T05:28:39.403707+09:00",
+  "scope": "final report staging audit, not source CI or packet validation",
+  "actualExit": 1,
+  "cause": "Expected original Root working-record69b7 bytes in Git index; repository JSON eol=lf normalized71 CRLF sequences,3186 to3115 bytes, canonical Git SHA e8d3f8ceb500dc2d7ea5060bc3452b3add169f481e0091c5e3680a1454e47456",
+  "onlyCRLFNormalization": true,
+  "productDiff": [],
+  "requiredSevenGatesStartedAfterFailure": false,
+  "originalRawPreserved": "docs\\vault\\30_Development\\Evidence\\fleet5-final-e50-20261106-codex\\e50-root-packet-review-original-bytes.json",
+  "correctedAudit": "Separate original raw69b7 and canonical GitLFe8d3 checks; no content/verdict/source/ref/packet/CI changes"
+}

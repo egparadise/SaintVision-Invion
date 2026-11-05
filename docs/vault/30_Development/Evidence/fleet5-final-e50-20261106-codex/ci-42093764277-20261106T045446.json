@@ -1,0 +1,148 @@
+{
+  "conclusion": "success",
+  "event": "workflow_dispatch",
+  "headBranch": "agent/codex/fleet5-test-followup-20261106",
+  "headSha": "e50c148287779add421265868ef16909ed984650",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T19:26:48Z",
+      "conclusion": "success",
+      "databaseId": 127478326251,
+      "name": "security-critical-high",
+      "startedAt": "2026-11-05T19:25:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T19:25:42Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T19:25:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:25:55Z",
+          "conclusion": "success",
+          "name": "Initialize containers",
+          "number": 2,
+          "startedAt": "2026-11-05T19:25:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:00Z",
+          "conclusion": "success",
+          "name": "Checkout exact PR head",
+          "number": 3,
+          "startedAt": "2026-11-05T19:25:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:04Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 4,
+          "startedAt": "2026-11-05T19:26:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:09Z",
+          "conclusion": "success",
+          "name": "Install pinned scanners",
+          "number": 5,
+          "startedAt": "2026-11-05T19:26:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:23Z",
+          "conclusion": "success",
+          "name": "Run complete registered scanner set",
+          "number": 6,
+          "startedAt": "2026-11-05T19:26:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:24Z",
+          "conclusion": "success",
+          "name": "Normalize redacted fixed-SHA report",
+          "number": 7,
+          "startedAt": "2026-11-05T19:26:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:32Z",
+          "conclusion": "success",
+          "name": "Install database boundary dependencies",
+          "number": 8,
+          "startedAt": "2026-11-05T19:26:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:40Z",
+          "conclusion": "success",
+          "name": "Measure the two database threat reports",
+          "number": 9,
+          "startedAt": "2026-11-05T19:26:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:40Z",
+          "conclusion": "success",
+          "name": "Validate redacted evidence shape",
+          "number": 10,
+          "startedAt": "2026-11-05T19:26:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:41Z",
+          "conclusion": "success",
+          "name": "Upload AC-11 security evidence",
+          "number": 11,
+          "startedAt": "2026-11-05T19:26:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:41Z",
+          "conclusion": "success",
+          "name": "Enforce critical/high gate after artifact upload",
+          "number": 12,
+          "startedAt": "2026-11-05T19:26:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:44Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 22,
+          "startedAt": "2026-11-05T19:26:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:44Z",
+          "conclusion": "success",
+          "name": "Post Checkout exact PR head",
+          "number": 23,
+          "startedAt": "2026-11-05T19:26:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:45Z",
+          "conclusion": "success",
+          "name": "Stop containers",
+          "number": 24,
+          "startedAt": "2026-11-05T19:26:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T19:26:45Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "startedAt": "2026-11-05T19:26:45Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093764277/job/127478326251"
+    }
+  ],
+  "status": "completed"
+}

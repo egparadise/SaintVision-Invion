@@ -1,0 +1,4 @@
+FAIL (regression): 1 NEW broken path citation(s) not in the baseline:
+  + 30_Development/History/2026-11-06_05-21-00_KST_FLEET5_SF1_credential_tests_542b_검토_Claude.md || tests/test_fleet5_sf1_current_credentials.py  [path does not exist]
+  Fix the document to cite a real path (or drop the line suffix). Adding a baseline line is a
+  visible, reviewable raise of the floor in tools/baselines/doc_path_citations.txt -- not for new inventions.

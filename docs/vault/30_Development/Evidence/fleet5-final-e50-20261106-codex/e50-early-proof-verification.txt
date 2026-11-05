@@ -1,0 +1,1 @@
+{"verifiedArtifacts": 4, "nativeCycles": 2, "unicodeSignatures": 7, "pinnedMatrices": ["3.12", "3.14"], "defaultPinnedCasesEach": 10, "mutantsKilled": 5, "CIExecutableSHA256Only": ["17fa59b6a168c3ae41f000a8d2e380d4caeb27e26d3234d811667cfa74fae574"], "physicalAcceptance": false}

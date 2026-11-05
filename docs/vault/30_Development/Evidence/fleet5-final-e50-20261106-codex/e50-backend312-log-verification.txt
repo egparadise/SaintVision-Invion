@@ -1,0 +1,1 @@
+{"job": "backend (3.12)", "source": "e50c148287779add421265868ef16909ed984650", "counts": {"passed": 8857, "failed": 0, "errors": 0, "skipped": 75, "deselected": 2}, "seconds": 1672.78, "rawLogSHA256": "bdf6d072bceb8c89b428656357233394588db7235abd2edda849e25da88ae3a4", "ownedFourNotExcluded": true, "BackendNamedXMLRetained": false}

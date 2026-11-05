@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "fleet5-e50-root-independent-packet-review:1",
+  "reviewer": "Codex Root coordinator (separate from packet author Codex worker); not a Claude review",
+  "startedAtKST": "2026-11-06T05:16:02+09:00",
+  "finishedAtKST": "2026-11-06T05:16:05+09:00",
+  "command": [
+    "python",
+    ".work/root_e50_packet_review.py"
+  ],
+  "exitCode": 0,
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "tree": "793c5db25147dd75f7bf496c2015aa969fc3dbae",
+  "report": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "verdict": "ACCEPT bounded nonexecuting packet / exact Git source / provenance",
+  "files": {
+    "candidate-source-manifest.json": {
+      "bytes": 1309,
+      "sha256": "ae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146"
+    },
+    "fleet5-candidate-source-e50c148287779add421265868ef16909ed984650.zip": {
+      "bytes": 47428827,
+      "sha256": "acdbd6669956cf49d2e38163c5af99d51e886a5bb9209df78fa7549758ad3f07"
+    },
+    "fleet5-nonexecuting-setup-e50c148287779add421265868ef16909ed984650.zip": {
+      "bytes": 48826426,
+      "sha256": "63ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b"
+    },
+    "packet-receipt.json": {
+      "bytes": 395,
+      "sha256": "350f7ecd73c9bd095901cd92568716fa1c591a5e34e8c82cc950e46a237d5c5f"
+    },
+    "setup-plan.json": {
+      "bytes": 11837,
+      "sha256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81"
+    },
+    "source-inventory.json": {
+      "bytes": 1383617,
+      "sha256": "d92d86c4ed68eb3f5d684f3aee0fdb04a1e82fe7141f0bf584402591a98e7d5d"
+    }
+  },
+  "comparedActualGitBlobs": 4864,
+  "actualGitBlobBytesCompared": 89175629,
+  "gitTreeInventoryZipPathSetsExact": true,
+  "allGitModesBlobIDsSizesSHA256AndActualBytesExact": true,
+  "noSymlinksGitlinksDuplicateOrUnsafeZipPaths": true,
+  "outerZipExactFiveEntries": true,
+  "outerFourSourceAndSidecarEntriesActualBytesEqual": true,
+  "noticeNonempty": true,
+  "sourceBinding": "manifest/receipt/Git blob bytes; the generic NOTICE has no source-SHA requirement",
+  "reportFourPublicCopiesActualGitBytesEqual": true,
+  "planActualSourceGitBlobBytesEqual": true,
+  "planOperationalBindingsAllNull": true,
+  "packetFilesStableDuringReview": true,
+  "frozenRemoteExact": true,
+  "reportNoProductDiff": true,
+  "reviewHarnessCorrection": {
+    "initialExit": 1,
+    "cause": "reviewer added an unsupported requirement that generic NOTICE contain the source SHA, after actual 4864 blob comparisons had completed",
+    "correction": "source identity is verified in manifest/receipt/frozen remote and actual Git bytes; NOTICE is generic and must be nonempty; full mechanical review rerun"
+  },
+  "notRun": [
+    "packet extraction or execution",
+    "CI tests reexecution",
+    "Node or Docker operations",
+    "physical acceptance"
+  ],
+  "CIWholeSourceAcceptance": false,
+  "physicalAcceptance": false,
+  "wholeProductAcceptance": false,
+  "authority": "Packet-only verdict; existing independent runtime/builder and e50 test-only reviews are separately scoped. Final source all-eight CI and implementation/physical gates remain separate."
+}

@@ -1,0 +1,1 @@
+{"job": "core", "source": "e50c148287779add421265868ef16909ed984650", "counts": {"passed": 9215, "failed": 0, "errors": 0, "skipped": 46, "deselected": 2}, "seconds": 1584.5, "rawLogSHA256": "c5972fd9d402d77b0696a74a6874f2769675a0ef6cc62432dc8b60a47f756ba0", "ownedFourNotExcluded": null, "BackendNamedXMLRetained": null}

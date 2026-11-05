@@ -1,0 +1,20 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "tools/check_doc_path_citations.py",
+    "--ratchet",
+    "--base-ref",
+    "8624c3eec0d967ffb1e49ccffe7fd20af2a52249"
+  ],
+  "startedAtKST": "2026-11-06T05:39:17.395097+09:00",
+  "finishedAtKST": "2026-11-06T05:39:34.803537+09:00",
+  "exit": 1,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "e50-review-closure-paths.txt",
+  "sourceAtStart": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

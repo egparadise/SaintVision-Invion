@@ -1,0 +1,55 @@
+{
+  "sourceWorkingBytesSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+  "sourceGitBlobAtE50": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+  "baseline": "rl1-owning-green.json",
+  "onlyIgnoredFixtureCopies": true,
+  "results": [
+    {
+      "term": "legacy._regular(root/'node-cert.pem') != files['node-cert.pem']",
+      "replacement": "False",
+      "name": "node-cert",
+      "startedAtKST": "2026-11-06T04:37:22.255699+09:00",
+      "finishedAtKST": "2026-11-06T04:37:29.233653+09:00",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "owned_credential_mutation",
+        "tests/test_fleet5_sf1_current_credentials.py"
+      ],
+      "actualExit": 1,
+      "killed": true,
+      "expected": "exact owning case DID NOT RAISE ValueError; other credential case still passes",
+      "rawLog": "rl1-node-cert-term-false.txt",
+      "rawLogSHA256": "316ea6fd522f4a25e3971159ed6041e2529938b80ed6b92b395aa75991f87fc4",
+      "mutantLFBytesSHA256": "aed3c4407d189e9546f7a2de58e3ebc8f4290b4914cc9573ec889d9f87b609e6",
+      "productionWorkingFileUnchanged": true
+    },
+    {
+      "term": "legacy._regular(root/'ca.pem') != files['ca.pem']",
+      "replacement": "False",
+      "name": "ca",
+      "startedAtKST": "2026-11-06T04:37:29.256374+09:00",
+      "finishedAtKST": "2026-11-06T04:37:34.144164+09:00",
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "owned_credential_mutation",
+        "tests/test_fleet5_sf1_current_credentials.py"
+      ],
+      "actualExit": 1,
+      "killed": true,
+      "expected": "exact owning case DID NOT RAISE ValueError; other credential case still passes",
+      "rawLog": "rl1-ca-term-false.txt",
+      "rawLogSHA256": "1fc82fc25f3e608329531135ef460c67bab79917b7b12fbf5a550d709af0d201",
+      "mutantLFBytesSHA256": "c69ce8d4fbf3dbde26f1b40792cd337403c9ff039afa7588ee13481a987163eb",
+      "productionWorkingFileUnchanged": true
+    }
+  ],
+  "physicalOrRuntimeMutation": false
+}

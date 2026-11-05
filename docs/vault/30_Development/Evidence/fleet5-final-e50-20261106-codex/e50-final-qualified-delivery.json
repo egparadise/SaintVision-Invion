@@ -1,0 +1,1176 @@
+{
+  "recordedAtKST": "2026-11-06T05:34:30.282956+09:00",
+  "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+  "sourceTree": "793c5db25147dd75f7bf496c2015aa969fc3dbae",
+  "scope": "Final bounded selected-source/nonexecuting-packet delivery; exact final report SHA/Docs follow commit, separate from code source e50",
+  "actualSourceCI": {
+    "sourceCommit": "e50c148287779add421265868ef16909ed984650",
+    "branch": "agent/codex/fleet5-test-followup-20261106",
+    "workflows": {
+      "backend": {
+        "workflow": "backend.yml",
+        "correlationId": "post-landing-verify/bc13541e1ea44b0cb32f24846a60894c",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:10.615172+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/bc13541e1ea44b0cb32f24846a60894c"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "backend.yml",
+          "runId": 42093699470,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 3,
+          "jobConclusions": {
+            "backend (3.14)": "success",
+            "mlflow-live": "success",
+            "backend (3.12)": "success"
+          }
+        },
+        "runId": 42093699470,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478106742,
+            "name": "backend (3.14)",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:17Z",
+            "completedAt": "2026-11-05T19:49:55Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478106742"
+          },
+          {
+            "databaseId": 127478107338,
+            "name": "mlflow-live",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:17Z",
+            "completedAt": "2026-11-05T19:25:59Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478107338"
+          },
+          {
+            "databaseId": 127478107423,
+            "name": "backend (3.12)",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:17Z",
+            "completedAt": "2026-11-05T19:55:38Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478107423"
+          }
+        ],
+        "rawObservation": "ci-42093699470-20261106T051715.json"
+      },
+      "core": {
+        "workflow": "core.yml",
+        "correlationId": "post-landing-verify/1c2757c2b9404f19b1957c198dbca84c",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:15.347042+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/1c2757c2b9404f19b1957c198dbca84c",
+          "run_fleet5_peer_phase_fixed_proof": "true"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "core.yml",
+          "runId": 42093714198,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 2,
+          "jobConclusions": {
+            "core": "success",
+            "s01-storage-roundtrip": "success"
+          }
+        },
+        "runId": 42093714198,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478148501,
+            "name": "core",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:21Z",
+            "completedAt": "2026-11-05T20:06:05Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478148501"
+          },
+          {
+            "databaseId": 127478149168,
+            "name": "s01-storage-roundtrip",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:21Z",
+            "completedAt": "2026-11-05T19:26:05Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478149168"
+          }
+        ],
+        "rawObservation": "ci-42093714198-20261106T051718.json"
+      },
+      "frontend": {
+        "workflow": "frontend.yml",
+        "correlationId": "post-landing-verify/312493c131474a34be77ca13fa74ad3d",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:19.955710+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/312493c131474a34be77ca13fa74ad3d"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "frontend.yml",
+          "runId": 42093726119,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 2,
+          "jobConclusions": {
+            "Portal Container Build & Hardened Runtime Smoke": "success",
+            "frontend": "success"
+          }
+        },
+        "runId": 42093726119,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093726119",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478192075,
+            "name": "Portal Container Build & Hardened Runtime Smoke",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:26Z",
+            "completedAt": "2026-11-05T19:26:53Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093726119/job/127478192075"
+          },
+          {
+            "databaseId": 127478192917,
+            "name": "frontend",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:26Z",
+            "completedAt": "2026-11-05T19:27:08Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093726119/job/127478192917"
+          }
+        ],
+        "rawObservation": "ci-42093726119-20261106T051721.json"
+      },
+      "desktopBrowser": {
+        "workflow": "desktop-browser.yml",
+        "correlationId": "post-landing-verify/d82f608bf068453ba89d81789fe854b9",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:24.620390+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/d82f608bf068453ba89d81789fe854b9"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "desktop-browser.yml",
+          "runId": 42093738328,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 1,
+          "jobConclusions": {
+            "desktop-browser": "success"
+          }
+        },
+        "runId": 42093738328,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093738328",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478229436,
+            "name": "desktop-browser",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:30Z",
+            "completedAt": "2026-11-05T19:27:45Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093738328/job/127478229436"
+          }
+        ],
+        "rawObservation": "ci-42093738328-20261106T051724.json"
+      },
+      "docs": {
+        "workflow": "docs.yml",
+        "adopted": true,
+        "adoptionReason": "Root-selected immutable e50: unique existing exact source/ref/event run adopted, no duplicate dispatch",
+        "runId": 42084668698,
+        "event": "workflow_dispatch",
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084668698",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127446456588,
+            "name": "docs",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T18:29:12Z",
+            "completedAt": "2026-11-05T18:29:44Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084668698/job/127446456588"
+          }
+        ],
+        "rawObservation": "ci-42084668698-20261106T051726.json",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "docs.yml",
+          "runId": 42084668698,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 1,
+          "jobConclusions": {
+            "docs": "success"
+          }
+        }
+      },
+      "portalLoginHarness": {
+        "workflow": "portal-login-harness.yml",
+        "adopted": true,
+        "adoptionReason": "Root-selected immutable e50: unique existing exact source/ref/event run adopted, no duplicate dispatch",
+        "runId": 42084627956,
+        "event": "push",
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084627956",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127446304063,
+            "name": "portal-login-harness",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T18:28:55Z",
+            "completedAt": "2026-11-05T18:29:46Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084627956/job/127446304063"
+          }
+        ],
+        "rawObservation": "ci-42084627956-20261106T051728.json",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "portal-login-harness.yml",
+          "runId": 42084627956,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "push",
+          "runConclusion": "success",
+          "jobCount": 1,
+          "jobConclusions": {
+            "portal-login-harness": "success"
+          }
+        }
+      },
+      "securityCriticalHigh": {
+        "workflow": "ac11-security-scan.yml",
+        "correlationId": "post-landing-verify/b6a94f01ebc94a599960ce04e3c35ede",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:34.008845+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/b6a94f01ebc94a599960ce04e3c35ede"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "ac11-security-scan.yml",
+          "runId": 42093764277,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 1,
+          "jobConclusions": {
+            "security-critical-high": "success"
+          }
+        },
+        "runId": 42093764277,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093764277",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478326251,
+            "name": "security-critical-high",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:40Z",
+            "completedAt": "2026-11-05T19:26:48Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093764277/job/127478326251"
+          }
+        ],
+        "rawObservation": "ci-42093764277-20261106T051731.json"
+      },
+      "accessibilityE2e": {
+        "workflow": "ac11-accessibility-e2e.yml",
+        "correlationId": "post-landing-verify/c75db73a792d4e93b3e7f426f9a85a7b",
+        "dispatchRequestedAtKST": "2026-11-06T04:25:38.098539+09:00",
+        "workflowInputs": {
+          "correlation_id": "post-landing-verify/c75db73a792d4e93b3e7f426f9a85a7b"
+        },
+        "dispatchReturnedSuccess": true,
+        "event": "workflow_dispatch",
+        "observation": {
+          "status": "MEASURED_PASS",
+          "workflow": "ac11-accessibility-e2e.yml",
+          "runId": 42093775632,
+          "headSha": "e50c148287779add421265868ef16909ed984650",
+          "headBranch": "agent/codex/fleet5-test-followup-20261106",
+          "event": "workflow_dispatch",
+          "runConclusion": "success",
+          "jobCount": 1,
+          "jobConclusions": {
+            "accessibility-e2e": "success"
+          }
+        },
+        "runId": 42093775632,
+        "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093775632",
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "databaseId": 127478358879,
+            "name": "accessibility-e2e",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-11-05T19:25:44Z",
+            "completedAt": "2026-11-05T19:36:54Z",
+            "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093775632/job/127478358879"
+          }
+        ],
+        "rawObservation": "ci-42093775632-20261106T051734.json"
+      }
+    },
+    "physicalAcceptance": false,
+    "allEightFinal": true,
+    "allJobsSuccess": true,
+    "cancelOrRerunPerformed": false,
+    "remoteRefCheck": {
+      "status": "MEASURED_PASS",
+      "ref": "agent/codex/fleet5-test-followup-20261106",
+      "refTipSha": "e50c148287779add421265868ef16909ed984650"
+    },
+    "observedAtKST": "2026-11-06T05:17:12.592851+09:00",
+    "jobCountObserved": 12
+  },
+  "CoreArtifact": {
+    "id": 13448697056,
+    "zipSHA256": "95f8d6da5ef9738902fc0809d6d628b9657109947cf46b311559a2332c2e76b3",
+    "metadataSourceAndDigestMatched": true,
+    "selectedMembers": [
+      {
+        "name": "core-tests.xml",
+        "bytes": 1418453,
+        "sha256": "ed7134aaccccb90e2f9d8772f0f9216966918886118e8f20088b11266890e9f5"
+      },
+      {
+        "name": "lan-installer-tests.xml",
+        "bytes": 2914,
+        "sha256": "237fbf8d0782971e45a76323705676ffa0f494199cd503d57e04e911e28029c4"
+      },
+      {
+        "name": "lan-pilot-database-real-pg.xml",
+        "bytes": 563,
+        "sha256": "b0962544e073a21ef6273f750c716a2a572cf7013f48cb4e036386731ce10c0b"
+      },
+      {
+        "name": "build-product-runtime-real-pg.xml",
+        "bytes": 2369,
+        "sha256": "aecde642a3b80e5b823a8d478b99a9e020498575c2fc9be1a90ef1acc6d875e7"
+      }
+    ]
+  },
+  "actualCoreMain": {
+    "counts": {
+      "passed": 9215,
+      "skipped": 46
+    }
+  },
+  "actualCoreDeselected": 2,
+  "actualCoreMainSeconds": 1584.5,
+  "actualHostedLinuxFamilies": {
+    "test_backend_leaf_runtime_contract": {
+      "passed": 72
+    },
+    "test_build_fleet5_setup_packet": {
+      "passed": 4
+    },
+    "test_fleet5_plain_reentry": {
+      "passed": 19
+    },
+    "test_fleet5_settled_launcher": {
+      "passed": 11
+    },
+    "test_fleet5_setup_packet": {
+      "passed": 29
+    },
+    "test_fleet5_reentry_guard_negatives": {
+      "passed": 13
+    },
+    "test_rotation_predecessor_residue": {
+      "passed": 2
+    },
+    "test_leaf_rotation_archive_residue": {
+      "passed": 14
+    },
+    "test_lan_leaf_rotation_consecutive": {
+      "passed": 43
+    },
+    "test_lan_leaf_rotation_batch_successor": {
+      "passed": 46
+    },
+    "test_route_coverage": {
+      "passed": 41
+    }
+  },
+  "ownedFourDirectCoreXMLCases": {
+    "test_backend_leaf_runtime_contract": [
+      {
+        "name": "test_backend_accepts_complete_verified_standalone_lifecycle_contract",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_refuses_absent_or_failed_node_finalization_attestation[missing]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_refuses_absent_or_failed_node_finalization_attestation[False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_refuses_absent_or_failed_node_finalization_attestation[1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_refuses_absent_or_failed_node_finalization_attestation[true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-1.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalized-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalizedAttestationVerified-1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalizedAttestationVerified-1.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalizedAttestationVerified-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalizedAttestationVerified-true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[finalizedAttestationVerified-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-1.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[installRestartReceipt-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rollbackRejected-1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rollbackRejected-1.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rollbackRejected-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rollbackRejected-true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rollbackRejected-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[fixtureOnly-1]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[fixtureOnly-1.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[fixtureOnly-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[fixtureOnly-true]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[fixtureOnly-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-0.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-false]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[rolledBack-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[actualGoAcceptanceAssessed-0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[actualGoAcceptanceAssessed-0.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[actualGoAcceptanceAssessed-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[actualGoAcceptanceAssessed-false]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[actualGoAcceptanceAssessed-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-4.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-4]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[restartCount-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-0.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[bytecodeCacheCount-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[completedNormalCycles-2.0]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[completedNormalCycles-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[completedNormalCycles-False]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[completedNormalCycles-2]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[completedNormalCycles-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[schemaVersion-saintvision-leaf-rotation-standalone-lifecycle:2]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[schemaVersion-saintvision-leaf-rotation-standalone-lifecycle:4]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[schemaVersion-3]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[schemaVersion-True]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_rejects_wrong_types_for_every_lifecycle_field[schemaVersion-None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_versioned_fixture_contract_matches_actual_producer_predicate",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[schemaVersion]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[fixtureOnly]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[actualGoAcceptanceAssessed]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[completedNormalCycles]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[bytecodeCacheCount]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[finalized]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[finalizedAttestationVerified]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[installRestartReceipt]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[restartCount]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[rolledBack]",
+        "status": "passed"
+      },
+      {
+        "name": "test_backend_requires_the_exact_lifecycle_key_set[rollbackRejected]",
+        "status": "passed"
+      }
+    ],
+    "test_build_fleet5_setup_packet": [
+      {
+        "name": "test_nonregular_git_modes_refused_before_any_output_without_materializing_target[120000-source-link-blob]",
+        "status": "passed"
+      },
+      {
+        "name": "test_nonregular_git_modes_refused_before_any_output_without_materializing_target[160000-source-submodule-commit]",
+        "status": "passed"
+      },
+      {
+        "name": "test_regular_git_modes_have_exact_blob_and_packet_readback[100644]",
+        "status": "passed"
+      },
+      {
+        "name": "test_regular_git_modes_have_exact_blob_and_packet_readback[100755]",
+        "status": "passed"
+      }
+    ],
+    "test_fleet5_plain_reentry": [
+      {
+        "name": "test_rs1_same_cid_start_requires_fresh_expected_ack_and_running_retry_does_not_start[overlap]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_same_cid_start_requires_fresh_expected_ack_and_running_retry_does_not_start[final]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[old-active]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[foreign-floor]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[boolean-version]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[wrong-identity]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[missing-floor]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[migration]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[stale-lock]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_unknown_or_old_state_never_starts_or_edits_journal[bad-pre-signature]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[symlink]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[hardlink]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[duplicate]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[uid]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[mode]",
+        "status": "passed"
+      },
+      {
+        "name": "test_rs1_actual_tar_rejects_links_duplicates_owner_mode_and_compression[compressed]",
+        "status": "passed"
+      },
+      {
+        "name": "test_sf1_read_only_verifier_and_idempotent_guard_preserve_original_archive",
+        "status": "passed"
+      },
+      {
+        "name": "test_sf1_refuses_even_equal_staging_residue_without_deleting_it",
+        "status": "passed"
+      },
+      {
+        "name": "test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift",
+        "status": "passed"
+      }
+    ],
+    "test_fleet5_settled_launcher": [
+      {
+        "name": "test_ci_pinned_fixture_refuses_non_ci_execution_before_writes",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[valid]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[missing-launcher]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[missing-entry]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[exit]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[timeout]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[empty]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[oversize]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[duplicate]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[unknown]",
+        "status": "passed"
+      },
+      {
+        "name": "test_default_settled_dispatch_has_fixed_pinned_paths_and_fails_closed[unverified]",
+        "status": "passed"
+      }
+    ]
+  },
+  "actualInstaller": {
+    "counts": {
+      "passed": 17
+    },
+    "cases": [
+      {
+        "name": "test_real_upgrade_preserves_credentials_journal_and_replays",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_failed_start_restores_prior_container_and_journal",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_trust_mismatch_does_not_stop_node",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_stopped_publication_reentry_starts_only_frozen_phase[after-stop]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_stopped_publication_reentry_starts_only_frozen_phase[after-copy]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_bad_policy_hash_creates_no_node_or_volume",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_replacement_preflight_preserves_state_and_rejects_stale_restart",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[None]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[prepared]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[fenced]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[renamed]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[created]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[installed]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[starting]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[ready]",
+        "status": "passed"
+      },
+      {
+        "name": "test_real_storage_bridge_prepares_hash_bound_request_and_resumes",
+        "status": "passed"
+      }
+    ]
+  },
+  "actualAuthenticatedTCPPostgres": {
+    "counts": {
+      "passed": 2
+    },
+    "cases": [
+      {
+        "name": "test_prepare_waits_for_final_tcp_after_temporary_unix_server",
+        "status": "passed"
+      },
+      {
+        "name": "test_prepare_verify_roundtrip_uses_real_psql_variable_semantics",
+        "status": "passed"
+      }
+    ]
+  },
+  "actualBuildRuntimePostgres": {
+    "counts": {
+      "passed": 13
+    },
+    "cases": [
+      {
+        "name": "test_uncommitted_or_merely_approved_decision_cannot_create_admission",
+        "status": "passed"
+      },
+      {
+        "name": "test_build_dispatch_rejects_foreign_tenant_plan_and_rolls_back",
+        "status": "passed"
+      },
+      {
+        "name": "test_committed_admission_promotes_atomically_and_is_tenant_isolated",
+        "status": "passed"
+      },
+      {
+        "name": "test_committed_admission_rejects_forged_approved_by_without_changing_receipt",
+        "status": "passed"
+      },
+      {
+        "name": "test_missing_project_permission_records_no_admission",
+        "status": "passed"
+      },
+      {
+        "name": "test_two_product_loops_promote_and_dispatch_exactly_once",
+        "status": "passed"
+      },
+      {
+        "name": "test_flag_off_preserves_admission_without_intent_or_dispatch",
+        "status": "passed"
+      },
+      {
+        "name": "test_admission_payload_update_delete_and_terminal_revival_are_rejected",
+        "status": "passed"
+      },
+      {
+        "name": "test_conflicting_existing_intent_quarantines_only_that_admission",
+        "status": "passed"
+      },
+      {
+        "name": "test_stale_node_promotion_backs_off_and_recovers_without_quarantine",
+        "status": "passed"
+      },
+      {
+        "name": "test_retryable_stale_admission_does_not_block_next_due_admission",
+        "status": "passed"
+      },
+      {
+        "name": "test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row",
+        "status": "passed"
+      },
+      {
+        "name": "test_promotion_order_reaches_healthy_row_beyond_one_tick_budget",
+        "status": "passed"
+      }
+    ]
+  },
+  "actualObservedGo": "go version go1.27.1 linux/amd64",
+  "CoreCompletedRawLogSHA256": "c5972fd9d402d77b0696a74a6874f2769675a0ef6cc62432dc8b60a47f756ba0",
+  "actualBackendEachMatrix": [
+    {
+      "job": {
+        "databaseId": 127478106742,
+        "name": "backend (3.14)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T19:25:17Z",
+        "completedAt": "2026-11-05T19:49:55Z",
+        "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478106742"
+      },
+      "actualMainCounts": {
+        "passed": 8857,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 75,
+        "deselected": 2
+      },
+      "actualMainSeconds": 1368.37,
+      "rawLogSHA256": "cfbe56db7fc7d18db28aec7cb384f68287cf70b55edb6492078491bd7c18e605",
+      "ownedFourNotExcluded": true,
+      "ownedFourExecutionAttribution": "Source-derived inference from actual whole-suite command, exact printed exclusions, unmarked/no-skip owned files, completed success and exact skip-distribution gate; no retained per-case Backend XML is claimed.",
+      "backendMainXMLUploaded": false
+    },
+    {
+      "job": {
+        "databaseId": 127478107423,
+        "name": "backend (3.12)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T19:25:17Z",
+        "completedAt": "2026-11-05T19:55:38Z",
+        "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478107423"
+      },
+      "actualMainCounts": {
+        "passed": 8857,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 75,
+        "deselected": 2
+      },
+      "actualMainSeconds": 1672.78,
+      "rawLogSHA256": "bdf6d072bceb8c89b428656357233394588db7235abd2edda849e25da88ae3a4",
+      "ownedFourNotExcluded": true,
+      "ownedFourExecutionAttribution": "Source-derived inference from actual whole-suite command, exact printed exclusions, unmarked/no-skip owned files, completed success and exact skip-distribution gate; no retained per-case Backend XML is claimed.",
+      "backendMainXMLUploaded": false
+    }
+  ],
+  "matricesNotSummedAsUniqueCoverage": true,
+  "backendAttributionLimit": "Both actual hosted whole-suite commands/exact printed exclusions/no owned skip marks and strict skip gates prove selection; no retained per-case Backend XML or invented named rows. Direct Core rows above are separate.",
+  "CoreSkippedStepsNotPassed": [
+    {
+      "job": "core",
+      "name": "FLEET5 early native Go peer-policy lifecycle proof",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "name": "Collect fixed-SHA S08 build acceptance observations",
+      "conclusion": "skipped"
+    },
+    {
+      "job": "core",
+      "name": "Recompute S08 build acceptance verdict from raw artifacts",
+      "conclusion": "skipped"
+    }
+  ],
+  "S08OrAC11OrPhysicalAxisAcceptanceInferred": false,
+  "earlyNativePinnedMutationProof": "e50-verified-early-proofs.json; independently validated exact-source artifact digests and contract",
+  "actualPacketReview": {
+    "reviewer": "Codex Root coordinator (separate from packet author Codex worker); not a Claude review",
+    "verdict": "ACCEPT bounded nonexecuting packet / exact Git source / provenance",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "reviewedReport": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+    "GitBlobsCompared": 4864,
+    "rawBytesCompared": 89175629,
+    "recordCopyProvenance": "e50-root-packet-review-provenance.json",
+    "RootOwnPublication": {
+      "commit": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+      "exactDocs": 42103667573,
+      "actualConclusion": "success/all jobs/MEASURED_PASS",
+      "packetReviewGitLFSHA256": "e8d3f8ceb500dc2d7ea5060bc3452b3add169f481e0091c5e3680a1454e47456",
+      "originalWorkingCRLF69StillPreserved": true,
+      "coreAuditSHA256": "ef24b555510edb658c854d2be75c240a64c9e74e3d52a867adec8afe7b8435ea"
+    }
+  },
+  "sourceReviews": "255c original72028 source scope;97 C-L1 a527 closure; b9db e50 TEST-ONLY source delta, original reviewer bytes preserved",
+  "R_L1": {
+    "source": "542b48f996344563424228fb9fc454f5970bbd18",
+    "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+    "reviewer": "Claude",
+    "exactReviewDocs": 42102780830,
+    "actualConclusion": "ACCEPT TEST-ONLY; R-L1 CLOSED; no blocking finding",
+    "newFileLinuxCoreBackend": "NOT_RUN, cannot inherit selected e50 CI",
+    "excludedFromE50": true,
+    "noSourceRespin": true,
+    "originalHistorySourceContext": {
+      "recordedAtKST": "2026-11-06T05:43:25.214500+09:00",
+      "failedGate": "e50-review-closure-paths actual exit1; docs/ontology prior0, ratchet/sync not executed after failure",
+      "cause": "Separate reviewed source542b test path intentionally absent from e50; current-tree citation checker correctly refuses original Markdown citation",
+      "originalReviewCommit": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "originalReviewHistorySourcePath": "docs/vault/30_Development/History/2026-11-06_05-21-00_KST_FLEET5_SF1_credential_tests_542b_\uac80\ud1a0_Claude.md",
+      "originalReviewHistoryGitBlob": "e464c68dfc81f9a8468edd0ef93a65281b412464",
+      "originalHistoryBytesSHA256": "f0c89c3fa4312d8997a3dea575fdebb345f0c5155e7a9c176a5c658494bfd0b2",
+      "originalBytesStoredAt": "docs\\vault\\30_Development\\Evidence\\fleet5-final-e50-20261106-codex\\review-0e53fc02-original-history.md.txt",
+      "contextPage": "docs\\vault\\30_Development\\History\\2026-11-06_FLEET5_RL1_review_source_context_Codex.md",
+      "sourceTestCommitURL": "https://github.com/egparadise/SaintVision-Invion/blob/542b48f996344563424228fb9fc454f5970bbd18/tests/test_fleet5_sf1_current_credentials.py",
+      "originalReviewerBytesOrVerdictChanged": false,
+      "baselineOrProductChanged": false,
+      "selectedSource": "e50c148287779add421265868ef16909ed984650",
+      "newR_L1TestInSelectedSource": false
+    }
+  },
+  "remainingInfo": [
+    "R-I2 broad launcher exceptions",
+    "R-I3 optional exact65536",
+    "C-I2 partial-output fail-closed",
+    "Separate R-L1 new file Linux/Core/Backend NOT_RUN",
+    "R-I4 CA test models post-validation race; earlier CA pin already refuses pre-validation drift"
+  ],
+  "queryExecuted": false,
+  "counts": null,
+  "operationalBindings": null,
+  "physicalFiveAccepted": false,
+  "wholeProductAccepted": false,
+  "landingOrNodeOpsOrOld3OrObsidianWrites": false,
+  "oldSourcesAndPacketsFrozen": true,
+  "nextFirstOwnerAction": "Root verifies final report exact Docs/source/immutable refs/eight runs and records bounded handoff; aggregates latest vault and runs own check/apply/check only after exact Docs, preserves e50 before any later integration and decides separate physical/production gate.",
+  "historicalTerminalCapture": "e50-terminal-qualified-delivery.json retained unchanged; its earlier draft/queued statements are observation-time facts superseded by this final closure record",
+  "reportBranch": "agent/codex/fleet5-final-e50-report-20261106",
+  "reportBase": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "independentRootCoreAudit": {
+    "commit": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/e50-root-core-artifact-audit.json",
+    "sha256": "ef24b555510edb658c854d2be75c240a64c9e74e3d52a867adec8afe7b8435ea",
+    "exactDocs": 42103667573,
+    "actualConclusion": "MEASURED_PASS"
+  },
+  "finalOwnReportPublication": "Commit/push/exact own Docs follow this write; actual final report SHA and run will be supplied in the orchestration handoff, never treated as e50 source CI",
+  "boundedSourceAndPacketEvidenceReady": true
+}

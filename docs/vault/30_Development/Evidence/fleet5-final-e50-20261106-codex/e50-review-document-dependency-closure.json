@@ -1,0 +1,144 @@
+{
+  "recordedAtKST": "2026-11-06T05:38:10.587493+09:00",
+  "cause": "Actual reviewer History wiki-links the original R-L1 author History; original review bytes must not be edited",
+  "failedGate": "e50-published-review-docs.json/txt actual exit1; sequence stopped before remaining checks",
+  "originalAuthorDocsImports": [
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/.gitattributes",
+      "gitBlob": "c26b808630a08a4821414e2ac547df53c319809e",
+      "sha256": "fcab5cd61ab0ecc1beef78cf486c6b4b7bebf58631251c3805bbc5da12285a24"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-ca-term-false.txt",
+      "gitBlob": "825b59e2f9f2d27b885cc288ff4f332016f7cf5e",
+      "sha256": "1fc82fc25f3e608329531135ef460c67bab79917b7b12fbf5a550d709af0d201"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-contracts.json",
+      "gitBlob": "25f7e2519370232573e9a089700e6595d0037b6a",
+      "sha256": "77dc5f63debb9190d82665f86404923cb93ae85d02dfabefc1d57137f5fea632"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-contracts.txt",
+      "gitBlob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb",
+      "sha256": "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-docs.json",
+      "gitBlob": "2c225dbaa7d2f707ace1130d45b782ca4e1ab352",
+      "sha256": "1b7fb9a0d490b79c65cc0441e1eef84d5b0d63dadeb63a4668f809ed59a6437d"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-docs.txt",
+      "gitBlob": "b8517d9fb0eed6ca6a86f43cf94aca31e9c8b6f4",
+      "sha256": "b320478973f4b92bf1159edd22ca6c59ed2fe3abebf12a0ea0a23cd90e3b668d"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-frontend.json",
+      "gitBlob": "07d3b5afb2babf49ae0f95c033e3aff0844cebda",
+      "sha256": "15b8845bbb7f5f767479488244da63f3765b2004a5811a6bdb7588e8d2897011"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-frontend.txt",
+      "gitBlob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842",
+      "sha256": "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-mutations.json",
+      "gitBlob": "4ba00e4fce7d6952d2baf5d32b6c30f8866dd22b",
+      "sha256": "0c24be2749000e3765c429b284147e531c1c504960775c097c3ef5ccf02083b1"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-node-cert-term-false.txt",
+      "gitBlob": "6bafa822581c6f3128a23d034fa51922d309312b",
+      "sha256": "316ea6fd522f4a25e3971159ed6041e2529938b80ed6b92b395aa75991f87fc4"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-ontology.json",
+      "gitBlob": "88c3e42465a5c38f1672d7449ddcc8c3f9f6241d",
+      "sha256": "9e03ff78afc921fc559e1363b48ec76b38104dbc963277b3da9624c841a822bd"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-ontology.txt",
+      "gitBlob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383",
+      "sha256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-owning-green.json",
+      "gitBlob": "8de32ca3d313c5702e03b8e4359bc21179208a86",
+      "sha256": "b6c7a2578763e93772eb2e8d8aefcbcb0a2782d3ba3a28c5dbf3e2ea8ad940c3"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-owning-green.txt",
+      "gitBlob": "7e160189a343c0bd31eb64d761a224a232f7f1fd",
+      "sha256": "fcdaa66d7976cdc631570b02d4d44a75e6d6e030d5936695bba9dd0f9c7b3fbd"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-paths.json",
+      "gitBlob": "578e4125619313b34b2016531fae36e65ee236ec",
+      "sha256": "1750c112f59c4a318f635b9894360e091fec9a21848cc57af548b5f66b6e1d30"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-paths.txt",
+      "gitBlob": "7068dd5a829129bf0b22306c15dcbb2f364d2457",
+      "sha256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-provenance.json",
+      "gitBlob": "b3db15a96e1fdabf2602933f4931f1048d505c95",
+      "sha256": "448d5c090a1ff1bd3a1cc82ee4a717ed3797bdf1a30a440bb4af5b7a831e28df"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-ratchet.json",
+      "gitBlob": "6b892d033b8382993bd4f5896c8b4ac4ab1c9f1f",
+      "sha256": "139c5dc9781daa45048be9f0a79140d78e914e76fb05d8a3a49fc5553e67ce27"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-ratchet.txt",
+      "gitBlob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee",
+      "sha256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-sync.json",
+      "gitBlob": "2675250fafcae25bf537306bb6c52702a3ba6b2d",
+      "sha256": "07047cd25906102c1e8927b41de656ded2725a65f24ecae33b8a09910425c584"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-codex/rl1-sync.txt",
+      "gitBlob": "02fcdd21969f420702f43780e207c8c2cc86c186",
+      "sha256": "56c9b1f1bf82b6d4a04383083c8b17fcbb472f1088003893e155a3e6f88d677d"
+    },
+    {
+      "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_SF1_credential_tests_Codex.md",
+      "gitBlob": "0bf2c2dc6be2cfb088406dd59cea9ef919ce15ef",
+      "sha256": "6f918a9c93c9b937f3a9d018f7ca2721c0a8dd39739d62fbdc45019098fbc54d"
+    }
+  ],
+  "onlyDocsImported": true,
+  "newR_L1TestFileImported": false,
+  "selectedE50SourceChanged": false,
+  "actualLaterReview": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+  "historicPendingRecordsNotRewritten": true
+}

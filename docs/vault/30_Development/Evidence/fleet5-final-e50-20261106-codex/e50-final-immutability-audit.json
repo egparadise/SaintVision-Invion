@@ -1,0 +1,48 @@
+{
+  "recordedAtKST": "2026-11-06T05:25:33.157227+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "actualSixFiles": [
+    {
+      "name": "candidate-source-manifest.json",
+      "bytes": 1309,
+      "sha256": "ae6fdf1e70a314ec4b1ea7ad3813a1b731aee64e03f040959eaab6b85830b146"
+    },
+    {
+      "name": "fleet5-candidate-source-e50c148287779add421265868ef16909ed984650.zip",
+      "bytes": 47428827,
+      "sha256": "acdbd6669956cf49d2e38163c5af99d51e886a5bb9209df78fa7549758ad3f07"
+    },
+    {
+      "name": "fleet5-nonexecuting-setup-e50c148287779add421265868ef16909ed984650.zip",
+      "bytes": 48826426,
+      "sha256": "63ac53e047a6bbc27341ad87c2d05003a4e107ee3ec68f78020d7ac6738d9c1b"
+    },
+    {
+      "name": "packet-receipt.json",
+      "bytes": 395,
+      "sha256": "350f7ecd73c9bd095901cd92568716fa1c591a5e34e8c82cc950e46a237d5c5f"
+    },
+    {
+      "name": "setup-plan.json",
+      "bytes": 11837,
+      "sha256": "4899f8c96a43ea16b9755e243b48a87bd6b4e420b2d52f3cf8da26b753c0ae81"
+    },
+    {
+      "name": "source-inventory.json",
+      "bytes": 1383617,
+      "sha256": "d92d86c4ed68eb3f5d684f3aee0fdb04a1e82fe7141f0bf584402591a98e7d5d"
+    }
+  ],
+  "metadataPublicCopiesExact": true,
+  "localAndRemoteFrozenRefsExact": {
+    "agent/codex/fleet5-test-followup-20261106": "e50c148287779add421265868ef16909ed984650",
+    "agent/codex/fleet5-setup-integration-20261105-ci2": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "agent/codex/fleet5-setup-integration-20261105": "842973bb73d53015eee77e6c4c55390c072258d0",
+    "agent/codex/fleet5-setup-integration-20261106-report72028": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+    "agent/codex/fleet5-sf1-credential-tests-20261106": "542b48f996344563424228fb9fc454f5970bbd18"
+  },
+  "localC913Preserved": true,
+  "reportProductDiff": [],
+  "old59fOr72028PacketsModified": false,
+  "physicalOrNodeOpsOrObsidianActions": false
+}

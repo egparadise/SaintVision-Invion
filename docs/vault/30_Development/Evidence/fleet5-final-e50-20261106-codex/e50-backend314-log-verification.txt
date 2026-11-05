@@ -1,0 +1,1 @@
+Completed log download failed; original preserved, no automatic retry

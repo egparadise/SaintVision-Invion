@@ -1,0 +1,283 @@
+{
+  "startedAtKST": "2026-11-06T05:19:31.721896+09:00",
+  "finishedAtKST": "2026-11-06T05:19:33.954143+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "workflow": "core",
+  "runId": 42093714198,
+  "job": {
+    "databaseId": 127478148501,
+    "name": "core",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAt": "2026-11-05T19:25:21Z",
+    "completedAt": "2026-11-05T20:06:05Z",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478148501"
+  },
+  "downloadCommand": [
+    "gh",
+    "api",
+    "--allow-escape-sequences",
+    "repos/egparadise/SaintVision-Invion/actions/jobs/127478148501/logs"
+  ],
+  "downloadExit": 0,
+  "rawLogIgnored": ".work\\fleet5-setup-integration\\e50-artifacts\\job-127478148501.log",
+  "rawLogBytes": 493559,
+  "rawLogSHA256": "c5972fd9d402d77b0696a74a6874f2769675a0ef6cc62432dc8b60a47f756ba0",
+  "retrySuffix": "",
+  "escapeSequencesWrittenOnlyToIgnoredFileNeverTerminal": true,
+  "noCIJobRerun": true,
+  "actualMainPytestSummary": "== 9215 passed, 46 skipped, 2 deselected, 2036 warnings in 1584.50s (0:26:24) ==",
+  "actualMainCounts": {
+    "passed": 9215,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 46,
+    "deselected": 2
+  },
+  "actualMainSeconds": 1584.5,
+  "actualObservedGoVersionLines": [
+    "go version go1.27.1 linux/amd64"
+  ],
+  "actualSteps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-python@v5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-go@v5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "FLEET5 early native Go peer-policy lifecycle proof",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "FLEET5 fixed native Go two-cycle proof",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Publish FLEET5 fixed native proof",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Start digest-pinned product ObjectStore service",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Create disposable CX01 PostgreSQL",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Regenerate contracts and detect drift",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Upgrade each published migration head",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Test Linux Node concurrency and crash boundaries",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build Node and isolated synthetic workload image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify Docker API negotiation and actual bounded execution",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build pinned Python workload image for kernel integration",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build owned LAN installer image and provide storage source root",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build production API image and require explicit configuration",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify Workspace recovery boundary first",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify containment controls and physical cleanup",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify business handoff against the execution kernel",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify bounded shard replacement on two real Nodes",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run provisioned LAN installer acceptance",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Require executed LAN installer evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run owned CX01 recovery drill evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Require executed CX01 recovery evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify build admission queue fairness on PostgreSQL",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Require executed build admission queue evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify LAN pilot database scripts with real PostgreSQL",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Require executed LAN pilot database evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Stop disposable product ObjectStore service",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Docker host hygiene (explicit lane)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Require executed evidence and declared platform skips",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Collect fixed-SHA S08 build acceptance observations",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Recompute S08 build acceptance verdict from raw artifacts",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run python -m build services/control-plane --outdir dist",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run go test ./...",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Cleanup disposable CX01 PostgreSQL",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/upload-artifact@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/setup-go@v5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/setup-python@v5",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

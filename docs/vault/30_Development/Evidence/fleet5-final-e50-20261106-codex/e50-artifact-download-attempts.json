@@ -1,0 +1,112 @@
+[
+  {
+    "id": 13445873494,
+    "name": "fleet5-native-peer-phase-fixed-proof-e50c148287779add421265868ef16909ed984650",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "runId": 42093714198,
+    "startedAtKST": "2026-11-06T04:42:27.383738+09:00",
+    "finishedAtKST": "2026-11-06T04:42:28.775404+09:00",
+    "command": [
+      "gh",
+      "api",
+      "repos/egparadise/SaintVision-Invion/actions/artifacts/13445873494/zip"
+    ],
+    "exit": 0,
+    "ignoredZip": ".work\\fleet5-setup-integration\\e50-artifacts\\13445873494.zip",
+    "bytes": 6047,
+    "sha256": "449d294282180d48fc07c3b022f43a41c7434bbeb816f048bd861bd124d1732a",
+    "metadataDigest": "sha256:449d294282180d48fc07c3b022f43a41c7434bbeb816f048bd861bd124d1732a",
+    "digestMatches": true,
+    "retrySuffix": "",
+    "partialPreserved": false,
+    "CIJobRerun": false
+  },
+  {
+    "id": 13447405275,
+    "name": "fleet5-settled-pinned-3.12-e50c148287779add421265868ef16909ed984650",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "runId": 42093699470,
+    "startedAtKST": "2026-11-06T04:42:28.776855+09:00",
+    "finishedAtKST": "2026-11-06T04:42:30.060958+09:00",
+    "command": [
+      "gh",
+      "api",
+      "repos/egparadise/SaintVision-Invion/actions/artifacts/13447405275/zip"
+    ],
+    "exit": 0,
+    "ignoredZip": ".work\\fleet5-setup-integration\\e50-artifacts\\13447405275.zip",
+    "bytes": 6016,
+    "sha256": "73ade0d35524db558b53e1efe34cfb5d4d100a28cdee227e6b09deaa26c9e681",
+    "metadataDigest": "sha256:73ade0d35524db558b53e1efe34cfb5d4d100a28cdee227e6b09deaa26c9e681",
+    "digestMatches": true,
+    "retrySuffix": "",
+    "partialPreserved": false,
+    "CIJobRerun": false
+  },
+  {
+    "id": 13444954137,
+    "name": "fleet5-settled-pinned-3.14-e50c148287779add421265868ef16909ed984650",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "runId": 42093699470,
+    "startedAtKST": "2026-11-06T04:42:30.061514+09:00",
+    "finishedAtKST": "2026-11-06T04:42:31.429671+09:00",
+    "command": [
+      "gh",
+      "api",
+      "repos/egparadise/SaintVision-Invion/actions/artifacts/13444954137/zip"
+    ],
+    "exit": 0,
+    "ignoredZip": ".work\\fleet5-setup-integration\\e50-artifacts\\13444954137.zip",
+    "bytes": 1770,
+    "sha256": "bf753be13bc1a37d2084762974a87ad34ccffd142ea3b414825569492a87ce9a",
+    "metadataDigest": "sha256:bf753be13bc1a37d2084762974a87ad34ccffd142ea3b414825569492a87ce9a",
+    "digestMatches": true,
+    "retrySuffix": "",
+    "partialPreserved": false,
+    "CIJobRerun": false
+  },
+  {
+    "id": 13445399291,
+    "name": "saintvision-s01-storage-evidence-42093714198",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "runId": 42093714198,
+    "startedAtKST": "2026-11-06T04:42:31.430270+09:00",
+    "finishedAtKST": "2026-11-06T04:42:32.744507+09:00",
+    "command": [
+      "gh",
+      "api",
+      "repos/egparadise/SaintVision-Invion/actions/artifacts/13445399291/zip"
+    ],
+    "exit": 0,
+    "ignoredZip": ".work\\fleet5-setup-integration\\e50-artifacts\\13445399291.zip",
+    "bytes": 1770,
+    "sha256": "a57f51b998aa7862328c8d7a85b5b72c763b3962b28a44b56c26956f9cffa0ac",
+    "metadataDigest": "sha256:a57f51b998aa7862328c8d7a85b5b72c763b3962b28a44b56c26956f9cffa0ac",
+    "digestMatches": true,
+    "retrySuffix": "",
+    "partialPreserved": false,
+    "CIJobRerun": false
+  },
+  {
+    "id": 13448697056,
+    "name": "saintvision-core-evidence",
+    "source": "e50c148287779add421265868ef16909ed984650",
+    "runId": 42093714198,
+    "startedAtKST": "2026-11-06T05:19:22.679343+09:00",
+    "finishedAtKST": "2026-11-06T05:19:28.447920+09:00",
+    "command": [
+      "gh",
+      "api",
+      "repos/egparadise/SaintVision-Invion/actions/artifacts/13448697056/zip"
+    ],
+    "exit": 0,
+    "ignoredZip": ".work\\fleet5-setup-integration\\e50-artifacts\\13448697056.zip",
+    "bytes": 13959999,
+    "sha256": "95f8d6da5ef9738902fc0809d6d628b9657109947cf46b311559a2332c2e76b3",
+    "metadataDigest": "sha256:95f8d6da5ef9738902fc0809d6d628b9657109947cf46b311559a2332c2e76b3",
+    "digestMatches": true,
+    "retrySuffix": "",
+    "partialPreserved": false,
+    "CIJobRerun": false
+  }
+]

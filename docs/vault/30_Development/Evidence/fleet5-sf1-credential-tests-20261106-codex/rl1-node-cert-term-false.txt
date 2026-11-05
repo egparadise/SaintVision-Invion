@@ -1,0 +1,43 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_ test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[node-cert.pem] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-1146/test_sf1_owning_verifier_refus0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DB512BBCE0>
+name = 'node-cert.pem'
+
+    @pytest.mark.parametrize("name", ["node-cert.pem", "ca.pem"])
+    def test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation(tmp_path, monkeypatch, name):
+        f = _fixture(tmp_path)
+        finish(f, tmp_path)
+        before = snapshot(f.worker)
+        assert plain.verify_settled(f.worker, now=f.now)["verified"] is True
+        assert snapshot(f.worker) == before
+    
+        credential = f.worker / name
+        original = credential.read_bytes()
+        # Same PEM certificates and keys; only the byte identity changes.
+        changed = original + b"\n"
+        assert rotation._certificates(changed) == rotation._certificates(original)
+        original_validate = rotation.validate_bundle
+        injected = []
+    
+        def validate_then_change(*args, **kwargs):
+            assert args[0] is None and Path(args[1]).resolve() == f.worker.resolve()
+            assert kwargs["installed"] is True and kwargs["finalized"] is True
+            assert kwargs["_archived_public_material"] is not None
+            validated = original_validate(*args, **kwargs)  # Real signature/CA pin validation.
+            assert credential.read_bytes() == original and not injected
+            credential.write_bytes(changed)  # Deliberate tmp_path-only race injection.
+            injected.append(snapshot(f.worker))
+            return validated
+    
+        monkeypatch.setattr(rotation, "validate_bundle", validate_then_change)
+>       with pytest.raises(ValueError, match="SF1 current credentials differ from the settled final bytes"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_fleet5_sf1_current_credentials.py:44: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_fleet5_sf1_current_credentials.py::test_sf1_owning_verifier_refuses_credential_drift_after_bundle_validation[node-cert.pem]
+1 failed, 1 passed in 4.93s

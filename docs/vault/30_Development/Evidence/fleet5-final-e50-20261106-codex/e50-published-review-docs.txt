@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 157, in <module>
+    validate()
+    ~~~~~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-setup-integration-20261105\tools\check_docs.py", line 152, in validate
+    raise ValueError('\n'.join(errors))
+ValueError: Broken wiki link 30_Development\History\2026-11-06_05-21-00_KST_FLEET5_SF1_credential_tests_542b_검토_Claude.md → 2026-11-06_FLEET5_SF1_credential_tests_Codex

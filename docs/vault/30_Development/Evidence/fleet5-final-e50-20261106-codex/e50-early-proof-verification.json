@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    ".work/fleet5-setup-integration/verify_e50_early.py"
+  ],
+  "startedAtKST": "2026-11-06T04:47:43.057830+09:00",
+  "finishedAtKST": "2026-11-06T04:47:45.692475+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "e50-early-proof-verification.txt",
+  "sourceAtStart": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

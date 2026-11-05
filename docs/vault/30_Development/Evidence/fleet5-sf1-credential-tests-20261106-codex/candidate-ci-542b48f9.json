@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "542b48f996344563424228fb9fc454f5970bbd18",
+  "branch": "agent/codex/fleet5-sf1-credential-tests-20261106",
+  "workflows": {
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/48aadb0054da49a0afa7b0ce448a66eb",
+      "dispatchRequestedAtKST": "2026-11-06T04:42:04.570880+09:00",
+      "workflowInputs": {
+        "correlation_id": "post-landing-verify/48aadb0054da49a0afa7b0ce448a66eb"
+      },
+      "dispatchReturnedSuccess": true,
+      "event": "workflow_dispatch",
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42096385358,
+        "headSha": "542b48f996344563424228fb9fc454f5970bbd18",
+        "headBranch": "agent/codex/fleet5-sf1-credential-tests-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42096385358,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42096385358",
+      "headSha": "542b48f996344563424228fb9fc454f5970bbd18",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127487412989,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T19:42:10Z",
+          "completedAt": "2026-11-05T19:42:42Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42096385358/job/127487412989"
+        }
+      ],
+      "rawObservation": "ci-42096385358-20261106T044523.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-sf1-credential-tests-20261106",
+    "refTipSha": "542b48f996344563424228fb9fc454f5970bbd18"
+  },
+  "observedAtKST": "2026-11-06T04:45:19.863458+09:00",
+  "intermediateScope": [
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "R-L1 Docs only; later tests excluded from selected e50, with no hosted test collection or all8/archive claimed",
+  "jobCountObserved": 1
+}

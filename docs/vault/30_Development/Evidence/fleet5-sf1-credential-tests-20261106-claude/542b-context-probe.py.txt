@@ -1,0 +1,16 @@
+# Reviewer-only context probe (temp test file copied into the disposable checkout, removed after).
+import pytest
+from test_lan_leaf_rotation import _plain_unit_transport, _fixture, rotation
+from test_fleet5_plain_reentry import finish, snapshot
+import worker_plain_rotation as plain
+
+@pytest.mark.parametrize("name", ["node-cert.pem", "ca.pem"])
+def test_ctx_drift_before_validation(tmp_path, name):
+    f = _fixture(tmp_path); finish(f, tmp_path)
+    assert plain.verify_settled(f.worker, now=f.now)["verified"] is True
+    p = f.worker / name; p.write_bytes(p.read_bytes() + b"\n")
+    before = snapshot(f.worker)
+    with pytest.raises(ValueError) as e:
+        plain.verify_settled(f.worker, now=f.now)
+    print("\nCTX-PREVALIDATION", name, "->", e.value)
+    assert snapshot(f.worker) == before

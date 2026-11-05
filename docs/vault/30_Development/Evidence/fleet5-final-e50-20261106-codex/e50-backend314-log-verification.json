@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    ".work/fleet5-setup-integration/capture_e50_job.py",
+    "127478106742"
+  ],
+  "startedAtKST": "2026-11-06T04:52:45.680901+09:00",
+  "finishedAtKST": "2026-11-06T04:52:48.198670+09:00",
+  "exit": 1,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "e50-backend314-log-verification.txt",
+  "sourceAtStart": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}

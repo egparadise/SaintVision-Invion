@@ -1,0 +1,82 @@
+{
+  "recordedAtKST": "2026-11-06T05:34:30.282956+09:00",
+  "actualRootMessage": "msg_856dd9e9dbdd",
+  "Root418": {
+    "commit": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+    "exactDocs": 42103667573,
+    "actualConclusion": "success/all jobs/MEASURED_PASS",
+    "packetReviewGitLFSHA256": "e8d3f8ceb500dc2d7ea5060bc3452b3add169f481e0091c5e3680a1454e47456",
+    "originalWorkingCRLF69StillPreserved": true,
+    "coreAuditSHA256": "ef24b555510edb658c854d2be75c240a64c9e74e3d52a867adec8afe7b8435ea"
+  },
+  "R_L1": {
+    "source": "542b48f996344563424228fb9fc454f5970bbd18",
+    "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+    "reviewer": "Claude",
+    "exactReviewDocs": 42102780830,
+    "actualConclusion": "ACCEPT TEST-ONLY; R-L1 CLOSED; no blocking finding",
+    "newFileLinuxCoreBackend": "NOT_RUN, cannot inherit selected e50 CI",
+    "excludedFromE50": true,
+    "noSourceRespin": true
+  },
+  "actualPinnedReviewDocs": [
+    {
+      "status": "MEASURED_PASS",
+      "workflow": "docs.yml",
+      "runId": 42103667573,
+      "headSha": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+      "headBranch": "agent/codex/fleet-five-orchestration-20261105",
+      "event": "workflow_dispatch",
+      "runConclusion": "success",
+      "jobCount": 1,
+      "jobConclusions": {
+        "docs": "success"
+      }
+    },
+    {
+      "status": "MEASURED_PASS",
+      "workflow": "docs.yml",
+      "runId": 42102780830,
+      "headSha": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "headBranch": "agent/claude/fleet5-sf1-credential-tests-542b-review-20261106",
+      "event": "workflow_dispatch",
+      "runConclusion": "success",
+      "jobCount": 1,
+      "jobConclusions": {
+        "docs": "success"
+      }
+    }
+  ],
+  "imports": [
+    {
+      "commit": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-claude/542b-context-probe.py.txt",
+      "gitBlob": "88513e720a44b2137f44d802c1b8807e0b46b2a0",
+      "sha256": "b1f4ebaf9c2d873c901492fb827382f1770d196b0c5d2ea8de785838645c10bf"
+    },
+    {
+      "commit": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-claude/542b-review-raw.txt",
+      "gitBlob": "17847fe44e5a8d286bbfc22e00ff14a56f0bbc1f",
+      "sha256": "2aee7835aefacca2a350f7e4d45b480b86db5ba0e2045c3e1aebe75032b30821"
+    },
+    {
+      "commit": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "path": "docs/vault/30_Development/Evidence/fleet5-sf1-credential-tests-20261106-claude/542b-review.json",
+      "gitBlob": "ab4cb33c3e936394f9517d3b90c5a6a9e3542315",
+      "sha256": "dc32d60de1ebb7acb940fb547b9001d10e8f9cfc31591e0fe343d2fa86398b7a"
+    },
+    {
+      "commit": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
+      "path": "docs/vault/30_Development/History/2026-11-06_05-21-00_KST_FLEET5_SF1_credential_tests_542b_\uac80\ud1a0_Claude.md",
+      "gitBlob": "e464c68dfc81f9a8468edd0ef93a65281b412464",
+      "sha256": "f0c89c3fa4312d8997a3dea575fdebb345f0c5155e7a9c176a5c658494bfd0b2"
+    },
+    {
+      "commit": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/e50-root-core-artifact-audit.json",
+      "gitBlob": "915c2b6023f1b1b3487142f31167487b0948c70b",
+      "sha256": "ef24b555510edb658c854d2be75c240a64c9e74e3d52a867adec8afe7b8435ea"
+    }
+  ]
+}

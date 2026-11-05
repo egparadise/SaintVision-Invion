@@ -12,22 +12,33 @@
       "dispatchReturnedSuccess": true,
       "event": "workflow_dispatch",
       "observation": {
-        "status": "NOT_OBSERVED",
-        "reason": "Run not terminal; never count in-progress or unscheduled/skipped tests as pass"
+        "status": "MEASURED_PASS",
+        "workflow": "backend.yml",
+        "runId": 42093699470,
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "headBranch": "agent/codex/fleet5-test-followup-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 3,
+        "jobConclusions": {
+          "backend (3.14)": "success",
+          "mlflow-live": "success",
+          "backend (3.12)": "success"
+        }
       },
       "runId": 42093699470,
       "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470",
       "headSha": "e50c148287779add421265868ef16909ed984650",
-      "status": "in_progress",
-      "conclusion": "",
+      "status": "completed",
+      "conclusion": "success",
       "jobs": [
         {
           "databaseId": 127478106742,
           "name": "backend (3.14)",
-          "status": "in_progress",
-          "conclusion": "",
+          "status": "completed",
+          "conclusion": "success",
           "startedAt": "2026-11-05T19:25:17Z",
-          "completedAt": "0001-01-01T00:00:00Z",
+          "completedAt": "2026-11-05T19:49:55Z",
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478106742"
         },
         {
@@ -42,14 +53,14 @@
         {
           "databaseId": 127478107423,
           "name": "backend (3.12)",
-          "status": "in_progress",
-          "conclusion": "",
+          "status": "completed",
+          "conclusion": "success",
           "startedAt": "2026-11-05T19:25:17Z",
-          "completedAt": "0001-01-01T00:00:00Z",
+          "completedAt": "2026-11-05T19:55:38Z",
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478107423"
         }
       ],
-      "rawObservation": "ci-42093699470-20261106T042802.json"
+      "rawObservation": "ci-42093699470-20261106T051715.json"
     },
     "core": {
       "workflow": "core.yml",
@@ -62,22 +73,32 @@
       "dispatchReturnedSuccess": true,
       "event": "workflow_dispatch",
       "observation": {
-        "status": "NOT_OBSERVED",
-        "reason": "Run not terminal; never count in-progress or unscheduled/skipped tests as pass"
+        "status": "MEASURED_PASS",
+        "workflow": "core.yml",
+        "runId": 42093714198,
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "headBranch": "agent/codex/fleet5-test-followup-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 2,
+        "jobConclusions": {
+          "core": "success",
+          "s01-storage-roundtrip": "success"
+        }
       },
       "runId": 42093714198,
       "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198",
       "headSha": "e50c148287779add421265868ef16909ed984650",
-      "status": "in_progress",
-      "conclusion": "",
+      "status": "completed",
+      "conclusion": "success",
       "jobs": [
         {
           "databaseId": 127478148501,
           "name": "core",
-          "status": "in_progress",
-          "conclusion": "",
+          "status": "completed",
+          "conclusion": "success",
           "startedAt": "2026-11-05T19:25:21Z",
-          "completedAt": "0001-01-01T00:00:00Z",
+          "completedAt": "2026-11-05T20:06:05Z",
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478148501"
         },
         {
@@ -90,7 +111,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478149168"
         }
       ],
-      "rawObservation": "ci-42093714198-20261106T042804.json"
+      "rawObservation": "ci-42093714198-20261106T051718.json"
     },
     "frontend": {
       "workflow": "frontend.yml",
@@ -140,7 +161,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093726119/job/127478192917"
         }
       ],
-      "rawObservation": "ci-42093726119-20261106T042807.json"
+      "rawObservation": "ci-42093726119-20261106T051721.json"
     },
     "desktopBrowser": {
       "workflow": "desktop-browser.yml",
@@ -180,7 +201,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093738328/job/127478229436"
         }
       ],
-      "rawObservation": "ci-42093738328-20261106T042809.json"
+      "rawObservation": "ci-42093738328-20261106T051724.json"
     },
     "docs": {
       "workflow": "docs.yml",
@@ -203,7 +224,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084668698/job/127446456588"
         }
       ],
-      "rawObservation": "ci-42084668698-20261106T042812.json",
+      "rawObservation": "ci-42084668698-20261106T051726.json",
       "observation": {
         "status": "MEASURED_PASS",
         "workflow": "docs.yml",
@@ -239,7 +260,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42084627956/job/127446304063"
         }
       ],
-      "rawObservation": "ci-42084627956-20261106T042814.json",
+      "rawObservation": "ci-42084627956-20261106T051728.json",
       "observation": {
         "status": "MEASURED_PASS",
         "workflow": "portal-login-harness.yml",
@@ -292,7 +313,7 @@
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093764277/job/127478326251"
         }
       ],
-      "rawObservation": "ci-42093764277-20261106T042817.json"
+      "rawObservation": "ci-42093764277-20261106T051731.json"
     },
     "accessibilityE2e": {
       "workflow": "ac11-accessibility-e2e.yml",
@@ -304,37 +325,46 @@
       "dispatchReturnedSuccess": true,
       "event": "workflow_dispatch",
       "observation": {
-        "status": "NOT_OBSERVED",
-        "reason": "Run not terminal; never count in-progress or unscheduled/skipped tests as pass"
+        "status": "MEASURED_PASS",
+        "workflow": "ac11-accessibility-e2e.yml",
+        "runId": 42093775632,
+        "headSha": "e50c148287779add421265868ef16909ed984650",
+        "headBranch": "agent/codex/fleet5-test-followup-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "accessibility-e2e": "success"
+        }
       },
       "runId": 42093775632,
       "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093775632",
       "headSha": "e50c148287779add421265868ef16909ed984650",
-      "status": "in_progress",
-      "conclusion": "",
+      "status": "completed",
+      "conclusion": "success",
       "jobs": [
         {
           "databaseId": 127478358879,
           "name": "accessibility-e2e",
-          "status": "in_progress",
-          "conclusion": "",
+          "status": "completed",
+          "conclusion": "success",
           "startedAt": "2026-11-05T19:25:44Z",
-          "completedAt": "0001-01-01T00:00:00Z",
+          "completedAt": "2026-11-05T19:36:54Z",
           "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093775632/job/127478358879"
         }
       ],
-      "rawObservation": "ci-42093775632-20261106T042820.json"
+      "rawObservation": "ci-42093775632-20261106T051734.json"
     }
   },
   "physicalAcceptance": false,
-  "allEightFinal": false,
-  "allJobsSuccess": false,
+  "allEightFinal": true,
+  "allJobsSuccess": true,
   "cancelOrRerunPerformed": false,
   "remoteRefCheck": {
     "status": "MEASURED_PASS",
     "ref": "agent/codex/fleet5-test-followup-20261106",
     "refTipSha": "e50c148287779add421265868ef16909ed984650"
   },
-  "observedAtKST": "2026-11-06T04:27:58.518084+09:00",
+  "observedAtKST": "2026-11-06T05:17:12.592851+09:00",
   "jobCountObserved": 12
 }

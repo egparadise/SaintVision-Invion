@@ -1,0 +1,26 @@
+{
+  "startedAtKST": "2026-11-06T04:52:45.844898+09:00",
+  "finishedAtKST": "2026-11-06T04:52:48.183331+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "workflow": "backend",
+  "runId": 42093699470,
+  "job": {
+    "databaseId": 127478106742,
+    "name": "backend (3.14)",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAt": "2026-11-05T19:25:17Z",
+    "completedAt": "2026-11-05T19:49:55Z",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478106742"
+  },
+  "downloadCommand": [
+    "gh",
+    "api",
+    "repos/egparadise/SaintVision-Invion/actions/jobs/127478106742/logs"
+  ],
+  "downloadExit": 1,
+  "rawLogIgnored": ".work\\fleet5-setup-integration\\e50-artifacts\\job-127478106742.log",
+  "rawLogBytes": 0,
+  "rawLogSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "noCIJobRerun": true
+}

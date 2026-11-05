@@ -1,0 +1,81 @@
+{
+  "observedAtKST": "2026-11-06T05:19:22.652366+09:00",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "artifacts": [
+    {
+      "id": 13447405275,
+      "name": "fleet5-settled-pinned-3.12-e50c148287779add421265868ef16909ed984650",
+      "size_in_bytes": 6016,
+      "digest": "sha256:73ade0d35524db558b53e1efe34cfb5d4d100a28cdee227e6b09deaa26c9e681",
+      "created_at": "2026-11-05T19:27:01Z",
+      "updated_at": "2026-11-05T19:27:01Z",
+      "workflow_run": {
+        "id": 42093699470,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-test-followup-20261106",
+        "head_sha": "e50c148287779add421265868ef16909ed984650"
+      }
+    },
+    {
+      "id": 13444954137,
+      "name": "fleet5-settled-pinned-3.14-e50c148287779add421265868ef16909ed984650",
+      "size_in_bytes": 1770,
+      "digest": "sha256:bf753be13bc1a37d2084762974a87ad34ccffd142ea3b414825569492a87ce9a",
+      "created_at": "2026-11-05T19:26:52Z",
+      "updated_at": "2026-11-05T19:26:52Z",
+      "workflow_run": {
+        "id": 42093699470,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-test-followup-20261106",
+        "head_sha": "e50c148287779add421265868ef16909ed984650"
+      }
+    },
+    {
+      "id": 13448697056,
+      "name": "saintvision-core-evidence",
+      "size_in_bytes": 13959999,
+      "digest": "sha256:95f8d6da5ef9738902fc0809d6d628b9657109947cf46b311559a2332c2e76b3",
+      "created_at": "2026-11-05T20:05:58Z",
+      "updated_at": "2026-11-05T20:05:58Z",
+      "workflow_run": {
+        "id": 42093714198,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-test-followup-20261106",
+        "head_sha": "e50c148287779add421265868ef16909ed984650"
+      }
+    },
+    {
+      "id": 13445873494,
+      "name": "fleet5-native-peer-phase-fixed-proof-e50c148287779add421265868ef16909ed984650",
+      "size_in_bytes": 6047,
+      "digest": "sha256:449d294282180d48fc07c3b022f43a41c7434bbeb816f048bd861bd124d1732a",
+      "created_at": "2026-11-05T19:26:23Z",
+      "updated_at": "2026-11-05T19:26:23Z",
+      "workflow_run": {
+        "id": 42093714198,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-test-followup-20261106",
+        "head_sha": "e50c148287779add421265868ef16909ed984650"
+      }
+    },
+    {
+      "id": 13445399291,
+      "name": "saintvision-s01-storage-evidence-42093714198",
+      "size_in_bytes": 1770,
+      "digest": "sha256:a57f51b998aa7862328c8d7a85b5b72c763b3962b28a44b56c26956f9cffa0ac",
+      "created_at": "2026-11-05T19:26:02Z",
+      "updated_at": "2026-11-05T19:26:02Z",
+      "workflow_run": {
+        "id": 42093714198,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-test-followup-20261106",
+        "head_sha": "e50c148287779add421265868ef16909ed984650"
+      }
+    }
+  ]
+}

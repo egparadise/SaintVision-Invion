@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "branch": "agent/codex/fleet5-final-e50-report-20261106",
+  "workflows": {
+    "docs": {
+      "workflow": "docs.yml",
+      "correlationId": "post-landing-verify/a2da322871e74904abca6163fa28992d",
+      "dispatchRequestedAtKST": "2026-11-06T04:34:54.698608+09:00",
+      "workflowInputs": {
+        "correlation_id": "post-landing-verify/a2da322871e74904abca6163fa28992d"
+      },
+      "dispatchReturnedSuccess": true,
+      "event": "workflow_dispatch",
+      "observation": {
+        "status": "MEASURED_PASS",
+        "workflow": "docs.yml",
+        "runId": 42095253246,
+        "headSha": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+        "headBranch": "agent/codex/fleet5-final-e50-report-20261106",
+        "event": "workflow_dispatch",
+        "runConclusion": "success",
+        "jobCount": 1,
+        "jobConclusions": {
+          "docs": "success"
+        }
+      },
+      "runId": 42095253246,
+      "runURL": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42095253246",
+      "headSha": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 127483474920,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-11-05T19:35:00Z",
+          "completedAt": "2026-11-05T19:35:33Z",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42095253246/job/127483474920"
+        }
+      ],
+      "rawObservation": "ci-42095253246-20261106T043811.json"
+    }
+  },
+  "physicalAcceptance": false,
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "cancelOrRerunPerformed": false,
+  "remoteRefCheck": {
+    "status": "MEASURED_PASS",
+    "ref": "agent/codex/fleet5-final-e50-report-20261106",
+    "refTipSha": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249"
+  },
+  "observedAtKST": "2026-11-06T04:38:07.756794+09:00",
+  "intermediateScope": [
+    "docs"
+  ],
+  "fullCandidateAcceptanceHeld": "Report-only gate; selected e50 exact all8 terminal and new packet review remain separate required gates",
+  "jobCountObserved": 1
+}

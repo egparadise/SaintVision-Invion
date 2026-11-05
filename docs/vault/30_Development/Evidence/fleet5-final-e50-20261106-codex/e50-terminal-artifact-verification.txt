@@ -1,0 +1,1 @@
+{"allEightFinal": true, "all12JobsSuccess": true, "mainCore": {"passed": 9215, "skipped": 46}, "ownedFourDirectCorePassed": 106, "installerPassed": 17, "realPGPassed": 2, "actualGo": "go1.27.1 linux/amd64", "packetReviewer": "Codex Root coordinator, not Claude", "packetAccepted": true, "physicalAcceptance": false}

@@ -1,0 +1,45 @@
+{
+  "recordedAtKST": "2026-11-06T04:56:24.283826+09:00",
+  "task": "task_78064fb4b7ff / ctx_ed7ec73163d6",
+  "source": "e50c148287779add421265868ef16909ed984650",
+  "report": "8624c3eec0d967ffb1e49ccffe7fd20af2a52249",
+  "reportExactDocs": 42095253246,
+  "workflowsSuccessful": 6,
+  "observedJobs": 12,
+  "successfulJobs": 10,
+  "pendingJobs": [
+    {
+      "databaseId": 127478107423,
+      "name": "backend (3.12)",
+      "status": "in_progress",
+      "conclusion": "",
+      "startedAt": "2026-11-05T19:25:17Z",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093699470/job/127478107423"
+    },
+    {
+      "databaseId": 127478148501,
+      "name": "core",
+      "status": "in_progress",
+      "conclusion": "",
+      "startedAt": "2026-11-05T19:25:21Z",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42093714198/job/127478148501"
+    }
+  ],
+  "allEightFinal": false,
+  "allJobsSuccess": false,
+  "actualSourceEarlyProof": "e50-verified-early-proofs.json",
+  "completedBackend314": "e50-job-127478106742-escape1-verified.json",
+  "namedBackendXMLRetained": false,
+  "sourceDerivedBackendSelectionAttributionExplicit": true,
+  "packetReviewRequest": "msg_106297af8a4e; actual newpacket/provenance verdict pending",
+  "R_L1PreparedSource": "542b48f996344563424228fb9fc454f5970bbd18",
+  "R_L1ExactDocs": 42096385358,
+  "R_L1ReviewRequest": "msg_9b791a89d7f3; nonblocking and excluded from e50",
+  "remainingWork": "Actual terminal Backend3.12/Core logs/full Core XML/artifact/toolchain/owned no-skip counts, exact all8 terminal, actual bounded newpacket review, then final qualified docs report/exact Docs and bounded worker_done",
+  "queryExecuted": false,
+  "counts": null,
+  "physicalOrProductAcceptance": false,
+  "oldRefsOrPacketsOrOperationsChanged": false
+}
