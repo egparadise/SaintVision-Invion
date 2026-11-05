@@ -1,0 +1,6 @@
+..........ssss..                                                         [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:117: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:129: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:162: OS cannot create test symlinks
+12 passed, 4 skipped in 6.63s

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "fleet5-module-isolation-regression:1",
+  "recordedAtKST": "2026-11-06T00:12:33+09:00",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent review via root pending",
+  "sourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "deltaBaseSHA": "5000069744931afb2fb85d24752a9916f7ba0ccc",
+  "runId": 42047403498,
+  "jobId": 127314057819,
+  "jobConclusion": "failure",
+  "observedCounts": {
+    "failed": 5,
+    "passed": 8717,
+    "skipped": 75,
+    "deselected": 2
+  },
+  "rawJobLogSHA256": "8fa8e2837bd115e63360a6cdc23e4647832f61ac94d7e9db7ec8c5a2b0935985",
+  "isolatedResidueProbe": {
+    "exit": 0,
+    "passed": 12,
+    "windowsSkips": 4
+  },
+  "runnerThenResidueWithoutPriorImportProbe": {
+    "exit": 0,
+    "passed": 6
+  },
+  "priorNormalThenRunnerThenResidueRed": {
+    "exit": 1,
+    "failed": 5,
+    "passed": 2
+  },
+  "productionSourceChanged": false,
+  "freshnessWindowChanged": false,
+  "testSource": "tests/test_lan_leaf_rotation_standalone_runtime.py",
+  "testSourceSHA256": "f5be523c1f242267becbee14e1e24941b8c9b2e5a71524dba6a12802d509b210",
+  "greenResult": {
+    "orderedInitialFix": {
+      "exit": 0,
+      "passed": 7
+    },
+    "orderedFinalSuccessAndFailureIdentityMatrix": {
+      "exit": 0,
+      "passed": 12
+    },
+    "sortedRelevantSuitesFinal": {
+      "exit": 0,
+      "passed": 314,
+      "existingWindowsPlatformSkips": 20
+    },
+    "documentContractChecks": {
+      "exit": 0,
+      "count": 7
+    }
+  },
+  "independentCodeAcceptance": false,
+  "physicalAcceptance": false,
+  "rootDirection": "msg_d8d3b719e68b",
+  "helperIdentityCases": [
+    "original object",
+    "initially absent",
+    "blocked import None"
+  ],
+  "terminalBackend": {
+    "runId": 42047403498,
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "jobId": 127314057819,
+        "python": "3.14",
+        "failed": 5,
+        "passed": 8717,
+        "skipped": 75,
+        "deselected": 2
+      },
+      {
+        "jobId": 127314058613,
+        "python": "3.12",
+        "failed": 5,
+        "passed": 8717,
+        "skipped": 75,
+        "deselected": 2
+      }
+    ]
+  }
+}

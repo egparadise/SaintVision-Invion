@@ -1,0 +1,115 @@
+..FFFFF                                                                  [100%]
+================================== FAILURES ===================================
+__ test_link_publication_crash_replay_removes_only_equal_owned_residue[node] __
+tests\test_leaf_rotation_archive_residue.py:17: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:121: in complete
+    receipt = rotation.install(
+deploy\lan\worker_leaf_rotation.py:939: in install
+    return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:121: in install
+    observed = _floor(root, manifest, files)  # missing/mismatch/unsupported image BLOCKS before mutation
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:35: in _floor
+    phase.verify_floor(value, certificate, manifest)
+deploy\lan\peer_policy_phase.py:170: in verify_floor
+    raise ValueError("Actual Node floor observation is stale or clock-uncertain")
+E   ValueError: Actual Node floor observation is stale or clock-uncertain
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "d575deaf5e8a42f68e5418e6f6499d32", "nodeCount": 2, "batchDigest": "4859ba9f649422c4e8b25491dd59478daab4399f92ed267f8024d7be9e43b3da", "privateKeyTransferred": false}
+_ test_link_publication_crash_replay_removes_only_equal_owned_residue[control] _
+tests\test_leaf_rotation_archive_residue.py:17: in test_link_publication_crash_replay_removes_only_equal_owned_residue
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:121: in complete
+    receipt = rotation.install(
+deploy\lan\worker_leaf_rotation.py:939: in install
+    return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:121: in install
+    observed = _floor(root, manifest, files)  # missing/mismatch/unsupported image BLOCKS before mutation
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:35: in _floor
+    phase.verify_floor(value, certificate, manifest)
+deploy\lan\peer_policy_phase.py:170: in verify_floor
+    raise ValueError("Actual Node floor observation is stale or clock-uncertain")
+E   ValueError: Actual Node floor observation is stale or clock-uncertain
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "13bd9294b7434a2691b91878b20b8786", "nodeCount": 2, "batchDigest": "780c4d1dfdfe452a889649d35cab9790011e445b5cf6cbeb9fff0be0f4c3cbf9", "privateKeyTransferred": false}
+___ test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source ___
+tests\test_leaf_rotation_archive_residue.py:103: in test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:121: in complete
+    receipt = rotation.install(
+deploy\lan\worker_leaf_rotation.py:939: in install
+    return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:121: in install
+    observed = _floor(root, manifest, files)  # missing/mismatch/unsupported image BLOCKS before mutation
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:35: in _floor
+    phase.verify_floor(value, certificate, manifest)
+deploy\lan\peer_policy_phase.py:170: in verify_floor
+    raise ValueError("Actual Node floor observation is stale or clock-uncertain")
+E   ValueError: Actual Node floor observation is stale or clock-uncertain
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "98c1c0fb10544cdebe52cb056c941ca3", "nodeCount": 2, "batchDigest": "9a3b15f1e6d09af3d1caf764540c26ceb4c005ac0d7c1538185e3c42252cdbc4", "privateKeyTransferred": false}
+__________ test_node_successor_requires_verified_predecessor_replay ___________
+tests\test_rotation_predecessor_residue.py:29: in test_node_successor_requires_verified_predecessor_replay
+    case = _normal_cycles(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:108: in _normal_cycles
+    receipt = install(first)
+              ^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_consecutive.py:78: in install
+    return rotation.install(
+deploy\lan\worker_leaf_rotation.py:939: in install
+    return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:121: in install
+    observed = _floor(root, manifest, files)  # missing/mismatch/unsupported image BLOCKS before mutation
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:35: in _floor
+    phase.verify_floor(value, certificate, manifest)
+deploy\lan\peer_policy_phase.py:170: in verify_floor
+    raise ValueError("Actual Node floor observation is stale or clock-uncertain")
+E   ValueError: Actual Node floor observation is stale or clock-uncertain
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "022ca479135245568048701c79b7b0be", "targetChannelVersion": 8, "proposalDigest": "348078ed55aeece98768b2da953af898a2e6b28a6d76e06dcaee46dc20353f53", "privateKeyTransferred": false}
+___________ test_cp_successor_requires_verified_predecessor_replay ____________
+tests\test_rotation_predecessor_residue.py:68: in test_cp_successor_requires_verified_predecessor_replay
+    case = _completed(tmp_path, monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_lan_leaf_rotation_batch_successor.py:258: in _completed
+    case.complete(case.args.output, 0)
+tests\test_lan_leaf_rotation_batch_successor.py:121: in complete
+    receipt = rotation.install(
+deploy\lan\worker_leaf_rotation.py:939: in install
+    return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:121: in install
+    observed = _floor(root, manifest, files)  # missing/mismatch/unsupported image BLOCKS before mutation
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+deploy\lan\worker_plain_rotation.py:35: in _floor
+    phase.verify_floor(value, certificate, manifest)
+deploy\lan\peer_policy_phase.py:170: in verify_floor
+    raise ValueError("Actual Node floor observation is stale or clock-uncertain")
+E   ValueError: Actual Node floor observation is stale or clock-uncertain
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "c64c9b2741e1422692bcb55b9dbbf0ba", "nodeCount": 2, "batchDigest": "18a9368d47cfe8c40f39a37de222e476dc1568d203531acb96126b6bb0f95578", "privateKeyTransferred": false}
+=========================== short test summary info ===========================
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[control]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+FAILED tests/test_rotation_predecessor_residue.py::test_node_successor_requires_verified_predecessor_replay
+FAILED tests/test_rotation_predecessor_residue.py::test_cp_successor_requires_verified_predecessor_replay
+5 failed, 2 passed in 3.78s

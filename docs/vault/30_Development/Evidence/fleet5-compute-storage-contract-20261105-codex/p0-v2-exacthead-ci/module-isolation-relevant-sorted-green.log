@@ -1,0 +1,17 @@
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+...........sssss..........................s............ssss............. [ 87%]
+...................ssssss..........ssss..                                [100%]
+=========================== short test summary info ===========================
+SKIPPED [5] tests\test_lan_leaf_rotation_batch_successor.py:561: OS cannot create test symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:383: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:480: symlink capability unavailable: 1314
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:628: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:642: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:655: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:671: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:117: POSIX ownership/mode guard
+SKIPPED [2] tests\test_leaf_rotation_archive_residue.py:129: POSIX file-owner guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:162: OS cannot create test symlinks
+309 passed, 20 skipped in 79.26s (0:01:19)

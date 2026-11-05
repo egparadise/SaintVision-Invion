@@ -206,7 +206,9 @@ def test_install_is_atomic_idempotent_and_rejects_changed_installed_file(tmp_pat
         runtime.install(bundle, destination)
 
 
-def test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode(tmp_path, monkeypatch):
+@pytest.mark.parametrize("worker_fails", [False, True])
+@pytest.mark.parametrize("helper_entry_state", ["original", "absent", "blocked-import"])
+def test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode(tmp_path, monkeypatch, worker_fails, helper_entry_state):
     raw, lock, wheels = _fixture_lock(monkeypatch)
     bundle = tmp_path / "runtime.zip"
     _bundle(bundle, raw, lock, wheels)
@@ -217,27 +219,52 @@ def test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode(tmp_path
     worker.write_text(
         "import cffi, cryptography, pathlib, pycparser, sys\n"
         "target=pathlib.Path(sys.argv[1])\n"
-        "target.write_text(str(int(target.read_text() or '0') + 1) if target.exists() else '1')\n",
+        "target.write_text(str(int(target.read_text() or '0') + 1) if target.exists() else '1')\n"
+        + ("raise RuntimeError('fixture worker failure after module eviction')\n" if worker_fails else ""),
         encoding="utf-8",
     )
     monkeypatch.setattr(runtime, "WORKER_SHA256", hashlib.sha256(worker.read_bytes()).hexdigest())
     saved_path = list(sys.path)
-    saved_modules = {name: sys.modules.get(name) for name in ("cryptography", "cffi", "pycparser")}
-    for name in saved_modules:
+    saved_argv = list(sys.argv)
+    dependencies = ("cryptography", "cffi", "pycparser")
+    # The production runner intentionally evicts all helper modules. This
+    # in-process fixture must restore their identities for later unit adapters.
+    helper_names = tuple(Path(name).stem for name in runtime.WORKER_MODULES)
+    for name in helper_names:
+        if helper_entry_state == "absent":
+            monkeypatch.delitem(sys.modules, name, raising=False)
+        elif helper_entry_state == "blocked-import":
+            monkeypatch.setitem(sys.modules, name, None)
+    names = (*dependencies, *helper_names)
+    missing = object()
+    saved_modules = {name: sys.modules.get(name, missing) for name in names}
+    for name in dependencies:
         sys.modules.pop(name, None)
     try:
-        runtime.run_worker(destination, worker, [str(observed)])
-        second = runtime.install(bundle, destination)
-        runtime.run_worker(destination, worker, [str(observed)])
-        third = runtime.install(bundle, destination)
+        if worker_fails:
+            with pytest.raises(RuntimeError, match="fixture worker failure after module eviction"):
+                runtime.run_worker(destination, worker, [str(observed)])
+        else:
+            runtime.run_worker(destination, worker, [str(observed)])
+            second = runtime.install(bundle, destination)
+            runtime.run_worker(destination, worker, [str(observed)])
+            third = runtime.install(bundle, destination)
     finally:
         sys.path[:] = saved_path
+        sys.argv[:] = saved_argv
         for name, module in saved_modules.items():
             sys.modules.pop(name, None)
-            if module is not None:
+            if module is not missing:
                 sys.modules[name] = module
-    assert first == second == third
-    assert observed.read_text("utf-8") == "2"
+    assert all(sys.modules.get(name, missing) is module for name, module in saved_modules.items())
+    assert sys.path == saved_path
+    assert sys.argv == saved_argv
+    if worker_fails:
+        assert runtime.install(bundle, destination) == first
+        assert observed.read_text("utf-8") == "1"
+    else:
+        assert first == second == third
+        assert observed.read_text("utf-8") == "2"
     assert not list(destination.rglob("__pycache__"))
     assert sys.dont_write_bytecode is True
 
