@@ -21,5 +21,10 @@
     "audit_sources.py": "1e95e75c0f08ac36c8426f9775fe5aad0a739fa906ad319a394659e0742aff81",
     "adversarial.py": "98ead6c6e5e3d8785d89c90fa92594a8b6c6b897e45fcaf34c987e064b3cf4e2"
   },
+  "committedBlobSha256": {
+    "note": "resultSha256 values above are the CRLF files as produced on Windows; Git normalized them to LF at commit 523b130c. Both are recorded; content is otherwise identical.",
+    "audit-sources-result.json": "e6c85d8be66a07ae872c7002b780cecceecc4fa08cb65977568a5c1dcaeeeabb",
+    "adversarial-result.json": "36e993dc52879e5c6595007e4a9ba0f080e53450bb74feeb770acc29f4a4f6fa"
+  },
   "failuresPreserved": "No required check returned an unexpected exit. Adversarial gaps are recorded as findings, not hidden."
 }
