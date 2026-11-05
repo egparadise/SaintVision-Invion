@@ -1,0 +1,124 @@
+{
+  "observedAtKST": "2026-11-05T16:32:10.056106+09:00",
+  "sourceSHA": "ff97cd9ef01bf9aebda3313cd90631c247a9f63a",
+  "runID": 41982378091,
+  "attempt": 2,
+  "conclusion": "success",
+  "artifactID": 13397325375,
+  "artifactDigest": "sha256:7ea3ed8f372d7740fe406a90ac03e72af27fa6c5515775093be6d8a2a5940bee",
+  "junit": [
+    {
+      "file": "build-product-runtime-real-pg.xml",
+      "sha256": "e53052ad9179ed809995b649ced173a05ee6bc5bd37001af4429275e68e996f5",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13
+    },
+    {
+      "file": "business-handoff-tests.xml",
+      "sha256": "f884165add2de392799fb89e525c03e29bd274ca9c696c258b333aeca5cf6b24",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 17
+    },
+    {
+      "file": "containment-tests.xml",
+      "sha256": "33b9a81f1181037bde380c9cdb784148218078d40c4a05a0df28e7ac791297ed",
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 28
+    },
+    {
+      "file": "core-tests.xml",
+      "sha256": "83227dddc62dbd76552aa1ac7fde8d3d0135dcd65991234b5824174ca0a62808",
+      "tests": 8943,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 46,
+      "passed": 8897,
+      "skipReasons": {
+        "PowerShell and csc.exe shim require Windows": 13,
+        "PowerShell parser requires Windows": 2,
+        "PowerShell required": 9,
+        "Actual Windows PowerShell launcher": 10,
+        "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+        "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+        "run only through tools/placement_benchmark.py": 1,
+        "run only through tools/placement_lock_wait_diagnostic.py": 1,
+        "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+        "claude is not installed on this machine": 1,
+        "codex is not installed on this machine": 1,
+        "gemini is not installed on this machine": 1,
+        "antigravity is not installed on this machine": 1,
+        "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+      },
+      "workspaceGuardCases": 30
+    },
+    {
+      "file": "cx01-recovery-tests.xml",
+      "sha256": "895a225bc4bd098287d3d1da31f3bdceb3f5c51b680d989f984d9d925134fa33",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 20
+    },
+    {
+      "file": "docker-host-tests.xml",
+      "sha256": "3263da98074c7bde418e2a4b3cac9038af51c7b90e4da586b1dc53313a8898e6",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 2
+    },
+    {
+      "file": "lan-installer-tests.xml",
+      "sha256": "4ab899205edb2c31bebc36c855b3e338ffdf0e646a14720bce0b35b8e7996480",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15
+    },
+    {
+      "file": "lan-pilot-database-real-pg.xml",
+      "sha256": "efb50a3b93d100e5b971fbec4bfa88313014b7c63cf38c346d9d9f6a72cc9976",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1
+    },
+    {
+      "file": "shard-recovery-tests.xml",
+      "sha256": "941570c4f9426b13ab5e18a5ad5d82bffed8ce85a1a2664d884e23bf3275de73",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 21
+    },
+    {
+      "file": "workspace-tests.xml",
+      "sha256": "399fb55dd7bdf73355bd9216598a33120ff21848e4ffad6a47939836ec05d246",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 23
+    }
+  ],
+  "attempt1FailureRetained": true,
+  "retryCount": 1,
+  "noAdditionalRetryAuthorized": true,
+  "physicalAcceptanceAssessed": false,
+  "mainCoreDeselected": 2,
+  "mainCoreDeselectedEvidence": "hosted-attempt2-pytest-summary.txt"
+}

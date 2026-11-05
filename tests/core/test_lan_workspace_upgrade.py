@@ -196,8 +196,12 @@ def test_install_rejects_unpreserved_storage_before_any_docker_mutation(installa
 
 
 @pytest.mark.parametrize('profile', ['lan-observe-v1', 'lan-test-v1', worker.PROFILE])
-def test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts(installation, profile):
+@pytest.mark.parametrize('socket_mounted', [True, False], ids=['with-socket', 'state-only'])
+def test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts(installation, profile, socket_mounted):
     p = installation
+    if not socket_mounted:
+        p.current['Mounts'] = p.current['Mounts'][:1]
+    original_mounts = deepcopy(p.current['Mounts'])
     args = p.current['Config']['Cmd']
     args[args.index('--profile')+1] = profile
     original_args = list(args)
@@ -207,6 +211,7 @@ def test_supported_plain_upgrade_preserves_identity_journal_and_recreated_mounts
     record = json.loads((p.state/'workspace-upgrade.json').read_text('utf-8'))
     assert record['phase'] == 'ready'
     assert p.containers[record['backup']]['Id'] == 'original-container'
+    assert p.containers[record['backup']]['Mounts'] == original_mounts
     assert not p.containers[record['backup']]['State']['Running']
     replacement = p.containers[p.name]
     assert replacement['State']['Running'] and replacement['Image'] == p.agent

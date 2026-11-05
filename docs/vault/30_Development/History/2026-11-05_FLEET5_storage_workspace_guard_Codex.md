@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-STORAGE-WORKSPACE-GUARD-20261105-CODEX"
 title: "2026-11-05 FLEET5 storage workspace upgrade guard Codex"
-version: "1.0.0"
+version: "1.0.1"
 status: "in_progress"
 author: "Codex"
 reviewer: "Claude via root"
-updated: "2026-11-05T15:57:00+09:00"
+updated: "2026-11-05T16:33:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "FLEET5-STORAGE-WORKSPACE-GUARD-20261105"
@@ -53,3 +53,21 @@ Core run **41982378091**, exact source `ff97cd9ef01bf9aebda3313cd90631c247a9f63a
 Evidence: `hosted-core-source.json`, `hosted-core-failure.txt`, `hosted-core-attempt1-summary.json`, and copied installer/database JUnit in the unique Evidence directory. Artifact ID **13395590043**, archive digest `88c564a142355e2830840e24546f204bac54477fc92fc97eaf05c1e8f0ec2587`; downloaded to ignored `.work/fleet5-storage-ff97cd9e-core-attempt1`, without executing its contents. Both failing database source/test files are unchanged from source59f. Static inference only: readiness uses a local Unix-socket query, which might observe initdb's temporary server before the target database exists; the suppressed diagnostics do not establish that cause. No database source changes, Docker actions or rerun were performed locally.
 
 Root reply `msg_3a4b885a38eb` confirms actual Claude review is still pending on task `task_5fd9ea4e3779` / dispatch `ctx_ac008a621cfe`; it is not acceptance. Core failure was escalated to root as `msg_47919a2e5927` for a same-head CI retry or separate-owner fix decision. Next owner/root: relay actual review and resolve the out-of-scope Core failure; next owner/Codex: record the resulting CI verdict, publish final evidence/report with documentation gate and send truthful delivery outcome. Physical acceptance, integration landing and source59f bundle mapping remain unchanged.
+
+## Actual independent review and one authorized retry
+
+Root relay `msg_73b2a84a5445` supplied the actual Claude verdict at commit `087aaf3521608a19fff28c8d70bacdda92697367`, original Evidence `fleet5-20261105-claude/packet7dd8-r4ff97-review.json`. Direct readback of review Docs **41983434951** is success at that exact review commit. Claude accepted source **ff97cd9e**, High/Medium **0**, independently ran owner tests **30** plus Claude probes **4** = **34 passed**, and confirmed pre-mutation ordering and storage-backup rollback. The exact `r4Source` extract and original review-blob digest are recorded in `independent-review-ff97.json`; this review does not cover future test bytes.
+
+The Low finding is repository coverage for a plain Node with `/state` and no Docker-socket mount. Claude's independent probe passes. Root directed a test-only coverage addition after the current same-head CI retry reaches a terminal result, followed by focused verification and required exact-head CI/delta review. Accepted helper bytes must remain unchanged.
+
+Root explicitly authorized exactly **one** normal `gh run rerun 41982378091 --failed`. That command returned exit0; direct readback confirms **attempt 2**, still exact source **ff97cd9e**, in progress. Attempt1 failure is preserved and no second retry is authorized if it fails again. Report-only commit `f40c38056628ecac88afd5c6ace46b6734ec080b` is pushed and its Docs **41983977989** is completed/success; it does not change the reviewed helper/test bytes. Next: observe attempt2 terminal result, then add only the requested no-socket test coverage and relay the new test-only hash to root.
+
+## Attempt 2 success and no-socket Low coverage
+
+The sole authorized retry is now terminal **SUCCESS**, exact source **ff97cd9ef01bf9aebda3313cd90631c247a9f63a**, run **41982378091 attempt2**, Core job **127100470442**, duration **31m4s**. Downloaded JUnit directly confirms main suite **8897 passed / 46 skipped / 0 failed / 0 errors**, including the **30 workspace-guard cases**; the captured pytest summary records **2 deselected**. Provisioned installer **15 passed / 0 skipped** and pilot database **1 passed** are separate earlier steps, not extra main-suite cases. `hosted-core-attempt2-summary.json` records per-file counts/hashes and all skip reasons. Artifact **13397325375** has archive digest `7ea3ed8f372d7740fe406a90ac03e72af27fa6c5515775093be6d8a2a5940bee`. Source Docs **41982381571** also succeeded on exact ff97. This is two relevant workflows, not whole eight-lane or physical acceptance.
+
+Attempt1's database failure remains recorded. Same-source retry success establishes intermittency, not the suppressed failure's cause. Root created separate actual database-readiness owner task `task_58f4ada5c2d8` / dispatch `ctx_77b63db632d7`; evidence paths were relayed in `msg_62d2473d2d5e`, terminal retry success in `msg_05209623aae4`. No further retry or bootstrap source edit was made in this branch.
+
+Only after attempt2 completed, the requested test-only Low was addressed: the supported-upgrade regression now exercises both socket-present and `/state`-only input shapes for observe/test/workspace profiles, checks the original backup mounts are preserved, and continues checking the actual recreated mount arguments. Related local workspace/config/storage/readiness is **104 passed / 0 skipped / exit0**, `no-socket-focused.xml` and `.txt`, same Windows/Python3.14.7 `-B` environment. This is three additional parameter cases. The helper stays byte-identical at SHA-256 **83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d**; updated tests hash **ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d**.
+
+Next owner/Codex: publish this test-only delta and run its exact-head required CI. Next owner/root: relay the actual independent delta review. Original Claude34 review applies to ff97 only and is not counted as review of these new test bytes. Source59f bundle packet and protected operational inputs remain unchanged; deployment, integration landing and physical acceptance are not performed here.
