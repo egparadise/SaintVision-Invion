@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "fleet5-b-rev2-independent-review:1",
+  "reviewer": "Claude",
+  "orcaTask": "task_d4c4c809ed4e",
+  "dispatchId": "ctx_c7674e6e1277",
+  "recordedAtKST": "2026-11-06T04:40:00+09:00",
+  "target": {
+    "sha": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+    "parent": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "branch": "agent/codex/fleet5-b-contract-rev2-20261106",
+    "addedFiles": 33,
+    "modifiedFiles": 0,
+    "paths": "1 History + 32 Evidence under fleet5-b-contract-rev2-20261106-codex, docs/vault only"
+  },
+  "inputsRead": {
+    "originalProposal": "100f6f132132199d1204a76190f04712dd82de00 (context, immutable)",
+    "originalReview": "2bb959a3365c2b59c8818ed746480c9183b4c0fc History + b-proposal-100f-review.json",
+    "rootDecision": "implementation-scope-decision-root.json at origin/agent/codex/fleet-five-orchestration-20261105 (ee1e8057, BDecisionBody msg_fa19f6e8d717 D1-D6 + L1-L4)",
+    "rootBoard": "INDEX-PROGRESS 1.0.417 updated 2026-11-06T04:06:14+09:00 at e840937b (registers this task after e50)",
+    "ownerHistory": "History/2026-11-06_FLEET5_B_contract_revision2_Codex.md",
+    "ownerEvidence": "all 32 files of Evidence/fleet5-b-contract-rev2-20261106-codex"
+  },
+  "contextOnly": {
+    "exactDocsCI": "run 42087817282 workflow Documentation Build, job docs 127457567268 success, headSha 02cfd260, 2026-11-05T18:48:39Z-18:49:14Z; reviewer re-read with gh run view",
+    "notBorrowed": "72028 combined CI and optional e50 test review are not B evidence"
+  },
+  "verdict": "REVISION REQUIRED (narrow rev3). Not ACCEPT, not FREEZE.",
+  "broaderNodeWireABI": "NOT ACCEPTED for registration. Requires Root architecture decisions R1 and R2 before freeze.",
+  "originalBlockers": {
+    "B1": "MOSTLY CLOSED in direction (Linux-native only, no DrvFs/9P/Desktop/remap/plain PC5 fallback, whole-cohort BLOCK, namespace-local mount IDs, launcher/probe digests). Residual R7.",
+    "B2": "MOSTLY CLOSED in direction (no second channel/counter, immutable admissions + guarded current pointer, same-tx member CAS ledger, observation_only not exempt, DENY_B default). Residual R3/R4.",
+    "B3": "CLOSED in contract text (pure dual prevalidation before journal/pin, NotBefore<=now-30, S4a exact-intent forward only, no restore/reset, floor history rule). Residual R5 for later grant/revoke rows.",
+    "B4": "MOSTLY CLOSED (durable all-five fence before exposure, prior grant expiry + quiescence, per-member CAS not atomic, tuple+ledger lost-response rule, ADR100 selected-healthy steady state). Residual R2/R3/R5.",
+    "B5": "DEFINED, NOT AUDITED COMPLETELY. Residual R6. Static order is not PG concurrency proof (owner agrees)."
+  },
+  "lowItems": {
+    "L1": "Closed for Mounts/VolumesFrom/top-level Mounts; see L-f (inspection is still a denylist).",
+    "L2": "Closed in text (exact current floor only, approved historical archive or BLOCK).",
+    "L3": "Closed in text (same-key old DER rejected by C/DER/nonce/CP row, not key separation).",
+    "L4": "Closed in text (operator planner freezes A/B bytes; revoke/C jump invalidates)."
+  },
+  "remainingBlockers": [
+    {"id": "R1", "severity": "Medium", "area": "new wire / trust authority", "summary": "roleConfig carries one key (releaseAuthorityPublicKey*) that verifies every per-request role-use token; the issuer is an unattended online attestor. The Node never sees a release object, so 'only the operator release authority can authorize a new generation; runtime cannot mint a release' has no cryptographic expression on the Node. Need key hierarchy decision (offline release key -> scoped online use key with cohort/generation/expiry) or explicit acceptance of a single trusted online key, plus rotation/revocation and the runtime->attestor request interface."},
+    {"id": "R2", "severity": "Medium", "area": "new wire / purpose matrix", "summary": "/v1/executions/receipts is bound to EXECUTION/MODEL business tokens, but at 72028 it is the CP observe/reconcile path (dispatch.py:339 observation_only=attempt.operation=='observe'; node_transport.py:83). No business token exists while fenced, after expiry or after generation change, so in-flight reconciliation, lost-response recovery and the B4 quiescence proof cannot read receipts. The 'separate typed safety authorization' for cancel/quarantine/receipts is not defined in the schema."},
+    {"id": "R3", "severity": "Medium", "area": "B2/B4 post-release lifecycle", "summary": "Post-release per-member readmission after a restart has no phase row, writer or fence rule (text: new operator-bound release transition; D4: no per-member readmission; releases bind all-five evidence). persistence-abi gives releases a 'short expiry' with no refresh rule: a new release needs five fresh members, so one unrelated offline worker would block steady state at release expiry, contradicting ADR100 selected-healthy. Owner predicate caps admissions at 120s (continuous attestor refresh; outage = deny all) and eligible(selected=[]) and eligible(selected=[0,0]) return True."},
+    {"id": "R4", "severity": "Medium", "area": "B2 authority matrix", "summary": "Writers are prose ('operator attestor', 'approval writer', 'guarded operator CAS function') with no named DB principals, GRANT/function owners or separation rule (attestor must not hold planner/approval grants). persistence-abi contradicts itself (admissions 'FK ...release' vs 'no FK to an already existing release'). CP-side one-use nonce/evidence writes at commit need runtime INSERT, which conflicts with 'runtime read/lock only' unless those tables are classified as non-authority runtime-writable with distinct grants."},
+    {"id": "R5", "severity": "Medium", "area": "B3/B4 phase coverage", "summary": "phase-table has no rows for revoke/C jump, epoch change, or grant/approval expiry during the 600s operation with k-of-five CAS done. Text says invalidate + keep quarantine + new reviewed intent, but the entry criteria for a new intent from a mixed pinned (P+1, C+1) / revoked cohort are not closed."},
+    {"id": "R6", "severity": "Medium", "area": "B5 audit completeness", "summary": "currentSourceInversions lists 4 entries. Reviewer found more concrete inversions against the proposed graph at 72028: leases.lock_run runs FOR UPDATE (leases.py:25) before lock_resources inv.nodes FOR UPDATE (leases.py:44); containment operator_grants FOR SHARE (containment.py:23) before inv.nodes FOR UPDATE (containment.py:109); observation.py:141 locks every online Node FOR UPDATE with no fence prefix; every Database.transaction takes control_epoch FOR SHARE first (db.py:202). Lock modes per rank (fence row SHARE vs UPDATE, fence-writer starvation under lock_timeout 2s) are unspecified."},
+    {"id": "R7", "severity": "Medium", "area": "B1 context capability", "summary": "executionContext has no CPU/memory/disk/network capacity fields, only const-true 'verified' booleans and capabilityEvidenceSha256 (raw measurement record schema undefined). Actual host at review time: 125 MB free of 16151 MB (99.2% used, 2026-11-06T04:2x KST) is a physical blocker for any guest. wsl2-ext4-dedicated-engine-v1 needs distro/instance identity, automount/interop disabled, and acknowledgement that WSL2 distros share one kernel/boot_id with Docker Desktop's distro."}
+  ],
+  "low": [
+    {"id": "L-a", "summary": "Python jsonschema uses re.search; '^...$' accepts a trailing newline for roleUseSignedToken and every ^[0-9a-f]{64}$ field (adversarial cases true). Go regexp/ECMA disagree. Require full-match semantics and cross-language vectors."},
+    {"id": "L-b", "summary": "roleUse issuedAt/expiresAt relation and <=120s window are not in schema/predicate (expiresAt<issuedAt and a 1e9s window validate). Time units are unstated for admission/roleUse/roleFloor."},
+    {"id": "L-c", "summary": "String fields accept U+2028, NUL and lone surrogates; C2 must reject invalid UTF-8/lone surrogates before Go marshal (U+FFFD substitution). Signature input bytes (domain||NUL||decoded canonical payload?) are not stated precisely."},
+    {"id": "L-d", "summary": "MODEL and EXECUTION share Node paths; purpose distinction is enforceable only at CP/attestor. State it."},
+    {"id": "L-e", "summary": "Existing journal is permit-keyed fsync'd records (journal.go:163). Per-terminal-frame durable nonce consumption needs GC-by-expiry; a generation-bound in-memory replay set may suffice because servingGeneration carries a per-process nonce. Decide."},
+    {"id": "L-f", "summary": "Workload inspection stays a denylist: docker.go at 72028 has 0 references to CapAdd, UsernsMode, Sysctls, Runtime, VolumeDriver, CgroupParent (plus Mounts/VolumesFrom). Prefer closed allowlist decoding of HostConfig."},
+    {"id": "L-g", "summary": "Caller classification is a path/name heuristic (build_source_audit.py classification()) with 'unclassified: []' set by construction; per-call-site semantics remain future code review. Route entry app.py (storage collect) is only transitively covered; tools/rls-table-census.json (RLS census new tables must join) is excluded as non-source."},
+    {"id": "L-h", "summary": "root.device/inode are free strings; canonical encoding for host-vs-Node comparison unstated."}
+  ],
+  "independentChecks": "commands.json",
+  "futureCodeOnly": [
+    "token decode/re-encode equality, Ed25519 verification, unique-key JSON, canonical C2 vectors",
+    "Node rawpath/query/body equivalence (72028 server.go:67 already rejects RawQuery/RawPath and non-POST)",
+    "nonce consumption and generation comparison on Node",
+    "all DB GRANTs/functions/triggers, lock order, retry, CAS ledger",
+    "capability probe, launcher adapter, host-to-Node root correspondence",
+    "quiescence evidence, CP client switch witnesses"
+  ],
+  "realEvidenceCounts": {"realGo": 0, "realPostgres": 0, "LinuxDocker": 0, "crash": 0, "concurrency": 0, "physical": 0},
+  "realBindings": null,
+  "rootDecisionNeeds": [
+    "R1 key hierarchy and attestor trust (Codex owner proposes, Root decides)",
+    "R2 typed observation/safety authorization for receipts/cancel/quarantine",
+    "R3 post-release readmission and release lifetime vs ADR100",
+    "R4 named DB principal/GRANT matrix",
+    "R7 managed VM vs WSL2 for the CP context and capacity preflight fields",
+    "Whether CP-only persistence/phase parts may freeze while the Node wire ABI is held"
+  ],
+  "notDone": "No B code/ADR/registry/board/NodeOps, no author checkout, no Docker/WSL/SSH/keys/clock/schedule, no Obsidian apply, no process kills or pagefile changes."
+}

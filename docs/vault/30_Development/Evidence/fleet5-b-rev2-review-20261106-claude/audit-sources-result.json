@@ -1,0 +1,73 @@
+{
+  "base": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "rev2": "02cfd260437e1d592cb4bf67e5d6764c4260363a",
+  "fourF": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+  "surfaces46": {
+    "count": 46,
+    "shaMismatch": [],
+    "not4f": [],
+    "notOrig": [],
+    "rev2Changed": [],
+    "anchorTotal": 341,
+    "anchorExact": 329,
+    "anchorStripOnly": 12,
+    "anchorBad": []
+  },
+  "bindings": {
+    "count": 11,
+    "shaMismatch": [],
+    "overlapWith46": []
+  },
+  "census": {
+    "graphFiles": 90,
+    "graphKinds": {
+      "RELATED_NODE_EPOCH_CONTRIBUTION": 228,
+      "DIRECT_CHANNEL": 87
+    },
+    "graphDirectByKind": 32,
+    "mineDirect": 34,
+    "mineRelated": 81,
+    "mineUnion": 94,
+    "directMissingFromGraph": [
+      "tools/baselines/doc_path_citations.txt",
+      "tools/rls-table-census.json"
+    ],
+    "relatedMissingFromGraph": [
+      "deploy/CONFIGURED-SERVER.md",
+      "services/control-plane/README.md",
+      "tools/rls-table-census.json"
+    ],
+    "graphNotInMineUnion": [],
+    "directKindSetDiff_mineMinusGraph": [
+      "tools/baselines/doc_path_citations.txt",
+      "tools/rls-table-census.json"
+    ],
+    "directKindSetDiff_graphMinusMine": [],
+    "graphShaMismatch": [],
+    "unclassifiedHits": 0,
+    "narrowCensusFiles": 29,
+    "narrowCensusNotInGraph": [],
+    "narrowCensusShaMismatch": []
+  },
+  "b2Callers": {
+    "services/control-plane/src/inv/placement.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/capacity.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/gpu.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/node_resource_usage.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/containment.py": "TYPED_DIAGNOSTIC_STOP_ALLOWED_BUSINESS_AND_STATE_WRITES_CANONICAL_GATE",
+    "services/control-plane/src/inv/observer_worker.py": "DIAGNOSTIC_ONLY_NO_BUSINESS_PROOF",
+    "services/control-plane/src/inv/node_execution.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/node_transfer.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/terminal.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/model_source.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/model_runtime.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/storage_commit.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "services/control-plane/src/inv/storage_check_collect.py": "BUSINESS_CANONICAL_GATE_CURRENT_ADMISSION_REQUIRED",
+    "tools/check_lan_storage_readiness.py": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B",
+    "tools/five_node_lab_preflight.py": "TOOL_BUSINESS_READINESS_GATE_OR_REFUSE_B"
+  },
+  "transitiveCandidatesNotInGraph": [
+    "services/control-plane/src/inv/remote_git.py",
+    "services/control-plane/src/inv/workspace_git.py"
+  ]
+}

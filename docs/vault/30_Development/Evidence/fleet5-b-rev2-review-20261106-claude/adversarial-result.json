@@ -1,0 +1,224 @@
+{
+  "tool": "reviewer adversarial checks",
+  "level": "SCHEMA_AND_OWNER_MOCK_PREDICATE_ONLY",
+  "cases": [
+    {
+      "case": "token-trailing-newline",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "ECMA-262 '$' would reject; Python re '$' accepts before final newline"
+    },
+    {
+      "case": "token-undecodable-b64-length-1mod4",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "shape-only; decode/re-encode equality is future code"
+    },
+    {
+      "case": "token-uppercase-sig",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "roleUse-nonce-trailing-newline",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "same '$' semantics on every ^...$ hash pattern"
+    },
+    {
+      "case": "roleUse-expires-before-issued",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "no schema/predicate expiry relation"
+    },
+    {
+      "case": "roleUse-expiry-window-1e9s",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "<=120s is text-only; no predicate fixture"
+    },
+    {
+      "case": "roleUse-EXECUTION-receipts-requires-business-token",
+      "actual": true,
+      "contractRequires": true,
+      "agrees": true,
+      "note": "receipts is also the CP observe/reconcile path (dispatch.py:339, node_transport.py:83)"
+    },
+    {
+      "case": "roleUse-path-not-business /v1/snapshots",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "roleUse-path-not-business /v1/heartbeats",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "roleUse-path-not-business /v1/executions/cancel",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "roleUse-path-not-business /v1/builds/quarantine",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "roleUse-MODEL-and-EXECUTION-share-paths",
+      "actual": true,
+      "contractRequires": true,
+      "agrees": true,
+      "note": "Node cannot distinguish MODEL vs EXECUTION by path; purpose check is CP/attestor-side only"
+    },
+    {
+      "case": "roleUse-string-with-U2028-NUL-lone-surrogate",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "no character-class constraint; Go json would turn lone surrogate into U+FFFD"
+    },
+    {
+      "case": "eligible-empty-selection",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": ""
+    },
+    {
+      "case": "eligible-duplicate-selection",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "duplicates not rejected by model"
+    },
+    {
+      "case": "eligible-foreign-index",
+      "actual": "EXCEPTION IndexError",
+      "contractRequires": false,
+      "agrees": false,
+      "note": "foreign Node not representable; out-of-range raises"
+    },
+    {
+      "case": "eligible-unrelated-offline-selected-healthy",
+      "actual": true,
+      "contractRequires": true,
+      "agrees": true,
+      "note": "ADR100 steady state"
+    },
+    {
+      "case": "eligible-admission-expiry-over-120s",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": "model caps admission lifetime at 120s: attestor must refresh every Node continuously"
+    },
+    {
+      "case": "eligible-release-not-current-denies-all",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": "persistence-abi gives releases 'short expiry'; refreshing needs a new all-five release -> offline worker would block steady state"
+    },
+    {
+      "case": "eligible-fenced-denies",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "eligible-stale-generation-denies",
+      "actual": false,
+      "contractRequires": false,
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "cas-revoked-before-cas",
+      "actual": "BLOCK_UNKNOWN",
+      "contractRequires": "BLOCK_UNKNOWN",
+      "agrees": true,
+      "note": ""
+    },
+    {
+      "case": "pin-replay-P-C-same-integer-scale",
+      "actual": true,
+      "contractRequires": true,
+      "agrees": true,
+      "note": "P and C passed as one integer pair; does not model independent P/C bases"
+    },
+    {
+      "case": "persistence-admission-FK-release-vs-no-FK-ordering",
+      "actual": true,
+      "contractRequires": false,
+      "agrees": false,
+      "note": "tables[] lists FK ...release while admissionReleaseOrdering says no FK to an existing release"
+    },
+    {
+      "case": "persistence-distinct-db-principals-named",
+      "actual": false,
+      "contractRequires": true,
+      "agrees": false,
+      "note": "writers are prose ('operator attestor', 'approval writer'); no named DB role/GRANT matrix"
+    },
+    {
+      "case": "roleConfig-single-trust-key",
+      "actual": [
+        "releaseAuthorityPublicKeyPath",
+        "releaseAuthorityPublicKeySha256"
+      ],
+      "contractRequires": [
+        "releaseAuthorityPublicKeyPath",
+        "releaseAuthorityPublicKeySha256"
+      ],
+      "agrees": true,
+      "note": "one key verifies both release authority and every per-request role-use token"
+    },
+    {
+      "case": "executionContext-has-cpu-memory-disk-network-capability",
+      "actual": false,
+      "contractRequires": true,
+      "agrees": false,
+      "note": "only boolean verified flags + capabilityEvidenceSha256"
+    },
+    {
+      "case": "executionContext-wsl2-distro-identity-field",
+      "actual": false,
+      "contractRequires": true,
+      "agrees": false,
+      "note": "WSL2 distros share one utility-VM kernel/boot_id with Docker Desktop"
+    },
+    {
+      "case": "phase-table-has-revoke-epoch-grant-expiry-rows",
+      "actual": false,
+      "contractRequires": true,
+      "agrees": false,
+      "note": ""
+    },
+    {
+      "case": "phase-table-has-post-release-member-readmission-row",
+      "actual": false,
+      "contractRequires": true,
+      "agrees": false,
+      "note": ""
+    }
+  ],
+  "agree": 15,
+  "disagree": 15
+}
