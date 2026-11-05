@@ -1,0 +1,64 @@
+[
+  {
+    "name": "check-docs",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_docs.py"
+    ],
+    "startKST": "2026-11-05T16:09:10.544938+09:00",
+    "endKST": "2026-11-05T16:09:11.541008+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-ontology",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_ontology.py"
+    ],
+    "startKST": "2026-11-05T16:09:11.541385+09:00",
+    "endKST": "2026-11-05T16:09:13.282841+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-contract-bindings",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_contract_bindings.py"
+    ],
+    "startKST": "2026-11-05T16:09:13.283199+09:00",
+    "endKST": "2026-11-05T16:09:24.359073+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-frontend-integrity",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_frontend_integrity.py"
+    ],
+    "startKST": "2026-11-05T16:09:24.359615+09:00",
+    "endKST": "2026-11-05T16:09:24.752701+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-single-source",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "startKST": "2026-11-05T16:09:24.753329+09:00",
+    "endKST": "2026-11-05T16:09:25.138767+09:00",
+    "exit": 0
+  },
+  {
+    "name": "check-path-citations",
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "tools/check_doc_path_citations.py",
+      "--ratchet"
+    ],
+    "startKST": "2026-11-05T16:09:25.139115+09:00",
+    "endKST": "2026-11-05T16:09:25.286677+09:00",
+    "exit": 2
+  }
+]
