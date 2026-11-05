@@ -1,0 +1,17 @@
+python.exe : Traceback (most recent call last):
+위치 줄:9 문자:3
++   & D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B @parts ...
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+  File "D:\Project\SaintVisionI-Invion\fleet5-consecutive-leaf-rotation-20261105\tools\check_docs.py", line 157, in <mo
+dule>
+    validate()
+    ~~~~~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-consecutive-leaf-rotation-20261105\tools\check_docs.py", line 152, in val
+idate
+    raise ValueError('\n'.join(errors))
+ValueError: Unreadable UTF-8 document/config: 30_Development\Evidence\fleet5-consecutive-leaf-rotation-20261105\green-f
+ocused.txt
+Unreadable UTF-8 document/config: 30_Development\Evidence\fleet5-consecutive-leaf-rotation-20261105\red-two-cycle.txt

@@ -1,0 +1,295 @@
+FFFFFFFFFFss                                                             [100%]
+================================== FAILURES ===================================
+__ test_link_publication_crash_replay_removes_only_equal_owned_residue[node] __
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_link_publication_crash_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000107B7EC8C30>
+role = 'node'
+
+    @pytest.mark.parametrize("role", ["node", "control"])
+    def test_link_publication_crash_replay_removes_only_equal_owned_residue(tmp_path, monkeypatch, role):
+        case = _completed(tmp_path, monkeypatch)
+        if role == "node":
+            worker = case.workers[NODE_ID]
+            bundle = case.args.output / f"nodes/{NODE_ID}"
+            manifest = json.loads((bundle / "rotation.json").read_bytes())
+            archive = worker / "leaf-rotation-finalized" / f'{manifest["rotationId"]}.json'
+            original = archive.read_bytes()
+            archive.rename(archive.with_suffix(".preserved"))
+            journal = json.loads((worker / "leaf-rotation.json").read_bytes())
+            journal["phase"] = "restarted"
+            (worker / "leaf-rotation.json").write_bytes(rotation._canonical(journal))
+            (worker / "peer-policy.json").write_bytes((bundle / "peer-policy-overlap.json").read_bytes())
+
+            def publish():
+                rotation.finalize(bundle, worker, tmp_path / "commits-0" / f"{NODE_ID}.json", now=case.clock[0], restart=lambda _root: None)
+
+        else:
+            _, batch, _ = lan_pilot._batch_material(case.args.output)
+            archive = lan_pilot._batch_archive_path(case.args.state, batch)
+            original = None
+
+            def publish():
+                lan_pilot.retire_leaf_rotation_batch(case.retirement)
+
+        real_link = os.link
+
+        def link_then_crash(source, target, *args, **kwargs):
+            real_link(source, target, *args, **kwargs)
+            raise RuntimeError("crash after complete link publication")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(rotation.os, "link", link_then_crash)
+            with pytest.raises(RuntimeError, match="complete link publication"):
+                publish()
+        temporary = archive.with_name(archive.name + ".next")
+        published = archive.read_bytes()
+        if original is not None:
+            assert published == original
+        assert temporary.read_bytes() == published
+        inode = archive.stat().st_ino
+        publish()
+        assert archive.read_bytes() == published
+        assert archive.stat().st_ino == inode
+>       assert not temporary.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_link_publication_crash_re0/nod_01HZZZZZZZZZZZZZZZZZZZZZZZ/leaf-rotation-finalized/32eb54a6c1d041b9be105130b5eea354.json.next').exists
+
+tests\test_leaf_rotation_archive_residue.py:57: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "32eb54a6c1d041b9be105130b5eea354", "nodeCount": 2, "batchDigest": "00f8514823bd1e70dc0b7559a92933ed54887c41695283ed8e3ff17514b07b98", "privateKeyTransferred": false}
+{"staged": true, "idempotentReplay": false, "batchId": "32eb54a6c1d041b9be105130b5eea354", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "globalControlLeafSwitched": false}
+{"staged": true, "idempotentReplay": false, "batchId": "32eb54a6c1d041b9be105130b5eea354", "nodeId": "nod_01HYYYYYYYYYYYYYYYYYYYYYYY", "channelVersion": 12, "globalControlLeafSwitched": false}
+{"committed": true, "idempotentReplay": false, "batchId": "32eb54a6c1d041b9be105130b5eea354", "nodeCount": 2, "globalControlLeafSwitched": true, "nodeOverlapFinalizationRequired": true}
+_ test_link_publication_crash_replay_removes_only_equal_owned_residue[control] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_link_publication_crash_re1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000107B7FD0EF0>
+role = 'control'
+
+    @pytest.mark.parametrize("role", ["node", "control"])
+    def test_link_publication_crash_replay_removes_only_equal_owned_residue(tmp_path, monkeypatch, role):
+        case = _completed(tmp_path, monkeypatch)
+        if role == "node":
+            worker = case.workers[NODE_ID]
+            bundle = case.args.output / f"nodes/{NODE_ID}"
+            manifest = json.loads((bundle / "rotation.json").read_bytes())
+            archive = worker / "leaf-rotation-finalized" / f'{manifest["rotationId"]}.json'
+            original = archive.read_bytes()
+            archive.rename(archive.with_suffix(".preserved"))
+            journal = json.loads((worker / "leaf-rotation.json").read_bytes())
+            journal["phase"] = "restarted"
+            (worker / "leaf-rotation.json").write_bytes(rotation._canonical(journal))
+            (worker / "peer-policy.json").write_bytes((bundle / "peer-policy-overlap.json").read_bytes())
+
+            def publish():
+                rotation.finalize(bundle, worker, tmp_path / "commits-0" / f"{NODE_ID}.json", now=case.clock[0], restart=lambda _root: None)
+
+        else:
+            _, batch, _ = lan_pilot._batch_material(case.args.output)
+            archive = lan_pilot._batch_archive_path(case.args.state, batch)
+            original = None
+
+            def publish():
+                lan_pilot.retire_leaf_rotation_batch(case.retirement)
+
+        real_link = os.link
+
+        def link_then_crash(source, target, *args, **kwargs):
+            real_link(source, target, *args, **kwargs)
+            raise RuntimeError("crash after complete link publication")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(rotation.os, "link", link_then_crash)
+            with pytest.raises(RuntimeError, match="complete link publication"):
+                publish()
+        temporary = archive.with_name(archive.name + ".next")
+        published = archive.read_bytes()
+        if original is not None:
+            assert published == original
+        assert temporary.read_bytes() == published
+        inode = archive.stat().st_ino
+        publish()
+        assert archive.read_bytes() == published
+        assert archive.stat().st_ino == inode
+>       assert not temporary.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_link_publication_crash_re1/pilot/leaf-rotation-finalized/1e97230c6cf446d2afe7116b83b93a09.json.next').exists
+
+tests\test_leaf_rotation_archive_residue.py:57: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "1e97230c6cf446d2afe7116b83b93a09", "nodeCount": 2, "batchDigest": "a7e933934d28b81968685e035b2f7bcfb407c574bdf67ebe77056cd6cd04ff01", "privateKeyTransferred": false}
+{"staged": true, "idempotentReplay": false, "batchId": "1e97230c6cf446d2afe7116b83b93a09", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "globalControlLeafSwitched": false}
+{"staged": true, "idempotentReplay": false, "batchId": "1e97230c6cf446d2afe7116b83b93a09", "nodeId": "nod_01HYYYYYYYYYYYYYYYYYYYYYYY", "channelVersion": 12, "globalControlLeafSwitched": false}
+{"committed": true, "idempotentReplay": false, "batchId": "1e97230c6cf446d2afe7116b83b93a09", "nodeCount": 2, "globalControlLeafSwitched": true, "nodeOverlapFinalizationRequired": true}
+{"batchId": "1e97230c6cf446d2afe7116b83b93a09", "phase": "finalized", "archiveSHA256": "443f101087500f04007f11cc9a9ca5e09a6442800b05e3e39939138e198cf1ff", "nodeCount": 2}
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[different evidence-False] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi0')
+publish = False, residue = b'different evidence'
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[different evidence-True] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi1')
+publish = True, residue = b'different evidence'
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[-False] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi2')
+publish = False, residue = b''
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[-True] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi3')
+publish = True, residue = b''
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[partial-False] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi4')
+publish = False, residue = b'partial'
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+_ test_existing_archive_never_hides_unknown_or_partial_staging_residue[partial-True] _
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_existing_archive_never_hi5')
+publish = True, residue = b'partial'
+
+    @pytest.mark.parametrize("publish", [False, True])
+    @pytest.mark.parametrize("residue", [b"different evidence", b"", b"partial"])
+    def test_existing_archive_never_hides_unknown_or_partial_staging_residue(tmp_path, publish, residue):
+        archive = tmp_path / "history.json"
+        canonical = b"canonical immutable evidence\n"
+        archive.write_bytes(canonical)
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(residue)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_leaf_rotation_archive_residue.py:72: Failed
+______________ test_equal_residue_is_not_removed_by_a_preflight _______________
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_equal_residue_is_not_remo0')
+
+    def test_equal_residue_is_not_removed_by_a_preflight(tmp_path):
+        archive = tmp_path / "history.json"
+        archive.write_bytes(b"canonical evidence\n")
+        temporary = archive.with_name(archive.name + ".next")
+        temporary.write_bytes(archive.read_bytes())
+        rotation._immutable(archive, archive.read_bytes(), publish=False)
+        assert temporary.exists()
+        rotation._immutable(archive, archive.read_bytes(), publish=True)
+>       assert not temporary.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_equal_residue_is_not_remo0/history.json.next').exists
+
+tests\test_leaf_rotation_archive_residue.py:86: AssertionError
+___ test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source ___
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_verified_terminal_cp_repl0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000107B7EB7DF0>
+
+    def test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source(tmp_path, monkeypatch):
+        case = _completed(tmp_path, monkeypatch)
+        lan_pilot.retire_leaf_rotation_batch(case.retirement)
+        _, batch, _ = lan_pilot._batch_material(case.args.output)
+        archive = lan_pilot._batch_archive_path(case.args.state, batch)
+        canonical = archive.read_bytes()
+        journal_raw = (case.args.state / "leaf-rotation-batch.json").read_bytes()
+        temporary = archive.with_name(archive.name + ".next")
+        os.link(archive, temporary)  # exact legacy link/unlink residue, already terminal
+        lan_pilot.retire_leaf_rotation_batch(case.retirement)
+>       assert not temporary.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-956/test_verified_terminal_cp_repl0/pilot/leaf-rotation-finalized/43911d70b62d41759e84b18013c5761a.json.next').exists
+
+tests\test_leaf_rotation_archive_residue.py:99: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "batchId": "43911d70b62d41759e84b18013c5761a", "nodeCount": 2, "batchDigest": "f5a44c527eb732a95299b703057df5126312ff45b2cb10933db9f1fed179790e", "privateKeyTransferred": false}
+{"staged": true, "idempotentReplay": false, "batchId": "43911d70b62d41759e84b18013c5761a", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "globalControlLeafSwitched": false}
+{"staged": true, "idempotentReplay": false, "batchId": "43911d70b62d41759e84b18013c5761a", "nodeId": "nod_01HYYYYYYYYYYYYYYYYYYYYYYY", "channelVersion": 12, "globalControlLeafSwitched": false}
+{"committed": true, "idempotentReplay": false, "batchId": "43911d70b62d41759e84b18013c5761a", "nodeCount": 2, "globalControlLeafSwitched": true, "nodeOverlapFinalizationRequired": true}
+{"batchId": "43911d70b62d41759e84b18013c5761a", "phase": "finalized", "archiveSHA256": "b576c31fff0cbcfe6f7162870d42261e92e5622ff605aebb696b0c41a69327ea", "nodeCount": 2}
+{"batchId": "43911d70b62d41759e84b18013c5761a", "phase": "finalized", "archiveSHA256": "b576c31fff0cbcfe6f7162870d42261e92e5622ff605aebb696b0c41a69327ea", "nodeCount": 2}
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:104: POSIX ownership/mode guard
+SKIPPED [1] tests\test_leaf_rotation_archive_residue.py:123: OS cannot create test symlinks
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[node]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_link_publication_crash_replay_removes_only_equal_owned_residue[control]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[different evidence-False]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[different evidence-True]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[-False]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[-True]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[partial-False]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_existing_archive_never_hides_unknown_or_partial_staging_residue[partial-True]
+FAILED tests/test_leaf_rotation_archive_residue.py::test_equal_residue_is_not_removed_by_a_preflight
+FAILED tests/test_leaf_rotation_archive_residue.py::test_verified_terminal_cp_replay_cleans_equal_residue_from_prior_source
+10 failed, 2 skipped in 5.51s

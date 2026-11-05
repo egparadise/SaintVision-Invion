@@ -1,0 +1,15 @@
+﻿......................................sssss..........................s.. [ 33%]
+..........ssss.......................................................... [ 67%]
+...............ssssss.................................ss.s...........    [100%]
+=========================== short test summary info ===========================
+SKIPPED [5] tests\test_lan_leaf_rotation_batch_successor.py:504: OS cannot create test symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:381: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:486: symlink capability unavailable: 1314
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:615: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:629: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:642: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:658: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_pilot_multinode.py:720: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:751: POSIX fake-driver test runs in hosted Linux
+SKIPPED [1] tests\test_lan_pilot_multinode.py:895: POSIX shell verifier runs in hosted Linux
+194 passed, 19 skipped in 61.78s (0:01:01)

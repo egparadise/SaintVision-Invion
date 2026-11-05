@@ -368,6 +368,77 @@ policy are both still valid; expired material is never restored. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
+Finalization preserves a public proof in
+`<worker-root>/leaf-rotation-finalized/<rotationId>.json`: the exact finalized
+journal bytes, proposal, public bundle, signed Node install receipt and signed
+CP commit receipt. Publication never replaces an existing archive. A distinct
+normal Node rotation may replace the active journal only when this proof binds
+the same tenant, Node, epoch, address, issuing chain, current certificates and
+final policy to the next channel generation. Partial, unknown, rolled-back or
+inconsistent state remains blocked; the previous backup and private key remain
+in place. A legacy finalized journal without this proof requires replaying
+`finalize` with its original bundle and signed CP receipt while its current
+leaves remain valid; replay does not restart an already finalized Node.
+
+For a multi-Node batch, `switched` records the CP commit and does not establish
+that every Node finalized. After each Node finalizes, use the same reviewed
+worker runtime to export a signed public attestation:
+
+```text
+python3 -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \
+  --runtime-dir <reviewed-runtime> --worker-script ./worker_leaf_rotation.py -- \
+  attest-finalized --bundle <node-proposal> --worker-root <worker-state> > <node-finalized.json>
+```
+
+Transfer each public attestation through the reviewed operator path. Each
+contains the immutable public proof and a distinct signature from that Node's
+active private key; an unsigned success flag or install receipt is insufficient.
+On the CP, explicitly retire the batch with every member's unique attestation:
+
+```text
+python tools/lan_pilot.py --state <pilot-state> retire-leaf-rotation-batch \
+  --bundle <batch> --finalized-receipt <node1-finalized.json> \
+  --finalized-receipt <node2-finalized.json>
+```
+
+Repeat `--finalized-receipt` once for every active member, including all five
+when the batch has five Nodes. Retirement verifies the exact batch, signatures,
+CA, tenant, epoch, member set, current CP/Node leaves, final policies and locked
+channel versions/expiry/endpoints. It preserves the exact switched journal,
+batch and signed proofs in a CP-signed, no-overwrite archive under
+`<pilot-state>/leaf-rotation-finalized/<batchId>.json`, then atomically records
+terminal phase `finalized`. Partial/unknown/inconsistent state cannot retire.
+Legacy switched journals use this same explicit proof-based command; legacy
+Node finalizations first need the exact finalize replay described above.
+
+The next normal prepare uses a distinct output and verifies this archived
+predecessor against current authority before publishing a successor generation.
+Exact same-batch prepare/commit replay keeps the terminal phase; a complete
+successor publication interrupted before journal replacement can resume after
+revalidation. Keep old proposal directories, backups, archives and receipts.
+Transfer finalized attestation files without changing their bytes, including
+whitespace, encoding and line endings. Retirement archives the exact transferred
+bytes; a crash replay requires the original files. Reformatting or reserializing
+equivalent JSON is refused and is not a supported recovery path.
+
+Retirement and normal succession require exactly the same active member set,
+tenant, recovery epoch, pinned CA, Node addresses, and Node/CP keys. Adding,
+removing, revoking or re-IPing a member, changing an authority or rotating a key
+blocks this path. This tooling does not support arbitrary cohort/key changes.
+For a new five-PC setup, initialize the full five-member cohort only when all
+five are ready; an initial smaller cohort cannot later append members through
+normal post-rotation succession. Existing observation cohorts remain separate.
+
+After a crash between immutable archive linking and staging-file removal,
+explicit finalize/retirement replay removes only an owned, regular `.next`
+whose bytes exactly match the already verified archive. It preserves that
+archive and refuses unequal, partial, foreign or redirected residue. Read-only
+preflight does not remove staging evidence. External setup classifiers must
+verify the canonical signed archives and all member proofs before treating
+`finalized` as settled; the phase string alone is insufficient.
+This lifecycle is not permission to clear a journal or reset a scheduler latch;
+scheduled-plan changes and operational acceptance remain separate work.
+
 Leaf rotation has two isolated Python runtime choices. The existing venv path is
 still supported. When `python3-venv` is unavailable, build the reviewed offline
 runtime on the Control Plane from the exact PyPI URLs and SHA-256 values in

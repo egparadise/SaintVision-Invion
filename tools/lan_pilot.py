@@ -42,6 +42,7 @@ from inv.node_transport import NodeTLSClient
 from inv.observer_worker import ObservationWorker
 from inv.tooling import NodePrincipal
 from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pem
+import worker_leaf_rotation as worker_rotation
 from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
 from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
 from worker_leaf_rotation import MAXIMUM_OVERLAP_SECONDS
@@ -1544,14 +1545,14 @@ def _batch_journal_path(path):
 
 def _load_batch_journal(path):
     target = _batch_journal_path(path)
-    if not target.exists():
+    if not target.exists() and not target.is_symlink():
         return None
-    value = json.loads(target.read_text("utf-8"))
+    value = json.loads(worker_rotation._regular(target))
     if (
         not isinstance(value, dict)
         or set(value) != BATCH_JOURNAL_KEYS
         or value.get("schemaVersion") not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA}
-        or value.get("phase") not in {"prepared", "staging", "staged", "switched"}
+        or value.get("phase") not in {"prepared", "staging", "staged", "switched", "finalized"}
         or not isinstance(value.get("stagedNodeIds"), list)
         or len(value["stagedNodeIds"]) != len(set(value["stagedNodeIds"]))
     ):
@@ -1560,7 +1561,9 @@ def _load_batch_journal(path):
 
 
 def _batch_material(path):
-    manifest_raw = (path / "batch.json").read_bytes()
+    if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
+        raise ValueError("Leaf rotation batch directory is redirected")
+    manifest_raw = worker_rotation._regular(path / "batch.json")
     manifest = json.loads(manifest_raw)
     if (
         not isinstance(manifest, dict)
@@ -1598,6 +1601,9 @@ def _batch_material(path):
         ):
             raise ValueError("Leaf rotation batch Node identity or version differs")
         node_ids.append(node_id)
+        for directory in (path / "nodes", path / row["bundlePath"]):
+            if directory.is_symlink() or getattr(directory, "is_junction", lambda: False)():
+                raise ValueError("Leaf rotation batch Node directory is redirected")
         raw, proposal, files = _rotation_material(path / row["bundlePath"])
         next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
         next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
@@ -1660,6 +1666,299 @@ def _assert_batch_journal(journal, *, manifest_raw, manifest, bundle):
         )
     ):
         raise ValueError("Another leaf rotation batch owns the pilot state")
+
+
+def _batch_archive_path(path, batch):
+    directory = path / "leaf-rotation-finalized"
+    worker_rotation._owned_directory(directory)
+    return directory / f'{batch["batchId"]}.json'
+
+
+def _current_finalized_batch(path, state, batch, bundles, conn):
+    """Bind retirement/successor validation to fresh exact current public authority."""
+    now = datetime.now(timezone.utc)
+    if (
+        batch["tenantId"] != state["tenantId"]
+        or batch["recoveryEpoch"] != state["epoch"]
+        or set(bundles) != {node["nodeId"] for node in active_configured_nodes(state)}
+        or batch["caBundleSHA256"] != state.get("caBundleSHA256")
+    ):
+        raise ValueError("Finalized batch identity, CA or membership differs")
+    ca_raw = worker_rotation._regular(path / "ca.pem")
+    if _rotation_digest(ca_raw) != batch["caBundleSHA256"]:
+        raise ValueError("Finalized batch pinned CA differs")
+    chain = worker_rotation._certificates(ca_raw)
+    if len(chain) != 2:
+        raise ValueError("Finalized batch issuing chain differs")
+    intermediate, root = chain
+    worker_rotation._verify_signature(root, intermediate)
+    worker_rotation._verify_signature(root, root)
+    if (
+        intermediate.issuer != root.subject
+        or root.issuer != root.subject
+        or not intermediate.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+        or intermediate.extensions.get_extension_for_class(x509.BasicConstraints).value.path_length
+        != 0
+        or not root.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+        or root.extensions.get_extension_for_class(x509.BasicConstraints).value.path_length != 1
+        or not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc
+        or not root.not_valid_before_utc <= now < root.not_valid_after_utc
+    ):
+        raise ValueError("Finalized batch issuing authority is invalid or expired")
+    shared = next(iter(bundles.values()))[2]["control-cert.pem"]
+    if worker_rotation._regular(path / "control-cert.pem") != shared:
+        raise ValueError("Finalized batch current Control Plane leaf differs")
+    control = x509.load_pem_x509_certificate(shared)
+    _validate_current_control_leaf(control, intermediate, state=state, now=now)
+    control_key = serialization.load_pem_private_key(
+        worker_rotation._regular(path / "control-key.pem"), password=None
+    )
+    if (
+        not isinstance(control_key, Ed25519PrivateKey)
+        or control_key.public_key().public_bytes_raw() != control.public_key().public_bytes_raw()
+    ):
+        raise ValueError("Finalized batch Control Plane key differs")
+    conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+    for node_id in sorted(bundles):
+        _raw, proposal, files = bundles[node_id]
+        node = node_by_id(state, node_id)
+        if node.get("credentialRevoked") or proposal["nodeIP"] != node["nodeIP"]:
+            raise ValueError("Finalized batch Node address or credential differs")
+        if (
+            files["ca.pem"] != ca_raw
+            or worker_rotation._regular(node_certificate_path(path, state, node))
+            != files["node-cert.pem"]
+            or worker_rotation._regular(node_policy_path(path, state, node))
+            != files["peer-policy-final.json"]
+        ):
+            raise ValueError("Finalized batch current Node leaf or final policy differs")
+        certificate = worker_rotation._leaf(
+            files["node-cert.pem"],
+            intermediate=intermediate,
+            uri=node_uri(NodePrincipal(state["tenantId"], node_id), state["epoch"]),
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,
+            now=now,
+            address=node["nodeIP"],
+        )
+        worker_rotation._policy(
+            files["peer-policy-final.json"],
+            manifest=proposal,
+            fingerprints=[batch["nextControlCertificateSHA256"]],
+            expires=proposal["certificateNotAfter"],
+        )
+        row = _channel_row(conn, state, node, lock=True)
+        if tuple(row) != (
+            proposal["targetChannelVersion"],
+            proposal["nextNodeCertificateSHA256"],
+            certificate.not_valid_after_utc,
+            True,
+            f'https://{node["nodeIP"]}:{node["nodePort"]}',
+        ):
+            raise ValueError("Finalized batch current channel generation differs")
+    return control_key
+
+
+def _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn):
+    archive_path = _batch_archive_path(path, batch)
+    archive_raw = worker_rotation._history_bytes(archive_path, limit=1024 * 1024)
+    temporary = archive_path.with_name(archive_path.name + ".next")
+    if (temporary.exists() or temporary.is_symlink()) and worker_rotation._history_bytes(
+        temporary, limit=1024 * 1024
+    ) != archive_raw:
+        raise ValueError("Finalized batch archive staging collision")
+    archive = json.loads(archive_raw)
+    if (
+        not isinstance(archive, dict)
+        or set(archive)
+        != {
+            "schemaVersion",
+            "journalRaw",
+            "terminalJournalRaw",
+            "batchManifest",
+            "nodeFinalizations",
+            "controlSignature",
+        }
+        or archive["schemaVersion"] != "saintvision-lan-finalized-batch:1"
+    ):
+        raise ValueError("Finalized batch archive shape differs")
+    switched = json.loads(archive["journalRaw"])
+    terminal = json.loads(archive["terminalJournalRaw"])
+    if (
+        archive_raw != _canonical_json(archive)
+        or archive["terminalJournalRaw"].encode("utf-8")
+        != worker_rotation._regular(_batch_journal_path(path))
+        or archive["batchManifest"].encode("utf-8") != batch_raw
+        or switched.get("phase") != "switched"
+        or terminal != {**switched, "phase": "finalized"}
+        or journal != terminal
+        or set(switched) != BATCH_JOURNAL_KEYS
+        or set(switched["stagedNodeIds"]) != set(bundles)
+        or set(archive["nodeFinalizations"]) != set(bundles)
+    ):
+        raise ValueError("Finalized batch archive journal or member bindings differ")
+    _assert_batch_journal(
+        terminal, manifest_raw=batch_raw, manifest=batch, bundle=Path(terminal["bundlePath"])
+    )
+    for node_id, (raw, _proposal, files) in bundles.items():
+        worker_rotation.verify_finalized_attestation(
+            json.loads(archive["nodeFinalizations"][node_id]), raw, files
+        )
+    body = {key: value for key, value in archive.items() if key != "controlSignature"}
+    signature = archive["controlSignature"]
+    if not isinstance(signature, str) or not re.fullmatch(r"[a-f0-9]{128}", signature):
+        raise ValueError("Finalized batch archive signature differs")
+    x509.load_pem_x509_certificate(
+        next(iter(bundles.values()))[2]["control-cert.pem"]
+    ).public_key().verify(bytes.fromhex(signature), _canonical_json(body))
+    _current_finalized_batch(path, state, batch, bundles, conn)
+    return archive_raw
+
+
+def _finalized_predecessor(path, state, journal, *, candidate=None):
+    if journal.get("phase") != "finalized":
+        raise ValueError("Another leaf rotation batch owns the pilot state")
+    old_path = Path(journal["bundlePath"])
+    old_raw, old, old_bundles = _batch_material(old_path)
+    with psycopg.connect(state["adminDSN"]) as conn:
+        _verify_batch_archive(path, state, journal, old_raw, old, old_bundles, conn)
+    if candidate is not None:
+        _raw, new, new_bundles = candidate
+        if (
+            new["schemaVersion"] != BATCH_ROTATION_SCHEMA
+            or new["batchId"] == old["batchId"]
+            or set(new_bundles) != set(old_bundles)
+            or any(new[key] != old[key] for key in ("tenantId", "recoveryEpoch", "caBundleSHA256"))
+            or new["currentControlCertificateSHA256"] != old["nextControlCertificateSHA256"]
+            or worker_rotation._utc(new["createdAt"]) <= worker_rotation._utc(old["createdAt"])
+            or _batch_archive_path(path, new).exists()
+            or _batch_archive_path(path, new).is_symlink()
+        ):
+            raise ValueError("Normal batch successor differs from finalized predecessor")
+        for node_id in new_bundles:
+            previous, next_proposal = old_bundles[node_id][1], new_bundles[node_id][1]
+            if (
+                next_proposal["currentChannelVersion"] != previous["targetChannelVersion"]
+                or next_proposal["currentNodeCertificateSHA256"]
+                != previous["nextNodeCertificateSHA256"]
+            ):
+                raise ValueError("Normal batch successor channel differs")
+            files = new_bundles[node_id][2]
+            old_files = old_bundles[node_id][2]
+            now = datetime.now(timezone.utc)
+            if files["ca.pem"] != old_files["ca.pem"] or not worker_rotation._utc(
+                new["createdAt"]
+            ) <= now < worker_rotation._utc(new["overlapExpiresAt"]) < worker_rotation._utc(
+                new["certificateNotAfter"]
+            ):
+                raise ValueError("Normal batch successor authority or overlap differs")
+            intermediate = worker_rotation._certificates(files["ca.pem"])[0]
+            certificate = worker_rotation._leaf(
+                files["node-cert.pem"],
+                intermediate=intermediate,
+                uri=node_uri(NodePrincipal(state["tenantId"], node_id), state["epoch"]),
+                usage=ExtendedKeyUsageOID.SERVER_AUTH,
+                now=now,
+                address=next_proposal["nodeIP"],
+            )
+            control = x509.load_pem_x509_certificate(files["control-cert.pem"])
+            _validate_current_control_leaf(control, intermediate, state=state, now=now)
+            if (
+                certificate.public_key().public_bytes_raw()
+                != x509.load_pem_x509_certificate(old_files["node-cert.pem"])
+                .public_key()
+                .public_bytes_raw()
+                or control.public_key().public_bytes_raw()
+                != x509.load_pem_x509_certificate(old_files["control-cert.pem"])
+                .public_key()
+                .public_bytes_raw()
+                or worker_rotation._utc(new["certificateNotAfter"])
+                != min(certificate.not_valid_after_utc, control.not_valid_after_utc)
+            ):
+                raise ValueError("Normal batch successor key or certificate lifetime differs")
+            worker_rotation._policy(
+                files["peer-policy-overlap.json"],
+                manifest=next_proposal,
+                fingerprints=[
+                    new["currentControlCertificateSHA256"],
+                    new["nextControlCertificateSHA256"],
+                ],
+                expires=new["overlapExpiresAt"],
+            )
+            worker_rotation._policy(
+                files["peer-policy-final.json"],
+                manifest=next_proposal,
+                fingerprints=[new["nextControlCertificateSHA256"]],
+                expires=new["certificateNotAfter"],
+            )
+
+
+def retire_leaf_rotation_batch(args):
+    """Record a terminal batch only after every Node signs its exact finalization proof."""
+    path, state = args.state, load(args.state)
+    if args.bundle.is_symlink():
+        raise ValueError("Leaf rotation retirement bundle is redirected")
+    bundle = args.bundle.resolve()
+    batch_raw, batch, bundles = _batch_material(bundle)
+    with exclusive_file(path / "leaf-rotation.lock"):
+        journal = _load_batch_journal(path)
+        _assert_batch_journal(journal, manifest_raw=batch_raw, manifest=batch, bundle=bundle)
+        if journal["phase"] not in {"switched", "finalized"} or set(
+            journal["stagedNodeIds"]
+        ) != set(bundles):
+            raise ValueError("Only a completely switched and Node-finalized batch can retire")
+        finalizations = {}
+        for receipt_path in args.finalized_receipt:
+            raw = worker_rotation._regular(receipt_path)
+            value = json.loads(raw)
+            node_id = value.get("nodeId")
+            if node_id not in bundles or node_id in finalizations:
+                raise ValueError("Each finalized Node proof must be supplied exactly once")
+            worker_rotation.verify_finalized_attestation(
+                value, bundles[node_id][0], bundles[node_id][2]
+            )
+            finalizations[node_id] = raw.decode("utf-8")
+        if set(finalizations) != set(bundles):
+            raise ValueError("Every active Node must supply a signed finalization proof")
+        with psycopg.connect(state["adminDSN"]) as conn:
+            control_key = _current_finalized_batch(path, state, batch, bundles, conn)
+            if journal["phase"] == "finalized":
+                archive_raw = _verify_batch_archive(
+                    path, state, journal, batch_raw, batch, bundles, conn
+                )
+                if json.loads(archive_raw)["nodeFinalizations"] != finalizations:
+                    raise ValueError("Finalized batch replay proof bytes differ")
+                worker_rotation._immutable(
+                    _batch_archive_path(path, batch), archive_raw, publish=True
+                )
+            else:
+                terminal_raw = _canonical_json({**journal, "phase": "finalized"})
+                body = {
+                    "schemaVersion": "saintvision-lan-finalized-batch:1",
+                    "journalRaw": worker_rotation._regular(_batch_journal_path(path)).decode(
+                        "utf-8"
+                    ),
+                    "terminalJournalRaw": terminal_raw.decode("utf-8"),
+                    "batchManifest": batch_raw.decode("utf-8"),
+                    "nodeFinalizations": finalizations,
+                }
+                archive_raw = _canonical_json(
+                    {**body, "controlSignature": control_key.sign(_canonical_json(body)).hex()}
+                )
+                worker_rotation._immutable(
+                    _batch_archive_path(path, batch), archive_raw, publish=True
+                )
+                getattr(args, "_kill", lambda _point: None)("after-retirement-archive")
+                atomic_write(_batch_journal_path(path), terminal_raw)
+    print(
+        json.dumps(
+            {
+                "batchId": batch["batchId"],
+                "phase": "finalized",
+                "archiveSHA256": _rotation_digest(archive_raw),
+                "nodeCount": len(bundles),
+            }
+        )
+    )
 
 
 def _write_rotation_public_material(
@@ -2615,7 +2914,22 @@ def prepare_leaf_rotation_batch(args):
                 if public.public_bytes_raw() != next_node.public_key().public_bytes_raw():
                     raise ValueError("Existing rotation batch CSR binding differs")
             if journal:
-                _assert_batch_journal(journal, manifest_raw=raw, manifest=manifest, bundle=output)
+                if journal["phase"] == "finalized" and journal["batchId"] != manifest["batchId"]:
+                    _finalized_predecessor(path, state, journal, candidate=(raw, manifest, bundles))
+                    journal = _write_batch_journal(
+                        path,
+                        manifest_raw=raw,
+                        manifest=manifest,
+                        bundle=output,
+                        phase="prepared",
+                        staged=[],
+                    )
+                else:
+                    if journal["phase"] == "finalized":
+                        _finalized_predecessor(path, state, journal)
+                    _assert_batch_journal(
+                        journal, manifest_raw=raw, manifest=manifest, bundle=output
+                    )
             else:
                 journal = _write_batch_journal(
                     path,
@@ -2639,7 +2953,7 @@ def prepare_leaf_rotation_batch(args):
             )
             return
         if journal:
-            raise ValueError("Another leaf rotation batch owns the pilot state")
+            _finalized_predecessor(path, state, journal)
         batch_id = uuid4().hex
         batch_now = datetime.now(timezone.utc)
         temporary = output.with_name(output.name + ".next")
@@ -2706,8 +3020,11 @@ def prepare_leaf_rotation_batch(args):
             }
             manifest_raw = _canonical_json(manifest)
             atomic_write(temporary / "batch.json", manifest_raw)
+            if journal:
+                _finalized_predecessor(path, state, journal, candidate=_batch_material(temporary))
             output.parent.mkdir(parents=True, exist_ok=True)
             os.replace(temporary, output)
+            getattr(args, "_kill", lambda _point: None)("after-batch-publication")
             journal = _write_batch_journal(
                 path,
                 manifest_raw=manifest_raw,
@@ -2740,9 +3057,7 @@ def abandon_expired_prepared_leaf_rotation_batch(args):
     manifest_raw, manifest, bundles = _batch_material(bundle)
     archive = path / f'leaf-rotation-abandoned-{manifest["batchId"]}.json'
     now = getattr(args, "_now", None) or datetime.now(timezone.utc)
-    overlap_expires = datetime.fromisoformat(
-        manifest["overlapExpiresAt"].replace("Z", "+00:00")
-    )
+    overlap_expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
     with exclusive_file(path / "leaf-rotation.lock"):
         journal = _load_batch_journal(path)
         common = {
@@ -2785,9 +3100,7 @@ def abandon_expired_prepared_leaf_rotation_batch(args):
                 )
             )
             return
-        _assert_batch_journal(
-            journal, manifest_raw=manifest_raw, manifest=manifest, bundle=bundle
-        )
+        _assert_batch_journal(journal, manifest_raw=manifest_raw, manifest=manifest, bundle=bundle)
         if journal["phase"] != "prepared" or journal["stagedNodeIds"]:
             raise ValueError("Only an entirely unstaged prepared batch may be abandoned")
         if now <= overlap_expires:
@@ -3133,7 +3446,7 @@ def stage_leaf_rotation_batch(args):
         _assert_batch_journal(
             journal, manifest_raw=batch_raw, manifest=batch, bundle=args.bundle.resolve()
         )
-        if journal["phase"] == "switched":
+        if journal["phase"] in {"switched", "finalized"}:
             raise ValueError("A switched leaf rotation batch cannot stage another Node")
         with psycopg.connect(state["adminDSN"]) as conn:
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
@@ -3205,6 +3518,8 @@ def commit_leaf_rotation_batch(args):
             raise ValueError("Every Node must restart and stage before the shared CP leaf switches")
         with psycopg.connect(state["adminDSN"]) as conn:
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            if journal["phase"] == "finalized":
+                _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn)
             for node_id, (_raw, manifest, _files) in bundles.items():
                 node = node_by_id(state, node_id)
                 row = _channel_row(conn, state, node, lock=True)
@@ -3230,14 +3545,15 @@ def commit_leaf_rotation_batch(args):
             node = node_by_id(state, node_id)
             atomic_write(node_certificate_path(path, state, node), files["node-cert.pem"])
             atomic_write(node_policy_path(path, state, node), files["peer-policy-final.json"])
-        _write_batch_journal(
-            path,
-            manifest_raw=batch_raw,
-            manifest=batch,
-            bundle=batch_path,
-            phase="switched",
-            staged=bundles,
-        )
+        if journal["phase"] != "finalized":
+            _write_batch_journal(
+                path,
+                manifest_raw=batch_raw,
+                manifest=batch,
+                bundle=batch_path,
+                phase="switched",
+                staged=bundles,
+            )
         output.mkdir(parents=True, exist_ok=True)
         if output.is_symlink():
             raise ValueError("Batch commit receipt directory must not be a symlink")
@@ -3837,6 +4153,12 @@ def main():
     )
     p.add_argument("--bundle", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p = commands.add_parser(
+        "retire-leaf-rotation-batch",
+        help="Archive a switched batch only with every Node's signed finalization proof",
+    )
+    p.add_argument("--bundle", type=Path, required=True)
+    p.add_argument("--finalized-receipt", type=Path, action="append", required=True)
     p = commands.add_parser(
         "commit-leaf-rotation",
         help="Commit an installed Node rotation with channel CAS and durable public material",

@@ -1,0 +1,113 @@
+[
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_docs.txt",
+    "observedKST": "2026-11-05T18:03:36.515879+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_ontology.txt",
+    "observedKST": "2026-11-05T18:03:38.953803+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_contract_bindings.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_contract_bindings.txt",
+    "observedKST": "2026-11-05T18:03:48.363388+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_frontend_integrity.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_frontend_integrity.txt",
+    "observedKST": "2026-11-05T18:03:49.349862+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_doc_single_source.txt",
+    "observedKST": "2026-11-05T18:03:49.722816+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_doc_path_citations.txt",
+    "observedKST": "2026-11-05T18:03:52.903678+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology_generation.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_ontology_generation.txt",
+    "observedKST": "2026-11-05T18:03:54.362119+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\sync_obsidian.txt",
+    "observedKST": "2026-11-05T18:03:58.598550+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_response_freshness.py"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\check_response_freshness.txt",
+    "observedKST": "2026-11-05T18:03:58.709992+09:00"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/core/test_serving_anchors.py",
+      "tests/test_route_coverage.py",
+      "-q",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "exit": 0,
+    "log": "docs\\vault\\30_Development\\Evidence\\fleet5-consecutive-leaf-rotation-20261105\\batch-successor\\serving-route.txt",
+    "observedKST": "2026-11-05T18:04:05.751002+09:00"
+  }
+]

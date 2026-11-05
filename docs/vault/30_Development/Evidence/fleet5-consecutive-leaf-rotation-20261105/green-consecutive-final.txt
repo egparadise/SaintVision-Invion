@@ -1,0 +1,5 @@
+﻿..........................s............ssss                              [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_lan_leaf_rotation_consecutive.py:381: POSIX directory ownership/mode boundary
+SKIPPED [4] tests\test_lan_leaf_rotation_consecutive.py:486: symlink capability unavailable: 1314
+38 passed, 5 skipped in 20.66s

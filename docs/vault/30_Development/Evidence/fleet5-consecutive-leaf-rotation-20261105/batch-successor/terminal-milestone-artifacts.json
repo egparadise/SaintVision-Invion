@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "fleet5-hosted-artifact-inventory:1",
+  "scope": "a93 Core milestone and exact 8b Docs; not final 8b Core acceptance",
+  "runs": [
+    {
+      "run": 41995694509,
+      "artifacts": [
+        {
+          "id": 13401882501,
+          "name": "saintvision-core-evidence",
+          "size_in_bytes": 13901996,
+          "digest": "sha256:6bb7013ec7dce9e56ab46e7cb02edaca5030881f8f6986ea2958e1ebb73c3d8d",
+          "expired": false,
+          "created_at": "2026-11-05T09:08:09Z",
+          "workflow_run": {
+            "id": 41995694509,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+            "head_sha": "a93ec9f1906cf5374fa8e2de172e11be0fd7cbdf"
+          }
+        },
+        {
+          "id": 13400112106,
+          "name": "saintvision-s01-storage-evidence-41995694509",
+          "size_in_bytes": 1767,
+          "digest": "sha256:0a1a5f1340ef2c1735fcf032572c2dcb34a9bb33186fd32b010287d73fb6a7e5",
+          "expired": false,
+          "created_at": "2026-11-05T08:36:33Z",
+          "workflow_run": {
+            "id": 41995694509,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+            "head_sha": "a93ec9f1906cf5374fa8e2de172e11be0fd7cbdf"
+          }
+        }
+      ]
+    },
+    {
+      "run": 42001888497,
+      "artifacts": [
+        {
+          "id": 13403395401,
+          "name": "route-coverage-report",
+          "size_in_bytes": 1897,
+          "digest": "sha256:6f303d1a85a682c2251d736bababb26a4b925321794ca1e63008f33d16f208d1",
+          "expired": false,
+          "created_at": "2026-11-05T09:23:14Z",
+          "workflow_run": {
+            "id": 42001888497,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+            "head_sha": "8b53fbfef107837602b1b2f700e1f8e7bae28638"
+          }
+        },
+        {
+          "id": 13402283796,
+          "name": "saintvision-guidelines",
+          "size_in_bytes": 11775074,
+          "digest": "sha256:fa676712722fba0ecdb0aededb0d92d2b327782444052ec8c6156256f5c11ee2",
+          "expired": false,
+          "created_at": "2026-11-05T09:23:22Z",
+          "workflow_run": {
+            "id": 42001888497,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+            "head_sha": "8b53fbfef107837602b1b2f700e1f8e7bae28638"
+          }
+        }
+      ]
+    }
+  ]
+}
