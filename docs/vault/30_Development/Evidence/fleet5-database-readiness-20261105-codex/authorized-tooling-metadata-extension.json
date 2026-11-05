@@ -1,0 +1,17 @@
+{
+  "authorizationMessage": "msg_a1cf4c1ac80b",
+  "baseSHA": "84bbec6bcf06f88a2f226972982bfad68fef5848",
+  "scope": "exact current HEAD tooling metadata only",
+  "changedPath": "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+  "changedFields": [
+    "source.toolSHA256.deploy/lan/prepare-pilot-database.sh",
+    "source.toolGitBlobSHA1.deploy/lan/prepare-pilot-database.sh"
+  ],
+  "allOtherJSONFieldsUnchanged": true,
+  "preparationSHA256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+  "preparationGitBlob": "a5695cab0a955d0aeeedf40f6459458ccef6210a",
+  "historicObservationsRerun": false,
+  "operationalPinsChanged": false,
+  "old59fArchiveChanged": false,
+  "observedAtKST": "2026-11-05T17:14:51.748863+09:00"
+}

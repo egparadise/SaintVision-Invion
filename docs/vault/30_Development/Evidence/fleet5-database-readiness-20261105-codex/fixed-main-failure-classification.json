@@ -1,0 +1,38 @@
+{
+  "sourceSHA": "84bbec6bcf06f88a2f226972982bfad68fef5848",
+  "runID": 41987450905,
+  "conclusion": "failure",
+  "main": {
+    "passed": 8875,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 46,
+    "deselected": 2
+  },
+  "failedCases": [
+    {
+      "classname": "tests.test_core_workflow_cx01",
+      "name": "test_lan_database_real_pg_case_executes_once_in_a_focused_core_step"
+    },
+    {
+      "classname": "tests.test_intranet_pki",
+      "name": "test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling"
+    }
+  ],
+  "realDatabaseCases": {
+    "executed": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "executedGate": "success"
+  },
+  "databasePhaseBinding": "verified separately",
+  "localFollowup": {
+    "passed": 10,
+    "failed": 1,
+    "directExit": 1,
+    "originalJUnitSHA256": "3cdd570204973ad35cd3acebd6555a35959e89566cc92d5ae8044c333b5d5a82",
+    "storedJUnitSHA256": "23faa68e41b7c523db38153aa63846bf08a7466f6394481c5275d3b984fedd2b"
+  },
+  "remainingFailure": "Card150 existing tooling metadata requires old prepare blob to equal HEAD; scope decision requested, no pins changed"
+}
