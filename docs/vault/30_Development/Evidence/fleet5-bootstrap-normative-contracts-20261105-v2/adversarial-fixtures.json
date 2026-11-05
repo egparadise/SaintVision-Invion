@@ -1,0 +1,467 @@
+{
+  "schemaVersion": "fleet5-synthetic-adversarial-fixtures:1",
+  "fixtureOnly": true,
+  "actualSignaturesVerified": 0,
+  "cases": [
+    {
+      "id": "X01",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X07",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X13",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X02",
+      "fixture": "synthetic-migration-event.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X08",
+      "fixture": "synthetic-migration-event.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X14",
+      "fixture": "synthetic-migration-event.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X03",
+      "fixture": "synthetic-migration-journal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X09",
+      "fixture": "synthetic-migration-journal.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X15",
+      "fixture": "synthetic-migration-journal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X04",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X10",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X16",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X05",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X11",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X17",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X06",
+      "fixture": "synthetic-runtime-inventory.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/schemaVersion",
+      "value": "wrong-schema",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong schema/domain"
+    },
+    {
+      "id": "X12",
+      "fixture": "synthetic-runtime-inventory.json",
+      "operation": "replace",
+      "pointer": "/artifact/signer/role",
+      "value": "node-leaf",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "wrong signing role"
+    },
+    {
+      "id": "X18",
+      "fixture": "synthetic-runtime-inventory.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/injected",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown property"
+    },
+    {
+      "id": "X19",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/secondMigrationAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "second migration"
+    },
+    {
+      "id": "X20",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/acceptedP0",
+      "value": null,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "missing actual product provenance"
+    },
+    {
+      "id": "X21",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/floor/version",
+      "value": 9007199254740992,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "integer overflow"
+    },
+    {
+      "id": "X22",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/scope/recoveryEpoch",
+      "value": 0,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "invalid epoch"
+    },
+    {
+      "id": "X23",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/hostUID",
+      "value": 4294967296,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "UID overflow"
+    },
+    {
+      "id": "X24",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/oldContainer/name",
+      "value": "name-without-slash",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "literal Docker Name required"
+    },
+    {
+      "id": "X25",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/backupRestartAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "backup restart forbidden"
+    },
+    {
+      "id": "X26",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/backupDeletionAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "backup deletion forbidden"
+    },
+    {
+      "id": "X27",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/rawTokenPublished",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "no secret token publication"
+    },
+    {
+      "id": "X28",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/staleAgeReclaimAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "stale owner no reclaim"
+    },
+    {
+      "id": "X29",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/requiresHeldOSLocks",
+      "value": false,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "lease is not a precheck"
+    },
+    {
+      "id": "X30",
+      "fixture": "synthetic-runtime-inventory.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/legacyAgentImageFallbackAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "no legacy runtime fallback"
+    },
+    {
+      "id": "X31",
+      "fixture": "synthetic-runtime-inventory.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/channelMutationAllowed",
+      "value": true,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "metadata publication only"
+    },
+    {
+      "id": "X32",
+      "fixture": "synthetic-migration-event.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/phase",
+      "value": "UNKNOWN",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "unknown phase"
+    },
+    {
+      "id": "X33",
+      "fixture": "synthetic-migration-journal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/phase",
+      "value": "finalized",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "not a leaf journal"
+    },
+    {
+      "id": "X34",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/acceptedP0/coreCI/conclusion",
+      "value": "failure",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "actual CI success required"
+    },
+    {
+      "id": "X35",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/image/executableSHA256",
+      "value": "8B956E595136603F08D4F5B05D2D9AF61516CECA8D4E4AEA1A4686324CDEB66F",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "lowercase exact bytes digest"
+    },
+    {
+      "id": "X36",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/entrypoint/0",
+      "value": "/inv\u0000node",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "argv embedded NUL"
+    },
+    {
+      "id": "X37",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/1/slot",
+      "value": "PC2",
+      "expected": "REJECT",
+      "layer": "semantic",
+      "reason": "duplicate cohort slot"
+    },
+    {
+      "id": "X38",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/acceptedP0/coreCI/headSHA",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "REJECT",
+      "layer": "semantic",
+      "reason": "CI head not exact source"
+    },
+    {
+      "id": "X39",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/acceptedP0/independentReview/reviewerId",
+      "value": "fixture-author",
+      "expected": "REJECT",
+      "layer": "semantic",
+      "reason": "self review"
+    },
+    {
+      "id": "X40",
+      "fixture": "synthetic-terminal-seal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/oldBackup/restartPolicy",
+      "value": "unless-stopped",
+      "expected": "REJECT",
+      "layer": "semantic",
+      "reason": "backup is always restart=no"
+    },
+    {
+      "id": "X41",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/memberInputs/0/cmdArgvCanonicalSHA256",
+      "value": "857599f605d746ced8fbc2c14fede14fc6324ca8be9af72532bc3349d09c4816",
+      "expected": "REJECT",
+      "layer": "semantic",
+      "reason": "wrong argv domain"
+    },
+    {
+      "id": "X42",
+      "fixture": "synthetic-migration-journal.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/ownerLeaseEnvelopeSHA256",
+      "value": null,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "nonterminal requires lease"
+    },
+    {
+      "id": "X43",
+      "fixture": "synthetic-operation-lease.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/operation",
+      "value": "normal3-renewal",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "normal3 requires two terminal seals"
+    },
+    {
+      "id": "X44",
+      "fixture": "synthetic-migration-event.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/sequence",
+      "value": 2,
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "sequence 2 missing prior hash"
+    },
+    {
+      "id": "X45",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/expectedInventoryHead/envelopeSHA256",
+      "value": "4ba80be0d401a78c94a12c6df39a7965106d379011b614cee7f7904ef92ce566",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "ABSENT inventory cannot have invented hash"
+    },
+    {
+      "id": "X46",
+      "fixture": "synthetic-successor-plan.json",
+      "operation": "replace",
+      "pointer": "/artifact/body/expectedInventoryHead/presence",
+      "value": "PRESENT",
+      "expected": "REJECT",
+      "layer": "schema",
+      "reason": "PRESENT inventory requires nonnull exact hash"
+    }
+  ]
+}

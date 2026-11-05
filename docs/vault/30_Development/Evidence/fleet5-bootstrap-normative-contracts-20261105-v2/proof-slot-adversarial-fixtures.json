@@ -1,0 +1,4315 @@
+{
+  "fixtureOnly": true,
+  "cases": [
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-contract",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-kind",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-role",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#wrong-domain",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#invalid-time",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#scope-hash-mismatch",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[reserve]:/arguments/rootExecutionDecision#stale-observation",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[stopOld]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-contract",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-kind",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-role",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#wrong-domain",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#invalid-time",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#scope-hash-mismatch",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#stale-observation",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#nodeId",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[captureFenced]:/arguments/quiescence#recoveryEpoch",
+      "slotId": "api-request[captureFenced]:/arguments/quiescence",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[preserveOld]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[createNew]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[startNew]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-contract",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-kind",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-role",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#wrong-domain",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#invalid-time",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#scope-hash-mismatch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#stale-observation",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#nodeId",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/signedM2#recoveryEpoch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-contract",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-kind",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-role",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#wrong-domain",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#invalid-time",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#scope-hash-mismatch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#stale-observation",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#nodeId",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/mtls#recoveryEpoch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-contract",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-kind",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-role",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#wrong-domain",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#invalid-time",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#scope-hash-mismatch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#stale-observation",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#nodeId",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/protectedStateEquality#recoveryEpoch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-contract",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-kind",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-role",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#wrong-domain",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#invalid-time",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#scope-hash-mismatch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#stale-observation",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#nodeId",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[verifyBootstrap]:/arguments/execReceipt#recoveryEpoch",
+      "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-contract",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-kind",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-role",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#wrong-domain",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#invalid-time",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#scope-hash-mismatch",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#stale-observation",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#nodeId",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[seal]:/arguments/rootSealDecision#recoveryEpoch",
+      "slotId": "api-request[seal]:/arguments/rootSealDecision",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-contract",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-kind",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-role",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#wrong-domain",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#invalid-time",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#scope-hash-mismatch",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#stale-observation",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#nodeId",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision#recoveryEpoch",
+      "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[readState]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-contract",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-kind",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-role",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#wrong-domain",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#invalid-time",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#scope-hash-mismatch",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "api-request[release]:/arguments/allDescendantsQuiescent#stale-observation",
+      "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-contract",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-kind",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-role",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#wrong-domain",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#invalid-time",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#scope-hash-mismatch",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#stale-observation",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#nodeId",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/memberStates/*/latestEvidence/*#recoveryEpoch",
+      "slotId": "migration-event:/body/memberStates/*/latestEvidence/*",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-contract",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-kind",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-role",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#wrong-domain",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#invalid-time",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#scope-hash-mismatch",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/effect/receipt#stale-observation",
+      "slotId": "migration-event:/body/effect/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-contract",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-kind",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-role",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#wrong-domain",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#invalid-time",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#scope-hash-mismatch",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "migration-event:/body/evidence/*#stale-observation",
+      "slotId": "migration-event:/body/evidence/*",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "operation-lease:/body/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "operation-lease:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-contract",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-kind",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-role",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#wrong-domain",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#invalid-time",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/buildProvenance#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/target/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-contract",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-kind",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-role",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#wrong-domain",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#invalid-time",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/target/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-contract",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-kind",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-role",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#wrong-domain",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#invalid-time",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/target/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-contract",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-kind",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-role",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#wrong-domain",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#invalid-time",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/target/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/target/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-contract",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-kind",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-role",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#wrong-domain",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#invalid-time",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/image/distributionProof#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/signedM2#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/signedM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/mtls#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/mtls",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/protectedStateEquality#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/protectedStateEquality",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/execReceipt#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/execReceipt",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-contract",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-kind",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-role",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#wrong-domain",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#invalid-time",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#stale-observation",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#nodeId",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2#recoveryEpoch",
+      "slotId": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-contract",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-kind",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-role",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#wrong-domain",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#invalid-time",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "runtime-inventory:/body/previousInventoryHead/readbackProof#stale-observation",
+      "slotId": "runtime-inventory:/body/previousInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/acceptedP0/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/acceptedP0/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/acceptedP0/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/acceptedP0/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/acceptedP0/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-contract",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-kind",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-role",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#wrong-domain",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#invalid-time",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/image/distributionProof#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/image/distributionProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/migrationHelper/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/migrationHelper/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/migrationHelper/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/migrationHelper/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/migrationHelper/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/commonFence/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/commonFence/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/commonFence/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/commonFence/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/commonFence/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/schema3Helper/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/schema3Helper/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/schema3Helper/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/schema3Helper/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/schema3Helper/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-contract",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-kind",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-role",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#wrong-domain",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#invalid-time",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/buildProvenance#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/newRenewalGuard/buildProvenance",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/coreCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/newRenewalGuard/coreCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-contract",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-kind",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-role",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#wrong-domain",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#invalid-time",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/backendCI/attestation#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/newRenewalGuard/backendCI/attestation",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-contract",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-kind",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-role",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#wrong-domain",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#invalid-time",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/newRenewalGuard/independentReview/receipt#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/newRenewalGuard/independentReview/receipt",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-contract",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-kind",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-role",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#wrong-domain",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#invalid-time",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/nativeTwoCycleProof#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/nativeTwoCycleProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-contract",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-kind",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-role",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#wrong-domain",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#invalid-time",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/oldNewNoWriteCompatibility#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/oldNewNoWriteCompatibility",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-contract",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-kind",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-role",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#wrong-domain",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#invalid-time",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/m2CapabilityProof#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/m2CapabilityProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-contract",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-kind",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-role",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#wrong-domain",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#invalid-time",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootG2Decision#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/rootG2Decision",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-contract",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-kind",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-role",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#wrong-domain",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#invalid-time",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/independentPlanReview#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-contract",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-kind",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-role",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#wrong-domain",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#invalid-time",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/rootPublicationIntent#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-contract",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-kind",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-role",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#wrong-domain",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#invalid-time",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/scheduleDisabledReadback#stale-observation",
+      "slotId": "successor-plan:/body/scheduleDisabledReadback",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-contract",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-kind",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-role",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#wrong-domain",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#invalid-time",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/allLaunchSurfaces#stale-observation",
+      "slotId": "successor-plan:/body/allLaunchSurfaces",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-contract",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-kind",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-role",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#wrong-domain",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#invalid-time",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/noOverlap#stale-observation",
+      "slotId": "successor-plan:/body/noOverlap",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-contract",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-kind",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-role",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#wrong-domain",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#invalid-time",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#scope-hash-mismatch",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "successor-plan:/body/expectedInventoryHead/readbackProof#stale-observation",
+      "slotId": "successor-plan:/body/expectedInventoryHead/readbackProof",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-contract",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-kind",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-role",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#wrong-domain",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#invalid-time",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#scope-hash-mismatch",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#stale-observation",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#nodeId",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapM2#recoveryEpoch",
+      "slotId": "terminal-seal:/body/bootstrapM2",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-contract",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "contractSHA256",
+      "value": "774707a899be04ca86a451630627106f31076d6b85ea8a7cbd362394b6b46dbd",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-kind",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "contractId",
+      "value": "attacker:1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-role",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "signerRole",
+      "value": "attacker-role",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#wrong-domain",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "signatureDomainASCII",
+      "value": "attacker/v1",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#invalid-time",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2026-02-30T25:61:61Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#scope-hash-mismatch",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "scopeSHA256",
+      "value": "21d37acae6619fe2e0fa159c4d09dc18ed37af038aa4557919e6308980ba95c3",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#stale-observation",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replace",
+      "field": "observedAt",
+      "value": "2029-12-31T23:55:00Z",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#nodeId",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replaceSubjectAndRehash",
+      "field": "nodeId",
+      "value": "fixture-FOREIGN-node",
+      "expected": "REJECT"
+    },
+    {
+      "id": "terminal-seal:/body/bootstrapMTLS#recoveryEpoch",
+      "slotId": "terminal-seal:/body/bootstrapMTLS",
+      "operation": "replaceSubjectAndRehash",
+      "field": "recoveryEpoch",
+      "value": "fixture-FOREIGN-epoch",
+      "expected": "REJECT"
+    },
+    {
+      "id": "swap:successor-plan:/body/independentPlanReview",
+      "slotId": "successor-plan:/body/independentPlanReview",
+      "operation": "swap",
+      "sourceSlot": "successor-plan:/body/rootPublicationIntent",
+      "expected": "REJECT"
+    },
+    {
+      "id": "swap:successor-plan:/body/rootPublicationIntent",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "swap",
+      "sourceSlot": "successor-plan:/body/independentPlanReview",
+      "expected": "REJECT"
+    },
+    {
+      "id": "swap:api-request[reserve]:/arguments/rootExecutionDecision",
+      "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "operation": "swap",
+      "sourceSlot": "successor-plan:/body/rootPublicationIntent",
+      "expected": "REJECT"
+    },
+    {
+      "id": "swap:successor-plan:/body/rootPublicationIntent",
+      "slotId": "successor-plan:/body/rootPublicationIntent",
+      "operation": "swap",
+      "sourceSlot": "api-request[reserve]:/arguments/rootExecutionDecision",
+      "expected": "REJECT"
+    }
+  ],
+  "approvalSwapKeepsPlanSubjectUnchanged": true,
+  "actualSignaturesVerified": 0
+}

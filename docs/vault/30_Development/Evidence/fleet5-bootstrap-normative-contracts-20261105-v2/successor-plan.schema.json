@@ -1,0 +1,5419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-plain-agent-migration-plan:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-plain-agent-migration-plan:1"
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "canonicalContractSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptedP0": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/acceptedP0/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/acceptedP0/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/acceptedP0/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/acceptedP0/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "image": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dockerImageId": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "distributionKind": {
+              "enum": [
+                "registry",
+                "authenticated-offline"
+              ]
+            },
+            "distributionProof": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/image/distributionProof"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-image-distribution:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/image-distribution/v1"
+                },
+                "producerRole": {
+                  "const": "artifact-publisher"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "image-distribution"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "imageId": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "platformManifestDigest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "configDigest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "archiveSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "executableSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "sourceSHA",
+                    "imageId",
+                    "platformManifestDigest",
+                    "configDigest",
+                    "archiveSHA256",
+                    "executableSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "indexOrManifestDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "platformManifestDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "configDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "rootFSDiffIDs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": false
+            },
+            "archiveSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "os": {
+              "const": "linux"
+            },
+            "architecture": {
+              "enum": [
+                "amd64",
+                "arm64"
+              ]
+            },
+            "executableSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "inheritedConfigSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildRecipeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "dockerImageId",
+            "distributionKind",
+            "distributionProof",
+            "indexOrManifestDigest",
+            "platformManifestDigest",
+            "configDigest",
+            "rootFSDiffIDs",
+            "archiveSHA256",
+            "os",
+            "architecture",
+            "executableSHA256",
+            "inheritedConfigSHA256",
+            "buildRecipeSHA256"
+          ]
+        },
+        "migrationHelper": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/migrationHelper/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/migrationHelper/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/migrationHelper/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/migrationHelper/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "commonFence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/commonFence/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/commonFence/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/commonFence/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/commonFence/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "runtimeInventoryAPI": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/runtimeInventoryAPI/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/runtimeInventoryAPI/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/runtimeInventoryAPI/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/runtimeInventoryAPI/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "schema3Helper": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/schema3Helper/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/schema3Helper/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/schema3Helper/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/schema3Helper/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "newRenewalGuard": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/newRenewalGuard/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/newRenewalGuard/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/newRenewalGuard/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "successor-plan:/body/newRenewalGuard/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "nativeTwoCycleProof": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/nativeTwoCycleProof"
+            },
+            "contractId": {
+              "const": "saintvision-proof-native-two-cycle:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/native-two-cycle/v1"
+            },
+            "producerRole": {
+              "const": "native-test-producer"
+            },
+            "signerRole": {
+              "const": "ci-attestor"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "native-two-cycle"
+                },
+                "sourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "executableSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "fixtureCohortSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "completedCycles": {
+                  "const": 2
+                }
+              },
+              "required": [
+                "kind",
+                "sourceSHA",
+                "executableSHA256",
+                "fixtureCohortSHA256",
+                "completedCycles"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "oldNewNoWriteCompatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/oldNewNoWriteCompatibility"
+            },
+            "contractId": {
+              "const": "saintvision-proof-old-new-no-write:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/old-new-no-write/v1"
+            },
+            "producerRole": {
+              "const": "native-test-producer"
+            },
+            "signerRole": {
+              "const": "ci-attestor"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "old-new-no-write"
+                },
+                "sourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "newExecutableSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "compatibilityFixtureSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "sourceSHA",
+                "newExecutableSHA256",
+                "compatibilityFixtureSHA256"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "m2CapabilityProof": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/m2CapabilityProof"
+            },
+            "contractId": {
+              "const": "saintvision-proof-m2-capability:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/m2-capability/v1"
+            },
+            "producerRole": {
+              "const": "native-test-producer"
+            },
+            "signerRole": {
+              "const": "ci-attestor"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "m2-capability"
+                },
+                "sourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "executableSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "receiptSchema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^[^\\u0000]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "sourceSHA",
+                "executableSHA256",
+                "receiptSchema"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "rootG2Decision": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/rootG2Decision"
+            },
+            "contractId": {
+              "const": "saintvision-proof-g2-planning-policy:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/g2-planning-policy/v1"
+            },
+            "producerRole": {
+              "const": "root-operator"
+            },
+            "signerRole": {
+              "const": "root-policy"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "g2-planning-policy"
+                },
+                "cohortScopesSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "selection": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "pretrustedRegistrySHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "cohortScopesSHA256",
+                "selection",
+                "pretrustedRegistrySHA256"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "independentPlanReview": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/independentPlanReview"
+            },
+            "contractId": {
+              "const": "saintvision-proof-independent-plan-review:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/independent-plan-review/v1"
+            },
+            "producerRole": {
+              "const": "independent-reviewer"
+            },
+            "signerRole": {
+              "const": "independent-reviewer"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "independent-plan-review"
+                },
+                "planSubjectSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "planSubjectSHA256"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "rootPublicationIntent": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/rootPublicationIntent"
+            },
+            "contractId": {
+              "const": "saintvision-proof-root-publication-intent:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/root-publication-intent/v1"
+            },
+            "producerRole": {
+              "const": "root-operator"
+            },
+            "signerRole": {
+              "const": "root-plan"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "root-publication-intent"
+                },
+                "planSubjectSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "planSubjectSHA256"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "scheduleDisabledReadback": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/scheduleDisabledReadback"
+            },
+            "contractId": {
+              "const": "saintvision-proof-schedule-disabled-readback:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/schedule-disabled-readback/v1"
+            },
+            "producerRole": {
+              "const": "root-schedule-reader"
+            },
+            "signerRole": {
+              "const": "root-observer"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "schedule-disabled-readback"
+                },
+                "cohortScopesSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "entryIdsSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "configAndTargetsSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "allDisabled": {
+                  "const": true
+                }
+              },
+              "required": [
+                "kind",
+                "cohortScopesSHA256",
+                "entryIdsSHA256",
+                "configAndTargetsSHA256",
+                "allDisabled"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "allLaunchSurfaces": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/allLaunchSurfaces"
+            },
+            "contractId": {
+              "const": "saintvision-proof-launch-surface-inventory:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/launch-surface-inventory/v1"
+            },
+            "producerRole": {
+              "const": "root-launch-reader"
+            },
+            "signerRole": {
+              "const": "root-observer"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "launch-surface-inventory"
+                },
+                "cohortScopesSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "registeredSurfacesSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedSurfaceSetSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "cohortScopesSHA256",
+                "registeredSurfacesSHA256",
+                "observedSurfaceSetSHA256"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "noOverlap": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signerKeySPKISHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observedAt": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "validUntil": {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            "slotId": {
+              "const": "successor-plan:/body/noOverlap"
+            },
+            "contractId": {
+              "const": "saintvision-proof-no-overlap:1"
+            },
+            "signatureDomainASCII": {
+              "const": "saintvision/proof/no-overlap/v1"
+            },
+            "producerRole": {
+              "const": "root-process-reader"
+            },
+            "signerRole": {
+              "const": "root-observer"
+            },
+            "typedSubject": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "no-overlap"
+                },
+                "cohortScopesSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "operationId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "descendantSetSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "allQuiescent": {
+                  "const": true
+                }
+              },
+              "required": [
+                "kind",
+                "cohortScopesSHA256",
+                "operationId",
+                "descendantSetSHA256",
+                "allQuiescent"
+              ]
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "artifactSHA256",
+            "scopeSHA256",
+            "signerKeySPKISHA256",
+            "observedAt",
+            "validUntil",
+            "slotId",
+            "contractId",
+            "signatureDomainASCII",
+            "producerRole",
+            "signerRole",
+            "typedSubject"
+          ]
+        },
+        "legacyCPStateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "memberInputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "nodeId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "recoveryEpoch": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "nodeId",
+                  "recoveryEpoch"
+                ]
+              },
+              "hostRegistrationSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "workerRootRegistrationSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "hostUID": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "hostGID": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "oldContainer": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "daemonIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 256,
+                    "pattern": "^/[^/\\u0000]+$"
+                  },
+                  "inspectSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "configSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountsSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "restartPolicy": {
+                    "enum": [
+                      "no",
+                      "unless-stopped"
+                    ]
+                  }
+                },
+                "required": [
+                  "daemonIdentitySHA256",
+                  "id",
+                  "name",
+                  "inspectSHA256",
+                  "imageId",
+                  "configSHA256",
+                  "mountsSHA256",
+                  "restartPolicy"
+                ]
+              },
+              "volume": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "driver": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "metadataSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "protectedTreeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "goJournalPath": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 4096,
+                    "pattern": "^/[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "name",
+                  "driver",
+                  "metadataSHA256",
+                  "mountIdentitySHA256",
+                  "protectedTreeSHA256",
+                  "goJournalPath"
+                ]
+              },
+              "exactConsumerIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "minItems": 1,
+                "maxItems": 1,
+                "uniqueItems": true
+              },
+              "nodeLabelSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "preservedPermitImageDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "cmd": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 4096,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "minItems": 1,
+                "maxItems": 256,
+                "uniqueItems": false
+              },
+              "entrypoint": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 4096,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "minItems": 1,
+                "maxItems": 256,
+                "uniqueItems": false
+              },
+              "cmdArgvCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "entrypointCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "servingArgvCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "rawServingCmdlineSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "authority": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "nodeKeyPublicSPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "nodeLeafDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "controlLeafDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "caBundleRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerPublicRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "nodeKeyPublicSPKISHA256",
+                  "nodeLeafDERSHA256",
+                  "controlLeafDERSHA256",
+                  "caBundleRawSHA256",
+                  "signerPublicRawSHA256"
+                ]
+              },
+              "floor": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "policySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "floorRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "journalIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "journalUID": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  }
+                },
+                "required": [
+                  "version",
+                  "policySHA256",
+                  "floorRawSHA256",
+                  "journalIdentitySHA256",
+                  "journalUID"
+                ]
+              },
+              "channel": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "certificateDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "enabled": {
+                    "const": true
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "version",
+                  "certificateDERSHA256",
+                  "enabled",
+                  "endpoint"
+                ]
+              },
+              "legacyCPAgentImageValueSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "backupReservedName": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 256,
+                "pattern": "^/[^/\\u0000]+$"
+              }
+            },
+            "required": [
+              "slot",
+              "scope",
+              "hostRegistrationSHA256",
+              "workerRootRegistrationSHA256",
+              "hostUID",
+              "hostGID",
+              "oldContainer",
+              "volume",
+              "exactConsumerIds",
+              "nodeLabelSHA256",
+              "preservedPermitImageDigest",
+              "cmd",
+              "entrypoint",
+              "cmdArgvCanonicalSHA256",
+              "entrypointCanonicalSHA256",
+              "servingArgvCanonicalSHA256",
+              "rawServingCmdlineSHA256",
+              "authority",
+              "floor",
+              "channel",
+              "legacyCPAgentImageValueSHA256",
+              "backupReservedName"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "leafDeadline": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "caDeadline": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "policyDeadline": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "maintenanceStart": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "maintenanceEnd": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "normalRenewalStart": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "normalRenewalEnd": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "operatorWindowStart": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "operatorWindowEnd": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+            },
+            "measuredSafetyBudgetSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 86400
+            },
+            "maxEvidenceAgeSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 120
+            },
+            "maxClockSkewSeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            }
+          },
+          "required": [
+            "leafDeadline",
+            "caDeadline",
+            "policyDeadline",
+            "maintenanceStart",
+            "maintenanceEnd",
+            "normalRenewalStart",
+            "normalRenewalEnd",
+            "operatorWindowStart",
+            "operatorWindowEnd",
+            "measuredSafetyBudgetSeconds",
+            "maxEvidenceAgeSeconds",
+            "maxClockSkewSeconds"
+          ]
+        },
+        "restartRestore": {
+          "enum": [
+            "keep-no",
+            "explicit-root-decision-later"
+          ]
+        },
+        "secondMigrationAllowed": {
+          "const": false
+        },
+        "credentialRecopyAllowed": {
+          "const": false
+        },
+        "oldContainerRestartAllowed": {
+          "const": false
+        },
+        "sourceOfFreshFiveIssuerAllowed": {
+          "const": false
+        },
+        "expectedInventoryHead": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "presence": {
+              "enum": [
+                "ABSENT",
+                "PRESENT"
+              ]
+            },
+            "envelopeSHA256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "readbackProof": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "successor-plan:/body/expectedInventoryHead/readbackProof"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-inventory-head-readback:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/inventory-head-readback/v1"
+                },
+                "producerRole": {
+                  "const": "cp-inventory-reader"
+                },
+                "signerRole": {
+                  "const": "cp-inventory"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "inventory-head-readback"
+                    },
+                    "cohortId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "presence": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "envelopeSHA256": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "registrationSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "cohortId",
+                    "presence",
+                    "envelopeSHA256",
+                    "registrationSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            }
+          },
+          "required": [
+            "presence",
+            "envelopeSHA256",
+            "readbackProof"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "presence": {
+                    "const": "ABSENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "const": null
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "planSubjectSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "planId",
+        "migrationId",
+        "createdAt",
+        "expiresAt",
+        "canonicalContractSHA256",
+        "acceptedP0",
+        "image",
+        "migrationHelper",
+        "commonFence",
+        "runtimeInventoryAPI",
+        "schema3Helper",
+        "newRenewalGuard",
+        "nativeTwoCycleProof",
+        "oldNewNoWriteCompatibility",
+        "m2CapabilityProof",
+        "rootG2Decision",
+        "independentPlanReview",
+        "rootPublicationIntent",
+        "scheduleDisabledReadback",
+        "allLaunchSurfaces",
+        "noOverlap",
+        "legacyCPStateSHA256",
+        "memberInputs",
+        "timing",
+        "restartRestore",
+        "secondMigrationAllowed",
+        "credentialRecopyAllowed",
+        "oldContainerRestartAllowed",
+        "sourceOfFreshFiveIssuerAllowed",
+        "expectedInventoryHead",
+        "planSubjectSHA256"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "root-plan"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

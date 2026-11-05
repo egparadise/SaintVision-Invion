@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "saintvision-bootstrap-api-response:1"
+    },
+    "requestSHA256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "operationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[^\\u0000]*$"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "status": {
+      "enum": [
+        "READ_ONLY_VALIDATED",
+        "RECORDED",
+        "IDEMPOTENT",
+        "BLOCK",
+        "CONFLICT",
+        "UNKNOWN"
+      ]
+    },
+    "projectionEnvelopeSHA256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "eventEnvelopeSHA256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "leaseEnvelopeSHA256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "inventoryEnvelopeSHA256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "errorCode": {
+      "enum": [
+        "none",
+        "schema",
+        "trust",
+        "provenance",
+        "ownership",
+        "scope",
+        "phase",
+        "predecessor",
+        "concurrency",
+        "consumer",
+        "engine-unknown",
+        "quiescence-unknown",
+        "evidence",
+        "timing",
+        "publication-conflict"
+      ]
+    },
+    "sideEffectPermitted": {
+      "const": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "requestSHA256",
+    "operationId",
+    "idempotencyKey",
+    "status",
+    "projectionEnvelopeSHA256",
+    "eventEnvelopeSHA256",
+    "leaseEnvelopeSHA256",
+    "inventoryEnvelopeSHA256",
+    "errorCode",
+    "sideEffectPermitted"
+  ]
+}

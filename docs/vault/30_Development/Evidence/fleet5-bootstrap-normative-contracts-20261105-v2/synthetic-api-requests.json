@@ -1,0 +1,821 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "runtimeAuthorized": false,
+  "cases": [
+    {
+      "method": "inspectAndValidate",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "inspectAndValidate",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "5914dd6fc202a8a533c12ca9f0c5a4903e9b9725df85f39956409db9ac74ee70",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "8693cbb32d7af14a1d32464693953504296699384f17272882c77d12c8d4c72e",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[inspectAndValidate]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {}
+      }
+    },
+    {
+      "method": "reserve",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "reserve",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "be2d42f4f2f2ea8cf5302c6c87b4be43ffed6284e2bc30cf1bae2d78653ad1e1",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "b4cc1f7837d3f27e7d00a2cf1131bb769df9b38a469582f66b322a00cac84651",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[reserve]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "rootExecutionDecision": {
+            "contractSHA256": "f15a5f1e944580de5f893dae7e44c18c78bc8058a5611988994255fec34c8c85",
+            "artifactSHA256": "a77b616a06b5c8bbd081fd554cf03f825baca190c0cac2c54218e2dbb16a555a",
+            "scopeSHA256": "82b135f4dee042feed654c09b2a4a23afa99d8c25938a0d1a9654ad49278ea76",
+            "signerKeySPKISHA256": "a01b662bf2c37df049e67b2a63fd8a0bbe83f1f95f08f2589300009103eb27c1",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[reserve]:/arguments/rootExecutionDecision",
+            "contractId": "saintvision-proof-root-execution-decision:1",
+            "signatureDomainASCII": "saintvision/proof/root-execution-decision/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-execution",
+            "typedSubject": {
+              "kind": "root-execution-decision",
+              "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+              "operationId": "fixture-operationId",
+              "migrationId": "fixture-first-migration"
+            }
+          },
+          "expectedNoPriorMigration": true
+        }
+      }
+    },
+    {
+      "method": "setOldRestartNo",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "setOldRestartNo",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "f95f791a253dc41ae6821d7780ee8fa137d776d8b4eded4097b115d5c7271b17",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "61c50aff252c13dd0fada6287d7a8caf63c67740543b0f4af0face849115750f",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[setOldRestartNo]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "b4eaaf647e2955f5abc9346af34a7bbb771f4354ad93ca0f9de0db13120335b9"
+        }
+      }
+    },
+    {
+      "method": "stopOld",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "stopOld",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "82a4a6006d22be248489fd72c93ec387dd9b2d47a4363b0f33fef441e502e713",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "b3a55505164db41053f2199ed7611fb1c65830b174451bf787ab25900b1fdd62",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[stopOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "75e4ccdad07d8de9cc3865d29f7c2dc8357d30d69a106d40e9424edd8a341fff"
+        }
+      }
+    },
+    {
+      "method": "captureFenced",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "captureFenced",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "12d2e811a30c9b98608bf8dde1af32a20f1812bd0bed8384164642e79459f818",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "e1c9df5f4c86e3a962b4a29bef354fb3c773eb3838c72e02395bab17a4d2d49b",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "a58cb4eb88962506e7400d4172f862d7048eb170881e541db8612515de9a0908",
+          "quiescence": {
+            "contractSHA256": "e018fcd5f21f0ec0dcf585dbb1b739a2d281639922b4b3ba04a0a49eda6ba1c1",
+            "artifactSHA256": "3cf6a64a771c7fda0ade8152b9d13d8a0d6905af82f11a56a52eecc65f46f540",
+            "scopeSHA256": "a99597f396f35ec090215881fad48c57314ddff469707575185f5f55bb095353",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[captureFenced]:/arguments/quiescence",
+            "contractId": "saintvision-proof-process-quiescence:1",
+            "signatureDomainASCII": "saintvision/proof/process-quiescence/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "process-quiescence",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "2ae6ec012b43f11b7a0c18ef8744bf81c95ffad6ec3481d1ac846dd16fa0ba65",
+              "oldContainerId": "af8f47a20dbbee185a3b4d32310dcaaca1d6d2197844cc49cbab451a430e86bc",
+              "volumeMetadataSHA256": "ac6836068cfd14e889e0a8f92d02f553cc6ef946a88b13e169e8995e3c4ef3cf",
+              "operationId": "fixture-operationId",
+              "fenceEpoch": 1,
+              "allProcessesStopped": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "preserveOld",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "preserveOld",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "b1fb98990dba5676936dd2bc67da113929b8725d0fa08c0cf88f7db034f27d1d",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "cc379126ed678f1664a99876adb225a88b901d430390237f8fbff900f51f960d",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[preserveOld]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "oldContainerId": "d0bf4bfdc25e7ab51c94a2a5751979e26165a0da10e5556e26ca11c3761d902f",
+          "reservedName": "fixture-reservedName"
+        }
+      }
+    },
+    {
+      "method": "createNew",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "createNew",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "459905aba92dcb90c8aeafbcc4f90cc567db9dd9ae59fdb79e4feaaec990778b",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "8c98c1b0c3ca924273c45fd9af2dc220b63dbf38ef17828b722931459e6ebf9a",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[createNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "captureEventSHA256": "3113331c8b0a97f7cb96c39614e4d96c7274e5c2991bfeacb05ca630280a6d68"
+        }
+      }
+    },
+    {
+      "method": "startNew",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "startNew",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "11cf221ebfdbdb35db0f0c8af63bed8dfaae6b89a7bb8f4d7c41fea5469ecba9",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "6983368f1b922229c4f10338f766e8a2fb9acd8e13737e0a71572b919ed3055e",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[startNew]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "9c53e1e04683316bd6386a988be36361d5c8a1f71e0ebe95ced9a34a9b16d62e"
+        }
+      }
+    },
+    {
+      "method": "verifyBootstrap",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "verifyBootstrap",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "670f0558fd06a6a7d99837c79eb1303b3a0d088c9fc38e17e99155782db9688c",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "25b4635e72284d87a165d51d9ca81e417d82b7a8502dd0961658ac59e102f44e",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "409a1757460db07be6869153cd57d2dc448ca6798c4fa1d1d42270c874246017",
+          "signedM2": {
+            "contractSHA256": "9b123ef5e8267c1d62e9a4bee45e0ec9b55e3562f2270fcd4ec6507c10f4a8b1",
+            "artifactSHA256": "ce67ea63d23b1eef09c6a8425841473eeb2a1ef2941b03cbb89fee8cbc4ebe4e",
+            "scopeSHA256": "d47ac876922df5f411a19edc097e0751d81adea392103811aa16656997cfc43f",
+            "signerKeySPKISHA256": "8d7f9062bf2fd1ed211ca30a4f119c99cf9780256137b4a86b7963388619fd09",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/signedM2",
+            "contractId": "saintvision-proof-node-floor-v2:1",
+            "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+            "producerRole": "actual-serving-node",
+            "signerRole": "node-leaf",
+            "typedSubject": {
+              "kind": "node-floor-v2",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "nonce": "96a1c1eb139f24193f399931fdc2ed2938982216724dc9bec52108c8287a78fc",
+              "certificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "peerPolicyVersion": 11,
+              "peerPolicySHA256": "9b1308293db9c0f4fcc0dced30ce02feb7b19d2e4e9af630d6803682ea200820",
+              "floorSHA256": "35933be76b46fffca7b0c74a15224114f58a085b22b496b099a2c33925b49d90",
+              "journalIdentitySHA256": "07b927244166ea174d7b3c6a857fbbcf35329388831c90881c6eb7390808cada",
+              "journalUID": 1,
+              "servingPID": 1,
+              "servingExecutableSHA256": "0cba14ee10ea016509d5a1606421de8c243f07ed28bdb2e51eb38c5873b0e563",
+              "servingProcessSHA256": "53c555b4adef5321a726a968e8839489ae5125e0ec13f7b14d00aea39b40d83c"
+            }
+          },
+          "mtls": {
+            "contractSHA256": "17337cbfd5dd9e54a1c7610011a6a46f7374dedcb2bfa0d2fdd7eef8d0348d3e",
+            "artifactSHA256": "fffd572bb362c7049fb3b8f44362afb7b028bd0759746e2300f9a6a299a9e780",
+            "scopeSHA256": "18fb3f33d22ff4c5a1a75108c56e0672b99a18fc719c4249ea763737ded32095",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/mtls",
+            "contractId": "saintvision-proof-unchanged-mtls:1",
+            "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+            "producerRole": "owned-mtls-client",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "unchanged-mtls",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "channelVersion": 3,
+              "nodeCertificateDERSHA256": "b1d00ce01c7c7cf1d33baa31ab74ab4b47f3465c87b76a216ded6e55ebc61466",
+              "controlCertificateDERSHA256": "1b698c0efc85521689a97a3f72f74f3f9ff941c37cf6321d67c790eecca7145e",
+              "endpoint": "fixture-endpoint",
+              "authoritySHA256": "48df9f71a32d96c2b1ce6901231deacd55a2c8cdda25e53c35cfc627c66a0d6d"
+            }
+          },
+          "protectedStateEquality": {
+            "contractSHA256": "abceb18136747c6202090decd80e37359152824aad3ba6b0fb4bdfad864e06c3",
+            "artifactSHA256": "8b02fa0cf717a6a67d71a6058e46d653e0f0d24a8d1f9a4a2b40c8a522221284",
+            "scopeSHA256": "53c1bf1ba68a5334275ca3030e75a41d14af2c179cea4a87a5aad2ba22f21bf7",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/protectedStateEquality",
+            "contractId": "saintvision-proof-protected-tree-equality:1",
+            "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "protected-tree-equality",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "volumeMetadataSHA256": "d8442d4f5f149ab26c5b71af2b0d4ec9cee18a15472613cd3ea02dc3014cbff0",
+              "beforeTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "afterTreeSHA256": "984098a64457e67a49fb2383f3abc7f9487590681fe01cc9f7bfa1543b81f8e2",
+              "operationId": "fixture-operationId"
+            }
+          },
+          "execReceipt": {
+            "contractSHA256": "e5afd0d36a78148791a1aa3cccc8619715a3a595f118186a92406f17335f078f",
+            "artifactSHA256": "0ab94d9838be51e7487373167678c121d60826aa0af7044057bb150934e563d0",
+            "scopeSHA256": "56e2db622672e5d80da5d959f7678db7695b8af4f0946c67a514642d3423b32b",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[verifyBootstrap]:/arguments/execReceipt",
+            "contractId": "saintvision-proof-owned-engine-exec:1",
+            "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+            "producerRole": "owned-engine-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "owned-engine-exec",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "daemonIdentitySHA256": "6831108c2153d8b7dc2cd5336b8284c7ae542e9357a537743e44ffc0f90c26c8",
+              "containerId": "e282752fe50d02b0bed76f550aaafc5cceff472201e40e585a8ace66e55ef198",
+              "execId": "d3649db466063758c122ad178bd710ac6da4607ac5bdacbe02885690616b792a",
+              "commandSHA256": "946fd393109ed0f552bcd44b5b6e97b73a5ba0c2904fc42734e013bd5ca9f0f7",
+              "uid": 1,
+              "exitCode": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "publishInventory",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "publishInventory",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "ae96bfc50d3f58275beade373573bd8ad2558fce0bf4fed279e4dc598242ccdd",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "d3a3fda240d9d28f2ac3d10a886f9692b135f508887666e269687dc204785ba0",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[publishInventory]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "candidateInventoryEnvelopeSHA256": "62cec81ac7d1497b25b416a13f4f51eeaaf01108c45849bd6c1b2e3a1e244772",
+          "expectedPriorInventoryHead": {
+            "presence": "ABSENT",
+            "envelopeSHA256": null,
+            "readbackProof": {
+              "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+              "artifactSHA256": "75afed816507666897107526cd9c90a518503c999e853dbd451cb7f7be4e6dce",
+              "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+              "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+              "observedAt": "2030-01-01T00:00:00Z",
+              "validUntil": "2030-01-01T00:01:00Z",
+              "slotId": "api-request[publishInventory]:/arguments/expectedPriorInventoryHead/readbackProof",
+              "contractId": "saintvision-proof-inventory-head-readback:1",
+              "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+              "producerRole": "cp-inventory-reader",
+              "signerRole": "cp-inventory",
+              "typedSubject": {
+                "kind": "inventory-head-readback",
+                "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+                "presence": "ABSENT",
+                "envelopeSHA256": null,
+                "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "seal",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "seal",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "dc92a0deeb1230e387c46534e05e595a6c45da2231bd63e33de76a4698116acb",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "5233c7e2ea60452da72751b23ec4fdb52693b955b1c0a472375d2e3670f22ec0",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "inventoryEnvelopeSHA256": "64f150343690a0004be1fc6e84b68df1976da97364902935990033167b29d2d2",
+          "rootSealDecision": {
+            "contractSHA256": "f624cb87142d0905fd654f2167b66313b396b9055838e7648bf70a703cea71ca",
+            "artifactSHA256": "9e05c825d54d58195af5c75811a97d5a69157f5295e4e6bd53ba0192b15c3a72",
+            "scopeSHA256": "39e7e8e2d62bb17614c466c68fd2c0c2993dcf010bcb304833c2bd9784806edf",
+            "signerKeySPKISHA256": "330a6086db259fe14c3a68f8f9f9e7c4338b3d665018e399f12a59c29ddd3cb7",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[seal]:/arguments/rootSealDecision",
+            "contractId": "saintvision-proof-root-seal-decision:1",
+            "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-seal",
+            "typedSubject": {
+              "kind": "root-seal-decision",
+              "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+              "inventoryEnvelopeSHA256": "39b8fff445caf3a2efbda397897e111ec19fc7a13f5e09649e14c64d67050219",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "migrationId": "fixture-first-migration"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "restoreNewRestartPolicy",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "restoreNewRestartPolicy",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "1ad761fcc6d62dfb54de74e8596c4915401be3fd29fb3834ed72eebfb4be291a",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "fb341c9841fbea06da3d63bcc206f89c9e9c4a14be6b88dc83fec5eb177a0fbc",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[restoreNewRestartPolicy]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "slot": "PC2",
+          "newContainerId": "077615064ccf8ee4f6bb379a280601f3edaf8c316310272df288c809918fc2e9",
+          "rootRestoreDecision": {
+            "contractSHA256": "de863ee37fe1ef39e2556485ccbae03b4f7420fb0fdddb97137c8fba2c6efdb7",
+            "artifactSHA256": "d252cab65dc33a14a736f9da622318810013a1411f1b22a665528cbc604cb9ce",
+            "scopeSHA256": "a5f148d66a62780b70652e1adbbb4b1f73574d511aba8c5e826639d31164aebf",
+            "signerKeySPKISHA256": "a01b662bf2c37df049e67b2a63fd8a0bbe83f1f95f08f2589300009103eb27c1",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[restoreNewRestartPolicy]:/arguments/rootRestoreDecision",
+            "contractId": "saintvision-proof-root-restart-restore:1",
+            "signatureDomainASCII": "saintvision/proof/root-restart-restore/v1",
+            "producerRole": "root-operator",
+            "signerRole": "root-execution",
+            "typedSubject": {
+              "kind": "root-restart-restore",
+              "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+              "scope": {
+                "tenantId": "fixture-tenant",
+                "nodeId": "fixture-node-0",
+                "recoveryEpoch": "fixture-existing-epoch"
+              },
+              "newContainerId": "8c756ad3637f9b60ad0dc48efeb296a14d5dbc70bf1b2a4a2726f8e850d98115",
+              "terminalSealEnvelopeSHA256": "ab1f60cf28d06d0d0253d11998dc95e25d948b00d5efd530ba32253a3f0f1559",
+              "operationId": "fixture-operationId",
+              "restartPolicy": "83449c3cabeb155aae6f260e5cd6d8d9b6b705cbcb37b44d7d1209b914790ed9"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "readState",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "readState",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "b92fd796fd256ae0b25a1649479f124f980a056f245bf97829b6317ab0407e96",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "417aaca6dec1b4f7c8e61f39e746223ea357ca6643a79a2815052b00c2fc04a5",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[readState]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {}
+      }
+    },
+    {
+      "method": "release",
+      "expectedStructuralVerdict": "VALID",
+      "request": {
+        "schemaVersion": "saintvision-bootstrap-api-request:1",
+        "method": "release",
+        "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+        "operationId": "fixture-operationId",
+        "idempotencyKey": "ed1a1718fde395bf706dc9d6375bf041af72ec3f34b94659193de73d15109797",
+        "expectedPriorProjectionSHA256": null,
+        "expectedFenceEpoch": 1,
+        "expectedInventoryHead": {
+          "presence": "ABSENT",
+          "envelopeSHA256": null,
+          "readbackProof": {
+            "contractSHA256": "01fe751cc0a93871aa3a8e6a42809d2368bf226516080e018db3114f4249de1c",
+            "artifactSHA256": "d2899329b5060e22443b8ce755d2b19ae9f8d9689f110d526cef4f9692062f36",
+            "scopeSHA256": "566723255b758dec463669c25599d0c759999226b0c3fe316322a80e36e0b17a",
+            "signerKeySPKISHA256": "1cc17afd601ab49f518a731862f8a4f8f78caca56aefc8fa5d6afea73806b3ac",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[release]:/expectedInventoryHead/readbackProof",
+            "contractId": "saintvision-proof-inventory-head-readback:1",
+            "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+            "producerRole": "cp-inventory-reader",
+            "signerRole": "cp-inventory",
+            "typedSubject": {
+              "kind": "inventory-head-readback",
+              "cohortId": "7c0805bd7289b9ff8415244e7590a65aafd10a179cb45acd6188ed1d12f2e6a6",
+              "presence": "ABSENT",
+              "envelopeSHA256": null,
+              "registrationSHA256": "9ab6742f2cab96a7cb5c785c9b6cc2ff4bb5c1447ebf4c10e1c126635fdd137b"
+            }
+          }
+        },
+        "arguments": {
+          "allDescendantsQuiescent": {
+            "contractSHA256": "78ec197d2757fc8bb8abd0d0574e632220a0b9c1a7991610d13879c439bf70c1",
+            "artifactSHA256": "0be523dfeb5c7d673bd94cb087716c7887f4cab38d47050b89770a62d82511fc",
+            "scopeSHA256": "a8b302c2191147419171192abc915adcdda580bdef5f283b5e701e7de0821db5",
+            "signerKeySPKISHA256": "d3dad6efaae9eeba66d25be7b57026e3e5aa7c672c339e4a38ecdf7af847c4c3",
+            "observedAt": "2030-01-01T00:00:00Z",
+            "validUntil": "2030-01-01T00:01:00Z",
+            "slotId": "api-request[release]:/arguments/allDescendantsQuiescent",
+            "contractId": "saintvision-proof-descendant-quiescence:1",
+            "signatureDomainASCII": "saintvision/proof/descendant-quiescence/v1",
+            "producerRole": "owned-host-adapter",
+            "signerRole": "host-helper",
+            "typedSubject": {
+              "kind": "descendant-quiescence",
+              "operationId": "fixture-operationId",
+              "fenceEpoch": 1,
+              "descendantSetSHA256": "1df986ae8090427d4d320ee2fbf41d7876e278fe0f4da0425f78908265f88bdb",
+              "allQuiescent": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}

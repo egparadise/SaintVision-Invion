@@ -1,0 +1,2232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-node-runtime-inventory:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-runtime-inventory:1"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "publicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "expectedLegacyCPStateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedChannelVectorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "leaseEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifactSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildProvenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "runtime-inventory:/body/target/buildProvenance"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-build-provenance:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/build-provenance/v1"
+                },
+                "producerRole": {
+                  "const": "build-service"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "build-provenance"
+                    },
+                    "component": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "component",
+                    "sourceSHA",
+                    "artifactSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "coreCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "runtime-inventory:/body/target/coreCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "backendCI": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "const": "egparadise/SaintVision-Invion"
+                },
+                "workflow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "runId": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "runAttempt": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "headSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "event": {
+                  "enum": [
+                    "push",
+                    "workflow_dispatch",
+                    "pull_request"
+                  ]
+                },
+                "conclusion": {
+                  "const": "success"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "attestation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "runtime-inventory:/body/target/backendCI/attestation"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-ci-attestation:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/ci-attestation/v1"
+                    },
+                    "producerRole": {
+                      "const": "github-actions"
+                    },
+                    "signerRole": {
+                      "const": "ci-attestor"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "ci-attestation"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "repository": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "workflow": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "headSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "runId": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "runAttempt": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "repository",
+                        "workflow",
+                        "headSHA",
+                        "ref",
+                        "event",
+                        "runId",
+                        "runAttempt",
+                        "artifactSHA256"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "repository",
+                "workflow",
+                "runId",
+                "runAttempt",
+                "headSHA",
+                "ref",
+                "event",
+                "conclusion",
+                "artifactSHA256",
+                "attestation"
+              ]
+            },
+            "independentReview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "reviewerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "reviewerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\u0000]*$"
+                },
+                "subjectSourceSHA": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "subjectArtifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verdict": {
+                  "const": "ACCEPT"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "runtime-inventory:/body/target/independentReview/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-independent-code-review:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/independent-code-review/v1"
+                    },
+                    "producerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "signerRole": {
+                      "const": "independent-reviewer"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "independent-code-review"
+                        },
+                        "component": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sourceSHA": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "artifactSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "authorId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "reviewerId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "component",
+                        "sourceSHA",
+                        "artifactSHA256",
+                        "authorId",
+                        "reviewerId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                }
+              },
+              "required": [
+                "reviewerId",
+                "reviewerKeySPKISHA256",
+                "authorId",
+                "subjectSourceSHA",
+                "subjectArtifactSHA256",
+                "reviewCommit",
+                "verdict",
+                "receipt"
+              ]
+            }
+          },
+          "required": [
+            "sourceSHA",
+            "artifactSHA256",
+            "buildProvenance",
+            "coreCI",
+            "backendCI",
+            "independentReview"
+          ]
+        },
+        "image": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dockerImageId": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "distributionKind": {
+              "enum": [
+                "registry",
+                "authenticated-offline"
+              ]
+            },
+            "distributionProof": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "runtime-inventory:/body/image/distributionProof"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-image-distribution:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/image-distribution/v1"
+                },
+                "producerRole": {
+                  "const": "artifact-publisher"
+                },
+                "signerRole": {
+                  "const": "build-attestor"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "image-distribution"
+                    },
+                    "sourceSHA": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    "imageId": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "platformManifestDigest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "configDigest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "archiveSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "executableSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "sourceSHA",
+                    "imageId",
+                    "platformManifestDigest",
+                    "configDigest",
+                    "archiveSHA256",
+                    "executableSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            },
+            "indexOrManifestDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "platformManifestDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "configDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "rootFSDiffIDs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": false
+            },
+            "archiveSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "os": {
+              "const": "linux"
+            },
+            "architecture": {
+              "enum": [
+                "amd64",
+                "arm64"
+              ]
+            },
+            "executableSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "inheritedConfigSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "buildRecipeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "dockerImageId",
+            "distributionKind",
+            "distributionProof",
+            "indexOrManifestDigest",
+            "platformManifestDigest",
+            "configDigest",
+            "rootFSDiffIDs",
+            "archiveSHA256",
+            "os",
+            "architecture",
+            "executableSHA256",
+            "inheritedConfigSHA256",
+            "buildRecipeSHA256"
+          ]
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "nodeId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "recoveryEpoch": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "nodeId",
+                  "recoveryEpoch"
+                ]
+              },
+              "oldBackup": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "daemonIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 256,
+                    "pattern": "^/[^/\\u0000]+$"
+                  },
+                  "inspectSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "configSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountsSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "restartPolicy": {
+                    "enum": [
+                      "no",
+                      "unless-stopped"
+                    ]
+                  }
+                },
+                "required": [
+                  "daemonIdentitySHA256",
+                  "id",
+                  "name",
+                  "inspectSHA256",
+                  "imageId",
+                  "configSHA256",
+                  "mountsSHA256",
+                  "restartPolicy"
+                ]
+              },
+              "currentContainer": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "daemonIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 256,
+                    "pattern": "^/[^/\\u0000]+$"
+                  },
+                  "inspectSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "configSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountsSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "restartPolicy": {
+                    "enum": [
+                      "no",
+                      "unless-stopped"
+                    ]
+                  }
+                },
+                "required": [
+                  "daemonIdentitySHA256",
+                  "id",
+                  "name",
+                  "inspectSHA256",
+                  "imageId",
+                  "configSHA256",
+                  "mountsSHA256",
+                  "restartPolicy"
+                ]
+              },
+              "volume": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "driver": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "metadataSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mountIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "protectedTreeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "goJournalPath": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 4096,
+                    "pattern": "^/[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "name",
+                  "driver",
+                  "metadataSHA256",
+                  "mountIdentitySHA256",
+                  "protectedTreeSHA256",
+                  "goJournalPath"
+                ]
+              },
+              "preservedPermitImageDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "cmdArgvCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "entrypointCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "servingArgvCanonicalSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "rawServingCmdlineSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "authority": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "nodeKeyPublicSPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "nodeLeafDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "controlLeafDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "caBundleRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerPublicRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "nodeKeyPublicSPKISHA256",
+                  "nodeLeafDERSHA256",
+                  "controlLeafDERSHA256",
+                  "caBundleRawSHA256",
+                  "signerPublicRawSHA256"
+                ]
+              },
+              "bootstrapFloor": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "policySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "floorRawSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "journalIdentitySHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "journalUID": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  }
+                },
+                "required": [
+                  "version",
+                  "policySHA256",
+                  "floorRawSHA256",
+                  "journalIdentitySHA256",
+                  "journalUID"
+                ]
+              },
+              "unchangedBootstrapChannel": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "certificateDERSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "enabled": {
+                    "const": true
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "version",
+                  "certificateDERSHA256",
+                  "enabled",
+                  "endpoint"
+                ]
+              },
+              "bootstrapVerifiedEvent": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sequence": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "envelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "sequence",
+                  "envelopeSHA256"
+                ]
+              },
+              "signedM2": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/signedM2"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-node-floor-v2:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/node-peer-policy-floor/v2"
+                  },
+                  "producerRole": {
+                    "const": "actual-serving-node"
+                  },
+                  "signerRole": {
+                    "const": "node-leaf"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "node-floor-v2"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "nonce": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "certificateDERSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "peerPolicyVersion": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "peerPolicySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "floorSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "journalIdentitySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "journalUID": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "servingPID": {
+                        "const": 1
+                      },
+                      "servingExecutableSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "servingProcessSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "nonce",
+                      "certificateDERSHA256",
+                      "peerPolicyVersion",
+                      "peerPolicySHA256",
+                      "floorSHA256",
+                      "journalIdentitySHA256",
+                      "journalUID",
+                      "servingPID",
+                      "servingExecutableSHA256",
+                      "servingProcessSHA256"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              },
+              "mtls": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/mtls"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-unchanged-mtls:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/proof/unchanged-mtls/v1"
+                  },
+                  "producerRole": {
+                    "const": "owned-mtls-client"
+                  },
+                  "signerRole": {
+                    "const": "host-helper"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "unchanged-mtls"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "channelVersion": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "nodeCertificateDERSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "controlCertificateDERSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "endpoint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      },
+                      "authoritySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "channelVersion",
+                      "nodeCertificateDERSHA256",
+                      "controlCertificateDERSHA256",
+                      "endpoint",
+                      "authoritySHA256"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              },
+              "protectedStateEquality": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/protectedStateEquality"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-protected-tree-equality:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/proof/protected-tree-equality/v1"
+                  },
+                  "producerRole": {
+                    "const": "owned-host-adapter"
+                  },
+                  "signerRole": {
+                    "const": "host-helper"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "protected-tree-equality"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "volumeMetadataSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "beforeTreeSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "afterTreeSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "volumeMetadataSHA256",
+                      "beforeTreeSHA256",
+                      "afterTreeSHA256",
+                      "operationId"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              },
+              "execReceipt": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/execReceipt"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-owned-engine-exec:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/proof/owned-engine-exec/v1"
+                  },
+                  "producerRole": {
+                    "const": "owned-engine-adapter"
+                  },
+                  "signerRole": {
+                    "const": "host-helper"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "owned-engine-exec"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "daemonIdentitySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "containerId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      },
+                      "execId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      },
+                      "commandSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "uid": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "exitCode": {
+                        "const": 0
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "daemonIdentitySHA256",
+                      "containerId",
+                      "execId",
+                      "commandSHA256",
+                      "uid",
+                      "exitCode"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              },
+              "runtimeInspectionBeforeM2": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/runtimeInspectionBeforeM2"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-runtime-inspection-before:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/proof/runtime-inspection-before/v1"
+                  },
+                  "producerRole": {
+                    "const": "owned-engine-adapter"
+                  },
+                  "signerRole": {
+                    "const": "host-helper"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "runtime-inspection-before"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "daemonIdentitySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "containerId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      },
+                      "imageId": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      },
+                      "configSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "mountsSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "processGenerationSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "point": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "daemonIdentitySHA256",
+                      "containerId",
+                      "imageId",
+                      "configSHA256",
+                      "mountsSHA256",
+                      "processGenerationSHA256",
+                      "point"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              },
+              "runtimeInspectionAfterM2": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "contractSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "artifactSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "signerKeySPKISHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observedAt": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "validUntil": {
+                    "$ref": "common.schema.json#/$defs/timestamp"
+                  },
+                  "slotId": {
+                    "const": "runtime-inventory:/body/members/*/runtimeInspectionAfterM2"
+                  },
+                  "contractId": {
+                    "const": "saintvision-proof-runtime-inspection-after:1"
+                  },
+                  "signatureDomainASCII": {
+                    "const": "saintvision/proof/runtime-inspection-after/v1"
+                  },
+                  "producerRole": {
+                    "const": "owned-engine-adapter"
+                  },
+                  "signerRole": {
+                    "const": "host-helper"
+                  },
+                  "typedSubject": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "runtime-inspection-after"
+                      },
+                      "scope": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "tenantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "nodeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          },
+                          "recoveryEpoch": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[^\\u0000]*$"
+                          }
+                        },
+                        "required": [
+                          "tenantId",
+                          "nodeId",
+                          "recoveryEpoch"
+                        ]
+                      },
+                      "daemonIdentitySHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "containerId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      },
+                      "imageId": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      },
+                      "configSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "mountsSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "processGenerationSHA256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "point": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "^[^\\u0000]*$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "scope",
+                      "daemonIdentitySHA256",
+                      "containerId",
+                      "imageId",
+                      "configSHA256",
+                      "mountsSHA256",
+                      "processGenerationSHA256",
+                      "point"
+                    ]
+                  }
+                },
+                "required": [
+                  "contractSHA256",
+                  "artifactSHA256",
+                  "scopeSHA256",
+                  "signerKeySPKISHA256",
+                  "observedAt",
+                  "validUntil",
+                  "slotId",
+                  "contractId",
+                  "signatureDomainASCII",
+                  "producerRole",
+                  "signerRole",
+                  "typedSubject"
+                ]
+              }
+            },
+            "required": [
+              "slot",
+              "scope",
+              "oldBackup",
+              "currentContainer",
+              "volume",
+              "preservedPermitImageDigest",
+              "cmdArgvCanonicalSHA256",
+              "entrypointCanonicalSHA256",
+              "servingArgvCanonicalSHA256",
+              "rawServingCmdlineSHA256",
+              "authority",
+              "bootstrapFloor",
+              "unchangedBootstrapChannel",
+              "bootstrapVerifiedEvent",
+              "signedM2",
+              "mtls",
+              "protectedStateEquality",
+              "execReceipt",
+              "runtimeInspectionBeforeM2",
+              "runtimeInspectionAfterM2"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "legacyAgentImageFallbackAllowed": {
+          "const": false
+        },
+        "channelMutationAllowed": {
+          "const": false
+        },
+        "previousInventoryHead": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "presence": {
+              "enum": [
+                "ABSENT",
+                "PRESENT"
+              ]
+            },
+            "envelopeSHA256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "readbackProof": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "runtime-inventory:/body/previousInventoryHead/readbackProof"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-inventory-head-readback:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/inventory-head-readback/v1"
+                },
+                "producerRole": {
+                  "const": "cp-inventory-reader"
+                },
+                "signerRole": {
+                  "const": "cp-inventory"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "inventory-head-readback"
+                    },
+                    "cohortId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "presence": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "envelopeSHA256": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "registrationSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "cohortId",
+                    "presence",
+                    "envelopeSHA256",
+                    "registrationSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            }
+          },
+          "required": [
+            "presence",
+            "envelopeSHA256",
+            "readbackProof"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "presence": {
+                    "const": "ABSENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "const": null
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "cohortId",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "revision",
+        "publishedAt",
+        "publicationId",
+        "expectedLegacyCPStateSHA256",
+        "expectedChannelVectorSHA256",
+        "leaseEnvelopeSHA256",
+        "target",
+        "image",
+        "members",
+        "legacyAgentImageFallbackAllowed",
+        "channelMutationAllowed",
+        "previousInventoryHead"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "cp-inventory"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "fixtureOnly": true,
+  "trustVerified": false,
+  "priorOriginalSealSHA256": "517525ac1c095b599d669d5a678abdc98917aea89633aecddfe054d9c28eed71",
+  "artifact": {
+    "body": {
+      "schemaVersion": "saintvision-plain-agent-migration:1",
+      "migrationId": "fixture-first-migration",
+      "planEnvelopeSHA256": "fc2291db6aeafadb38e9f63dfdaa36f3ee83612638c1e15a8f1544a0846527ab",
+      "workerRootRegistrationSHA256": "47d2bf041a25c1b5665e2cd208680ffe98b9aa3d84a4f07c80eb23ff7217e5a5",
+      "scope": {
+        "tenantId": "fixture-tenant",
+        "nodeId": "fixture-node-0",
+        "recoveryEpoch": "fixture-existing-epoch"
+      },
+      "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+      "ownerGeneration": 1,
+      "commonFenceIdentitySHA256": "9d9945290cfff02db0772c7a200b98a1c760a860e2de803f40ed411955ac7a04",
+      "latestEvent": {
+        "sequence": 1,
+        "envelopeSHA256": "79b0462fdd9d01cfe30afb0a8bee017d118fa05287eff01fe5a2075344f7c173"
+      },
+      "previousProjectionSHA256": null,
+      "phase": "QUIESCENCE_UNKNOWN",
+      "ownerLeaseEnvelopeSHA256": "4a49cb0d09012145953254a224b3b4635fe4cdc00003fc2e8896e11c421079a6",
+      "terminalSealEnvelopeSHA256": "517525ac1c095b599d669d5a678abdc98917aea89633aecddfe054d9c28eed71",
+      "oldBackup": {
+        "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+        "id": "986275a1f599936430a3b83487d0f2c5eb3d1d518d09c0112b43252da90dec69",
+        "name": "/fixture-backupReservedName",
+        "inspectSHA256": "6c40d73850201a708d457b00ea73735668a9feecfeadbbee065d01fed4512d96",
+        "imageId": "sha256:9c846ddff12d79db37088a75dfd8aa76b51bd41c67f0dbe1563e1143417cbf42",
+        "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+        "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+        "restartPolicy": "no"
+      },
+      "currentContainer": {
+        "daemonIdentitySHA256": "a309ff22e8510c0271114968750183a830a0ac0b84c86de27479b59c7a73e2c5",
+        "id": "b5e0f1a792a3f5753a096bfe2ca15c968be0b0dcae5bf7486500be1a4c38b353",
+        "name": "/fixture-new-node-0",
+        "inspectSHA256": "d0c55a1333dadfc2f3bd3c45ad3fc36d0844d01d1302d3c4f74f712855ad80be",
+        "imageId": "sha256:177c995f545284070e5f6959eb64bd330ca54c091a1cace2ba847f95ece10712",
+        "configSHA256": "af1bd59877e0fceae4c006aa76cc1ed7d30e3bc27bb266b9a24caaabe4c05250",
+        "mountsSHA256": "a4ad590900c6ca5c23b2a0b794a3170001de021b92e10c357a301999c97e0865",
+        "restartPolicy": "no"
+      },
+      "volume": {
+        "name": "fixture-name",
+        "driver": "fixture-driver",
+        "metadataSHA256": "6a8f83ff0503be1d6072c52ed1c9eaa3b691473c6f11b9818c837ecf85955ecd",
+        "mountIdentitySHA256": "482351669a89a09a51374872c8d29e3d5bc72fea59de45faab78cd87dfd315c8",
+        "protectedTreeSHA256": "71e1946de666d30afac55c3572a3a095305950dcfb335c1b8479c7a333b841b1",
+        "goJournalPath": "/fixture-goJournalPath"
+      },
+      "sealedHistory": true,
+      "sealOriginEvent": {
+        "sequence": 20,
+        "envelopeSHA256": "6cfefcbb232c4d663fb067911c2005be5c08eba06c4bae1a4485ac70ad1a6030"
+      },
+      "operationKind": "RESTART_RESTORE",
+      "leaseState": "UNKNOWN"
+    },
+    "signer": {
+      "role": "host-helper",
+      "keySPKISHA256": "2b3c172de5ec4e2a9493972cabd108fb708642e27763c9cc4a78d5e1faf15624",
+      "signatureHex": "873cdb5b6d345fc296634648d8eb36b08a30ef73c2f4f9dcc30277b87b4d1acbb8a3ef83119c07f71ed12a95fa19ba581f02415228922e24dbb969d0b55adcf2"
+    }
+  }
+}

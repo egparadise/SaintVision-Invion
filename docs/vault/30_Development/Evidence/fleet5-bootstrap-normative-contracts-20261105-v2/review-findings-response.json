@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "fleet5-v2-author-review-response:1",
+  "actualPriorReview": "78ae01388c6d0fcb08c4ced010b665c97c4a6209",
+  "priorVerdict": "REVISION REQUIRED preserved",
+  "priorReviewDocsReportedVerifiedByRoot": 42058508327,
+  "responseStatus": "AUTHOR PROPOSED RESPONSE; independent DELTA review pending",
+  "items": [
+    {
+      "id": "M1",
+      "severity": "Medium",
+      "artifacts": [
+        "trust-bootstrap-contract.json",
+        "revision-contract.md"
+      ],
+      "documentEvidence": "M1-external-policy",
+      "mandatoryFutureProductAcceptance": "Real installed helper/CP/worker-root external policy and role/scope grants, schema/verifier/source/CI/review bytes pinned before plan/Reserve/lease; no bundle self-certification",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "M2",
+      "severity": "Medium",
+      "artifacts": [
+        "proof-slot-registry.json",
+        "synthetic-proof-slots.json",
+        "proof-slot-adversarial-fixtures.json"
+      ],
+      "documentEvidence": "77 slot positives and every slot wrong contract/kind/role/domain/time/hash plus cross-node/epoch/approval-final-envelope swaps",
+      "mandatoryFutureProductAcceptance": "Actual referent signature/domain/slot/subject/freshness verifier and registered schemas; no generic shape trust",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "M3",
+      "severity": "Medium",
+      "artifacts": [
+        "migration-journal.schema.json",
+        "synthetic-postseal-unknown.json",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "M3-preserve/drop/clear/replace-seal",
+      "mandatoryFutureProductAcceptance": "Actual durable signed original history replay, exact retained seals and per-operation lease through failure",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "L1",
+      "severity": "Low",
+      "artifacts": [
+        "strict-byte-fixtures.json",
+        "revision-contract.md"
+      ],
+      "documentEvidence": "J06-J09:1.0/1e0/1E2/-0 reject before schema; bool never int",
+      "mandatoryFutureProductAcceptance": "Actual Go/Python strict token parser parity over every numeric field",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "L2",
+      "severity": "Low",
+      "artifacts": [
+        "strict-time-fixtures.json",
+        "revision-contract.md"
+      ],
+      "documentEvidence": "real parse + roundtrip: invalid calendar/hour/leap-second/offset reject",
+      "mandatoryFutureProductAcceptance": "Actual reader parse/format/freshness checks, not schema annotation",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "L3",
+      "severity": "Low",
+      "artifacts": [
+        "state-machine.json",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "L3 restartNo/stopped/foreign stop-ID/foreign fence epoch",
+      "mandatoryFutureProductAcceptance": "Actual stop receipt/process/descendant quiescence before capture, no restart-no inference",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "L4",
+      "severity": "Low",
+      "artifacts": [
+        "migration-event.schema.json",
+        "state-machine.json",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "early inventory/seal/wrong method effect/outcome-no-intent reject",
+      "mandatoryFutureProductAcceptance": "Actual table-bound intent/effect/readback/CAS/crash state transitions",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "L5",
+      "severity": "Low",
+      "artifacts": [
+        "synthetic-terminal-seal.json",
+        "synthetic-runtime-inventory.json",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "same-daemon/distinct-ID/name/volume/authority/plan/image/scope checks, negative foreign-daemon/same-name",
+      "mandatoryFutureProductAcceptance": "Actual owned inspection/protected state/image/M2/mTLS binding",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "I1",
+      "severity": "Info",
+      "artifacts": [
+        "state-machine.json",
+        "revision-contract.md",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "fixed OS-lock/logical CAS/release order; nested other-owner reject static predicate",
+      "mandatoryFutureProductAcceptance": "Actual ordered distributed acquisition/children/refcount/no-steal crash tests",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "I2",
+      "severity": "Info",
+      "artifacts": [
+        "revision-contract.md"
+      ],
+      "documentEvidence": "strict RFC8032 pure Ed25519/canonical A R/S<L/prime order/no-normalization specified only",
+      "mandatoryFutureProductAcceptance": "Actual reviewed verifier rejects noncanonical/small-order/malleated signatures; NO cryptography run here",
+      "actualProductTestStatus": "NOT RUN"
+    },
+    {
+      "id": "I3",
+      "severity": "Info",
+      "artifacts": [
+        "state-machine.json",
+        "materialized-edge-fixtures.json"
+      ],
+      "documentEvidence": "postseal unknown and repeat-blocked failure records accepted with retained original refs",
+      "mandatoryFutureProductAcceptance": "Actual failure append and no repeated effect under immutable history",
+      "actualProductTestStatus": "NOT RUN"
+    }
+  ],
+  "registeredContractAcceptance": false,
+  "implementationAcceptance": false,
+  "operations": "HOLD",
+  "all40FutureProductCases": "NOT RUN"
+}

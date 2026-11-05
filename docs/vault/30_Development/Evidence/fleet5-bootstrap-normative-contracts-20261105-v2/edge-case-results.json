@@ -1,0 +1,78 @@
+{
+  "fixtureOnly": true,
+  "results": [
+    {
+      "id": "M1-external-policy",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "M3-preserve-seal",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "M3-drop-seal",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "M3-clear-history",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "M3-replace-seal",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L3-stopped-proof",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L3-restartNo-only",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L3-foreign-stop-ID",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L3-foreign-stop-epoch",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L4-early-inventory",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L4-early-seal",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L4-start-wrong-effect",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L4-outcome-no-intent",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L5-foreign-daemon",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "L5-same-name",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "I1-nested-other-owner",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "I3-postseal-failure",
+      "result": "PASS_STATIC"
+    },
+    {
+      "id": "I3-repeat-blocked-failure",
+      "result": "PASS_STATIC"
+    }
+  ],
+  "signatureOrRuntimeVerification": false
+}

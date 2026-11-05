@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "fleet5-proposed-binding-projection:1",
+  "actualValues": "ALL NULL/HOLD; only field destinations are proposed. Phase-derived outputs cannot be populated before actual evidence.",
+  "targetGroups": {
+    "acceptedP0/image/nativeTwoCycleProof/oldNewNoWriteCompatibility/m2CapabilityProof": [
+      "p0SourceSHA",
+      "p0ExecutableSHA256",
+      "p0DockerImageId",
+      "p0RepositoryDigestOrOfflineProof",
+      "p0ImageArchiveDigest",
+      "p0ImageManifestDigest",
+      "p0ImageConfigDigest",
+      "p0ImageRootFSDiffIDs",
+      "p0BuildProvenance",
+      "p0CIrunId",
+      "p0NativeTwoCompletedCyclesReceipt",
+      "p0NoWriteJournalCompatibilityReceipt",
+      "p0M2CapabilityReceipt",
+      "p0IndependentVerdict"
+    ],
+    "migrationHelper": [
+      "migrationHelperSourceSHA",
+      "migrationHelperArtifactDigest",
+      "migrationHelperCIrunId",
+      "migrationHelperIndependentVerdict"
+    ],
+    "runtimeInventoryAPI/canonicalContractSHA256": [
+      "runtimeInventoryContractSHA",
+      "runtimeInventoryAPIArtifactDigest",
+      "runtimeInventoryCIVerdict"
+    ],
+    "newRenewalGuard": [
+      "newGuardSourceSHA",
+      "newGuardArtifactDigest",
+      "newGuardCIrunId",
+      "newGuardIndependentVerdict"
+    ],
+    "schema3Helper plus SEPARATE later immutable normal3 plan and guard pin contracts": [
+      "newSchema3HelperSourceSHA",
+      "newSchema3HelperDigest",
+      "newRenewalImmutablePlanSHA256",
+      "newRenewalPlanVerdict",
+      "newRenewalGuardPlanPinSet"
+    ]
+  },
+  "rootGroups": {
+    "successor plan approval proofs": [
+      "rootG2Decision",
+      "rootPlanReview",
+      "freshDisabledScheduleReadback",
+      "allLaunchSurfacesInventory",
+      "noOverlappingAttemptProof"
+    ],
+    "reserve request + held operation lease (derived, not preplan fiction)": [
+      "rootExecutionDecision",
+      "cohortReservation",
+      "fenceOwnershipToken"
+    ],
+    "trusted time and successor timing gates": [
+      "currentRootTime",
+      "currentLeafDeadline",
+      "currentCADeadline",
+      "currentPolicyDeadline",
+      "requiredSafetyBudgetSeconds",
+      "maintenanceOperatorWindow",
+      "normalRenewalWindow",
+      "renewalOperatorWindow"
+    ],
+    "inventory CAS and optional restore requests": [
+      "inventoryCompareAndPublishToken",
+      "restartPolicyRestoreDecision"
+    ]
+  },
+  "memberBaselineFields": [
+    "tenantId",
+    "nodeId",
+    "epoch",
+    "daemonIdentity",
+    "oldContainerName",
+    "oldContainerId",
+    "oldNodeLabel",
+    "oldInspectDigest",
+    "preservedConfigDigest",
+    "oldRuntimeDockerImageId",
+    "preservedPermitImageDigest",
+    "nodeAddress",
+    "nodePort",
+    "volumeName",
+    "volumeMetadataDigest",
+    "exactVolumeConsumerIds",
+    "actualJournalPath",
+    "protectedStateDigest",
+    "peerFloorVersion",
+    "peerFloorHash",
+    "activePeerPolicyHash",
+    "nodeKeyPublicSPKISHA256",
+    "nodeLeafDERSHA256",
+    "controlLeafDERSHA256",
+    "caBundleRawSHA256",
+    "signerPublicRawSHA256",
+    "channelVersion",
+    "channelCertificateDERSHA256",
+    "channelEnabled",
+    "channelEndpoint",
+    "legacyCPAgentImageValueHash",
+    "backupReservedName",
+    "oldCmdArgvSHA256",
+    "oldEntrypointSHA256"
+  ],
+  "memberDerivedFields": [
+    "quiescenceProof",
+    "preCutoverUnsignedDoubleRead",
+    "newContainerId",
+    "postStartProtectedStateDigest",
+    "postStartSignedM2",
+    "postStartMTLS",
+    "runtimeInventoryReceipt",
+    "newCmdArgvSHA256",
+    "newEntrypointSHA256",
+    "livePID1ArgvSHA256",
+    "ownedRuntimeInspectionBeforeM2",
+    "ownedRuntimeInspectionAfterM2",
+    "newRuntimeDockerImageId",
+    "newRuntimeRepositoryOrOfflineProof",
+    "newRuntimePlatformManifestDigest",
+    "newRuntimeConfigDigest",
+    "newRuntimeRootFSDiffIDs",
+    "newRuntimeExecutableSHA256",
+    "migrationPredecessorJournalDigest",
+    "postFenceBackupInspectSHA256",
+    "commonAgentMutationFenceIdentity",
+    "observedM2ExecIdsReceipt",
+    "rawServingCmdlineSHA256",
+    "servingArgvCanonicalSHA256",
+    "imageInheritedConfigBeforeAfter",
+    "signedExecutableBytesV2Receipt"
+  ],
+  "groupsAreNotAuthorizations": true,
+  "gates": [
+    {
+      "id": "G1",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "exact inspect/no storage",
+      "red": "helper invokes storage/workspace/credential path or changes a Config/mount",
+      "green": "storage-free exact old inspect replacement, same volume and resources",
+      "futureProductTestOwner": "N04"
+    },
+    {
+      "id": "G2",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "runtime inventory versus workload --image",
+      "red": "runtime image mistaken for permit digest or global agentImage silently rewritten",
+      "green": "preserved args/permit; distinct accepted runtime; atomic typed inventory, all readers or BLOCK",
+      "futureProductTestOwner": "N05"
+    },
+    {
+      "id": "G3",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "credential/state preservation",
+      "red": "recopy/create/new authority or protected tree changes",
+      "green": "no-write stopped double-read, startup/replay/M2 equality and same identity/keys",
+      "futureProductTestOwner": "N04"
+    },
+    {
+      "id": "G4",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "fenced capture plus actual signed poststart M2",
+      "red": "unsigned floor snapshot or host mirror used for normal renewal",
+      "green": "fresh host fenced capture then exact signed sameexeUID/PID1/journal/exebytes v2 + image joins",
+      "futureProductTestOwner": "N01/N04"
+    },
+    {
+      "id": "G5",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "forward only",
+      "red": "automatic downgrade, second migration or deleted/restarted backup",
+      "green": "exact preserved stopped restart=no backup; unknown outcome blocks; no predecessor replacement",
+      "futureProductTestOwner": "N04"
+    },
+    {
+      "id": "G6",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "actual capability/compatibility",
+      "red": "sideloaded observer on old Go, flag assumed, OpenJournal/write by observer",
+      "green": "actual accepted old/new Go startup/replay/observer no-write proof plus unchanged mTLS; native P0 green first",
+      "futureProductTestOwner": "N01"
+    },
+    {
+      "id": "G7",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "ownership/quiescence/publication",
+      "red": "partial reservation, extra consumer, loose lease or partial cohort CAS",
+      "green": "fixed scopes/P/H/C, held OS/logical fence, all descendant/process quiescence, durable intents/readbacks",
+      "futureProductTestOwner": "N03/N04/N05"
+    },
+    {
+      "id": "G8",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "restart restoration",
+      "red": "old image restart or new policy restored before evidence",
+      "green": "new-only explicit Root decision AFTER both M2/mTLS/authority checks, readback; old always no",
+      "futureProductTestOwner": "N04"
+    },
+    {
+      "id": "G9",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "old launch surface exclusion",
+      "red": "new legacy registration, disabled entries treated as no in-flight proof",
+      "green": "fresh exact disabled readback + all surfaces excluded + no overlap/children; technical fence denies",
+      "futureProductTestOwner": "N03/N08"
+    },
+    {
+      "id": "G10",
+      "actual": "HOLD / NOT SATISFIED",
+      "contract": "exact provenance and verdict first",
+      "red": "candidate/report/Docs hash used as accepted product binding",
+      "green": "real source/binary/image/helper/guard/CI/native/review closure, Root decision; NULL until then",
+      "futureProductTestOwner": "N01/N02/N07/N08"
+    }
+  ]
+}

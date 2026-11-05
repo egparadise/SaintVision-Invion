@@ -1,0 +1,2541 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-plain-agent-migration-event:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-plain-agent-migration-event:1"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "previousEventSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "requestSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "phase": {
+          "enum": [
+            "PROVENANCE_LOCKED",
+            "RESERVED",
+            "FENCE_INTENT",
+            "OLD_RESTART_NO",
+            "OLD_STOP_INTENT",
+            "OLD_STOPPED_QUIESCENT",
+            "CAPTURED",
+            "PUBLICATION_INTENT",
+            "OLD_PRESERVED",
+            "NEW_CREATE_INTENT",
+            "NEW_CREATED",
+            "NEW_START_INTENT",
+            "NEW_STARTED_UNVERIFIED",
+            "BOOTSTRAP_VERIFIED_RESTART_NO",
+            "INVENTORY_PUBLICATION_INTENT",
+            "INVENTORY_PUBLISHED",
+            "SEAL_INTENT",
+            "SEALED",
+            "RESTART_RESTORE_INTENT",
+            "RESTART_POLICY_RESTORED",
+            "READY_FOR_NEW_RENEWAL_PLAN",
+            "BLOCKED_FORWARD_ONLY",
+            "QUIESCENCE_UNKNOWN"
+          ]
+        },
+        "fenceEpoch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "leaseEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "memberStates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "nodeId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "recoveryEpoch": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "nodeId",
+                  "recoveryEpoch"
+                ]
+              },
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              },
+              "oldContainerId": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "backupContainerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "newContainerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "latestEvidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "migration-event:/body/memberStates/*/latestEvidence/*"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-member-progress-evidence:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/member-progress-evidence/v1"
+                    },
+                    "producerRole": {
+                      "const": "owned-host-adapter"
+                    },
+                    "signerRole": {
+                      "const": "host-helper"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "member-progress-evidence"
+                        },
+                        "planEnvelopeSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "migrationId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "scope": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "tenantId": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256,
+                              "pattern": "^[^\\u0000]*$"
+                            },
+                            "nodeId": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256,
+                              "pattern": "^[^\\u0000]*$"
+                            },
+                            "recoveryEpoch": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256,
+                              "pattern": "^[^\\u0000]*$"
+                            }
+                          },
+                          "required": [
+                            "tenantId",
+                            "nodeId",
+                            "recoveryEpoch"
+                          ]
+                        },
+                        "phase": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "operationId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sequence": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "planEnvelopeSHA256",
+                        "migrationId",
+                        "scope",
+                        "phase",
+                        "operationId",
+                        "sequence"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 32,
+                "uniqueItems": false
+              }
+            },
+            "required": [
+              "slot",
+              "scope",
+              "phase",
+              "oldContainerId",
+              "backupContainerId",
+              "newContainerId",
+              "latestEvidence"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "effect": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "none",
+                "restart-no",
+                "stop",
+                "rename",
+                "create",
+                "start",
+                "inventory-cas",
+                "seal",
+                "restore-new-restart-policy"
+              ]
+            },
+            "targetSlot": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PC2",
+                    "PC4"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "intentEventSHA256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "receipt": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "contractSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "artifactSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "scopeSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "signerKeySPKISHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "observedAt": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "validUntil": {
+                      "$ref": "common.schema.json#/$defs/timestamp"
+                    },
+                    "slotId": {
+                      "const": "migration-event:/body/effect/receipt"
+                    },
+                    "contractId": {
+                      "const": "saintvision-proof-migration-effect-readback:1"
+                    },
+                    "signatureDomainASCII": {
+                      "const": "saintvision/proof/migration-effect-readback/v1"
+                    },
+                    "producerRole": {
+                      "const": "owned-engine-adapter"
+                    },
+                    "signerRole": {
+                      "const": "host-helper"
+                    },
+                    "typedSubject": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "migration-effect-readback"
+                        },
+                        "planEnvelopeSHA256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "migrationId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "operationId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "sequence": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        },
+                        "method": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "effectKind": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        },
+                        "targetSlot": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 4096,
+                              "pattern": "^[^\\u0000]*$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "intentEventSHA256": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "outcome": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000]*$"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "planEnvelopeSHA256",
+                        "migrationId",
+                        "operationId",
+                        "sequence",
+                        "method",
+                        "effectKind",
+                        "targetSlot",
+                        "intentEventSHA256",
+                        "outcome"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "contractSHA256",
+                    "artifactSHA256",
+                    "scopeSHA256",
+                    "signerKeySPKISHA256",
+                    "observedAt",
+                    "validUntil",
+                    "slotId",
+                    "contractId",
+                    "signatureDomainASCII",
+                    "producerRole",
+                    "signerRole",
+                    "typedSubject"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "targetSlot",
+            "intentEventSHA256",
+            "receipt"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "contractSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "artifactSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "scopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "signerKeySPKISHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "observedAt": {
+                "$ref": "common.schema.json#/$defs/timestamp"
+              },
+              "validUntil": {
+                "$ref": "common.schema.json#/$defs/timestamp"
+              },
+              "slotId": {
+                "const": "migration-event:/body/evidence/*"
+              },
+              "contractId": {
+                "const": "saintvision-proof-migration-event-evidence:1"
+              },
+              "signatureDomainASCII": {
+                "const": "saintvision/proof/migration-event-evidence/v1"
+              },
+              "producerRole": {
+                "const": "owned-host-adapter"
+              },
+              "signerRole": {
+                "const": "host-helper"
+              },
+              "typedSubject": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "migration-event-evidence"
+                  },
+                  "planEnvelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "migrationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "operationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "sequence": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "phase": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "method": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "recordKind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "planEnvelopeSHA256",
+                  "migrationId",
+                  "operationId",
+                  "sequence",
+                  "phase",
+                  "method",
+                  "recordKind"
+                ]
+              }
+            },
+            "required": [
+              "contractSHA256",
+              "artifactSHA256",
+              "scopeSHA256",
+              "signerKeySPKISHA256",
+              "observedAt",
+              "validUntil",
+              "slotId",
+              "contractId",
+              "signatureDomainASCII",
+              "producerRole",
+              "signerRole",
+              "typedSubject"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 32,
+          "uniqueItems": false
+        },
+        "inventoryEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalSealEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failureReason": {
+          "enum": [
+            "none",
+            "ownership-lost",
+            "inspection-mismatch",
+            "quiescence-unknown",
+            "engine-result-unknown",
+            "protected-state-mismatch",
+            "m2-rejected",
+            "mtls-rejected",
+            "publication-conflict",
+            "timing-unsafe",
+            "foreign-consumer",
+            "provenance-invalid"
+          ]
+        },
+        "method": {
+          "enum": [
+            "inspectAndValidate",
+            "reserve",
+            "setOldRestartNo",
+            "stopOld",
+            "captureFenced",
+            "preserveOld",
+            "createNew",
+            "startNew",
+            "verifyBootstrap",
+            "publishInventory",
+            "seal",
+            "restoreNewRestartPolicy",
+            "readState",
+            "release"
+          ]
+        },
+        "recordKind": {
+          "enum": [
+            "intent",
+            "outcome",
+            "readback",
+            "failure"
+          ]
+        },
+        "priorPhase": {
+          "enum": [
+            "UNRECORDED",
+            "PROVENANCE_LOCKED",
+            "RESERVED",
+            "FENCE_INTENT",
+            "OLD_RESTART_NO",
+            "OLD_STOP_INTENT",
+            "OLD_STOPPED_QUIESCENT",
+            "CAPTURED",
+            "PUBLICATION_INTENT",
+            "OLD_PRESERVED",
+            "NEW_CREATE_INTENT",
+            "NEW_CREATED",
+            "NEW_START_INTENT",
+            "NEW_STARTED_UNVERIFIED",
+            "BOOTSTRAP_VERIFIED_RESTART_NO",
+            "INVENTORY_PUBLICATION_INTENT",
+            "INVENTORY_PUBLISHED",
+            "SEAL_INTENT",
+            "SEALED",
+            "RESTART_RESTORE_INTENT",
+            "RESTART_POLICY_RESTORED",
+            "READY_FOR_NEW_RENEWAL_PLAN",
+            "BLOCKED_FORWARD_ONLY",
+            "QUIESCENCE_UNKNOWN"
+          ]
+        },
+        "sealedHistory": {
+          "type": "boolean"
+        },
+        "inventoryPublishedHistory": {
+          "type": "boolean"
+        },
+        "targetSlot": {
+          "anyOf": [
+            {
+              "enum": [
+                "PC2",
+                "PC4"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "migrationId",
+        "planEnvelopeSHA256",
+        "sequence",
+        "previousEventSHA256",
+        "operationId",
+        "idempotencyKey",
+        "requestSHA256",
+        "recordedAt",
+        "phase",
+        "fenceEpoch",
+        "leaseEnvelopeSHA256",
+        "memberStates",
+        "effect",
+        "evidence",
+        "inventoryEnvelopeSHA256",
+        "terminalSealEnvelopeSHA256",
+        "failureReason",
+        "method",
+        "recordKind",
+        "priorPhase",
+        "sealedHistory",
+        "inventoryPublishedHistory",
+        "targetSlot"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sequence": {
+                "const": 1
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "previousEventSHA256": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "previousEventSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalSealEnvelopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "terminalSealEnvelopeSHA256": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealedHistory": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inventoryPublishedHistory": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inventoryEnvelopeSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "inventoryEnvelopeSHA256": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inventoryPublishedHistory": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealedHistory": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inventoryPublishedHistory": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "inspectAndValidate"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "RESERVED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "reserve"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "RESERVED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "restart-no"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "FENCE_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "OLD_RESTART_NO"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "setOldRestartNo"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "stop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "OLD_STOP_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "OLD_STOPPED_QUIESCENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "stopOld"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "CAPTURED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "captureFenced"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "CAPTURED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "rename"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "OLD_PRESERVED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "preserveOld"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "create"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "NEW_CREATE_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "NEW_CREATED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "createNew"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "start"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "NEW_START_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "NEW_STARTED_UNVERIFIED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "startNew"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "BOOTSTRAP_VERIFIED_RESTART_NO"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "verifyBootstrap"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "BOOTSTRAP_VERIFIED_RESTART_NO"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "inventory-cas"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "INVENTORY_PUBLICATION_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "INVENTORY_PUBLISHED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "publishInventory"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "seal"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "SEAL_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "SEALED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "seal"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "restore-new-restart-policy"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "enum": [
+                  "PC2",
+                  "PC4"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "RESTART_RESTORE_INTENT"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "RESTART_POLICY_RESTORED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "restoreNewRestartPolicy"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "readState"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "release"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "release"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetSlot": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "outcome"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "release"
+              },
+              "recordKind": {
+                "const": "readback"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "PROVENANCE_LOCKED",
+                  "RESERVED",
+                  "FENCE_INTENT",
+                  "OLD_RESTART_NO",
+                  "OLD_STOP_INTENT",
+                  "OLD_STOPPED_QUIESCENT",
+                  "CAPTURED",
+                  "PUBLICATION_INTENT",
+                  "OLD_PRESERVED",
+                  "NEW_CREATE_INTENT",
+                  "NEW_CREATED",
+                  "NEW_START_INTENT",
+                  "NEW_STARTED_UNVERIFIED",
+                  "BOOTSTRAP_VERIFIED_RESTART_NO",
+                  "INVENTORY_PUBLICATION_INTENT",
+                  "INVENTORY_PUBLISHED",
+                  "SEAL_INTENT",
+                  "SEALED",
+                  "RESTART_RESTORE_INTENT",
+                  "RESTART_POLICY_RESTORED",
+                  "READY_FOR_NEW_RENEWAL_PLAN",
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recordKind": {
+                "const": "failure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "enum": [
+                  "BLOCKED_FORWARD_ONLY",
+                  "QUIESCENCE_UNKNOWN"
+                ]
+              },
+              "failureReason": {
+                "not": {
+                  "const": "none"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recordKind": {
+                "const": "failure"
+              },
+              "failureReason": {
+                "const": "engine-result-unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "intentEventSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recordKind": {
+                "const": "intent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "receipt": {
+                    "const": null
+                  },
+                  "intentEventSHA256": {
+                    "const": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recordKind": {
+                "const": "outcome"
+              },
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "restart-no",
+                      "stop",
+                      "rename",
+                      "create",
+                      "start",
+                      "inventory-cas",
+                      "seal",
+                      "restore-new-restart-policy"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "receipt": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "intentEventSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "kind": {
+                    "const": "none"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effect": {
+                "properties": {
+                  "receipt": {
+                    "const": null
+                  },
+                  "intentEventSHA256": {
+                    "const": null
+                  },
+                  "targetSlot": {
+                    "const": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "host-helper"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

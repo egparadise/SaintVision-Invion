@@ -1,0 +1,467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "saintvision-agent-mutation-fence:1 PROPOSED",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-agent-mutation-fence:1"
+        },
+        "leaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "operation": {
+          "enum": [
+            "migration",
+            "migration-observe",
+            "normal3-renewal",
+            "normal3-observe",
+            "inventory-publish",
+            "new-restart-restore"
+          ]
+        },
+        "planEnvelopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "migrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "fenceEpoch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "priorFenceEnvelopeSHA256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "nodeId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  },
+                  "recoveryEpoch": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\u0000]*$"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "nodeId",
+                  "recoveryEpoch"
+                ]
+              },
+              "daemonIdentitySHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "workerRootRegistrationSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "ownedVolumeMetadataSHA256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "scope",
+              "daemonIdentitySHA256",
+              "workerRootRegistrationSHA256",
+              "ownedVolumeMetadataSHA256"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": false
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "principal": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\u0000]*$"
+            },
+            "uid": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4294967295
+            },
+            "gid": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4294967295
+            },
+            "hostBootIdentitySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "pid": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            "processStartIdentitySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "ownerGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "principal",
+            "uid",
+            "gid",
+            "hostBootIdentitySHA256",
+            "pid",
+            "processStartIdentitySHA256",
+            "ownerGeneration"
+          ]
+        },
+        "tokenSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acquiredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"
+        },
+        "mode": {
+          "enum": [
+            "HELD",
+            "RELEASED",
+            "BLOCKED_UNKNOWN"
+          ]
+        },
+        "permittedEntrypointsSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "descendantRegistrySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "terminalSeals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 0,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "requiresHeldOSLocks": {
+          "const": true
+        },
+        "staleAgeReclaimAllowed": {
+          "const": false
+        },
+        "rawTokenPublished": {
+          "const": false
+        },
+        "expectedInventoryHead": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "presence": {
+              "enum": [
+                "ABSENT",
+                "PRESENT"
+              ]
+            },
+            "envelopeSHA256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "readbackProof": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contractSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "artifactSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "scopeSHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "signerKeySPKISHA256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "observedAt": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "validUntil": {
+                  "$ref": "common.schema.json#/$defs/timestamp"
+                },
+                "slotId": {
+                  "const": "operation-lease:/body/expectedInventoryHead/readbackProof"
+                },
+                "contractId": {
+                  "const": "saintvision-proof-inventory-head-readback:1"
+                },
+                "signatureDomainASCII": {
+                  "const": "saintvision/proof/inventory-head-readback/v1"
+                },
+                "producerRole": {
+                  "const": "cp-inventory-reader"
+                },
+                "signerRole": {
+                  "const": "cp-inventory"
+                },
+                "typedSubject": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "inventory-head-readback"
+                    },
+                    "cohortId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "presence": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "^[^\\u0000]*$"
+                    },
+                    "envelopeSHA256": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "registrationSHA256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "cohortId",
+                    "presence",
+                    "envelopeSHA256",
+                    "registrationSHA256"
+                  ]
+                }
+              },
+              "required": [
+                "contractSHA256",
+                "artifactSHA256",
+                "scopeSHA256",
+                "signerKeySPKISHA256",
+                "observedAt",
+                "validUntil",
+                "slotId",
+                "contractId",
+                "signatureDomainASCII",
+                "producerRole",
+                "signerRole",
+                "typedSubject"
+              ]
+            }
+          },
+          "required": [
+            "presence",
+            "envelopeSHA256",
+            "readbackProof"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "presence": {
+                    "const": "ABSENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "const": null
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "envelopeSHA256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "leaseId",
+        "operationId",
+        "operation",
+        "planEnvelopeSHA256",
+        "migrationId",
+        "fenceEpoch",
+        "priorFenceEnvelopeSHA256",
+        "scopes",
+        "owner",
+        "tokenSHA256",
+        "acquiredAt",
+        "expiresAt",
+        "mode",
+        "permittedEntrypointsSHA256",
+        "descendantRegistrySHA256",
+        "terminalSeals",
+        "requiresHeldOSLocks",
+        "staleAgeReclaimAllowed",
+        "rawTokenPublished",
+        "expectedInventoryHead"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "normal3-renewal",
+                  "normal3-observe",
+                  "new-restart-restore"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalSeals": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "uniqueItems": true
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "terminalSeals": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "minItems": 0,
+                "maxItems": 0,
+                "uniqueItems": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "root-fence"
+        },
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureHex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "role",
+        "keySPKISHA256",
+        "signatureHex"
+      ]
+    }
+  },
+  "required": [
+    "body",
+    "signer"
+  ]
+}

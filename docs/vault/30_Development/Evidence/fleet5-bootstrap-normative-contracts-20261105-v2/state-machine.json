@@ -1,0 +1,256 @@
+{
+  "status": "PROPOSED_NOT_IMPLEMENTED",
+  "phases": [
+    "PROVENANCE_LOCKED",
+    "RESERVED",
+    "FENCE_INTENT",
+    "OLD_RESTART_NO",
+    "OLD_STOP_INTENT",
+    "OLD_STOPPED_QUIESCENT",
+    "CAPTURED",
+    "PUBLICATION_INTENT",
+    "OLD_PRESERVED",
+    "NEW_CREATE_INTENT",
+    "NEW_CREATED",
+    "NEW_START_INTENT",
+    "NEW_STARTED_UNVERIFIED",
+    "BOOTSTRAP_VERIFIED_RESTART_NO",
+    "INVENTORY_PUBLICATION_INTENT",
+    "INVENTORY_PUBLISHED",
+    "SEAL_INTENT",
+    "SEALED",
+    "RESTART_RESTORE_INTENT",
+    "RESTART_POLICY_RESTORED",
+    "READY_FOR_NEW_RENEWAL_PLAN",
+    "BLOCKED_FORWARD_ONLY",
+    "QUIESCENCE_UNKNOWN"
+  ],
+  "methodTable": [
+    {
+      "method": "inspectAndValidate",
+      "priorPhases": [
+        "UNRECORDED"
+      ],
+      "intentPhase": null,
+      "outcomePhase": "PROVENANCE_LOCKED",
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "cohort",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "reserve",
+      "priorPhases": [
+        "PROVENANCE_LOCKED"
+      ],
+      "intentPhase": null,
+      "outcomePhase": "RESERVED",
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "cohort",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "setOldRestartNo",
+      "priorPhases": [
+        "RESERVED",
+        "FENCE_INTENT"
+      ],
+      "intentPhase": "FENCE_INTENT",
+      "outcomePhase": "OLD_RESTART_NO",
+      "effectKind": "restart-no",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "stopOld",
+      "priorPhases": [
+        "OLD_RESTART_NO"
+      ],
+      "intentPhase": "OLD_STOP_INTENT",
+      "outcomePhase": "OLD_STOPPED_QUIESCENT",
+      "effectKind": "stop",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "captureFenced",
+      "priorPhases": [
+        "OLD_STOPPED_QUIESCENT"
+      ],
+      "intentPhase": null,
+      "outcomePhase": "CAPTURED",
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "member",
+      "specialPrerequisite": "authenticated exact stop-outcome predecessor + quiescence receipt"
+    },
+    {
+      "method": "preserveOld",
+      "priorPhases": [
+        "CAPTURED",
+        "PUBLICATION_INTENT"
+      ],
+      "intentPhase": "PUBLICATION_INTENT",
+      "outcomePhase": "OLD_PRESERVED",
+      "effectKind": "rename",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "createNew",
+      "priorPhases": [
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT"
+      ],
+      "intentPhase": "NEW_CREATE_INTENT",
+      "outcomePhase": "NEW_CREATED",
+      "effectKind": "create",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "startNew",
+      "priorPhases": [
+        "NEW_CREATED",
+        "NEW_START_INTENT"
+      ],
+      "intentPhase": "NEW_START_INTENT",
+      "outcomePhase": "NEW_STARTED_UNVERIFIED",
+      "effectKind": "start",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "verifyBootstrap",
+      "priorPhases": [
+        "NEW_STARTED_UNVERIFIED"
+      ],
+      "intentPhase": null,
+      "outcomePhase": "BOOTSTRAP_VERIFIED_RESTART_NO",
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "publishInventory",
+      "priorPhases": [
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT"
+      ],
+      "intentPhase": "INVENTORY_PUBLICATION_INTENT",
+      "outcomePhase": "INVENTORY_PUBLISHED",
+      "effectKind": "inventory-cas",
+      "requiresPriorIntent": true,
+      "scope": "cohort",
+      "specialPrerequisite": "BOTH member verified states"
+    },
+    {
+      "method": "seal",
+      "priorPhases": [
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT"
+      ],
+      "intentPhase": "SEAL_INTENT",
+      "outcomePhase": "SEALED",
+      "effectKind": "seal",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "restoreNewRestartPolicy",
+      "priorPhases": [
+        "SEALED",
+        "RESTART_RESTORE_INTENT"
+      ],
+      "intentPhase": "RESTART_RESTORE_INTENT",
+      "outcomePhase": "RESTART_POLICY_RESTORED",
+      "effectKind": "restore-new-restart-policy",
+      "requiresPriorIntent": true,
+      "scope": "member",
+      "specialPrerequisite": "BOTH original seals + fresh new restore lease/M2/mTLS/Root decision"
+    },
+    {
+      "method": "readState",
+      "priorPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ],
+      "intentPhase": null,
+      "outcomePhase": null,
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "cohort",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    },
+    {
+      "method": "release",
+      "priorPhases": [
+        "PROVENANCE_LOCKED",
+        "RESERVED",
+        "FENCE_INTENT",
+        "OLD_RESTART_NO",
+        "OLD_STOP_INTENT",
+        "OLD_STOPPED_QUIESCENT",
+        "CAPTURED",
+        "PUBLICATION_INTENT",
+        "OLD_PRESERVED",
+        "NEW_CREATE_INTENT",
+        "NEW_CREATED",
+        "NEW_START_INTENT",
+        "NEW_STARTED_UNVERIFIED",
+        "BOOTSTRAP_VERIFIED_RESTART_NO",
+        "INVENTORY_PUBLICATION_INTENT",
+        "INVENTORY_PUBLISHED",
+        "SEAL_INTENT",
+        "SEALED",
+        "RESTART_RESTORE_INTENT",
+        "RESTART_POLICY_RESTORED",
+        "READY_FOR_NEW_RENEWAL_PLAN",
+        "BLOCKED_FORWARD_ONLY",
+        "QUIESCENCE_UNKNOWN"
+      ],
+      "intentPhase": null,
+      "outcomePhase": null,
+      "effectKind": "none",
+      "requiresPriorIntent": false,
+      "scope": "cohort",
+      "specialPrerequisite": "exact same plan/operation/owner and allowed history"
+    }
+  ],
+  "captureRequires": "OLD_STOPPED_QUIESCENT produced by exact stopOld OUTCOME, with same old ID/daemon/volume/fence and authenticated process/descendant quiescence. Restart=no alone NEVER qualifies.",
+  "failureRules": "failure record may originate at ANY phase including SEALED/restore/READY; transition to BLOCKED_FORWARD_ONLY or QUIESCENCE_UNKNOWN. A repeated failure observation in a blocked phase may remain there, with no effect. Original seal/inventory refs and history flags must remain exact if they ever existed. No clear/reset/drop to satisfy schema.",
+  "reentry": "same first-plan request only; unknown BLOCK; no second migration; normal3 new lease validates immutable seals + current M2 without freezing migration P/H/C",
+  "lockOrder": "external auth -> acquire OS locks PC2 thenPC4 by registered daemon/root sort order -> durable logical lease CAS against prior fence while both locks held -> effects. On CAS conflict release only newly acquired locks after no-effect/child proof. Release: stop new children -> prove all descendants quiescent -> durable RELEASED logical CAS under both locks -> unlock PC4 thenPC2.",
+  "nestedReentrancy": "Only live matching operation/token hash/owner generation/OS-lock registry may reuse held locks via trusted internal context and reference count. No recursive reacquisition, lock upgrade, caller asserted owned flag or taking another owner; mismatch BLOCK.",
+  "unknownOwnership": "no PID/age/expiry reclaim or stale eviction",
+  "secondMigrationAllowed": false
+}
