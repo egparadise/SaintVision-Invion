@@ -1,0 +1,51 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_da78a1ae6d7b / ctx_607df2b15a4b",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T18:45:00+09:00", "2026-11-05T19:05:00+09:00"],
+  "reviewed": {"head": "6fcedbbdba24e43e3917adb07f080a683dedfefe", "base": "8b53fbfef107837602b1b2f700e1f8e7bae28638", "commits": 1, "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105", "priorReviewCovered8b53Only": true},
+  "integrity": {
+    "workerSHA256": {"value": "9219cd817778278cb5e92ef4d4ed08b666d6dfe7ab727ee9e660cf1d8a0ca68b", "matched": true, "launcherPinMatches": true},
+    "lanPilot": {"sha256": "e1437600dad2231f40b24cb44d7c3edf1c147e42bc68d39dad2ebb0c9b51f574", "blob": "111922523062608efeb02f81de82f0b41a8189fe", "matched": true},
+    "card150DiffVs59fPaths": ["/source/toolGitBlobSHA1/tools/lan_pilot.py", "/source/toolSHA256/tools/lan_pilot.py"],
+    "dbPreparationBaselinePreserved": true,
+    "nonDocsDelta": ["worker _immutable +15", "lan_pilot terminal retire replay calls _immutable(publish=True) +3", "README +20", "tests/test_leaf_rotation_archive_residue.py new"],
+    "importsAndRuntimeLockUnchanged": true
+  },
+  "semantics": {
+    "cleanup": "archive exact bytes + regular/owner/mode verified; .next independently verified and equal; unlink + POSIX dir fsync only when publish=True; archive bytes/inode preserved",
+    "nodeCallSite": "finalize publish=True after evidence signatures, policy and restart",
+    "cpCallSite": "terminal retire replay after archive verify, all proofs, current authority/DB channel and exact receipt bytes",
+    "readOnlyPathsDoNotRemove": true,
+    "L2": "exact receipt bytes preserved; README states reserialization unsupported",
+    "L3": "README states fixed membership/tenant/epoch/CA/IP/Node+CP keys, changes block, full-five initialization, classifier must verify signed archives and all proofs"
+  },
+  "ownRuns": {
+    "focused": {"files": ["test_leaf_rotation_archive_residue", "test_lan_leaf_rotation_consecutive", "test_lan_leaf_rotation_batch_successor", "test_lan_leaf_rotation", "test_lan_leaf_rotation_standalone_runtime"], "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider", "result": "162 passed, 20 skipped in 54.86s", "skips": "Windows symlink + POSIX owner/mode; not executed by Claude"},
+    "probes": {"fileSHA256": "9d92ad6311eeb336c054280c8171f5eceb573926ea70ad3ee70294b4551d5f59", "committed": false, "items": [
+      {"id": "Q1", "case": "Node equal hard-linked .next, finalize replay", "result": "removed; archive bytes and inode preserved"},
+      {"id": "Q2", "case": "Node .next last byte differs, finalize replay", "result": "ValueError staging collision; worker snapshot unchanged"},
+      {"id": "Q5", "case": "CP terminal .next; same-batch prepare/commit replay then retire replay", "result": "kept by read-only replays; removed by retire replay"},
+      {"id": "Q8", "case": "CP .next with one proof byte-different retire replay", "result": "ValueError replay proof bytes differ; snapshot unchanged; .next kept"},
+      {"id": "Q4", "case": "Node predecessor .next then successor install", "result": "accepted; old finalize replay then refused; .next persists after successor finalize"},
+      {"id": "Q6", "case": "CP predecessor .next then successor prepare", "result": "accepted; old retire then refused; .next persists"}
+    ]}
+  },
+  "findings": [
+    {"id": "L1b", "severity": "Low", "kind": "liveness, not safety", "summary": "_finalized_successor (Node) and _finalized_predecessor (CP) accept an equal predecessor .next; once a successor starts, the only verified cleanup paths (old finalize / old retire) are refused, so the residue is permanently stranded and the .next=orphan classifier keeps blocking", "fix": "(a, recommended) refuse successor while predecessor archive .next exists: 'replay finalize/retire first'; or (b) call _immutable(publish=True) at that already-verified point", "tests": "add Node and CP successor-with-residue cases"}
+  ],
+  "requirementsMet": ["cleanup only after full verification", "unequal/empty/partial/symlink/foreign residue refused and preserved (symlink/foreign by code and Linux-only tests)", "preflight does not clean", "archive never overwritten", "legacy 8b terminal residue cleaned by retire replay", "L2 exact bytes", "L3 documented", "only Card150 lan_pilot pair changed"],
+  "hosted": {
+    "docs": {"run": 42006174091, "head": "6fcedbbd", "conclusion": "success"},
+    "core": {"head": "6fcedbbd", "status": "not present in branch run list", "checkedAtKST": "2026-11-05T18:59:04+09:00", "countedAsSuccess": false},
+    "prior8bCore": {"run": 42001883513, "head": "8b53fbfe", "conclusion": "success", "evidenceFor6fce": false}
+  },
+  "verdict": "ACCEPT (delta source, safety); residual Low L1b recommended before integrator pin; 6fce Core absent",
+  "currentTaskMutations": {"physical": 0, "privateRuntime": 0, "CA": 0, "oldR5": 0, "original48": 0, "implementationEdits": 0, "localTempWorktree": "added and removed"},
+  "nextFirstAction": [
+    {"owner": "root", "action": "dispatch/confirm exact 6fce Core; decide L1b (recommend a); build integrator pin after L1b"},
+    {"owner": "Codex", "action": "L1b fix with Node and CP successor-with-residue tests"},
+    {"owner": "Claude", "action": "review L1b delta when relayed"}
+  ]
+}
