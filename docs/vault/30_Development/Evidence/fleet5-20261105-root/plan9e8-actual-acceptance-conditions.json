@@ -1,0 +1,103 @@
+{
+  "schema": "fleet5-plan9e8-actual-acceptance-with-conditions:1",
+  "recordedAtKST": "2026-11-05T23:13:05+09:00",
+  "rootBase": "df053beac53d2991af7e51c9dc3edc240d9c1018",
+  "priorRootCheckpoint": {
+    "schema": "fleet5-root409-final-checkpoint:1",
+    "verifiedAtKST": "2026-11-05T23:13:05+09:00",
+    "SHA": "df053beac53d2991af7e51c9dc3edc240d9c1018",
+    "Docs": 42041535837,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "exported": 24,
+    "independentlyMatchedNormalizedDestinationHashes": 2393,
+    "pending": 0,
+    "conflicts": 0,
+    "worktreeClean": true,
+    "wholeProgramComplete": false
+  },
+  "reviewedPlan": "9e8e8c2f160c1b6cccc5ffec87d8917010a7df6a",
+  "actualIndependentReview": {
+    "SHA": "a471ce1988e444270fdf83283fee18e0342ddd69",
+    "task": "task_3c24efc159b8",
+    "dispatch": "ctx_9fe3a9741db8",
+    "Docs": 42041692267,
+    "rootVerifiedExactHeadAllJobsSuccess": true,
+    "verdict": "ACCEPT as NONEXECUTING plan with Low carry-forward C1-C3",
+    "planFindingsClosed": [
+      "R1",
+      "R2",
+      "R4",
+      "N1",
+      "N2"
+    ],
+    "artifactHashesMatched": 20,
+    "ownerSchemaCasesMatched": 26,
+    "reviewerMutationsRejected": 98,
+    "futureProductCasesExecuted": false,
+    "runtimeCases": 36,
+    "reviewerPlanDocsRechecked": false,
+    "planDocsVerifiedByRoot": 42040204454,
+    "P0CompatibilityVerifiedByReviewer": false,
+    "compatibilityRootRelayedMessage": "msg_03604b3e6bed"
+  },
+  "conditions": {
+    "C1": "explicit DENIED scheduler registration/invocation/executor surfaces in common-fence and G9 inventory",
+    "C2": "byte-identical v2 canonical signed body across actual Go producer and Python verifier with fully published Unicode/escape/negative fixture inputs",
+    "C3": "second migration BLOCK until separately reviewed design; no predecessor deletion/replacement/rotation"
+  },
+  "rootDirections": {
+    "actualVerdictReply": "msg_c6e48bc54f3a",
+    "P0CanonicalRelay": "msg_d43265602041",
+    "M2v2SignedBody": "Go encoding/json.Marshal(map) sorted compact UTF8 with HTML escaping and U+2028/U+2029 escaping; no signed body newline; strict valid Unicode; transport newline separate",
+    "OtherSignatureBodies": "preserve their own original canonicalization including required newlines; no global normalization",
+    "v1History": "no rewrite or missing executable-field fallback",
+    "futureContractProposal": "close Low docs first; precise closed journal/fence/inventory schemas and ownership/provenance proposal before separate Root implementation decision"
+  },
+  "sourceOrBinaryPublished": false,
+  "P0CodeAccepted": false,
+  "M2v2JournalFenceInventoryContractAccepted": false,
+  "runtimeCIAccepted": false,
+  "operationalAccepted": false,
+  "targetBindings": null,
+  "rootOperationalBindings": null,
+  "memberBindings": null,
+  "physicalAcceptance": false,
+  "legacyThreeAutomations": "disabled",
+  "integrationPendingActualSourceQuestion": "msg_fe3ec1971bc9",
+  "imports": [
+    {
+      "source": "a471ce1988e444270fdf83283fee18e0342ddd69",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/legacy-bootstrap-plan-9e8e-review.json",
+      "SHA256": "b7073698711af71581537ee6122c6ad1b9d6c79f6ff64f7feb254abb14623612"
+    },
+    {
+      "source": "a471ce1988e444270fdf83283fee18e0342ddd69",
+      "path": "docs/vault/30_Development/History/2026-11-05_23-03-41_KST_FLEET5_legacy_bootstrap_plan_9e8e_검토_Claude.md",
+      "SHA256": "fe56ce9422d369b93b41a4aa12bec5f1c6423781d83793ce1ccf43f2b8bae665"
+    }
+  ],
+  "rootProductChanged": false,
+  "wholeProgramComplete": false,
+  "nextFirstAction": {
+    "planOwner": "close C1-C3 and fully publish fixtures, propose exact next contracts",
+    "P0Owner": "finish actual code/native/lifecycle/recovery/v2 and exact CI/new independent code review",
+    "Root": "review real next deliveries; no physical or final integration acceptance before required actual proof"
+  },
+  "checkpointValidation": {
+    "docsExit": 0,
+    "ontologyExit": 0,
+    "syncCheckExit": 0,
+    "pathCitationsRatchetExit": 0,
+    "singleSourceRatchetExit": 0,
+    "syncManaged": 2396,
+    "syncPending": 6,
+    "syncConflicts": 0,
+    "pathBase": "df053beac53d2991af7e51c9dc3edc240d9c1018",
+    "productChanged": false
+  }
+}

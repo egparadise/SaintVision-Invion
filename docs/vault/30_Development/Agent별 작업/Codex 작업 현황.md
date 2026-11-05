@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.370"
+version: "1.0.371"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T23:02:26+09:00"
+updated: "2026-11-05T23:13:05+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "9e8 plan independent delta review task3c24/ctx9fe3 started; actual P0 author compatibility received; code/native acceptance pending; legacy3 disabled"
-active_card_next: "Claude reports exact9e8 verdict; P0 owner delivers actual revised source/native/Core/review; Root routes real results and keeps operation HOLD; integrator waits actual P0"
+active_card_status: "Actual9e8 NONEXECUTING plan ACCEPT with C1-C3; code/contracts/runtimeCI/operations unaccepted; P0 corrections and planLow/contractproposal active; legacy3 disabled"
+active_card_next: "Plan owner closes C1-C3 and proposes precise contracts; P0 owner delivers source/native/Core/review; Root handles actual results and keeps execution HOLD; integration waits actual P0"
 ---
+
+## 2026-11-05 비실행 계획 수락과 후속 조건
+
+작업한 것: 실제 a471의 plan ACCEPT/C1–C3를 읽고 exact Docs42041692267 성공을 확인해 담당의 pending 질문에 답했다. 확인한 것:20artifact/26schema/98mutation은 독립 문서 검사이고36 runtime case는 미실행이다. 다음 첫 행동/담당: 계획 담당은 예약 도구 DENIED 목록·서명 바이트 규칙·두 번째 migration BLOCK과 공개 fixture 입력을 보완하고, P0 담당은 실제 v2 producer/verifier·기존 lifecycle·native/한정 복구 교정을 마친다. Root는 구체 계약과 실제 새 구현의 별도 검토/CI 전까지 운영을 보류한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 수정9e8 계획의 실제 독립 delta 검토
 
