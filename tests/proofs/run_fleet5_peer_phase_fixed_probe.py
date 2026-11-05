@@ -125,11 +125,11 @@ def run_proof(output):
                 connection.connect()
                 if sha(connection.sock.getpeercert(binary_form=True)) != expected_der:
                     raise ValueError("Actual server DER differs from expected native phase")
-                connection.request("POST", "/v1/heartbeats", body=json.dumps({"nonce": base64.b64encode(os.urandom(32)).decode()}), headers={"Content-Type": "application/json"})
+                connection.request("POST", "/v1/heartbeats", body=json.dumps({"nonce": os.urandom(32).hex()}), headers={"Content-Type": "application/json"})
                 response = connection.getresponse()
                 body = response.read()
                 if response.status != 200:
-                    raise ValueError("mTLS heartbeat rejected")
+                    raise ValueError("mTLS heartbeat rejected: status=" + str(response.status) + " body=" + body.decode("utf-8", "replace")[:256])
                 if not accepted:
                     raise AssertionError("Old CP certificate remained authorized after final trust narrowing")
                 assert json.loads(body)["nodeId"] == node_id
