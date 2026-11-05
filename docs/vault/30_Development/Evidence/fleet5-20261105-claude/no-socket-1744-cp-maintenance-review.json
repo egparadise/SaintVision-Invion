@@ -1,0 +1,77 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_4a4927d2b60d / ctx_55be7bd3f015",
+  "reviewer": "Claude",
+  "author": "Codex (part A); Claude plan reviewed for root (part B)",
+  "observedWindowKST": ["2026-11-05T16:41:00+09:00", "2026-11-05T17:02:00+09:00"],
+  "partA": {
+    "reviewedCommit": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+    "branch": "agent/codex/fleet5-storage-workspace-guard-20261105",
+    "parent": "f40c3805 (docs-only vs ff97)",
+    "integrity": {
+      "testFile": {"path": "tests/core/test_lan_workspace_upgrade.py", "blob": "f4ccf241", "sha256": "ca86b49e5c1be86273ceeb550e3e44fd2b1a7db4ffebc26b943d7544b244273d", "matched": true},
+      "helper": {"path": "deploy/lan/worker_workspace.py", "blob": "c1e51ddb", "sha256": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d", "unchangedSinceFf97Accept": true},
+      "delta": "6 insertions / 1 deletion; socket_mounted parametrize with-socket/state-only x 3 profiles; state-only keeps state mount only and asserts backup Mounts == original"
+    },
+    "ownRun": {"interpreter": "main .venv Python 3.14.7 -B", "file": "33 passed", "atKST": "2026-11-05T17:01:00+09:00", "priorReviewReused": false},
+    "mutationProbe": {"mutant": "if sockets != 1: raise before return args in validate_install_target", "stateOnlyFailed": 3, "othersPassed": 30, "restored": true},
+    "hosted": {
+      "docs": {"run": 41988236953, "head": "17447988", "conclusion": "success"},
+      "core": {"run": 41988233523, "head": "17447988", "status": "in_progress", "checkedAtKST": "2026-11-05T17:00:20+09:00", "countedAsSuccess": false},
+      "codexReportedFocused": "104 pass 0 skip (recorded, not re-measured)"
+    },
+    "verdict": "ACCEPT (source); hosted Core pending"
+  },
+  "partB": {
+    "withdrawnCondition": "all future Nov8-10 follow-ups terminal before maintenance (calendar gate without Docker dependency)",
+    "pinInspection": {"executables": 6, "cyclePlanPins": 106, "pinsUnderSupervisionWork": 104, "pinsOnC": 2, "dockerOrWslPinsOrStrings": 0, "guardSHA256Prefix": "acf8b4f6", "configSHA256Prefix": "ca684b45", "parametersSHA256Prefix": "d46ddd2a"},
+    "releaseCondition": [
+      "no active attempt/latch/lock/lock.guard/completion-unknown/orphan intent/live Cycle child, before and after",
+      "whole maintenance outside Nov8 14:20-18:32, Nov9 12:15-16:27, Nov10 08:00-12:12 KST plus grace; post-check done >=2h before next window",
+      "3 follow-ups enabled; config/parameters/guard/106 pins/6 executables/private-state hashes equal before and after",
+      "no reboot/logoff/user switch; sessionId, logon and boot time equal",
+      "18082 overview 2 Nodes fresh; 127.0.0.1 listeners 18082 python, 3000 node, 55448 ssh same before/after; external PG untouched"
+    ],
+    "cpReadOnlyMeasuredByClaude": {
+      "atKST": ["2026-11-05T16:57:42+09:00", "2026-11-05T16:58:15+09:00"],
+      "dockerDesktop": "4.16.3.96739 all-users, default Program Files dir, no per-user install",
+      "token": "unelevated; Administrators deny-only (UAC split token); EnableLUA=1 ConsentPromptBehaviorAdmin=5 PromptOnSecureDesktop=1 AutoAdminLogon=0",
+      "sessionId": 1, "dockerUsersMember": true,
+      "listeners": {"18082": "python", "3000": "node", "55448": "ssh", "15408": "none"},
+      "port55440": {"owner": "com.docker.backend", "established": 0},
+      "comDockerService": "Running/Automatic", "wsl": "2.4.12.0", "pendingReboot": false,
+      "vhdxBytes": {"wsl/data/ext4.vhdx": 74746691584, "wsl/distro/ext4.vhdx": 5654970368, "wsl/disk/docker_data.vhdx": "absent"},
+      "freeBytes": {"C": 296793403392, "D": 1616598122496},
+      "freePhysicalBytesAtSample": 496017408
+    },
+    "rootRelayedNotRemeasured": ["4.98.0.245422 and 4.16.3.96739 installers staged, SHA and Authenticode valid (Docker Inc)", "LanmanServer Auto/Running", "rootAdmin=false", "full rollback not available", "16:41 physical recheck: 1/2 SSH 0, Docker 1.52/1.56 group true; 3 saved SSH accounts not inviz, group false, Docker denied; user inviz key login to 3 rejected; 4 mDNS no result, inventory blank; sudo -n firewall queries interactive-authentication-required"],
+    "officialDocs": {
+      "target": "4.98.0 build 245422, installer SHA256 cd6273d9...4388, Engine 29 API 1.56 min 1.40, Win11 22631+, WSL >=2.1.5, CVE-2026-112917 needs WSL >=3.0.3",
+      "flags": ["install", "--quiet", "--accept-license", "--backend=wsl-2|hyper-v|windows|docker-vmm", "--installation-dir", "--always-run-service", "--no-windows-containers", "--wsl-default-data-root", "--admin-settings", "--allowed-org", "proxy flags", "--user"],
+      "modeSwitchRequiresUninstallReinstall": true,
+      "allUsersInstallUpdateNeedsAdmin": true,
+      "noRebootGuaranteeInDocs": true,
+      "wslUpdateDocsSayAdminModeAndMayRestart": true
+    },
+    "recommendedUpgradeCommand": "elevated: Start-Process <staged 4.98 installer> -Wait -ArgumentList 'install','--quiet','--accept-license','--backend=wsl-2' (no --user)",
+    "adminVsConsent": "elevation = physical user's UAC consent on secure desktop (behavior 5); agents cannot and must not drive it; project consent does not produce an elevated token",
+    "unresolvedGates": [
+      {"id": "G-a", "gate": "actual elevation for all-users in-place upgrade", "resolve": "attended UAC consent once"},
+      {"id": "G-b", "gate": "--user path needs all-users uninstall first", "resolve": "rejected without VHDX copy"},
+      {"id": "G-c", "gate": "WSL 3.0.3 update needs admin, may request restart", "resolve": "elevate once; restart request -> stop and defer; alternative keep 2.4.12 with CVE fix recorded incomplete"},
+      {"id": "G-d", "gate": "non-elevated Ubuntu registration unproven", "resolve": "out of scope; Docker Desktop does not need Ubuntu"},
+      {"id": "G-e", "gate": "installer reboot/sign-out not provably absent", "resolve": "attended; decline prompt and abort; record ExitCode"},
+      {"id": "G-f", "gate": "restoration boundary absent", "resolve": "quiesce Docker, copy both VHDX to D:, hash match, keep signed 4.16.3 installer; needs separate execution approval"}
+    ],
+    "impact": {"r5": "none by pins", "stoppedDuringMaintenance": ["coco-annotator x2", "saint-control x5", "old 55440 pilot DB"], "saintviewRunning": 0, "payloadsOpened": false, "downgradeAfterEngine29OnlyViaVhdxCopy": true},
+    "stagedScript": "read-only pre/post check in History; quiesce/copy/install/wsl update are operator-only commented steps",
+    "verdict": "ACCEPT-AS-PLAN; not executable until G-a and G-f resolved; G-c and G-e handled as attended abort rules"
+  },
+  "separatelyTracked": ["S1 consecutive Node rotation Medium: root assigns Codex fix before second renewal", "worker accounts/SSH/sudo firewall: awaiting root admin target info"],
+  "currentTaskMutations": {"install": 0, "serviceActions": 0, "backup": 0, "os": 0, "elevation": 0, "authenticationAttempts": 0, "dataOrPayload": 0, "r5PinsAutomationsRegistryBoards": 0, "localScratchMutationProbe": 1},
+  "nextFirstAction": [
+    {"owner": "root", "action": "confirm Core 41988233523; apply plan; schedule attended outside-window session with user and get explicit approval for quiesce + VHDX copy first"},
+    {"owner": "user", "action": "one UAC consent at step 3; decline any restart prompt"},
+    {"owner": "Claude", "action": "review pre/post JSON diff and ExitCode when relayed"}
+  ]
+}
