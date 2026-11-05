@@ -1,11 +1,11 @@
 ---
 doc_id: "EVIDENCE-FLEET5-20261105-ROOT-VERIFIER-CORRECTIONS"
 title: "FLEET5 운영 검증기 정정과 실패 보존"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-05T18:48:52+09:00"
+updated: "2026-11-05T19:59:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,3 +17,5 @@ source_of_truth: "Git"
 - 기존 inventory 슬롯 번호는 사용자의 물리 PC 번호가 아니다. 주소·계정과 직접 SSH 결과로 legacyworker1=PC2, legacyworker2=PC4, legacyworker3=PC3를 확인했다. 이전 관측은 원래 슬롯 기준 기록으로 보존하고 새 ledger를 만들었다. 원래 inventory/r5 ID·CA·예약·pins를 덮지 않았다.
 
 실제 증거/현재 상태는 `physical-setup-checkpoint.json`과 [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]를 따른다. 이 정정은 제품 검증 실패를 PASS로 바꾸는 처리가 아니다. 기존 source 실패와 새 verifier 성공을 구분한다.
+
+- 합본9a8 bool probe의 첫 실행은 고정 Git object 대신 작성자의 변경 중인 checkout을 읽었다. 그 checkout은 이미 isTrue 수정으로 numeric1을 거부해 Python0, expected-red wrapper1이었다. 실제9a8을 pass/fail로 판정하지 않고 exact Gitblob의 caller assert만 다시 실행해 numeric1 수락을 확인했다. source/키/운영상태 변경 없이 fixedrevision과 mutabletree 결과를 나눠 기록했다.

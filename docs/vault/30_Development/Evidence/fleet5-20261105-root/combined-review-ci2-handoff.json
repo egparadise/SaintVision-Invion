@@ -1,0 +1,78 @@
+{
+  "schema": "fleet5-combined-review-ci2-handoff:1",
+  "recordedAtKST": "2026-11-05T19:59:09+09:00",
+  "candidate": "9a8f9a504bdbb39e6fc28c26c45427bab1d56543",
+  "rootRemoteVerified": true,
+  "review": {
+    "task": "task_3529eefa626c",
+    "dispatch": "ctx_ba275b06ce0c",
+    "actualStart": "ready",
+    "verdict": null,
+    "currentMutableBooleanFixNotCoveredWithoutExactNewPin": true,
+    "exactNewSourceDeltaRelayed": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+    "deliveryMessage": "msg_a7b4f55a9ca8"
+  },
+  "ci2Decision": {
+    "ownImmutableRefAuthorized": true,
+    "normalPushOnly": true,
+    "targetedBackendDocsAndPushPortalAllowedAfterCompleteBooleanFix": true,
+    "newLongCoreAndAll8HeldPendingNativeGoClosure": true,
+    "deploymentOrIntegrationPromotionAllowed": false
+  },
+  "strictBooleanProbe": {
+    "firstMutableProbe": {
+      "actualPythonExit": 0,
+      "numeric1Refused": true,
+      "rootExpectedRedWrapperExit": 1,
+      "notEvidenceForFrozen9a8": true
+    },
+    "correctedExact9a8GitBlob": {
+      "exit": 0,
+      "numeric1Accepted": true
+    },
+    "authorFilesChangedByRoot": false
+  },
+  "S1CI": {
+    "run": 42011998610,
+    "head": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+    "observedKST": "2026-11-05T19:51:42+09:00",
+    "main": "in_progress",
+    "s01": "success",
+    "completionCollectionAssignedToSameDispatch": true,
+    "reply": "msg_37ceb45890e3"
+  },
+  "nativeGoP0ProofPending": true,
+  "previousRoot": {
+    "SHA": "224c9b179876d2a4c01af841798477c85577d948",
+    "Docs": 42013354248,
+    "exactSuccessVerified": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "destinationHashesMatched": 2304,
+    "pending": 0,
+    "conflicts": 0
+  },
+  "wholeProductAccepted": false,
+  "physicalFiveAccepted": false,
+  "latestIntermediateSource": "1e6491468dd0ba72f57e7fc807be1e57b307024c",
+  "latestIntermediateRemoteVerified": true,
+  "latestIntermediateDocs": {
+    "run": 42015020044,
+    "exactHeadAndJobSuccessVerified": true
+  },
+  "latestIntermediateBackend": {
+    "run": 42015010474,
+    "lastOwnerReported": "in_progress",
+    "terminalNotVerifiedByRoot": true
+  },
+  "newPacketAfterHold": false,
+  "nativeProofOwner": {
+    "dispatch": "ctx_6f0f8253b8a7",
+    "initialStartBookkeeping": "start_unknown",
+    "readOnlyTranscriptShowsActualToolsAndLive": true,
+    "resetOrRestart": false
+  }
+}

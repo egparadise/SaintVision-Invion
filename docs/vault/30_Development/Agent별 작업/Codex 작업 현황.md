@@ -1,19 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.365"
+version: "1.0.366"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:43:57+09:00"
+updated: "2026-11-05T19:59:09+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Failed d073 candidate retained; Backend attestation consumer fix; actual Go peer-floor/phase proof required before new final freeze; B design and physical prerequisites remain"
-active_card_next: "Integrator preserves d073 all8 and fixes exact attestation expectation; contract owner prioritizes Linux realGo policy lifecycle proof; S1 finishes2fb Core; root gates next candidate on proof/fix/review"
+active_card_status: "Actual combinedreview9a8 inprogress; explicitBool consumer delta local; targetedci2 authorized; nativeGo proof/fix gates fullCIrepeat and promotion; component Core pending"
+active_card_next: "Claude reviews exact combinedsource/packet; integrator publishes strictBool delta and targetedBackendDocs onimmutableci2; architectureowner nativeLinux proof; S1 owns existingCorewatch through artifact/report/done"
 ---
 
-## 2026-11-05 합본 실패 보존과 실제 Go 정책 경로 재현
+## 2026-11-05 합본 독립 검토와 CI 대기 책임 인계
 
-작업한 것: d073 합본의8개 CI/head·전체12 jobs를 직접 조회해 Backend2실패/Core1진행/나머지9job성공을 구분하고 호출부 attestation 필드의 최소 교정·회귀를 지시했다. 확인한 것: Go PinPeerPolicy는 같은 버전·다른 hash를 거부하지만 helper overlap/final은 둘 다 targetChannelVersion을 사용한다. 실제 Linux Go 재현 전 live 실패로 주장하지 않는다. 다음 첫 행동/담당: 저장소 계약 owner가 실제 Journal+Authority+정본 Python 정책의 native Linux 재현을 우선 제출하고, 통합 owner는 기존실패/진행CI를 보존하며 다음 최종freeze를 기다린다. S1은2fb Core를 마무리한다. Root는 실제 증거·수정·독립 검토 뒤에만 승격한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+작업한 것: 실제 Claude task_3529eefa626c/ctx_ba275b06ce0c를 게시9a8 합본·packet 검토에 착수시켰고 자체 immutable ci2의 한정 Backend/Docs 검증을 허용했다. 확인한 것: frozen9a8은 numeric1을 True로 받으나 mutable tree는 이미 별도 isTrue 보강으로 거부한다. Root는 첫 probe의 대상 혼동을 exact Git blob 검사로 바로잡았고 어떤 source도 수정하지 않았다. 다음 첫 행동/담당: 통합 owner는 새 정확한 수정본과 targetedCI, reviewer는 exactSHA별 판정, 계약 owner는 nativeGo proof를 제출한다. S1은 기존Corewatch 완료를 직접 수집해 보고하며 일반 승인 없이 계속한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 
