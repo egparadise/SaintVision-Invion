@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.380"
+version: "1.0.381"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T05:37:50+09:00"
+updated: "2026-11-06T05:46:54+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 parser/schema groundwork and fixed proof-wire proposal code; no crypto acceptance yet; B rev3; e50 all8/packet accepted/final report pending; physical incomplete"
-active_card_next: "K1 Codex real per-contract proofs/crypto/native M2 codec and actual CI then one code review; B Codex rev3; Integrator final qualified e50 report; Root gates"
+active_card_status: "B rev3 final e993 exactDocs/source verified/Claude review pending; K1 real implementation and new fixed proof-codec proposal; e50 accepted/final report pending; physical incomplete"
+active_card_next: "Claude actual e993 whole coupled R1-R7/new ARM/key-delivery/ObservationScope review; K1 Codex code/crypto/CI; Integrator final report; Root concrete decision only after actual verdict"
 ---
+
+## 2026-11-06T05:46:54+09:00 B rev3 최종본 검토 배정
+
+작업한 것과 확인: B rev3 최종 e9932f30의 exact Docs42105739288·전체 job 성공과72028 대비 제품 diff0·02cf 대비 고유 문서 추가를 Root가 대조했다. 중간15823을 대신 검토하지 않고 Claude task task_deba0c63a626/dispatch ctx_ba55264f86fb에 새 ARM gate·키 전달·ObservationScope까지 묶은 독립 검토를 한 번 배정했다. 실제 판정은 대기하며 B 구현·부분 동결·운영 등록은 아직 승인하지 않았다. 다음 첫 행동/담당은 Claude의 실제 정적·schema·권한/수명·잠금 검토와 ownDocs 판정, K1 Codex의 구현이다. Root는 질문 msg_e269bdd34436을 실제 판정까지 유지하고 수신·검토 완료를 대신 처리하지 않는다.
 
 ## 2026-11-06T05:37:50+09:00 K1 구체 wire 공백 해결과 구현 지속
 

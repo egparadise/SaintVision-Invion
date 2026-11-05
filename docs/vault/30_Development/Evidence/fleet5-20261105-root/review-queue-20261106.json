@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T05:37:50+09:00",
+  "atKST": "2026-11-06T05:46:54+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,15 +12,21 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "task": "task_deba0c63a626",
+    "dispatch": "ctx_ba55264f86fb",
+    "source": "e9932f306550a07e4893ab7a1a7dc6944b31e271",
+    "scope": "B rev3 FINAL whole coupled contract delta including new protected ARM/key-delivery/ObservationScope",
+    "state": "ready actual worker receipt; verdict pending"
+  },
   "pending": null,
-  "authorParallelWork": "Codex K1 parser/graph/real fixed proof codecs; Codex B rev3; Integrator final qualified e50 report",
-  "reason": "one active Claude review under measured host memory pressure; completed settled reviewer reopened with actual ready receipt",
+  "authorParallelWork": "Codex K1 implementation continues; B owner waits actual whole review at msg_e269bdd34436; Integrator final qualified e50 report",
+  "reason": "one Claude reviewer on memory-limited host; completed SF1 reviewer reopened with guarded ready receipt",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "published K1 code SHA + exact CI, review new referent wire and implementation/crypto together once; not launched for an unpublished working tree"
+  "nextActualReviewTrigger": "K1 code+new proof-wire published SHA/actual CI; sequence after current B review, no duplicate launch"
 }
