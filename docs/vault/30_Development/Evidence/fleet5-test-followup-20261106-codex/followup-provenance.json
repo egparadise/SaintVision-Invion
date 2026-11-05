@@ -1,0 +1,56 @@
+{
+  "task": "task_78064fb4b7ff / ctx_ed7ec73163d6",
+  "recordedAtKST": "2026-11-06T03:24:50.639930+09:00",
+  "branch": "agent/codex/fleet5-test-followup-20261106",
+  "baseReport": "a52782e8c2a5f187cb1ff227a371125711b209c1",
+  "frozenRuntimeSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "f0af": {
+    "sourceCommit": "f0af307705b4923ebc3e231db5238af4c70aa389",
+    "file": "tests/test_fleet5_settled_launcher.py",
+    "expectedBlob": "2b99768f5dac8396dd034ab44140fc11643c2456",
+    "scope": "Only approved 3-line test change imported; original 15-file delivery commit remains separately reachable, its test-only verdict is not applied to this later combined followup."
+  },
+  "actualPriorReviewImports": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-claude/p0-low-token-tests-f0af-review.json",
+      "commit": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
+      "blob": "a701478a6a775165377649b7187f200cc3ccb0fe",
+      "sha256": "1b7cb709f70b7098c8c2f4efa1dd0269e65a17a7dc805720e8b99ef778337164"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_02-05-05_KST_FLEET5_P0_Low_token_tests_f0af_검토_Claude.md",
+      "commit": "70f7502bd7a25d1e133280fecf0ee2391ae82f33",
+      "blob": "29595d52048430d59b76d62430c32da05c737816",
+      "sha256": "fd9d7bbbfe9cb231ae033a346376f27113461a21e93922bca97088b10e812ee7"
+    }
+  ],
+  "cl2": {
+    "owningTest": "test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift",
+    "baseline": "followup-owned-tests.json:34 passed/0 skipped/exit0",
+    "mutant": "cl2-peer-policy-guard-removed.json:actual pytest exit1 DID NOT RAISE, only peer-policy equality removed in ignored copy; product bytes unchanged",
+    "packetHarnessUsed": false,
+    "syntheticTransportOnly": true
+  },
+  "ci1": {
+    "before": "ci1-before-fix.json:actual1 failed/exit1 ModuleNotFoundError in fresh process",
+    "after": "ci1-standalone-green.json:72 passed/0 skipped/exit0 in fresh process",
+    "fix": "Explicit tools.check_leaf_rotation_standalone_lifecycle import; no reliance on other test module collection."
+  },
+  "ci3": {
+    "fixture": "Real Git commit object plus actual index/tree mode160000; no checkout/submodule clone",
+    "checks": "Git ls-tree mode/type, cat-file target type, refusal message, no .work or link/submodule output, untouched sentinel; regular100644/100755 positive readback remains."
+  },
+  "optional65536": "Deferred availability-only Info; no root instruction to hold required delivery.",
+  "ciForThisNewFollowup": {
+    "allEightDispatched": false,
+    "allEightPassed": false,
+    "newArchiveCreated": false,
+    "rootSelectionRequired": true
+  },
+  "independentCombinedFollowupReview": "PENDING; Root must arrange against exact new followup SHA",
+  "cl1DeltaReview": "PENDING at exact a52782e8 report; separate required before landing",
+  "physicalOrProductAcceptance": false,
+  "queryExecuted": false,
+  "counts": null,
+  "operations": "HOLD; no remote/physical/issuance/runtime/old3/Obsidian/landing action."
+}

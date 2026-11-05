@@ -40,6 +40,12 @@ def _source(tmp_path, monkeypatch, mode="100644"):
         blob = _git(repo, "hash-object", "-w", "--stdin", data=b"../outside-sentinel")
         # No on-disk link exists: the index records the real Git symlink mode.
         _git(repo, "update-index", "--add", "--cacheinfo", "120000," + blob.decode() + ",source-link")
+    elif mode == "160000":
+        tree = _git(repo, "write-tree").decode()
+        target = _git(repo, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                      "commit-tree", tree, data=b"disposable Gitlink target commit\n").decode()
+        # A real commit object and Gitlink index entry; no submodule is cloned.
+        _git(repo, "update-index", "--add", "--cacheinfo", "160000," + target + ",source-submodule")
     elif mode == "100755":
         blob = _git(repo, "rev-parse", ":regular.bin").decode()
         _git(repo, "update-index", "--cacheinfo", "100755," + blob + ",regular.bin")
@@ -50,16 +56,22 @@ def _source(tmp_path, monkeypatch, mode="100644"):
     return repo, source
 
 
-def test_git_symlink_mode_refused_before_any_output_without_materializing_link(tmp_path, monkeypatch):
+@pytest.mark.parametrize("mode,name,kind", [
+    ("120000", "source-link", "blob"),
+    ("160000", "source-submodule", "commit"),
+])
+def test_nonregular_git_modes_refused_before_any_output_without_materializing_target(tmp_path, monkeypatch, mode, name, kind):
     sentinel = tmp_path / "outside-sentinel"
     sentinel.write_bytes(b"untouched")
-    repo, source = _source(tmp_path, monkeypatch, "120000")
-    assert not (repo / "source-link").exists()
-    assert b"120000 blob" in _git(repo, "ls-tree", "-r", source)
-    with redirect_stdout(io.StringIO()), pytest.raises(ValueError, match="120000"):
+    repo, source = _source(tmp_path, monkeypatch, mode)
+    assert not (repo / name).exists()
+    entry = _git(repo, "ls-tree", source, "--", name).split()
+    assert entry[:2] == [mode.encode(), kind.encode()]
+    assert _git(repo, "cat-file", "-t", entry[2].decode()) == kind.encode()
+    with redirect_stdout(io.StringIO()), pytest.raises(ValueError, match=mode):
         builder.build(source)
     assert not (repo / ".work").exists(), "Refused source must produce no output directory/archive"
-    assert not (repo / "source-link").exists()
+    assert not (repo / name).exists()
     assert sentinel.read_bytes() == b"untouched"
 
 

@@ -1,0 +1,55 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_bd777860781e / ctx_023fb7a3cc28",
+  "reviewer": "Claude",
+  "author": "Codex (task_a8fd2969f0b3), owner request msg_f6ae2eae8f24",
+  "observedWindowKST": ["2026-11-06T01:59:23+09:00", "2026-11-06T02:05:05+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and after the scratch worktree was removed; publication times are separate",
+  "reviewKind": "independent source review of a test-only Low delta; patch CI is not borrowed from 4f; no long Core rerun",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-p0-low-token-tests-20261106",
+    "commit": "f0af307705b4923ebc3e231db5238af4c70aa389",
+    "base": "4f97ba71b1482ae70d72dda1833a28fddcd05994",
+    "delta": {"files": 15, "insertions": 232, "deletions": 2, "nonDocs": ["tests/test_fleet5_settled_launcher.py (+3/-2)"]},
+    "context": {"source4f": "4f97ba71 ACCEPT at source level (2736aec1)", "report3af": "3af3334e docs-only freeze report, parent 4f97, 0 non-docs files; read as context only"},
+    "readFrom": "Git objects only (detached scratch worktree, removed afterwards; porcelain 0 after every red control)"
+  },
+  "diff": {
+    "oversize": "raw = b' '*65537 + json.dumps(token): a complete valid token behind 65537 leading spaces",
+    "duplicate": "raw = json.dumps(token)[:-1] + b',\"verified\":true}': the exact valid token with a second identical verified key",
+    "validityAssert": "for both faults json.loads(raw) == value before dispatch, so a plain parser would accept the payload",
+    "unchanged": "every other case, the expected argv/kwargs, the call counts, the snapshot and the lock assertions"
+  },
+  "ownProbes": {
+    "interpreter": "main .venv Python 3.14.7 -B, PYTHONUTF8=1, Windows; own scripts -I",
+    "productionUnchanged": "deploy, services, tools, .github, src, contracts and migrations have no diff from 4f97; worker_config 909d1c25, worker_leaf_rotation 4e296852, launcher 76be4088, peer_policy_phase 8aac0c65, worker_peer_floor c73c81ad, worker_plain_rotation bf3754a2",
+    "focusedFile": "11 passed, 0 skipped",
+    "ownT3Mutants": {"drop -I": "KILLED (8)", "drop timeout": "KILLED (8)", "drop verified check": "KILLED (1)", "drop key set": "KILLED (1)", "drop file/symlink check": "KILLED (2)", "drop 64 KiB stdout bound": "KILLED (1, only [oversize])", "strict_json -> json.loads": "KILLED (1, only [duplicate])"},
+    "failureReason": "both targeted mutants fail with 'Invalid default verifier dispatch admitted an operation' (the guard admitted the operation), not an error or skip",
+    "redControl": "with the 4f version of the test restored, both targeted mutants survive again (11 passed each); the three changed lines are the cause",
+    "payloads": "oversize is 65939 bytes (> 65536), json.loads and the real strict_json both accept it, so only the byte bound rejects it; duplicate parses equal to the token under json.loads and the real strict_json rejects it with 'Duplicate private protocol field'",
+    "boundary": "loosening the bound to 131072 is KILLED; tightening to < 65536 or <= 4096 survives (no accept-at-limit case; see I-LT-1)",
+    "ownerEvidence": "3/3 owner log SHA256 recomputed from committed bytes; 3/3 owner production hashes equal the tree; owner baseline 10, each targeted mutant exactly one failed case, 0 errors/skips"
+  },
+  "ci": {
+    "patchDocs": {"run": 42068760043, "name": "fleet5-p0-low-f0af3077-docs", "headSHA": "f0af307705b4923ebc3e231db5238af4c70aa389", "conclusion": "success", "checkedByClaude": "API only"},
+    "patchCoreBackend": "none at f0af; 4f CI (Core 42058859797, Backend 42058865926) is NOT reassigned to this patch; final combined CI owns collection",
+    "longCoreRerun": "not run by Claude"
+  },
+  "findings": [
+    {"id": "L-T3-1", "severity": "Low", "status": "closed", "summary": "the oversize case is a valid token above 65536 bytes; removing the stdout bound now fails exactly [oversize]"},
+    {"id": "L-T3-2", "severity": "Low", "status": "closed", "summary": "the duplicate case is the exact valid token with a duplicated verified key; strict_json -> json.loads now fails exactly [duplicate]"},
+    {"id": "I-LT-1", "severity": "Info", "status": "open", "summary": "no case accepts a valid token of exactly 65536 bytes, so an over-tight bound (fail-closed, availability only) survives; optional"}
+  ],
+  "verdicts": {
+    "sourceReview": "ACCEPT (test-only): L-T3-1 and L-T3-2 closed; runtime unchanged; no assertion relaxed",
+    "patchCI": "Docs 42068760043 success only; no Core/Backend at f0af; not claimed",
+    "integration": "4f source ACCEPT (2736aec1) unchanged and not widened; registration, helper, runtime, equipment and physical stay HOLD"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysClockGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "fullCIRuns": 0},
+  "nextFirstAction": [
+    {"owner": "root", "action": "record the f0af test-only ACCEPT and include f0af in the final combined CI before whole integration acceptance"},
+    {"owner": "Codex", "action": "optional: add an accept-at-limit 65536-byte case (I-LT-1)"},
+    {"owner": "Claude", "action": "review the next assigned delta"}
+  ]
+}

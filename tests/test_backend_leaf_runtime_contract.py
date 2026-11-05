@@ -83,7 +83,7 @@ def test_backend_rejects_wrong_types_for_every_lifecycle_field(field, bad):
 
 
 def test_versioned_fixture_contract_matches_actual_producer_predicate():
-    from check_leaf_rotation_standalone_lifecycle import validate_result
+    from tools.check_leaf_rotation_standalone_lifecycle import validate_result
 
     assert validate_result(dict(VERIFIED_LIFECYCLE)) == VERIFIED_LIFECYCLE
     _validate_as_workflow(dict(VERIFIED_LIFECYCLE))

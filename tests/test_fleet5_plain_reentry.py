@@ -155,3 +155,30 @@ def test_sf1_refuses_even_equal_staging_residue_without_deleting_it(tmp_path,mon
     before=snapshot(f.worker)
     with pytest.raises(ValueError,match='unsettled'):plain.verify_settled(f.worker,now=f.now)
     assert snapshot(f.worker)==before
+
+
+def test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift(tmp_path,monkeypatch):
+    f=_fixture(tmp_path);finish(f,tmp_path)
+    settled=plain.verify_settled(f.worker,now=f.now)
+    assert settled['verified'] is True
+    # Hold the fixture-only transport observation at its valid signed final
+    # value so a second policy-hash check cannot mask this owning SF1 guard.
+    # plain._floor still verifies the signature, freshness and manifest scope.
+    final_floor=dict(settled['actualFinalPeerFloor'])
+    def observe(root,manifest,files):
+        assert Path(root).resolve()==f.worker.resolve()
+        assert manifest['rotationId']==f.manifest['rotationId']
+        return dict(final_floor)
+    monkeypatch.setattr(rotation,'observe_actual_floor',observe)
+    before=snapshot(f.worker)
+    assert plain.verify_settled(f.worker,now=f.now)['verified'] is True
+    assert snapshot(f.worker)==before
+
+    policy=f.worker/'peer-policy.json'
+    original=policy.read_bytes()
+    policy.write_bytes(original+b'\n')  # Same valid policy object, different bytes.
+    assert phase.strict(policy.read_bytes())==phase.strict(original)
+    tampered=snapshot(f.worker)
+    with pytest.raises(ValueError,match='SF1 current credentials differ from the settled final bytes'):
+        plain.verify_settled(f.worker,now=f.now)
+    assert snapshot(f.worker)==tampered

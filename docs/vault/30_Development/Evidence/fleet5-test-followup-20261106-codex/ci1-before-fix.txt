@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_versioned_fixture_contract_matches_actual_producer_predicate ______
+
+    def test_versioned_fixture_contract_matches_actual_producer_predicate():
+>       from check_leaf_rotation_standalone_lifecycle import validate_result
+E       ModuleNotFoundError: No module named 'check_leaf_rotation_standalone_lifecycle'
+
+tests\test_backend_leaf_runtime_contract.py:86: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_backend_leaf_runtime_contract.py::test_versioned_fixture_contract_matches_actual_producer_predicate
+1 failed in 0.18s

@@ -1,0 +1,30 @@
+{
+  "recordedAtKST": "2026-11-06T03:23:51.121412+09:00",
+  "startedAtKST": "2026-11-06T03:23:41.665696+09:00",
+  "scope": "Synthetic Python fixture; original direct owning SF1 test, not packet harness or actual Node evidence",
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "owned_sf1_mutation_plugin",
+    "tests/test_fleet5_plain_reentry.py::test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift"
+  ],
+  "actualExit": 1,
+  "expectedFailure": "pytest DID NOT RAISE ValueError at current peer-policy byte guard",
+  "mutantKilledWithIntendedDiagnostic": true,
+  "removedOnly": "or legacy._regular(root/'peer-policy.json') != files['peer-policy-final.json']",
+  "sourceWorkingBytesSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+  "sourceGitBlob": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+  "mutantLFBytesSHA256": "370b07d953f339e9e239f7a99667716edb51d768e17aa91c45d520deca1ac329",
+  "testGitWorkingBytesSHA256": "c9a7fbca005f4a537a1c7c2ffad4046a9d2396561839776f5fc4b909bf0a0f05",
+  "productionFileUnchanged": true,
+  "mutantLocation": "ignored .work fixture copy only",
+  "signatureFreshnessScopeAndArchiveChecksStillActive": true,
+  "positiveBaseline": "followup-owned-tests.json:34 passed/0 skipped/exit0, including the same new owning test",
+  "rawLog": "cl2-peer-policy-guard-removed.txt",
+  "rawLogSHA256": "64f8646949c1cbc60e5412dcc3723360d58c1d99e603f81cdeaa77159e0dc803",
+  "physicalAcceptance": false,
+  "runtimeOrSourceRefMutation": false
+}

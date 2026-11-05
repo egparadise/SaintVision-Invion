@@ -1,0 +1,37 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift _______
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-1121/test_sf1_owning_verifier_refus0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F0CB6F82B0>
+
+    def test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift(tmp_path,monkeypatch):
+        f=_fixture(tmp_path);finish(f,tmp_path)
+        settled=plain.verify_settled(f.worker,now=f.now)
+        assert settled['verified'] is True
+        # Hold the fixture-only transport observation at its valid signed final
+        # value so a second policy-hash check cannot mask this owning SF1 guard.
+        # plain._floor still verifies the signature, freshness and manifest scope.
+        final_floor=dict(settled['actualFinalPeerFloor'])
+        def observe(root,manifest,files):
+            assert Path(root).resolve()==f.worker.resolve()
+            assert manifest['rotationId']==f.manifest['rotationId']
+            return dict(final_floor)
+        monkeypatch.setattr(rotation,'observe_actual_floor',observe)
+        before=snapshot(f.worker)
+        assert plain.verify_settled(f.worker,now=f.now)['verified'] is True
+        assert snapshot(f.worker)==before
+    
+        policy=f.worker/'peer-policy.json'
+        original=policy.read_bytes()
+        policy.write_bytes(original+b'\n')  # Same valid policy object, different bytes.
+        assert phase.strict(policy.read_bytes())==phase.strict(original)
+        tampered=snapshot(f.worker)
+>       with pytest.raises(ValueError,match='SF1 current credentials differ from the settled final bytes'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_fleet5_plain_reentry.py:182: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_fleet5_plain_reentry.py::test_sf1_owning_verifier_refuses_current_peer_policy_byte_drift
+1 failed in 6.44s
