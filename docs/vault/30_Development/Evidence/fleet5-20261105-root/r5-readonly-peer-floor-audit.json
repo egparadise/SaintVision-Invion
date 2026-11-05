@@ -1,0 +1,78 @@
+{
+  "schema": "r5-readonly-peer-floor-snapshot:1",
+  "recordedAtKST": "2026-11-05T20:34:03+09:00",
+  "targets": [
+    {
+      "activePeerPolicySHA256": "7f9d3078f224fc642c47d3f51054e5fce9d6543fa2d5345983c51be20a6a35a6",
+      "activePeerPolicyVersion": 1,
+      "floorHashMatchesActive": true,
+      "floorMode": "0o600",
+      "floorSHA256": "7f9d3078f224fc642c47d3f51054e5fce9d6543fa2d5345983c51be20a6a35a6",
+      "floorUIDMatchesIdentity": true,
+      "floorVersion": 1,
+      "hostHistory": {
+        "hostFinalizedArchiveCount": 0,
+        "hostHelperJournalPresent": false,
+        "hostHistoryFullyObserved": true
+      },
+      "inventoryPortBindingMatches": true,
+      "nodeContainerRestarting": false,
+      "nodeContainerRunning": true,
+      "policyVersionMatchesFloor": true,
+      "readOnly": true,
+      "remoteFileWrites": false,
+      "restartExecuted": false,
+      "runningOwnedNodeCount": 6,
+      "scopeMatchesGoIdentity": true,
+      "snapshotConsistent": true,
+      "stableDoubleRead": true,
+      "physicalPC": 2,
+      "sshExit": 0
+    },
+    {
+      "activePeerPolicySHA256": "3ae90a1c965f701cfc56db5b71c0c5dbcb4721aaf3e4c31666fae976bda6fd1e",
+      "activePeerPolicyVersion": 1,
+      "floorHashMatchesActive": true,
+      "floorMode": "0o600",
+      "floorSHA256": "3ae90a1c965f701cfc56db5b71c0c5dbcb4721aaf3e4c31666fae976bda6fd1e",
+      "floorUIDMatchesIdentity": true,
+      "floorVersion": 1,
+      "hostHistory": {
+        "hostFinalizedArchiveCount": 0,
+        "hostHelperJournalPresent": false,
+        "hostHistoryFullyObserved": true
+      },
+      "inventoryPortBindingMatches": true,
+      "nodeContainerRestarting": false,
+      "nodeContainerRunning": true,
+      "policyVersionMatchesFloor": true,
+      "readOnly": true,
+      "remoteFileWrites": false,
+      "restartExecuted": false,
+      "runningOwnedNodeCount": 6,
+      "scopeMatchesGoIdentity": true,
+      "snapshotConsistent": true,
+      "stableDoubleRead": true,
+      "physicalPC": 4,
+      "sshExit": 0
+    }
+  ],
+  "knownHostsSHA256": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "knownHostsUnchanged": true,
+  "onlyKnownCoordinatorKeyUsed": true,
+  "remoteMutations": false,
+  "restartAttempted": false,
+  "pinnedOriginalR5IdentitiesOnly": true,
+  "productionM2InterfaceAccepted": false,
+  "signedFreshNodeFloorAttestation": false,
+  "futureRenewalSafetyAccepted": false,
+  "collectorSHA256": "b9fb1473943ac7e980fe820e10e3acb0bfd894cd4adf986772d028143ec5a0be",
+  "initialCollectionRefusedAmbiguousSixNodesPerHost": true,
+  "historyScope": "only current selected host helper journal/finalized paths; not a claim that all past history was observed",
+  "legacyPublicSourceAudit": {
+    "task": "task_fb415493ffa5",
+    "dispatch": "ctx_373e829bc65e",
+    "actualStart": "ready",
+    "sourceOnly": true
+  }
+}

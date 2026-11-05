@@ -1,19 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.366"
+version: "1.0.367"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T19:59:09+09:00"
+updated: "2026-11-05T20:43:53+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Actual combinedreview9a8 inprogress; explicitBool consumer delta local; targetedci2 authorized; nativeGo proof/fix gates fullCIrepeat and promotion; component Core pending"
-active_card_next: "Claude reviews exact combinedsource/packet; integrator publishes strictBool delta and targetedBackendDocs onimmutableci2; architectureowner nativeLinux proof; S1 owns existingCorewatch through artifact/report/done"
+active_card_status: "NativeGo phase defect confirmed; actual bounded P0 architecture ACCEPT M1-M10 and implementation underway; 1e integration/packet ACCEPT withGo blocker; Lowclosures and hardware remain"
+active_card_next: "P0 owner implementsactualfloor/schema3/P+1P+2/forwardonly and realGo2cycle green; integrator closesB1-B3; root read-onlyr5 audit beforeanyrestart; implementationCI/review before finalall8/deploy"
 ---
 
-## 2026-11-05 합본 독립 검토와 CI 대기 책임 인계
+## 2026-11-05 실제 Go 결함 확정과 P0 구현 인계
 
-작업한 것: 실제 Claude task_3529eefa626c/ctx_ba275b06ce0c를 게시9a8 합본·packet 검토에 착수시켰고 자체 immutable ci2의 한정 Backend/Docs 검증을 허용했다. 확인한 것: frozen9a8은 numeric1을 True로 받으나 mutable tree는 이미 별도 isTrue 보강으로 거부한다. Root는 첫 probe의 대상 혼동을 exact Git blob 검사로 바로잡았고 어떤 source도 수정하지 않았다. 다음 첫 행동/담당: 통합 owner는 새 정확한 수정본과 targetedCI, reviewer는 exactSHA별 판정, 계약 owner는 nativeGo proof를 제출한다. S1은 기존Corewatch 완료를 직접 수집해 보고하며 일반 승인 없이 계속한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+작업한 것: 실제 native proof Core42014770700의 실패/증거 upload/비실행 main suite와 artifact 원본3개 bytes를 독립 검증했다. 실제 Claude f012의 제한적 P0 architecture수락/M1-M10 뒤 구현을 지시했다. 확인한 것: overlap8·9수락/final8·9거부/정상완료0이며 expired10도 거부전 floor가 저장된다. 별도 helper2fb Core와9ec report는 실제 성공했고 그 성과를 realGo 수락으로 확대하지 않는다. 다음 첫 행동/담당: P0 owner는 실제floor·출판intent·P+1/P+2·signedreceipt·forward-only/2cycle시험을 구현, 통합owner는B1-B3 Low를 닫는다. Root는 r5를 재시작하지 않고 읽기 전용 상태를 점검하고 실제 구현CI·검토 뒤 새전체후보를 판정한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
 
 ## 2026-11-05 통합 실제 착수·독립 검토 후속
 

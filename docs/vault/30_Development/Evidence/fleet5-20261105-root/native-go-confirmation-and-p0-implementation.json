@@ -1,0 +1,86 @@
+{
+  "schema": "fleet5-native-peer-phase-confirmed:1",
+  "recordedAtKST": "2026-11-05T20:27:09+09:00",
+  "codeProof": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+  "proofReport": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+  "unchangedProductionSource": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "nativeCore": {
+    "run": 42014770700,
+    "rootVerifiedHeadAndExpectedFailure": true,
+    "proofUpload": "success",
+    "expensiveCoreSuite": "skipped/not run",
+    "productCoreAcceptance": false
+  },
+  "artifact": {
+    "id": 13409265588,
+    "rootDownloadedSHA256": "dc273e5069aca4d62d0a22cb2736ff745fdd98a75ba3c72d687439e7e86e9901",
+    "matchesGitHubDigest": true,
+    "allThreeMemberBytesMatchExact5023GitBlobs": true,
+    "members": {
+      "go-events.jsonl": "d06d86ef4cc16302a974f947506fb8eaf6871f1cec1bc2fcd1705b009716811f",
+      "native-go-result.json": "d5c62571e08bb57e89924179d390aab21fba479eb484bfe8633283e092174c6b",
+      "publication-receipt.json": "5380e9f34d3aeb588ffafc61f582fa2085cbf93b2ceca0ca2e5760ba51f6c744"
+    }
+  },
+  "nativeResult": {
+    "GOOS": "linux",
+    "realSameDurableJournalAndAuthorityTLS": true,
+    "attemptedNominalCycles": 2,
+    "completedNormalCycles": 0,
+    "overlap8And9Accepted": true,
+    "sameVersionDifferentHashFinalsRejected": 2,
+    "expired10RejectedAfterFloor10Persisted": true,
+    "noMockRestartOrFloorReset": true,
+    "operationalAcceptance": false
+  },
+  "actualReview": {
+    "SHA": "f012b206f9505bf93fc5d57f7ca2713a68dbbb6f",
+    "Docs": 42017771684,
+    "rootVerifiedExactHeadAndJobSuccess": true,
+    "priorReportDocsFailure": 42016481729,
+    "P0Verdict": "ACCEPT-AS-ARCHITECTURE bounded plain repair with mandatory M1-M10",
+    "implementationAcceptance": false,
+    "broadBAcceptance": false,
+    "source1eAndPacketBinding": "ACCEPT with confirmed nativeGo blocker"
+  },
+  "rootImplementationAuthorization": {
+    "message": "msg_340dea13aa6f",
+    "mandatoryGuards": "M1-M10 in formal source-bound P0 review",
+    "publicationStartIntentBeforeLiveExposure": true,
+    "forwardOnlyFromIntentUnlessContinuouslyProvenQuiescentOwnership": true,
+    "existingPerMemberStagingCASSemanticsOnly": true,
+    "newAtomicBOrCASLadderAllowed": false,
+    "peerMaximumCanonicalVerified": 9007199254740991,
+    "allStorageAndUnknownStatesFailClosed": true,
+    "productionFixPublished": false
+  },
+  "helperComponentDelivery": {
+    "source": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+    "report": "9ec6d6bf4697745bfe41602bb720473b1ff9b22f",
+    "Core": 42011998610,
+    "reportDocs": 42016533601,
+    "rootVerifiedExactSuccess": true,
+    "ownerReportedPassed": 8982,
+    "ownerReportedSkipped": 46,
+    "ownerReportedSelectedLinuxPassed": 143,
+    "selectedLinuxSkipped": 0,
+    "nativeGoAcceptance": false
+  },
+  "integratorLowClosuresAuthorized": [
+    "B1 rejectGitSymlinkMode120000",
+    "B2 exacttypesAllLifecycleFields",
+    "B3 exactrawDiagnosticDigests"
+  ],
+  "previousRoot": {
+    "SHA": "f8ff1b450458a264b60d622124e40bc3ed8efeab",
+    "Docs": 42015699923,
+    "exactSuccessVerified": true,
+    "intermediateSyncNotAppliedSupersededByThisLatestReport": true,
+    "lastCompletedSyncSHA": "224c9b179876d2a4c01af841798477c85577d948",
+    "lastCompletedSyncDestinationHashes": 2304
+  },
+  "oldR5Changed": false,
+  "newF5Initialized": false,
+  "physicalFiveAccepted": false,
+  "wholeProductComplete": false
+}
