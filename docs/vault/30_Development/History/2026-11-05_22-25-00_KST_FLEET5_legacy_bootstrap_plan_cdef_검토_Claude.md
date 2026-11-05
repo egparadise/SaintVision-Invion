@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-FLEET5-20261105-LEGACY-BOOTSTRAP-PLAN-CDEF-REVIEW-CLAUDE"
 title: "2026-11-05 FLEET5 legacy bootstrap plan 개정판 cdeffee7 독립 architecture 검토"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-11-05T22:25:00+09:00"
+updated: "2026-11-05T22:20:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "830efd93"
@@ -104,3 +104,19 @@ Orca task `task_03867932b2f0`, dispatch `ctx_37e3f120fac0`. root의 `msg_7b5f8be
 - **`ctx_6f0f8253b8a7`:** P0의 B1, B2, F1~F3을 고친다. M2에 executable bytes hash(N1)와 migration-predecessor 규칙(R1)을 넣을지 plan owner와 정한다.
 - **root:** HOLD를 유지하고 contract와 운영 G2 binding을 null로 둔다.
 - **Claude:** 다음 plan 개정판과 고친 P0가 오면 검토한다.
+
+## 시간 기록 정정 (v1.0.1, 2026-11-05T22:20:18+09:00)
+
+처음 판에 적은 관측 시각은 실제로 관측한 값이 아니었다. 이번 정정에서 바꾼 것은 시각뿐이다. 판정, 실행 결과, 발견은 바꾸지 않았고 Git history도 다시 쓰지 않았다.
+
+- **처음 적은 값(무효):** Evidence `observedWindowKST` 22:12:00~22:25:00, header `updated` 22:25:00
+- **무효인 이유:** declared 22:12..22:25 and History updated 22:25 were invented; 22:25 is after the commit (22:12:22) and Docs completion (22:12:58), so it could not have been observed
+- **복원한 관측 구간:** 22:09:32~22:10:46 KST
+  - brief 수신: 22:09:21
+  - 첫 관측: 22:09:32 fetch cde
+  - 마지막 관측: 22:10:46 cde source hash recompute result
+  - Evidence 작성: 22:11:18-22:11:53
+- **근거:** session transcript(`f3feb390-…jsonl`)를 읽기만 했다. tool 결과의 시각이며 초 단위 정밀도다.
+- **공개 metadata (관측이 아님):** commit eace0e2d author/commit 2026-11-05T22:12:22+09:00; Docs 42033713492 created 22:12:29, completed 22:12:58 KST, success
+- **파일 경로:** 경로에 든 시각은 인용이 깨지지 않도록 legacy ID로 그대로 둔다. 그 시각을 관측 시각으로 보면 **안 된다.**
+- **`updated`:** 이 정정을 한 시각이다.

@@ -3,7 +3,8 @@
   "task": "task_03867932b2f0 / ctx_37e3f120fac0 (superseding revision per msg_7b5f8be7e2ba)",
   "reviewer": "Claude",
   "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
-  "observedWindowKST": ["2026-11-05T22:12:00+09:00", "2026-11-05T22:25:00+09:00"],
+  "observedWindowKST": ["2026-11-05T22:09:32+09:00", "2026-11-05T22:10:46+09:00"],
+  "observedWindowCorrection": {"originalDeclared": ["2026-11-05T22:12:00+09:00", "2026-11-05T22:25:00+09:00"], "originalDeclaredHistoryUpdated": "2026-11-05T22:25:00+09:00", "status": "original values INVALID (not observed)", "reason": "declared 22:12..22:25 and History updated 22:25 were invented; 22:25 is after the commit (22:12:22) and Docs completion (22:12:58), so it could not have been observed", "briefReceived": "2026-11-05T22:09:21+09:00 (orchestration check of msg_7b5f8be7e2ba)", "firstObservation": "22:09:32 fetch cde", "lastObservation": "22:10:46 cde source hash recompute result", "evidenceWrite": "22:11:18-22:11:53", "source": "session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only): first observation tool result start and last observation tool result before the Evidence write; second-level precision", "publicationMetadata": {"commit": "eace0e2d author/commit 2026-11-05T22:12:22+09:00", "docs": "42033713492 created 22:12:29, completed 22:12:58 KST, success"}, "correctedAt": "2026-11-05T22:20:18+09:00", "verdictAndResultsChanged": false, "gitHistoryRewritten": false, "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation", "scope": "requested"},
   "reviewKind": "bounded independent architecture/plan review only; not corrected-P0 code, contract or operational acceptance",
   "reviewed": {
     "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",

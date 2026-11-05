@@ -3,7 +3,8 @@
   "task": "task_03867932b2f0 / ctx_37e3f120fac0",
   "reviewer": "Claude",
   "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
-  "observedWindowKST": ["2026-11-05T21:58:00+09:00", "2026-11-05T22:10:00+09:00"],
+  "observedWindowKST": ["2026-11-05T22:01:31+09:00", "2026-11-05T22:07:19+09:00"],
+  "observedWindowCorrection": {"originalDeclared": ["2026-11-05T21:58:00+09:00", "2026-11-05T22:10:00+09:00"], "originalDeclaredHistoryUpdated": "2026-11-05T22:10:00+09:00", "status": "original values INVALID (not observed)", "reason": "declared start 21:58 precedes the brief (22:01:15) and belongs to the previous task; declared end 22:10 and History updated 22:10 are after the commit (22:09:11)", "briefReceived": "2026-11-05T22:01:15+09:00", "firstObservation": "22:01:31 fetch plan branch", "lastObservation": "22:07:19 plan Docs 42029683097 view result", "evidenceWrite": "22:07:56-22:08:46", "source": "session transcript f3feb390-561c-4cec-9ef9-009f065bee12.jsonl (read-only): first observation tool result start and last observation tool result before the Evidence write; second-level precision", "publicationMetadata": {"commit": "830efd93 author/commit 2026-11-05T22:09:11+09:00", "docs": "42033242038 created 22:09:18, completed 22:09:44 KST, success"}, "correctedAt": "2026-11-05T22:20:18+09:00", "verdictAndResultsChanged": false, "gitHistoryRewritten": false, "pathTimestamp": "History file path kept as legacy ID for citations; its time is NOT an observation", "scope": "requested"},
   "reviewKind": "bounded independent architecture/plan review only; not corrected-P0 code acceptance",
   "reviewed": {
     "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
