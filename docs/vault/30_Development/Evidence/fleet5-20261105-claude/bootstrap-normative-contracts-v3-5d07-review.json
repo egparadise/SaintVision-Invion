@@ -21,7 +21,8 @@
     "note": "private scratch reviewer program, not committed (no helper code authorized); hashes recorded",
     "check_v3.py": "f240dd33b7be62c53dad91228b78c5256604573576ca571c69bb6c46baa44a2c",
     "probe_ni1.py": "ee4ee3e0c1e05a1b89cfbe36f563e400bc3bf9b622d82277feb8ca2e3b35ff7a",
-    "rawOutput": "bootstrap-normative-contracts-v3-5d07-review-raw.json (sha256 4007af3b5e5f8a88ff7199bba6e53a88462fca86e05090c04a7f091ac0b63f36; synthetic fixture values only)",
+    "rawOutput": "bootstrap-normative-contracts-v3-5d07-review-raw.json (synthetic fixture values only); committed LF blob sha256 f44bc374971fb5dbd9aef776c402a5fbdb38cac63244d56a238b148cf0fb0658",
+    "rawOutputCorrection": "a0cb83b8 recorded 4007af3b5e5f8a88ff7199bba6e53a88462fca86e05090c04a7f091ac0b63f36, the CRLF scratch-file hash; git normalized line endings on commit, so the published bytes hash to f44bc374...; JSON content unchanged",
     "runs": [
       {"startKST": "2026-11-06T02:32:42+09:00", "exit": 0, "note": "first pass; two harness bugs in MY program (ignored owner topTarget field; mis-parsed api:<method> document names) produced 14 false transition accepts and 113 unhandled recipe negatives; corrected, not owner defects"},
       {"startKST": "2026-11-06T02:33:42+09:00", "exit": 0, "note": "corrected pass"},
