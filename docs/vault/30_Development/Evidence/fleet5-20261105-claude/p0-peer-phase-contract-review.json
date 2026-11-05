@@ -1,0 +1,57 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_3529eefa626c / ctx_ba275b06ce0c (priority msg_c811f47cc4a1)",
+  "reviewer": "Claude",
+  "author": "Codex (contract owner ctx_6f0f8253b8a7)",
+  "observedWindowKST": ["2026-11-05T20:00:00+09:00", "2026-11-05T20:40:00+09:00"],
+  "earlyStatusMessage": "msg_ab9e13adf7dd",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+    "probeCommit": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+    "reportCommit": "5023ce7d72b7f13431cb6a7182e2677eb6926662",
+    "sources": ["History/2026-11-05_FLEET5_compound_lifecycle_B_contract_Codex.md#P0 standalone plain-mode repair proposal", "Evidence/fleet5-compute-storage-contract-20261105-codex/proposed-contract-v1.schema.json", "Evidence/fleet5-compute-storage-contract-20261105-codex/lifecycle-source-2fb.json", "Evidence/fleet5-compute-storage-contract-20261105-codex/hosted-native-peer-phase/native-go-result.json"],
+    "scope": "minimal standalone P0 plain-mode repair only; broad B compound not accepted; S1 ctx_4194506d5037 comments not counted",
+    "readFrom": "Git objects only; nothing executed by Claude (no local Go)"
+  },
+  "nativeProof": {
+    "realGoPackages": ["node.OpenJournal", "transport.NewAuthority", "authority.TLS", "journal.PinPeerPolicy"],
+    "inputs": "policies generated from 2fb tools/lan_pilot.py bytes",
+    "productionChangesInProofCommits": 0,
+    "events": [
+      {"phase": "initial", "version": 7, "accepted": true},
+      {"phase": "cycle-1-overlap", "version": 8, "accepted": true},
+      {"phase": "cycle-1-final", "version": 8, "accepted": false, "error": "NODE-0041: peer policy rollback rejected", "floorStaysAtOverlapHash": true},
+      {"phase": "cycle-2-overlap", "version": 9, "accepted": true},
+      {"phase": "cycle-2-final", "version": 9, "accepted": false, "error": "NODE-0041: peer policy rollback rejected"},
+      {"phase": "expired", "version": 10, "accepted": false, "error": "expired or unbounded", "floorPersistedAt10": true}
+    ],
+    "attemptedNormalCycles": 2,
+    "completedNormalCycles": 0,
+    "coreRun": {"id": 42014770700, "conclusion": "failure", "intended": true, "countedAsSuccess": false},
+    "executedByClaude": false,
+    "agreesWithClaudeStaticAnalysis": ["tools/lan_pilot.py:2030-2049", "2fb52bbe:deploy/lan/worker_leaf_rotation.py:199", "services/node-agent/runtime/journal.go:341-366", "services/node-agent/transport/trust.go:67-93", "services/node-agent/cmd/inv-node/main.go:88-108"]
+  },
+  "verdict": "ACCEPT-AS-ARCHITECTURE (bounded P0 schema :3 direction); NOT implementation acceptance",
+  "mandatoryGuards": [
+    {"id": "M1", "summary": ":3 new SCHEMA + exact keys; 2fb :1 readers reject :3 before mutation (test); explicit :1->:3 successor rule", "blocking": false},
+    {"id": "M2", "summary": "read actual <state>/.peer-policy {Version,Hash}: lstat regular, no symlink, owner==journal uid, 0600, size bound, exact keys, int-not-bool, 64-hex; no Go lock; unreadable/absent -> BLOCK, never infer; Version==currentPeerPolicyVersion and Hash==sha256(active bytes)==currentPeerPolicySHA256", "blocking": true, "gap": "journal is container-uid 0600; host reader path and authentication undefined (e.g. Node-signed startup receipt reporting floor)"},
+    {"id": "M3", "summary": "strict ints, P+2 <= 9007199254740991, overflow checked, no bool/float; channel C+1 independent", "blocking": false},
+    {"id": "M4", "summary": "Go pins before expiry check: validate scope, version>floor, now+margin<expiresAt<=now+7d (incl. skew) BEFORE writing active policy; enforce leaf max 518400s", "blocking": true},
+    {"id": "M5", "summary": "2fb rollback() (line 1070: installing/installed/restarted/rolled-back) restores version P; after P+1 pinned by restart or any per-connection Authorize the Node cannot start; rollback only if actual floor==(P, old hash), else forward finalize or separate reviewed recovery; same for all automatic failure paths", "blocking": true, "existingDefect": true},
+    {"id": "M6", "summary": "Node-signed install receipt binds pre-floor (P,hash) and post-restart (P+1,overlap hash); CP commit receipt binds final P+2 hash; CP node policy updated only after CAS", "blocking": false},
+    {"id": "M7", "summary": "finalized evidence/attestation/CP archive carry peer fields; successor new.current == old final P+2 bytes; keep 2fb exact-byte archive, .next refusal, retirement", "blocking": false},
+    {"id": "M8", "summary": "batch preflight requires every member CP-recorded P == Node-observed floor, else whole batch refused", "blocking": false},
+    {"id": "M9", "summary": "expired/partial/unknown -> BLOCKED, separate reviewed offline recovery; no +1 CAS ladder, trigger jump or floor reset; unknown first pin forward-only", "blocking": false},
+    {"id": "M10", "summary": "real Linux Go two-cycle green (7->8->9, ->10->11 final accepted) plus negatives: same-version final, expired-before-write refused, rollback-after-pin refused, floor/CP mismatch refused", "blocking": true}
+  ],
+  "operationalNote": "any Node that ran a :1 finalize may be unable to restart (floor=overlap hash, active=final); root to check r5 history read-only; Claude touched no Node",
+  "impactOnIntegration": "9a8f and 1e64 source/artifact acceptances carry the confirmed Go blocker until the repair is reviewed",
+  "ci": "none accepted",
+  "physicalAcceptance": "none",
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "floorWeakeningOrReset": 0, "physical": 0, "remote": 0, "CA": 0, "privateKeys": 0, "hostDockerWSL": 0, "authorWorkspaceWrites": 0},
+  "nextFirstAction": [
+    {"owner": "ctx_6f0f8253b8a7", "action": "define M2 floor-read path and authentication first, then implement :3 per M1-M10 and publish native Go two-cycle proof"},
+    {"owner": "root", "action": "read-only check whether r5 Nodes ran :1 finalize; keep all-8/landing/deploy HOLD"},
+    {"owner": "Claude", "action": "independently review P0 implementation delta"}
+  ]
+}
