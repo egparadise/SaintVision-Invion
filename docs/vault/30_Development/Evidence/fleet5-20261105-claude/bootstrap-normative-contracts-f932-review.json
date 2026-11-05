@@ -1,0 +1,73 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_c5957c5bb2f5 / ctx_8d0de000717d",
+  "reviewer": "Claude",
+  "author": "Codex (task_38393b5d1865 / ctx_ceecb3824e33)",
+  "observedWindowKST": ["2026-11-06T00:38:04+09:00", "2026-11-06T00:44:29+09:00"],
+  "observedWindowSource": "own shell `date` outputs at the first fetch and at the last branch check before writing; publication times are separate",
+  "reviewKind": "independent architecture/contract-PROPOSAL review of a nonexecuting document delta; design-contract-proposal verdict only; not registered product contracts, code, runtime CI, physical or operational acceptance",
+  "reviewed": {
+    "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105",
+    "commit": "f932283de3fd96f3816a99ea5c38d6d14969b930",
+    "base": "803ad270562b1b75e44d26f9e14b965c714ab519",
+    "delta": {"files": 32, "insertions": 15238, "deletions": 0, "nonDocsFiles": 0, "history": "2026-11-05_FLEET5_bootstrap_normative_contract_proposal_Codex.md v1.0.0", "evidenceDir": "fleet5-bootstrap-normative-contracts-20261105-v1 (31 files)"},
+    "readFrom": "Git objects only (git archive into a private scratch directory); author checkout untouched",
+    "abiReference": "4a928310 as NONBINDING reference (8baaa6b5 NOT ACCEPTED exact head)",
+    "proposalDocs": {"run": 42054280142, "verifiedBy": "Root (reported)", "checkedByClaude": false}
+  },
+  "independentChecks": {
+    "interpreter": "main .venv Python 3.14.7 -B -I; jsonschema Draft 2020-12 with referencing registry; own Go Marshal emulator; no Go, no crypto signing",
+    "artifactHashes": "30/30 recomputed and matched (proposal-validation.json itself excluded to avoid self-reference)",
+    "schemas": "9/9 metaschema-valid",
+    "structuralExamples": "6/6 VALID",
+    "adversarial": "46/46: 41 schema-layer rejected by schema; 5 semantic-layer are schema-valid and rejected by own semantic predicates (honest layer labels)",
+    "requiredRemovals": "owner 1083/1083 rejected; own enumeration of every key in all six artifacts = the same 1083 set, all rejected",
+    "ownMutations": {"boolFlip": "17/17 rejected", "intAsBool": "60/60 rejected", "intAsFloat1.5": "60/60 rejected", "intAsString": "60/60 rejected", "hexUpper": "430/430 rejected", "extraKeyAtEveryObject": "158/158 rejected", "intAsIntegralFloat (1.0)": "60/60 ACCEPTED by schema layer (finding L1)"},
+    "api": "14 methods valid; own negatives force/workerRoot/argv/bool-epoch/wrong method 70/70 rejected; response sideEffectPermitted const false",
+    "strictBytes": "J01-J05 input SHA256 5/5 and own strict classifier reaches the same reason 5/5",
+    "canonicalBodies": "6/6: body bytes, body SHA256, domain hex, domain+body SHA256, envelope SHA256 reproduced by own emulator; no body newline; signatureVerified false",
+    "domains": "6 distinct ASCII domains, none equal to the M2 floor domain",
+    "planSubject": "recomputed planSubjectSHA256 equals fixture with exactly planSubjectSHA256/independentPlanReview/rootPublicationIntent excluded; the two approval proofs have distinct contracts but their scopeSHA256 is not the subject digest (typed scope derivation unspecified)",
+    "bindingCoverage": "803 target 30, Root 18, member 60 names fully covered by the projection groups; member baseline/derived disjoint",
+    "holdBindings": "executionAuthorized false, HOLD, all target and Root bindings null",
+    "candidateABI": "7/7 files: git blob, SHA256 and byte length equal 4a928310 objects; M2 v2 domain decoded",
+    "epoch": "Go Config.Epoch is a string flag (journal identity struct string), lan_pilot epoch is str(uuid4()); proposal string recoveryEpoch matches the ABI; integer epoch X22 rejected",
+    "plan803BytesFromGit": "matched"
+  },
+  "designReview": {
+    "acyclicChain": "lease binds prior inventory head; inventory binds lease and BOOTSTRAP_VERIFIED event refs; seal binds verified event and inventory; terminal event binds seal; normal3 lease binds two seals: no hash cycle",
+    "retainedSemantics": "Cmd --image permit and global CP agentImage frozen; runtime truth moves to typed inventory; C, certs, enabled and endpoints unchanged",
+    "authority": "static backup binding versus current P/H/C from fresh signed M2 and approved normal plan, never migration baseline; normal3 needs a NEW common lease",
+    "bindings": "container daemon/id/name/inspect/image/config/mounts/restart, volume metadata/mount/protected tree, ExecID receipt, direct /inv-node, distinct argv domains",
+    "lease": "OS locks plus logical fence for the whole operation, fence epoch by CAS after proven quiescence, no age/PID/expiry reclaim, unknown -> BLOCKED_UNKNOWN",
+    "forwardOnly": "intent before effect, unknown outcome BLOCKED_FORWARD_ONLY/QUIESCENCE_UNKNOWN, no old restart, downgrade, second migration, predecessor replacement or reset",
+    "launchSurfaces": "generic mutators denied under any marker; scheduler entrypoints and new registrations denied; raw privileged scripts honestly outside, G9 HOLD"
+  },
+  "findings": [
+    {"id": "M1", "severity": "Medium", "summary": "Trust-anchor self-certification: signer keys/roles come from a trust configuration bound by the plan's own canonicalContractSHA256, and verifier contracts are selected from the set the plan pins; a plan author could pin a contract set that registers its own root-plan key or weaker verifiers", "requiredRevision": "pin the root-plan/root-fence/root-seal/cp-inventory/host-helper anchors and the reviewed verifier contract set outside the plan being authenticated (reviewed helper build or registered worker-root/trust registration) and state that the plan only selects within that pinned set"},
+    {"id": "M2", "severity": "Medium", "summary": "Proof slots are untyped at schema and specification level: 56 proof refs share one shape with no normative slot->contractSHA256/signer-role/scope-derivation table; swapping independentPlanReview and rootPublicationIntent stays schema-valid with an unchanged planSubject, and the fixture approval scopes are not the subject digest while their typed derivation is unspecified; reserve rootExecutionDecision scope to the final envelope is likewise prose-only", "requiredRevision": "add a closed per-slot proof registry (field path -> contract, signer role, typed scope recipe, freshness) inside the pinned contract set, plus red fixtures for slot swaps and cross-kind reuse"},
+    {"id": "M3", "severity": "Medium", "summary": "Post-seal failure is not representable: migration-journal forces terminalSealEnvelopeSHA256 null and a held lease for BLOCKED_FORWARD_ONLY/QUIESCENCE_UNKNOWN, so a failed or unknown restart-policy restore after SEALED can only be journaled by dropping the seal reference (verified: keep seal -> invalid, drop seal + lease -> valid)", "requiredRevision": "allow blocked phases to retain the existing seal (required when a SEALED event exists) with lease rules per operation, and add red/green fixtures"},
+    {"id": "L1", "severity": "Low", "summary": "Integral floats 1.0/1e0 and -0 pass every integer field at the schema layer (60/60); strict-byte fixtures cover only 1.5", "requiredRevision": "add strict-byte rejects for 1.0, 1e0, 1E2, -0 and require Go and Python readers to agree before schema evaluation"},
+    {"id": "L2", "severity": "Low", "summary": "timestamp relies on format date-time, which Draft 2020-12 treats as an annotation; 2026-02-30T25:61:61Z is schema-valid without a format checker", "requiredRevision": "mandate strict RFC3339 parsing and add a red fixture"},
+    {"id": "L3", "severity": "Low", "summary": "OLD_FENCED covers both restart=no applied while still running and stopped/quiescent (stopOld is OLD_FENCED->OLD_FENCED); captureFenced eligibility depends on the stop outcome receipt, stated only in prose", "requiredRevision": "make the stop-outcome predecessor normative in state-machine.json or split the phase"},
+    {"id": "L4", "severity": "Low", "summary": "migration-event inventoryEnvelopeSHA256/terminalSealEnvelopeSHA256 are not phase-gated (schema-valid on BOOTSTRAP_VERIFIED_RESTART_NO) and effect.kind is not bound to phase in the schema (S08 prose)", "requiredRevision": "add phase-conditional nullability and method/phase/effect table"},
+    {"id": "L5", "severity": "Low", "summary": "The VALID terminal-seal and inventory fixtures put backup and current on different daemon identities (and the seal reuses one name for both), violating S05; the harness checks S05 restart only, as stated", "requiredRevision": "make positive fixtures semantically coherent or label them structure-only"},
+    {"id": "I1", "severity": "Info", "summary": "Acquisition/release order between host OS locks and the logical fence CAS and nested re-entrancy is not specified beyond PC2-then-PC4 and per-call matching"},
+    {"id": "I2", "severity": "Info", "summary": "envelopeSHA256 covers signature bytes; specify RFC 8032 strict verification; a malleated duplicate fails closed through no-overwrite"},
+    {"id": "I3", "severity": "Info", "summary": "failureExits allows a same-phase failure event while the spec limits same-phase events to intent or readback; reconcile wording"}
+  ],
+  "verdicts": {
+    "designContractProposal": "REVISION REQUIRED: M1-M3 Medium, L1-L5 Low, I1-I3 Info; structure, hashes, fixtures, ABI reference, epoch and binding coverage verified; the forward-only, ownership, inventory and seal architecture is sound",
+    "registeredProductContracts": "none; not accepted",
+    "implementation": "none; not accepted",
+    "runtimeCI": "none; actual Go, signatures, OS locks, Engine and filesystem cases 0",
+    "physicalOperations": "HOLD; 30 target, 18 Root and member bindings null",
+    "p0Context": "4a NOT ACCEPTED (8baaa6b5); 50000697 vector ACCEPT Python/source; 46b4573f isolation ACCEPT test source (315411bc); unchanged"
+  },
+  "currentTaskMutations": {"productionOrSourceEdits": 0, "helperSSHDockerKeysClockGuardPrecheckAutomation": 0, "boardsRegistryObsidian": 0, "authorCheckoutWrites": 0, "subagents": 0, "bindingsFilled": 0},
+  "nextFirstAction": [
+    {"owner": "Codex (plan owner)", "action": "revise the proposal for M1-M3 (and L1-L5) with fixtures; answer msg_7d7fb1adc3de against this verdict"},
+    {"owner": "root", "action": "record REVISION REQUIRED; keep bindings null and operations HOLD; assign the revised delta review"},
+    {"owner": "Claude", "action": "review the revised proposal delta when assigned"}
+  ]
+}
