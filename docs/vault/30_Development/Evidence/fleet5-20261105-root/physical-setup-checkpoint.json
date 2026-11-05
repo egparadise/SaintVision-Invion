@@ -1,0 +1,142 @@
+{
+  "schema": "fleet5-physical-reconciliation:1",
+  "recordedAtKST": "2026-11-05T18:48:52+09:00",
+  "mapping": [
+    {
+      "physicalPC": 1,
+      "legacyInventorySlot": null,
+      "keyRegistrationAndDockerPending": true
+    },
+    {
+      "physicalPC": 2,
+      "legacyInventorySlot": "worker1",
+      "directSSH": true,
+      "dockerAPI": "1.52",
+      "existingR5NodeActive": true
+    },
+    {
+      "physicalPC": 3,
+      "legacyInventorySlot": "worker3",
+      "directSSH": true,
+      "dockerGroupPending": true
+    },
+    {
+      "physicalPC": 4,
+      "legacyInventorySlot": "worker2",
+      "directSSH": true,
+      "dockerAPI": "1.56",
+      "existingR5NodeActive": true
+    },
+    {
+      "physicalPC": 5,
+      "role": "Windows CP plus planned colocated Node",
+      "dockerAPI": "1.41",
+      "runtimeReady": false
+    }
+  ],
+  "oldInventoryPreserved": true,
+  "addressesAccountsHardwareBindings": "private physical-targets.private.json; no raw LAN/key material in this public record",
+  "permissionClassificationV2": [
+    {
+      "physicalPC": 2,
+      "legacySlot": "worker1",
+      "measurementKST": "2026-11-05T16:41:46+09:00",
+      "sshExit": 0,
+      "dockerGroupActive": true,
+      "firewallQueryExit": 1,
+      "interactiveOperatorAuthenticationRequired": true
+    },
+    {
+      "physicalPC": 4,
+      "legacySlot": "worker2",
+      "measurementKST": "2026-11-05T16:41:46+09:00",
+      "sshExit": 0,
+      "dockerGroupActive": true,
+      "firewallQueryExit": 1,
+      "interactiveOperatorAuthenticationRequired": true
+    },
+    {
+      "physicalPC": 3,
+      "legacySlot": "worker3",
+      "measurementKST": "2026-11-05T16:41:46+09:00",
+      "sshExit": 0,
+      "dockerGroupActive": false,
+      "firewallQueryExit": 1,
+      "interactiveOperatorAuthenticationRequired": true
+    }
+  ],
+  "collectorV1Caveat": "English interactive-authentication and Korean password-required markers were initially missed by one boolean; raw exit1/stderr retained, v2 corrects classification without retry or fake permission",
+  "sharePreparation": {
+    "createdParent": true,
+    "createdProjectFolder": true,
+    "directoryMode": "0o750",
+    "worldAccess": 0,
+    "rootReadACL": true,
+    "defaultRootReadACL": true,
+    "probeExit": 0,
+    "capDropAll": true,
+    "noNewPrivileges": true,
+    "network": "none",
+    "mountReadonly": true,
+    "rootCanRead": true,
+    "rootCannotWrite": true,
+    "probeContainerResidue": false,
+    "onlyOwnProbeFileRemoved": true,
+    "existingNodeContainerChanged": false,
+    "storagePolicyIssued": false,
+    "resourceOfferCreated": false,
+    "aclSHA256": "f87c6431e44858e3d5ef97050dab9684027697a86ff8c9b3fd83aca494ebe94e"
+  },
+  "freshIssuer": {
+    "purpose": "node-mtls-only",
+    "algorithm": "Ed25519",
+    "rootOffline": false,
+    "rootOnline": true,
+    "rootPassphraseSeparated": true,
+    "rootNotAfter": "2036-11-02T08:54:42+00:00",
+    "intermediateNotAfter": "2029-11-04T08:54:42+00:00",
+    "rootAndIntermediateSignaturesVerified": true,
+    "chainOrderVerified": true,
+    "CRLSignatureVerified": true,
+    "privateKeysEncrypted": true,
+    "legacyPublicCertsCompared": 24,
+    "controlOrNodeLeafCreated": false,
+    "existingTrustOrRuntimeChanged": false,
+    "verificationImplementation": "explicit authoritative _paths roles; no regeneration after initial verifier assertion",
+    "initialVerification": "first checker asserted; generation exit0 preserved, read-only recovery verified actual roles",
+    "aclVerified": true,
+    "allowedPrincipalCategories": [
+      "current-operator",
+      "SYSTEM",
+      "Administrators"
+    ],
+    "otherNonPrivilegedUsersAllowed": false,
+    "aclPolicySource": "tools/intranet_pki.py private_directory/private_file explicit Windows policy",
+    "verifiedAtKST": "2026-11-05T18:06:48+09:00",
+    "initialAclVerifier": "operator-only expectation corrected to the reviewed explicit operator+SYSTEM+Administrators policy; no key regeneration or ACL broadening"
+  },
+  "newF5Initialized": false,
+  "newNodeOrControlLeavesIssued": 0,
+  "currentActivePilotNodeCount": 2,
+  "allFiveOperationallyAccepted": false,
+  "sourceDelivery": {
+    "guard": {
+      "source": "17447988d631cb575fbe7d04e28c5dd7e0e9774e",
+      "report": "e62a4828f2291cca20dc49bfcd93f246e95c9b7a",
+      "Core": 41988233523,
+      "status": "success verified by root"
+    },
+    "database": {
+      "source": "864b49076c5aa4daa52419e04cb0e883e4df2163",
+      "report": "d18f076ef92c5401818f2800eac0c0ecfa86f33f",
+      "Core": 41993280120,
+      "status": "success verified by root"
+    },
+    "successor": {
+      "source": "8b53fbfef107837602b1b2f700e1f8e7bae28638",
+      "actualReviewer": "b852f9e089bac41fc19bd6060230aef90823f885",
+      "reviewDocs": 42003881586,
+      "verdict": "source accepted with3Lows; L1 cleanup/source correction and L2/L3 docs closure directed, final changed-source review/CI pending"
+    }
+  }
+}

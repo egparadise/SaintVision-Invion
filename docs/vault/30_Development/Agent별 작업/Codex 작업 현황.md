@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.360"
+version: "1.0.361"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T16:23:39+09:00"
+updated: "2026-11-05T18:48:52+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Actual R4 source accepted; full Core blocked at existing DB bootstrap; separate readiness regression and coverage/plan Lows in progress"
-active_card_next: "Collect same-head attempt2 and controlled DB red/green proof; review new exact source before combined CI/landing; preserve physical ingress and no-leaf-start gates"
+active_card_status: "Physical PC map corrected; actual PC4 read-only share and fresh issuer prepared; source2 fixes delivered; successor Low closure/integration and hardware prerequisites remain"
+active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
 ---
+
+## 2026-11-05 물리 PC 재대조·실제 준비·완료 판정
+
+작업한 것: 사용자 장비 정보를 직접 SSH와 대조해 legacy슬롯과 물리PC 번호를 바로잡고, PC4 전용 폴더/ACL과 실제 read-only 컨테이너 probe를 완료했다. 새 Node mTLS issuer도 별도 생성·서명/암호화/CRL/Windows ACL을 검증했고 leaf0으로 유지한다. 확인한 것: R4174와 DB864의 최종 Core는 실제 SUCCESS다. S18b source는 실제 Claude b852 수락/3Low이며 최종보강과 통합8lane은 남는다. 다음 첫 행동/담당: source owner의 Low closure, 통합 후보/새 archive, 실제 장비 인증/설정 후5대 검증을 root가 감독한다. 전체100%는 아직 아니며 원래48-task/VF-CL 상태를 유지한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
+
 
 ## 2026-11-05 검증된 감독 checkpoint와 남은 입력
 
