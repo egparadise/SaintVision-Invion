@@ -1,0 +1,47 @@
+{
+  "schema": "fleet5-20261105-independent-review:1",
+  "task": "task_ad55d6c5ac02 / ctx_e1eac667cf1d",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "observedWindowKST": ["2026-11-05T19:10:00+09:00", "2026-11-05T19:30:00+09:00"],
+  "reviewed": {"head": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d", "base": "6fcedbbdba24e43e3917adb07f080a683dedfefe", "commits": 1, "branch": "agent/codex/fleet5-consecutive-leaf-rotation-20261105", "prior7fe0VerdictUnchanged": true},
+  "integrity": {
+    "workerSHA256": {"value": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06", "matched": true, "launcherPinMatches": true},
+    "lanPilot": {"sha256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077", "blob": "3d205d52a377b52163240b824c1e6a092346e867", "matched": true},
+    "card150DiffVs59f": "only tools/lan_pilot.py sha256/blob pair; DB preparation and historical fields unchanged",
+    "nonDocsDelta": ["worker _require_settled_archive + call in _finalized_successor", "lan_pilot call in _finalized_predecessor", "launcher repin", "README +6", "new tests/test_rotation_predecessor_residue.py; consecutive fixture exposes prepare"],
+    "importsAndRuntimeLockUnchanged": true
+  },
+  "ordering": {
+    "guard": ".next exists() or is_symlink() -> ValueError; never deletes",
+    "node": "install under lock, read-only validation, _finalized_successor: owned dir, rotationId format, guard BEFORE archive read; supersession path requires restarted so cannot bypass",
+    "cp": "_finalized_predecessor: _batch_material read, guard BEFORE DB connect/archive verify; all three prepare paths (existing successor output, same-batch replay, fresh before temporary.mkdir) pass through it; offline recovery requires staging/staged",
+    "cleanupUnchanged": "only Node finalize replay and CP retire replay clean equal owned regular .next after full verification"
+  },
+  "ownRuns": {
+    "focused": {"files": ["test_rotation_predecessor_residue", "test_leaf_rotation_archive_residue", "test_lan_leaf_rotation_consecutive", "test_lan_leaf_rotation_batch_successor", "test_lan_leaf_rotation", "test_lan_leaf_rotation_standalone_runtime"], "interpreter": "main .venv Python 3.14.7 -B -p no:cacheprovider", "result": "164 passed, 20 skipped in 57.33s"},
+    "probes": {"fileSHA256": "b69a4d74315c3acea7fcbf7a954367dbec73903da48561ddbd146098d6856934", "committed": false, "result": "7 passed, 1 skipped (dangling symlink: no Windows symlink capability)", "items": [
+      {"case": "Node equal hard-link .next -> successor install", "result": "refused; whole worker tree unchanged; archive inode same"},
+      {"case": "Node guard-removal mutant (no-op _require_settled_archive)", "result": "successor accepted -> guard is the sole defense and is detected"},
+      {"case": "Node unequal / directory .next", "result": "successor refused; predecessor finalize replay refused; no mutation"},
+      {"case": "Node equal -> finalize replay -> successor", "result": "residue cleaned, archive bytes/inode kept, successor install+finalize complete"},
+      {"case": "CP equal .next -> successor prepare", "result": "refused; state snapshot unchanged; no output/temp; same-batch prepare refused; same-batch commit ok and keeps residue"},
+      {"case": "CP equal -> retire replay -> successor", "result": "residue cleaned, archive bytes/inode kept; successor batch prepared/completed/retired"},
+      {"case": "CP unequal / directory .next", "result": "successor, same-batch prepare and retire replay all refused; no mutation"}
+    ]}
+  },
+  "notExecutedByClaude": ["dangling/malicious symlink and foreign-owner/mode cases (Windows); code-read only, Linux CI required"],
+  "notes": ["same-batch CP prepare replay is also blocked by residue (fail-closed; resolved by retire replay)", "Node attest-finalized is read-only and not blocked by Node residue", "cleanup via retire needs original receipt bytes (L2); lost receipts need separate reviewed recovery as documented"],
+  "verdict": "ACCEPT (source safety and liveness); prior L1b closed",
+  "hosted": {
+    "docs2fb5": {"run": 42009966309, "conclusion": "success"},
+    "core2fb5": {"status": "not present in branch run list", "checkedAtKST": "2026-11-05T19:24:52+09:00", "countedAsSuccess": false},
+    "core6fce": {"run": 42006923070, "status": "in_progress", "canceledOrRerunByClaude": false}
+  },
+  "currentTaskMutations": {"physical": 0, "runtime": 0, "CA": 0, "private": 0, "integratorWorkspace": 0, "localTempWorktree": "added and removed"},
+  "nextFirstAction": [
+    {"owner": "root", "action": "feed ACCEPT to integrator; run Core for 2fb5/combined candidate and record 6fce Core terminal result; arrange combined candidate review and all 8 CI"},
+    {"owner": "Codex", "action": "none for this delta"},
+    {"owner": "Claude", "action": "review combined candidate when relayed"}
+  ]
+}

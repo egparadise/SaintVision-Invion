@@ -1,10 +1,10 @@
 {
   "taskId": "FLEET5-SETUP-INTEGRATION-20261105",
-  "observedAtKST": "2026-11-05T19:29:06.597675+09:00",
+  "observedAtKST": "2026-11-05T19:31:46.354954+09:00",
   "baseSHA": "142b517fb21e4dde1191d4df7a09b0c72c12382f",
   "preliminaryHEAD": "6d4727f1ee527e5c27437d10a17a6b77b451c112",
   "finalCandidate": null,
-  "pending": "L1b owner fix, independent delta review and exact CI; combined review and all8 candidate CI",
+  "pending": "candidate exact archive/all8CI and actual independent combined review; component source Core tracked separately",
   "actualChangedFiles": [
     ".github/workflows/core.yml",
     "deploy/lan/README.md",
@@ -41,6 +41,7 @@
     "docs/vault/30_Development/Evidence/fleet5-20261105-claude/db-readiness-864b-followup-review.json",
     "docs/vault/30_Development/Evidence/fleet5-20261105-claude/low-closure-af5b-review.json",
     "docs/vault/30_Development/Evidence/fleet5-20261105-claude/no-socket-1744-cp-maintenance-review.json",
+    "docs/vault/30_Development/Evidence/fleet5-20261105-claude/predecessor-residue-2fb5-review.json",
     "docs/vault/30_Development/Evidence/fleet5-20261105-claude/rotation-low-closure-6fce-review.json",
     "docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-rotation-20261105/batch-successor/check_contract_bindings.txt",
     "docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-rotation-20261105/batch-successor/check_doc_path_citations.txt",
@@ -209,7 +210,11 @@
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/assembled-sync.json",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/assembled-sync.txt",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/assembly-observation.json",
+    "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/committed-current-tooling.json",
+    "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/committed-current-tooling.txt",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/errors.md",
+    "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/freeze-docs.json",
+    "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/freeze-docs.txt",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/preliminary-contracts.json",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/preliminary-contracts.txt",
     "docs/vault/30_Development/Evidence/fleet5-setup-integration-20261105-codex/preliminary-docs-after-review-dependency.json",
@@ -290,6 +295,7 @@
     "docs/vault/30_Development/History/2026-11-05_17-35-00_KST_FLEET5_DB_readiness_followup_864b_검토_Claude.md",
     "docs/vault/30_Development/History/2026-11-05_18-40-00_KST_FLEET5_연속_leaf_rotation_8b53_검토_Claude.md",
     "docs/vault/30_Development/History/2026-11-05_19-05-00_KST_FLEET5_rotation_Low_closure_6fce_검토_Claude.md",
+    "docs/vault/30_Development/History/2026-11-05_19-30-00_KST_FLEET5_predecessor_residue_2fb5_검토_Claude.md",
     "docs/vault/30_Development/History/2026-11-05_F5_low_closure_Codex.md",
     "docs/vault/30_Development/History/2026-11-05_F5_worker12_first_wave_plan_Codex.md",
     "docs/vault/30_Development/History/2026-11-05_FLEET5_batch_successor_Codex.md",
@@ -317,7 +323,8 @@
     "8ad8f6d9": "8ad8f6d9b053dadc62f572dc61fc5e1248810103",
     "b852f9e0": "b852f9e089bac41fc19bd6060230aef90823f885",
     "7fe0701f": "7fe0701f2d58669ad4f72c0e60db5d0756df42ce",
-    "d254fc6a": "d254fc6a511db108be351a3ba82645341748fea3"
+    "d254fc6a": "d254fc6a511db108be351a3ba82645341748fea3",
+    "d06f93f7": "d06f93f73a211bb2d56ce2b42141c71771b7f270"
   },
   "card150HistoricalFieldsPreserved": true,
   "protectedBoardsRegistryDiffEmpty": true,
@@ -376,7 +383,7 @@
     "preliminary-sync": 0
   },
   "selectedL1bSource": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
-  "selectedL1bReview": "pending task_ad55d6c5ac02/ctx_e1eac667cf1d",
+  "selectedL1bReview": "actual safety+liveness ACCEPT; L1b closed; original d06f93f73a211bb2d56ce2b42141c71771b7f270",
   "sourceCore": "pending root; component is separate from combined candidate",
   "allAssembledGates": {
     "assembled-contracts": 0,
@@ -410,5 +417,6 @@
       "sha256": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
       "gitBlobSHA1": "efb08ee9611013f0bd656a2282172b22e20ecfe2"
     }
-  }
+  },
+  "freezeDocsExit": 0
 }

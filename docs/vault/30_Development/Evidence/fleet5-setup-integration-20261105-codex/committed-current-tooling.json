@@ -1,0 +1,20 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_intranet_pki.py::test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling"
+  ],
+  "startedAtKST": "2026-11-05T19:29:09.896114+09:00",
+  "finishedAtKST": "2026-11-05T19:29:13.297258+09:00",
+  "exit": 0,
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "stdoutAndStderr": "committed-current-tooling.txt",
+  "sourceAtStart": "243a8b1d8b604368f25afb7210a8bb49c6ea199a",
+  "workingChangesIncluded": true,
+  "operationalAcceptance": false
+}
