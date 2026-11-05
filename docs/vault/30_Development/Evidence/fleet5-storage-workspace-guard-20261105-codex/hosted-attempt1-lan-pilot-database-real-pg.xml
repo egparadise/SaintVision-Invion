@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.742" timestamp="2026-11-05T06:54:49.536441+00:00" hostname="runnervmnwato"><testcase classname="tests.integration.test_lan_pilot_database_real_pg" name="test_prepare_verify_roundtrip_uses_real_psql_variable_semantics" time="2.635"><failure message="AssertionError: initial prepare failed with redacted diagnostics&#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['bash', '/home/runner/work/SaintVision-Invion/SaintVision-Invion/deploy/lan/prepare-pilot-datab..., 'saintvision_lan'], returncode=1, stdout='', stderr='Pilot runtime role hardening failed; diagnostics suppressed.\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-6/test_prepare_verify_roundtrip_0')
+
+    def test_prepare_verify_roundtrip_uses_real_psql_variable_semantics(tmp_path: Path) -&gt; None:
+        suffix = uuid.uuid4().hex[:10]
+        container = f"saintvision-card297-{suffix}"
+        network = f"saintvision-card297-{suffix}-network"
+        database = f"saintvision_lan_card297_{suffix}"
+        runtime_role = f"inv_lan_runtime_card297_{suffix}"
+        volume = f"{container}-data"
+        private_dir = tmp_path / "operator-private"
+        port = _free_port()
+
+        try:
+            bootstrapped = _run(
+                "bash",
+                str(PREPARE),
+                IMAGE,
+                container,
+                str(port),
+                str(private_dir),
+                network,
+                "saintvision_lan",
+            )
+&gt;           assert bootstrapped.returncode == 0, "initial prepare failed with redacted diagnostics"
+E           AssertionError: initial prepare failed with redacted diagnostics
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['bash', '/home/runner/work/SaintVision-Invion/SaintVision-Invion/deploy/lan/prepare-pilot-datab..., 'saintvision_lan'], returncode=1, stdout='', stderr='Pilot runtime role hardening failed; diagnostics suppressed.\n').returncode
+
+tests/integration/test_lan_pilot_database_real_pg.py:88: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,82 @@
+core	Verify LAN pilot database scripts with real PostgreSQL	﻿2026-11-05T06:54:48.9904162Z ##[group]Run repo_digest="$(docker image inspect postgres:16 --format '{{index .RepoDigests 0}}')"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9904701Z ^[[36;1mrepo_digest="$(docker image inspect postgres:16 --format '{{index .RepoDigests 0}}')"^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9905062Z ^[[36;1mimage="${repo_digest##*/}"^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9905315Z ^[[36;1m[[ "$image" =~ ^postgres@sha256:[a-f0-9]{64}$ ]] || {^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9905649Z ^[[36;1m  echo 'The disposable PostgreSQL image is not digest-pinned.' >&2^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9905940Z ^[[36;1m  exit 1^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9906112Z ^[[36;1m}^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9906344Z ^[[36;1mINV_TEST_LAN_DATABASE_IMAGE="$image" python -m pytest -q \^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9906866Z ^[[36;1m  tests/integration/test_lan_pilot_database_real_pg.py \^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9907188Z ^[[36;1m  --junitxml=dist/lan-pilot-database-real-pg.xml^[[0m
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9934566Z shell: /usr/bin/bash -e {0}
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9934797Z env:
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9935197Z   INV_TEST_ADMIN_DSN: ***127.0.0.1:5432/postgres
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9935582Z   INV_TEST_EVIDENCE_DIR: /home/runner/work/SaintVision-Invion/SaintVision-Invion/dist
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9936084Z   MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9936618Z   MINIO_ROOT_USER: product-store-ci
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9936870Z   MINIO_ROOT_PASSWORD: product-store-ci-only-secret
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9937149Z   INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9937428Z   INV_OBJECT_STORE_BUCKET: saintvision-product-ci
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9937686Z   INV_OBJECT_STORE_ACCESS_KEY_ID: product-store-ci
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9937985Z   INV_OBJECT_STORE_SECRET_ACCESS_KEY: product-store-ci-only-secret
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9938269Z   INV_OBJECT_STORE_REGION: us-east-1
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9938492Z   INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9938950Z   INV_EVIDENCE_CODE_SHA: ff97cd9ef01bf9aebda3313cd90631c247a9f63a
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9939226Z   INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9939499Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9939817Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9940140Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9940441Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9940728Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9941020Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9941373Z   CX01_CONTAINER: e095c835c4423eb4226202cb01e4cc9de961431cd224fc5710866106f2cfdb22
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9941797Z   INV_NODE_IMAGE: sha256:47a9ab0236017913b0b6a50cad433aa6ec2dfeb23966cf51aae49ebb1aa7095b
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9942240Z   INV_NODE_BINARY: /home/runner/work/SaintVision-Invion/SaintVision-Invion/dist/inv-node
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9942566Z   INV_RUN_NODE_TESTS: 1
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9942883Z   INV_PYTHON_NODE_IMAGE: sha256:1e8a097ecb7d421326fe808d035b9b3623a875f4966fa2689ccd4ff088977178
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9943365Z   INV_UPGRADE_AGENT_IMAGE: sha256:0a921ebef18cd54f6dde7741aa31a365eae723e58a0cc8dd0e6424348a187ef1
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9943835Z   INV_STORAGE_AGENT_IMAGE: sha256:0a921ebef18cd54f6dde7741aa31a365eae723e58a0cc8dd0e6424348a187ef1
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9944352Z   INV_STORAGE_SOURCE_ROOT: /home/runner/work/SaintVision-Invion/SaintVision-Invion/.work/storage-source
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9944846Z   INV_TEST_SERVER_IMAGE: sha256:6dd47a570a36e49977e741a6f2e539bae312bffaf78599e9dce90d28d0d3bde0
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9945311Z   INV_TEST_CONFIG_IMAGE: sha256:6dd47a570a36e49977e741a6f2e539bae312bffaf78599e9dce90d28d0d3bde0
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9945661Z   INV_CONTAINER_TEST_DB_HOST: 172.17.0.3
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:48.9945874Z ##[endgroup]
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4239825Z F                                                                        [100%]
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4240603Z =================================== FAILURES ===================================
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4241761Z _______ test_prepare_verify_roundtrip_uses_real_psql_variable_semantics ________
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4242126Z
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4242566Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-6/test_prepare_verify_roundtrip_0')
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4242975Z
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4243473Z     def test_prepare_verify_roundtrip_uses_real_psql_variable_semantics(tmp_path: Path) -> None:
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4244106Z         suffix = uuid.uuid4().hex[:10]
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4244594Z         container = f"saintvision-card297-{suffix}"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4245151Z         network = f"saintvision-card297-{suffix}-network"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4245688Z         database = f"saintvision_lan_card297_{suffix}"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4246221Z         runtime_role = f"inv_lan_runtime_card297_{suffix}"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4246905Z         volume = f"{container}-data"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4247390Z         private_dir = tmp_path / "operator-private"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4247797Z         port = _free_port()
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4248065Z
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4248291Z         try:
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4248645Z             bootstrapped = _run(
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4248991Z                 "bash",
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4249326Z                 str(PREPARE),
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4249652Z                 IMAGE,
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4249978Z                 container,
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4250297Z                 str(port),
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4250671Z                 str(private_dir),
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4251009Z                 network,
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4251392Z                 "saintvision_lan",
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4251699Z             )
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4252296Z >           assert bootstrapped.returncode == 0, "initial prepare failed with redacted diagnostics"
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4253035Z E           AssertionError: initial prepare failed with redacted diagnostics
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4253761Z E           assert 1 == 0
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4255303Z E            +  where 1 = CompletedProcess(args=['bash', '/home/runner/work/SaintVision-Invion/SaintVision-Invion/deploy/lan/prepare-pilot-datab..., 'saintvision_lan'], returncode=1, stdout='', stderr='Pilot runtime role hardening failed; diagnostics suppressed.\n').returncode
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4256616Z
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4256973Z tests/integration/test_lan_pilot_database_real_pg.py:88: AssertionError
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4257596Z =========================== short test summary info ============================
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4258867Z FAILED tests/integration/test_lan_pilot_database_real_pg.py::test_prepare_verify_roundtrip_uses_real_psql_variable_semantics - AssertionError: initial prepare failed with redacted diagnostics
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4259764Z assert 1 == 0
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4261153Z  +  where 1 = CompletedProcess(args=['bash', '/home/runner/work/SaintVision-Invion/SaintVision-Invion/deploy/lan/prepare-pilot-datab..., 'saintvision_lan'], returncode=1, stdout='', stderr='Pilot runtime role hardening failed; diagnostics suppressed.\n').returncode
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.4262388Z 1 failed in 2.81s
+core	Verify LAN pilot database scripts with real PostgreSQL	2026-11-05T06:54:52.5865209Z ##[error]Process completed with exit code 1.

@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "in_progress"
 author: "Codex"
 reviewer: "Claude via root"
-updated: "2026-11-05T15:43:00+09:00"
+updated: "2026-11-05T15:57:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "FLEET5-STORAGE-WORKSPACE-GUARD-20261105"
@@ -37,3 +37,19 @@ Pending: normal commit/push, exact-head hosted Core/Docs and actual Claude revie
 Interpreter is the existing main-repo Python 3.14.7 at `D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.venv/Scripts/python.exe`, always `-B`/`PYTHONDONTWRITEBYTECODE=1`; no install/pip and no protected r5 interpreter. Windows tests will simulate Docker and the Unix lock boundary explicitly. Actual Docker, device, runtime, lock semantics and physical acceptance are not measured here.
 
 Next action/owner: Codex publishes the guarded source and local evidence, dispatches exact-head Core/Docs and gives root the fixed commit for actual independent Claude review. This is a future source revision; existing source59f first-wave packet/bundle hashes remain separate and unchanged.
+
+## Published checkpoint, 2026-11-05 15:51 KST
+
+Implementation/evidence commit `ff97cd9ef01bf9aebda3313cd90631c247a9f63a` is normally pushed and remote readback matches. Source/committed helper SHA-256 is `83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d`; tests `b4b47fb1b586ff2644189788e8b00846004671e86077a1ed35591b888549041f`. Captured artifact hashes were directly rechecked, exit0. `code-source-mapping.json` separately preserves the original source59f helper digest `da46ab67d0220b705c54bf889c3bf63e18b3bddb327bfe5881969121d43711c3` and unchanged config/storage/launcher bytes; no packet was rebuilt or replaced.
+
+Exact-head Documentation run **41982381571** is completed/success; Core **41982378091** has storage roundtrip success and provisioned LAN installer acceptance in progress at 15:50:49 KST. No Core success claim yet. Root received review request `msg_930144b3c5f4`; actual independent Claude verdict is still pending. Next action: coordinator relays that verdict; Codex then observes terminal CI results, resolves any finding and publishes the final History/Evidence report and report-head Docs check. No `worker_done` until delivery is complete.
+
+Delivery diagnostics: the first staged diff check returned exit2 for whitespace in captured pytest failure tracebacks; text/XML logs were explicitly normalized to UTF-8/LF without trailing whitespace, then staged diff check exited0 and the commit succeeded. An optional Python `-c` hash-verification invocation returned exit1 because Windows PowerShell stripped embedded quotes; the UTF-8 stdin invocation directly verified all hashes with exit0. Neither diagnostic changed product source or its test results.
+
+## Core attempt 1 failed after installer acceptance
+
+Core run **41982378091**, exact source `ff97cd9ef01bf9aebda3313cd90631c247a9f63a`, completed **failure** at 15:54:52 KST in `Verify LAN pilot database scripts with real PostgreSQL`. Initial `prepare-pilot-database.sh` returned exit1 with `Pilot runtime role hardening failed; diagnostics suppressed.` The database JUnit has **1 failure**, and the later main Core pytest/build checks were skipped by the failed gate. This is not a Core PASS. The source guard's provisioned installer step and its executed-evidence gate both succeeded; downloaded JUnit directly confirms **15 tests / 0 failures / 0 errors / 0 skips**. S01 storage roundtrip succeeded separately.
+
+Evidence: `hosted-core-source.json`, `hosted-core-failure.txt`, `hosted-core-attempt1-summary.json`, and copied installer/database JUnit in the unique Evidence directory. Artifact ID **13395590043**, archive digest `88c564a142355e2830840e24546f204bac54477fc92fc97eaf05c1e8f0ec2587`; downloaded to ignored `.work/fleet5-storage-ff97cd9e-core-attempt1`, without executing its contents. Both failing database source/test files are unchanged from source59f. Static inference only: readiness uses a local Unix-socket query, which might observe initdb's temporary server before the target database exists; the suppressed diagnostics do not establish that cause. No database source changes, Docker actions or rerun were performed locally.
+
+Root reply `msg_3a4b885a38eb` confirms actual Claude review is still pending on task `task_5fd9ea4e3779` / dispatch `ctx_ac008a621cfe`; it is not acceptance. Core failure was escalated to root as `msg_47919a2e5927` for a same-head CI retry or separate-owner fix decision. Next owner/root: relay actual review and resolve the out-of-scope Core failure; next owner/Codex: record the resulting CI verdict, publish final evidence/report with documentation gate and send truthful delivery outcome. Physical acceptance, integration landing and source59f bundle mapping remain unchanged.
