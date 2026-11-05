@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from test_lan_leaf_rotation_batch_successor import _completed, lan_pilot, rotation, NODE_ID
+from test_lan_leaf_rotation import _plain_unit_transport
 
 
 @pytest.mark.parametrize("role", ["node", "control"])

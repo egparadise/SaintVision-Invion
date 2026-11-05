@@ -1,0 +1,66 @@
+{
+  "attemptedNormalCycles": 2,
+  "baselineMismatchConfirmed": true,
+  "completedNormalCycles": 0,
+  "events": [
+    {
+      "accepted": true,
+      "durableFloorSHA256": "f1218b9490dbd2704e9f8db8dcde626953d910f5c336188828cdb76f7e560466",
+      "durableFloorVersion": 7,
+      "error": "",
+      "phase": "initial",
+      "policySHA256": "f1218b9490dbd2704e9f8db8dcde626953d910f5c336188828cdb76f7e560466",
+      "policyVersion": 7
+    },
+    {
+      "accepted": true,
+      "durableFloorSHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+      "durableFloorVersion": 8,
+      "error": "",
+      "phase": "cycle-1-overlap",
+      "policySHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+      "policyVersion": 8
+    },
+    {
+      "accepted": false,
+      "durableFloorSHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+      "durableFloorVersion": 8,
+      "error": "NODE-0041: peer policy rollback rejected",
+      "phase": "cycle-1-final",
+      "policySHA256": "73f0c7ee73289acb42b4863731da87a0268fee86f585855952b2d596b9a69580",
+      "policyVersion": 8
+    },
+    {
+      "accepted": true,
+      "durableFloorSHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+      "durableFloorVersion": 9,
+      "error": "",
+      "phase": "cycle-2-overlap",
+      "policySHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+      "policyVersion": 9
+    },
+    {
+      "accepted": false,
+      "durableFloorSHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+      "durableFloorVersion": 9,
+      "error": "NODE-0041: peer policy rollback rejected",
+      "phase": "cycle-2-final",
+      "policySHA256": "b9f1d6408c46712b513ee2b9b70a4171e6722ff1f0bca2ba2d72cfb0f24a3d87",
+      "policyVersion": 9
+    },
+    {
+      "accepted": false,
+      "durableFloorSHA256": "dff83ff0ab25b751d43b80a4392ddca371fd51cd19ccbc442f600fecc0174b1e",
+      "durableFloorVersion": 10,
+      "error": "NODE-0041: peer policy expired or unbounded",
+      "phase": "expired-after-pin-negative",
+      "policySHA256": "dff83ff0ab25b751d43b80a4392ddca371fd51cd19ccbc442f600fecc0174b1e",
+      "policyVersion": 10
+    }
+  ],
+  "operationalAcceptanceAssessed": false,
+  "proofValid": true,
+  "runtimeGOOS": "linux",
+  "sameDurableJournal": true,
+  "sameVersionDifferentHashFinalRejections": 2
+}

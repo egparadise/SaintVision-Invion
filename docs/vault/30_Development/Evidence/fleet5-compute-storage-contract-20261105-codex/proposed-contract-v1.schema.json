@@ -1,0 +1,1044 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:proposed:fleet5-compute-storage:1",
+  "title": "Proposed B local deployment/authority contract; architecture review pending",
+  "$comment": "Review artifact only. Not installed, not a production canonical schema, not cryptographic authority. Semantic constraints in the companion contract are mandatory. Existing signed storage challenge wire remains unchanged.",
+  "$defs": {
+    "SHA256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "DecimalU64": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "OperationId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nodeId": {
+          "type": "string",
+          "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "endpoint": {
+          "type": "string",
+          "pattern": "^https://[^/]+:[0-9]{1,5}$"
+        }
+      },
+      "required": [
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "endpoint"
+      ],
+      "additionalProperties": false
+    },
+    "RootIdentity": {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "$ref": "#/$defs/DecimalU64"
+        },
+        "inode": {
+          "$ref": "#/$defs/DecimalU64"
+        }
+      },
+      "required": [
+        "deviceId",
+        "inode"
+      ],
+      "additionalProperties": false
+    },
+    "Root": {
+      "type": "object",
+      "properties": {
+        "contributionId": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "rootVersion": {
+          "$ref": "#/$defs/Version"
+        },
+        "containerPath": {
+          "const": "/contribution"
+        },
+        "sourceHostPath": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 4096,
+          "pattern": "^/"
+        },
+        "identity": {
+          "$ref": "#/$defs/RootIdentity"
+        }
+      },
+      "required": [
+        "contributionId",
+        "rootVersion",
+        "containerPath",
+        "sourceHostPath",
+        "identity"
+      ],
+      "additionalProperties": false
+    },
+    "MountBinding": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "node-storage-mount-binding:1"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "contributionId": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "rootVersion": {
+          "$ref": "#/$defs/Version"
+        },
+        "rootPath": {
+          "const": "/contribution"
+        },
+        "expectedRootIdentity": {
+          "$ref": "#/$defs/RootIdentity"
+        },
+        "policySHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "readonly": {
+          "const": true
+        },
+        "recursive": {
+          "const": false
+        },
+        "propagation": {
+          "const": "rprivate"
+        },
+        "daemonScope": {
+          "const": "native-linux-local-default"
+        },
+        "socketPath": {
+          "const": "/var/run/docker.sock"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "operationId",
+        "identity",
+        "contributionId",
+        "rootVersion",
+        "rootPath",
+        "expectedRootIdentity",
+        "policySHA256",
+        "readonly",
+        "recursive",
+        "propagation",
+        "daemonScope",
+        "socketPath"
+      ],
+      "additionalProperties": false
+    },
+    "Authority": {
+      "type": "object",
+      "properties": {
+        "channelVersion": {
+          "$ref": "#/$defs/Version"
+        },
+        "nodeCertificateDER_SHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "controlCertificateDER_SHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "peerPolicyVersion": {
+          "$ref": "#/$defs/Version"
+        },
+        "peerPolicySHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "storagePolicySHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "storageChannelSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mountBindingSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "channelVersion",
+        "nodeCertificateDER_SHA256",
+        "controlCertificateDER_SHA256",
+        "peerPolicyVersion",
+        "peerPolicySHA256",
+        "storagePolicySHA256",
+        "storageChannelSHA256",
+        "mountBindingSHA256"
+      ],
+      "additionalProperties": false
+    },
+    "RawArtifact": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "rawBase64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384
+        }
+      },
+      "required": [
+        "sha256",
+        "rawBase64"
+      ],
+      "additionalProperties": false
+    },
+    "Predecessor": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "initial-enrollment",
+            "finalized-rotation"
+          ]
+        },
+        "proofSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "archiveSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "journalRawSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stagingResidue": {
+          "const": false
+        }
+      },
+      "required": [
+        "kind",
+        "proofSHA256",
+        "archiveSHA256",
+        "journalRawSHA256",
+        "stagingResidue"
+      ],
+      "additionalProperties": false
+    },
+    "StateVolume": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^saintvision-nod_[0-9a-hjkmnp-tv-z]{26}-state$"
+        },
+        "nodeLabel": {
+          "type": "string",
+          "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "containerId": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "metadataSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "protectedStateSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "consumerIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SHA256"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "nodeLabel",
+        "containerId",
+        "metadataSHA256",
+        "protectedStateSHA256",
+        "consumerIds"
+      ],
+      "additionalProperties": false
+    },
+    "RenewalProposal": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-compound-renewal-proposal:1"
+        },
+        "lifecycleSourceSHA": {
+          "const": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "batchId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "cohortSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "storageMode": {
+          "enum": [
+            "plain",
+            "readonly-contribution"
+          ]
+        },
+        "root": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Root"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "old": {
+          "$ref": "#/$defs/Authority"
+        },
+        "nextOverlap": {
+          "$ref": "#/$defs/Authority"
+        },
+        "finalPeer": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "$ref": "#/$defs/Version"
+            },
+            "sha256": {
+              "$ref": "#/$defs/SHA256"
+            }
+          },
+          "required": [
+            "version",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "oldStoragePolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextStoragePolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextMountBinding": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MountBinding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "predecessor": {
+          "$ref": "#/$defs/Predecessor"
+        },
+        "stateVolume": {
+          "$ref": "#/$defs/StateVolume"
+        },
+        "noOwnedWorkload": {
+          "const": true
+        },
+        "rootUnchanged": {
+          "const": true
+        },
+        "profileUnchanged": {
+          "const": true
+        },
+        "nodeKeyUnchanged": {
+          "const": true
+        },
+        "casOrdering": {
+          "const": "all-node-pins-then-atomic-all-channel-cas"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "overlapExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "publicFiles": {
+          "type": "object",
+          "properties": {
+            "caBundle": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "oldNodeCertificate": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "nextNodeCertificate": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "oldControlCertificate": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "nextControlCertificate": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "oldPeerPolicy": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "overlapPeerPolicy": {
+              "$ref": "#/$defs/RawArtifact"
+            },
+            "finalPeerPolicy": {
+              "$ref": "#/$defs/RawArtifact"
+            }
+          },
+          "required": [
+            "caBundle",
+            "oldNodeCertificate",
+            "nextNodeCertificate",
+            "oldControlCertificate",
+            "nextControlCertificate",
+            "oldPeerPolicy",
+            "overlapPeerPolicy",
+            "finalPeerPolicy"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "lifecycleSourceSHA",
+        "operationId",
+        "batchId",
+        "cohortSHA256",
+        "identity",
+        "storageMode",
+        "root",
+        "old",
+        "nextOverlap",
+        "finalPeer",
+        "oldStoragePolicy",
+        "nextStoragePolicy",
+        "nextMountBinding",
+        "predecessor",
+        "stateVolume",
+        "noOwnedWorkload",
+        "rootUnchanged",
+        "profileUnchanged",
+        "nodeKeyUnchanged",
+        "casOrdering",
+        "createdAt",
+        "overlapExpiresAt",
+        "publicFiles"
+      ],
+      "additionalProperties": false
+    },
+    "MigrationProposal": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-workspace-storage-preservation:1"
+        },
+        "workspacePackageSchema": {
+          "const": 2
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "root": {
+          "$ref": "#/$defs/Root"
+        },
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "policy": {
+          "$ref": "#/$defs/RawArtifact"
+        },
+        "mountBinding": {
+          "$ref": "#/$defs/MountBinding"
+        },
+        "stateVolume": {
+          "$ref": "#/$defs/StateVolume"
+        },
+        "fromProfile": {
+          "const": "lan-observe-v1"
+        },
+        "toProfile": {
+          "const": "lan-workspace-v1"
+        },
+        "nodeKeyUnchanged": {
+          "const": true
+        },
+        "authorityUnchanged": {
+          "const": true
+        },
+        "noOwnedWorkload": {
+          "const": true
+        },
+        "explicitOptIn": {
+          "const": "preserve-readonly-contribution"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "workspacePackageSchema",
+        "operationId",
+        "identity",
+        "root",
+        "authority",
+        "policy",
+        "mountBinding",
+        "stateVolume",
+        "fromProfile",
+        "toProfile",
+        "nodeKeyUnchanged",
+        "authorityUnchanged",
+        "noOwnedWorkload",
+        "explicitOptIn"
+      ],
+      "additionalProperties": false
+    },
+    "NodeJournal": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-compound-node-journal:1"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "requestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "phase": {
+          "enum": [
+            "reserved",
+            "prepared",
+            "stopped",
+            "files-installed",
+            "start-intent",
+            "projections-partial",
+            "generation-committed",
+            "acknowledged",
+            "channel-committed",
+            "final-start-intent",
+            "final-generation-committed",
+            "final-acknowledged",
+            "archived",
+            "rolled-back",
+            "unknown"
+          ]
+        },
+        "activeGenerationSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intentSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "floorObservation": {
+          "enum": [
+            "unchanged",
+            "advanced",
+            "unknown"
+          ]
+        },
+        "channelObservation": {
+          "enum": [
+            "old",
+            "next",
+            "unknown"
+          ]
+        },
+        "oldContainerId": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "newContainerId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "protectedStateSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "previousRecordSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "operationId",
+        "requestSHA256",
+        "phase",
+        "activeGenerationSHA256",
+        "intentSHA256",
+        "floorObservation",
+        "channelObservation",
+        "oldContainerId",
+        "newContainerId",
+        "protectedStateSHA256",
+        "previousRecordSHA256",
+        "sequence"
+      ],
+      "additionalProperties": false
+    },
+    "CompoundDecision": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-authority-generation:1"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "requestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "phase": {
+          "enum": [
+            "overlap",
+            "final"
+          ]
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "root": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Root"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previousGenerationSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intentSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "projectionDigestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "operationId",
+        "requestSHA256",
+        "phase",
+        "identity",
+        "authority",
+        "root",
+        "previousGenerationSHA256",
+        "intentSHA256",
+        "projectionDigestSHA256"
+      ],
+      "additionalProperties": false
+    },
+    "BatchJournal": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-compound-batch-journal:1"
+        },
+        "batchId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "manifestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "cohortSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "nodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "phase": {
+          "enum": [
+            "prepared",
+            "all-preflight",
+            "installing",
+            "all-acknowledged",
+            "cas-intent",
+            "channels-committed",
+            "control-switched",
+            "finalizing",
+            "retired",
+            "unknown"
+          ]
+        },
+        "preflightVectorSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ackVectorSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "channelVectorSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "controlSwitchObserved": {
+          "enum": [
+            "old",
+            "next",
+            "unknown"
+          ]
+        },
+        "previousRecordSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "batchId",
+        "manifestSHA256",
+        "cohortSHA256",
+        "nodeIds",
+        "phase",
+        "preflightVectorSHA256",
+        "ackVectorSHA256",
+        "channelVectorSHA256",
+        "controlSwitchObserved",
+        "previousRecordSHA256",
+        "sequence"
+      ],
+      "additionalProperties": false
+    },
+    "CompoundIntent": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-authority-intent:1"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "requestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "phase": {
+          "enum": [
+            "overlap",
+            "final"
+          ]
+        },
+        "previousGenerationSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedPriorProjectionSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "nextDecisionSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "validatedFilesSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "validatedMountBindingSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "operationId",
+        "requestSHA256",
+        "phase",
+        "previousGenerationSHA256",
+        "expectedPriorProjectionSHA256",
+        "nextDecisionSHA256",
+        "validatedFilesSHA256",
+        "validatedMountBindingSHA256"
+      ],
+      "additionalProperties": false
+    },
+    "InstallationAcknowledgement": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-authority-acknowledgement:1"
+        },
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "requestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "phase": {
+          "enum": [
+            "overlap",
+            "final"
+          ]
+        },
+        "generationSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "projectionDigestSHA256": {
+          "$ref": "#/$defs/SHA256"
+        },
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "observedRootIdentity": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RootIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rootReadonly": {
+          "enum": [
+            true,
+            null
+          ]
+        },
+        "mountBindingSHA256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SHA256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bootId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "operationalAcceptanceAssessed": {
+          "const": false
+        },
+        "nodeSignature": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{128}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "operationId",
+        "requestSHA256",
+        "identity",
+        "phase",
+        "generationSHA256",
+        "projectionDigestSHA256",
+        "authority",
+        "observedRootIdentity",
+        "rootReadonly",
+        "mountBindingSHA256",
+        "bootId",
+        "observedAt",
+        "operationalAcceptanceAssessed",
+        "nodeSignature"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/MountBinding"
+    },
+    {
+      "$ref": "#/$defs/RenewalProposal"
+    },
+    {
+      "$ref": "#/$defs/MigrationProposal"
+    },
+    {
+      "$ref": "#/$defs/NodeJournal"
+    },
+    {
+      "$ref": "#/$defs/CompoundDecision"
+    },
+    {
+      "$ref": "#/$defs/BatchJournal"
+    },
+    {
+      "$ref": "#/$defs/CompoundIntent"
+    },
+    {
+      "$ref": "#/$defs/InstallationAcknowledgement"
+    }
+  ]
+}

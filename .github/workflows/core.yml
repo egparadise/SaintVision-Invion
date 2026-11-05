@@ -19,6 +19,16 @@ on:
         required: false
         type: boolean
         default: false
+      run_fleet5_peer_phase_proof:
+        description: 'Early fixture-only native Go peer-phase proof; baseline rejection intentionally fails Core before expensive suites'
+        required: false
+        type: boolean
+        default: false
+      run_fleet5_peer_phase_fixed_proof:
+        description: 'Require two actual Go plain renewals and negative cases before the main Core suites'
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -92,6 +102,34 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
+      - name: FLEET5 early native Go peer-policy lifecycle proof
+        if: github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_proof
+        timeout-minutes: 5
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -B tests/proofs/run_fleet5_peer_phase_probe.py --output dist/fleet5-peer-phase-proof
+      - name: Publish FLEET5 native peer-phase proof (including expected baseline failure)
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-native-peer-phase-proof-${{ github.sha }}
+          path: dist/fleet5-peer-phase-proof/
+          if-no-files-found: error
+          retention-days: 30
+      - name: FLEET5 fixed native Go two-cycle proof
+        if: github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof
+        timeout-minutes: 7
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -B tests/proofs/run_fleet5_peer_phase_fixed_probe.py --output dist/fleet5-peer-phase-fixed-proof
+      - name: Publish FLEET5 fixed native proof
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-native-peer-phase-fixed-proof-${{ github.sha }}
+          path: dist/fleet5-peer-phase-fixed-proof/
+          if-no-files-found: error
+          retention-days: 30
       - name: Start digest-pinned product ObjectStore service
         run: |
           docker pull --platform linux/amd64 "$MINIO_IMAGE"

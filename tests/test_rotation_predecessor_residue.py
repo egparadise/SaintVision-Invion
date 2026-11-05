@@ -8,6 +8,7 @@ import os
 import pytest
 
 from test_lan_leaf_rotation_consecutive import _normal_cycles
+from test_lan_leaf_rotation import _plain_unit_transport
 from test_lan_leaf_rotation_batch_successor import _completed, _snapshot, lan_pilot, rotation
 
 

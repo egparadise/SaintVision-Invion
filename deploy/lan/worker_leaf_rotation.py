@@ -20,6 +20,8 @@ import stat
 import subprocess
 import sys
 from typing import Callable
+import peer_policy_phase as peer_phase
+import worker_peer_floor
 
 import cryptography
 from cryptography import x509
@@ -68,6 +70,28 @@ NODE_ID = re.compile(r"nod_[0-9A-HJKMNP-TV-Z]{26}\Z")
 MINIMUM_PYTHON = (3, 11)
 REQUIRED_CRYPTOGRAPHY = (50, 0, 1)
 MAXIMUM_OVERLAP_SECONDS = 21600
+
+
+def manifest_keys(schema):
+    if schema == peer_phase.SCHEMA:
+        return MANIFEST_KEYS | peer_phase.PEER_FIELDS
+    return OFFLINE_MANIFEST_KEYS if schema == OFFLINE_SCHEMA else MANIFEST_KEYS
+
+
+def file_names(manifest):
+    return (*FILE_NAMES, *peer_phase.EXTRA_FILES) if manifest.get("schemaVersion") == peer_phase.SCHEMA else FILE_NAMES
+
+
+def _peer_binding(manifest):
+    return peer_phase.binding(manifest)
+
+
+def observe_actual_floor(worker_root, manifest, files):
+    return worker_peer_floor.observe(worker_root, manifest, files)
+
+
+def floor_target_context(worker_root):
+    return worker_peer_floor.context(worker_root)
 
 
 def _version_tuple(value: str) -> tuple[int, int, int]:
@@ -197,6 +221,12 @@ def _historical_expired_leaf(
 
 
 def _policy(raw: bytes, *, manifest: dict, fingerprints: list[str], expires: str) -> dict:
+    if manifest.get("schemaVersion") == peer_phase.SCHEMA:
+        phase = "final" if expires == manifest["certificateNotAfter"] else "overlap"
+        value = peer_phase.validate_policy(raw, manifest, phase)
+        if value["clientFingerprints"] != fingerprints or value["expiresAt"] != expires:
+            raise ValueError("Peer phase authority differs")
+        return value
     value = json.loads(raw)
     expected = {
         "version": manifest["targetChannelVersion"],
@@ -218,20 +248,21 @@ def validate_bundle(
     now: datetime | None = None,
     installed: bool | None = False,
     finalized: bool = False,
+    _archived_public_material: tuple | None = None,
 ) -> dict:
     """Validate exact chain, Node/key binding, time window, and monotonic version."""
     now = now or datetime.now(timezone.utc)
-    manifest_raw = _regular(bundle / "rotation.json")
-    manifest = json.loads(manifest_raw)
+    manifest_raw = (_regular(bundle / "rotation.json") if _archived_public_material is None else _archived_public_material[0])
+    manifest = peer_phase.strict(manifest_raw)
     if not isinstance(manifest, dict):
         raise ValueError("Rotation manifest shape differs")
     schema = manifest.get("schemaVersion")
-    expected_keys = OFFLINE_MANIFEST_KEYS if schema == OFFLINE_SCHEMA else MANIFEST_KEYS
+    expected_keys = manifest_keys(schema)
     if set(manifest) != expected_keys:
         raise ValueError("Rotation manifest shape differs")
     offline = schema == OFFLINE_SCHEMA
     if (
-        schema not in {SCHEMA, OFFLINE_SCHEMA}
+        schema not in {SCHEMA, OFFLINE_SCHEMA, peer_phase.SCHEMA}
         or not isinstance(manifest["rotationId"], str)
         or not re.fullmatch(r"[0-9a-f]{32}", manifest["rotationId"])
         or not isinstance(manifest["tenantId"], str)
@@ -251,7 +282,7 @@ def validate_bundle(
             )
         )
         or not isinstance(manifest["files"], dict)
-        or set(manifest["files"]) != set(FILE_NAMES)
+        or set(manifest["files"]) != set(file_names(manifest))
         or any(
             not isinstance(value, str) or not HEX.fullmatch(value)
             for value in manifest["files"].values()
@@ -289,8 +320,10 @@ def validate_bundle(
     ):
         raise ValueError("Rotation overlap or certificate validity window is invalid")
 
-    files = {name: _regular(bundle / name) for name in FILE_NAMES}
-    if any(_digest(files[name]) != manifest["files"][name] for name in FILE_NAMES):
+    files = ({name: _regular(bundle / name) for name in file_names(manifest)} if _archived_public_material is None else _archived_public_material[1])
+    if set(files) != set(file_names(manifest)):
+        raise ValueError("Archived public material field set differs")
+    if any(_digest(files[name]) != manifest["files"][name] for name in file_names(manifest)):
         raise ValueError("Rotation public material digest differs")
     if _digest(files["ca.pem"]) != manifest["caBundleSHA256"]:
         raise ValueError("Rotation issuing chain differs")
@@ -384,6 +417,29 @@ def validate_bundle(
     )
     if next_control.fingerprint(hashes.SHA256()).hex() != manifest["nextControlCertificateSHA256"]:
         raise ValueError("Next Control Plane leaf fingerprint differs")
+    if schema == peer_phase.SCHEMA:
+        peer_phase.versions(manifest)
+        if not_after != min(next_node.not_valid_after_utc,next_control.not_valid_after_utc):
+            raise ValueError('Normal v3 certificate expiry tuple differs')
+        observation = peer_phase.strict(files["peer-floor-observation.json"])
+        if _digest(files["peer-floor-observation.json"]) != manifest["floorObservationSHA256"]:
+            raise ValueError("Frozen actual floor observation differs")
+        peer_phase.verify_floor(observation, files["previous-node-cert.pem"], manifest, fresh=False)
+        peer_phase.match_floor(observation, manifest, "current")
+        previous = x509.load_pem_x509_certificate(files["previous-node-cert.pem"])
+        old_policy = peer_phase.strict(files["previous-peer-policy.json"])
+        if (previous.fingerprint(hashes.SHA256()).hex() != manifest["currentNodeCertificateSHA256"]
+                or previous.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+                != next_node.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+                or _digest(files["previous-peer-policy.json"]) != manifest["currentPeerPolicySHA256"]
+                or type(old_policy.get("version")) is not int
+                or old_policy["version"] != manifest["currentPeerPolicyVersion"]
+                or (old_policy.get("tenantId"), old_policy.get("nodeId"), old_policy.get("recoveryEpoch")) != (manifest["tenantId"], manifest["nodeId"], manifest["recoveryEpoch"])
+                or old_policy.get("clientFingerprints") != [manifest["currentControlCertificateSHA256"]]):
+            raise ValueError("Previous actual peer policy/certificate tuple differs")
+        _leaf(files["previous-node-cert.pem"], intermediate=intermediate,
+              uri=f'spiffe://saintvision.ai/tenant/{manifest["tenantId"]}/node/{manifest["nodeId"]}/epoch/{manifest["recoveryEpoch"]}',
+              usage=ExtendedKeyUsageOID.SERVER_AUTH, now=_utc(manifest["createdAt"]), address=manifest["nodeIP"])
     overlap_fingerprints = (
         [manifest["nextControlCertificateSHA256"]]
         if offline
@@ -539,10 +595,34 @@ def _finalized_evidence(
         "certificateSHA256": manifest["nextNodeCertificateSHA256"],
         "committed": True,
     }
+    expected_journal = {**identity, "phase": "finalized", "restartRequired": False, "receipt": receipt}
+    archive_schema = "saintvision-node-finalized-rotation:1"
+    if manifest["schemaVersion"] == peer_phase.SCHEMA:
+        receipt_body.update(**_peer_binding(manifest), prePeerFloor=receipt.get("prePeerFloor"), postPeerFloor=receipt.get("postPeerFloor"))
+        commit_body.update(_peer_binding(manifest))
+        for value, phase_name, cert_name in ((receipt_body["prePeerFloor"], "current", "previous-node-cert.pem"),
+                                             (receipt_body["postPeerFloor"], "overlap", "node-cert.pem"),
+                                             (journal.get("finalPeerFloor"), "final", "node-cert.pem")):
+            peer_phase.verify_floor(value, files[cert_name], manifest, fresh=False)
+            peer_phase.match_floor(value, manifest, phase_name)
+        expected_journal.update(peerSchemaVersion=3, publicationIntent=True,
+                                peerPhaseBinding=_peer_binding(manifest),
+                                prePeerFloor=receipt_body["prePeerFloor"],
+                                targetContext=journal.get("targetContext"), finalPeerFloor=journal.get("finalPeerFloor"))
+        context = journal.get("targetContext")
+        if (not isinstance(context, dict) or set(context) != {"nodeId", "containerId", "image", "configSHA256", "hostConfigSHA256", "mountsSHA256", "volumeSHA256", "consumers"}
+                or context["nodeId"] != manifest["nodeId"] or not HEX.fullmatch(context["containerId"])
+                or not re.fullmatch(r"sha256:[0-9a-f]{64}", context.get("image", ""))
+                or any(not isinstance(context[k], str) or not HEX.fullmatch(context[k]) for k in ("configSHA256", "hostConfigSHA256", "mountsSHA256", "volumeSHA256"))
+                or not isinstance(context["consumers"], list) or not 1 <= len(context["consumers"]) <= 2
+                or any(not isinstance(cid, str) or not HEX.fullmatch(cid) for cid in context["consumers"])
+                or len(context["consumers"]) != len(set(context["consumers"]))
+                or context["containerId"] not in context["consumers"]):
+            raise ValueError("Finalized actual target binding differs")
+        archive_schema = "saintvision-node-finalized-rotation:3"
     if (
         json.loads(journal_raw) != journal
-        or journal
-        != {**identity, "phase": "finalized", "restartRequired": False, "receipt": receipt}
+        or journal != expected_journal
         or set(receipt) != {*receipt_body, "nodeSignature"}
         or any(receipt.get(key) != value for key, value in receipt_body.items())
         or not _utc(manifest["createdAt"])
@@ -564,7 +644,7 @@ def _finalized_evidence(
         )
     return _canonical(
         {
-            "schemaVersion": "saintvision-node-finalized-rotation:1",
+            "schemaVersion": archive_schema,
             "journal": journal,
             "journalRaw": journal_raw.decode("utf-8"),
             "rotationManifest": manifest_raw.decode("utf-8"),
@@ -598,18 +678,16 @@ def _finalized_successor(
     if (
         set(archive)
         != {"schemaVersion", "journal", "journalRaw", "rotationManifest", "files", "commitReceipt"}
-        or archive["schemaVersion"] != "saintvision-node-finalized-rotation:1"
+        or archive["schemaVersion"] not in {"saintvision-node-finalized-rotation:1", "saintvision-node-finalized-rotation:3"}
     ):
         raise ValueError("Finalized rotation archive shape differs")
     manifest_raw = archive["rotationManifest"].encode("utf-8")
     old = json.loads(manifest_raw)
-    expected_keys = (
-        OFFLINE_MANIFEST_KEYS if old.get("schemaVersion") == OFFLINE_SCHEMA else MANIFEST_KEYS
-    )
-    if set(old) != expected_keys or set(archive["files"]) != set(FILE_NAMES):
+    expected_keys = manifest_keys(old.get("schemaVersion"))
+    if set(old) != expected_keys or set(archive["files"]) != set(file_names(old)):
         raise ValueError("Finalized rotation archive manifest differs")
     files = {name: raw.encode("utf-8") for name, raw in archive["files"].items()}
-    if any(_digest(files[name]) != old["files"][name] for name in FILE_NAMES):
+    if any(_digest(files[name]) != old["files"][name] for name in file_names(old)):
         raise ValueError("Finalized rotation archive public material differs")
     verified_raw = _finalized_evidence(
         {"manifest": old, "files": files},
@@ -624,7 +702,7 @@ def _finalized_successor(
         or archive["journal"] != journal
         or journal.get("phase") != "finalized"
         or archive["journalRaw"].encode("utf-8") != _regular(worker_root / "leaf-rotation.json")
-        or new["schemaVersion"] != SCHEMA
+        or new["schemaVersion"] not in {SCHEMA, peer_phase.SCHEMA}
         or old["rotationId"] == new["rotationId"]
         or any(
             old[key] != new[key]
@@ -641,6 +719,13 @@ def _finalized_successor(
         or (archive_dir / f'{new["rotationId"]}.json').is_symlink()
     ):
         raise ValueError("Normal successor differs from the finalized generation")
+    if new["schemaVersion"] == peer_phase.SCHEMA:
+        prior_policy = peer_phase.strict(files["peer-policy-final.json"])
+        if (new["currentPeerPolicyVersion"] != prior_policy["version"]
+                or new["currentPeerPolicySHA256"] != _digest(files["peer-policy-final.json"])
+                or validated["files"]["previous-peer-policy.json"] != files["peer-policy-final.json"]
+                or validated["files"]["previous-node-cert.pem"] != files["node-cert.pem"]):
+            raise ValueError("Normal :1/:3 successor differs from actual finalized peer P/hash")
     intermediate = _certificates(files["ca.pem"])[0]
     for filename, uri, usage, address in (
         (
@@ -686,10 +771,10 @@ def _finalized_successor(
 
 
 def _finalization_body(
-    manifest: dict, manifest_raw: bytes, files: dict, evidence_raw: bytes
+    manifest: dict, manifest_raw: bytes, files: dict, evidence_raw: bytes, actual_final_floor=None
 ) -> dict:
     return {
-        "schemaVersion": "saintvision-node-finalized-attestation:1",
+        "schemaVersion": ("saintvision-node-finalized-attestation:3" if manifest["schemaVersion"] == peer_phase.SCHEMA else "saintvision-node-finalized-attestation:1"),
         "rotationId": manifest["rotationId"],
         "proposalDigest": _digest(manifest_raw),
         "tenantId": manifest["tenantId"],
@@ -701,6 +786,8 @@ def _finalization_body(
         "controlCertificateSHA256": manifest["nextControlCertificateSHA256"],
         "finalPeerPolicySHA256": _digest(files["peer-policy-final.json"]),
         "evidenceSHA256": _digest(evidence_raw),
+        **_peer_binding(manifest),
+        **({"actualFinalPeerFloor": actual_final_floor} if manifest["schemaVersion"] == peer_phase.SCHEMA else {}),
     }
 
 
@@ -710,11 +797,14 @@ def verify_finalized_attestation(value: dict, manifest_raw: bytes, files: dict) 
     evidence_raw = value["evidence"].encode("utf-8")
     proof = json.loads(evidence_raw)
     journal = proof["journal"]
-    expected = _finalization_body(manifest, manifest_raw, files, evidence_raw)
+    expected = _finalization_body(manifest, manifest_raw, files, evidence_raw, value.get("actualFinalPeerFloor"))
+    if manifest["schemaVersion"] == peer_phase.SCHEMA:
+        peer_phase.verify_floor(value.get("actualFinalPeerFloor"), files["node-cert.pem"], manifest, fresh=False)
+        peer_phase.match_floor(value["actualFinalPeerFloor"], manifest, "final")
     if (
         set(value) != {*expected, "evidence", "nodeSignature"}
         or any(value.get(key) != item for key, item in expected.items())
-        or proof.get("schemaVersion") != "saintvision-node-finalized-rotation:1"
+        or proof.get("schemaVersion") != ("saintvision-node-finalized-rotation:3" if manifest["schemaVersion"] == peer_phase.SCHEMA else "saintvision-node-finalized-rotation:1")
         or proof.get("rotationManifest") != manifest_raw.decode("utf-8")
         or proof.get("files") != {name: raw.decode("utf-8") for name, raw in files.items()}
         or _finalized_evidence(
@@ -745,7 +835,11 @@ def attest_finalized(bundle: Path, worker_root: Path, *, now: datetime | None = 
         archive_dir = worker_root / "leaf-rotation-finalized"
         _owned_directory(archive_dir)
         evidence_raw = _history_bytes(archive_dir / f'{manifest["rotationId"]}.json')
-        body = _finalization_body(manifest, _regular(bundle / "rotation.json"), files, evidence_raw)
+        actual_final = None
+        if manifest["schemaVersion"] == peer_phase.SCHEMA:
+            actual_final = observe_actual_floor(worker_root, manifest, files)
+            peer_phase.match_floor(actual_final, manifest, "final")
+        body = _finalization_body(manifest, _regular(bundle / "rotation.json"), files, evidence_raw, actual_final)
         private = serialization.load_pem_private_key(
             _regular(worker_root / "node-key.pem"), password=None
         )
@@ -770,6 +864,7 @@ def _supersede_expired_journal(
     *,
     now: datetime,
 ) -> None:
+    raise ValueError("Expired/partial Node publication is blocked for separately reviewed offline recovery")
     """Archive exactly one expired partial-batch journal before a fresh recovery install."""
     old_raw = _regular(old_bundle / "rotation.json")
     old_manifest = json.loads(old_raw)
@@ -839,131 +934,10 @@ def install(
 ) -> dict:
     """Install public material atomically, then restart; exact retries are idempotent."""
     runtime_preflight()
-    worker_root = worker_root.resolve()
-    worker_root.mkdir(parents=True, exist_ok=True)
-    with _exclusive(worker_root / "leaf-rotation.lock"):
-        journal_path = worker_root / "leaf-rotation.json"
-        journal_exists = journal_path.exists() or journal_path.is_symlink()
-        journal = json.loads(_regular(journal_path)) if journal_exists else None
-        if journal_exists and (
-            not isinstance(journal, dict)
-            or journal.get("phase")
-            not in {"installing", "installed", "restarted", "finalized", "rolled-back"}
-        ):
-            raise ValueError("Unknown or partial rotation journal state")
-        current_time = now or datetime.now(timezone.utc)
-        if journal and superseded_bundle is not None:
-            # Validate the fresh bundle before archiving the exact expired journal.
-            validate_bundle(bundle, worker_root, now=current_time, installed=False)
-            _supersede_expired_journal(
-                superseded_bundle,
-                bundle,
-                worker_root,
-                journal,
-                now=current_time,
-            )
-            journal = None
-        elif journal and superseded_bundle is None:
-            candidate_raw = _regular(bundle / "rotation.json")
-            candidate = json.loads(candidate_raw)
-            candidate_identity = {
-                "rotationId": candidate.get("rotationId"),
-                "proposalDigest": _digest(candidate_raw),
-                "targetChannelVersion": candidate.get("targetChannelVersion"),
-            }
-            if journal.get("phase") == "finalized" and candidate.get("rotationId") != journal.get(
-                "rotationId"
-            ):
-                validated = validate_bundle(bundle, worker_root, now=current_time, installed=False)
-                _finalized_successor(worker_root, journal, validated, now=current_time)
-                # The immutable archive retains the exact prior journal; replace the active
-                # slot only at the existing durable install-intent boundary below.
-                journal = None
-            if (
-                journal
-                and candidate.get("recoveryMode") == OFFLINE_RECOVERY_MODE
-                and any(journal.get(key) != value for key, value in candidate_identity.items())
-            ):
-                raise ValueError(
-                    "Fully expired staged recovery requires the exact superseded bundle"
-                )
-        validated = validate_bundle(
-            bundle,
-            worker_root,
-            now=current_time,
-            installed=(
-                None
-                if journal and journal.get("phase") == "installing"
-                else bool(
-                    journal and journal.get("phase") in {"installed", "restarted", "finalized"}
-                )
-            ),
-        )
-        manifest, files = validated["manifest"], validated["files"]
-        expected_identity = {
-            "rotationId": manifest["rotationId"],
-            "proposalDigest": validated["proposalDigest"],
-            "targetChannelVersion": manifest["targetChannelVersion"],
-        }
-        if journal and any(journal.get(key) != value for key, value in expected_identity.items()):
-            raise ValueError("Another leaf rotation or stale channel version is already journaled")
-        if journal and journal.get("phase") in {"finalized", "rolled-back"}:
-            raise ValueError("A completed leaf rotation cannot be installed again")
-        if journal and journal.get("phase") == "restarted":
-            return journal["receipt"]
-        kill("before-install")
-        backup = worker_root / "leaf-rotation-backup" / manifest["rotationId"]
-        _owned_directory(backup.parent)
-        _owned_directory(backup)
-        for name in ("node-cert.pem", "peer-policy.json"):
-            source = worker_root / name
-            target = backup / name
-            if (
-                journal is None
-                and (target.exists() or target.is_symlink())
-                and _regular(target) != _regular(source)
-            ):
-                raise ValueError("Rotation backup collision")
-            if not target.exists():
-                _atomic(target, _regular(source))
-        journal = {**expected_identity, "phase": "installing", "restartRequired": True}
-        _atomic(journal_path, _canonical(journal))
-        kill("after-intent")
-        _atomic(worker_root / "node-cert.pem", files["node-cert.pem"])
-        _atomic(worker_root / "peer-policy.json", files["peer-policy-overlap.json"])
-        kill("after-public-install")
-        journal = {**expected_identity, "phase": "installed", "restartRequired": True}
-        _atomic(journal_path, _canonical(journal))
-        kill("after-install")
-        kill("before-restart")
-        restart(worker_root)
-        installed_at = (now or datetime.now(timezone.utc)).isoformat().replace("+00:00", "Z")
-        receipt_body = {
-            "schemaVersion": manifest["schemaVersion"],
-            **expected_identity,
-            "nodeId": manifest["nodeId"],
-            "installedNodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
-            "installedAt": installed_at,
-            "restartObserved": True,
-        }
-        private = serialization.load_pem_private_key(
-            _regular(worker_root / "node-key.pem"), password=None
-        )
-        if not isinstance(private, Ed25519PrivateKey):
-            raise ValueError("Node receipt signing key type differs")
-        receipt = {
-            **receipt_body,
-            "nodeSignature": private.sign(_canonical(receipt_body)).hex(),
-        }
-        journal = {
-            **expected_identity,
-            "phase": "restarted",
-            "restartRequired": False,
-            "receipt": receipt,
-        }
-        _atomic(journal_path, _canonical(journal))
-        return receipt
-
+    if peer_phase.strict(_regular(Path(bundle) / "rotation.json")).get("schemaVersion") == peer_phase.SCHEMA:
+        from worker_plain_rotation import install as plain_install
+        return plain_install(bundle, worker_root, restart=restart, now=now, kill=kill, superseded_bundle=superseded_bundle)
+    raise ValueError("Legacy :1/:2 installation is blocked; normal renewal requires authenticated :3 actual floors; partial/expired state requires separate offline recovery")
 
 def finalize(
     bundle: Path,
@@ -975,9 +949,14 @@ def finalize(
 ) -> dict:
     """End bounded overlap only after the CP proves the same channel CAS committed."""
     runtime_preflight()
+    if peer_phase.strict(_regular(Path(bundle) / "rotation.json")).get("schemaVersion") == peer_phase.SCHEMA:
+        from worker_plain_rotation import finalize as plain_finalize
+        return plain_finalize(bundle, worker_root, commit_receipt, restart=restart, now=now)
     with _exclusive(worker_root / "leaf-rotation.lock"):
         journal_path = worker_root / "leaf-rotation.json"
         journal = json.loads(_regular(journal_path))
+        if journal.get("phase") != "finalized":
+            raise ValueError("Legacy in-flight finalization is blocked; only exact historical finalized archive replay is supported")
         validated = validate_bundle(
             bundle,
             worker_root,
@@ -1056,61 +1035,10 @@ def rollback(
 ) -> dict:
     """Restore the prior public material only while both prior authorities are fresh."""
     runtime_preflight()
-    now = now or datetime.now(timezone.utc)
-    with _exclusive(worker_root / "leaf-rotation.lock"):
-        manifest_raw = _regular(bundle / "rotation.json")
-        manifest = json.loads(manifest_raw)
-        if not isinstance(manifest, dict) or set(manifest) != MANIFEST_KEYS:
-            raise ValueError("Rotation manifest shape differs")
-        journal_path = worker_root / "leaf-rotation.json"
-        journal = json.loads(_regular(journal_path))
-        if (
-            journal.get("rotationId") != manifest["rotationId"]
-            or journal.get("proposalDigest") != _digest(manifest_raw)
-            or journal.get("phase") not in {"installing", "installed", "restarted", "rolled-back"}
-        ):
-            raise ValueError("Only the exact unfinalized rotation can roll back")
-        backup = worker_root / "leaf-rotation-backup" / manifest["rotationId"]
-        old_cert_raw = _regular(backup / "node-cert.pem")
-        old_policy_raw = _regular(backup / "peer-policy.json")
-        old_cert = x509.load_pem_x509_certificate(old_cert_raw)
-        old_policy = json.loads(old_policy_raw)
-        if (
-            old_cert.fingerprint(hashes.SHA256()).hex() != manifest["currentNodeCertificateSHA256"]
-            or not old_cert.not_valid_before_utc <= now < old_cert.not_valid_after_utc
-            or not isinstance(old_policy, dict)
-            or set(old_policy)
-            != {
-                "version",
-                "tenantId",
-                "nodeId",
-                "recoveryEpoch",
-                "expiresAt",
-                "clientFingerprints",
-            }
-            or old_policy["tenantId"] != manifest["tenantId"]
-            or old_policy["nodeId"] != manifest["nodeId"]
-            or old_policy["recoveryEpoch"] != manifest["recoveryEpoch"]
-            or old_policy["version"] != manifest["currentChannelVersion"]
-            or old_policy["clientFingerprints"] != [manifest["currentControlCertificateSHA256"]]
-            or _utc(old_policy["expiresAt"]) <= now
-        ):
-            raise ValueError("Prior public authority is expired or differs; rollback refused")
-        result = {
-            "rotationId": manifest["rotationId"],
-            "rolledBack": True,
-            "channelVersion": manifest["currentChannelVersion"],
-        }
-        if journal.get("phase") == "rolled-back":
-            return result
-        _atomic(worker_root / "node-cert.pem", old_cert_raw)
-        _atomic(worker_root / "peer-policy.json", old_policy_raw)
-        restart(worker_root)
-        journal["phase"] = "rolled-back"
-        journal["restartRequired"] = False
-        _atomic(journal_path, _canonical(journal))
-        return result
-
+    if peer_phase.strict(_regular(Path(bundle) / "rotation.json")).get("schemaVersion") == peer_phase.SCHEMA:
+        from worker_plain_rotation import rollback as plain_rollback
+        return plain_rollback(bundle, worker_root, restart=restart, now=now)
+    raise ValueError("Legacy rollback is blocked: publication and actual floor/CP state are unknown; preserve current bytes and journal for separate offline recovery")
 
 def docker_restart(worker_root: Path) -> None:
     manifest = json.loads((worker_root / "manifest.json").read_text("utf-8"))
@@ -1120,17 +1048,29 @@ def docker_restart(worker_root: Path) -> None:
     container = "saintvision-" + node_id.lower()
     from worker_config import check_running, install_files
 
-    install_files(container, worker_root)
-    subprocess.run(["docker", "restart", container], check=True, timeout=60, capture_output=True)
+    # A running Authority rereads peer bytes on every handshake. Stop the exact
+    # owned plain container BEFORE any volume copy; publication intent is already
+    # durable in :3 and every error thereafter remains forward-only/blocked.
+    _, _, before, _, _, _ = worker_peer_floor.target(worker_root)
+    subprocess.run(["docker", "stop", before["Id"]], check=True, timeout=60, capture_output=True)
+    _, _, stopped, _, _, _ = worker_peer_floor.target(worker_root)
+    if stopped["Id"] != before["Id"] or stopped["State"].get("Running"):
+        raise ValueError("Owned Node changed or did not quiesce before public-file copy")
+    install_files(container, worker_root, rotation_publication=True)
+    subprocess.run(["docker", "start", before["Id"]], check=True, timeout=60, capture_output=True)
     check_running(container)
 
 
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description=__doc__)
-    commands = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    commands = parser.add_subparsers(dest="command", required=True,
+                                    parser_class=lambda **kw: argparse.ArgumentParser(allow_abbrev=False, **kw))
     commands.add_parser("runtime-preflight")
+    floor_parser = commands.add_parser("observe-floor")
+    floor_parser.add_argument("--worker-root", type=Path, required=True)
+    floor_parser.add_argument("--nonce", required=True)
     install_parser = commands.add_parser("install")
     install_parser.add_argument("--bundle", type=Path, required=True)
     install_parser.add_argument("--worker-root", type=Path, required=True)
@@ -1149,10 +1089,24 @@ def main() -> None:
     rollback_parser = commands.add_parser("rollback")
     rollback_parser.add_argument("--bundle", type=Path, required=True)
     rollback_parser.add_argument("--worker-root", type=Path, required=True)
+    resume_parser = commands.add_parser('resume-publication')
+    resume_parser.add_argument('--bundle', type=Path, required=True)
+    resume_parser.add_argument('--worker-root', type=Path, required=True)
+    resume_parser.add_argument('--commit-receipt', type=Path)
+    settled_parser = commands.add_parser('verify-settled')
+    settled_parser.add_argument('--worker-root', type=Path, required=True)
+    repair_parser = commands.add_parser('repair-current')
+    repair_parser.add_argument('--worker-root', type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command == "runtime-preflight":
             result = runtime_preflight()
+        elif args.command == "observe-floor":
+            runtime_preflight()
+            metadata = peer_phase.strict(_regular(args.worker_root / "manifest.json"))
+            scope = {"nodeId": metadata["nodeId"], "tenantId": metadata["tenantId"], "recoveryEpoch": metadata["epoch"]}
+            result = worker_peer_floor.observe(args.worker_root, scope,
+                                               {"node-cert.pem": _regular(args.worker_root / "node-cert.pem")}, nonce=args.nonce)
         elif args.command == "install":
             result = install(
                 args.bundle,
@@ -1166,6 +1120,19 @@ def main() -> None:
             )
         elif args.command == "attest-finalized":
             result = attest_finalized(args.bundle, args.worker_root)
+        elif args.command in {'resume-publication','verify-settled','repair-current'}:
+            runtime_preflight()
+            import worker_plain_rotation as plain
+            import worker_config
+            worker_config._settled_verifier = plain.verify_settled
+            if args.command == 'resume-publication':
+                result = plain.resume_publication(args.bundle,args.worker_root,commit_receipt=args.commit_receipt)
+            elif args.command == 'verify-settled':
+                result = plain.verify_settled(args.worker_root)
+            else:
+                metadata = peer_phase.strict(_regular(args.worker_root/'manifest.json'))
+                worker_config.install_files('saintvision-'+metadata['nodeId'].lower(),args.worker_root)
+                result = {'schemaVersion':'saintvision-settled-repair:1','sameBytesVerified':True,'acceptanceAssessed':False}
         else:
             result = rollback(args.bundle, args.worker_root, restart=docker_restart)
         print(json.dumps(result, sort_keys=True))

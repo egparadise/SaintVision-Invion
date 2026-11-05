@@ -16,6 +16,7 @@ from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 
 from test_lan_leaf_rotation import (
+    _plain_unit_transport,
     NODE_ID,
     _BatchConnection,
     _batch_worker,
@@ -63,7 +64,7 @@ def _normal_cycles(tmp_path, monkeypatch):
     )
     args.safety_window_hours = 48
     args.leaf_valid_seconds = 6 * 86400
-    args.overlap_seconds = 120
+    args.overlap_seconds = 3600
     restarts = []
 
     def prepare(cycle):
@@ -130,7 +131,7 @@ def test_two_server_issued_normal_cycles_keep_generation_and_immutable_history(
     new = json.loads((case.second / "rotation.json").read_bytes())
     assert json.loads(case.journal_raw)["phase"] == "finalized"
     assert old["rotationId"] != new["rotationId"]
-    assert old["schemaVersion"] == new["schemaVersion"] == rotation.SCHEMA
+    assert old["schemaVersion"] == new["schemaVersion"] == "saintvision-lan-leaf-rotation:3"
     assert old["targetChannelVersion"] == new["currentChannelVersion"] == 8
     assert new["targetChannelVersion"] == 9
     assert old["nextNodeCertificateSHA256"] == new["currentNodeCertificateSHA256"]
@@ -390,7 +391,7 @@ def test_successor_refuses_group_writable_archive_directory(tmp_path, monkeypatc
 
 @pytest.mark.parametrize(
     "point",
-    ["before-install", "after-intent", "after-public-install", "after-install", "before-restart"],
+    ["before-install", "after-publication-intent", "after-overlap-publication", "after-restart-before-ack", "before-restart"],
 )
 def test_successor_crash_resume_keeps_prior_archive_and_backup(tmp_path, monkeypatch, point):
     case = _normal_cycles(tmp_path, monkeypatch)
@@ -414,21 +415,13 @@ def test_successor_lock_refuses_concurrent_writer(tmp_path, monkeypatch):
             case.install(case.second)
 
 
-def test_successor_uncommitted_rollback_restores_exact_prior_finalized_authority(
-    tmp_path, monkeypatch
-):
+def test_successor_publication_rollback_is_refused_and_preserves_prior_archive(tmp_path, monkeypatch):
     case = _normal_cycles(tmp_path, monkeypatch)
-    before_cert = (case.worker / "node-cert.pem").read_bytes()
-    before_policy = (case.worker / "peer-policy.json").read_bytes()
-    archives = {p.name: p.read_bytes() for p in (case.worker / "leaf-rotation-finalized").iterdir()}
     case.install(case.second)
-    result = rotation.rollback(case.second, case.worker, now=case.now(), restart=lambda _root: None)
-    assert result["channelVersion"] == 8
-    assert (case.worker / "node-cert.pem").read_bytes() == before_cert
-    assert (case.worker / "peer-policy.json").read_bytes() == before_policy
-    assert {
-        p.name: p.read_bytes() for p in (case.worker / "leaf-rotation-finalized").iterdir()
-    } == archives
+    before = _snapshot(case.worker)
+    with pytest.raises(ValueError, match="forward-only"):
+        rotation.rollback(case.second, case.worker, now=case.now(), restart=lambda _: pytest.fail("old restart"))
+    assert _snapshot(case.worker) == before
 
 
 def test_unfinalized_overlap_and_expired_legacy_finalize_remain_refused(tmp_path, monkeypatch):

@@ -1,0 +1,450 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:plain-peer-phase:3",
+  "$comment": "Closed wire shapes only; production validation also enforces independent P+1/P+2 and C+1 arithmetic, exact raw bytes, signatures, real journal/process ownership, nonce freshness, expiry and immutable predecessor evidence. No storage or offline recovery authority.",
+  "$defs": {
+    "Proposal": {
+      "type": "object",
+      "properties": {
+        "nodeId": {
+          "type": "string"
+        },
+        "recoveryEpoch": {
+          "type": "string"
+        },
+        "nextNodeCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "targetChannelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "overlapPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "overlapPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "overlapExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "files": {
+          "type": "object",
+          "properties": {
+            "ca.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "node-cert.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "control-cert.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "peer-policy-overlap.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "peer-policy-final.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "previous-node-cert.pem": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "previous-peer-policy.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "peer-floor-observation.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "ca.pem",
+            "control-cert.pem",
+            "node-cert.pem",
+            "peer-floor-observation.json",
+            "peer-policy-final.json",
+            "peer-policy-overlap.json",
+            "previous-node-cert.pem",
+            "previous-peer-policy.json"
+          ],
+          "additionalProperties": false
+        },
+        "nextControlCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "currentControlCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "currentChannelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "finalPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "currentNodeCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "certificateNotAfter": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "floorObservationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "nodeIP": {
+          "type": "string"
+        },
+        "currentPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "caBundleSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rotationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "schemaVersion": {
+          "const": "saintvision-lan-leaf-rotation:3"
+        },
+        "finalPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "caBundleSHA256",
+        "certificateNotAfter",
+        "createdAt",
+        "currentChannelVersion",
+        "currentControlCertificateSHA256",
+        "currentNodeCertificateSHA256",
+        "currentPeerPolicySHA256",
+        "currentPeerPolicyVersion",
+        "files",
+        "finalPeerPolicySHA256",
+        "finalPeerPolicyVersion",
+        "floorObservationSHA256",
+        "nextControlCertificateSHA256",
+        "nextNodeCertificateSHA256",
+        "nodeIP",
+        "nodeId",
+        "overlapExpiresAt",
+        "overlapPeerPolicySHA256",
+        "overlapPeerPolicyVersion",
+        "recoveryEpoch",
+        "rotationId",
+        "schemaVersion",
+        "targetChannelVersion",
+        "tenantId"
+      ],
+      "additionalProperties": false
+    },
+    "FloorObservation": {
+      "type": "object",
+      "properties": {
+        "nodeId": {
+          "type": "string"
+        },
+        "plainServingProcess": {
+          "const": true
+        },
+        "recoveryEpoch": {
+          "type": "string"
+        },
+        "nodeSignature": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        },
+        "peerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "certificateDER_SHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingProcessSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "journalIdentitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "peerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "journalUID": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "servingPID": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "schemaVersion": {
+          "const": "saintvision-node-peer-policy-floor:2"
+        },
+        "floorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "servingExecutableSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "certificateDER_SHA256",
+        "floorSHA256",
+        "journalIdentitySHA256",
+        "journalUID",
+        "nodeId",
+        "nodeSignature",
+        "nonce",
+        "observedAt",
+        "peerPolicySHA256",
+        "peerPolicyVersion",
+        "plainServingProcess",
+        "recoveryEpoch",
+        "schemaVersion",
+        "servingExecutableSHA256",
+        "servingPID",
+        "servingProcessSHA256",
+        "tenantId"
+      ],
+      "additionalProperties": false
+    },
+    "InstallReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-lan-leaf-rotation:3"
+        },
+        "rotationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "proposalDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "targetChannelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "installedNodeCertificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "installedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "restartObserved": {
+          "const": true
+        },
+        "overlapPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "overlapPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finalPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finalPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "floorObservationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "prePeerFloor": {
+          "$ref": "#/$defs/FloorObservation"
+        },
+        "postPeerFloor": {
+          "$ref": "#/$defs/FloorObservation"
+        },
+        "nodeSignature": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "currentPeerPolicySHA256",
+        "currentPeerPolicyVersion",
+        "finalPeerPolicySHA256",
+        "finalPeerPolicyVersion",
+        "floorObservationSHA256",
+        "installedAt",
+        "installedNodeCertificateSHA256",
+        "nodeId",
+        "nodeSignature",
+        "overlapPeerPolicySHA256",
+        "overlapPeerPolicyVersion",
+        "postPeerFloor",
+        "prePeerFloor",
+        "proposalDigest",
+        "restartObserved",
+        "rotationId",
+        "schemaVersion",
+        "targetChannelVersion"
+      ],
+      "additionalProperties": false
+    },
+    "CommitReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-lan-leaf-rotation:3"
+        },
+        "rotationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "proposalDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "channelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "certificateSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "committed": {
+          "const": true
+        },
+        "overlapPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "overlapPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "currentPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finalPeerPolicySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finalPeerPolicyVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "floorObservationSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "controlSignature": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      },
+      "required": [
+        "certificateSHA256",
+        "channelVersion",
+        "committed",
+        "controlSignature",
+        "currentPeerPolicySHA256",
+        "currentPeerPolicyVersion",
+        "finalPeerPolicySHA256",
+        "finalPeerPolicyVersion",
+        "floorObservationSHA256",
+        "nodeId",
+        "overlapPeerPolicySHA256",
+        "overlapPeerPolicyVersion",
+        "proposalDigest",
+        "rotationId",
+        "schemaVersion"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

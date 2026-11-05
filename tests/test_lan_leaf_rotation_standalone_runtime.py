@@ -129,6 +129,8 @@ def test_reviewed_lock_is_exactly_two_observed_abis_and_four_pypi_wheels():
             (ROOT / "deploy/lan/worker_config.py").read_bytes()
         ).hexdigest(),
         "worker_leaf_rotation.py": runtime.WORKER_SHA256,
+        **{name: hashlib.sha256((ROOT / "deploy/lan" / name).read_bytes()).hexdigest()
+           for name in ("peer_policy_phase.py", "worker_peer_floor.py", "worker_plain_rotation.py")},
     }
 
 
@@ -139,6 +141,9 @@ def test_worker_local_import_closure_is_exact_and_missing_module_fails_before_do
     assert set(runtime._worker_sources()) == {
         "worker_leaf_rotation.py",
         "worker_config.py",
+        "peer_policy_phase.py",
+        "worker_peer_floor.py",
+        "worker_plain_rotation.py",
     }
     monkeypatch.setattr(
         runtime,
@@ -194,7 +199,7 @@ def test_install_is_atomic_idempotent_and_rejects_changed_installed_file(tmp_pat
     first = runtime.install(bundle, destination)
     second = runtime.install(bundle, destination)
     assert first == second
-    assert first["fileCount"] == 8
+    assert first["fileCount"] == 6 + len(runtime.WORKER_MODULES)
     assert set(path.name for path in destination.parent.iterdir()) == {"runtime.zip", "installed"}
     (destination / "cryptography/__init__.py").write_text("changed", encoding="utf-8")
     with pytest.raises(ValueError, match="files differ"):

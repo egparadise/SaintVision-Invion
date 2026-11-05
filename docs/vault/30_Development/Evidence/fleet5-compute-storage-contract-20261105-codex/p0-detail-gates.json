@@ -1,0 +1,52 @@
+[
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "exit": 0,
+    "log": "p0-detail-gate-1.txt"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "exit": 0,
+    "log": "p0-detail-gate-2.txt"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "log": "p0-detail-gate-3.txt"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "5023ce7d72b7f13431cb6a7182e2677eb6926662"
+    ],
+    "exit": 0,
+    "log": "p0-detail-gate-4.txt"
+  },
+  {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "exit": 0,
+    "log": "p0-detail-gate-5.txt"
+  }
+]

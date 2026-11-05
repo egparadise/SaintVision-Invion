@@ -1,0 +1,309 @@
+{
+  "sourceSHA": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "headSHA": "fe7ebeff1f695e0744a7f25eace52c7321dcc1d7",
+  "sourceBindings": [
+    {
+      "path": "tools/lan_pilot.py",
+      "sha256": "bce8aa36ffced4e73646e52483f5ad77dc3d9e42445ce543402834986c4a6077"
+    },
+    {
+      "path": "tools/lan_pki.py",
+      "sha256": "8880087eacc4729795d344b65eaaefed907dcb748c87243328ae461d8b867d5c"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "sha256": "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06"
+    },
+    {
+      "path": "tests/test_lan_leaf_rotation.py",
+      "sha256": "36f8994dd154e916bef9fa341a8aa47d29ebc4076af2938dcda6cf6cec814370"
+    },
+    {
+      "path": "packages/contracts-go/contracts.go",
+      "sha256": "f18069a8dc8ae6190879be48c32435e6e572802971ac4a44034dfaa71c71a75b"
+    },
+    {
+      "path": "packages/contracts-go/go.mod",
+      "sha256": "bb5f6271d1e4cf852c090adc57abaa235afe1c2e7fbfc28240a8fcc12a8804c3"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-discover/main.go",
+      "sha256": "714a73d868540a0e72b82c5b4692aec199e1809693677179ee03ba405dced46d"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "sha256": "e4f8803823838d04a4bfbf783b36b9117383742d66ba4452836d69a8ec773fb9"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/main_linux.go",
+      "sha256": "d22c7526f17f5d4d64b18ca09883c3c7d77379096898779db14375cdd081757a"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/main_other.go",
+      "sha256": "d2e97c48326b9df151f935b5bf087edc054b50413469c2ae53491cc80ee4990e"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/output_linux.go",
+      "sha256": "22dc00ceb15ac4b94e802db7239ff52cc395b77e28efd27d057da3de447a498a"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/output_linux_test.go",
+      "sha256": "2d341e39926aa917b24ab7b1fc108b978dd9bd1563fbee60102850502c3d684f"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/terminal_linux.go",
+      "sha256": "4b94bfd5bada1d5c435f9fbe063d984b4960c59dd61c12fa564a1ed8cefa0417"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/terminal_linux_test.go",
+      "sha256": "b2c0abe054944b682294b2bbc16fb77b917f39800131ae1e7f37292be061f89a"
+    },
+    {
+      "path": "services/node-agent/discovery/announce.go",
+      "sha256": "8cb2ef8e3d94f5e12c5e1d0b87d58fb9497e63359939513b046bee04ac25106a"
+    },
+    {
+      "path": "services/node-agent/discovery/announce_test.go",
+      "sha256": "f992448077bc1a9db4eb01aa2f6ded115207e8879702242737a7d3d6cdb49215"
+    },
+    {
+      "path": "services/node-agent/go.mod",
+      "sha256": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990"
+    },
+    {
+      "path": "services/node-agent/go.sum",
+      "sha256": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d"
+    },
+    {
+      "path": "services/node-agent/internal/wire/core.schema.json",
+      "sha256": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea"
+    },
+    {
+      "path": "services/node-agent/internal/wire/model_manifest.go",
+      "sha256": "aa8924f0d13288a6d5e85c1e7770b38b29804fecba759eb720f00df1da596d80"
+    },
+    {
+      "path": "services/node-agent/internal/wire/model_manifest_test.go",
+      "sha256": "93ba48caf2ab560cf7ff662d0d3debce255b6d616b7470a4a7d805066760d6e4"
+    },
+    {
+      "path": "services/node-agent/internal/wire/validate.go",
+      "sha256": "98f936024ebbf68727af0ef2b6f02bdd1afd8c4eecda431b3718fa2dc506609b"
+    },
+    {
+      "path": "services/node-agent/runtime/cleanup_test.go",
+      "sha256": "8d7ec2bd46942bda5b553ea9da6e8f63e46941c31ca9eedd90a9981394460f4a"
+    },
+    {
+      "path": "services/node-agent/runtime/docker.go",
+      "sha256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb"
+    },
+    {
+      "path": "services/node-agent/runtime/docker_linux_test.go",
+      "sha256": "9911199b00e918ffe19a4a7ac5f6f53fa843533bdec957b99e113543fff727ed"
+    },
+    {
+      "path": "services/node-agent/runtime/docker_test.go",
+      "sha256": "d6f97b2495c70f787c7d7ae525fe8a9ae373beb54027478e1bcf77982acf89a6"
+    },
+    {
+      "path": "services/node-agent/runtime/journal.go",
+      "sha256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6"
+    },
+    {
+      "path": "services/node-agent/runtime/lock_linux.go",
+      "sha256": "11dc4f3e4d6c123b8c62e4ea25f29b051b0284008f9089b07cbb54366debbc76"
+    },
+    {
+      "path": "services/node-agent/runtime/lock_other.go",
+      "sha256": "6cb2c3a64503f9c9e0ce8aab2533b9d6fbdaa9c75d248383d95ce5e54a42d82c"
+    },
+    {
+      "path": "services/node-agent/runtime/permit.go",
+      "sha256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b"
+    },
+    {
+      "path": "services/node-agent/runtime/permit_test.go",
+      "sha256": "61fd502cca8e44ca548076ce5a78136a388b7c86ee83f964d005fcbba9c59e58"
+    },
+    {
+      "path": "services/node-agent/runtime/quarantine.go",
+      "sha256": "ad77f4139fd4cacfd36a48e0b777023f52870ace400bcf939bd528efb9db2f95"
+    },
+    {
+      "path": "services/node-agent/runtime/quarantine_linux_test.go",
+      "sha256": "c336c9f92390caa3af77148ff2c41e7374f329e7e66390959cebf7f32b965069"
+    },
+    {
+      "path": "services/node-agent/runtime/runner.go",
+      "sha256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9"
+    },
+    {
+      "path": "services/node-agent/runtime/runner_linux_test.go",
+      "sha256": "07f7feb1bdc391d32e9f519ddf562d65fefd1eeda01fa8f8e8cdf53be889c7af"
+    },
+    {
+      "path": "services/node-agent/runtime/storage_policy.go",
+      "sha256": "8a15937331502f5f94abc2e489d0f0c9cfe48473b857e6bd266218a69b8cb33f"
+    },
+    {
+      "path": "services/node-agent/runtime/terminal.go",
+      "sha256": "54734a4c72e2357fdba6f4aba14c0008a0817d01736515e1bffb0c1bdb5d271f"
+    },
+    {
+      "path": "services/node-agent/runtime/terminal_test.go",
+      "sha256": "0858cc4b125096b4d285ab342c4ce211c4aff1dc8d4778a57e6371d38aa67a7f"
+    },
+    {
+      "path": "services/node-agent/storage/root_linux.go",
+      "sha256": "f174c3b9e6971c273ddf53c77e119e6f335708cf66b96bba0a908aeae1609596"
+    },
+    {
+      "path": "services/node-agent/storage/root_linux_test.go",
+      "sha256": "0ec0df6f95b8ae7dbdf0663ea394697511b76b32b46859773201a98e146cbad2"
+    },
+    {
+      "path": "services/node-agent/storage/root_other.go",
+      "sha256": "ae93cf6c4923f3241bd9968fbbd2339f29b9cba949d9520bb2ebbda824351c76"
+    },
+    {
+      "path": "services/node-agent/storage/sample.go",
+      "sha256": "296892a8a2b3a80c9146daf9922fe195a3c0808de81da08b8b11b28798f9a7c8"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_linux.go",
+      "sha256": "0ac19ab585bf545915057726f5f042b589d633385cdf01c5592aa1588c8fea42"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_linux_test.go",
+      "sha256": "e575105d88b78c8ea5620e3783a6c8fd573d1b9dba3eadbb121601d36f739970"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_other.go",
+      "sha256": "f0123818fe2780660037423df195d3d808e9f7ad774df561a2db0f96c21b8994"
+    },
+    {
+      "path": "services/node-agent/tests/probe/main.go",
+      "sha256": "aceae2b1173dd1e03292eada3a8206eb0aa437df5683785d6b7cfcfcbc5b19cf"
+    },
+    {
+      "path": "services/node-agent/transfer/chunks_linux.go",
+      "sha256": "78cfa1031357f3e66feb147783efc2d8e106debc1675eee5b8cd6457615d9eff"
+    },
+    {
+      "path": "services/node-agent/transfer/chunks_other.go",
+      "sha256": "4174eae9b2b31f740480e92809e729d0688798020b8324098d1a73e0086e4c20"
+    },
+    {
+      "path": "services/node-agent/transport/server.go",
+      "sha256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2"
+    },
+    {
+      "path": "services/node-agent/transport/server_test.go",
+      "sha256": "420322143669a542f6d576a0c8dde3a791f459ceb00cf14bbfb261796b557776"
+    },
+    {
+      "path": "services/node-agent/transport/storage.go",
+      "sha256": "9bf91ac747df5e9ceb14ffa990d73e8384ddb024f1ecec66630f00d0c00e6e12"
+    },
+    {
+      "path": "services/node-agent/transport/storage_test.go",
+      "sha256": "3387b33ccd6a6dca845f93cf32ad0a2ce0bd681364262db707fdc1febaa4cfa0"
+    },
+    {
+      "path": "services/node-agent/transport/trust.go",
+      "sha256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df"
+    },
+    {
+      "path": "services/node-agent/workspace/files_linux.go",
+      "sha256": "70b44b5bd56d1e3c88783c64bc4c1fc4fee63992af66f3bcdfff9e1950395db5"
+    },
+    {
+      "path": "services/node-agent/workspace/files_linux_test.go",
+      "sha256": "945dfca4500e936817a60230cf85aefd7c6282ff65cd16968f898131bbed8d70"
+    },
+    {
+      "path": "services/node-agent/workspace/manifest.go",
+      "sha256": "da7eb319bf87037e9930a5d6425a210ed910523b4c9cd0aa188832b2d97574f6"
+    },
+    {
+      "path": "services/node-agent/workspace/manifest_test.go",
+      "sha256": "90feaf9dd1c028fed559d765187887184b40c4958ae0c9c94f2d0a51ceee6343"
+    }
+  ],
+  "scope": "ci-fixture-native-go-peer-phase",
+  "hostDockerUsed": false,
+  "privateFixtureKeysUploaded": false,
+  "operationalAcceptanceAssessed": false,
+  "generatedCycles": [
+    {
+      "cycle": 1,
+      "manifestSHA256": "83365624509aa58f32ee87b2ae0338207933a1a7322570e23fc584587abd86c6",
+      "manifest": {
+        "schemaVersion": "saintvision-lan-leaf-rotation:1",
+        "rotationId": "11111111111111111111111111111111",
+        "tenantId": "00000000-0000-4000-8000-000000000001",
+        "nodeId": "nod_00000000000000000000000000",
+        "recoveryEpoch": "00000000-0000-4000-8000-000000000002",
+        "nodeIP": "192.0.2.2",
+        "currentChannelVersion": 7,
+        "targetChannelVersion": 8,
+        "currentNodeCertificateSHA256": "53b3a0a9051eed7539165f1d899297e6b6127ab20d4e243071ca03b629fedade",
+        "nextNodeCertificateSHA256": "5e9914919b970e20e88a84a1ea012bd01df3f126abd2196d5b58b4b6a1e61c0b",
+        "currentControlCertificateSHA256": "a644578dd4d59aa9cc21bf53409b69fcc7527e41fd891fb1637b63b2db56e1de",
+        "nextControlCertificateSHA256": "49489bc436f5a39843c8026b230e88aa5b9db9a57c4954a366ab1b0801736d5f",
+        "caBundleSHA256": "9ac5b960911cf3aaeacba9e2a218b9bfa8e0c2fb1bbf2ee7da69f4af21b42dc0",
+        "createdAt": "2026-11-05T10:56:33Z",
+        "overlapExpiresAt": "2026-11-05T11:56:33Z",
+        "certificateNotAfter": "2026-11-05T16:56:33Z",
+        "files": {
+          "ca.pem": "9ac5b960911cf3aaeacba9e2a218b9bfa8e0c2fb1bbf2ee7da69f4af21b42dc0",
+          "node-cert.pem": "e6b3b36d42ccc2893c27ddea794eb550d417b95776cd4c2c631491459248ba0d",
+          "control-cert.pem": "9a6c62259a0083e8c83aa8ad7bd44577c6f42d0e32884b50e3c868c1f6cadc4b",
+          "peer-policy-overlap.json": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+          "peer-policy-final.json": "73f0c7ee73289acb42b4863731da87a0268fee86f585855952b2d596b9a69580"
+        }
+      },
+      "overlapPolicySHA256": "514aded116b8dc9be726f89293e3fc03fd8b211b0e182ee5f4cda25c1b7b0895",
+      "finalPolicySHA256": "73f0c7ee73289acb42b4863731da87a0268fee86f585855952b2d596b9a69580",
+      "phaseVersionsEqual": true,
+      "phaseBytesDiffer": true
+    },
+    {
+      "cycle": 2,
+      "manifestSHA256": "7e93a061153eec4afe23315b46921b1bf0cd571bcd742948ad58a6790e9c2021",
+      "manifest": {
+        "schemaVersion": "saintvision-lan-leaf-rotation:1",
+        "rotationId": "22222222222222222222222222222222",
+        "tenantId": "00000000-0000-4000-8000-000000000001",
+        "nodeId": "nod_00000000000000000000000000",
+        "recoveryEpoch": "00000000-0000-4000-8000-000000000002",
+        "nodeIP": "192.0.2.2",
+        "currentChannelVersion": 8,
+        "targetChannelVersion": 9,
+        "currentNodeCertificateSHA256": "5e9914919b970e20e88a84a1ea012bd01df3f126abd2196d5b58b4b6a1e61c0b",
+        "nextNodeCertificateSHA256": "bce10feb7aaae2bd799f60fa92896ec0e85b3474c9378b688aa261ea8ea56eb4",
+        "currentControlCertificateSHA256": "49489bc436f5a39843c8026b230e88aa5b9db9a57c4954a366ab1b0801736d5f",
+        "nextControlCertificateSHA256": "d233283fe364851158b4eac6f6250ab42dde2c58b94fdab7073464afacc5f8ea",
+        "caBundleSHA256": "9ac5b960911cf3aaeacba9e2a218b9bfa8e0c2fb1bbf2ee7da69f4af21b42dc0",
+        "createdAt": "2026-11-05T10:56:33Z",
+        "overlapExpiresAt": "2026-11-05T11:56:33Z",
+        "certificateNotAfter": "2026-11-05T16:56:33Z",
+        "files": {
+          "ca.pem": "9ac5b960911cf3aaeacba9e2a218b9bfa8e0c2fb1bbf2ee7da69f4af21b42dc0",
+          "node-cert.pem": "51544e30d1a3e57dce710cc2eb32129d2124d45eeb6a754437c81c7f8d69a2f9",
+          "control-cert.pem": "8edbe462db50b4882cbbabd1385789a13e88b02de845e7e07077ed72241b88e7",
+          "peer-policy-overlap.json": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+          "peer-policy-final.json": "b9f1d6408c46712b513ee2b9b70a4171e6722ff1f0bca2ba2d72cfb0f24a3d87"
+        }
+      },
+      "overlapPolicySHA256": "56aa6074d9ffae0f018ec03f1822e589f0e69e5e92a676326f85d8650573c178",
+      "finalPolicySHA256": "b9f1d6408c46712b513ee2b9b70a4171e6722ff1f0bca2ba2d72cfb0f24a3d87",
+      "phaseVersionsEqual": true,
+      "phaseBytesDiffer": true
+    }
+  ],
+  "goTestExit": 1,
+  "classification": "expected-baseline-contract-mismatch",
+  "proofValid": true
+}

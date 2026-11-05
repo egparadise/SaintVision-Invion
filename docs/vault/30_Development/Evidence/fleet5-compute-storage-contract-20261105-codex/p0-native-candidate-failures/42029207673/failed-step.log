@@ -1,0 +1,29 @@
+core	FLEET5 fixed native Go two-cycle proof	﻿2026-11-05T12:41:28.3111793Z ##[group]Run python -B tests/proofs/run_fleet5_peer_phase_fixed_probe.py --output dist/fleet5-peer-phase-fixed-proof
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3112711Z ^[[36;1mpython -B tests/proofs/run_fleet5_peer_phase_fixed_probe.py --output dist/fleet5-peer-phase-fixed-proof^[[0m
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3147714Z shell: /usr/bin/bash -e {0}
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3148000Z env:
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3148563Z   INV_TEST_ADMIN_DSN: ***127.0.0.1:5432/postgres
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3149049Z   INV_TEST_EVIDENCE_DIR: /home/runner/work/SaintVision-Invion/SaintVision-Invion/dist
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3149729Z   MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3150270Z   MINIO_ROOT_USER: product-store-ci
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3150624Z   MINIO_ROOT_PASSWORD: product-store-ci-only-secret
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3151010Z   INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3151379Z   INV_OBJECT_STORE_BUCKET: saintvision-product-ci
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3151741Z   INV_OBJECT_STORE_ACCESS_KEY_ID: product-store-ci
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3152176Z   INV_OBJECT_STORE_SECRET_ACCESS_KEY: product-store-ci-only-secret
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3152560Z   INV_OBJECT_STORE_REGION: us-east-1
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3152875Z   INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3153260Z   INV_EVIDENCE_CODE_SHA: 526d48e4bdcbb0b363d6e45bfc5635fcc1584d2a
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3153645Z   INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3154008Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3154458Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3154905Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3155305Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3155695Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3156097Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3156644Z   PYTHONDONTWRITEBYTECODE: 1
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:28.3156917Z ##[endgroup]
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:29.0007681Z go: downloading golang.org/x/text v0.14.0
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:29.0009048Z go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:45.8341198Z Fixed native proof failed (not green): InvalidSignature: 
+core	FLEET5 fixed native Go two-cycle proof	2026-11-05T12:41:45.8955709Z ##[error]Process completed with exit code 1.

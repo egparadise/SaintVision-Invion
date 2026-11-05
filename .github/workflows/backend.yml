@@ -129,7 +129,7 @@ jobs:
           second = json.loads((root / 'leaf-runtime-second-preflight.json').read_text('utf-8'))
           lifecycle = json.loads((root / 'leaf-runtime-lifecycle.json').read_text('utf-8'))
           assert build['wheelCount'] == 4
-          assert build['workerModuleCount'] == 2
+          assert build['workerModuleCount'] == 5
           assert install['schemaVersion'] == 'saintvision-leaf-rotation-runtime-install:2'
           assert install['platformKey'] in {
               'cpython-312-x86_64-linux-gnu',
@@ -141,19 +141,28 @@ jobs:
           assert reinstall == install
           assert second == preflight
           assert lifecycle == {
+              'schemaVersion': 'saintvision-leaf-rotation-standalone-lifecycle:3',
+              'fixtureOnly': True,
+              'actualGoAcceptanceAssessed': False,
+              'completedNormalCycles': 2,
               'bytecodeCacheCount': 0,
               'finalized': True,
               'finalizedAttestationVerified': True,
               'installRestartReceipt': True,
               'restartCount': 4,
-              'rolledBack': True,
+              'rolledBack': False,
+              'rollbackRejected': True,
           }
           assert lifecycle['finalized'] is True
           assert lifecycle['finalizedAttestationVerified'] is True
           assert lifecycle['installRestartReceipt'] is True
-          assert lifecycle['rolledBack'] is True
+          assert lifecycle['rollbackRejected'] is True
+          assert lifecycle['rolledBack'] is False
+          assert lifecycle['fixtureOnly'] is True
+          assert lifecycle['actualGoAcceptanceAssessed'] is False
           assert type(lifecycle['restartCount']) is int
           assert type(lifecycle['bytecodeCacheCount']) is int
+          assert type(lifecycle['completedNormalCycles']) is int
           PY
 
       - name: Kill the standalone leaf-runtime guard mutations

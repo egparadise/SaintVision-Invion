@@ -43,6 +43,7 @@ from inv.observer_worker import ObservationWorker
 from inv.tooling import NodePrincipal
 from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pem
 import worker_leaf_rotation as worker_rotation
+import peer_policy_phase as peer_phase
 from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
 from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
 from worker_leaf_rotation import MAXIMUM_OVERLAP_SECONDS
@@ -1251,6 +1252,11 @@ def bundle(args):
                 "Start-Worker.ps1",
                 "worker_config.py",
                 "worker_leaf_rotation.py",
+                "peer_policy_phase.py",
+                "worker_peer_floor.py",
+                "worker_plain_rotation.py",
+                "leaf_rotation_standalone_runtime.py",
+                "leaf-rotation-runtime-lock.json",
                 "worker_storage.py",
                 "worker_replacement.py",
                 "worker_replace.py",
@@ -1499,31 +1505,32 @@ def _load_offline_authorization(path):
 
 def _rotation_material(path):
     manifest_raw = (path / "rotation.json").read_bytes()
-    manifest = json.loads(manifest_raw)
+    manifest = peer_phase.strict(manifest_raw)
     if not isinstance(manifest, dict):
         raise ValueError("Rotation manifest shape differs")
     schema = manifest.get("schemaVersion")
-    expected_keys = (
-        OFFLINE_ROTATION_MANIFEST_KEYS
-        if schema == OFFLINE_ROTATION_SCHEMA
-        else ROTATION_MANIFEST_KEYS
-    )
+    expected_keys = worker_rotation.manifest_keys(schema)
     if set(manifest) != expected_keys:
         raise ValueError("Rotation manifest shape differs")
     files = {}
-    for name in ROTATION_FILE_NAMES:
+    names = worker_rotation.file_names(manifest)
+    for name in names:
         target = path / name
         if target.is_symlink() or not target.is_file() or not 0 < target.stat().st_size <= 65536:
             raise ValueError("Rotation public material is missing or unsafe")
         files[name] = target.read_bytes()
-    if schema not in {ROTATION_SCHEMA, OFFLINE_ROTATION_SCHEMA} or set(
+    if schema not in {ROTATION_SCHEMA, OFFLINE_ROTATION_SCHEMA, peer_phase.SCHEMA} or set(
         manifest.get("files", {})
-    ) != set(ROTATION_FILE_NAMES):
+    ) != set(names):
         raise ValueError("Rotation schema or file set differs")
     if any(
-        _rotation_digest(files[name]) != manifest["files"].get(name) for name in ROTATION_FILE_NAMES
+        _rotation_digest(files[name]) != manifest["files"].get(name) for name in names
     ):
         raise ValueError("Rotation public material digest differs")
+    if schema == peer_phase.SCHEMA:
+        peer_phase.versions(manifest)
+        for phase in ("overlap", "final"):
+            peer_phase.validate_policy(files[f"peer-policy-{phase}.json"], manifest, phase)
     return manifest_raw, manifest, files
 
 
@@ -1539,6 +1546,51 @@ def _channel_row(conn, state, node, *, lock=False):
     return row
 
 
+def _normal_floor_input(args, node):
+    nonce = getattr(args, "peer_floor_nonce", None)
+    value = getattr(args, "_peer_floor_observation", None)
+    if not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+        raise ValueError("Normal :3 requires an independently supplied fresh floor nonce")
+    if value is None:
+        path = getattr(args, "peer_floor_observation", None)
+        if path is None:
+            raise ValueError("Normal :3 requires the actual Node-signed durable floor observation")
+        value = peer_phase.strict(worker_rotation._regular(Path(path)))
+    if value.get("nodeId") != node["nodeId"] or value.get("servingPID") != 1:
+        raise ValueError("Normal production floor must come from this actual container PID1")
+    return value, nonce
+
+
+def _plain_cp_floor(path, state, node, channel, observation, nonce, now):
+    raw = worker_rotation._regular(node_certificate_path(path, state, node))
+    policy_raw = worker_rotation._regular(node_policy_path(path, state, node))
+    policy = peer_phase.strict(policy_raw)
+    peer_phase.verify_floor(observation, raw, {"tenantId": state["tenantId"], "nodeId": node["nodeId"], "epoch": state["epoch"]}, nonce=nonce, now=now)
+    if observation["plainServingProcess"] is not True or observation["servingPID"] != 1:
+        raise ValueError("Storage/unsupported serving process requires separately accepted compound renewal")
+    p = peer_phase.version(observation["peerPolicyVersion"], 2) - 2
+    peer_phase.version(channel[0], 1)
+    current_control = x509.load_pem_x509_certificate(worker_rotation._regular(path / "control-cert.pem"))
+    if (channel[1] != fingerprint(x509.load_pem_x509_certificate(raw)) or channel[3] is not True
+            or channel[2] <= now or channel[4] != f'https://{node["nodeIP"]}:{node["nodePort"]}'
+            or peer_phase.digest(policy_raw) != observation["peerPolicySHA256"]
+            or policy != {"version": p, "tenantId": state["tenantId"], "nodeId": node["nodeId"],
+                          "recoveryEpoch": state["epoch"], "expiresAt": policy.get("expiresAt"),
+                          "clientFingerprints": [fingerprint(current_control)]}
+            or type(policy.get("version")) is not int):
+        raise ValueError("CP-recorded policy/channel and actual Node durable floor differ")
+    expiry = worker_rotation._utc(policy["expiresAt"])
+    if not now < expiry <= now + timedelta(days=7):
+        raise ValueError("Current plain peer authority is expired/unbounded; normal recovery is blocked")
+    chain_raw = worker_rotation._regular(path / "ca.pem")
+    chain = worker_rotation._certificates(chain_raw)
+    if len(chain) != 2 or peer_phase.digest(chain_raw) != state.get("caBundleSHA256"):
+        raise ValueError("Plain peer preflight issuing pin differs")
+    worker_rotation._leaf(raw, intermediate=chain[0], uri=node_uri(NodePrincipal(state["tenantId"], node["nodeId"]), state["epoch"]),
+                          usage=ExtendedKeyUsageOID.SERVER_AUTH, now=now, address=node["nodeIP"])
+    return policy_raw
+
+
 def _batch_journal_path(path):
     return path / "leaf-rotation-batch.json"
 
@@ -1551,7 +1603,7 @@ def _load_batch_journal(path):
     if (
         not isinstance(value, dict)
         or set(value) != BATCH_JOURNAL_KEYS
-        or value.get("schemaVersion") not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA}
+        or value.get("schemaVersion") not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA, peer_phase.BATCH_SCHEMA}
         or value.get("phase") not in {"prepared", "staging", "staged", "switched", "finalized"}
         or not isinstance(value.get("stagedNodeIds"), list)
         or len(value["stagedNodeIds"]) != len(set(value["stagedNodeIds"]))
@@ -1574,7 +1626,7 @@ def _batch_material(path):
             else BATCH_MANIFEST_KEYS
         )
         or manifest.get("schemaVersion")
-        not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA}
+        not in {BATCH_ROTATION_SCHEMA, OFFLINE_BATCH_ROTATION_SCHEMA, peer_phase.BATCH_SCHEMA}
         or not re.fullmatch(r"[a-f0-9]{32}", str(manifest.get("batchId", "")))
         or not isinstance(manifest.get("nodes"), list)
         or len(manifest["nodes"]) < 2
@@ -1588,6 +1640,8 @@ def _batch_material(path):
         "targetChannelVersion",
         "nextNodeCertificateSHA256",
     }
+    if manifest["schemaVersion"] == peer_phase.BATCH_SCHEMA:
+        expected_node_keys |= peer_phase.PEER_FIELDS
     bundles = {}
     node_ids = []
     for row in manifest["nodes"]:
@@ -1627,6 +1681,11 @@ def _batch_material(path):
             or _rotation_digest(files["ca.pem"]) != proposal["caBundleSHA256"]
         ):
             raise ValueError("Leaf rotation batch and Node proposal differ")
+        if manifest["schemaVersion"] == peer_phase.BATCH_SCHEMA:
+            if proposal["schemaVersion"] != peer_phase.SCHEMA or any(row[key] != proposal[key] for key in peer_phase.PEER_FIELDS):
+                raise ValueError("Batch peer phase/preflight binding differs")
+            peer_phase.versions(proposal)
+            peer_phase.versions(row)
         if manifest["schemaVersion"] == OFFLINE_BATCH_ROTATION_SCHEMA and (
             proposal.get("schemaVersion") != OFFLINE_ROTATION_SCHEMA
             or proposal.get("recoveryMode") != OFFLINE_RECOVERY_MODE
@@ -1778,7 +1837,7 @@ def _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn)
             "nodeFinalizations",
             "controlSignature",
         }
-        or archive["schemaVersion"] != "saintvision-lan-finalized-batch:1"
+        or archive["schemaVersion"] != ("saintvision-lan-finalized-batch:3" if batch["schemaVersion"] == peer_phase.BATCH_SCHEMA else "saintvision-lan-finalized-batch:1")
     ):
         raise ValueError("Finalized batch archive shape differs")
     switched = json.loads(archive["journalRaw"])
@@ -1825,7 +1884,7 @@ def _finalized_predecessor(path, state, journal, *, candidate=None):
     if candidate is not None:
         _raw, new, new_bundles = candidate
         if (
-            new["schemaVersion"] != BATCH_ROTATION_SCHEMA
+            new["schemaVersion"] not in {BATCH_ROTATION_SCHEMA, peer_phase.BATCH_SCHEMA}
             or new["batchId"] == old["batchId"]
             or set(new_bundles) != set(old_bundles)
             or any(new[key] != old[key] for key in ("tenantId", "recoveryEpoch", "caBundleSHA256"))
@@ -1845,6 +1904,13 @@ def _finalized_predecessor(path, state, journal, *, candidate=None):
                 raise ValueError("Normal batch successor channel differs")
             files = new_bundles[node_id][2]
             old_files = old_bundles[node_id][2]
+            if new["schemaVersion"] == peer_phase.BATCH_SCHEMA:
+                prior_policy = peer_phase.strict(old_files["peer-policy-final.json"])
+                if (next_proposal["currentPeerPolicyVersion"] != prior_policy["version"]
+                        or next_proposal["currentPeerPolicySHA256"] != peer_phase.digest(old_files["peer-policy-final.json"])
+                        or files["previous-peer-policy.json"] != old_files["peer-policy-final.json"]
+                        or files["previous-node-cert.pem"] != old_files["node-cert.pem"]):
+                    raise ValueError("Batch :1/:3 successor peer generation differs")
             now = datetime.now(timezone.utc)
             if files["ca.pem"] != old_files["ca.pem"] or not worker_rotation._utc(
                 new["createdAt"]
@@ -1934,7 +2000,7 @@ def retire_leaf_rotation_batch(args):
             else:
                 terminal_raw = _canonical_json({**journal, "phase": "finalized"})
                 body = {
-                    "schemaVersion": "saintvision-lan-finalized-batch:1",
+                    "schemaVersion": ("saintvision-lan-finalized-batch:3" if batch["schemaVersion"] == peer_phase.BATCH_SCHEMA else "saintvision-lan-finalized-batch:1"),
                     "journalRaw": worker_rotation._regular(_batch_journal_path(path)).decode(
                         "utf-8"
                     ),
@@ -1980,8 +2046,28 @@ def _write_rotation_public_material(
     overlap_seconds,
     leaf_valid_seconds,
     rotation_id,
+    peer_floor_observation,
+    peer_floor_nonce,
+    current_policy_raw,
+    current_node_raw,
     shared_control_raw=None,
 ):
+    # Normal :3 never derives P from C or from a host policy mirror alone.
+    if (type(leaf_valid_seconds) is not int or not 60 <= leaf_valid_seconds <= 518400
+            or type(overlap_seconds) is not int or not peer_phase.MIN_EXPIRY_SECONDS + peer_phase.CLOCK_SKEW_SECONDS < overlap_seconds <= MAXIMUM_OVERLAP_SECONDS):
+        raise ValueError("Normal peer phase lifetime/overlap is invalid")
+    peer_phase.verify_floor(peer_floor_observation, current_node_raw,
+                           {"tenantId": state["tenantId"], "nodeId": node["nodeId"], "epoch": state["epoch"]},
+                           nonce=peer_floor_nonce, now=now)
+    p = peer_phase.version(peer_floor_observation["peerPolicyVersion"], 2) - 2
+    previous_policy = peer_phase.strict(current_policy_raw)
+    if (type(previous_policy.get("version")) is not int or previous_policy["version"] != p
+            or peer_phase.digest(current_policy_raw) != peer_floor_observation["peerPolicySHA256"]):
+        raise ValueError("CP-recorded peer policy differs from actual Go floor")
+    peer_phase.current_policy(current_policy_raw, version_number=p,
+                              scope={"tenantId": state["tenantId"], "nodeId": node["nodeId"], "epoch": state["epoch"]},
+                              control_fingerprint=fingerprint(current_control), now=now)
+    peer_phase.version(current_version, 1)
     principal = NodePrincipal(state["tenantId"], node["nodeId"])
     if current_node.public_key().public_bytes_raw() != public_key.public_bytes_raw():
         raise ValueError("Recovery CSR does not preserve the pinned Node key")
@@ -2001,6 +2087,7 @@ def _write_rotation_public_material(
     ):
         raise ValueError("Recovery Node or Control Plane identity is invalid or revoked")
     intermediate.public_key().verify(current_node.signature, current_node.tbs_certificate_bytes)
+    _validate_current_control_leaf(current_control, intermediate, state=state, now=now)
     lifetime = timedelta(seconds=leaf_valid_seconds)
     next_node = issue(
         ca_key,
@@ -2023,13 +2110,17 @@ def _write_rotation_public_material(
     else:
         next_control = x509.load_pem_x509_certificate(shared_control_raw)
         _validate_current_control_leaf(next_control, intermediate, state=state, now=now)
+    if (next_control.public_key().public_bytes_raw() != control_key.public_key().public_bytes_raw()
+            or fingerprint(next_control) in revocations
+            or current_control.public_key().public_bytes_raw() != control_key.public_key().public_bytes_raw()):
+        raise ValueError("Normal renewal must preserve the exact Control Plane key and unrevoked leaf")
     not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
     overlap_expires = min(now + timedelta(seconds=overlap_seconds), not_after)
     if overlap_expires <= now + timedelta(minutes=10):
         raise ValueError("Recovery overlap is too short to complete safely")
     target_version = current_version + 1
     overlap_policy = {
-        "version": target_version,
+        "version": p + 1,
         "tenantId": state["tenantId"],
         "nodeId": node["nodeId"],
         "recoveryEpoch": state["epoch"],
@@ -2038,6 +2129,7 @@ def _write_rotation_public_material(
     }
     final_policy = {
         **overlap_policy,
+        "version": p + 2,
         "expiresAt": _utc_z(not_after),
         "clientFingerprints": [fingerprint(next_control)],
     }
@@ -2047,9 +2139,12 @@ def _write_rotation_public_material(
         "control-cert.pem": pem(next_control),
         "peer-policy-overlap.json": json.dumps(overlap_policy, indent=2).encode(),
         "peer-policy-final.json": json.dumps(final_policy, indent=2).encode(),
+        "previous-node-cert.pem": current_node_raw,
+        "previous-peer-policy.json": current_policy_raw,
+        "peer-floor-observation.json": peer_phase.canonical(peer_floor_observation),
     }
     manifest = {
-        "schemaVersion": ROTATION_SCHEMA,
+        "schemaVersion": peer_phase.SCHEMA,
         "rotationId": rotation_id,
         "tenantId": state["tenantId"],
         "nodeId": node["nodeId"],
@@ -2066,7 +2161,17 @@ def _write_rotation_public_material(
         "overlapExpiresAt": _utc_z(overlap_expires),
         "certificateNotAfter": _utc_z(not_after),
         "files": {name: _rotation_digest(raw) for name, raw in material.items()},
+        "currentPeerPolicyVersion": p,
+        "currentPeerPolicySHA256": peer_phase.digest(current_policy_raw),
+        "overlapPeerPolicyVersion": p + 1,
+        "overlapPeerPolicySHA256": peer_phase.digest(material["peer-policy-overlap.json"]),
+        "finalPeerPolicyVersion": p + 2,
+        "finalPeerPolicySHA256": peer_phase.digest(material["peer-policy-final.json"]),
+        "floorObservationSHA256": peer_phase.digest(material["peer-floor-observation.json"]),
     }
+    peer_phase.versions(manifest)
+    for phase in ("overlap", "final"):
+        peer_phase.validate_policy(material[f"peer-policy-{phase}.json"], manifest, phase, now=now, before_write=True)
     output.mkdir(parents=True, exist_ok=False)
     for name, raw in material.items():
         atomic_write(output / name, raw)
@@ -2197,6 +2302,7 @@ def _write_fully_expired_rotation_public_material(
 
 def prepare_leaf_rotation_recovery_batch(args):
     """Supersede one expired, partially staged batch with a fresh all-Node batch."""
+    raise ValueError("Partial/expired normal recovery is blocked for separately reviewed offline ownership; no normal schema conversion")
     path, state = args.state, load(args.state)
     output = args.output.resolve()
     active = sorted(active_configured_nodes(state), key=lambda item: item["nodeId"])
@@ -2495,6 +2601,7 @@ def prepare_leaf_rotation_recovery_batch(args):
 
 
 def prepare_fully_expired_leaf_rotation_recovery_batch(args):
+    raise ValueError("Expired/partial/unknown normal phase recovery is blocked; separately reviewed offline recovery required")
     """Recover an all-expired pilot without accepting an expired leaf as authority."""
     path, state = args.state, load(args.state)
     output = args.output.resolve()
@@ -2904,6 +3011,23 @@ def prepare_leaf_rotation_batch(args):
         raise ValueError("The rotation batch must include every active Node")
     output = args.output.resolve()
     with exclusive_file(path / "leaf-rotation.lock"):
+        # Every selected member must prove its actual floor matches CP-recorded
+        # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.
+        observation_dir = getattr(args, "peer_floor_observations", None)
+        nonce = getattr(args, "peer_floor_nonce", None)
+        if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):
+            raise ValueError("Normal :3 batch requires all actual signed floor files and independent nonce")
+        observation_dir = Path(observation_dir)
+        if observation_dir.is_symlink() or not observation_dir.is_dir():
+            raise ValueError("Actual floor observation directory is unsafe")
+        if {p.name for p in observation_dir.iterdir()} != {node["nodeId"] + ".json" for node in active}:
+            raise ValueError("Actual floor observation cohort differs")
+        floor_observations = {node["nodeId"]: peer_phase.strict(worker_rotation._regular(observation_dir / (node["nodeId"] + ".json"))) for node in active}
+        preflight_now = datetime.now(timezone.utc)
+        with psycopg.connect(state["adminDSN"]) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
+            for node in active:
+                _plain_cp_floor(path, state, node, _channel_row(conn, state, node), floor_observations[node["nodeId"]], nonce, preflight_now)
         journal = _load_batch_journal(path)
         if output.exists():
             raw, manifest, bundles = _batch_material(output)
@@ -2981,6 +3105,8 @@ def prepare_leaf_rotation_batch(args):
                     _batch_next_control_raw=shared_control_raw,
                     _batch_now=batch_now,
                     _quiet=True,
+                    _peer_floor_observation=floor_observations[node["nodeId"]],
+                    peer_floor_nonce=nonce,
                 )
                 prepare_leaf_rotation(child)
                 proposal_raw, proposal, files = _rotation_material(node_output)
@@ -2994,6 +3120,7 @@ def prepare_leaf_rotation_batch(args):
                         "currentChannelVersion": proposal["currentChannelVersion"],
                         "targetChannelVersion": proposal["targetChannelVersion"],
                         "nextNodeCertificateSHA256": proposal["nextNodeCertificateSHA256"],
+                        **peer_phase.binding(proposal),
                     }
                 )
             proposals = [_rotation_material(temporary / row["bundlePath"])[1] for row in rows]
@@ -3011,7 +3138,7 @@ def prepare_leaf_rotation_batch(args):
             if any(len(values) != 1 for values in common.values()):
                 raise ValueError("Leaf rotation batch shared authority differs across Nodes")
             manifest = {
-                "schemaVersion": BATCH_ROTATION_SCHEMA,
+                "schemaVersion": peer_phase.BATCH_SCHEMA,
                 "batchId": batch_id,
                 "tenantId": state["tenantId"],
                 "recoveryEpoch": state["epoch"],
@@ -3052,6 +3179,7 @@ def prepare_leaf_rotation_batch(args):
 
 
 def abandon_expired_prepared_leaf_rotation_batch(args):
+    raise ValueError("Unobserved Node publication intent cannot be abandoned from CP staging flags; separate offline recovery required")
     """Archive an expired, entirely unstaged batch whose live authority never changed."""
     path, state = args.state, load(args.state)
     bundle = args.bundle.resolve()
@@ -3218,11 +3346,14 @@ def prepare_leaf_rotation(args):
         if current_node.issuer != intermediate.subject:
             raise ValueError("Current Node leaf is not bound to the exact issuing chain")
         _validate_current_control_leaf(current_control, intermediate, state=state, now=now)
-        policy = json.loads(node_policy_path(path, state, node).read_text("utf-8"))
+        policy_raw = worker_rotation._regular(node_policy_path(path, state, node))
+        policy = peer_phase.strict(policy_raw)
+        floor_observation, floor_nonce = _normal_floor_input(args, node)
         with psycopg.connect(state["adminDSN"]) as conn:
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
             channel = _channel_row(conn, state, node)
         version, channel_fingerprint, channel_not_after, enabled, endpoint = channel
+        _plain_cp_floor(path, state, node, channel, floor_observation, floor_nonce, now)
         if (
             not enabled
             or channel_fingerprint != fingerprint(current_node)
@@ -3230,7 +3361,7 @@ def prepare_leaf_rotation(args):
             or endpoint != f'https://{node["nodeIP"]}:{node["nodePort"]}'
             or policy
             != {
-                "version": version,
+                "version": floor_observation["peerPolicyVersion"],
                 "tenantId": state["tenantId"],
                 "nodeId": node["nodeId"],
                 "recoveryEpoch": state["epoch"],
@@ -3253,6 +3384,9 @@ def prepare_leaf_rotation(args):
                 or next_node.public_key().public_bytes_raw() != public.public_bytes_raw()
                 or fingerprint(current_node) in revocations
                 or fingerprint(next_node) in revocations
+                or manifest.get("schemaVersion") != peer_phase.SCHEMA
+                or manifest.get("currentPeerPolicyVersion") != floor_observation["peerPolicyVersion"]
+                or manifest.get("currentPeerPolicySHA256") != peer_phase.digest(policy_raw)
             ):
                 raise ValueError("Existing rotation output is not an exact safe retry")
             if not getattr(args, "_quiet", False):
@@ -3269,87 +3403,18 @@ def prepare_leaf_rotation(args):
                     )
                 )
             return
-        lifetime = timedelta(seconds=args.leaf_valid_seconds)
-        next_node = issue(
-            ca_key,
-            intermediate,
-            public,
-            node_uri(principal, state["epoch"]),
-            address=node["nodeIP"],
-            now=now,
-            valid_for=lifetime,
-        )
-        shared_control_raw = getattr(args, "_batch_next_control_raw", None)
-        if shared_control_raw is None:
-            next_control = issue(
-                ca_key,
-                intermediate,
-                control_key.public_key(),
-                f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
-                now=now,
-                valid_for=lifetime,
-            )
-        else:
-            next_control = x509.load_pem_x509_certificate(shared_control_raw)
-            _validate_current_control_leaf(next_control, intermediate, state=state, now=now)
-            if (
-                control_key.public_key().public_bytes_raw()
-                != next_control.public_key().public_bytes_raw()
-                or fingerprint(next_control) in revocations
-            ):
-                raise ValueError("Shared batch Control Plane leaf differs from pinned authority")
-        not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)
-        overlap_expires = min(now + timedelta(seconds=args.overlap_seconds), not_after)
-        if overlap_expires <= now + timedelta(seconds=30):
-            raise ValueError("Rotation overlap is too short to complete safely")
-        target_version = version + 1
-        next_node_raw, next_control_raw = pem(next_node), pem(next_control)
-        overlap_policy = {
-            "version": target_version,
-            "tenantId": state["tenantId"],
-            "nodeId": node["nodeId"],
-            "recoveryEpoch": state["epoch"],
-            "expiresAt": _utc_z(overlap_expires),
-            "clientFingerprints": [fingerprint(current_control), fingerprint(next_control)],
-        }
-        final_policy = {
-            **overlap_policy,
-            "expiresAt": _utc_z(not_after),
-            "clientFingerprints": [fingerprint(next_control)],
-        }
-        material = {
-            "ca.pem": chain_raw,
-            "node-cert.pem": next_node_raw,
-            "control-cert.pem": next_control_raw,
-            "peer-policy-overlap.json": json.dumps(overlap_policy, indent=2).encode(),
-            "peer-policy-final.json": json.dumps(final_policy, indent=2).encode(),
-        }
-        manifest = {
-            "schemaVersion": ROTATION_SCHEMA,
-            "rotationId": getattr(args, "_batch_rotation_id", None) or uuid4().hex,
-            "tenantId": state["tenantId"],
-            "nodeId": node["nodeId"],
-            "recoveryEpoch": state["epoch"],
-            "nodeIP": node["nodeIP"],
-            "currentChannelVersion": version,
-            "targetChannelVersion": target_version,
-            "currentNodeCertificateSHA256": fingerprint(current_node),
-            "nextNodeCertificateSHA256": fingerprint(next_node),
-            "currentControlCertificateSHA256": fingerprint(current_control),
-            "nextControlCertificateSHA256": fingerprint(next_control),
-            "caBundleSHA256": _rotation_digest(chain_raw),
-            "createdAt": _utc_z(now),
-            "overlapExpiresAt": _utc_z(overlap_expires),
-            "certificateNotAfter": _utc_z(not_after),
-            "files": {name: _rotation_digest(raw) for name, raw in material.items()},
-        }
+        # One production generator is shared by preparation and native proof.
         temporary = output.with_name(output.name + ".next")
-        temporary.mkdir(parents=True, exist_ok=False)
         try:
-            for name, raw in material.items():
-                atomic_write(temporary / name, raw)
-            manifest_raw = _canonical_json(manifest)
-            atomic_write(temporary / "rotation.json", manifest_raw)
+            manifest_raw, manifest, material = _write_rotation_public_material(
+                temporary, state=state, node=node, current_node=current_node, current_control=current_control,
+                control_key=control_key, public_key=public, ca_key=ca_key, intermediate=intermediate,
+                chain_raw=chain_raw, revocations=revocations, now=now, current_version=version,
+                overlap_seconds=args.overlap_seconds, leaf_valid_seconds=args.leaf_valid_seconds,
+                rotation_id=getattr(args, "_batch_rotation_id", None) or uuid4().hex,
+                shared_control_raw=getattr(args, "_batch_next_control_raw", None),
+                peer_floor_observation=floor_observation, peer_floor_nonce=floor_nonce,
+                current_policy_raw=policy_raw, current_node_raw=current_node_raw)
             os.replace(temporary, output)
             if os.name != "nt":
                 directory = os.open(output.parent, os.O_RDONLY)
@@ -3368,7 +3433,7 @@ def prepare_leaf_rotation(args):
                         idempotentReplay=False,
                         nodeId=node["nodeId"],
                         rotationId=manifest["rotationId"],
-                        targetChannelVersion=target_version,
+                        targetChannelVersion=manifest["targetChannelVersion"],
                         proposalDigest=_rotation_digest(manifest_raw),
                         privateKeyTransferred=False,
                     )
@@ -3381,8 +3446,36 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
     node = node_by_id(state, manifest["nodeId"])
     if node.get("credentialRevoked"):
         raise ValueError("Revoked Node credentials cannot be committed")
+    if manifest['schemaVersion'] == peer_phase.SCHEMA:
+        # Public input is never an alternate CA or Node-key provisioning path.
+        # Authenticate every proposed leaf before accepting its receipt or CAS.
+        now = datetime.now(timezone.utc)
+        if (manifest['tenantId'],manifest['nodeId'],manifest['recoveryEpoch'],manifest['nodeIP']) != (state['tenantId'],node['nodeId'],state['epoch'],node['nodeIP']):
+            raise ValueError('Rotation receipt scope differs from current authority')
+        if files['ca.pem'] != worker_rotation._regular(path/'ca.pem') or _rotation_digest(files['ca.pem']) != state['caBundleSHA256']:
+            raise ValueError('Rotation receipt issuing chain differs from the current pin')
+        intermediate, root = worker_rotation._certificates(files['ca.pem'])
+        worker_rotation._verify_signature(root,intermediate)
+        worker_rotation._verify_signature(root,root)
+        if (not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc
+                or not root.not_valid_before_utc <= now < root.not_valid_after_utc):
+            raise ValueError('Rotation receipt issuing chain expired')
+        uri = node_uri(NodePrincipal(state['tenantId'],node['nodeId']),state['epoch'])
+        previous = worker_rotation._leaf(files['previous-node-cert.pem'],intermediate=intermediate,uri=uri,
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,now=worker_rotation._utc(manifest['createdAt']),address=node['nodeIP'])
+        proposed = worker_rotation._leaf(files['node-cert.pem'],intermediate=intermediate,uri=uri,
+            usage=ExtendedKeyUsageOID.SERVER_AUTH,now=now,address=node['nodeIP'])
+        control = worker_rotation._leaf(files['control-cert.pem'],intermediate=intermediate,
+            uri=f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',usage=ExtendedKeyUsageOID.CLIENT_AUTH,now=now)
+        if (fingerprint(previous) != manifest['currentNodeCertificateSHA256'] or fingerprint(proposed) != manifest['nextNodeCertificateSHA256']
+                or fingerprint(control) != manifest['nextControlCertificateSHA256']
+                or previous.public_key().public_bytes_raw() != proposed.public_key().public_bytes_raw()
+                or worker_rotation._utc(manifest['certificateNotAfter']) != min(proposed.not_valid_after_utc,control.not_valid_after_utc)):
+            raise ValueError('Rotation receipt certificate/key/expiry tuple differs')
     proposal_digest = _rotation_digest(manifest_raw)
-    receipt = json.loads(receipt_path.read_text("utf-8"))
+    receipt = peer_phase.strict(receipt_path.read_bytes())
+    if not isinstance(receipt,dict):
+        raise ValueError('Node installation receipt differs')
     expected_receipt_body = {
         "schemaVersion": manifest["schemaVersion"],
         "rotationId": manifest["rotationId"],
@@ -3393,6 +3486,15 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
         "installedAt": receipt.get("installedAt"),
         "restartObserved": True,
     }
+    if manifest["schemaVersion"] == peer_phase.SCHEMA:
+        peer_phase.versions(manifest)
+        expected_receipt_body.update(**peer_phase.binding(manifest), prePeerFloor=receipt.get("prePeerFloor"), postPeerFloor=receipt.get("postPeerFloor"))
+        for floor, name, certificate in ((receipt.get("prePeerFloor"), "current", files["previous-node-cert.pem"]),
+                                         (receipt.get("postPeerFloor"), "overlap", files["node-cert.pem"])):
+            peer_phase.verify_floor(floor, certificate, manifest, fresh=False)
+            peer_phase.match_floor(floor, manifest, name)
+        if not peer_phase.signed_shape(receipt,expected_receipt_body,'nodeSignature'):
+            raise ValueError('Node installation receipt differs (strict v3 shape)')
     if set(receipt) != {*expected_receipt_body, "nodeSignature"} or any(
         receipt.get(key) != value for key, value in expected_receipt_body.items()
     ):
@@ -3415,6 +3517,15 @@ def _validate_rotation_receipt(path, state, bundle, receipt_path):
         or installed_at >= overlap_expires
     ):
         raise ValueError("Node installation receipt is outside the overlap window")
+    if manifest["schemaVersion"] == peer_phase.SCHEMA:
+        pre_at = datetime.fromtimestamp(receipt["prePeerFloor"]["observedAt"], timezone.utc)
+        post_at = datetime.fromtimestamp(receipt["postPeerFloor"]["observedAt"], timezone.utc)
+        created = worker_rotation._utc(manifest["createdAt"])
+        if (pre_at > post_at + timedelta(seconds=peer_phase.CLOCK_SKEW_SECONDS)
+                or post_at < created - timedelta(seconds=peer_phase.CLOCK_SKEW_SECONDS)
+                or pre_at < created - timedelta(seconds=peer_phase.CLOCK_SKEW_SECONDS)
+                or abs((post_at - installed_at).total_seconds()) > peer_phase.CLOCK_SKEW_SECONDS):
+            raise ValueError("Actual pre/post floor acknowledgement times differ from installation")
     control_key = serialization.load_pem_private_key(
         (path / "control-key.pem").read_bytes(), password=None
     )
@@ -3430,6 +3541,8 @@ def stage_leaf_rotation_batch(args):
     """CAS one restarted Node while keeping the global CP leaf unchanged."""
     path, state = args.state, load(args.state)
     batch_raw, batch, bundles = _batch_material(args.bundle.resolve())
+    if batch["schemaVersion"] != peer_phase.BATCH_SCHEMA:
+        raise ValueError("Live normal staging requires :3 actual peer-floor acknowledgement")
     if set(bundles) != {node["nodeId"] for node in active_configured_nodes(state)}:
         raise ValueError("Leaf rotation batch no longer matches the complete active Node set")
     receipt_value = json.loads(args.node_receipt.read_text("utf-8"))
@@ -3508,6 +3621,8 @@ def commit_leaf_rotation_batch(args):
     path, state = args.state, load(args.state)
     batch_path = args.bundle.resolve()
     batch_raw, batch, bundles = _batch_material(batch_path)
+    if batch["schemaVersion"] != peer_phase.BATCH_SCHEMA:
+        raise ValueError("Live normal commit requires the exact :3 batch contract")
     if set(bundles) != {node["nodeId"] for node in active_configured_nodes(state)}:
         raise ValueError("Leaf rotation batch no longer matches the complete active Node set")
     output = args.output.resolve()
@@ -3572,6 +3687,7 @@ def commit_leaf_rotation_batch(args):
                 "channelVersion": manifest["targetChannelVersion"],
                 "certificateSHA256": manifest["nextNodeCertificateSHA256"],
                 "committed": True,
+                **peer_phase.binding(manifest),
             }
             receipt_raw = _canonical_json(
                 {**body, "controlSignature": control_key.sign(_canonical_json(body)).hex()}
@@ -3599,52 +3715,12 @@ def commit_leaf_rotation(args):
     path, state = args.state, load(args.state)
     if len(active_configured_nodes(state)) != 1:
         raise ValueError("Multiple active Nodes require one shared leaf rotation batch")
-    manifest_raw, manifest, files = _rotation_material(args.bundle.resolve())
-    node = node_by_id(state, manifest["nodeId"])
-    if node.get("credentialRevoked"):
-        raise ValueError("Revoked Node credentials cannot be committed")
+    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(
+        path, state, args.bundle, args.node_receipt
+    )
+    if manifest["schemaVersion"] != peer_phase.SCHEMA:
+        raise ValueError("Live normal commit requires :3 actual peer-floor acknowledgement")
     proposal_digest = _rotation_digest(manifest_raw)
-    receipt = json.loads(args.node_receipt.read_text("utf-8"))
-    expected_receipt_body = {
-        "schemaVersion": manifest["schemaVersion"],
-        "rotationId": manifest["rotationId"],
-        "proposalDigest": proposal_digest,
-        "targetChannelVersion": manifest["targetChannelVersion"],
-        "nodeId": manifest["nodeId"],
-        "installedNodeCertificateSHA256": manifest["nextNodeCertificateSHA256"],
-        "installedAt": receipt.get("installedAt"),
-        "restartObserved": True,
-    }
-    if set(receipt) != {*expected_receipt_body, "nodeSignature"} or any(
-        receipt.get(key) != value for key, value in expected_receipt_body.items()
-    ):
-        raise ValueError("Node installation receipt differs from the rotation proposal")
-    signature = receipt.get("nodeSignature")
-    if not isinstance(signature, str) or not re.fullmatch(r"[a-f0-9]{128}", signature):
-        raise ValueError("Node installation receipt signature is invalid")
-    next_node = x509.load_pem_x509_certificate(files["node-cert.pem"])
-    next_node.public_key().verify(bytes.fromhex(signature), _canonical_json(expected_receipt_body))
-    installed_at = datetime.fromisoformat(receipt["installedAt"].replace("Z", "+00:00"))
-    current_time = datetime.now(timezone.utc)
-    overlap_expires = datetime.fromisoformat(manifest["overlapExpiresAt"].replace("Z", "+00:00"))
-    certificate_not_after = datetime.fromisoformat(
-        manifest["certificateNotAfter"].replace("Z", "+00:00")
-    )
-    if (
-        installed_at.tzinfo != timezone.utc
-        or installed_at > current_time + timedelta(seconds=30)
-        or not current_time < overlap_expires < certificate_not_after
-        or installed_at >= overlap_expires
-    ):
-        raise ValueError("Node installation receipt is outside the overlap window")
-    control_key = serialization.load_pem_private_key(
-        (path / "control-key.pem").read_bytes(), password=None
-    )
-    if not isinstance(control_key, Ed25519PrivateKey):
-        raise ValueError("Control Plane receipt signing key type differs")
-    next_control = x509.load_pem_x509_certificate(files["control-cert.pem"])
-    if control_key.public_key().public_bytes_raw() != next_control.public_key().public_bytes_raw():
-        raise ValueError("Control Plane key differs from the proposed control certificate")
     with exclusive_file(path / "leaf-rotation.lock"):
         with psycopg.connect(state["adminDSN"]) as conn:
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (state["tenantId"],))
@@ -3684,6 +3760,7 @@ def commit_leaf_rotation(args):
             "channelVersion": committed_version,
             "certificateSHA256": manifest["nextNodeCertificateSHA256"],
             "committed": True,
+            **peer_phase.binding(manifest),
         }
         commit_receipt = {
             **commit_receipt_body,
@@ -4062,6 +4139,8 @@ def main():
     )
     p.add_argument("--csr", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--peer-floor-observation", type=Path, required=True, help="Fresh signed actual Go floor; host mirror is not accepted")
+    p.add_argument("--peer-floor-nonce", required=True, help="Independent outstanding floor challenge nonce")
     p.add_argument("--ca-key", type=Path, required=True)
     p.add_argument("--ca-key-password-file", type=Path, required=True)
     p.add_argument("--ca-chain", type=Path, required=True)
@@ -4086,6 +4165,8 @@ def main():
         "prepare-leaf-rotation-batch",
         help="Issue one shared Control Plane leaf and exact bundles for every active Node",
     )
+    p.add_argument("--peer-floor-observations", type=Path, required=True, help="Exact active-Node observation directory")
+    p.add_argument("--peer-floor-nonce", required=True)
     p.add_argument("--csr", type=Path, action="append", required=True)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--ca-key", type=Path, required=True)

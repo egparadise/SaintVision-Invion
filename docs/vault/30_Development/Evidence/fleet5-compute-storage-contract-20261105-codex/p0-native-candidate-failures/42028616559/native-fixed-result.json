@@ -1,0 +1,39 @@
+{
+  "headSHA": "6c0fc4adf53562909e3d8246ddf293d8aadb0d0e",
+  "scope": "native-go-plain-peer-phase-fixture",
+  "runtimeGOOS": "linux",
+  "completedNormalCycles": 0,
+  "floors": [
+    {
+      "certificateDER_SHA256": "18d7c90204a7b4fe3fede12ace46eeca543e5ff568ed67251c5bab4f03492303",
+      "floorSHA256": "fd1a9624b49bd8ee4336bb491def7ab0f4cac50673567e3751cbebedec483458",
+      "journalIdentitySHA256": "ec0f1db86d5f43e91c26f4fd0524350cf185b76d8fe15b812206de08fcecb819",
+      "journalUID": 1001,
+      "nodeId": "nod_00000000000000000000000000",
+      "nodeSignature": "26b064b20074d5a2f55d31c817e00eb3b5fb74ec2a3f5f8940f74121c268f60905c724da5d6f7cf80265b5ca2b69306ac96fc4732ae22a40eb59c1a51b78e40a",
+      "nonce": "2a1cf82af6523404f354c4312a853b7f329bd3f42bad09bb8ef80f95406c7ac8",
+      "observedAt": 1793882250,
+      "peerPolicySHA256": "c4489fc9a4498df0c4ef10386711c3330ec65a5edadfe9645ee6ad9e70849059",
+      "peerPolicyVersion": 7,
+      "plainServingProcess": true,
+      "recoveryEpoch": "00000000-0000-4000-8000-000000000002",
+      "schemaVersion": "saintvision-node-peer-policy-floor:1",
+      "servingPID": 4253,
+      "servingProcessSHA256": "81cb05a27099e76a11dd95cde9d80587beb97d494bc983d12e096c8e69d972f1",
+      "tenantId": "00000000-0000-4000-8000-000000000001"
+    }
+  ],
+  "events": [],
+  "productionDockerOwnershipAssessed": false,
+  "actualPostgresCASAssessed": false,
+  "privateFixtureKeysUploaded": false,
+  "operationalAcceptanceAssessed": false,
+  "expiryBeforeWriteRejected": true,
+  "rollbackAfterHandshakePinRejected": false,
+  "sameProposalRetryFrozen": false,
+  "predecessorResidueRejected": false,
+  "predecessorExactReplaySettled": false,
+  "floorCPMismatchRejected": true,
+  "strictOldReaderRejected": true,
+  "proofValid": false
+}

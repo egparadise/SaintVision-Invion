@@ -16,6 +16,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.x509.oid import NameOID
 
 from test_lan_leaf_rotation import (
+    _plain_unit_transport,
     NODE_ID,
     NODE_ID_2,
     _batch_inputs,
@@ -99,6 +100,7 @@ def _batch_case(tmp_path, monkeypatch, *, node_count=2):
         args.csr.append(csr_path)
         identities.append((node_id, key, cert))
     (args.state / "private-state.json").write_text(json.dumps(state), encoding="utf-8")
+    args._unit_keys.update({node_id: key for node_id, key, _cert in identities})
     workers = {}
     for node_id, key, cert in identities:
         state = lan_pilot.load(args.state)

@@ -1,0 +1,36 @@
+{
+  "taskId": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "recordedAtKST": "2026-11-05T19:55:31.133997+09:00",
+  "branch": "agent/codex/fleet5-compute-storage-contract-20261105",
+  "historicalGapSourceSHA": "0bcf9670d098fac87667fc9e2448b332db46e691",
+  "acceptedLifecycleMerged": "2fb52bbe5e500354b323eb8e46d5aa5066690d2d",
+  "productionLifecycleImplementationAuthored": false,
+  "rootDecision": "B-staged-architecture-review-before-implementation",
+  "nativeProofStatus": "source-binding-and-AST-only-locally; real Linux execution pending hosted dispatch",
+  "localInterpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+  "pythonVersion": "3.14.7",
+  "pythonNoBytecode": true,
+  "initialDocsExit": 1,
+  "scopedDependencyRestoration": "exact d254fc6a511db108be351a3ba82645341748fea3 two files",
+  "publicationGates": "8 exit0; final-publication-gates.json",
+  "workflowFixtureTests": {
+    "passed": 6,
+    "exit": 0
+  },
+  "schemaSyntaxValidated": true,
+  "mergeConflict": {
+    "path": "docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+    "resolution": "retain current DB prepare pair and accepted2fb lan-pilot pair; both actual SHA256/blob pairs verified"
+  },
+  "obsidian": {
+    "checkExit": 0,
+    "applyPerformed": false
+  },
+  "independentArchitectureReview": "pending via root",
+  "contributedStorageAccepted": false,
+  "physicalAcceptance": "not-performed",
+  "sharedBoardsChanged": false,
+  "commit": "next; this pre-publication receipt does not self-reference its future SHA",
+  "historicalPrePublicationSnapshot": true,
+  "subsequentActualHostedProof": "hosted-proof-receipt.json"
+}

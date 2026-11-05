@@ -1,0 +1,17 @@
+﻿{
+  "scope": "synthetic-source-validator-only",
+  "policyBytesPreserved": true,
+  "plainStateOnlyAccepted": true,
+  "plainDefaultSocketAccepted": true,
+  "storageOnlyAccepted": true,
+  "workspaceStorageRejected": "Workspace upgrade does not support storage contribution; preserve this Node and use a separate plain Node for workspace acceptance",
+  "storageWithWorkspaceSocketRejected": "Storage installation scope, path, bytes or receipt differs",
+  "aliasesRejected": 3,
+  "activeStorageAssessed": false,
+  "linuxMountEnforcementAssessed": false,
+  "sourceSHA256": {
+    "worker_workspace.py": "83930f4d40be82ba211ba57ea9e8c13218a3f8217cf6d13ae4d6b127536e5b7d",
+    "worker_storage.py": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+    "worker_config.py": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992"
+  }
+}

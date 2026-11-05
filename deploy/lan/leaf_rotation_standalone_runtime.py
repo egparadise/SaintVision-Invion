@@ -29,8 +29,11 @@ LOCK_NAME = "leaf-rotation-runtime-lock.json"
 LOCK_SHA256 = "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
 WORKER_ENTRY = "worker_leaf_rotation.py"
 WORKER_MODULES = {
-    "worker_config.py": "bb2b750ac294a2558f0214f8822c02da2f015486767f361b385ccc58e3c18992",
-    WORKER_ENTRY: "497ac592f4a686bfeb63629ccc330800b136784b4dea5fd51638aed445907f06",
+    'worker_config.py': '909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c',
+    'worker_leaf_rotation.py': '4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998',
+    'peer_policy_phase.py': '8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8',
+    'worker_peer_floor.py': 'c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec',
+    'worker_plain_rotation.py': 'bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5',
 }
 WORKER_SHA256 = WORKER_MODULES[WORKER_ENTRY]
 BUNDLE_SCHEMA = "saintvision-leaf-rotation-runtime-bundle:2"
@@ -168,6 +171,7 @@ def _worker_sources() -> dict[str, bytes]:
             imported_local.update(name for name in names if name in available)
         loaded[filename] = raw
     expected_local = {Path(name).stem for name in WORKER_MODULES if name != WORKER_ENTRY}
+    imported_local.discard(Path(WORKER_ENTRY).stem)  # explicit lazy cycle back to the entry module
     if imported_local != expected_local:
         raise ValueError("Reviewed worker local-module closure differs")
     return loaded

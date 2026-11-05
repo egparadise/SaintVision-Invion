@@ -1,0 +1,1 @@
+CHECK: 2600 managed files, 305 pending exports, 0 conflicts. No writes.

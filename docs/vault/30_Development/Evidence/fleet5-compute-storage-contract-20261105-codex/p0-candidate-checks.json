@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-11-05T21:31:05.005601+09:00",
+  "checks": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/test_fleet5_plain_peer_phase_v3.py",
+        "tests/test_lan_leaf_rotation_standalone_runtime.py",
+        "tests/test_core_workflow_cx01.py",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-1.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-2.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-3.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-4.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-5.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-6.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-7.txt"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "exitCode": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-compute-storage-contract-20261105-codex/p0-candidate-check-8.txt"
+    }
+  ]
+}
