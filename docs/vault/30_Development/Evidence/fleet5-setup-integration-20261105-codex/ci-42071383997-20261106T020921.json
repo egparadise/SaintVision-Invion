@@ -1,0 +1,140 @@
+{
+  "conclusion": "",
+  "event": "workflow_dispatch",
+  "headBranch": "agent/codex/fleet5-setup-integration-20261105-ci2",
+  "headSha": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "jobs": [
+    {
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "databaseId": 127399940073,
+      "name": "desktop-browser",
+      "startedAt": "2026-11-05T17:07:10Z",
+      "status": "in_progress",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T17:07:12Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T17:07:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:07:17Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-05T17:07:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:07:17Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "startedAt": "2026-11-05T17:07:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:07:18Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v4",
+          "number": 4,
+          "startedAt": "2026-11-05T17:07:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:07:33Z",
+          "conclusion": "success",
+          "name": "Run python -m pip install -r requirements-backend.txt playwright==1.62.0",
+          "number": 5,
+          "startedAt": "2026-11-05T17:07:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:07:52Z",
+          "conclusion": "success",
+          "name": "Run python -m playwright install --with-deps chromium",
+          "number": 6,
+          "startedAt": "2026-11-05T17:07:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:08:31Z",
+          "conclusion": "success",
+          "name": "Run npm ci --ignore-scripts",
+          "number": 7,
+          "startedAt": "2026-11-05T17:07:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T17:08:46Z",
+          "conclusion": "success",
+          "name": "Build frontend assets and owned proxy test image",
+          "number": 8,
+          "startedAt": "2026-11-05T17:08:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Real browser, canonical HTTP and disposable PostgreSQL",
+          "number": 9,
+          "startedAt": "2026-11-05T17:08:46Z",
+          "status": "in_progress"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Require every canonical browser journey to execute",
+          "number": 10,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Test built frontend proxy image and TLS boundary",
+          "number": 11,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 12,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/setup-node@v4",
+          "number": 22,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 23,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/checkout@v4",
+          "number": 24,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        }
+      ],
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42071383997/job/127399940073"
+    }
+  ],
+  "status": "in_progress"
+}

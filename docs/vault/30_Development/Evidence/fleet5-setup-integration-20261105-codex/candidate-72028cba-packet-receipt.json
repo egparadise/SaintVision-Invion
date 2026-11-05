@@ -1,0 +1,9 @@
+{
+  "bytes": 48259331,
+  "executed": false,
+  "manifestSHA256": "0d03e5c1a06bed083a0e223bada1281fea470ada6fdc901e6d7fa1f0cdb1186c",
+  "packet": "fleet5-nonexecuting-setup-72028cbac903c4415d9979f980a6e0f9948e914f.zip",
+  "packetReadbackVerified": true,
+  "sha256": "dedd5571cabb36811a113f14b9c59227fcdba9dad162edf9ca89d89e6452262f",
+  "sourceCommit": "72028cbac903c4415d9979f980a6e0f9948e914f"
+}
