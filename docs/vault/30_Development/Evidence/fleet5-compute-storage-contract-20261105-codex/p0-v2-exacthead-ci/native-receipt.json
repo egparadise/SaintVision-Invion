@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "fleet5-p0-v2-native-receipt:1",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Independent Claude corrected-delta review via root pending",
+  "recordedAtKST": "2026-11-05T23:49:57.123369+09:00",
+  "sourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "runId": 42047390811,
+  "coreJobId": 127313967305,
+  "fixedNativeGateConclusion": "success",
+  "fullCoreConclusion": "pending in separately recorded final snapshot",
+  "artifactId": 13426365088,
+  "artifactDigest": "sha256:89905efce01632d27238a433e189c46150c7c0ff4a45838ca1b87da617683d0c",
+  "downloadedZipSHA256": "89905efce01632d27238a433e189c46150c7c0ff4a45838ca1b87da617683d0c",
+  "commandExit": 0,
+  "completedNormalCycles": 2,
+  "peerFloors": [
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "controlChannels": [
+    8,
+    9
+  ],
+  "actualNativeGoProofValid": true,
+  "actualDockerAndStandalone": "pending provisioned Core and Backend",
+  "independentCodeAcceptance": false,
+  "physicalAcceptance": false,
+  "fullCompoundBImplemented": false,
+  "files": [
+    {
+      "name": "backend-jobs-first-snapshot.json",
+      "sha256": "2abf417cb3c1033bba2e6ed401ec8225419565ba2085b73ede16b6254abf6c50"
+    },
+    {
+      "name": "canonical-go-results.json",
+      "sha256": "f423e0e978a2ab8771900d94b6ff6097b31c873a7aaa53133a401dd12f07a868"
+    },
+    {
+      "name": "core-jobs-first-snapshot.json",
+      "sha256": "8447bd7796ea63e6fc7cfa0887841a1f8b38c3e9b173291e15aab5fbaa6177a5"
+    },
+    {
+      "name": "docs-jobs-first-snapshot.json",
+      "sha256": "0171f054aeef7afefb1c99bfea38bff6f343433548b86e2633aa78aaacfab44f"
+    },
+    {
+      "name": "go-guard-events.jsonl",
+      "sha256": "aa7a4af3dc88e7d0bc457c5e8c35e9a70bc7da9d9084d7715314bd816233b287"
+    },
+    {
+      "name": "native-artifact-metadata.json",
+      "sha256": "fd5d59e68e28f23d066537c984aab153d3aa805fa66224fe67f51947f71730a9"
+    },
+    {
+      "name": "native-fixed-proof.zip",
+      "sha256": "89905efce01632d27238a433e189c46150c7c0ff4a45838ca1b87da617683d0c"
+    },
+    {
+      "name": "native-fixed-result.json",
+      "sha256": "38a98ed6e4c64df76fdfcc99f1668a17aa4fcd1c1bc66ad7316f0ded4e0d514f"
+    },
+    {
+      "name": "native-server.log",
+      "sha256": "4b298076169524b37fe09dda38d8b134dd4b5c887fb34d1b35ba64971869f711"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "fleet5-unicode-vector-correction:1",
+  "recordedAtKST": "2026-11-05T23:54:55.879922+09:00",
+  "taskId": "task_a8fd2969f0b3",
+  "dispatchId": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Independent Claude corrected-delta review pending via root",
+  "baseSourceSHA": "4a928310e88ac336efb040c1621525fee7133f32",
+  "runtimeSourceChanged": false,
+  "defect": "Static unicode/supplementary/nested vectors had substituted question marks; supplied-byte cross-language equality passed, intended full Unicode coverage was incomplete. Existing direct Python non-ASCII body test was valid.",
+  "reportedToRoot": "msg_7113bdba916c",
+  "expectedRedCommand": "python -B -m pytest -q tests/test_fleet5_floor_v2_canonical.py (exact code-point coverage assertions, original 4a fixture)",
+  "expectedRedExit": 1,
+  "expectedRedSummary": "1 failed, 9 passed",
+  "greenCommand": "python -B -m pytest -q tests/test_fleet5_floor_v2_canonical.py (corrected escaped fixture)",
+  "greenExit": 0,
+  "greenSummary": "10 passed",
+  "actualCorrectedGoProof": "pending exact-head CI",
+  "fullCI": "pending exact-head final candidate",
+  "codeAcceptance": false,
+  "physicalAcceptance": false,
+  "files": [
+    {
+      "path": "tests/fixtures/fleet5-floor-v2-canonical-vectors.json",
+      "sha256": "88e327d3fb7d706f589e798c6a30464e87d8c296a59851a7ed6bfbd639e04ed9"
+    },
+    {
+      "path": "tests/test_fleet5_floor_v2_canonical.py",
+      "sha256": "9861ddda154041aca93d4718b415bcdd464eb2551beae0552372adb1391e4367"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical_test.go",
+      "sha256": "6c1002104d8fc125c697ad627e4580c7a4d60215d1cbadc3f45691b195facc36"
+    }
+  ],
+  "rootNarrowDeltaDirection": "msg_80d97ffc4e8b",
+  "normalizationCoverage": "Distinct precomposed U+00E9 and decomposed U+0065/U+0301 keys; no NFC normalization; explicit known UTF-8 hex before canonical/signature tests"
+}

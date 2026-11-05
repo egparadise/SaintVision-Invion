@@ -14,10 +14,11 @@
     {
       "name": "unicode",
       "body": {
-        "??": "?? caf?",
-        "?": "na?ve"
+        "\ud55c\uae00": "\ud14c\uc2a4\ud2b8 caf\u00e9",
+        "\u00e9": "na\u00efve",
+        "e\u0301": "decomposed"
       },
-      "expectedCanonicalUTF8Hex": "7b223f223a226e613f7665222c223f3f223a223f3f206361663f227d"
+      "expectedCanonicalUTF8Hex": "7b2265cc81223a226465636f6d706f736564222c22c3a9223a226e61c3af7665222c22ed959ceab880223a22ed858cec8aa4ed8ab820636166c3a9227d"
     },
     {
       "name": "html",
@@ -45,10 +46,10 @@
     {
       "name": "supplementary",
       "body": {
-        "scalar": "????\udbff\udfff",
-        "??": "emoji"
+        "scalar": "\ud83d\ude00\ud834\udd1e\udbff\udfff",
+        "\ud83e\udded": "emoji"
       },
-      "expectedCanonicalUTF8Hex": "7b223f3f223a22656d6f6a69222c227363616c6172223a223f3f3f3ff48fbfbf227d"
+      "expectedCanonicalUTF8Hex": "7b227363616c6172223a22f09f9880f09d849ef48fbfbf222c22f09fa7ad223a22656d6f6a69227d"
     },
     {
       "name": "nested",
@@ -60,11 +61,11 @@
           -1,
           9007199254740991,
           {
-            "&": "?\u2028??"
+            "&": "\u00e9\u2028\ud83d\ude00"
           }
         ]
       },
-      "expectedCanonicalUTF8Hex": "7b226172726179223a5b6e756c6c2c747275652c66616c73652c2d312c393030373139393235343734303939312c7b225c7530303236223a223f5c75323032383f3f227d5d7d"
+      "expectedCanonicalUTF8Hex": "7b226172726179223a5b6e756c6c2c747275652c66616c73652c2d312c393030373139393235343734303939312c7b225c7530303236223a22c3a95c7532303238f09f9880227d5d7d"
     }
   ]
 }
