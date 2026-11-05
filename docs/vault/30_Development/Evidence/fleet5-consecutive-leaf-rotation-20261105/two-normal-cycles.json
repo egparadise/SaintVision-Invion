@@ -1,0 +1,62 @@
+{
+  "schema": "fleet5-consecutive-normal-rotation-proof:1",
+  "fixtureOnly": true,
+  "systemClockChanged": false,
+  "channelStore": "CAS fixture",
+  "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+  "first": {
+    "caBundleSHA256": "3d42b3274fddb99bbeb241aa3ffcf761e9d07994827537c95286fdf10e06e4bf",
+    "certificateNotAfter": "2026-11-11T00:00:00Z",
+    "createdAt": "2026-11-05T00:00:00Z",
+    "currentChannelVersion": 7,
+    "currentControlCertificateSHA256": "198efbd10a9f65a29b0996e316cebdec20fb8543926c3c31dddcbf05a139e292",
+    "currentNodeCertificateSHA256": "d2da21baa9fac16df2d98e62bc151eefabcc58eebe3eae68a6ee75db454719b7",
+    "files": {
+      "ca.pem": "3d42b3274fddb99bbeb241aa3ffcf761e9d07994827537c95286fdf10e06e4bf",
+      "control-cert.pem": "a402bf91e99d258a8c6001e18b9d21637878f97a13bb2c2f30b690a8a968bd8f",
+      "node-cert.pem": "09d8431a01525abafcc08ac559980ee132649bcfcfc750bd615d76d5ad61c1db",
+      "peer-policy-final.json": "6658b5cad9ed74352653e367205a11e1d31db173237b72aa053290c8f94fa0c1",
+      "peer-policy-overlap.json": "659b06241ea09cb9ce99e1db5636dfbeaf44bca191d0bdbc5599ef62398f6bac"
+    },
+    "nextControlCertificateSHA256": "b977330fa0d293f18372de99e096a5bd2baef342258827d0b92eb630461f2716",
+    "nextNodeCertificateSHA256": "6dda6fac6d0e798961be289198c9892bfe023d9b92d7e1111ec2969d12ba0259",
+    "nodeIP": "192.168.45.81",
+    "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+    "overlapExpiresAt": "2026-11-05T00:02:00Z",
+    "recoveryEpoch": "11111111-1111-4111-8111-111111111111",
+    "rotationId": "51922db8f989433b84e688c1e019b374",
+    "schemaVersion": "saintvision-lan-leaf-rotation:1",
+    "targetChannelVersion": 8,
+    "tenantId": "22222222-2222-4222-8222-222222222222"
+  },
+  "second": {
+    "caBundleSHA256": "3d42b3274fddb99bbeb241aa3ffcf761e9d07994827537c95286fdf10e06e4bf",
+    "certificateNotAfter": "2026-11-15T00:00:00Z",
+    "createdAt": "2026-11-09T00:00:00Z",
+    "currentChannelVersion": 8,
+    "currentControlCertificateSHA256": "b977330fa0d293f18372de99e096a5bd2baef342258827d0b92eb630461f2716",
+    "currentNodeCertificateSHA256": "6dda6fac6d0e798961be289198c9892bfe023d9b92d7e1111ec2969d12ba0259",
+    "files": {
+      "ca.pem": "3d42b3274fddb99bbeb241aa3ffcf761e9d07994827537c95286fdf10e06e4bf",
+      "control-cert.pem": "76b4d5c64799850a0830b9476031d60940bff92900ddff990a7e8051ecf6e19c",
+      "node-cert.pem": "33396f292564bb6a21758740dd1a1823d9d31e98e278aa4960e41f0f0475f4de",
+      "peer-policy-final.json": "d145c459014f4f1348ed2b3b605a153fc255dc6bde9fa7f9270bfa89d983925d",
+      "peer-policy-overlap.json": "e0d8605a2ace0258fb5dce9344241b0ca64f9b185a8728dfb8dc96e8ed7449bb"
+    },
+    "nextControlCertificateSHA256": "ebd448f952882b8ef590ef7426af7d77f45a2c019b17a4a0543b9e02e9fefd03",
+    "nextNodeCertificateSHA256": "57bf0c4756107f43342ef8c1c43f1fc1feb9b2993788aac2768747dd7b598f65",
+    "nodeIP": "192.168.45.81",
+    "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+    "overlapExpiresAt": "2026-11-09T00:02:00Z",
+    "recoveryEpoch": "11111111-1111-4111-8111-111111111111",
+    "rotationId": "a4325a9da96b4d99a26aa163a6f0870c",
+    "schemaVersion": "saintvision-lan-leaf-rotation:1",
+    "targetChannelVersion": 9,
+    "tenantId": "22222222-2222-4222-8222-222222222222"
+  },
+  "priorFinalizedJournalSHA256": "404b2380ef612030e3fc377663c9779f6f43ac4ff7867f96c91d48872a31f29f",
+  "preservedArchiveSHA256": "2caa26189109e1ef6d55d5eaab72b1a5fce31a9c35269fe0630605c72fe78b06",
+  "restartCount": 4,
+  "nodeKeyUnchanged": true,
+  "priorBackupUnchanged": true
+}

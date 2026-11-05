@@ -362,6 +362,24 @@ policy are both still valid; expired material is never restored. Windows reboot
 does not automatically relaunch the server's observer or download process. The
 worker and database use `unless-stopped`.
 
+Finalization preserves a public proof in
+`<worker-root>/leaf-rotation-finalized/<rotationId>.json`: the exact finalized
+journal bytes, proposal, public bundle, signed Node install receipt and signed
+CP commit receipt. Publication never replaces an existing archive. A distinct
+normal Node rotation may replace the active journal only when this proof binds
+the same tenant, Node, epoch, address, issuing chain, current certificates and
+final policy to the next channel generation. Partial, unknown, rolled-back or
+inconsistent state remains blocked; the previous backup and private key remain
+in place. A legacy finalized journal without this proof requires replaying
+`finalize` with its original bundle and signed CP receipt while its current
+leaves remain valid; replay does not restart an already finalized Node.
+
+This Node lifecycle does not retire the server's `leaf-rotation-batch.json`.
+The server retains `switched` after batch commit and rejects preparation at a
+different output while that journal exists. A new multi-Node batch therefore
+still requires a separately reviewed server retirement contract; do not clear
+the journal or treat the Node archive as permission to reset a scheduler latch.
+
 Leaf rotation has two isolated Python runtime choices. The existing venv path is
 still supported. When `python3-venv` is unavailable, build the reviewed offline
 runtime on the Control Plane from the exact PyPI URLs and SHA-256 values in

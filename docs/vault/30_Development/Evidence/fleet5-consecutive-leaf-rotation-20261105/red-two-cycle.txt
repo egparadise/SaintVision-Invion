@@ -1,0 +1,166 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_two_server_issued_normal_cycles_keep_generation_and_immutable_history __
+
+tmp_path = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-935/test_two_server_issued_normal_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024CD9C382B0>
+
+    def test_two_server_issued_normal_cycles_keep_generation_and_immutable_history(tmp_path, monkeypatch):
+        case = _normal_cycles(tmp_path, monkeypatch)
+        old = json.loads((case.first / "rotation.json").read_bytes())
+        new = json.loads((case.second / "rotation.json").read_bytes())
+        assert json.loads(case.journal_raw)["phase"] == "finalized"
+        assert old["rotationId"] != new["rotationId"]
+        assert old["schemaVersion"] == new["schemaVersion"] == rotation.SCHEMA
+        assert old["targetChannelVersion"] == new["currentChannelVersion"] == 8
+        assert new["targetChannelVersion"] == 9
+        assert old["nextNodeCertificateSHA256"] == new["currentNodeCertificateSHA256"]
+        assert old["nextControlCertificateSHA256"] == new["currentControlCertificateSHA256"]
+        assert old["nextNodeCertificateSHA256"] != new["nextNodeCertificateSHA256"]
+        key_raw = (case.worker / "node-key.pem").read_bytes()
+        backup = case.worker / "leaf-rotation-backup" / old["rotationId"]
+        backup_raw = {p.name: p.read_bytes() for p in backup.iterdir()}
+>       receipt = case.install(case.second)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_lan_leaf_rotation_consecutive.py:107:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_lan_leaf_rotation_consecutive.py:64: in install
+    return rotation.install(
+deploy\lan\worker_leaf_rotation.py:550: in install
+    validated = validate_bundle(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+bundle = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-935/test_two_server_issued_normal_0/normal-1')
+worker_root = WindowsPath('C:/Users/inviz/AppData/Local/Temp/pytest-of-inviz/pytest-935/test_two_server_issued_normal_0/consecutive-worker')
+now = datetime.datetime(2026, 11, 9, 0, 0, tzinfo=datetime.timezone.utc)
+installed = True
+
+    def validate_bundle(
+        bundle: Path,
+        worker_root: Path,
+        *,
+        now: datetime | None = None,
+        installed: bool | None = False,
+    ) -> dict:
+        """Validate exact chain, Node/key binding, time window, and monotonic version."""
+        now = now or datetime.now(timezone.utc)
+        manifest_raw = _regular(bundle / "rotation.json")
+        manifest = json.loads(manifest_raw)
+        if not isinstance(manifest, dict):
+            raise ValueError("Rotation manifest shape differs")
+        schema = manifest.get("schemaVersion")
+        expected_keys = OFFLINE_MANIFEST_KEYS if schema == OFFLINE_SCHEMA else MANIFEST_KEYS
+        if set(manifest) != expected_keys:
+            raise ValueError("Rotation manifest shape differs")
+        offline = schema == OFFLINE_SCHEMA
+        if (
+            schema not in {SCHEMA, OFFLINE_SCHEMA}
+            or not isinstance(manifest["rotationId"], str)
+            or not re.fullmatch(r"[0-9a-f]{32}", manifest["rotationId"])
+            or not isinstance(manifest["tenantId"], str)
+            or not NODE_ID.fullmatch(manifest["nodeId"])
+            or not isinstance(manifest["recoveryEpoch"], str)
+            or type(manifest["currentChannelVersion"]) is not int
+            or type(manifest["targetChannelVersion"]) is not int
+            or manifest["targetChannelVersion"] != manifest["currentChannelVersion"] + 1
+            or any(
+                not isinstance(manifest[key], str) or not HEX.fullmatch(manifest[key])
+                for key in (
+                    "currentNodeCertificateSHA256",
+                    "nextNodeCertificateSHA256",
+                    "currentControlCertificateSHA256",
+                    "nextControlCertificateSHA256",
+                    "caBundleSHA256",
+                )
+            )
+            or not isinstance(manifest["files"], dict)
+            or set(manifest["files"]) != set(FILE_NAMES)
+            or any(
+                not isinstance(value, str) or not HEX.fullmatch(value)
+                for value in manifest["files"].values()
+            )
+        ):
+            raise ValueError("Rotation manifest identity, version, or digest is invalid")
+        if offline and (
+            manifest["recoveryMode"] != OFFLINE_RECOVERY_MODE
+            or not isinstance(manifest["offlineAuthorizationSHA256"], str)
+            or not HEX.fullmatch(manifest["offlineAuthorizationSHA256"])
+            or not isinstance(manifest["currentPeerPolicySHA256"], str)
+            or not HEX.fullmatch(manifest["currentPeerPolicySHA256"])
+            or not (
+                (
+                    manifest["supersededRotationId"] is None
+                    and manifest["supersededProposalDigest"] is None
+                )
+                or (
+                    isinstance(manifest["supersededRotationId"], str)
+                    and re.fullmatch(r"[0-9a-f]{32}", manifest["supersededRotationId"])
+                    and isinstance(manifest["supersededProposalDigest"], str)
+                    and HEX.fullmatch(manifest["supersededProposalDigest"])
+                )
+            )
+        ):
+            raise ValueError("Offline recovery authority binding is invalid")
+        created = _utc(manifest["createdAt"])
+        overlap = _utc(manifest["overlapExpiresAt"])
+        not_after = _utc(manifest["certificateNotAfter"])
+        if (
+            not created <= now < overlap < not_after
+            or (overlap - now).total_seconds() > MAXIMUM_OVERLAP_SECONDS
+        ):
+            raise ValueError("Rotation overlap or certificate validity window is invalid")
+
+        files = {name: _regular(bundle / name) for name in FILE_NAMES}
+        if any(_digest(files[name]) != manifest["files"][name] for name in FILE_NAMES):
+            raise ValueError("Rotation public material digest differs")
+        if _digest(files["ca.pem"]) != manifest["caBundleSHA256"]:
+            raise ValueError("Rotation issuing chain differs")
+        pinned_ca = _regular(worker_root / "ca.pem")
+        if not hashlib.sha256(pinned_ca).digest() == hashlib.sha256(files["ca.pem"]).digest():
+            raise ValueError("Rotation issuing chain is not the pinned chain")
+        chain = _certificates(files["ca.pem"])
+        if len(chain) != 2:
+            raise ValueError("Pinned chain must contain one intermediate and one root")
+        intermediate, root = chain
+        intermediate_constraints = intermediate.extensions.get_extension_for_class(
+            x509.BasicConstraints
+        ).value
+        root_constraints = root.extensions.get_extension_for_class(x509.BasicConstraints).value
+        _verify_signature(root, intermediate)
+        _verify_signature(root, root)
+        if (
+            intermediate.issuer != root.subject
+            or root.issuer != root.subject
+            or not intermediate_constraints.ca
+            or intermediate_constraints.path_length != 0
+            or not root_constraints.ca
+            or root_constraints.path_length != 1
+            or not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc
+            or not root.not_valid_before_utc <= now < root.not_valid_after_utc
+        ):
+            raise ValueError("Pinned issuing chain constraints or validity differ")
+
+        old_node_raw = _regular(worker_root / "node-cert.pem")
+        old_node = x509.load_pem_x509_certificate(old_node_raw)
+        expected_current = {
+            (
+                manifest["nextNodeCertificateSHA256"]
+                if installed
+                else manifest["currentNodeCertificateSHA256"]
+            )
+        }
+        if installed is None:
+            expected_current.add(manifest["nextNodeCertificateSHA256"])
+        if old_node.fingerprint(hashes.SHA256()).hex() not in expected_current:
+>           raise ValueError("Current Node leaf does not match the rotation base")
+E           ValueError: Current Node leaf does not match the rotation base
+
+deploy\lan\worker_leaf_rotation.py:331: ValueError
+---------------------------- Captured stdout call -----------------------------
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "0e15bb0225f1427eaba25d9c771c820b", "targetChannelVersion": 8, "proposalDigest": "da356fdef683c6330e9ab6fae1d0d7982baad7bb87711f66023d89e78bbcbd94", "privateKeyTransferred": false}
+{"schemaVersion": "saintvision-lan-leaf-rotation:1", "rotationId": "0e15bb0225f1427eaba25d9c771c820b", "proposalDigest": "da356fdef683c6330e9ab6fae1d0d7982baad7bb87711f66023d89e78bbcbd94", "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "channelVersion": 8, "certificateSHA256": "33efbe9cd4526d0014c902b1c489b709672091dd6505ae6985cdc17f1c16f30d", "committed": true, "controlSignature": "dd6d9446aaafc23127146ba528ad562557c5b8bb4f8ef29cb45e9b48c7e37992afc4ba6ae4afec2437d4caf2f100dd747fc472d516c90db49866f55e3cc49104", "idempotentReplay": false, "restartObserverRequired": true, "nodeOverlapFinalizationRequired": true}
+{"prepared": true, "idempotentReplay": false, "nodeId": "nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "rotationId": "c7ba4c455e1c4650aadaa3762a41ab59", "targetChannelVersion": 9, "proposalDigest": "eb686e5b9b95098ddca4fb16015236238598651dc36ab9e8e712431b84388367", "privateKeyTransferred": false}
+=========================== short test summary info ===========================
+FAILED tests/test_lan_leaf_rotation_consecutive.py::test_two_server_issued_normal_cycles_keep_generation_and_immutable_history
+1 failed in 3.00s

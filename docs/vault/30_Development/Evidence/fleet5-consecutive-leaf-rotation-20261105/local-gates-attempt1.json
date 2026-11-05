@@ -1,0 +1,6 @@
+﻿{
+    "command":  "main .venv python -B tools/check_docs.py",
+    "exit":  1,
+    "log":  "docs/vault/30_Development/Evidence/fleet5-consecutive-leaf-rotation-20261105/check_docs.txt",
+    "observedKST":  "2026-11-05T17:27:55.7171438+09:00"
+}

@@ -1,0 +1,12 @@
+{
+  "checkDocsAttempt1": {
+    "exit": 1,
+    "reason": "PowerShell UTF-16 redirected transcripts; lossless UTF-8 conversion then check passed"
+  },
+  "firstStagedDiff": {
+    "exit": 2,
+    "reason": "trailing spaces in actual pytest/PowerShell transcripts",
+    "repair": "raw transcript text preserved in raw-transcripts.json; presentation .txt only trims trailing whitespace"
+  },
+  "commitAndPushAttemptedAfterFailure": false
+}
