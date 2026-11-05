@@ -1,0 +1,45 @@
+{
+  "scope": "NONEXECUTING_FUTURE_P0_MERGE_CONSUMER_CLOSURE_NOT_IMPLEMENTATION",
+  "observedAtKST": "2026-11-05T21:36:40.655336+09:00",
+  "acceptedCurrentProduct": "bd96479b1cd33ea560e3d2ad55030e5c0e7d25e2",
+  "acceptedCurrentLowReport": "0136f1687ccc02aaeba10b52a83b0bade31c03a8",
+  "actualLowReview": "45bc23cb34d30232edf5c9f097960b1300ea1b5f",
+  "externalGate": "No published reviewed P0 production source/CI received; prototype hashes/interface messages are not source pins",
+  "requiredBeforeMerge": [
+    "root-selected exact published production SHA and full source/report IDs",
+    "actual implementation review verdict and scoped M1-M10/native two-cycle plus negative evidence",
+    "actual new worker/launcher/LAN tooling pairs and complete dependency/image closure"
+  ],
+  "preserveAcceptedLow": [
+    "Git mode120000 and all nonregular kinds refused before any output; no link following/materialization",
+    "exact closed lifecycle result keyset/values; four bool identity checks and two int-not-bool/float checks",
+    "original raw diagnostic files, byte SHA256 and Git blob semantics; structured metadata uses explicitly labeled Git LF bytes",
+    "literal evidence attribute entries only; root/source attributes unchanged"
+  ],
+  "whenActualP0Arrives": {
+    "sharedHelper": "inspect actual deploy/lan/peer_policy_phase.py and every producer/worker/standalone/bundle import; include complete public helper dependency closure with recomputed actual hashes",
+    "runtimeCapability": "rebuild exact selected Go Node image and require actual --observe-peer-policy-floor capability; old2fb/legacy binary or old read-only floor audit is insufficient",
+    "standalone": "measure actual WORKER_MODULES/files and package manifest; update Backend workerModuleCount/wrappers only to observed produced values, never blindly retain2 or guess3",
+    "consumerTypes": "retain strict lifecycle types; change expected result keys/values only for actual approved producer-contract changes with meaningful red/green evidence",
+    "publicTooling": "combine actual new LAN pair supplied by root with prepare60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266/a5695cab0a955d0aeeedf40f6459458ccef6210a; preserve every historical observation/source field",
+    "nativeProof": "require actual native Go two normal cycles, actual floor/hash and CP/cohort bindings, CAS/no-weakening/forward-only negatives; fixture-only finalized flags do not settle runtime",
+    "canonicalPacket": "revalidate signed CP archive/every Node attestation/current authority-members-files-peer bindings/original byte-bound receipt; unknown/partial/duplicate/.next stays blocked; no evidence reserialization",
+    "bootstrapG2": "root nonexecuting plan preserves old --image permit digest and separates typed new runtime-image inventory; plan itself authorizes no helper implementation or runtime operation"
+  },
+  "finalCandidateOnlyAfterGate": [
+    "merge exact accepted production source and resolve related consumers honestly",
+    "meaningful affected tests plus required local docs/ontology/contracts/frontend/path/ratchet/sync-check gates",
+    "new separately named exact full-source archive/manifest/nonexecuting plan",
+    "all eight required workflows at exact complete source, all actual jobs observed; approvedci2 must be unbound or already exactsameSHA, never move differently bound ref",
+    "adopt exact successful push Portal when all required jobs/head/ref are verified; never cancel predecessor/rerun silently",
+    "actual independent combined-source/packet review at its named SHA; report/CI code SHA separated"
+  ],
+  "mutationsForbiddenHere": [
+    "physical/remote/CA/enrollment/workload/offer/policy/runtime/schedule actions",
+    "protectedsource03/executorB5/r5/keys/clocks/pins/folder cleanup",
+    "shared boards/task registry or Obsidian writes",
+    "whole-product or five-PC acceptance claims"
+  ],
+  "currentBaseline": "fixed FIVE only after allready; four independent plain Linux workspace Nodes, CP fifth excluded S05/S07; PC4 share inactive, no simultaneous storage/workspace claim",
+  "newCoreFullEightFinalArchiveDeploymentLaunched": false
+}
