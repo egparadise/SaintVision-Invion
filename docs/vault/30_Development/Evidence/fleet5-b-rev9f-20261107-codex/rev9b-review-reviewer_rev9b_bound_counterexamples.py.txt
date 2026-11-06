@@ -1,0 +1,59 @@
+"""Reviewer (Claude) Rev9b: bound-name re-statement of every ACCEPTED counterexample.
+Every name a mutant uses is bound in its file (import, local or parameter), so the
+counterexample is runtime-meaningful, not a NameError. Parse-only, producer sanity first.
+Usage: python -B reviewer_rev9b_bound_counterexamples.py <absolute Rev9b evidence dir> <out.json>"""
+import ast, hashlib, json, sys
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb
+assert Path(t.__file__).resolve().parent == E
+def sha(s): return hashlib.sha256(s.encode()).hexdigest()
+A8 = json.loads((E / 't1-mark-offline-closure.json').read_bytes())['narrowA8Proof']
+WIT = [r['source'] for r in A8['completeConstructorGraph']['productionConstructorProofs']] + [h['source'] for h in A8['completeConstructorGraph']['localHelperProofs']] + [{'path': d['path'], 'span': d['span'], 'expressionSHA256': d['expressionSHA256']} for d in A8['productionDatabaseConstructors']]
+def sanity(path, src, skip=()):
+    tree = ast.parse(src); k = 0
+    for w in WIT:
+        if w['path'] != path or tuple(w['span']) in skip: continue
+        l, c, el, ec = w['span']; node = next((n for n in ast.walk(tree) if getattr(n, 'lineno', None) == l and n.col_offset == c and n.end_lineno == el and n.end_col_offset == ec), None)
+        if node is None or sha(ast.get_source_segment(src, node)) != w['expressionSHA256']: return False, k
+        k += 1
+    return True, k
+def unbound(src):
+    """Free Load names at module/function level that are neither builtins nor bound anywhere in the file (coarse, conservative)."""
+    import builtins
+    tree = ast.parse(src); bound = set(dir(builtins))
+    for n in ast.walk(tree):
+        if isinstance(n, (ast.Import, ast.ImportFrom)): bound |= {(a.asname or a.name).split('.')[0] for a in n.names}
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): bound.add(n.name)
+        elif isinstance(n, ast.arg): bound.add(n.arg)
+        elif isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)): bound.add(n.id)
+        elif isinstance(n, ast.ExceptHandler) and n.name: bound.add(n.name)
+    return sorted({n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load) and n.id not in bound})
+core = t.read_batch([t.CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+base_unbound = {p: unbound(s) for p, s in {**core, **ctors}.items()}
+R = []
+def run(name, path, src, skip=(), outside=False):
+    ok, k = sanity(path, src, skip); ub = sorted(set(unbound(src)) - set(base_unbound.get(path, unbound(sb.frozen_source(path)))))
+    if outside:
+        _, perr = t.provenance(core, ctors); _, gerr = cg.prove({**core, **ctors, path: src}); cen = cg.current_census({path: src})
+        R.append({'case': name, 'ownerPipeline': 'ACCEPT' if perr is None else 'REFUSE', 'ownerPipelineError': perr, 'ifHandAddedToSources': gerr, 'censusProductionRows': len(cen['production']), 'newUnboundNames': ub, 'producerSanity': ok, 'sourceSHA256': sha(src)})
+    else:
+        c2, k2 = dict(core), dict(ctors)
+        if path in c2: c2[path] = src
+        if path in k2: k2[path] = src
+        g, gerr = cg.prove({**c2, **k2}); _, perr = t.provenance(c2, k2)
+        R.append({'case': name, 'ownerPipeline': 'ACCEPT' if perr is None else 'REFUSE', 'ownerPipelineError': perr, 'graphError': gerr, 'censusProductionRows': len(g['census']['production']) if g else None, 'newUnboundNames': ub, 'producerSanity': ok, 'witnessesChecked': k, 'sourceSHA256': sha(src)})
+    print(json.dumps(R[-1]), flush=True)
+LP = 'tools/lan_pilot.py'; lp = ctors[LP]; CALL = 'ObservationWorker(runtime(state), '
+imp = lambda s, m: s.replace('\nimport argparse\n', '\nimport argparse, ' + m + '\n', 1)
+run('B9b-L1a lan_pilot string-reflective root, bound dict state as db', LP, imp(lp, 'operator').replace(CALL, "operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(state, ", 1), {(3945, 15, 3945, 82)})
+run('B9b-L1a lan_pilot string-reflective root, benign runtime(state) (root silently leaves census)', LP, imp(lp, 'operator').replace(CALL, "operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(runtime(state), ", 1), {(3945, 15, 3945, 82)})
+BH = t.CP + 'business_handoff.py'
+run('B9b-L2 uncatalogued production caller of configured_workspace (object())', BH, sb.frozen_source(BH) + '\nfrom .workspace_config import configured_workspace as _cw\n\ndef _extra_root(tenant, settings):\n    return _cw(object(), tenant, settings)\n', outside=True)
+WC = t.CP + 'workspace_config.py'; wc = core[WC]; LOOP = '    for runtime in pool.values():\n        runtime.destinations = pool\n'
+for label, stmt in (('owner escape', 'register_runtime(runtime)'), ('root db escape', 'register_runtime(runtime.db)'), ('db.transaction method escape', 'register_runtime(runtime.db.transaction)')):
+    run('B9b-L3 workspace_config for-target ' + label, WC, wc.replace(LOOP, LOOP + '        from foreign_module import register_runtime\n        ' + stmt + '\n', 1))
+AP = t.CP + 'app.py'; APL = '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n'
+for label, stmt in (('owner escape', 'register_workspace(workspace)'), ('root db escape', 'register_workspace(workspace.runtime.db)')):
+    run('B9b-L3 app.py factory-result ' + label, AP, core[AP].replace(APL, APL + '            from foreign_module import register_workspace\n            ' + stmt + '\n', 1))
+OUT.write_text(json.dumps({'reviewer': 'Claude', 'cases': R, 'effectfulMutantsImportedOrExecuted': False, 'actualRuntimeB': 0}, indent=1))

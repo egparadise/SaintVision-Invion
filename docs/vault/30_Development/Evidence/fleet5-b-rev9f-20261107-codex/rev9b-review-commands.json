@@ -1,0 +1,20 @@
+{
+  "environment": "Windows 11, Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B, PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9b-870-review-20261106 created from 870486f9. Times KST. Serial only; no installs, no OS/pagefile/process changes.",
+  "provenance": [
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9b-20261106 && git rev-parse FETCH_HEAD", "result": "870486f98ba8fdc6d82f24c2610352a426f23a16"},
+    {"argv": "git ls-remote origin refs/heads/agent/codex/fleet5-b-rev9b-20261106", "result": "870486f98ba8fdc6d82f24c2610352a426f23a16 exact"},
+    {"argv": "git log --oneline 3daf1a0d..870486f9 ; git diff --name-status 3daf1a0d 870486f9", "result": "1 commit; 123 A (122 Evidence/fleet5-b-rev9b-20261106-codex + 1 History), 0 M/D"},
+    {"argv": "git diff --name-only 72028cba 870486f9 -- . ':!docs'", "result": "0 paths"},
+    {"argv": "gh run view 42211243730 --json headSha,headBranch,event,workflowName,attempt,displayTitle,conclusion,jobs ; gh api repos/egparadise/SaintVision-Invion/actions/runs/42211243730 --jq .path", "result": "head 870486f9, branch exact, workflow_dispatch, Documentation Build, .github/workflows/docs.yml, attempt 1, correlation title exact, success, job 127870124147 19 steps 0 non-success"}
+  ],
+  "ownerReruns": {"driver": "reviewer_owner_rerun_driver.py.txt", "receipts": "owner-reruns.tsv.txt", "afterEach": "git status/diff inspected; regenerated files restored with git checkout -- docs/"},
+  "reviewerProbes": [
+    {"argv": "python -B reviewer_rev9b_m1_terminal_parity.py.txt <abs fleet5-b-rev9b-20261106-codex>", "exit": 0, "out": "reviewer-m1-rev9b-result.json"},
+    {"argv": "python -B reviewer_rev9b_m1_terminal_parity.py.txt <abs fleet5-b-rev9-t1-20261106-codex>", "exit": 0, "out": "reviewer-m1-rev9-3daf-differential-result.json"},
+    {"argv": "python -B rev9-review-reviewer_offline_frame_probe.py.txt <abs rev9b|rev9|rev8|rev7 dir> (original byte-exact script)", "exit": "0 x4", "out": "original-offline-frame-probe-rerun.jsonl.txt"},
+    {"argv": "python -B reviewer_rev9b_m2_l1_static.py.txt <abs rev9b dir> out.json", "exit": 0, "out": "reviewer-m2-l1-static-run1-result.json (30 cases)"},
+    {"argv": "python -B reviewer_rev9b_bound_counterexamples.py.txt <abs rev9b dir> out.json", "exit": 0, "out": "reviewer-bound-counterexamples-result.json (8 cases, all ACCEPT through owner pipeline)"}
+  ],
+  "hashChecks": ["15 rev9-review-* copies vs a7e9f9d7 blobs: 0 differ", "3 prior-reviewer_* scripts vs 0440d1ca blobs: equal", "39 proof producers vs 870486f9 blobs: 39 match, 338399 B, manifest 79c0fdba...", "stage1 7947e050... final 7b0ea4d9..."],
+  "syncCheck": "tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json before and after (see local-doc-gates.txt); no apply/adopt/resolve/state write"
+}

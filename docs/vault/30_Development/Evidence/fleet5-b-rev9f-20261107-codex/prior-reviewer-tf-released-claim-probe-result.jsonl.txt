@@ -1,0 +1,4 @@
+{"defect": true, "matchedClaimReleased": true, "model": "fleet5-b-contract-rev7-20261106-codex", "nodeLeaseActive": true, "otherClaimsOnNode": ["claim-1"], "parentConfirmedTerminalClean": true, "releasedClaimRightsRetained": true, "terminalFrameInvoked": true, "terminalFrameRegistered": true}
+rc=0
+{"defect": true, "matchedClaimReleased": true, "model": "fleet5-b-rev8-revoke-portcut-20261106-codex", "nodeLeaseActive": true, "otherClaimsOnNode": ["claim-1"], "parentConfirmedTerminalClean": true, "releasedClaimRightsRetained": true, "terminalFrameInvoked": true, "terminalFrameRegistered": true}
+rc=0

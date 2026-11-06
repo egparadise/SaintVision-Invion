@@ -1,0 +1,56 @@
+﻿{"case": "actual-72028-positive", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-9266-actual-sys-modules-string-variable-forwarder", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-9266-actual-sys-modules-fstring-forwarder", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-9266-actual-importlib-join-forwarder", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-9266-actual-getattr-importlib-variable-constructor-root", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-retained-4288-attrgetter-sys-modules-root", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE"}
+{"case": "L1-retained-4288-importlib-configured_workspace", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE"}
+{"case": "L1-retained-4288-sys-modules-configured_workspace", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE"}
+{"case": "L1-control-outside-benign-database-helper", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-outside-assigned-string-unused-import", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-bounded-literal-unrelated-sys-modules", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-conservative-nonliteral-unrelated-key", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE"}
+{"case": "L1-near-import_module-relative-variable-package", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L1-near-import_module-relative-literal-package", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L1-near-dunder-import-relative-level1", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-9266-actual-WorkspaceAPI-__new__-receives-runtime", "observed": "REFUSE", "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING", "expected": "REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING"}
+{"case": "L2-9266-actual-lan_pilot-callee-rebinding-conn", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND"}
+{"case": "L2-control-app-factory-rebinding", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE"}
+{"case": "L2-retained-4288-WorkspaceAPI-init-runtime", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L2-retained-4288-WorkspaceAPI-init-runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L2-retained-4288-WorkspaceAPI-init-runtime.db.transaction", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L2-retained-4288-create_app-workspace_service-workspace", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace"}
+{"case": "L2-retained-4288-create_app-workspace_service-workspace.runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace"}
+{"case": "L2-control-WorkspaceAPI-init-unowned-working", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L2-control-lan_pilot-unrelated-module-helper", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L2-near-WorkspaceAPI-class-body-__new__-assignment", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.object", "expected": "REFUSE"}
+{"case": "L2-near-WorkspaceAPI-__init__-module-attribute-rebind", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.workspace_api.WorkspaceAPI.__init__", "expected": "REFUSE"}
+{"case": "L2-near-WorkspaceAPI-__new__-module-attribute-assign", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.workspace_api.WorkspaceAPI.__new__", "expected": "REFUSE"}
+{"case": "L2-near-lan_pilot-global-import-in-function", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-near-lan_pilot-star-import-shadow", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-near-lan_pilot-match-capture-rebind", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.__import__", "expected": "REFUSE"}
+{"case": "L2-bound-lan_pilot-globals-dict-store", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:globals()['_current_finalized_batch']", "expected": null}
+{"case": "L2-server-control-new-in-server-class", "observed": "REFUSE", "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING", "expected": "REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING"}
+{"case": "L2-server-control-metaclass-header", "observed": "REFUSE", "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING", "expected": "REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING"}
+{"case": "L2-server-control-changed-call", "observed": "REFUSE", "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING", "expected": "REFUSE"}
+{"case": "I1-explicit-kw-into-kwargs", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["extra"]}, "matchesExpectation": true}
+{"case": "I1-two-explicit-kw-into-kwargs", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["extra"]}, "matchesExpectation": true}
+{"case": "I1-dict-literal-spread-into-kwargs", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["extra"]}, "matchesExpectation": true}
+{"case": "I1-unknown-spread-refuses", "error": null, "unresolved": ["UNRESOLVED:OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "I1-kwargs-forward-chain", "error": null, "unresolved": ["UNRESOLVED:OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING"], "ownedFormalsAt": {"accept": ["extra"]}, "matchesExpectation": true}
+{"case": "I1-vararg-refuses", "error": null, "unresolved": ["UNRESOLVED:OWNED_ARGUMENT_VARIADIC_BINDING"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "I1-factory-chain-converges", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "alias-before-computed-rebind", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "alias-call-of-original-after-rebind", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": false}
+{"case": "lexical-unrelated-local-same-name", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "lexical-unrelated-class-attr-same-name", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "near-global-def-in-function", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": false}
+{"case": "near-global-import-in-function", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": false}
+{"case": "near-nonlocal-rebind-nested-callee", "error": null, "unresolved": [], "ownedFormalsAt": {"outer.accept": ["slot"]}, "matchesExpectation": false}
+{"case": "near-star-import-shadow", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": false}
+{"case": "near-class-body-__new__-assign", "error": null, "unresolved": [], "ownedFormalsAt": {"Box.__init__": ["slot"]}, "matchesExpectation": false}
+{"case": "near-module-attr-init-rebind", "error": null, "unresolved": [], "ownedFormalsAt": {"Box.__init__": ["slot"]}, "matchesExpectation": false}
+{"case": "control-ordinary-init", "error": null, "unresolved": [], "ownedFormalsAt": {"Box.__init__": ["slot"]}, "matchesExpectation": true}
+{"case": "control-frozen-style-staticmethod", "error": null, "unresolved": [], "ownedFormalsAt": {"Box.accept": ["slot"]}, "matchesExpectation": true}
+{"cases": 35, "binder": 19, "mismatches": ["L1-near-import_module-relative-variable-package", "L1-near-import_module-relative-literal-package", "L1-near-dunder-import-relative-level1", "L2-near-lan_pilot-global-import-in-function", "L2-near-lan_pilot-star-import-shadow", "alias-call-of-original-after-rebind", "near-global-def-in-function", "near-global-import-in-function", "near-nonlocal-rebind-nested-callee", "near-star-import-shadow", "near-class-body-__new__-assign", "near-module-attr-init-rebind"]}
+{"ownerResourceMeasurement": {"target": "C:\\Users\\inviz\\AppData\\Local\\Temp\\claude\\c281c9806df8bc9f\\010760ec-0a70-4fa6-b1a9-8ae4ffdf96b1\\scratchpad\\r9e\\reviewer_rev9e_delta_probes.py", "peakWorkingSetBytes": 162545664, "elapsedSeconds": 888.275, "OSMemoryLimitEnforced": false, "serial": true}}

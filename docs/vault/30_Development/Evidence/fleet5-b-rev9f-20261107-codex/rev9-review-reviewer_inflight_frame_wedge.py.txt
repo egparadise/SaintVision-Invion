@@ -1,0 +1,21 @@
+"""Reviewer probe: in-flight TERMINAL_FRAME whose confirmation arrives after kernel release.
+Usage: python -B reviewer_inflight_frame_wedge.py <rev9-evidence-dir>"""
+import json, sys
+sys.path.insert(0, sys.argv[1])
+from model import World, binding, scope, sk, VER
+from io_contract import fixture_footprint
+out = {}
+for profile in ('PLAIN', 'B'):
+    w = World(); s = scope(); n = w.nodes[sk(s)]; n['profile'] = profile; c = w.connect(VER)
+    def send(h):
+        b = w.obligations[w.handles[h.handle_hash]['key']]['binding']; return w.invoke(h, b['bodySHA'], b['method'], b['rawPath'])
+    p = w.register(c, binding(w, op='parent', kind='EXECUTE')); assert send(p)
+    f = w.register(c, binding(w, op='frame', kind='TERMINAL_FRAME', parent=p.handle_hash)); assert send(f)
+    assert w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    late = w.confirm(c, f, w.outcome(f, 'OBSERVED'))
+    frow = w.obligations[w.handles[f.handle_hash]['key']]
+    disjoint = w.register(c, binding(w, op='other-run', kind='EXECUTE', run='run-9', resource='resource-9'))
+    other_node = w.register(c, binding(w, s=scope(n='node-2'), op='n2', kind='EXECUTE'))
+    out[profile] = {'lateConfirm': late, 'frameRow': frow['state'], 'frameCap': w.private_caps[f.handle_hash]['state'],
+                    'disjointSameNodeAdmission': disjoint is not None, 'otherNodeAdmission': other_node is not None}
+print(json.dumps(out))

@@ -1,0 +1,6 @@
+Reviewer local gates, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B, PYTHONUTF8=1, cwd=worktree root, tree = 3cccfe4d + own review History/Evidence only.
+sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write.
+2026-11-07T03:38:23+09:00..2026-11-07T03:39:13+09:00 exit=3 logsha=fe3c73a4059bac8466065699eb5be560d75451ef67f467f22117608880397ec4 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-canonical-sync-check-before.json
+    stateBefore c3043aee926330d9f40b7a87227006284fdfe8c93022c9dc9c5da314740201bf stateAfter e4c2ccd25a996966c485f72f161d24cedd41562c55c1d235b13afb77059ae4ce
+      full list (2): C:\Users\inviz\AppData\Local\Temp\claude\c281c9806df8bc9f\010760ec-0a70-4fa6-b1a9-8ae4ffdf96b1\scratchpad\r9e\sync-conflicts-canonical-sync-check-before.json
+      no-baseline = the tool has no manifest/state record for these; it cannot tell a real edit from an un-recorded prior sync. --adopt-identical records only matching files; it does not resolve divergent files.

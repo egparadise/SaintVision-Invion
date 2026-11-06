@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "fleet5-b-rev9-3daf-review-claude:1",
+  "reviewer": "Claude (actual independent, one worker, no helpers)",
+  "orca": {"task": "task_522bf43089d4", "dispatch": "ctx_de2750e94f9d", "dependsOnCompleted": "task_b234a0f9df1a/ctx_aabf96f33707 (combined review 7d979761)"},
+  "owner": {"agent": "Codex", "task": "task_a8fd2969f0b3", "dispatch": "ctx_6f0f8253b8a7", "pendingQuestion": "msg_ae8b4176e148"},
+  "target": {
+    "final": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+    "base": "6a65665819d7479073189c524abf585636c3079d",
+    "branch": "agent/codex/fleet5-b-rev9-t1-20261106",
+    "remoteExact": true,
+    "addedPaths": 86, "modifiedOrDeletedPaths": 0,
+    "pathsOutsideOwnHistoryEvidence": 0,
+    "diffOutsideDocsVsProduct72028": 0,
+    "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "ownerDocs": {"run": 42191613681, "job": 127804769842, "event": "workflow_dispatch", "workflow": ".github/workflows/docs.yml", "attempt": 1,
+                  "headSha": "3daf1a0d24c220586474a4b376609e62960b8ca6", "headBranch": "agent/codex/fleet5-b-rev9-t1-20261106",
+                  "displayTitle": "fleet5-rev9-t1-task_a8fd2969f0b3-3daf1a0d24c220586474a4b376609e62960b8ca6",
+                  "conclusion": "success", "steps": 19, "allStepsSuccess": true, "reverifiedBy": "gh run view + gh api by this reviewer"}
+  },
+  "inputsRead": [
+    "History 2026-11-06_FLEET5_B_Rev9_T1_Codex.md v1.0.0",
+    "Root b-rev9-t1-root-scope.json (msg_78b82487362a exact Rev9 choice incl. BUILD_CLEANUP split)",
+    "prior actual review 0440d1ca (REVISION_REQUIRED B8-M1 + L1/L2/L3)",
+    "Rev9 lifecycle.py io_contract.py model.py(admission/binding) model_tests.py analysis_rules.py t1_provenance.py t1_build.py t1_tests.py mutation_fixture.py analysis_rule_tests.py terminal_claim_regression.py measured_run.py",
+    "t1-mark-offline-closure.json targeted-category-delta.json producer-order.json proof-producer-hashes.json proof-checks.json original-reviewer-rule16-owner-rerun.log",
+    "actual 72028 terminal.py 40-112/215-282, observation.py 130-155, db.py 1-60/100-255, containment.py 15-19, node_channels.py 1-150, node_transport.py 50-62/225-300, observer_worker.py 14-22, lan_pilot.py 898-904/3935-3952"
+  ],
+  "verdict": "REVISION_REQUIRED (bounded, narrow)",
+  "blocking": ["B9-M1", "B9-M2"],
+  "beforeReuse": ["B9-L1"],
+  "info": ["B9-I1", "B9-I2", "B9-I3", "B9-I4", "B9-I5", "B9-I6"],
+  "priorFindingStatus": {
+    "B8-M1": "CLOSED for the matched-claim defect and the BUILD_CLEANUP_READ split. Reviewer 102 attacks (PLAIN+B): per-claim tombstone on original EXECUTE and CANCEL receipt, with/without other claims, other claim rights/version untouched and its frame still positive, re-admitted claim old-parent refused/new-parent positive, per-lease expiry and now+5 after prepare, rights.version mismatch, non-EXECUTE parent, restart, cross-node, Node booleans never substitute, recovery ACK never releases, no double release, CANCEL identity lookup after tombstone, UNKNOWN parent kept. Cleanup read: current-auth fields, read grant revoke/expiry after prepare, wrong purpose, EXECUTE parent fixture refused, quarantine read no effect, UNKNOWN parent no settlement, TERMINAL_CLEAN label refused with claim unchanged, cross-node, duplicate op, lineage tombstone not observe revoke. Owner terminal regression reproduced exit 1/1/0 with raw defect true/true/false. Residual Node-liveness/tenant-containment parity => NEW B9-M1 (retained since Rev7).",
+    "B8-L3": "CLOSED. Owner field-at-a-time negatives plus reviewer liveness/grantLive/expiresAt/cert/cross-node connection/restart own-node UNKNOWN hold/other-node unaffected/missing scope no mutation/forged footprint ignored/lineage tombstone => AUTHORITY_DENIED, all without version/fact mutation.",
+    "B8-L1": "PARTIAL. All Rev8-named forms (attribute store, setattr/delattr, metaclass, foreign dataclass/Exception import, caller rebind) now refuse with fresh producer sanity. Original 16-case script unchanged; its 3 remaining reports are correctly explained (old-test reconstruction is HASH_MISMATCH by construction; caller case is a hardcoded syntactic assertion, not a predicate call; unbound field would NameError and Root requires exact field import, proper-import positive passes). New uncovered forms => B9-L1.",
+    "B8-L2": "CLOSED (bounded cut only). 6 refs/14 rows: file+expression hashes match 72028, all blocksGrant=true, actualBinding null; OneConnection.connect 9 IO links cover every production caller of exchange/probe/resource_snapshot/read_chunk/quarantine/storage_sample/terminal_frame (git grep). Recount: 598 rows, 25 touched, 573 outside, 227 fallback -> 9 touched -> 218 UNREVIEWED backlog. No global category closure.",
+    "B7/I1-I4 closed items": "Not reopened. Retained probes 79+8 reproduced via owner retained_probes.py exit 0."
+  },
+  "findings": [
+    {
+      "id": "B9-M1", "severity": "MEDIUM", "retainedSince": "Rev7 (missed by 97bb and by this reviewer's 0440 review)",
+      "title": "TERMINAL_FRAME lane omits the Node-status and tenant-execution conditions of actual terminal._current",
+      "source": "lifecycle.py:318-332 _terminal_parent_current; register :64-67; invoke :90-95 (no n['liveness'] / projection check). Actual 72028 terminal.py:65 require_execution (tenant kill_switch), :76-84 node status in {online,draining} and recovery_epoch; frame() calls _current at terminal.py:229 then snapshot(observation_only=True) at :275, which itself skips status/heartbeat.",
+      "counterexample": "PLAIN and B: register EXECUTE parent, invoke; set Node liveness offline (what actual NodeObservation.mark_offline does; it never releases leases). TERMINAL_FRAME register -> handle, invoke -> True; prepared-then-offline invoke -> True. The model's own R12 eligible() query returns False for the same frame. Same result on immutable Rev7 and Rev8 models (reviewer-offline-frame-probe-result.jsonl.txt).",
+      "impact": "The proposed guard is weaker than the installed product guard on the exact condition the T1 demonstrator writes; adopting it as the contract would let a terminal frame reach a Node the CP has declared lost. No tenant execution-stop (kill switch) condition is modelled for the frame lane either.",
+      "remedy": "In register/invoke/confirm for TERMINAL_FRAME require projection(n) in {online, draining} (draining == DRAIN fact, matching actual status enum) and a modelled tenant execution containment equal to actual require_execution; add PLAIN+B regressions (offline before register, offline after prepare, draining positive, tenant stop refuses) and keep cleanup read / CANCEL / RECEIPT lanes unchanged."
+    },
+    {
+      "id": "B9-M2", "severity": "MEDIUM",
+      "title": "Narrow A8 'ALL production NodeObservation.db chains' omits the tools/lan_pilot.py observe() root",
+      "source": "t1_provenance.py:93-125 verifies only NodeObservation/RestrictedWorkspaceRuntime call sites and three named roots; ObservationWorker call sites are never enumerated. Actual 72028 tools/lan_pilot.py:3945 observer = ObservationWorker(runtime(state), NodeTLSClient(...)); runtime at :902-903 returns Database(...). lan_pilot.py is itself counted by the owner as a production Database site (:903).",
+      "counterexample": "Mutate only lan_pilot.py:3945 to ObservationWorker(object(), ...) or ObservationWorker(foreign_database, ...) or append 'runtime = foreign_runtime': owner provenance() still returns SOURCE_PROVEN_RUNTIME_PENDING with NodeObservationDbUnion ['inv.db.Database'] and A1c for mark_offline still proves (reviewer-rev9-l1-t1-mutations-result.json A8-lan_pilot-root rows).",
+      "impact": "The conclusion {Database} is true for actual bytes (runtime() returns Database), but the recorded SOURCE_STATIC_CLOSED proof does not establish it for a real production root, so the T1 closure claim as written is not justified. No runtime/grant consequence (notGrantable).",
+      "remedy": "Enumerate every ObservationWorker( call (production observer_worker.py:58, tools/lan_pilot.py:3945; harness tests/integration/test_node_extensions.py:47) and bind lan_pilot.runtime as the single local def returning Database with no rebind (same helper-return proof as remote_workspace_entry.database). Prefer deriving the expected chain set from a census of all callers of every constructor on the path (ObservationWorker.__init__, NodeObservation.__init__, RestrictedWorkspaceRuntime.__init__) instead of a hand-written dict. This is a local helper, not the deferred A7 cross-module import."
+    },
+    {
+      "id": "B9-L1", "severity": "LOW",
+      "title": "Hardened A1c/A8/A2 mutation scans are per-form denylists that miss escape/patch forms",
+      "source": "analysis_rules.py:74-93 mutation_reason (positional-Name-only escape; class scan by literal root name), :28-40 dynamic_module_mutation, :44-62 error_initializer, :41-43 constructor_binding; t1_provenance.py:44-55/56-79 (no post-construction attribute store check).",
+      "counterexample": "With fresh reparse/rebase and producer sanity passing, the owner pipeline ACCEPTS (48 rows in reviewer-rev9-l1-t1-mutations-result.json): receiver escape foreign(c=conn), foreign([conn]), foreign(*[conn]), lambda capture, dict box, foreign.attach(conn=conn), foreign(conn.execute) for all three receivers; owner patch self.db.transaction = foreign / self.db.__class__ = foreign / vars(self.db).update(...) in mark_offline or __init__; from .db import Database as _D; _D.transaction = foreign; root-site db.transaction / db.statement_observer = socket / db.placement_metric_sink = subprocess after observer_worker Database(...); import psycopg as _pg or from psycopg import Connection as _PC then .execute = foreign; builtins.setattr / type.__setattr__ / globals()[...] on _ObservedConnection; A2 builtins.Exception = foreign before the class, type.__setattr__/builtins.setattr/globals() on DomainError, and from . import errors as _e; _e.DomainError.__init__ = foreign in the caller. Direct controls (foreign(conn), conn.__class__.execute =, Database.transaction =, psycopg.Connection.execute =, DomainError.__init__ =) refuse. Actual 72028 inputs contain none of these forms (only lan_pilot.py:4258 globals() command dispatch), so the actual 16-edge source closure is unaffected.",
+      "remedy": "Replace denylists with use-site allowlists before reuse: every Load of a proven receiver must be the receiver of the recorded execute/fetch*/cursor call or the with-as binding, anything else refuses; resolve import aliases (import X as Y, from M import C as Y) into the protected class set; refuse any Attribute Store/Del whose root resolves to a proven owner instance (self.db, root db) and any setattr/__setattr__/globals()/vars()/__dict__ use regardless of spelling; for A2 refuse builtins rebinding and any module-alias path to the class. Add these as span-shifted negatives with producer sanity."
+    }
+  ],
+  "infoItems": [
+    {"id": "B9-I1", "text": "_tombstone_claim_rights is keyed by claim, not a CAS on (claim, admittedClaimVersion, executionAttemptId), and kernel_receipt() binds neither field. Fixture-only probe: a late original receipt tombstones newer seeded rights for the same claim key. Not reachable through register because the CANCEL-released parent stays PENDING_IO overlapping and blocks re-admission (probe confirms). Recommend the version/attempt CAS as defence in depth."},
+    {"id": "B9-I2", "text": "lifecycle.py:249-251 is unreachable (TERMINAL_FRAME/BUILD_CLEANUP_READ already dispatched at :246-247). Cosmetic."},
+    {"id": "B9-I3", "text": "An in-flight frame whose confirmation arrives after a legitimate matched release fails closed: row UNCERTAIN, cap POISONED, every same-Node admission (even disjoint) held until protected settlement; other Nodes unaffected (reviewer-inflight-frame-wedge-result.json.txt). Safe, but a normal workload-exit race wedges the Node; record the intended protected-settlement path for this case."},
+    {"id": "B9-I4", "text": "The statement observer call inside the held transaction lock (_ObservedConnection.execute) is recorded only as a note in the union proof, not as a named RUNTIME_PENDING row; production binding None is source-proven only for constructor keywords (see B9-L1 post-construction stores)."},
+    {"id": "B9-I5", "text": "nonProductionHarness lists only two grep patterns; the many tests/integration NodeObservation(a.e.db, ...) and ObservationWorker(a.e.db, ...) constructions are not recorded as HARNESS_ONLY references. Minor completeness."},
+    {"id": "B9-I6", "text": "Reviewer's own Rev8 probe reviewer_tf_released_claim_probe.py silently imports the model next to the script when argv[1] is not an existing directory and echoes argv as 'model'. My first rerun passed bare directory names and got exit 0/0/0 labelled rev7/rev8 (reviewer mistake, retained in owner-reruns.tsv.txt rows 12-14). Owner's recorded runs used absolute paths and are valid; rows 12a-14a reproduce 1/1/0. The wrapper should assert the directory exists and that model.__file__ is under it."}
+  ],
+  "t1Assessment": {
+    "edgeSet": "19 unknown refs == immutable functionPlans mark_offline remainingUnknownRefs (sha 7d650fbe...): A1c 2+3, A2 4, A3 4, A5 1, A8 attribute 2 closed; P-DBROLE 1 and T1-OBSERVABILITY 2 named pending. Matches Root scope lines exactly.",
+    "actualSourcePositives": "A1c 5 edges, A3 ContextVar, A5 local list, A2 DomainError/constructor binding all prove on actual bytes; observed union exact; consistent-view guard real (SOURCE_INPUT_DISAGREEMENT).",
+    "status": "SOURCE_STATIC_CLOSED_RUNTIME_PENDING/notGrantable is the right shape, but not yet justified until B9-M2 (and B9-L1 for reuse) are fixed. Explicit runtime pending (P-DBROLE, READ COMMITTED/SET LOCAL/timeouts, lock traces, clock cutoff, logging handlers, B roles/auth/cutover) is correct and is not a rejection reason.",
+    "sharedEntries": "12 critical entries named; entryStatusUpgrades 0."
+  },
+  "producerProof": {
+    "hashes": "33/33 proof-producer-hashes entries equal 3daf blobs (reviewer recomputed).",
+    "order": "pending_contracts.py (e0dd1ee5...) -> stage1 61daff8a... NOT_FINAL -> edge_categories.py (d16ae559...) -> final 79a03d49...; rerun in that order reproduced both byte-identically.",
+    "ownerReruns": "16 owner commands rerun individually and serially: all expected exits (Rev7/Rev8 regression 1, Rev9 0, R4 normal 0, --require-coexistence 1) after correcting reviewer argv; regenerated artifacts byte-identical except producer-order.json KST and retained-probe-results.json absolute worktree paths, both restored. Owner reruns are not new B evidence."
+  },
+  "nextCutForRoot": {
+    "recommendation": "Rev9b fix-only delta first, then the A7 cut narrowed to NodeChannels.snapshot only.",
+    "rev9b": {
+      "owner": "Codex task_a8fd2969f0b3 (same)", "reviewer": "Claude delta review through Root",
+      "base": "3daf1a0d24c220586474a4b376609e62960b8ca6", "scope": "docs/schema/static/symbolic only; unique own History/Evidence",
+      "items": ["B9-M1 projection/tenant-containment parity for TERMINAL_FRAME + PLAIN/B regressions", "B9-M2 ObservationWorker root census + lan_pilot.runtime helper proof", "B9-L1 use-site allowlist + alias resolution + generic setattr/globals/vars refusal, as span-shifted negatives", "optional B9-I1 CAS"],
+      "unchanged": "T1 19-edge set, 12 entries, 598/757/1071/21, 573 outside rows, 218 backlog, all real bindings NULL"
+    },
+    "afterRev9bAccepted": {
+      "entry": "inv.node_channels.NodeChannels.snapshot node_channels.py:124-149 (shared by terminal.py:275 frame observation_only and node_transport.py:264 deliver)",
+      "subgraph": "Database.transaction reused by hash from T1; require_execution containment.py:15-18 (A1c tenant_controls + A2); two A1c conn.execute(...).fetchone (inv.nodes FOR SHARE with clock_timestamp, inv.node_channels); proof() ChannelProof dataclass node_channels.py:84-101 (A2 dataclass variant); assert_channel :104-117 (two A1c + clock_timestamp + DomainError); observation_only branch semantics recorded exactly (skips kill switch and online/heartbeat, used by terminal/recovery).",
+      "A7": "cross-module 'from lan_pilot import runtime' in tools/lan_execution.py:19 and tools/check_remote_workspace.py:21 -> lan_pilot.runtime:902-903 Database",
+      "A8": "census of every NodeChannels( site: build_product_runtime.py:532, node_transfer.py:18, node_transport.py:231, observation.py:14, terminal.py:275 (self.db = workspace.db), tools/check_remote_workspace.py:116, tools/lan_execution.py:83/137/172, tools/remote_workspace_entry.py:205; if any chain yields BoundDatabase record union {Database,BoundDatabase} with its tenant-equality/yield-self.conn proof instead of forcing {Database}; harness separate",
+      "excluded": "NodeDelivery.deliver (T2 exchange, NodeReceiptStore, GPU quarantine writer, event) to a later cut; full A8; full assembler/3485 plans",
+      "errors": "RULE_NOT_APPLICABLE, RECEIVER_UNION_UNPROVEN, MISSING_PRODUCER_RECORD, HARNESS_ONLY_PROVENANCE, DYNAMIC_BLOCK, RUNTIME_PENDING",
+      "runtimePending": "actual clock_timestamp/heartbeat freshness, certificate_not_after with real certs, PG locks, kill-switch writer authority, B purpose roles",
+      "output": "snapshot view SOURCE_STATIC_CLOSED_RUNTIME_PENDING notGrantable; no entry status upgrade"
+    },
+    "notGranted": "No B product/code/port/credential/registration/partial freeze/runtime/PKI/Node/VM/clock grant from this review."
+  },
+  "notRun": "full assembler/523 files/3485 plans/aggregate ledgers; PG/Docker/SSH/Node/Go/crypto/TLS/crash/concurrency/equipment/VM/clock/PKI; Obsidian apply/adopt/resolve/state write; effectful mutants (parsed only)",
+  "bState": {"newActualBEvidence": 0, "A1_A16": "PENDING", "realBindings": null},
+  "resources": "serial only; max simultaneous selected source files 10 (owner read_batch assert) then separate census; owner-command reruns peak working set max 62840832 B (t1_tests.py, measured_run); reviewer probe scripts ran serially without measured_run (peak not recorded, same owner batch reader); no installs/OS/pagefile/process changes"
+}

@@ -1,0 +1,2 @@
+PASS: 24 original hashes, 1261 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py", "peakWorkingSetBytes": 180383744, "elapsedSeconds": 35.598, "OSMemoryLimitEnforced": false, "serial": true}}

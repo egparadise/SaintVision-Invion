@@ -1,0 +1,414 @@
+{
+  "cases": [
+    {
+      "case": "relative-variable-package",
+      "pass": true,
+      "sourceSHA256": "9a4a0950780b6181d7747ba9ad5b3b18b58d382fea0ba4d9529c6ec0065a5dc1",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "relative-literal-package",
+      "pass": true,
+      "sourceSHA256": "fc00f0288db73e105f944bcdab30143dd3ff8d2e8e06a8c90506a1f005be004e",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "relative-keyword-package",
+      "pass": true,
+      "sourceSHA256": "bc0cf6ee02e8be3aa39bd9663e7f0ba04a02640a0986818d7857ca514bba845a",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "absolute-variable-package",
+      "pass": true,
+      "sourceSHA256": "bbd848543a2ac75753302be13b3bd77a1f1133643b288147f06907dec765845b",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "absolute-literal-package",
+      "pass": true,
+      "sourceSHA256": "ea7d334e49634064d76da7f57e979d7688458917269357132feae8fb14318869",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "absolute-no-package",
+      "pass": true,
+      "sourceSHA256": "c434a37bad147b688a2bb77df81a40193af5c4085f0728f64d6ee0ae1bc2a481",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "absolute-keyword-name",
+      "pass": true,
+      "sourceSHA256": "bde99801f3514ff0256f233954c2eef9daeb0cb156af138ff198d15c6b0fcae1",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "relative-leading-dots",
+      "pass": true,
+      "sourceSHA256": "9813c2d737f27e9d62fd713ac32eff28a1dfeb9ea84e4eb31abf9f2f8b437a50",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-positional-one",
+      "pass": true,
+      "sourceSHA256": "92c5229c40357d0eceaa1364c050ee327e3b7762c2eb19effb706ce3c88d24e0",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-keyword-one",
+      "pass": true,
+      "sourceSHA256": "b3f4a33e1fdc171cf7b2110121ee6f70690721ef39ba911cf191dbfe16da01f5",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-keyword-variable",
+      "pass": true,
+      "sourceSHA256": "70cd6a4bb696bf01f696c09aadb998b0bc4f4b7b5df156235d02c923358f0653",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-positional-variable",
+      "pass": true,
+      "sourceSHA256": "7a5a5678db233c5da6d1ef5ebc125514f9569ba4d5944f6904622a2e42671cec",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-keyword-zero",
+      "pass": true,
+      "sourceSHA256": "0893852f5f968ca19d9af166a16959559e958832e46502fa911f0935219c8684",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-positional-zero",
+      "pass": true,
+      "sourceSHA256": "ff0ebad60ab67dace4add060469a4adfa04d86c367b303477ff531adcadfcb4b",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-absent",
+      "pass": true,
+      "sourceSHA256": "6fc995cd986ec8fdba76e0efd30d2d3276f0c97ba635cf39fa90a658ba096b24",
+      "unknown": false,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-bool-conservative",
+      "pass": true,
+      "sourceSHA256": "d8ceb5fdaf7899e15b34c1f0f73f1fa3e4dea1436abcc01fbfd967fc508642fb",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "dunder-relative-name",
+      "pass": true,
+      "sourceSHA256": "bbd1cd11309493a65e5bcf70fc97998b3fd8404919faed09243760bc4fd6d57e",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "package-spread-unknown",
+      "pass": true,
+      "sourceSHA256": "814bddadf9eb88ecff2b72657b1c886206f38ce5e806c70cd3de45533a61f396",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "level-spread-unknown",
+      "pass": true,
+      "sourceSHA256": "1b8d1e11da16df95ac46c42482f673a24a5e9b7b46e913cf2ea166816988b52f",
+      "unknown": true,
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-import",
+      "pass": true,
+      "sourceSHA256": "6331bb7452e78baefe6b2823d07192aadb3e02edac607ac673aef6a145928e25",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-import",
+      "pass": true,
+      "sourceSHA256": "c47ecb6142a4c4cdd2f641e77669333384211cecb4a35f27b40ab2aa08783eb2",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-importfrom",
+      "pass": true,
+      "sourceSHA256": "dfdf6835bd3d301553716b21c7d5413834728d64dc8d68cfd1dcf2d17797628f",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-importfrom",
+      "pass": true,
+      "sourceSHA256": "a5516876933458ae7a4ddc74295d60f48b6bba5f8ecbaf9252d3a19ae186d858",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-importfrom-alias",
+      "pass": true,
+      "sourceSHA256": "e9885108f7160116acb426053f9cd05028f535002839b7da550bcdd80ee27506",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-importfrom-alias",
+      "pass": true,
+      "sourceSHA256": "7d244a63321d5a101bca32efd48844ea551001a88d29b11345c02bec36adb654",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-def",
+      "pass": true,
+      "sourceSHA256": "4b4ab22fc6bcdb1d92e5b6de6c83690c13df2c87191f0e6561a7974c4169e70d",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-def",
+      "pass": true,
+      "sourceSHA256": "1883f537a89b63099a219a8a4ebaf5bc7d0fabd64b5e7880185f39f96fabfa03",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-async-def",
+      "pass": true,
+      "sourceSHA256": "53adb35e4f1d3180df9e06a23cf6862b63bbb91d4b457adbe9cbd7afcb4929e3",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-async-def",
+      "pass": true,
+      "sourceSHA256": "d36154dee89398f6141ce97d9e1b6a1c733e1af0fdcf7b760e8f62d6fff2f691",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-class",
+      "pass": true,
+      "sourceSHA256": "c4c73499975276b3f45308a5f1d017422ad6fec836e04390504a86c1d5e4ed9a",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-class",
+      "pass": true,
+      "sourceSHA256": "08612146f5cf7606f715aa677c7fe9db04a35b8d07ee0595bb6403865f13cd29",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-match-as",
+      "pass": true,
+      "sourceSHA256": "235ee111a8a7e9d88b53fb997ab5e37e5ba20a2b69ce8fb683060236ba27c850",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-match-as",
+      "pass": true,
+      "sourceSHA256": "cbe9927d33b2a750f700f21d9d52884f57558a73c5949e7a914cdc34507d74d6",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-match-star",
+      "pass": true,
+      "sourceSHA256": "f9286b5966dfecd2daf20d5af3d00ea2b480d02a631d71adc258d8e0d48a075e",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-match-star",
+      "pass": true,
+      "sourceSHA256": "57137dbf54c22b0833fe5294bc6ffd71dbd4868b5ce75020dc138146fa882a36",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-match-mapping-rest",
+      "pass": true,
+      "sourceSHA256": "1298edfcfaa48a1ee7fed325e68abbcf351e985fae9ce8b7050c1f07066b091c",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-match-mapping-rest",
+      "pass": true,
+      "sourceSHA256": "fe9822acf78778b1b7f04018528a975f2e21a84d93e1f7263062923d6e3db6d2",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-except",
+      "pass": true,
+      "sourceSHA256": "6e69f8ab397bd1f8c6c3c1927602a7f9cd91a720b005f074a6c93983f1a1050f",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-except",
+      "pass": true,
+      "sourceSHA256": "5f192ac0217eaf18a90c82f9b278cd06d29b8d21a96eb6b098d72670fc887d4f",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-store",
+      "pass": true,
+      "sourceSHA256": "7752d4b4882281332a2d40c9a26a36fa881f5b4053f166dbc892f61d89fe9730",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-store",
+      "pass": true,
+      "sourceSHA256": "fe6441abb4fdca5230dd6b7737cf276ff49be8d7d005c157bfd7c7fa2a0c47be",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-delete",
+      "pass": true,
+      "sourceSHA256": "7bd9b5a968250ef69c1423d00ea082abff30f2131f5a53883d0e4c431d8a567d",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-delete",
+      "pass": true,
+      "sourceSHA256": "c6ff8493004a3dfb1fc02ba3107039155f9ebea2b43b69e635c87a45ea200fdc",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-augmented",
+      "pass": true,
+      "sourceSHA256": "535f6d78b853f77dc4d8c6d6f1f0ac68f890d95fa140344af60ff0e591c58b40",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-augmented",
+      "pass": true,
+      "sourceSHA256": "e49dec087fbfab47ede0030d1f3860b2c4d39627821aa4e4a9b4baef994b6bd7",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-named-expression",
+      "pass": true,
+      "sourceSHA256": "96bd126d482ed01b3a9727192bb6d99a21d8a2dc4f0f20ccaf7d59d202e26d5d",
+      "reason": [
+        "UNRESOLVED:CALLEE_REBOUND"
+      ],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "local-control-named-expression",
+      "pass": true,
+      "sourceSHA256": "f2781fcdef5f2c043120059f335a9975b3bdc6dd27046f20811f08b322ccd323",
+      "reason": [],
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-declaration-alone",
+      "pass": true,
+      "sourceSHA256": "f407c87f558d64eba99d265c6c8847893a1775c71f1a727b25c181266e1a7e72",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "nested-function-boundary",
+      "pass": true,
+      "sourceSHA256": "2ceb42ba13fe4cc73957130992798566e02c25a63190cc261b73bd23dc0295d4",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "nested-class-boundary",
+      "pass": true,
+      "sourceSHA256": "8d0b86429bf1c3753a5add90d054a71404399964e295c05488730772b4bb05a1",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "comprehension-boundary",
+      "pass": true,
+      "sourceSHA256": "91d5d2640aa710d63567df0601e91fd22f3f62caa1fddd51ed1b372b9650dbc8",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "module-comprehension-boundary",
+      "pass": true,
+      "sourceSHA256": "95b29350c0afb77ec06c357f79170fd1f393d57773e7b520770d502e02cd0198",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "lambda-boundary",
+      "pass": true,
+      "sourceSHA256": "246fc9f0679c41497e4eda0d5b1d610f47bc58be9c03ffdf962b675fdd7f3fbd",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "star-import",
+      "pass": true,
+      "sourceSHA256": "b6421816cc8060c2a15c943aab8e8774a2c1d2302116a48397eee489e1b11dd0",
+      "syntaxCompiledOnly": true
+    },
+    {
+      "case": "global-walrus-through-comprehension",
+      "pass": true,
+      "sourceSHA256": "84cad2a3f83b3a118bb4e453f8af2041a3e5f214bf8f9ac996d7f21f5abdbe22",
+      "syntaxCompiledOnly": true
+    }
+  ],
+  "count": 55,
+  "nonlocal": "INFO/OUTSIDE_REQUIRED_CUT",
+  "binderAlone": "INSUFFICIENT; full provenance/use-site guard required for class-body/attribute stores",
+  "effectfulFixturesExecuted": false,
+  "actualRuntimeB": 0
+}

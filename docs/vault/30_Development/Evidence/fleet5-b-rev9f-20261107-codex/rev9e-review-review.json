@@ -1,0 +1,100 @@
+{
+  "review": "Actual independent Claude NARROW Rev9e delta review",
+  "orca": {"task": "task_d1f9b00b0306", "dispatch": "ctx_52365790d017", "reviewerBranch": "agent/claude/fleet5-b-rev9e-3ccc-review-20261107", "reviewerBase": "3cccfe4d7511180fa8fbb6f5742328c6a43d04bd"},
+  "owner": {"agent": "Codex", "task": "task_a8fd2969f0b3", "dispatch": "ctx_6f0f8253b8a7", "pendingQuestion": "msg_9578b8329a2e", "rootFixGrant": "msg_533819c42490"},
+  "target": "3cccfe4d7511180fa8fbb6f5742328c6a43d04bd",
+  "base": "54549b90774aab3599c0486a5217d0d1634baca8",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "priorActualReview": {"commit": "9266f719fe97f41b9b4ba38cee4a963a3c1218dc", "docs": 42257602765, "verdict": "LOW-only REVISION_REQUIRED (B9d-L1/L2, I1-I3 info)"},
+  "rootSourceReceiptAccepted": {"path": "fleet-five-orchestration-20261105/.work/b9e-source-root-verified.json", "docs": 42264002754, "job": 128051002636, "rerunByReviewer": false, "note": "Root CI/raw-hash receipt taken as Root evidence, not as semantic review"},
+  "rootBoardsRead": {"head": "138534a667d344dec579e816a3e13bc190852a11", "index": "1.0.472", "codexBoard": "1.0.433", "claudeBoard": "1.2.130", "mode": "read-only"},
+  "verdict": "REVISION_REQUIRED",
+  "severity": "LOW only; no MEDIUM. Actual frozen 72028 T1/A8 closure stands (positive ACCEPT at the final 3ccc producers). Both new LOWs are near variants inside the categories the B9d-L1/L2 corrections enumerate; frozen 72028 contains 0 of these forms.",
+  "items": {
+    "B9d-L1": {
+      "status": "PARTIAL -> B9e-L1 (LOW)",
+      "closed": [
+        "all four actual 9266 counterexamples refuse at final producers: sys.modules[_CLAUDE_MOD], sys.modules[f-string], importlib.import_module('.'.join(...)), getattr(importlib.import_module(_CLAUDE_MOD), _CLAUDE_NAME) hidden 7th root -> UNCATALOGUED_PRODUCTION_SOURCE:business_auth.py with ENUMERATED_REFLECTION_NONLITERAL_KEY hits (1/1/1/2); six frozen roots preserved",
+        "retained 4288 literal refusals (attrgetter+sys.modules, importlib configured_workspace, sys.modules configured_workspace) -> UNCATALOGUED with ENUMERATED_RELEVANT_REFLECTION",
+        "controls ACCEPT: outside Database helper, assigned protected string with unused import, bounded literal sys.modules['js'+'on']; an unprovable but unrelated key refuses conservatively as declared",
+        "reviewer-computed parsed universe at final producers: census 20 + discovery 11, union 25 (11 production), parsed set == audited set; frozen NONLITERAL_KEY hits db.py 1, lan_pilot.py 1, test_object_store_provider_binding.py 2 are exact-frozen allowances",
+        "getattr object argument is not taken as the key (index 1); missing/spread/keyword-spread keys become unknown"
+      ],
+      "open": {
+        "id": "B9e-L1",
+        "severity": "LOW",
+        "source": "reflection_audit.py keys() lines 36-49 and relevant_string() lines 30-34: for importlib.import_module only args[0]/name is inspected; the package argument (args[1] / package=) and builtins.__import__ level (args[4] / level=) are ignored, and a relative name is never composed with its package before the protected-module test",
+        "counterexamples": [
+          "L1-near-import_module-relative-variable-package: _CLAUDE_PKG = 'inv'; importlib.import_module('.workspace_config', _CLAUDE_PKG).configured_workspace(object(), tenant, settings) -> ACCEPT (unprovable module identity inside an enumerated API)",
+          "L1-near-import_module-relative-literal-package: importlib.import_module('.workspace_config', 'inv').configured_workspace(object(), tenant, settings) -> ACCEPT",
+          "L1-near-dunder-import-relative-level1: __import__('workspace_config', globals(), None, (), 1).configured_workspace(object(), tenant, settings) in inv/business_auth.py -> ACCEPT"
+        ],
+        "validity": "business_auth.py overlay only (same file/shape as the four 9266 cases), valid AST, no new unbound names, 15/15 closure witnesses, six frozen roots preserved, full t1_provenance.provenance at final producers; nothing imported or executed",
+        "minimalCorrection": "In keys(): for importlib.import_module also return the package argument (args[1] or keyword package) when present; for builtins.__import__ also return level (args[4] or keyword level). Treat a non-literal package/level as unknown. Treat a relative name (leading '.') or a nonzero level as relevant-unknown unless the composed absolute name is provably unprotected (or simply: relative/levelled enumerated import = unknown, exact frozen match or refuse). Regression: these three refuse; existing controls and the 72028 positive still ACCEPT."
+      }
+    },
+    "B9d-L2": {
+      "status": "PARTIAL -> B9e-L2 (LOW)",
+      "closed": [
+        "actual 9266 WorkspaceAPI.__new__ runtime escape -> UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+        "actual 9266 non-factory _current_finalized_batch wrapper conn escape -> UNRESOLVED:CALLEE_REBOUND",
+        "create_app factory rebinding still refuses (now UNRESOLVED:CALLEE_REBOUND)",
+        "retained 4288 escapes: WorkspaceAPI.__init__ runtime x3 -> USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime, create_app.workspace_service workspace x2 -> ...:INSTANCE:workspace",
+        "controls ACCEPT: same-function unowned working, new unrelated module helper/assignment before the lan_pilot guard; binder: unrelated same-spelled local and class attribute keep the module callee, ordinary __init__ and staticmethod bind",
+        "alias-before-computed-rebind guard: _orig = accept; accept = wrap(_orig); accept(held) -> CALLEE_REBOUND. Calling the stored alias _orig(held) after the rebind is ALSO refused (reviewer expected ACCEPT; conservative over-refusal, not a gap)",
+        "frozen serve.Server (tools/lan_pilot.py:4049) exception is narrow: a __new__ in Server, a metaclass header and a changed call expression each refuse CLASS_CONSTRUCTION_BINDING; the unchanged call stays outside the binder only after construction identity passes",
+        "defence in depth at full provenance: class-body __new__ = lambda, post-class WorkspaceAPI.__init__/__new__ attribute assignment and globals()['_current_finalized_batch'] = ... are refused by use-site guards (USE_SITE_NOT_ALLOWLISTED SYMBOL/WRITE_USE)"
+      ],
+      "open": {
+        "id": "B9e-L2",
+        "severity": "LOW",
+        "source": "callee_identity.py rebound() lines 30-45: a global declaration is honoured only for an ast.Name Store/Del; an import, def or class that binds the declared global inside a function, and 'from X import *' in the callee's scope (alias '*' is compared to the name), are not seen as rebinding",
+        "counterexamples": [
+          "L2-near-lan_pilot-global-import-in-function: replacing the two blank lines before the __main__ guard with 'def _claude_install(): global _current_finalized_batch; from foreign_module import _current_finalized_batch' and '_claude_install()' -> ACCEPT; lan_pilot :1872/:1990 then pass conn to the foreign callee (same causal escape as the 9266 wrapper)",
+          "L2-near-lan_pilot-star-import-shadow: replacing them with 'from foreign_module import *' (foreign __all__ may list _current_finalized_batch) -> ACCEPT",
+          "binder-only: global + nested def, global + import, star import -> owned formal still bound, no CALLEE_REBOUND"
+        ],
+        "validity": "tools/lan_pilot.py line-count-preserving replacement as in the actual 9266 case, valid AST, no new unbound names, 15/15 witnesses, six frozen roots preserved, full provenance at final producers; nothing imported or executed",
+        "minimalCorrection": "In rebound(): (a) when name is declared global in a function, any binding of it there (Import/ImportFrom alias, FunctionDef/ClassDef name, MatchAs/MatchStar/MatchMapping rest, ExceptHandler name, Name Store/Del) is a module rebinding; (b) an ImportFrom with '*' in the callee's binding scope is a rebinding unless frozen-identical; optionally (c) the same for nonlocal-declared names of a nested callee. Regression: these two refuse; existing controls and the 72028 positive still ACCEPT."
+      },
+      "info": [
+        "I-a: callee_identity alone misses class-body __new__ = <lambda> and post-class C.__init__/C.__new__ attribute stores (binder fixtures bind the owned formal); at full provenance these are refused by use-site guards, so no full-provenance gap was shown. Graph/binder alone remains insufficient, as the owner states.",
+        "I-b: nonlocal rebinding of a nested callee is not seen by rebound() (binder fixture). Frozen 72028 has 3 nonlocal statements; no full-provenance case was built (would need line-shifting edits inside create_app).",
+        "I-c: the match-capture full-provenance probe was refused by a use-site SYMBOL:builtins.__import__ guard caused by the reviewer fixture spelling, so it is inconclusive for rebound(), not evidence either way."
+      ]
+    },
+    "B9d-I1": {
+      "status": "CLOSED within the declared bound",
+      "observed": [
+        "bound now 1 + |called U factories| + every positional/kwonly slot + vararg + kwarg; frozen run 7 iterations of bound 719, 576 bindings, 0 unresolved",
+        "explicit keywords into **kwargs converge (3 of bound 3); two explicit keywords and a dict-literal spread converge; every argumentEvidence span/hash resolves to the original member expression (EXPLICIT_KEYWORDS_TO_KWARG_DICT)",
+        "unknown **bag spread -> OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING; **extra forwarded onward -> same refusal; *rest -> OWNED_ARGUMENT_VARIADIC_BINDING (unknown packs never become trusted bindings)",
+        "three-hop factory chain converges (5 of bound 6)"
+      ]
+    }
+  },
+  "currentPositive": {
+    "finalProducerRun": "actual-72028-positive ACCEPT via t1_provenance.provenance at the final 3ccc producers",
+    "parsedAudited": 25, "production": 11, "parsedEqualsAudited": true, "frozenBindings": 576, "unresolved": 0,
+    "ownerArtifactsChecked": "rev9e-current-verification.json lists the same 25 parsed/audited and 11 production paths and 576 bindings; proof-producer-hashes.json 71 producers/528040 B, 20 artifacts and 2 receipt ledgers recomputed equal to committed bytes",
+    "notRecomputedByReviewer": "19 edges (16/3), 12 entries and the 6 accounting/model byte equalities are taken from owner verify_rev9e.py and the Root receipt, not re-derived"
+  },
+  "ownerReceiptAssessment": {
+    "finalByteReruns": ["rev9e_units.py (31)", "t1_build.py (positive closure)", "verify_rev9e.py"],
+    "reusedBeforeFinalAliasGuard": ["parameter_binding_tests 02:27", "universe_audit_tests 02:20:59 (first-run, before the Server fix)", "rev9e_gap_driver old six (rev9d dir)", "rev9e_gap_driver new 13 02:27:26", "verify --contrasts", "pending_obligations", "pending_contracts", "edge_categories", "R4 exit0/exit1"],
+    "assessment": "The 13 new causal/control cases were not rerun by the owner after the final alias guard; the post-run seal does not prove their execution bytes. The reviewer run exercised the six actual cases and the owner control set at the final producer bytes and they agree (6 refuse, controls ACCEPT, factory rebind refuses). The first constructor/Server false refusal, cp949 failure and unflushed tail repair are preserved as owner failures, not negative-product success."
+  },
+  "mismatchesInReviewerRun": {
+    "total": 12,
+    "findings": ["L1-near-import_module-relative-variable-package", "L1-near-import_module-relative-literal-package", "L1-near-dunder-import-relative-level1", "L2-near-lan_pilot-global-import-in-function", "L2-near-lan_pilot-star-import-shadow"],
+    "binderOnlyInfo": ["near-global-def-in-function", "near-global-import-in-function", "near-star-import-shadow", "near-nonlocal-rebind-nested-callee", "near-class-body-__new__-assign", "near-module-attr-init-rebind"],
+    "reviewerExpectationWrongConservative": ["alias-call-of-original-after-rebind"]
+  },
+  "frozen72028Scan": "reviewer_scan_72028_b9e_forms over the 11 production paths: 0 star imports, 0 global statements, 0 match captures, 0 import_module with package / relative name, 0 __import__ with level, 0 __new__ assignments, 0 dunder attribute stores; 3 nonlocal statements",
+  "resources": {"peakWorkingSetBytes": 162545664, "elapsedSeconds": 888.275, "scope": "observed per-process peak only, no aggregate or hard quota"},
+  "notRun": ["owner run_checks/proof commands", "model/terminal/recovery suites", "owner 70/19/31/83/29 replays", "full 523 assembler / 3485 plans / giant ledger", "mutant import or execution", "Obsidian apply/adopt/resolve/state write"],
+  "unchanged": "actualRuntimeB 0; all real bindings NULL/HOLD; A1-A16 PENDING; observer lock outside 19; storage R4 0/1 expected; model f7384016.../lifecycle 710c6aaf... untouched",
+  "A7": "UNSTARTED / NOT GRANTED; this verdict does not allow an A7 grant",
+  "nextCut": "Rev9f fix-only from exact 3cccfe4d: B9e-L1 (import_module package / __import__ level / relative names unknown) and B9e-L2 (global-declared non-Name bindings and star-import rebinding in rebound(); optional nonlocal) with these 5 full-provenance cases + binder fixtures as regressions and existing controls; then one narrow Claude delta review. A7 NodeChannels.snapshot only after actual acceptance and a separate Root grant.",
+  "nextFirstAction": {"owner": "Root", "action": "relay this verdict to msg_9578b8329a2e and decide Rev9f"}
+}
