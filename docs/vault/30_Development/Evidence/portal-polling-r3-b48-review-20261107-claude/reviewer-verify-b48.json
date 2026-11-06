@@ -1,0 +1,107 @@
+{
+ "remoteBranchHead": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+ "parents": {
+  "b48^": "9cd017abf26a145d15a5c1b0d915662c3c71a724",
+  "9cd^": "9c25f3c9cab162f424744d79f9a4e21729c40404"
+ },
+ "nonDocPathsR2toB48": [
+  "apps/web/src/app/App.tsx",
+  "apps/web/src/shared/ui/Header.tsx",
+  "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+ ],
+ "pathsInitialToB48": [
+  "apps/web/src/app/App.tsx"
+ ],
+ "initialToB48Diff": [
+  "-    } catch (err: any) {",
+  "+    } catch {"
+ ],
+ "blobs": {
+  "apps/web/src/app/App.tsx": "bf41cbd21e0679e90fd794b27e8491caf34eeb1f",
+  "apps/web/src/features/desktop/ResourceExplorer.tsx": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+  "apps/web/src/shared/api/client.ts": "23d40210f6a0b548b5e27fa3866c848ba7ec076b",
+  "apps/web/src/shared/api/nodeCertificateObservation.ts": "52c560211db43b39f5232c0dad8fc93c57c49c5e",
+  "apps/web/src/shared/ui/Header.tsx": "10ed412640f5151251a25d14e8e5405b62340d14",
+  "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "e14d7f697bd6e5684fe853d2e607f06606d7b1ed"
+ },
+ "M1_certCallWithSignal": true,
+ "M1_innerAbortRethrow": true,
+ "L1_ownedReasonClassifierCount": 4,
+ "L1_timeoutAbortSites": 4,
+ "L1_errNameOrMessageClassifier": [],
+ "L1_finallyClearTimeoutCount": 4,
+ "L2_clearTimeoutCount": 1,
+ "L2_clearOnlyInFinally": true,
+ "L2_bodyAbortRethrow": true,
+ "L2_seqFenceAfterBody": true,
+ "testItCount": 41,
+ "testEachBlocks": 1,
+ "namedCases": {
+  "R1": true,
+  "R1b": true,
+  "R2": true,
+  "R2b": true,
+  "R6": true,
+  "R8": true,
+  "R8c": true,
+  "R9": true,
+  "H2": true,
+  "H3": true,
+  "H3b": true,
+  "H4": true,
+  "H5": true,
+  "T1": true
+ },
+ "rootReceiptSha256": {
+  "uir3-b48-frontend-root-verified.json": "d743ba85874fb4b85097837cce5b852120e135debda0c07bdb2020214a20e9e1",
+  "uir3-b48-hosted-test-summary.json": "61f3f273866a8c2ce88418c1f2541f5712d7493c0cb2b6d41ef81763097f97e2",
+  "uir3-b48-build-artifact-verification.json": "cc87154dd16e44f63ed43ddba549f89bee8f0d66514a9e9716d11df6d3388982",
+  "uir3-pc3-guard-root-proof.json": "98f6949affbaac61186e32732e228d699738a3c6129e58a0a9e8a08dbd953ac7",
+  "uir3-pc3-final-receipts.json": "80d638573d65f752274a3009ce338c99b14af1a5d61ec696b6f71427a1f9e99f"
+ },
+ "pc3ControlInputsVsB48": {
+  "files": 446,
+  "mismatch": []
+ },
+ "pc3MutantChangedPaths": {
+  "MD": [
+   "apps/web/src/app/App.tsx"
+  ],
+  "ME": [
+   "apps/web/src/app/App.tsx",
+   "apps/web/src/features/desktop/ResourceExplorer.tsx"
+  ]
+ },
+ "pc3MutantKeySetEqual": {
+  "MD": true,
+  "ME": true
+ },
+ "pc3RawReceiptShaMatchesCompact": true,
+ "pc3Runs": {
+  "control": {
+   "status": "PASS",
+   "passed": 46,
+   "failed": 0,
+   "actualContainerExit": 0,
+   "failedTitles": []
+  },
+  "MD": {
+   "status": "KILLED_BY_NAMED_BEHAVIOR",
+   "passed": 45,
+   "failed": 1,
+   "actualContainerExit": 1,
+   "failedTitles": [
+    "R8:"
+   ]
+  },
+  "ME": {
+   "status": "KILLED_BY_NAMED_BEHAVIOR",
+   "passed": 45,
+   "failed": 1,
+   "actualContainerExit": 1,
+   "failedTitles": [
+    "R9:"
+   ]
+  }
+ }
+}

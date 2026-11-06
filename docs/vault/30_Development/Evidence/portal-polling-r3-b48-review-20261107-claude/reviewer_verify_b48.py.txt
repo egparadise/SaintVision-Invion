@@ -1,0 +1,56 @@
+"""Reviewer read-only verification of UI R3 SOURCE b48 (Git + text/regex + JSON receipts; no Node/Vite/browser/Docker).
+Usage: python -I reviewer_verify_b48.py.txt <worktree> <root-coordinator-worktree> <out.json>"""
+import hashlib, json, re, subprocess, sys
+from pathlib import Path
+WT, RC, OUT = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+B48 = 'b48c2c4492f8aea4b55c33161733a9a6fb9eed8c'; I9C = '9cd017abf26a145d15a5c1b0d915662c3c71a724'; R2 = '9c25f3c9cab162f424744d79f9a4e21729c40404'
+BR = 'refs/heads/agent/gemini/portal-refresh-polling-r3-20261106'
+def git(*a, raw=False):
+    r = subprocess.run(['git', '-C', str(WT), *a], capture_output=True)
+    return r.stdout if raw else r.stdout.decode('utf-8', 'replace').strip()
+def sha(b): return hashlib.sha256(b).hexdigest()
+res = {}
+res['remoteBranchHead'] = git('ls-remote', 'origin', BR).split('\t')[0]
+res['parents'] = {'b48^': git('rev-parse', B48 + '^'), '9cd^': git('rev-parse', I9C + '^')}
+res['nonDocPathsR2toB48'] = [p for p in git('diff', '--name-only', R2, B48).splitlines()]
+res['pathsInitialToB48'] = git('diff', '--name-only', I9C, B48).splitlines()
+res['initialToB48Diff'] = [l for l in git('diff', '-U0', I9C, B48).splitlines() if l[:1] in '+-' and not l.startswith(('+++', '---'))]
+res['blobs'] = {l.split('\t')[1]: l.split()[2] for l in git('ls-tree', B48, 'apps/web/src/app/App.tsx', 'apps/web/src/shared/ui/Header.tsx',
+    'apps/web/tests/portal-refresh-fleet-ui.test.tsx', 'apps/web/src/shared/api/client.ts',
+    'apps/web/src/shared/api/nodeCertificateObservation.ts', 'apps/web/src/features/desktop/ResourceExplorer.tsx').splitlines()}
+app = git('show', B48 + ':apps/web/src/app/App.tsx'); hdr = git('show', B48 + ':apps/web/src/shared/ui/Header.tsx')
+tst = git('show', B48 + ':apps/web/tests/portal-refresh-fleet-ui.test.tsx')
+# M1: certificate leg receives the owned signal and an aborted inner catch rethrows
+res['M1_certCallWithSignal'] = 'fetchProjectNodeCertificates(targetPrj, controller.signal)' in app
+res['M1_innerAbortRethrow'] = bool(re.search(r'fetchProjectNodeCertificates\(targetPrj, controller\.signal\);\s*\} catch \(err: any\) \{\s*if \(controller\.signal\.aborted\) \{\s*throw err;', app))
+# L1: four catches classify timeout from owned signal.reason only; no err.name/err.message classification remains
+cls = r"const isTimeout = controller\.signal\.aborted && \(\s*controller\.signal\.reason\?\.message === 'REQUEST_TIMEOUT' \|\|\s*controller\.signal\.reason === 'REQUEST_TIMEOUT'\s*\);\s*if \(controller\.signal\.aborted && !isTimeout\) \{\s*return;\s*\}"
+res['L1_ownedReasonClassifierCount'] = len(re.findall(cls, app))
+res['L1_timeoutAbortSites'] = app.count("controller.abort(new Error('REQUEST_TIMEOUT'))")
+res['L1_errNameOrMessageClassifier'] = re.findall(r"err\??\.(?:name|message) === '(?:AbortError|REQUEST_TIMEOUT)'", app)
+res['L1_finallyClearTimeoutCount'] = len(re.findall(r'\} finally \{\s*clearTimeout\(timeoutId\);', app))
+# L2: Header timer cleared only in finally; body read under the deadline; aborted body rethrown; malformed -> null
+res['L2_clearTimeoutCount'] = hdr.count('clearTimeout(timeoutId)')
+res['L2_clearOnlyInFinally'] = bool(re.search(r'\} finally \{\s*clearTimeout\(timeoutId\);', hdr)) and hdr.count('clearTimeout(timeoutId)') == 1
+res['L2_bodyAbortRethrow'] = bool(re.search(r'data = await res\.json\(\);\s*\} catch \(jsonErr: any\) \{\s*if \(currentController\.signal\.aborted\) \{\s*throw jsonErr;\s*\}\s*data = null;', hdr))
+res['L2_seqFenceAfterBody'] = bool(re.search(r"const rtt = .*\n\s*if \(!isMounted \|\| reqId !== reqSeqRef\.current\) return;", hdr))
+# Tests: count cases (41 it + 5 it.each rows = 46) and named cases present
+res['testItCount'] = len(re.findall(r'^\s*it\(', tst, re.M)); res['testEachBlocks'] = len(re.findall(r'^\s*it\.each', tst, re.M))
+res['namedCases'] = {n: (f"it('{n}:" in tst) for n in ['R1', 'R1b', 'R2', 'R2b', 'R6', 'R8', 'R8c', 'R9', 'H2', 'H3', 'H3b', 'H4', 'H5', 'T1']}
+# Root receipts: hashes + PC3 inputs equal exact b48 bytes
+W = RC / '.work'
+names = ['uir3-b48-frontend-root-verified.json', 'uir3-b48-hosted-test-summary.json', 'uir3-b48-build-artifact-verification.json',
+         'uir3-pc3-guard-root-proof.json', 'uir3-pc3-final-receipts.json']
+res['rootReceiptSha256'] = {n: sha((W / n).read_bytes()) for n in names}
+raw = json.loads((W / 'uir3-pc3-final-receipts.json').read_text(encoding='utf-8'))
+runs = raw['tests']['runs']; ctrl = runs['control']['inputFileHashes']; mism = []
+for k, v in ctrl.items():
+    if sha(git('show', f'{B48}:{k}', raw=True)) != v: mism.append(k)
+res['pc3ControlInputsVsB48'] = {'files': len(ctrl), 'mismatch': mism}
+res['pc3MutantChangedPaths'] = {m: sorted(k for k in ctrl if runs[m]['inputFileHashes'].get(k) != ctrl[k]) for m in ('MD', 'ME')}
+res['pc3MutantKeySetEqual'] = {m: set(runs[m]['inputFileHashes']) == set(ctrl) for m in ('MD', 'ME')}
+proof = json.loads((W / 'uir3-pc3-guard-root-proof.json').read_text(encoding='utf-8'))
+res['pc3RawReceiptShaMatchesCompact'] = proof['rawPrivateReceiptSHA256'] == res['rootReceiptSha256']['uir3-pc3-final-receipts.json']
+res['pc3Runs'] = {m: {k: proof['runs'][m][k] for k in ('status', 'passed', 'failed', 'actualContainerExit')} | {'failedTitles': [f['title'][:3] for f in proof['runs'][m]['failedAssertions']]} for m in proof['runs']}
+OUT.write_text(json.dumps(res, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps(res, ensure_ascii=False, indent=1))

@@ -1,0 +1,32 @@
+"""Reviewer serial local publication gates + child official sync CHECK (argv only, shell=False, no apply/state write).
+Each sync CHECK records the full canonical state SHA-256 immediately before and after that check; Root may apply between checks.
+Usage: python -B reviewer_gate_driver.py.txt <base-ref> <out.txt> <conflicts-out-dir>
+"""
+import datetime, hashlib, subprocess, sys
+from pathlib import Path
+ROOT = Path(r'D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106')
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+BASE = sys.argv[1]; OUT = Path(sys.argv[2]); SCR = Path(sys.argv[3])
+def kst(): return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%dT%H:%M:%S+09:00')
+def sha(b): return hashlib.sha256(b).hexdigest()
+def sync(tag): return ['tools/sync_obsidian.py', '--check', '--state', ST.as_posix(), '--conflicts-out', str(SCR / f'sync-conflicts-{tag}.json')]
+gates = [sync('pre'), ['tools/check_docs.py'], ['tools/check_ontology.py'], ['tools/check_contract_bindings.py'],
+         ['tools/check_frontend_integrity.py'], ['tools/check_doc_single_source.py', '--ratchet'], ['tools/check_response_freshness.py'],
+         ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE], sync('post')]
+lines = [f'Reviewer local gates, Windows, {sys.executable} -B, PYTHONUTF8=1, cwd=worktree root, tree = {BASE[:8]} + own review History/Evidence only.',
+         'sync_obsidian is CHECK only with the canonical state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write/stale export.']
+worst = 0
+env = dict(__import__('os').environ, PYTHONUTF8='1')
+for g in gates:
+    is_sync = g[0] == 'tools/sync_obsidian.py'
+    before = sha(ST.read_bytes()) if is_sync else None
+    a = kst(); r = subprocess.run([sys.executable, '-B', *g], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    after = sha(ST.read_bytes()) if is_sync else None
+    b = kst(); worst = max(worst, r.returncode)
+    shown = ' '.join('<scratch>/' + Path(x).name if x.startswith(str(SCR)) else x for x in g)
+    lines.append(f'{a}..{b} exit={r.returncode} logsha={sha(r.stdout)} :: python -B {shown}')
+    if is_sync: lines.append(f'    stateBefore {before} stateAfter {after} unchanged={before == after}')
+    lines += ['    ' + t[:300] for t in r.stdout.decode('utf-8', 'replace').strip().splitlines()[-2:]]
+st = subprocess.run(['git', '-C', str(ROOT), 'status', '--short'], capture_output=True, encoding='utf-8', errors='replace').stdout
+lines.append('git status --short:'); lines += ['    ' + l for l in st.splitlines()]
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n'); print('\n'.join(lines)); raise SystemExit(worst)
