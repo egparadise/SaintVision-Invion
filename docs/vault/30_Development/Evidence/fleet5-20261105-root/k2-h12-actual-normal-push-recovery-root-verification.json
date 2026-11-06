@@ -1,0 +1,28 @@
+{
+  "atKST": "2026-11-07T08:23:42+09:00",
+  "source": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "rootGrant": "msg_a48c8c8a2b37",
+  "firstNormalPushExit": 1,
+  "firstErrorAttribution": "observed tool output, not original byte capture",
+  "actualRetryArgv": [
+    "git",
+    "push",
+    "-u",
+    "origin",
+    "agent/codex/fleet5-k2-h1-h2-authority-design-20261107"
+  ],
+  "actualRetryExit": 0,
+  "actualRetryStartedKST": "2026-11-07T08:14:32.400586+09:00",
+  "actualRetryEndedKST": "2026-11-07T08:14:37.649989+09:00",
+  "originalStdoutSHA256": "ec815ab16dfdfc1536a17acc0a44c1177d9631bca881dd1d29ddfa1260e2bdf9",
+  "originalStderrSHA256": "dbf7532421dcd88df27c662e3f3a1b4b97f6d26edd41231fcd8bd2274197fa84",
+  "RootByteHashComparedOriginalStreams": true,
+  "beforeRemoteSHA": null,
+  "afterRemoteSHA": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "noCommitChange": true,
+  "normalRecovery": "SUCCESS_EXACT",
+  "firstFailureCause": "UNKNOWN_NOT_PROVEN",
+  "permissionRulesAccountCredentialChanges": false,
+  "DocsAfterPush": 42310548604,
+  "deliveryIsNotContractAcceptance": true
+}

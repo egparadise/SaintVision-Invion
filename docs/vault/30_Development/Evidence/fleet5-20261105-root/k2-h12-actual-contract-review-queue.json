@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T08:23:42+09:00",
+  "status": "ACTUAL_H12_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+  "target": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+  "sourceDocs": 42310548604,
+  "ownerTask": "task_a95ef3d8ccce",
+  "ownerDispatch": "ctx_ed23b4a777d0",
+  "ownerQuestion": "msg_8e6a9c9d83b0",
+  "rootDesignGrant": "msg_10808c1899e9",
+  "task": "task_ce76beac4d2d",
+  "dispatch": "ctx_8cd16f1141a3",
+  "predecessor": "ctx_36ec44cc8ca0",
+  "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+  "independentVerdict": null,
+  "allActualBindings": null,
+  "nextCode": "DATA_ONLY_NOT_GRANTED",
+  "caseStatus": "H12_C01_C10_PROPOSED_NOT_RUN",
+  "wholeProgramComplete": false
+}

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T08:14:42+09:00",
+  "atKST": "2026-11-07T08:23:42+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,28 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "atKST": "2026-11-07T08:23:42+09:00",
+    "status": "ACTUAL_H12_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "382fe3d86c14283dcb549f935205081db8b4eee4",
+    "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+    "sourceDocs": 42310548604,
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "ownerQuestion": "msg_8e6a9c9d83b0",
+    "rootDesignGrant": "msg_10808c1899e9",
+    "task": "task_ce76beac4d2d",
+    "dispatch": "ctx_8cd16f1141a3",
+    "predecessor": "ctx_36ec44cc8ca0",
+    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "independentVerdict": null,
+    "allActualBindings": null,
+    "nextCode": "DATA_ONLY_NOT_GRANTED",
+    "caseStatus": "H12_C01_C10_PROPOSED_NOT_RUN",
+    "wholeProgramComplete": false
+  },
   "pending": [],
-  "authorParallelWork": "H1/H2 localcandidate382fe3 firstnormalpush remotecommit_refs_rules exit1; Root read-only ref/rules/APIchecks0, samefrozencandidate ONE normalretry authorizedmsga48c; result/DocsPENDING, no reviewready. B modeorigin finite sourcework remainsactive.",
+  "authorParallelWork": "H1/H2 source382fe3 normalretry+Docs verified, frozen pending actualsingleClaude contractreviewctx8cd. B modeorigin finite sourcework remainsactive; no nextCODE or runtime grant.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -737,7 +756,7 @@
     ],
     "reviewerFinalLifecycle": "succeeded_settled_exited_released"
   },
-  "futureDesignReviewTrigger": "H1/H2 exact successfulnormalpush/readback/Docs then Root frozenpacket verification; noactualreview until delivery. B modeorigin candidate separately after readiness; priorctx36ec released.",
+  "futureDesignReviewTrigger": "ActualH12 contractverdict or frozen B modeorigin candidate; one reviewer at a time after fresh predecessor exit/release.",
   "completedA7R2": {
     "atKST": "2026-11-07T08:05:16+09:00",
     "status": "ACTUAL_PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD",
