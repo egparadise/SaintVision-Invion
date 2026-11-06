@@ -1,0 +1,101 @@
+// Source-only standard Go AST/types census. Never a product/trust adapter.
+package main
+
+import (
+ "encoding/json"
+ "fmt"
+ "go/ast"
+ "go/importer"
+ "go/parser"
+ "go/token"
+ "go/types"
+ "os"
+ "sort"
+)
+
+type Field struct { Name, DeclaredGoType, CanonicalGoType string; Embedded, Exported bool }
+type Record struct { Name string; Fields []Field }
+type Alias struct { Name, RHS string }
+type Result struct {
+ Signature string
+ Types []Record
+ Aliases []Alias
+ FieldCount, EmbeddedFields int
+ SourceSignatureLine int
+ Method string
+}
+
+func main() {
+ if len(os.Args)!=2 { panic("one public trust.go source file required") }
+ fs:=token.NewFileSet()
+ source,err:=parser.ParseFile(fs,os.Args[1],nil,parser.ParseComments)
+ if err!=nil { panic(err) }
+ // Keep every declared type and the ACTUAL NewVerifier signature. Only missing
+ // private result implementation types are opaque stubs, never input types.
+ // No product function body or initializer executes or is used to infer fields.
+ f:=&ast.File{Name:ast.NewIdent("migrationverify"),Imports:source.Imports}
+ defined:=map[string]bool{}
+ var target *ast.FuncDecl
+ for _,d:=range source.Decls {
+  switch x:=d.(type) {
+  case *ast.GenDecl:
+   if x.Tok==token.IMPORT || x.Tok==token.TYPE {
+    f.Decls=append(f.Decls,d)
+    if x.Tok==token.TYPE { for _,s:=range x.Specs { defined[s.(*ast.TypeSpec).Name.Name]=true } }
+   }
+  case *ast.FuncDecl:
+   if x.Name.Name=="NewVerifier" { target=&ast.FuncDecl{Name:x.Name,Type:x.Type};f.Decls=append(f.Decls,target) }
+  }
+ }
+ if target==nil { panic("actual NewVerifier signature missing") }
+ for _,name:=range []string{"Schemas","contracts","graph"} {
+  if !defined[name] {
+   f.Decls=append(f.Decls,&ast.GenDecl{Tok:token.TYPE,Specs:[]ast.Spec{&ast.TypeSpec{Name:ast.NewIdent(name),Type:&ast.StructType{Fields:&ast.FieldList{}}}}})
+  }
+ }
+ config:=types.Config{Importer:importer.ForCompiler(fs,"source",nil),DisableUnusedImportCheck:true}
+ pkg,err:=config.Check("migrationverify",fs,[]*ast.File{f},nil)
+ if err!=nil { panic(err) }
+ fn,ok:=pkg.Scope().Lookup("NewVerifier").(*types.Func)
+ if !ok { panic("NewVerifier is not a function") }
+ sig:=fn.Type().(*types.Signature)
+ qualifier:=func(p *types.Package)string{return p.Path()}
+ typeName:=func(t types.Type)string{return types.TypeString(t,qualifier)}
+ r:=Result{Signature:typeName(sig),SourceSignatureLine:fs.Position(target.Pos()).Line,
+  Method:"go/parser + go/types; reachable from actual signature parameters; bodies excluded; private result implementation stubs only"}
+ seen:=map[*types.Named]bool{}
+ aliases:=map[string]string{}
+ var walk func(types.Type)
+ walk=func(t types.Type) {
+  switch x:=t.(type) {
+  case *types.Alias:
+   aliases[x.Obj().Name()]=typeName(x.Rhs());walk(types.Unalias(x))
+  case *types.Pointer: walk(x.Elem())
+  case *types.Slice: walk(x.Elem())
+  case *types.Array: walk(x.Elem())
+  case *types.Map: walk(x.Key());walk(x.Elem())
+  case *types.Named:
+   if x.Obj().Pkg()!=pkg || seen[x] {return};seen[x]=true
+   st,ok:=x.Underlying().(*types.Struct)
+   if !ok {walk(x.Underlying());return}
+   rec:=Record{Name:x.Obj().Name()}
+   for i:=0;i<st.NumFields();i++ {
+    field:=st.Field(i)
+    rec.Fields=append(rec.Fields,Field{field.Name(),typeName(field.Type()),typeName(types.Unalias(field.Type())),field.Embedded(),field.Exported()})
+    r.FieldCount++
+    if field.Embedded(){r.EmbeddedFields++}
+    walk(field.Type())
+   }
+   r.Types=append(r.Types,rec)
+  case *types.Struct:
+   // Inline anonymous structs must remain visible; named parent field GoType
+   // captures their full canonical field shape and traversal follows members.
+   for i:=0;i<x.NumFields();i++ {walk(x.Field(i).Type())}
+  }
+ }
+ for i:=0;i<sig.Params().Len();i++ {walk(sig.Params().At(i).Type())}
+ sort.Slice(r.Types,func(i,j int)bool{return r.Types[i].Name<r.Types[j].Name})
+ for name,rhs:=range aliases {r.Aliases=append(r.Aliases,Alias{name,rhs})}
+ sort.Slice(r.Aliases,func(i,j int)bool{return r.Aliases[i].Name<r.Aliases[j].Name})
+ b,err:=json.MarshalIndent(r,"","  ");if err!=nil {panic(err)};fmt.Println(string(b))
+}

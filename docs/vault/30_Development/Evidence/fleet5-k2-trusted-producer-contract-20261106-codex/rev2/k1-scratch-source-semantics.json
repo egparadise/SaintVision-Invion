@@ -1,0 +1,43 @@
+{
+  "classification": "FOCUSED_K1_EXISTING_SYNTHETIC_FIXTURE_SOURCE_SEMANTICS_ONLY_NOT_K2_PROOF",
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-run",
+    "^TestK2Rev2",
+    "-count=1",
+    "-json"
+  ],
+  "exit": 0,
+  "startedKST": "2026-11-06T11:50:05.329378+09:00",
+  "endedKST": "2026-11-06T11:50:26.332691+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "scratchArchiveRawSHA256": "878d6b9e683b54cd02ef5e1140b19f61dddd24086eb2901c8af3730c64e5c400",
+  "addedScratchTestSHA256": "0f8d395918896074b3f1128a94dd16025e1c3c7f026bb4fa4276941ef7586dac",
+  "passTestNames": [
+    "TestK2Rev2OriginalMigrationSelector/two-epoch-positive",
+    "TestK2Rev2OriginalMigrationSelector/P12-current-ID-substitution",
+    "TestK2Rev2OriginalMigrationSelector/missing-original-history",
+    "TestK2Rev2OriginalMigrationSelector/facts-only-mismatch",
+    "TestK2Rev2OriginalMigrationSelector",
+    "TestK2Rev2ClockEndpoints/publication-expiry-exclusive",
+    "TestK2Rev2ClockEndpoints/current-key-expiry-history-separate",
+    "TestK2Rev2ClockEndpoints/status-age-120-inclusive",
+    "TestK2Rev2ClockEndpoints/live-challenge-issued-inclusive",
+    "TestK2Rev2ClockEndpoints"
+  ],
+  "failedTestNames": [],
+  "skippedTestNames": [],
+  "rawJSONLPrivateIgnored": true,
+  "rawJSONLSHA256": "10e0fcc21a9ed39910d8e3ad7e737f91f286092a63cc2dd976a660f504aca681",
+  "runtimeA01A40Executions": 0,
+  "newK2CodeOrCryptoAcceptanceClaim": false,
+  "productSourceChanged": false,
+  "env": {
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "classification": "REV2_STATIC_SOURCE_CONTRACT_ONLY_NOT_K2_RUNTIME",
+  "fieldsFromStandardGoTypes": 73,
+  "types": 13,
+  "goShapeMutationsDetectedAfterRepin": 8,
+  "reviewedStructuralSemanticNegatives": [
+    {
+      "id": "S06-selector-placement",
+      "rejected": true
+    },
+    {
+      "id": "S07-wrong-cataloged-error",
+      "rejected": true
+    },
+    {
+      "id": "S08-empty-forbidden",
+      "rejected": true
+    },
+    {
+      "id": "S09-inverted-root-choice",
+      "rejected": true
+    },
+    {
+      "id": "S10-prose-error-alias",
+      "rejected": true
+    },
+    {
+      "id": "S11-codeblock-error-alias",
+      "rejected": true
+    }
+  ],
+  "normativeFailureExamples": 30,
+  "originalA01A40UTF8RedGreenPreserved": 40,
+  "futureRuntimeCasesExecuted": 0,
+  "newFocusedK1FixtureSemanticsPassEvents": 10,
+  "K2CryptoOrProducerAcceptanceClaim": false,
+  "clockFamilies": 10,
+  "clockOperationalMechanism": "HOLD",
+  "allActualBindings": "NULL_HOLD",
+  "limitations": [
+    "Typed shape and targeted invariants cannot prove arbitrary producer meaning or English policy semantics",
+    "New focused scratch checks existing K1 only; no K2 adapter exists",
+    "Exact future running stdlib/installation/clock match remains HOLD"
+  ]
+}

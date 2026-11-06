@@ -1,0 +1,55 @@
+"""Source-only semantic shape mutations AFTER simulated legitimate raw repin.
+No product, package dependency, key, runtime or CI mutation/execution.
+"""
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+
+HERE=Path(__file__).resolve().parent
+SCRATCH=Path('.work/census-mutants')
+SCRATCH.mkdir(parents=True,exist_ok=True)
+EXE=Path('.work/go_input_census.exe').resolve()
+BASE='eb32b211ab3704935b9431747089ab0715582a74'
+SOURCE=subprocess.check_output(['git','show',BASE+':services/node-agent/migrationverify/trust.go']).decode('utf-8')
+ENV=dict(os.environ,GOTOOLCHAIN='local',GOWORK='off',GOPROXY='off',GOSUMDB='off')
+def census(text,name):
+    path=SCRATCH/(name+'.go')
+    path.write_text(text,encoding='utf-8')
+    r=subprocess.run([str(EXE),str(path)],capture_output=True,env=ENV)
+    assert r.returncode==0,(name,r.stderr.decode('utf-8',errors='replace'))
+    return json.loads(r.stdout)
+def semantic(value):
+    out=copy.deepcopy(value)
+    out.pop('SourceSignatureLine',None)
+    return out
+baseline=census(SOURCE,'baseline')
+cases=[
+ ('G01-embedded-value',SOURCE.replace('type InstalledTrust struct {','type InstalledTrust struct {\n\tKeyGrant',1)),
+ ('G02-embedded-pointer',SOURCE.replace('type InstalledTrust struct {','type InstalledTrust struct {\n\t*KeyGrant',1)),
+ ('G03-Now-any',SOURCE.replace('Now                  time.Time','Now                  any',1)),
+ ('G04-type-alias',SOURCE.replace('type InstalledTrust struct {','type GrantAlias = KeyGrant\n\ntype InstalledTrust struct {',1).replace('Grants         []KeyGrant','Grants         []GrantAlias',1)),
+ ('G05-new-field',SOURCE.replace('type TrustedContext struct {','type TrustedContext struct {\n\tInjected string',1)),
+ ('G06-new-named-input',SOURCE.replace('type TrustedContext struct {','type ClockBox struct { UTC time.Time }\n\ntype TrustedContext struct {',1).replace('Now                  time.Time','Now                  ClockBox',1)),
+ ('G07-map-value-type',SOURCE.replace('NodeKinds      map[string]string','NodeKinds      map[string]any',1)),
+ ('G08-pointer-signature',SOURCE.replace('context TrustedContext) (*Verifier, error)','context *TrustedContext) (*Verifier, error)',1)),
+]
+results=[]
+for name,text in cases:
+    assert text!=SOURCE,name
+    value=census(text,name)
+    changed=semantic(value)!=semantic(baseline)
+    assert changed,name
+    results.append({'id':name,'rawSourceSHA256AfterSimulatedRepin':hashlib.sha256(text.encode()).hexdigest(),
+        'parserTypesExit':0,'semanticShapeMismatchDetected':changed,'fieldCount':value['FieldCount'],
+        'embeddedFields':value['EmbeddedFields'],'typeCount':len(value['Types'])})
+out={'classification':'STATIC_SOURCE_AST_TYPES_ONLY','baselineSource':BASE,
+    'baselineRawSHA256':hashlib.sha256(SOURCE.encode()).hexdigest(),
+    'baselineTypes':len(baseline['Types']),'baselineFields':baseline['FieldCount'],
+    'baselineEmbedded':baseline['EmbeddedFields'],'mutations':results,
+    'allEightDetectedAfterRawRepin':True,'rawPinAloneUsedAsSemanticGate':False,
+    'runtimeCasesExecuted':0,'liveProducerOrCryptographicProofClaimed':False}
+(HERE/'go-census-mutations.json').write_text(json.dumps(out,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'types':len(baseline['Types']),'fields':baseline['FieldCount'],'mutantsDetected':len(results),'runtimeCasesExecuted':0}))

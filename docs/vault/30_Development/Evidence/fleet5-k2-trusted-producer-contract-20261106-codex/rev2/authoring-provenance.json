@@ -1,0 +1,32 @@
+{
+  "atKST": "2026-11-06T12:07:14.970136+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "base": "551d7312bb9c806fd423dcf6074158a9802cbb14",
+  "productSource": "eb32b211ab3704935b9431747089ab0715582a74",
+  "reviewPath": "docs/vault/30_Development/Evidence/fleet5-k2-551-contract-review-20261106-claude/review.json",
+  "reviewRawSHA256": "780e97b297bb703e430e44cb279043e8f6615fccd380415ae36c9037022b7c27",
+  "RootDecisionMessage": "msg_6df22674ff19",
+  "GoVersion": "go version go1.27.0 windows/amd64",
+  "PythonVersion": "Python 3.14.7",
+  "runtimeA01A40": 0,
+  "sourceScratchLimit": "Existing K1 in-memory synthetic fixtures; not K2/installation/producer/runtime acceptance",
+  "failedScratchPreparationsPreserved": [
+    "scratch-preparation-attempt1.json",
+    "k1-scratch-attempt2-compile-failure.json"
+  ],
+  "failedStaticAttemptsPreserved": [
+    "static-validation-attempt1.json",
+    "static-validation-attempt2.json"
+  ],
+  "wholeProgramOrPhysicalAcceptance": false,
+  "latestCanonicalRead": {
+    "rootLocalHead": "6bf6dc36a05ac3cf7bb10c98c1e53647648c4857",
+    "Index": "1.0.434",
+    "Codex": "1.0.395",
+    "governance": "1.0.6",
+    "RootDecisionRawSHA256": "01b207cc3b1a757589f5735aeffd3143b0ae83aafeb2fd0d4dac0c17a7cc7992",
+    "managementCIRerunOrClaimedByWorker": false
+  },
+  "latestObservationKST": "2026-11-06T12:14:41.061643+09:00"
+}

@@ -1,0 +1,247 @@
+{
+  "classification": "PINNED_SOURCE_CONVEXITY_OBLIGATIONS_NOT_INSTALLED_CLOCK_PROOF",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "allNonTestGoPins": [
+    {
+      "path": "services/node-agent/migrationverify/contracts.go",
+      "rawSHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967"
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "rawSHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519.go",
+      "rawSHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph.go",
+      "rawSHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c"
+    },
+    {
+      "path": "services/node-agent/migrationverify/json.go",
+      "rawSHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "rawSHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0"
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "rawSHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes.go",
+      "rawSHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8"
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas.go",
+      "rawSHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal.go",
+      "rawSHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7"
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "rawSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "rawSHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743"
+    }
+  ],
+  "directNowSites": [
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "line": 135,
+      "source": "original, e := v.authenticateNativeOriginal(w.Raw, w.Slot, v.ctx.Now)",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "line": 158,
+      "source": "if _, e = v.verifyNativeAt(w.Raw, expected, ref, contract, op, proofUse{at: v.ctx.Now, live: true}); e != nil {",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "line": 172,
+      "source": "a, err := v.verifyProofAt(loc, x.payloads, x.digests, x.referents, proofUse{at: v.ctx.Now, live: true})",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "line": 97,
+      "source": "now := v.ctx.Now",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "line": 219,
+      "source": "now := v.ctx.Now",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal.go",
+      "line": 115,
+      "source": "if at.After(v.ctx.Now) {",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "line": 143,
+      "source": "if context.Now.IsZero() || context.Now.Location() != time.UTC {",
+      "NowSelectorOccurrences": 2,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "line": 250,
+      "source": "return v.keyAt(role, scope, spki, v.ctx.Now)",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "line": 359,
+      "source": "if op.MigrationID != c.MigrationID || op.FenceEpoch != c.FenceEpoch || v.ctx.Now.Before(op.AcquiredAt) || !v.ctx.Now.Before(op.ExpiresAt) {",
+      "NowSelectorOccurrences": 2,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "line": 372,
+      "source": "if e != nil || !v.ctx.Now.Before(expires) {",
+      "NowSelectorOccurrences": 1,
+      "type": "time.Time; actual trusted-input go/types census"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "line": 377,
+      "source": "if p.contract == \"saintvision-proof-inventory-head-readback:1\" && p.operation == c.OperationID && p.migration == c.MigrationID && v.ctx.Now.Before(p.until) && !v.ctx.Now.Before(p.observed.Add(-30*time.Second)) && v.ctx.Now.Sub(p.observed) <= 120*time.Second {",
+      "NowSelectorOccurrences": 3,
+      "type": "time.Time; actual trusted-input go/types census"
+    }
+  ],
+  "directNowSelectorCount": 15,
+  "predicateFamilies": [
+    {
+      "id": "T01",
+      "source": "trust.go:NewVerifier",
+      "bounds": [
+        "UTC/nonzero interval domain"
+      ],
+      "classification": "CONSTANT_ON_ALLOWED_DOMAIN"
+    },
+    {
+      "id": "T02",
+      "source": "temporal.go:recordUse + proofs.go:freshnessAt",
+      "bounds": [
+        "n >= original consumingAt"
+      ],
+      "classification": "CLOSED_HALF_LINE"
+    },
+    {
+      "id": "T03",
+      "source": "proofs.go:freshnessAt publication status",
+      "bounds": [
+        "n >= PublishedAt",
+        "n >= CheckedAt",
+        "n <= CheckedAt+120s",
+        "n < ExpiresAt"
+      ],
+      "classification": "INTERSECTION_INTERVAL"
+    },
+    {
+      "id": "T04",
+      "source": "native.go:authenticateNativeOriginal current certificate status",
+      "bounds": [
+        "n >= CheckedAt",
+        "n <= CheckedAt+120s",
+        "n < ExpiresAt"
+      ],
+      "classification": "INTERSECTION_INTERVAL"
+    },
+    {
+      "id": "T05",
+      "source": "trust.go:key/keyAt through live proof use",
+      "bounds": [
+        "NotBefore <= n",
+        "n < NotAfter"
+      ],
+      "classification": "HALF_OPEN_INTERVAL"
+    },
+    {
+      "id": "T06",
+      "source": "native.go:x509 Verify with fixed leaf/sole CA",
+      "bounds": [
+        "NotBefore <= n",
+        "n <= NotAfter"
+      ],
+      "classification": "CLOSED_INTERVAL_CONDITIONAL_ON_PINNED_STDLIB"
+    },
+    {
+      "id": "T07",
+      "source": "proofs.go:freshnessAt live fresh use",
+      "bounds": [
+        "observed-30s <= n",
+        "n <= observed+age",
+        "n < validUntil",
+        "n < planExpiry",
+        "acquired <= n",
+        "n < operationExpiry"
+      ],
+      "classification": "INTERSECTION_INTERVAL"
+    },
+    {
+      "id": "T08",
+      "source": "proofs.go:verifyNativeAt live challenge",
+      "bounds": [
+        "issued <= n",
+        "n < challengeExpiry"
+      ],
+      "classification": "HALF_OPEN_INTERVAL"
+    },
+    {
+      "id": "T09",
+      "source": "current.go:currentNativeWitnesses/currentReadback",
+      "bounds": [
+        "propagates n into T03-T08; derived until constant"
+      ],
+      "classification": "CONJUNCTION_OF_INTERVALS"
+    },
+    {
+      "id": "T10",
+      "source": "verify.go:VerifyCurrentProjectionSet",
+      "bounds": [
+        "acquired <= n",
+        "n < operationExpiry",
+        "n < signedLeaseExpiry",
+        "n < readbackUntil",
+        "readbackObserved-30s <= n",
+        "n <= readbackObserved+120s"
+      ],
+      "classification": "INTERSECTION_INTERVAL"
+    }
+  ],
+  "proof": "clock-convexity.md",
+  "bothEndpointAndActualT0EvaluationRequired": true,
+  "sameImmutableInputsExceptNow": true,
+  "excludedK1DiagnosticFields": [],
+  "permittedWrapperDiagnosticExclusions": [
+    "wrapperEvaluatedAt",
+    "monotonicElapsed"
+  ],
+  "realClockActualSource": "NULL_HOLD",
+  "runningStdlibSemanticsMatched": false,
+  "operationalClockMechanismStatus": "CLOCK_MECHANISM_HOLD",
+  "unknownSourceChangeInvalidatesProof": true,
+  "runtimeA01A40Executed": 0
+}

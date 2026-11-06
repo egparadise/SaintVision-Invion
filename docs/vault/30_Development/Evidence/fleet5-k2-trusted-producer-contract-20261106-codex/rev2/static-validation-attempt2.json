@@ -1,0 +1,13 @@
+{
+  "exit": 1,
+  "cause": "Strict refusal-name scanner found a quoted historical proposal STATUS, not an error; classification remains separately enumerated from canonical error catalog",
+  "uncategorizedSymbols": {
+    "clock-convexity.md": [],
+    "contract.md": [
+      "NEW_CODE_CONTRACT_NOT_IMPLEMENTED_OR_ACCEPTED"
+    ],
+    "history-and-go-boundary.md": [],
+    "observation-authority.md": []
+  },
+  "sourceOrRuntimeChanged": false
+}

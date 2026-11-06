@@ -1,0 +1,86 @@
+{
+  "classification": "STATIC_SOURCE_AST_TYPES_ONLY",
+  "baselineSource": "eb32b211ab3704935b9431747089ab0715582a74",
+  "baselineRawSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+  "baselineTypes": 13,
+  "baselineFields": 73,
+  "baselineEmbedded": 0,
+  "mutations": [
+    {
+      "id": "G01-embedded-value",
+      "rawSourceSHA256AfterSimulatedRepin": "43084305ed29124132807de478c2804293dca39478b4cb0a1776637987b011ec",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 74,
+      "embeddedFields": 1,
+      "typeCount": 13
+    },
+    {
+      "id": "G02-embedded-pointer",
+      "rawSourceSHA256AfterSimulatedRepin": "ad2864cb30f7799322e30e02f3ab238f0ed2627aab83e7d9efead43e89dba46a",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 74,
+      "embeddedFields": 1,
+      "typeCount": 13
+    },
+    {
+      "id": "G03-Now-any",
+      "rawSourceSHA256AfterSimulatedRepin": "33b3ca0a1e34e0d8f074d1c559b2c0084834e63424644d441be1da5c3a608590",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 73,
+      "embeddedFields": 0,
+      "typeCount": 13
+    },
+    {
+      "id": "G04-type-alias",
+      "rawSourceSHA256AfterSimulatedRepin": "2541448e748fe8c5d645f0ccb7065863b40013988b203f7cf1e15d2197a81bd4",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 73,
+      "embeddedFields": 0,
+      "typeCount": 13
+    },
+    {
+      "id": "G05-new-field",
+      "rawSourceSHA256AfterSimulatedRepin": "be264a32fbed044194646788af828fc97e45b02e54cdbc204c910d869d25aecc",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 74,
+      "embeddedFields": 0,
+      "typeCount": 13
+    },
+    {
+      "id": "G06-new-named-input",
+      "rawSourceSHA256AfterSimulatedRepin": "b4d6c965fec178aa1115719ccec2e98231f197115a20dae2b2fcad10d2fe81f2",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 74,
+      "embeddedFields": 0,
+      "typeCount": 14
+    },
+    {
+      "id": "G07-map-value-type",
+      "rawSourceSHA256AfterSimulatedRepin": "8d8d753097d8143292d0c13d04143c77a691aef79526553f89a766e527486421",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 73,
+      "embeddedFields": 0,
+      "typeCount": 13
+    },
+    {
+      "id": "G08-pointer-signature",
+      "rawSourceSHA256AfterSimulatedRepin": "01c1ad44b98f881bce50177a19a719a9060332f377c9b6365ce47ab31664242e",
+      "parserTypesExit": 0,
+      "semanticShapeMismatchDetected": true,
+      "fieldCount": 73,
+      "embeddedFields": 0,
+      "typeCount": 13
+    }
+  ],
+  "allEightDetectedAfterRawRepin": true,
+  "rawPinAloneUsedAsSemanticGate": false,
+  "runtimeCasesExecuted": 0,
+  "liveProducerOrCryptographicProofClaimed": false
+}

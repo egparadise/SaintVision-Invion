@@ -1,0 +1,34 @@
+{
+  "classification": "FOCUSED_K1_EXISTING_SYNTHETIC_FIXTURE_SOURCE_SEMANTICS_ONLY_NOT_K2_PROOF",
+  "argv": [
+    "go",
+    "test",
+    "./migrationverify",
+    "-run",
+    "^TestK2Rev2",
+    "-count=1",
+    "-json"
+  ],
+  "exit": 1,
+  "startedKST": "2026-11-06T11:49:27.546331+09:00",
+  "endedKST": "2026-11-06T11:49:31.193814+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "scratchArchiveRawSHA256": "878d6b9e683b54cd02ef5e1140b19f61dddd24086eb2901c8af3730c64e5c400",
+  "addedScratchTestSHA256": "1bde0ddb1399fa511385b3799ce9b37a1bbe9cc3ec78acae97e71be25744137f",
+  "passTestNames": [],
+  "failedTestNames": [
+    null
+  ],
+  "skippedTestNames": [],
+  "rawJSONLPrivateIgnored": true,
+  "rawJSONLSHA256": "be9c02bfb75970c31ad5e9595424196959568889c8e084c5e2b64675fa7851a0",
+  "runtimeA01A40Executions": 0,
+  "newK2CodeOrCryptoAcceptanceClaim": false,
+  "productSourceChanged": false,
+  "env": {
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off"
+  }
+}

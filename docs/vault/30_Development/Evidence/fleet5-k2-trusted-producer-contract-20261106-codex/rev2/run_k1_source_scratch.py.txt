@@ -1,0 +1,48 @@
+"""New focused K1 source semantics, not K2 runtime or producer acceptance."""
+import datetime
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import subprocess
+import zipfile
+
+HERE=Path(__file__).resolve().parent
+ROOT=Path('.work/k1-rev2-source-scratch-attempt3').resolve()
+assert not ROOT.exists(),'Preserve existing results; no blind rerun'
+source='eb32b211ab3704935b9431747089ab0715582a74'
+archive=subprocess.check_output(['git','archive','--format=zip',source,'services/node-agent','packages/contracts-go'])
+z=zipfile.ZipFile(io.BytesIO(archive));ROOT.mkdir()
+for member in z.infolist():
+    target=(ROOT/member.filename).resolve()
+    assert ROOT==target or ROOT in target.parents
+    assert (member.is_dir() and member.filename in ('packages/','services/')) or member.filename.startswith(('services/node-agent/','packages/contracts-go/'))
+    assert (member.external_attr>>16)&0o170000 != 0o120000,'No source symlink extraction'
+    z.extract(member,ROOT)
+test=HERE/'k1_semantics_scratch_test.go.txt'
+(ROOT/'services/node-agent/migrationverify/k2_rev2_source_semantics_test.go').write_bytes(test.read_bytes())
+env=dict(os.environ,GOTOOLCHAIN='local',GOWORK='off',GOPROXY='off',GOSUMDB='off')
+args=['go','test','./migrationverify','-run','^TestK2Rev2','-count=1','-json']
+def now():return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+start=now()
+r=subprocess.run(args,cwd=ROOT/'services/node-agent',env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+Path('.work/k1-rev2-source-semantics.jsonl').write_bytes(r.stdout)
+(HERE/'k1-scratch-stderr.log').write_bytes(r.stderr)
+events=[]
+for line in r.stdout.splitlines():
+    try:events.append(json.loads(line))
+    except ValueError:pass
+passes=[x['Test'] for x in events if x.get('Action')=='pass' and x.get('Test')]
+fails=[x.get('Test') for x in events if x.get('Action')=='fail']
+skips=[x.get('Test') for x in events if x.get('Action')=='skip']
+value={'classification':'FOCUSED_K1_EXISTING_SYNTHETIC_FIXTURE_SOURCE_SEMANTICS_ONLY_NOT_K2_PROOF',
+    'argv':args,'exit':r.returncode,'startedKST':start,'endedKST':now(),'source':source,
+    'scratchArchiveRawSHA256':hashlib.sha256(archive).hexdigest(),'addedScratchTestSHA256':hashlib.sha256(test.read_bytes()).hexdigest(),
+    'passTestNames':passes,'failedTestNames':fails,'skippedTestNames':skips,'rawJSONLPrivateIgnored':True,
+    'rawJSONLSHA256':hashlib.sha256(r.stdout).hexdigest(),'runtimeA01A40Executions':0,
+    'newK2CodeOrCryptoAcceptanceClaim':False,'productSourceChanged':False,
+    'env':{k:env[k] for k in ('GOTOOLCHAIN','GOWORK','GOPROXY','GOSUMDB')}}
+(HERE/'k1-scratch-source-semantics.json').write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'exit':r.returncode,'passes':len(passes),'fails':fails,'skips':skips,'K2RuntimeCases':0}))
+if r.returncode:raise SystemExit(r.returncode)

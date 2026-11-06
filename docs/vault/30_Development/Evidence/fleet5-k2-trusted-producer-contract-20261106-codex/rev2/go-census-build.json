@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    ".work\\go_input_census.exe",
+    ".work\\go_input_census.go"
+  ],
+  "exit": 0,
+  "atKST": "2026-11-06T11:42:37.489158+09:00",
+  "sourceSHA256": "3e28473b14a1e327e9463cfbaee952d69a9ad36f78a36efc9d3b8bc05ee8b498",
+  "env": {
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off"
+  },
+  "stdlibOnly": true
+}

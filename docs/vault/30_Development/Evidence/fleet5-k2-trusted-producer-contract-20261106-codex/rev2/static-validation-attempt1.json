@@ -1,0 +1,6 @@
+{
+  "exit": 1,
+  "cause": "New symbolic example ID contained digit3, outside unchanged closed example ID regex; corrected example spelling, schema not weakened",
+  "sourceOrProductChanged": false,
+  "K2RuntimeExecuted": false
+}

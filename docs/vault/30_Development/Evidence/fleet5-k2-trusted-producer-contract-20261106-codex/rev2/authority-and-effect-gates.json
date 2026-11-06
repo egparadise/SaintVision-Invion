@@ -1,0 +1,198 @@
+{
+  "status": "PROPOSED_INTERNAL_INTERFACES_NOT_DEPLOYED",
+  "interfaces": {
+    "K2A": [
+      "LoadInstalledPolicy(selector)",
+      "ReadHistory(scope,hashes,versions)",
+      "ReadCurrent(scope,expectedVersion)",
+      "Assemble(authenticatedPolicy,history,current,clock)",
+      "ValidateHistory(packet,snapshot)",
+      "DeriveCurrent(packet,snapshot)"
+    ],
+    "K2B": [
+      "AuthorizeObservationRefresh(mode,method,immutableAttemptBody,independentPermit)",
+      "AuthorizeEffect(method,immutableRequest,independentPermit)",
+      "ExecuteOwnedIntent(intentID)"
+    ]
+  },
+  "SnapshotToken": {
+    "authorizesEffects": false,
+    "fields": [
+      "registryVersion",
+      "grantVersion",
+      "publicationVersion",
+      "certificateVersion",
+      "orderedCohortIdentityKey",
+      "currentVersion",
+      "activeMigration",
+      "operation",
+      "HELDLeaseRawSHA256",
+      "maxFenceEpoch",
+      "maxSequence",
+      "inventoryHead",
+      "orderedMemberHashes",
+      "ownedRootDaemonVolumeContainerProcessGeneration",
+      "challengeVersion",
+      "clockInterval",
+      "authenticatedInputDigest",
+      "currentObservationAttemptVersion"
+    ],
+    "callerSuppliedTokenAccepted": false
+  },
+  "K2AForbiddenEffects": [
+    "trust installation",
+    "private key read",
+    "sign",
+    "issue or consume challenge",
+    "reserve or lease write",
+    "create runtime temp or lock file",
+    "OpenJournal or pin",
+    "Engine ExecCreate/Start",
+    "host root mutation",
+    "SSH launch",
+    "issuer write",
+    "schedule write",
+    "challenge replacement",
+    "observation authorization signing",
+    "publication write",
+    "new Engine Exec intent",
+    "normal:3 lease mutation"
+  ],
+  "RootDecisions": [
+    {
+      "id": "D-TRUST-INSTALL",
+      "owner": "Root",
+      "architectureChoice": "OPERATOR_APPROVED_SEALED_PUBLIC_REGISTRY",
+      "decisionAuthority": "msg_6df22674ff19",
+      "actualProvisioning": "HOLD",
+      "missing": "Protected locator/public anchors/custody/CA/installation receipt and any new registry attestation wire/issuer; no new accepted role/domain"
+    },
+    {
+      "id": "D-COHORT-FENCE",
+      "owner": "Root",
+      "architectureChoice": "ONE_PROTECTED_CP_TRANSACTIONAL_COMMON_COHORT_AUTHORITY",
+      "decisionAuthority": "msg_6df22674ff19",
+      "actualProvisioning": "HOLD",
+      "missing": "New DB/procedure/authenticated read ports, durable operation/challenge/attempt archive and mandatory all-mutator mediation/quiescent UNKNOWN takeover; no B tables/grants"
+    },
+    {
+      "id": "D-CLOCK",
+      "owner": "Root",
+      "architectureChoice": "MAX_1_SECOND_UNCERTAINTY_POLICY",
+      "maxUncertaintySeconds": 1,
+      "decisionAuthority": "msg_6df22674ff19",
+      "actualProvisioning": "HOLD",
+      "missing": "Installed authenticated time source/measurement and complete pinned endpoint mechanism; not NTP guarantee or30s proof skew"
+    },
+    {
+      "id": "D-PREPUBLICATION",
+      "owner": "Root",
+      "architectureChoice": "STRICT_HOLD_ALL_BOOTSTRAP_EFFECTS",
+      "decisionAuthority": "msg_6df22674ff19",
+      "actualProvisioning": "HOLD",
+      "missing": "Closed separately reviewed BootstrapPhaseAuthorization and separate grant; original A36 required conditions preserved"
+    },
+    {
+      "id": "D-OBSERVATION",
+      "owner": "Root",
+      "architectureChoice": "SEPARATE_METHOD_SCOPED_OBSERVATION_REFRESH_AUTHORIZATION",
+      "decisionAuthority": "msg_6df22674ff19",
+      "actualProvisioning": "HOLD",
+      "missing": "Closed approved issuer/body/mediation; PRESENT stale/missing M2 never supplies authority and never relaxes K1"
+    }
+  ],
+  "effectStates": [
+    "REFUSED_NO_EFFECT",
+    "INTENT_COMMITTED",
+    "EFFECT_OUTCOME_UNKNOWN",
+    "READBACK_VERIFIED",
+    "BLOCKED_FORWARD_ONLY"
+  ],
+  "durableIntentFields": [
+    "method",
+    "operation",
+    "cohortFence",
+    "scope",
+    "requestDigest",
+    "expectedCurrentVersion",
+    "priorEvent",
+    "preimage",
+    "expectedPostimage",
+    "ownedIDsNamesGenerations",
+    "publicationDecision",
+    "deadline",
+    "actor",
+    "idempotencyKey"
+  ],
+  "errorCatalog": [
+    "ARTIFACT_OR_REVIEW_SCOPE_MISMATCH",
+    "CERTIFICATE_STATUS_UNKNOWN_REVOKED_OR_EXPIRED",
+    "CLOCK_INTERVAL_INVALID",
+    "CLOCK_MECHANISM_UNPROVEN",
+    "CLOCK_UNTRUSTED",
+    "CONSUMING_TIME_OR_INDEPENDENT_ANCHOR_UNKNOWN",
+    "CROSS_MIGRATION_FENCE_OR_VERSION_CHANGED",
+    "CURRENT_CHALLENGE_REPLACED",
+    "CURRENT_NATIVE_WITNESS_UNKNOWN_MISMATCH_OR_EXPIRED",
+    "CURRENT_OPERATION_STALE_RELEASED_OR_UNKNOWN",
+    "EFFECT_NOT_ALLOWED_IN_K2A",
+    "EFFECT_OUTCOME_UNKNOWN",
+    "GENERATION_OR_ROLLBACK_BARRIER",
+    "GRAPH_AUTHORITY_UNKNOWN",
+    "HISTORICAL_BINDING_UNKNOWN",
+    "HISTORICAL_CHALLENGE_UNKNOWN_OR_REPLAY",
+    "IDEMPOTENCY_COLLISION",
+    "IDENTITY_OR_CA_UNKNOWN",
+    "INSTALLATION_OR_RUNTIME_CAPABILITY_UNKNOWN",
+    "K1_VALIDATION_REFUSED",
+    "KEY_GRANT_UNKNOWN_REVOKED_OR_OUTSIDE_USE_INTERVAL",
+    "LIVE_CHALLENGE_UNKNOWN_OR_REPLAY",
+    "NORMAL3_K1_CURRENT_UNSUPPORTED",
+    "NO_CURRENT_HEAD_OR_STALE_CURRENT_SET",
+    "OBSERVATION_ATTEMPT_COLLISION",
+    "OBSERVATION_ATTEMPT_NOT_TERMINAL",
+    "OBSERVATION_AUTHORITY_HOLD",
+    "OBSERVATION_OUTCOME_UNKNOWN",
+    "OBSERVATION_PRECONDITION_FAILED",
+    "ORIGINAL_PLAN_OPERATION_MISMATCH",
+    "PERMISSION_OR_CAPABILITY_UNKNOWN",
+    "PREPUBLICATION_AUTHORITY_UNDECIDED",
+    "PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED",
+    "RUNNING_VERIFIER_IDENTITY_MISMATCH",
+    "SEMANTIC_OBSERVATION_AUTHORITY_UNKNOWN",
+    "SEMANTIC_SOURCE_UNKNOWN",
+    "STALE_SNAPSHOT",
+    "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+    "UNSUPPORTED_SELF_MEASUREMENT"
+  ],
+  "noIOBehindHeldDBRowLocks": true,
+  "noTTLOwnershipTakeoverWithUnknownIntent": true,
+  "newWireOrSignerAccepted": false,
+  "actualBindings": "NULL_HOLD",
+  "revision": 2,
+  "GoEnforcement": {
+    "proposedPackage": "services/node-agent/internal/migrationcontext",
+    "bridgeFile": "k1_bridge.go",
+    "entrypoint": "services/node-agent/cmd/inv-migration-readonly (future name/source/install all HOLD)",
+    "authenticatedDTOFields": "unexported; unexported checked factories only after independent provider checks",
+    "productionK1ImportAndConstructorAllowlist": [
+      "internal/migrationcontext/k1_bridge.go"
+    ],
+    "entrypointAllowedUse": "reviewed internal service API only; no direct handbuilt K1 input",
+    "boundaryTest": "standard Go AST/types import/callgraph, aliases/dot-imports/constructors included; tests isolated",
+    "JSONUnmarshalOrHandbuiltRPCDTOCreatesAuthentication": false,
+    "maliciousSameTrustedProcessOrUnsafeDefendedByOpacity": false,
+    "K2BAcceptsCallerReportDigestSnapshotTokenAsCapability": false
+  },
+  "errorSyntax": "ERR[CODE] in normative prose; typed error fields in JSON. HOLD/UNKNOWN are classifications, not aliases.",
+  "errorCatalogStatus": "PROPOSED_INTERNAL_ONLY_NOT_ACCEPTED_WIRE",
+  "smallestNextGrantCandidate": {
+    "status": "NO_GRANT_NOW",
+    "after": "actual Rev2 delta review plus separate Root grant",
+    "scope": "K2A-TRUST/HISTORY only",
+    "currentOrObservationOrEffect": "HOLD",
+    "defaultRefusalWithUnprovisionedPorts": true,
+    "owner": "Codex",
+    "actualFutureReviewer": "Claude through Root"
+  }
+}

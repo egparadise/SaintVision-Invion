@@ -1,0 +1,29 @@
+{
+  "toolchain": "go version go1.27.0 windows/amd64",
+  "stdlibSourcePath": "crypto/x509/verify.go",
+  "rawSHA256": "8b3d059f20a75ac8a103d97b473fbe90e01d40654c4548c50d9b0937f54f3c8f",
+  "sourceSlices": [
+    {
+      "line": 461,
+      "text": "\n\tnow := opts.CurrentTime\n\tif now.IsZero() {\n\t\tnow = time.Now()"
+    },
+    {
+      "line": 462,
+      "text": "\tnow := opts.CurrentTime\n\tif now.IsZero() {\n\t\tnow = time.Now()\n\t}"
+    },
+    {
+      "line": 463,
+      "text": "\tif now.IsZero() {\n\t\tnow = time.Now()\n\t}\n\tif now.Before(c.NotBefore) {"
+    },
+    {
+      "line": 465,
+      "text": "\t}\n\tif now.Before(c.NotBefore) {\n\t\treturn CertificateInvalidError{\n\t\t\tCert:   c,"
+    },
+    {
+      "line": 471,
+      "text": "\t\t}\n\t} else if now.After(c.NotAfter) {\n\t\treturn CertificateInvalidError{\n\t\t\tCert:   c,"
+    }
+  ],
+  "actualFutureRunningToolchainEquivalentProven": false,
+  "clockMechanismOperationalStatus": "HOLD_UNTIL_EXACT_RUNNING_STDLIB_SEMANTICS_REVIEWED"
+}

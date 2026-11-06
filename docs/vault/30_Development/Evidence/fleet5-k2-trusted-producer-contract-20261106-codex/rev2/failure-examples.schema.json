@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-k2-plan.invalid/rev2/static-refusal-examples-v1",
+  "title": "Planning examples only; not an input or wire protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "classification",
+    "runtimeExecutions",
+    "examples"
+  ],
+  "properties": {
+    "classification": {
+      "const": "STATIC_NORMATIVE_EXAMPLES_NOT_AUTHENTICATED_INPUTS"
+    },
+    "runtimeExecutions": {
+      "const": 0
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "hypothesis",
+          "requiredIndependentEvidence",
+          "expectedRefusal",
+          "effectDisposition",
+          "pairedGreenRequirement",
+          "actualExecution"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^K2-[A-Z_]+$"
+          },
+          "hypothesis": {
+            "type": "string",
+            "minLength": 10
+          },
+          "requiredIndependentEvidence": {
+            "type": "string",
+            "minLength": 10
+          },
+          "expectedRefusal": {
+            "type": "string",
+            "minLength": 5
+          },
+          "effectDisposition": {
+            "enum": [
+              "REFUSED_NO_EFFECT",
+              "BLOCKED_FORWARD_ONLY"
+            ]
+          },
+          "pairedGreenRequirement": {
+            "type": "string",
+            "minLength": 10
+          },
+          "actualExecution": {
+            "const": "NOT_RUN"
+          }
+        }
+      }
+    }
+  }
+}

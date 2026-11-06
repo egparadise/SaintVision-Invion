@@ -1,0 +1,16 @@
+{
+  "exit": 1,
+  "cause": "Strict prefix allowlist omitted harmless selected-source parent directory entries; containment check passed; no Go test executed",
+  "unexpectedEntries": [
+    {
+      "name": "packages/",
+      "directory": true
+    },
+    {
+      "name": "services/",
+      "directory": true
+    }
+  ],
+  "partialScratchPreserved": true,
+  "GoTestExecuted": false
+}

@@ -1,0 +1,692 @@
+{
+  "schemaVersion": "fleet5-k2-producer-contract-proposal:1",
+  "classification": "STATIC_DESIGN_NOT_IMPLEMENTED",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "allDeclaredInputFields": 73,
+  "types": 13,
+  "allFieldsCovered": true,
+  "commonRules": {
+    "missingAuthentication": "UNKNOWN_HOLD before any effect",
+    "callerAssertionIsAuthority": false,
+    "readOnlySnapshots": "short V0 read/close; independent bounded I/O without held DB row locks; V1 version recheck; no silent retry",
+    "allMutableValues": "exclusive ownership while copying; no uncoordinated mutator safety claim",
+    "allActualPrivateBindings": "NULL_HOLD",
+    "newWireSignerDomainAccepted": false,
+    "semanticSnapshot": "Original authenticated plan/history recipe snapshot, including fallback containers/facts/outcomes; Current live context is separately versioned. Never refresh a historical selector merely because its label says current."
+  },
+  "rows": [
+    {
+      "id": "P01",
+      "inputs": [
+        "InstalledTrust.RegistrySHA256",
+        "InstalledTrust.ContractPins",
+        "ContractPin.ContractSHA256",
+        "ContractPin.SchemaSHA256",
+        "ContractPin.Codec",
+        "ContractPin.RequiredVerifier"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "NewVerifier"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/contracts.go",
+          "symbols": "loadContracts"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/source-pins.json",
+          "symbols": "28 fixed source pins"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "LoadInstalledPolicy / independently provisioned registry reader",
+      "independentlyRequiredAuthority": "Root-chosen operator-approved SEALED PUBLIC REGISTRY with independently preprovisioned protected locator/public anchors outside packet. Installation/registry attestation wire or issuer not already present remains PROPOSED_HOLD; actual provisioning NULL.",
+      "validation": "Exact registry version/raw hash, complete28 contract/schema hashes, codec and requiredVerifier; offline graph/schema closure; no unknown/duplicate pin or fallback",
+      "containingTransaction": "Short authenticated registry snapshot; capture immutable installation version before plan parse/reservation",
+      "currentReadback": "Re-read registry version and installation receipt at assembly/admission; mismatch stops",
+      "onFailure": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P02",
+      "inputs": [
+        "InstalledTrust.Verifier",
+        "VerifierPublication.ID",
+        "VerifierPublication.SourceSHA",
+        "VerifierPublication.ArtifactSHA256",
+        "VerifierPublication.ReviewSHA",
+        "VerifierPublication.CIRunIDs"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "VerifierPublication/NewVerifier"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.contract.json",
+          "symbols": "existing immutable provenance contract"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.contract.json",
+          "symbols": "exact code review subject"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Registered publication resolver; existing fixed build/ci/reviewer proof producers after independent acquisition",
+      "independentlyRequiredAuthority": "Independently registered repository/provider, workflow identity, reviewer identity/grant and actual Root source-choice publication; no arbitrary review JSON or workflow name",
+      "validation": "Exact ID/source/artifact/review/CIrunIDs join head/ref/event/correlation/runAttempt/jobs/required steps/artifact bytes/digest/binary VCS and actual review target/scope/verdict;56651-Go equals eb32 exceptREADME; scoped Root successor decision required VerifierPublication.ArtifactSHA256 MUST equal the measured ACTUAL RUNNING K1/K2 integration entrypoint executable under a held OS identity and independently approved installation receipt. Archive/image digests are separately typed metadata; authentic artifactX with runningY refuses.",
+      "containingTransaction": "Read immutable provider objects without DB locks, join authentic acceptance registry version in short transaction",
+      "currentReadback": "Current accepted/unrevoked publication and grant readback; same source bytes/ref identity; missing K2 target or installed verifier remains HOLD",
+      "onFailure": "ARTIFACT_OR_REVIEW_SCOPE_MISMATCH",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P03",
+      "inputs": [
+        "InstalledTrust.GraphBytes",
+        "InstalledTrust.GraphSHA256",
+        "InstalledTrust.NodeKinds"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "NewVerifier"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/graph.go",
+          "symbols": "compileGraph"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/source-pins.json",
+          "symbols": "registered v5 design baseline"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "LoadInstalledPolicy graph installation reader",
+      "independentlyRequiredAuthority": "Same independent installed registry; not packet graph selection",
+      "validation": "Exact raw graph hash, closed node-kind map, complete causal dependency order and separate role@scope policies; hash equality alone is not provenance",
+      "containingTransaction": "Same immutable installed-policy version as P01",
+      "currentReadback": "Re-read installed version; any unknown graph/NodeKinds denies before evaluation",
+      "onFailure": "GRAPH_AUTHORITY_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P04",
+      "inputs": [
+        "InstalledTrust.CohortID",
+        "InstalledTrust.Members",
+        "MemberIdentity.Slot",
+        "MemberIdentity.Scope",
+        "MemberIdentity.CertificateDER",
+        "MemberIdentity.CARootDER"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "member/scopeIdentity/cohortAuthority"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/native.go",
+          "symbols": "authenticateNativeOriginal"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/control-plane/src/inv/node_channels.py",
+          "symbols": "certificate_identity/NodeChannels.snapshot/assert_channel"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Provisioned identity registry and public DER/CA reader",
+      "independentlyRequiredAuthority": "Actual old tenant/Node/recoveryEpoch registrations and approved unchanged CA; Root physical binding separately authenticated, no key creation or fixture promotion",
+      "validation": "Exact ordered PC2/PC4 unique scopes; public DER byte identity/CA/non-CA leaf/SPIFFE URI/ServerAuth/DigitalSignature/SPKI; channel row is partial evidence only",
+      "containingTransaction": "Read RLS-scoped registered identities/channels and public anchor registration version; close transaction before file/provider I/O",
+      "currentReadback": "Same enabled channel version/current DER/epoch and independent certificate status; old two scopes never remapped to fresh all-five cohort",
+      "onFailure": "IDENTITY_OR_CA_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P05",
+      "inputs": [
+        "InstalledTrust.Grants",
+        "KeyGrant.Role",
+        "KeyGrant.AuthorityScope",
+        "KeyGrant.PublicKeyHex",
+        "KeyGrant.NotBefore",
+        "KeyGrant.NotAfter",
+        "KeyGrant.Status"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "NewVerifier/keyAt"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/verify.go",
+          "symbols": "outerRoles"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json",
+          "symbols": "28 exact role/domain contract bindings"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Independent role/SPKI/scope grant registry reader",
+      "independentlyRequiredAuthority": "Root public-anchor/custody provisioning plus separate grant authority; neither role label nor self-issued test key grants anything",
+      "validation": "ACTIVE current registration; exact role+C2 authority scope+DER SPKI/public Ed25519; original half-open signing intervals and duplicate refusal; expired historical interval can authenticate original use but cannot sign current use; revoked registration denies",
+      "containingTransaction": "Read authentic grant version/status snapshot with original issuance/interval evidence; never rewrite interval or restore revoked grants",
+      "currentReadback": "Current version/nonrevocation at realNow before assembly and every effect admission",
+      "onFailure": "KEY_GRANT_UNKNOWN_REVOKED_OR_OUTSIDE_USE_INTERVAL",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P06",
+      "inputs": [
+        "TrustedContext.Now"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "NewVerifier trusted UTC requirement"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/proofs.go",
+          "symbols": "freshnessAt/evidenceAge"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/control-plane/src/inv/node_channels.py",
+          "symbols": "DB clock_timestamp partial local clock source"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "TrustedClockSource (proposed read-only adapter)",
+      "independentlyRequiredAuthority": "Independently installed approved time authority/monitor; physical UTC cannot be authenticated by caller timestamp; actual source and1s uncertainty bound pending D-CLOCK",
+      "validation": "Root chose max1second uncertainty POLICY budget only. Same immutable authenticated snapshot is evaluated by pinned K1 at BOTH interval endpoints, identical full security outputs required, then actual t0 evaluation within interval. Full acquisition/evaluation monotonic bracket must fit; complete Now convexity/stdlib assumptions pinned or CLOCK_MECHANISM_UNPROVEN. Actual clock source/provisioning remains HOLD.",
+      "containingTransaction": "Read clock without held DB row locks, bracket all acquisition I/O; no physical clock set",
+      "currentReadback": "Fresh real clock sample and continuity immediately before admission; no old Now reuse",
+      "onFailure": "CLOCK_UNTRUSTED",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P07",
+      "inputs": [
+        "TrustedContext.SemanticInputs"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/temporal.go",
+          "symbols": "validateSemanticInputs"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/recipes.go",
+          "symbols": "recipeSources/subject"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+          "symbols": "all fixed recipe source pointers"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Assemble authenticated plan/facts/policy/containers from independently owned producers",
+      "independentlyRequiredAuthority": "Plan root-plan authorization plus P01 policy, P04 identities, P08-P16 authoritative state; packet facts are not authority",
+      "validation": "plan/facts/policy/containers are complete typed objects; plan expiry/age; recipe input inventory covers aliases/product/CI/head/input/nodeFacts/current/progress/seal selected by containing method/slot; no first-member lookup or guessed field Original semantic snapshot and Current context remain separated; four opaque any fields require explicit authenticated shape construction, not JSON hand-built authority.",
+      "containingTransaction": "Join short currentVersion snapshots with bounded authenticated host/provider records after closing DB read transaction",
+      "currentReadback": "Same versions/protected state/container generations and semantic source digests at V0/V1/admission",
+      "onFailure": "SEMANTIC_SOURCE_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P08",
+      "inputs": [
+        "TrustedContext.History",
+        "HistoricalContext.Operations",
+        "OperationBinding.MigrationID",
+        "OperationBinding.OperationID",
+        "OperationBinding.LeaseEnvelopeSHA256",
+        "OperationBinding.FenceEpoch",
+        "OperationBinding.AcquiredAt",
+        "OperationBinding.ExpiresAt",
+        "TrustedContext.MigrationOperationID"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "HistoricalContext/checkedOperation"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/temporal.go",
+          "symbols": "recordUse"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+          "symbols": "cohortId overlay only; HELD/RELEASED definitions are in v2"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/schemas/v2/operation-lease.schema.json",
+          "symbols": "HELD/RELEASED definitions; v3 only overlays cohortId"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Sealed registry-authorized original plan/history archive reader under proposed protected CP common-cohort authority",
+      "independentlyRequiredAuthority": "Original root-fence authenticated HELD lease and independently preserved ledger/version/cohort scope; not packet-derived map",
+      "validation": "Exact migration/operation/fence/HELD-envelope hash/acquired/expiry, original scope ordering and causal record; ended epochs remain history with no current operation fabricated MigrationOperationID is the AUTHENTICATED ORIGINAL PLAN migration operation: exactly equals SemanticInputs.facts.migrationOperationId, must resolve to the original exact HELD binding in History.Operations, may be expired and absent from live Operations. Never replace it with Current.OperationID.",
+      "containingTransaction": "Immutable archive read bound to authentic durable publication sequence; no reserve/lease refresh",
+      "currentReadback": "Recheck archive acceptance/current registry revocation, keep original bytes and event-time anchors unchanged",
+      "onFailure": "HISTORICAL_BINDING_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P09",
+      "inputs": [
+        "HistoricalContext.Challenges",
+        "NativeChallenge.Nonce",
+        "NativeChallenge.MigrationID",
+        "NativeChallenge.OperationID",
+        "NativeChallenge.ScopeSHA256",
+        "NativeChallenge.FenceEpoch",
+        "NativeChallenge.IssuedAt",
+        "NativeChallenge.ExpiresAt"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/proofs.go",
+          "symbols": "verifyNativeAt"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "NativeChallenge"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/native.go",
+          "symbols": "original signed nonce"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadHistory original durable challenge issuance archive (new producer)",
+      "independentlyRequiredAuthority": "Independently authorized original challenge issuer under exact HELD operation and Node scope; copied native nonce is not issuance evidence",
+      "validation": "Original nonce/migration/operation/scope hash/fence/issue/expiry; consuming and signed observation times obey original windows and existing skew; no reissuance/backdated Now",
+      "containingTransaction": "Read preserved issuance and consumption records at original authenticated sequence",
+      "currentReadback": "Current trust/status acceptance only; never rewrite historical issued/expiry or create a current nonce",
+      "onFailure": "HISTORICAL_CHALLENGE_UNKNOWN_OR_REPLAY",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P10",
+      "inputs": [
+        "TrustedContext.Publications",
+        "PublicationStatus.Status",
+        "PublicationStatus.SubjectSHA256",
+        "PublicationStatus.PublishedAt",
+        "PublicationStatus.CheckedAt",
+        "PublicationStatus.ExpiresAt"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/proofs.go",
+          "symbols": "freshnessAt immutable-provenance/validity-bounded-approval"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadCurrent accepted publication and independently anchored history registry (new producer)",
+      "independentlyRequiredAuthority": "Independent publication authority/current grants plus preserved append-only commit-time anchors; signer-chosen date or green CI is insufficient",
+      "validation": "Map key exact referent raw hash, SubjectSHA256 exact typed subject, ACCEPTED_UNREVOKED, authentic PublishedAt and current CheckedAt/ExpiresAt; <=120s current status age; original publication/consuming graph-time joins; no offline-backdating guarantee",
+      "containingTransaction": "Short authenticated read snapshot of acceptance/nonrevocation version with ledger anchor references",
+      "currentReadback": "Requery fresh current status/version at realNow before current derivation/effect; missing/revoked status refuses history use too",
+      "onFailure": "PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P11",
+      "inputs": [
+        "TrustedContext.Certificates",
+        "CertificateStatus.Status",
+        "CertificateStatus.CheckedAt",
+        "CertificateStatus.ExpiresAt"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/native.go",
+          "symbols": "authenticateNativeOriginal"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/control-plane/src/inv/node_channels.py",
+          "symbols": "snapshot/assert_channel/revoke_channel partial channel authority"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadCurrent independent certificate nonrevocation source (new integration)",
+      "independentlyRequiredAuthority": "Actual registered old CA/leaf revocation authority plus channel status; enabled channel alone is not full CA revocation knowledge",
+      "validation": "Exact leaf DER hash key, UNREVOKED with current CheckedAt/ExpiresAt <=120s status age; original certificate validity at signed observation/consumption, current validity for live use",
+      "containingTransaction": "Short registered CA/channel/status snapshot; independent query outside DB locks if necessary",
+      "currentReadback": "Same DER/CA/status versions current at realNow and within expiry",
+      "onFailure": "CERTIFICATE_STATUS_UNKNOWN_REVOKED_OR_EXPIRED",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P12",
+      "inputs": [
+        "TrustedContext.Operations"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "operation/checkedOperation"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/verify.go",
+          "symbols": "VerifyCurrentProjectionSet"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/control-plane/src/inv/leases.py",
+          "symbols": "ordinary execution fences are NOT migration grants"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadCurrent active common-cohort operation registry (new producer)",
+      "independentlyRequiredAuthority": "Independently installed root-fence authority and closed ordered cohort reservation, not generic job lease or caller operation ID",
+      "validation": "Actual LIVE active common-cohort operation only, exact current HELD lease/hash/fence/window/version and operation-qualified maximum sequence. Never supplies the original plan MigrationOperationID.",
+      "containingTransaction": "Single short authority snapshot with currentVersion, active migration, max cohort epoch/sequence; no external I/O under row lock",
+      "currentReadback": "Mandatory fence/currentVersion CAS and fresh window at effect admission; no takeover on timeout with ambiguous in-flight intent",
+      "onFailure": "CURRENT_OPERATION_STALE_RELEASED_OR_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P13",
+      "inputs": [
+        "TrustedContext.Challenges"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/trust.go",
+          "symbols": "TrustedContext.Challenges"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/proofs.go",
+          "symbols": "verifyNativeAt live challenge"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadCurrent already issued durable operation-scoped challenges; issuance is K2B",
+      "independentlyRequiredAuthority": "Authenticated challenge issuer/permission with actual reservation/current fence; no K2A RNG allocation or packet-nonce promotion",
+      "validation": "P09 challenge fields plus realNow>=IssuedAt, Now<ExpiresAt, exact current operation/Node/fence and attempt; retained history cannot fill live map Exactly ONE current challenge per K1 parent operation+scope. Duplicate immutable attemptID/body returns original nonce/times/outcome; replacement only after prior attempt terminal-known/no-inflight, same parent valid and fresh method authorization, atomic currentVersion advance. Prior History.Challenges/packet never overwritten; UNKNOWN blocks new challenge/exec/owner.",
+      "containingTransaction": "Proposed CP common-cohort authority reads the active current challenge slot and append-only attempt archive. Issuance/replacement/consumption writes are separately authorized K2B, never K2A.",
+      "currentReadback": "Recheck issuance/consumption version and lifetime; stale/replayed/generation-crossed witness refuses",
+      "onFailure": "LIVE_CHALLENGE_UNKNOWN_OR_REPLAY",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P14",
+      "inputs": [
+        "TrustedContext.Current",
+        "CurrentProjectionContext.SetID",
+        "CurrentProjectionContext.MigrationID",
+        "CurrentProjectionContext.OperationID",
+        "CurrentProjectionContext.PlanEnvelopeSHA256",
+        "CurrentProjectionContext.LeaseEnvelopeSHA256",
+        "CurrentProjectionContext.FenceEpoch",
+        "CurrentProjectionContext.Sequence",
+        "CurrentProjectionContext.InventoryHead",
+        "CurrentProjectionContext.InventoryReadbackSHA256",
+        "CurrentProjectionContext.MemberProjectionSHA256",
+        "CurrentProjectionContext.NativeWitnesses"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/current.go",
+          "symbols": "latestCurrent/currentReadback/currentNativeWitnesses"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/verify.go",
+          "symbols": "VerifyCurrentProjectionSet"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.contract.json",
+          "symbols": "cp-inventory fresh proof"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "ReadCurrent authenticated head/projections/sequence service and K2A assembler (new integration)",
+      "independentlyRequiredAuthority": "Independent cp-inventory current readback and common-fence registry; packet-derived head/set cannot self-select current",
+      "validation": "Exact SetID/migration/operation/plan/HELD hash/fence/max sequence, PRESENT authenticated head and fresh readback hash, ordered two member hashes and independently original native witnesses; ABSENT no CurrentView",
+      "containingTransaction": "Atomic two-member current head/currentVersion snapshot, preserve mixed states; acquire no current view until all independent sources agree",
+      "currentReadback": "Re-read currentVersion/head/max sequence/cohort fence plus fresh current proof at realNow; any partial member refuses",
+      "onFailure": "NO_CURRENT_HEAD_OR_STALE_CURRENT_SET",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P15",
+      "inputs": [
+        "CurrentNativeWitness.Slot",
+        "CurrentNativeWitness.Raw"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/native.go",
+          "symbols": "authenticateNativeOriginal"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/current.go",
+          "symbols": "currentNativeWitnesses"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/transport/peer_floor.go",
+          "symbols": "ObservePeerPolicyFloor"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/runtime/peer_floor_linux.go",
+          "symbols": "ServingExecutableSHA256/PeerFloorServingProcess/ReadPeerPolicyFloor"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "deploy/lan/worker_peer_floor.py",
+          "symbols": "observe/target/context"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "K2A reads authenticated original bytes from separately authorized K2B-owned observer intent; Node remains original signer",
+      "independentlyRequiredAuthority": "Node unchanged leaf identity plus host-helper owned Engine/container/ExecID provenance and current issuer challenge; new observer cannot be sideloaded against old executable",
+      "validation": "Two ordered Slot/Raw records, fixed M2v2 original domain/bytes/signature/DER, nonce/UID/live same-exe PID/start generation/journal/floor/policy hash; signed raw cmdline distinct from argv JSON and image; authenticate independent before/after host joins Separate ObservationRefreshAuthorization is required even with PRESENT head when M2 is stale/missing; not CurrentView. MIGRATION_OBSERVE and TERMINAL_NORMAL3_OBSERVE are distinct, all actual observation effects HOLD until issuer/body/mediation accepted and provisioned.",
+      "containingTransaction": "Node double-read is original producer behavior; Engine ExecCreate/Start and durable challenge allocation are K2B effects committed before launch; no K2A exec",
+      "currentReadback": "Original wire reverified at realNow/current challenge; exact host/container/PID/executable/ExecID generation stability; source/capability mismatch refuses",
+      "onFailure": "CURRENT_NATIVE_WITNESS_UNKNOWN_MISMATCH_OR_EXPIRED",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P16",
+      "inputs": [
+        "@K2.CrossMigrationCohortFence",
+        "@K2.currentVersion"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/current.go",
+          "symbols": "latestCurrent filters same migration/plan"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+          "symbols": "proposed root-fence lease"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "New common cohort authority read API; no deployed producer at eb32",
+      "independentlyRequiredAuthority": "Root chose ONE protected CP transactional common-cohort authority with ordered tenant/Node/R vector, monotone fence/currentVersion, exactly one active owner/migration and operation-qualified sequence; new DB/procedures/authenticated ports are PROPOSED only, no B tables/grants or deployed authority.",
+      "validation": "Key complete ordered tenant/Node/R vector plus cohort; authenticate active migration and max cohort fence epoch across migrations, then max sequence for the selected active operation qualified by epoch/migration/operation; never compare sequence alone across operations; R2 rejects a superseding different migration despite an internally consistent packet",
+      "containingTransaction": "Single authoritative cohort record/version with fenced CAS shared by all mutators; generic execution leases not interchangeable",
+      "currentReadback": "V0==V1 and immediate admission CAS under mandatory logical/OS ownership; changed registry or inaccessible writer refuses",
+      "onFailure": "CROSS_MIGRATION_FENCE_OR_VERSION_CHANGED",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P17",
+      "inputs": [
+        "@K2.SourceBinaryHelperLockRuntimeProfile"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+          "symbols": "WORKER_MODULES/_worker_sources/validate_runtime"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+          "symbols": "published lock"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/runtime/permit.go",
+          "symbols": "plan.ImageDigest versus Config.Image"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "New reviewed packaging/publication installation readers; retain five-module plus launcher+lock closure",
+      "independentlyRequiredAuthority": "Independently authenticated artifact/image/platform/build/review/publication and actual installation receipt; e50 packet cannot stand for eb32",
+      "validation": "Separate source/executable/archive/image ID/config/layers/RepoDigest/CLI --image allowed WORKLOAD image/runtime image; exact storage-free profile/resources/args/endpoint/mount/keys/CA/epoch/channels; all target installation bindings null/HOLD The measured running verification entrypoint must actually link and call pinned K1; public eb32 inv-node does not. Actual running digest/identity/installation receipt equality is mandatory; argv0 or caller file never substitutes.",
+      "containingTransaction": "Read installed immutable file descriptors and registered image metadata; no build/load/copy/restart/download-to-runtime action in K2A",
+      "currentReadback": "Exact descriptor ownership/no symlink/single-link/atomic read stability, source/helper/lock/current install versions; wrong or missing target refuses",
+      "onFailure": "INSTALLATION_OR_RUNTIME_CAPABILITY_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P18",
+      "inputs": [
+        "@K2.SemanticPlanFactsPolicyContainers"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/recipes.go",
+          "symbols": "recipeSources"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+          "symbols": "all existing semantic pointers"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "Registered plan reader; Root observation inventory and owned Engine inspection records; independently granted policy registry",
+      "independentlyRequiredAuthority": "plan root-plan/publication authority; facts actual root-observer/host-helper/CP records; policy independently installed; no bundle-author authority",
+      "validation": "Original plan/history semantic recipe snapshot: facts.migrationOperationId equals original plan selector, nodes/eventSlots/effectOutcomes and containers/*/current are authenticated for the exact signed containing artifact and consuming epoch; current-looking field names never authorize substitution by live registry values. SemanticInputs.plan must equal the authenticated original plan body. Current live head/witness/operation are assembled separately.",
+      "containingTransaction": "Read immutable authenticated semantic/history snapshots and original outcome archive; no effect/signing/nonce write. Join current status versions separately without altering history bytes.",
+      "currentReadback": "Fresh source/current status and exact allowed launch surfaces/no overlap, current container identity; unsigned20:34 snapshot context only",
+      "onFailure": "SEMANTIC_OBSERVATION_AUTHORITY_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    },
+    {
+      "id": "P19",
+      "inputs": [
+        "@Derived.OriginalSignedConsumingTimes"
+      ],
+      "existingSource": [
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/temporal.go",
+          "symbols": "recordUse"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/verify.go",
+          "symbols": "original envelope authentication then causal graph"
+        },
+        {
+          "source": "eb32b211ab3704935b9431747089ab0715582a74",
+          "path": "services/node-agent/migrationverify/proofs.go",
+          "symbols": "freshnessAt"
+        }
+      ],
+      "existingDeployedAuthenticatedProducer": "UNKNOWN_HOLD",
+      "proposedProducer": "K1 derives times; K2 reads independent immutable time anchors without overriding them",
+      "independentlyRequiredAuthority": "Original root-plan/host-helper/root-fence/cp-inventory/root-seal signatures and independent ledger anchors/current grant/publication status",
+      "validation": "Exact original createdAt/recordedAt/publishedAt/sealedAt/HELD.acquiredAt/earliest exact request event/latest exact journal event/release outcome; no arbitrary consume time or manufactured current ended epoch",
+      "containingTransaction": "Authenticated archived causal graph and original recorded publication order; status at realNow separately",
+      "currentReadback": "Anchor/grant/publication current acceptance; residual authorized-key offline backdating explicitly retained",
+      "onFailure": "CONSUMING_TIME_OR_INDEPENDENT_ANCHOR_UNKNOWN",
+      "untrustedCallerMaySupplyAuthority": false,
+      "implementationStatus": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "Codex"
+    }
+  ],
+  "revision": 2,
+  "supersedesProposal": "551d7312bb9c806fd423dcf6074158a9802cbb14"
+}

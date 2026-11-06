@@ -1,0 +1,133 @@
+"""Rev2 static/source consistency gate; NOT live trust or K2 acceptance.
+
+Requires the recorded STANDARD Go census/mutation/source-fixture receipts.
+Their actual commands/exits remain separate; labels do not prove semantics.
+"""
+import copy
+from fractions import Fraction
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+from jsonschema import Draft202012Validator
+
+HERE=Path(__file__).resolve().parent
+OLD=HERE.parent
+BASE='eb32b211ab3704935b9431747089ab0715582a74'
+def read(name):return json.loads((HERE/name).read_text(encoding='utf-8'))
+def raw(source,path):return subprocess.check_output(['git','show',source+':'+path])
+def sha(b):return hashlib.sha256(b).hexdigest()
+
+def validate(matrix,authority,examples,markdowns):
+    census=read('go-input-census.json')
+    assert len(census['Types'])==13 and census['FieldCount']==73 and census['EmbeddedFields']==0
+    assert census['Signature']=='func(installed migrationverify.InstalledTrust, context migrationverify.TrustedContext) (*migrationverify.Verifier, error)'
+    expected={t['Name']+'.'+f['Name'] for t in census['Types'] for f in t['Fields']}
+    assert any(t['Name']=='TrustedContext' and any(f['Name']=='Now' and f['DeclaredGoType']=='time.Time' for f in t['Fields']) for t in census['Types'])
+    covered={x for r in matrix['rows'] for x in r['inputs'] if not x.startswith('@')}
+    assert covered==expected
+    rows={r['id']:r for r in matrix['rows']}
+    assert 'TrustedContext.MigrationOperationID' in rows['P08']['inputs']
+    assert 'TrustedContext.MigrationOperationID' not in rows['P12']['inputs']
+    assert 'AUTHENTICATED ORIGINAL PLAN' in rows['P08']['validation']
+    catalog=set(authority['errorCatalog'])
+    assert len(catalog)==len(authority['errorCatalog'])
+    for row in matrix['rows']:
+        assert row['onFailure'] in catalog
+        assert row['untrustedCallerMaySupplyAuthority'] is False
+        for ref in row['existingSource']:assert raw(ref['source'],ref['path'])
+    Draft202012Validator(read('failure-examples.schema.json')).validate(examples)
+    ids={x['id']:x for x in examples['examples']}
+    assert len(ids)==len(examples['examples'])==30
+    for ex in examples['examples']:assert ex['expectedRefusal'] in catalog and ex['actualExecution']=='NOT_RUN'
+    critical={'K2-PRESENT_STALE_WITNESS':'OBSERVATION_AUTHORITY_HOLD','K2-ORIGINAL_SELECTOR_CURRENT_SUBSTITUTION':'ORIGINAL_PLAN_OPERATION_MISMATCH','K2-RUNNING_ARTIFACT_MISMATCH':'RUNNING_VERIFIER_IDENTITY_MISMATCH','K2-ATTEMPT_UNKNOWN_REPLACE':'OBSERVATION_OUTCOME_UNKNOWN'}
+    for id,error in critical.items():assert ids[id]['expectedRefusal']==error
+    essential={'private key read','sign','issue or consume challenge','Engine ExecCreate/Start','challenge replacement','publication write'}
+    assert essential<=set(authority['K2AForbiddenEffects'])
+    choices={x['id']:x for x in authority['RootDecisions']}
+    assert len(choices)==5 and all(x['actualProvisioning']=='HOLD' for x in choices.values())
+    assert choices['D-PREPUBLICATION']['architectureChoice']=='STRICT_HOLD_ALL_BOOTSTRAP_EFFECTS'
+    assert choices['D-OBSERVATION']['architectureChoice']=='SEPARATE_METHOD_SCOPED_OBSERVATION_REFRESH_AUTHORIZATION'
+    assert choices['D-TRUST-INSTALL']['architectureChoice']=='OPERATOR_APPROVED_SEALED_PUBLIC_REGISTRY'
+    assert choices['D-COHORT-FENCE']['architectureChoice']=='ONE_PROTECTED_CP_TRANSACTIONAL_COMMON_COHORT_AUTHORITY'
+    assert choices['D-CLOCK']['maxUncertaintySeconds']==1
+    assert authority['GoEnforcement']['K2BAcceptsCallerReportDigestSnapshotTokenAsCapability'] is False
+    assert authority['GoEnforcement']['JSONUnmarshalOrHandbuiltRPCDTOCreatesAuthentication'] is False
+    assert authority['SnapshotToken']['authorizesEffects'] is False
+    # ALL normative Markdown prose/tables/codeblocks use one error catalog.
+    non_errors={'REV2_DESIGN_PROPOSAL_REVIEW_REQUIRED','DESIGN_PROPOSAL_REVIEW_REQUIRED','NOT_RUN','NULL_HOLD','PROPOSED_HOLD','NEW_CODE_CONTRACT_NOT_IMPLEMENTED_OR_ACCEPTED',
+      'CLOCK_MECHANISM_HOLD','RESOURCE_UNAVAILABLE','REFUSED_NO_EFFECT','INTENT_COMMITTED','READBACK_VERIFIED','BLOCKED_FORWARD_ONLY',
+      'AUTHENTICATED_ORIGINAL_NATIVE_HISTORY_NOT_FRESH_PROOF','MIGRATION_OBSERVE','TERMINAL_NORMAL3_OBSERVE','CHALLENGE_ISSUE',
+      'CHALLENGE_REPLACE','OBSERVER_EXEC_CREATE_START','RECONCILE_OWNED_ATTEMPT','CGO_ENABLED','CODE'}
+    for name,text in markdowns.items():
+        assert not re.search(r'\b(?:TRUST_UNKNOWN|NO_CURRENT_HEAD|REPLAY_OR_SCOPE_MISMATCH)\b',text),name
+        for code in re.findall(r'ERR\[([A-Z][A-Z0-9_]+)\]',text):assert code in catalog or code=='CODE',(name,code)
+        for token in re.findall(r'\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b',text):
+            assert token in catalog or token in non_errors,(name,'uncataloged normative symbol',token)
+        assert 'K1 current where available' not in text
+
+matrix=read('producer-matrix.json');authority=read('authority-and-effect-gates.json');examples=read('failure-examples.json')
+markdowns={p.name:p.read_text(encoding='utf-8') for p in HERE.glob('*.md') if p.name!='review-response.md'}
+validate(matrix,authority,examples,markdowns)
+
+cases=read('future-runtime-A01-A40.json')
+original_raw=raw(cases['originalSource'],cases['originalPath']);original=json.loads(original_raw)['cases']
+assert sha(original_raw)==cases['originalRawSHA256']
+for old,new in zip(original,cases['cases']):
+    assert all(new[k]==v for k,v in old.items())
+    assert new['red'].encode('utf-8')==old['red'].encode('utf-8') and new['green'].encode('utf-8')==old['green'].encode('utf-8')
+    assert new['status']=='NOT_RUN' and new['executionEvidence'] is None
+    assert 'requiredTask' not in new
+    assert new['wholeCaseGreenCanBeClaimedByK2AConsumption'] is False
+    assert new['dependencies']['productionEffectGreen']['tasks']
+assert len(cases['cases'])==40
+quoted=json.loads(markdowns['observation-authority.md'].split('<!-- original-A36 -->\n```json\n',1)[1].split('\n```',1)[0])
+a36=next(x for x in original if x['id']=='A36')
+assert quoted=={k:a36[k] for k in ('id','red','green')}
+bindings=read('installed-bindings-HOLD.json');assert all(v is None for v in bindings['actual'].values())
+assert bindings['effectAuthorityGranted'] is False
+mutations=read('go-census-mutations.json');assert mutations['allEightDetectedAfterRawRepin'] and len(mutations['mutations'])==8
+assert all(x['semanticShapeMismatchDetected'] for x in mutations['mutations'])
+scratch=read('k1-scratch-source-semantics.json')
+assert scratch['exit']==0 and len(scratch['passTestNames'])==10 and not scratch['failedTestNames'] and not scratch['skippedTestNames']
+assert scratch['runtimeA01A40Executions']==0 and scratch['newK2CodeOrCryptoAcceptanceClaim'] is False
+clock=read('clock-predicate-inventory.json');assert len(clock['allNonTestGoPins'])==12
+for pin in clock['allNonTestGoPins']:assert sha(raw(BASE,pin['path']))==pin['rawSHA256']
+assert len(clock['directNowSites'])==11 and clock['directNowSelectorCount']==15
+assert clock['operationalClockMechanismStatus']=='CLOCK_MECHANISM_HOLD'
+assert clock['excludedK1DiagnosticFields']==[]
+
+# STATIC proof-of-shape negatives target the specific reviewed V06..V09 limits.
+# They do not assert natural-language or arbitrary semantic correctness.
+negative=[]
+for name in ['S06-selector-placement','S07-wrong-cataloged-error','S08-empty-forbidden','S09-inverted-root-choice','S10-prose-error-alias','S11-codeblock-error-alias']:
+    m=copy.deepcopy(matrix);a=copy.deepcopy(authority);e=copy.deepcopy(examples);d=copy.deepcopy(markdowns)
+    if name.startswith('S06'):
+        x={r['id']:r for r in m['rows']};x['P08']['inputs'].remove('TrustedContext.MigrationOperationID');x['P12']['inputs'].append('TrustedContext.MigrationOperationID')
+    elif name.startswith('S07'):next(x for x in e['examples'] if x['id']=='K2-PRESENT_STALE_WITNESS')['expectedRefusal']='CLOCK_UNTRUSTED'
+    elif name.startswith('S08'):a['K2AForbiddenEffects']=[]
+    elif name.startswith('S09'):next(x for x in a['RootDecisions'] if x['id']=='D-PREPUBLICATION')['architectureChoice']='ALLOW_BOOTSTRAP'
+    elif name.startswith('S10'):d['contract.md']+='\nNormative refusal: ERR[TRUST_UNKNOWN].\n'
+    else:d['contract.md']+='\n```text\nERR[REPLAY_OR_SCOPE_MISMATCH]\n```\n'
+    try:validate(m,a,e,d)
+    except (AssertionError,ValueError):negative.append({'id':name,'rejected':True})
+    else:raise AssertionError(name+' unexpectedly passed')
+
+# Arithmetic convexity/boundary sanity only, never duplicated runtime K1 logic.
+operators={'GE':lambda n:n>=0,'GT':lambda n:n>0,'LE':lambda n:n<=0,'LT':lambda n:n<0}
+grid=[Fraction(i,2) for i in range(-6,7)]
+for op,predicate in operators.items():
+    for lo in grid:
+        for hi in grid:
+            if lo<=hi and predicate(lo) and predicate(hi):
+                assert all(predicate(x) for x in grid if lo<=x<=hi)
+assert operators['GE'](0) and operators['LE'](0) and not operators['GT'](0) and not operators['LT'](0)
+result={'classification':'REV2_STATIC_SOURCE_CONTRACT_ONLY_NOT_K2_RUNTIME','fieldsFromStandardGoTypes':73,'types':13,
+    'goShapeMutationsDetectedAfterRepin':8,'reviewedStructuralSemanticNegatives':negative,'normativeFailureExamples':30,
+    'originalA01A40UTF8RedGreenPreserved':40,'futureRuntimeCasesExecuted':0,
+    'newFocusedK1FixtureSemanticsPassEvents':10,'K2CryptoOrProducerAcceptanceClaim':False,
+    'clockFamilies':10,'clockOperationalMechanism':'HOLD','allActualBindings':'NULL_HOLD',
+    'limitations':['Typed shape and targeted invariants cannot prove arbitrary producer meaning or English policy semantics','New focused scratch checks existing K1 only; no K2 adapter exists','Exact future running stdlib/installation/clock match remains HOLD']}
+(HERE/'rev2-static-validation.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,indent=2))

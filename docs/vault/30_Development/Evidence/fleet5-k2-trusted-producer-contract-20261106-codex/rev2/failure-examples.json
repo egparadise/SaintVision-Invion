@@ -1,0 +1,276 @@
+{
+  "classification": "STATIC_NORMATIVE_EXAMPLES_NOT_AUTHENTICATED_INPUTS",
+  "runtimeExecutions": 0,
+  "examples": [
+    {
+      "id": "K2-UNKNOWN_TRUST",
+      "hypothesis": "Packet carries a correct registry hash, filename and self-issued signer but no independent installed registration",
+      "requiredIndependentEvidence": "Authenticated provisioned registry/owner installation receipt/public anchors, independent of this packet",
+      "expectedRefusal": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Future fixture provisioned by separate test authority authenticates exact registry version; packet still cannot update it",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-REVOKED_KEY",
+      "hypothesis": "Cryptographic signature valid at its claimed historical date but current independent role grant is revoked",
+      "requiredIndependentEvidence": "Authentic current grant registration plus original exact role/scope/SPKI interval",
+      "expectedRefusal": "KEY_GRANT_UNKNOWN_REVOKED_OR_OUTSIDE_USE_INTERVAL",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Historical use within original interval with currently accepted nonrevoked historical registration; no new signing permission",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-EXPIRED_KEY",
+      "hypothesis": "Proof observation or authenticated consuming event lies at or beyond its exact original key NotAfter",
+      "requiredIndependentEvidence": "Original half-open grant interval and authenticated signed event times",
+      "expectedRefusal": "KEY_GRANT_UNKNOWN_REVOKED_OR_OUTSIDE_USE_INTERVAL",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Both original observation and consuming use within original interval; realNow is never backdated",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-REVOKED_CERT",
+      "hypothesis": "Node M2 signature and DER agree but current independent certificate status is revoked or unavailable",
+      "requiredIndependentEvidence": "Exact original DER/CA/URI plus fresh authoritative nonrevocation",
+      "expectedRefusal": "CERTIFICATE_STATUS_UNKNOWN_REVOKED_OR_EXPIRED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Exact registered unchanged Node leaf/CA and fresh UNREVOKED status, explicit ServerAuth/DigitalSignature",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-EXPIRED_CURRENT_STATUS",
+      "hypothesis": "A publication or certificate status was checked more than120seconds ago, is future-dated or has expired",
+      "requiredIndependentEvidence": "Authentic current source with realNow/checkedAt/expiry/version bound",
+      "expectedRefusal": "PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Fresh independent status valid over full clock uncertainty interval; original publish date remains unchanged",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-BACKDATED_PUBLICATION",
+      "hypothesis": "An authorized signer invents an old date, but independent publication ledger/causal event anchor is missing or disagrees",
+      "requiredIndependentEvidence": "Independent original publication/commit order and graph-time anchors plus current acceptance",
+      "expectedRefusal": "PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Original signed consuming graph and independent historical anchors agree; offline authorized-key backdating residual stays documented",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-REPLAYED_NONCE",
+      "hypothesis": "Retained M2 from a different operation/fence/attempt or an expired challenge is offered as current",
+      "requiredIndependentEvidence": "Actual current durable challenge issuance and original Node wire for exact scope/generation",
+      "expectedRefusal": "LIVE_CHALLENGE_UNKNOWN_OR_REPLAY",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Fresh original current signed nonce/wire, exact issued active challenge and bounded operation window; no fixture nonce promotion",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-WRONG_ARTIFACT",
+      "hypothesis": "Green workflow name or source SHA is correct but downloaded artifact/digest/binary VCS/source image relation is wrong",
+      "requiredIndependentEvidence": "Provider-authenticated exact run/head/ref/jobs/required steps/artifact digest plus read-only executable metadata and registered acceptance",
+      "expectedRefusal": "ARTIFACT_OR_REVIEW_SCOPE_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Exact immutable artifact bytes and source/target/publication bindings match approved component; install status still separately required",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-REVIEW_SCOPE",
+      "hypothesis": "Independent review targets an older different Go delta or only a plan but is used to authorize effect code",
+      "requiredIndependentEvidence": "Actual immutable review target/scope/verdict and independently authorized successor byte-equivalence decision",
+      "expectedRefusal": "ARTIFACT_OR_REVIEW_SCOPE_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Actual191b reviewed56651 Go byte equivalence to eb32 plus Root exact successor delta/source choice, scoped to K1 code only",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-CROSS_MIGRATION",
+      "hypothesis": "Packet contains an internally consistent current set for migrationA while common cohort registry owns higher epoch in migrationB",
+      "requiredIndependentEvidence": "Single independent cohort-wide active migration/max fence/sequence/currentVersion source",
+      "expectedRefusal": "CROSS_MIGRATION_FENCE_OR_VERSION_CHANGED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Exact current migration/epoch/sequence/HELD owner across full ordered cohort and participating mandatory mutators",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-HEAD_ABSENT",
+      "hypothesis": "All historical signatures pass but requested CurrentView has ABSENT inventory head",
+      "requiredIndependentEvidence": "PRESENT authenticated head with expected native declarations and fresh readback, or separate future phase authority for named bootstrap method",
+      "expectedRefusal": "NO_CURRENT_HEAD_OR_STALE_CURRENT_SET",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "PRESENT head and both exact member projections/witnesses produce current view; ABSENT history-only path remains non-authorizing",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-CURRENT_WITNESS",
+      "hypothesis": "Only one ordered current M2 is available, witness order is swapped or actual PID/start/executable/journal differs",
+      "requiredIndependentEvidence": "Two fresh original signed Node witnesses plus authenticated owned before/after container/ExecID/process joins",
+      "expectedRefusal": "CURRENT_NATIVE_WITNESS_UNKNOWN_MISMATCH_OR_EXPIRED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Both ordered same-scope live witnesses authenticate at realNow/current nonce with stable independently measured generations",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-UNTRUSTED_CLOCK",
+      "hypothesis": "Caller supplies Now or system UTC jumps/backdates without an accepted independent clock bound",
+      "requiredIndependentEvidence": "Installed approved time authority and monotonic bracketing with provisioned maximum uncertainty",
+      "expectedRefusal": "CLOCK_UNTRUSTED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Actual approved UTC interval is continuous and every freshness/expiry predicate holds for its full interval",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-TOCTOU",
+      "hypothesis": "Installed grant/head/cohort currentVersion changes between V0, V1 or final effect admission",
+      "requiredIndependentEvidence": "Authentic versioned snapshots and final mandatory-fence CAS plus realNow",
+      "expectedRefusal": "STALE_SNAPSHOT",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Same authenticated complete version vector before/after read acquisition and immediate exact admission; no automatic retries",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-READONLY_EFFECT",
+      "hypothesis": "A K2A adapter tries to allocate a challenge or launch Docker Exec to collect its supposedly read-only witness",
+      "requiredIndependentEvidence": "Explicit future K2B capability/durable intent for Engine ExecCreate/Start or issuer write",
+      "expectedRefusal": "EFFECT_NOT_ALLOWED_IN_K2A",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "K2A consumes existing authenticated issuance/observation records without any effect API; separate K2B path tested only after grant",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-PREPUBLICATION",
+      "hypothesis": "A generic allow flag or historical HELD lease is used to reserve/start/observe before a PRESENT current head exists",
+      "requiredIndependentEvidence": "Separately decided and implemented D-PREPUBLICATION closed method-scoped authority, installed trust and exact durable preimage/intent",
+      "expectedRefusal": "PREPUBLICATION_AUTHORITY_UNDECIDED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Future Root-reviewed BootstrapPhaseAuthorization authorizes only its exact next method and is never a K1 CurrentView",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-AMBIGUOUS_EFFECT",
+      "hypothesis": "Engine/host action may have occurred but reply/readback was lost and caller tries the action again",
+      "requiredIndependentEvidence": "Original committed immutable intent plus exact actual owned reconciliation/quiescence and unchanged mandatory owner",
+      "expectedRefusal": "EFFECT_OUTCOME_UNKNOWN",
+      "effectDisposition": "BLOCKED_FORWARD_ONLY",
+      "pairedGreenRequirement": "No automatic retry or lease takeover; reconcile exact owned attempt, preserve all artifacts and publish only verified readback",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-FLOOR_RESET",
+      "hypothesis": "A stopped backup, expired window or partial renewal is used to lower P/C, change R or restart old image",
+      "requiredIndependentEvidence": "Exact original monotone generation bindings and separately authorized forward-only recovery contract",
+      "expectedRefusal": "GENERATION_OR_ROLLBACK_BARRIER",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Binary-only preserves P/H/C/R; normal schema3 uses P+1/P+2 and C+1 under existing accepted rules; no expanded RS1/SF1",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-PRESENT_STALE_WITNESS",
+      "hypothesis": "PRESENT head, valid HELD lease/readback, last M2 is121seconds old; current derivation unavailable",
+      "requiredIndependentEvidence": "Separate method-scoped approved ObservationRefreshAuthorization; stale M2 is not permission",
+      "expectedRefusal": "OBSERVATION_AUTHORITY_HOLD",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Future MIGRATION_OBSERVE authorization can produce a fresh witness without a CurrentView; currently all effects HOLD",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-OBSERVE_WITHOUT_CURRENT",
+      "hypothesis": "PRESENT expected declaration valid but no current witnesses exist",
+      "requiredIndependentEvidence": "Independent observation authority with exact installed trust/HELD scope/fence/owned preimage/method, not CurrentView",
+      "expectedRefusal": "OBSERVATION_AUTHORITY_HOLD",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "No circular CurrentView prerequisite for refresh; actual issuer/body/mediation must first be approved/provisioned",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-ATTEMPT_DUPLICATE_BODY_CHANGE",
+      "hypothesis": "Same immutable attemptID is reused with a different body or method",
+      "requiredIndependentEvidence": "Original durable attempt body hash and separately authenticated permit",
+      "expectedRefusal": "OBSERVATION_ATTEMPT_COLLISION",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Exact same ID+bytes returns ORIGINAL challenge/time/outcome; no new nonce or effects",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-ATTEMPT_INFLIGHT_REPLACE",
+      "hypothesis": "New attempt replaces challenge while prior ExecCreate/Start is pending or running",
+      "requiredIndependentEvidence": "Exact prior terminal-known/no-inflight readback and same still-valid parent plus fresh method permit",
+      "expectedRefusal": "OBSERVATION_ATTEMPT_NOT_TERMINAL",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Atomic current-slot replacement only after all predicates; advance currentVersion and archive old raw evidence",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-ATTEMPT_UNKNOWN_REPLACE",
+      "hypothesis": "Prior observation may have executed but response is missing; operator requests new challenge/exec/owner",
+      "requiredIndependentEvidence": "Protected reconciliation and actual quiescence before new approved attempt/operation/fence",
+      "expectedRefusal": "OBSERVATION_OUTCOME_UNKNOWN",
+      "effectDisposition": "BLOCKED_FORWARD_ONLY",
+      "pairedGreenRequirement": "Restart reloads UNKNOWN and preserves owner/archive; expiry alone never permits takeover",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-OLD_CHALLENGE_SNAPSHOT",
+      "hypothesis": "A witness or snapshot from the superseded current challenge is replayed",
+      "requiredIndependentEvidence": "Active attempt/current challenge version and exact parent scope",
+      "expectedRefusal": "CURRENT_CHALLENGE_REPLACED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Original historical challenge/packet remains unchanged; newly active current slot requires newly authenticated witness",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-NORMAL_THREE_CAST_TO_MIGRATION",
+      "hypothesis": "Terminal seal and normal:3 common lease are cast to K1 MigrationOperationID/current view",
+      "requiredIndependentEvidence": "Typed normal operation ID/lease and immutable terminal seal, separate from original migration selector",
+      "expectedRefusal": "NORMAL3_K1_CURRENT_UNSUPPORTED",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Normal observation may be a separately authorized record; unchanged K1 cannot be asserted to derive a normal current view it cannot consume",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-ORIGINAL_SELECTOR_CURRENT_SUBSTITUTION",
+      "hypothesis": "P12 current operation replaces original plan MigrationOperationID",
+      "requiredIndependentEvidence": "Authenticated original plan/facts selector equal and exact original History.Operations HELD binding",
+      "expectedRefusal": "ORIGINAL_PLAN_OPERATION_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Existing K1 durable two-epoch control authenticates expired original op while current op differs",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-ORIGINAL_SELECTOR_MISSING_HISTORY",
+      "hypothesis": "Original plan operation missing from History.Operations or facts-only selector differs",
+      "requiredIndependentEvidence": "Immutable plan/history/lease-hash and semantic-facts equality",
+      "expectedRefusal": "ORIGINAL_PLAN_OPERATION_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Missing original history and mismatched facts both refuse; never fill from live Operations",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-RUNNING_ARTIFACT_MISMATCH",
+      "hypothesis": "Approved published executableX accompanies actual running integration executableY",
+      "requiredIndependentEvidence": "Held executable identity/hash plus independent sealed install receipt and exact publication",
+      "expectedRefusal": "RUNNING_VERIFIER_IDENTITY_MISMATCH",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Actual running executable hash equals VerifierPublication.ArtifactSHA256 and is the entrypoint that really links/calls K1",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-IDEMPOTENT_INTENT_COLLISION",
+      "hypothesis": "Effect intent ID is reused with different request bytes",
+      "requiredIndependentEvidence": "Original durable exact method/body/preimage identity and fresh separate permit",
+      "expectedRefusal": "IDEMPOTENCY_COLLISION",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Same completed exact intent returns immutable recorded outcome after current checks; not a new execution",
+      "actualExecution": "NOT_RUN"
+    },
+    {
+      "id": "K2-CAPABILITY_MISSING",
+      "hypothesis": "Caller supplies K1 Report/digest/SnapshotToken without independent effect permit",
+      "requiredIndependentEvidence": "Fresh independently reacquired authority and exact effect/observation capability",
+      "expectedRefusal": "PERMISSION_OR_CAPABILITY_UNKNOWN",
+      "effectDisposition": "REFUSED_NO_EFFECT",
+      "pairedGreenRequirement": "Future K2B re-acquires authority and verifies separate permit; caller data never becomes capability",
+      "actualExecution": "NOT_RUN"
+    }
+  ]
+}

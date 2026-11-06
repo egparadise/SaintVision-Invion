@@ -1,0 +1,591 @@
+{
+  "Signature": "func(installed migrationverify.InstalledTrust, context migrationverify.TrustedContext) (*migrationverify.Verifier, error)",
+  "Types": [
+    {
+      "Name": "CertificateStatus",
+      "Fields": [
+        {
+          "Name": "Status",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CheckedAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ExpiresAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "ContractPin",
+      "Fields": [
+        {
+          "Name": "ContractSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "SchemaSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Codec",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "RequiredVerifier",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "CurrentNativeWitness",
+      "Fields": [
+        {
+          "Name": "Slot",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Raw",
+          "DeclaredGoType": "[]byte",
+          "CanonicalGoType": "[]byte",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "CurrentProjectionContext",
+      "Fields": [
+        {
+          "Name": "SetID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "MigrationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "OperationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "PlanEnvelopeSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "LeaseEnvelopeSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "FenceEpoch",
+          "DeclaredGoType": "int64",
+          "CanonicalGoType": "int64",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Sequence",
+          "DeclaredGoType": "int64",
+          "CanonicalGoType": "int64",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "InventoryHead",
+          "DeclaredGoType": "any",
+          "CanonicalGoType": "interface{}",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "InventoryReadbackSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "MemberProjectionSHA256",
+          "DeclaredGoType": "[]string",
+          "CanonicalGoType": "[]string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "NativeWitnesses",
+          "DeclaredGoType": "[]migrationverify.CurrentNativeWitness",
+          "CanonicalGoType": "[]migrationverify.CurrentNativeWitness",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "HistoricalContext",
+      "Fields": [
+        {
+          "Name": "Operations",
+          "DeclaredGoType": "map[string]migrationverify.OperationBinding",
+          "CanonicalGoType": "map[string]migrationverify.OperationBinding",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Challenges",
+          "DeclaredGoType": "map[string]migrationverify.NativeChallenge",
+          "CanonicalGoType": "map[string]migrationverify.NativeChallenge",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "InstalledTrust",
+      "Fields": [
+        {
+          "Name": "RegistrySHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Verifier",
+          "DeclaredGoType": "migrationverify.VerifierPublication",
+          "CanonicalGoType": "migrationverify.VerifierPublication",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ContractPins",
+          "DeclaredGoType": "map[string]migrationverify.ContractPin",
+          "CanonicalGoType": "map[string]migrationverify.ContractPin",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Grants",
+          "DeclaredGoType": "[]migrationverify.KeyGrant",
+          "CanonicalGoType": "[]migrationverify.KeyGrant",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CohortID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Members",
+          "DeclaredGoType": "[]migrationverify.MemberIdentity",
+          "CanonicalGoType": "[]migrationverify.MemberIdentity",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "GraphBytes",
+          "DeclaredGoType": "[]byte",
+          "CanonicalGoType": "[]byte",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "GraphSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "NodeKinds",
+          "DeclaredGoType": "map[string]string",
+          "CanonicalGoType": "map[string]string",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "KeyGrant",
+      "Fields": [
+        {
+          "Name": "Role",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "AuthorityScope",
+          "DeclaredGoType": "any",
+          "CanonicalGoType": "interface{}",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "PublicKeyHex",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "NotBefore",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "NotAfter",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Status",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "MemberIdentity",
+      "Fields": [
+        {
+          "Name": "Slot",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Scope",
+          "DeclaredGoType": "any",
+          "CanonicalGoType": "interface{}",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CertificateDER",
+          "DeclaredGoType": "[]byte",
+          "CanonicalGoType": "[]byte",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CARootDER",
+          "DeclaredGoType": "[]byte",
+          "CanonicalGoType": "[]byte",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "NativeChallenge",
+      "Fields": [
+        {
+          "Name": "Nonce",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "MigrationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "OperationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ScopeSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "FenceEpoch",
+          "DeclaredGoType": "int64",
+          "CanonicalGoType": "int64",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "IssuedAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ExpiresAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "OperationBinding",
+      "Fields": [
+        {
+          "Name": "MigrationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "OperationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "LeaseEnvelopeSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "FenceEpoch",
+          "DeclaredGoType": "int64",
+          "CanonicalGoType": "int64",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "AcquiredAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ExpiresAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "PublicationStatus",
+      "Fields": [
+        {
+          "Name": "Status",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "SubjectSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "PublishedAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CheckedAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ExpiresAt",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "TrustedContext",
+      "Fields": [
+        {
+          "Name": "Now",
+          "DeclaredGoType": "time.Time",
+          "CanonicalGoType": "time.Time",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "SemanticInputs",
+          "DeclaredGoType": "any",
+          "CanonicalGoType": "interface{}",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Operations",
+          "DeclaredGoType": "map[string]migrationverify.OperationBinding",
+          "CanonicalGoType": "map[string]migrationverify.OperationBinding",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "History",
+          "DeclaredGoType": "migrationverify.HistoricalContext",
+          "CanonicalGoType": "migrationverify.HistoricalContext",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "MigrationOperationID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Challenges",
+          "DeclaredGoType": "map[string]migrationverify.NativeChallenge",
+          "CanonicalGoType": "map[string]migrationverify.NativeChallenge",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Publications",
+          "DeclaredGoType": "map[string]migrationverify.PublicationStatus",
+          "CanonicalGoType": "map[string]migrationverify.PublicationStatus",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Certificates",
+          "DeclaredGoType": "map[string]migrationverify.CertificateStatus",
+          "CanonicalGoType": "map[string]migrationverify.CertificateStatus",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "Current",
+          "DeclaredGoType": "*migrationverify.CurrentProjectionContext",
+          "CanonicalGoType": "*migrationverify.CurrentProjectionContext",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    },
+    {
+      "Name": "VerifierPublication",
+      "Fields": [
+        {
+          "Name": "ID",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "SourceSHA",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ArtifactSHA256",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "ReviewSHA",
+          "DeclaredGoType": "string",
+          "CanonicalGoType": "string",
+          "Embedded": false,
+          "Exported": true
+        },
+        {
+          "Name": "CIRunIDs",
+          "DeclaredGoType": "[]string",
+          "CanonicalGoType": "[]string",
+          "Embedded": false,
+          "Exported": true
+        }
+      ]
+    }
+  ],
+  "Aliases": [
+    {
+      "Name": "any",
+      "RHS": "interface{}"
+    }
+  ],
+  "FieldCount": 73,
+  "EmbeddedFields": 0,
+  "SourceSignatureLine": 136,
+  "Method": "go/parser + go/types; reachable from actual signature parameters; bodies excluded; private result implementation stubs only"
+}

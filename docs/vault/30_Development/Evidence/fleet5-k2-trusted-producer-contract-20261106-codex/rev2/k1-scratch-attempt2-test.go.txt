@@ -1,0 +1,81 @@
+package migrationverify
+
+// NEW focused SOURCE/EXISTING FIXTURE semantics only, never product code.
+// Ephemeral in-memory K1 fixtures are not K2 producers, installed trust or any
+// A01-A40 runtime execution. No physical clock, key, CA or Node is touched.
+import (
+ "reflect"
+ "strings"
+ "testing"
+ "time"
+)
+
+func k2Rev2Evaluate(f cryptoFixture, at time.Time) (Report,error,string,error) {
+ c:=f.context;c.Now=at
+ v,e:=NewVerifier(f.installed,c)
+ if e!=nil {return Report{},e,"",e}
+ report,he:=v.Verify(f.packet)
+ current,ce:=v.VerifyCurrentProjectionSet(f.packet,"cohort-36")
+ return report,he,current,ce
+}
+
+func TestK2Rev2OriginalMigrationSelector(t *testing.T) {
+ for _,name:=range []string{"two-epoch-positive","P12-current-ID-substitution","missing-original-history","facts-only-mismatch"} {
+  t.Run(name,func(t *testing.T){
+   f:=newCryptoFixtureMutated(t,nil,cryptoFixtureOptions{DurableHistory:true})
+   original:=f.context.MigrationOperationID
+   old:=f.context.History.Operations[original]
+   if !f.context.Now.After(old.ExpiresAt)||f.context.Operations[original].OperationID!="" {t.Fatal("fixture must have expired original epoch1, absent from live operations")}
+   switch name {
+   case "P12-current-ID-substitution":f.context.MigrationOperationID=f.context.Current.OperationID
+   case "missing-original-history":delete(f.context.History.Operations,original)
+   case "facts-only-mismatch":f.context.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"]="synthetic-wrong-original-operation"
+   }
+   _,he,_,ce:=k2Rev2Evaluate(f,f.context.Now)
+   if name=="two-epoch-positive" {if he!=nil||ce!=nil {t.Fatalf("history=%v current=%v",he,ce)};return}
+   if he==nil||ce==nil {t.Fatalf("expected BOTH history/current refusal; history=%v current=%v",he,ce)}
+   if name=="P12-current-ID-substitution"&&!strings.Contains(he.Error(),"proof signed for different current operation") {t.Fatal(he)}
+   if name=="facts-only-mismatch"&&!strings.Contains(he.Error(),"proof subject differs") {t.Fatal(he)}
+   t.Logf("EXPECTED_SOURCE_REFUSAL history=%v; current=%v",he,ce)
+  })
+ }
+}
+
+func TestK2Rev2ClockEndpoints(t *testing.T) {
+ f:=newCryptoFixtureMutated(t,nil,cryptoFixtureOptions{DurableHistory:true})
+ t0:=f.context.Now
+ h0,he0,c0,ce0:=k2Rev2Evaluate(f,t0)
+ h1,he1,c1,ce1:=k2Rev2Evaluate(f,t0.Add(time.Second))
+ if he0!=nil||ce0!=nil||he1!=nil||ce1!=nil {t.Fatalf("positive endpoints: %v %v %v %v",he0,ce0,he1,ce1)}
+ if !reflect.DeepEqual(h0,h1)||c0!=c1 {t.Fatal("security-relevant outputs changed across valid endpoints")}
+
+ t.Run("publication-expiry-exclusive",func(t *testing.T){
+  x:=f;x.context.Publications=map[string]PublicationStatus{}
+  for k,v:=range f.context.Publications {v.ExpiresAt=t0.Add(time.Second);x.context.Publications[k]=v}
+  _,hbefore,_,cbefore:=k2Rev2Evaluate(x,t0.Add(time.Second-time.Nanosecond))
+  _,hat,_,cat:=k2Rev2Evaluate(x,t0.Add(time.Second))
+  if hbefore!=nil||cbefore!=nil||hat==nil||cat==nil {t.Fatalf("before=%v/%v at=%v/%v",hbefore,cbefore,hat,cat)}
+ })
+ t.Run("current-key-expiry-history-separate",func(t *testing.T){
+  x:=f;x.installed.Grants=append([]KeyGrant(nil),f.installed.Grants...)
+  for i:=range x.installed.Grants {x.installed.Grants[i].NotAfter=t0.Add(time.Second)}
+  _,hbefore,_,cbefore:=k2Rev2Evaluate(x,t0.Add(time.Second-time.Nanosecond))
+  _,hat,_,cat:=k2Rev2Evaluate(x,t0.Add(time.Second))
+  if hbefore!=nil||cbefore!=nil||hat!=nil||cat==nil {t.Fatalf("before=%v/%v at=%v/%v",hbefore,cbefore,hat,cat)}
+ })
+ t.Run("status-age-120-inclusive",func(t *testing.T){
+  x:=f;x.context.Publications=map[string]PublicationStatus{}
+  for k,v:=range f.context.Publications {v.CheckedAt=t0.Add(-119*time.Second);x.context.Publications[k]=v}
+  _,hat,_,cat:=k2Rev2Evaluate(x,t0.Add(time.Second))
+  _,hafter,_,cafter:=k2Rev2Evaluate(x,t0.Add(time.Second+time.Nanosecond))
+  if hat!=nil||cat!=nil||hafter==nil||cafter==nil {t.Fatalf("at=%v/%v after=%v/%v",hat,cat,hafter,cafter)}
+ })
+ t.Run("live-challenge-issued-inclusive",func(t *testing.T){
+  x:=f;x.context.Publications=map[string]PublicationStatus{};x.context.Certificates=map[string]CertificateStatus{}
+  for k,v:=range f.context.Publications {v.CheckedAt=t0.Add(-2*time.Second);x.context.Publications[k]=v}
+  for k,v:=range f.context.Certificates {v.CheckedAt=t0.Add(-2*time.Second);x.context.Certificates[k]=v}
+  _,hat,_,cat:=k2Rev2Evaluate(x,t0.Add(-time.Second))
+  _,hbefore,_,cbefore:=k2Rev2Evaluate(x,t0.Add(-time.Second-time.Nanosecond))
+  if hat!=nil||cat!=nil||hbefore!=nil||cbefore==nil {t.Fatalf("at=%v/%v before=%v/%v",hat,cat,hbefore,cbefore)}
+ })
+}
