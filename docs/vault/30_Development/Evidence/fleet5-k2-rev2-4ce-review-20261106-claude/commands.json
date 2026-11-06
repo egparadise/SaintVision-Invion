@@ -1,0 +1,31 @@
+{
+ "schemaVersion": "fleet5-k2-rev2-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released review workspace, new branch)",
+  "branch": "agent/claude/fleet5-k2-rev2-4ce-review-20261106 created FROM 4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+  "python": "system Python 3.10 for reviewer scripts and the owner validator (jsonschema available); no installs",
+  "go": "go1.27.0 windows/amd64, GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod (module cache only)",
+  "scratch": "session scratchpad outside the repo; eb32 extracted with git archive",
+  "noDB_PG_Docker_Node_SSH_PKI_VM_clock_schedule_privateKey": true
+ },
+ "timeNote": "Clock-captured KST: 12:42:33 (PowerShell Get-Date, after scratch Go run). Other times are session-order approximations; gate times are in local-doc-gates.txt.",
+ "commands": [
+  {"atKST": "~12:20", "argv": "git fetch origin agent/codex/fleet5-k2-trusted-producer-contract-rev2-20261106; git ls-remote origin refs/heads/agent/codex/fleet5-k2-trusted-producer-contract-rev2-20261106", "exit": 0, "result": "FETCH_HEAD = remote ref = 4ce63e8e...; parent 551d7312..."},
+  {"atKST": "~12:20", "argv": "git diff --stat/--name-status 551d7312 4ce63e8e; git diff --quiet eb32b211 4ce63e8e -- services packages .github tools contracts", "exit": 0, "result": "50 A, 0 M/D/R; product/workflow diff 0"},
+  {"atKST": "~12:21", "argv": "git switch -c agent/claude/fleet5-k2-rev2-4ce-review-20261106 4ce63e8e", "exit": 0},
+  {"atKST": "~12:21", "argv": "git fetch origin 5623dc00...; git show 5623dc00:<review.json>", "exit": 0},
+  {"atKST": "~12:24", "argv": "git archive eb32b211 services/node-agent | tar -x (scratch); grep -n time selectors in non-test migrationverify; python rehash of 12 clock pins", "exit": 0, "result": "12/12 pins equal; 15 Now selectors on 11 lines; no other clock read"},
+  {"atKST": "~12:27", "argv": "go build -o census.exe go_input_census.go (copy of owner go_input_census.go.txt sha 3e28473b...); census.exe trust_base.go", "exit": 0, "result": "semantic JSON equals owner go-input-census.json (13/73/0)"},
+  {"atKST": "~12:28", "argv": "python -I reviewer_census_mutants.py <scratch>", "exit": 0, "output": "reviewer-census-mutants-result.json", "result": "R01-R03 UNDETECTED; R04-R07,R09-R11 DETECTED; R08 fail-closed"},
+  {"atKST": "~12:29", "argv": "python -I compare 8874 acceptance-matrix.json vs future-runtime-A01-A40.json", "exit": 0, "result": "raw sha e671501c...; 40/40 ids; 0 key value diffs; 40 NOT_RUN/null; partition clean"},
+  {"atKST": "~12:31..12:37", "argv": "go test ./migrationverify -run '^TestK2Rev2|^TestK2Reviewer' -count=1 -p 1 -v (scratch eb32 copy + owner test + reviewer test)", "exit": 0, "output": "reviewer-go-scratch-test.log.txt", "result": "owner 10 PASS/0 fail/0 skip; reviewer 4 selector negatives + contiguous scan PASS; wall 360 s"},
+  {"atKST": "~12:38", "argv": "python -I L2 scan of ERR[...] and snake tokens in all normative rev2 MD/JSON", "exit": 0, "result": "32 ERR refs, 0 outside 39-code catalog except ERR[CODE] placeholder; no bare aliases"},
+  {"atKST": "~12:39", "argv": "python <scratch copy of rev2>/validate_rev2.py (cwd repo)", "exit": 0, "stdoutLFSha256": "88904c39a54dcfbd26cd61f2a7c94c95c50d77fa16be24be18a8c55d648dee01", "comparison": "= owner gate-01 and final-rev2_static.log; regenerated rev2-static-validation.json identical; owner files untouched", "output": "owner-validator-reproduction.stdout.txt"},
+  {"atKST": "~12:40", "argv": "gh api repos/egparadise/SaintVision-Invion/actions/runs/42155660700 (+ /jobs)", "exit": 0, "result": "head 4ce63e8e, branch rev2, workflow_dispatch, .github/workflows/docs.yml, attempt 1, success; job 127689080244 docs success. Read only."},
+  {"atKST": "12:42:33", "argv": "read-only: canonical vault fleet-five-orchestration-20261105 (d17ea2d3 ancestor of aed226c2; Index 1.0.436, Claude board 1.2.130) and k2-rev2-concrete-root-decision.json sha256 01b207cc...; sha256 of canonical obsidian-sync-state.json", "exit": 0},
+  {"atKST": "12:46:59..12:47:43", "argv": "attempt 1: doc gates one by one via scratch run_gates.py (owner interpreter), stop on first nonzero", "exit": 1, "result": "gates 1-5 exit 0; check_doc_path_citations --ratchet --base-ref 4ce63e8e exit 1: new History line cited the not-yet-existing future package path in backticks. Preserved as local-doc-gates-attempt1-citation-fail.txt. Fix: reworded that line as plain prose (no baseline raise)."},
+  {"atKST": "12:48:15..12:49:04", "argv": "attempt 2: same 10 gates, sync_obsidian --check --state <canonical> only", "exit": 0, "result": "all 10 exit 0; canonical state sha256 b77c516f... before = after; CHECK 3373 managed, 921 pending exports, 0 conflicts, no writes", "output": "local-doc-gates.txt"}
+ ],
+ "notRun": ["any PG/Docker/Node/SSH/VM/crypto-vector/clock/schedule/equipment command", "owner gate runner in place (owner ledgers not rewritten)", "Obsidian apply/adopt/resolve/state write", "rerun of any completed CI/proof/archive", "74MB ledger read"]
+}

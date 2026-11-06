@@ -1,0 +1,27 @@
+# Claude K2 rev2 4ce review local doc gates (owner interpreter, each command run separately, stop on first nonzero)
+interpreter: D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe, env PYTHONUTF8=1, cwd worktree root, branch agent/claude/fleet5-k2-rev2-4ce-review-20261106 from 4ce63e8ee78d957aa91e813f6ee226cc21abb52a
+canonical state: D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+state sha256 before: b77c516f5255dc576d58042ccd2f887e848f6dfb081fc6d392d7158a03a874b5
+state sha256 after:  b77c516f5255dc576d58042ccd2f887e848f6dfb081fc6d392d7158a03a874b5  unchanged=True
+
+python -B tools/check_docs.py | exit 0 | 2026-11-06T12:46:59.287427+09:00 .. 2026-11-06T12:47:21.503887+09:00
+    PASS: 24 original hashes, 1256 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+python -B tools/check_ontology_generation.py | exit 0 | 2026-11-06T12:47:21.503887+09:00 .. 2026-11-06T12:47:23.697657+09:00
+    PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+python -B tools/check_ontology.py | exit 0 | 2026-11-06T12:47:23.697657+09:00 .. 2026-11-06T12:47:25.573682+09:00
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+python -B tools/check_contract_bindings.py | exit 0 | 2026-11-06T12:47:25.573682+09:00 .. 2026-11-06T12:47:37.896305+09:00
+    PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards presen
+      UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+python -B tools/check_frontend_integrity.py | exit 0 | 2026-11-06T12:47:37.896305+09:00 .. 2026-11-06T12:47:39.422463+09:00
+    Scanning 94 frontend production source files under apps/web/src ...
+    
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+python -B tools/check_doc_path_citations.py --ratchet --base-ref 4ce63e8ee78d957aa91e813f6ee226cc21abb52a | exit 1 | 2026-11-06T12:47:39.422463+09:00 .. 2026-11-06T12:47:43.055331+09:00
+    FAIL (regression): 1 NEW broken path citation(s) not in the baseline:
+      + 30_Development/History/2026-11-06_12-45-00_KST_FLEET5_K2_rev2_4ce_계약_독립검토_Claude.md || services/node-agent/internal/migrationcontext/  [path does not exist]
+      Fix the document to cite a real path (or drop the line suffix). Adding a baseline line is a
+      visible, reviewable raise of the floor in tools/baselines/doc_path_citations.txt -- not for new inventions.
+
+allExit0=False; sync was --check only (no apply/adopt/resolve/state write).

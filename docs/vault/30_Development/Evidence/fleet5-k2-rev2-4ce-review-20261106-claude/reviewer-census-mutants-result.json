@@ -1,0 +1,62 @@
+{
+ "censusSourceSHA256": "3e28473b14a1e327e9463cfbaee952d69a9ad36f78a36efc9d3b8bc05ee8b498",
+ "baseTrustRawSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+ "cases": [
+  {
+   "id": "R01-named-map-underlying-change",
+   "result": "UNDETECTED_SAME_SEMANTIC_JSON",
+   "mutantRawSHA256": "2c0ccf89062b01da76f0c0d0ed407bf59ed9ca8a4643f019159b3a014e669e4e"
+  },
+  {
+   "id": "R02-named-slice-underlying-change",
+   "result": "UNDETECTED_SAME_SEMANTIC_JSON",
+   "mutantRawSHA256": "559f12b012d8c0c91e94fec1e1be1695367d0ff0681c3542babb3ec8fb4651d8"
+  },
+  {
+   "id": "R03-named-func-underlying-change",
+   "result": "UNDETECTED_SAME_SEMANTIC_JSON",
+   "mutantRawSHA256": "f4a2d0ca3cdc2dd7613b5fb90aec880a29e3a9dbde2b5c2416ce4aa026210621"
+  },
+  {
+   "id": "R04-generic-type-arg-change",
+   "result": "DETECTED",
+   "mutantRawSHA256": "5384fb30588db71ef01e7d776249f22f8cd02b82816a9377ad28869370aaaafd"
+  },
+  {
+   "id": "R05-generic-body-change",
+   "result": "DETECTED",
+   "mutantRawSHA256": "6901bfa1bf2e2f4da64a88aa297f99d30ef2839cc665e8054133fa13aec69011"
+  },
+  {
+   "id": "R06-alias-to-time",
+   "result": "DETECTED",
+   "mutantRawSHA256": "d15def770f5802ee1a83dbd212f4cb013734925fc6189da4b9363a27042371e0"
+  },
+  {
+   "id": "R07-any-to-interface-method",
+   "result": "DETECTED",
+   "mutantRawSHA256": "ce92f687d6e4a04093d3dae2710fc25ea3056563d3a9bb5085ee7be71fd6cf26"
+  },
+  {
+   "id": "R08-type-from-other-file",
+   "result": "FAIL_CLOSED_CENSUS_ERROR",
+   "err": "panic: C:\\Users\\inviz\\AppData\\Local\\Temp\\claude\\c281c9806df8bc9f\\0b42e115-fb3d-41f2-a657-1c684b70dce8\\scratchpad\\census\\mut\\R08-type-from-other-file-mut.go:51:8: undefined: proofContract",
+   "mutantRawSHA256": "fa74191f9585a831d8b3e4163ebca3be8ccea53624f1cbb1e3e35dda5474ed52"
+  },
+  {
+   "id": "R09-stubbed-private-type-field",
+   "result": "DETECTED",
+   "mutantRawSHA256": "29df80807b870855558a3e42af71867076c562a6feeb8260d02b55d35dc7d45d"
+  },
+  {
+   "id": "R10-field-reorder",
+   "result": "DETECTED",
+   "mutantRawSHA256": "7b5454b3e623fdeb632826384f19f6b482a20a4c7cc2489cbc0726e52f937a60"
+  },
+  {
+   "id": "R11-anonymous-struct-field-change",
+   "result": "DETECTED",
+   "mutantRawSHA256": "8d1009ac8035c6bb5c309c5eae615fc9edad89ba8400ac763955fc9587e38e3f"
+  }
+ ]
+}

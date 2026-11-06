@@ -1,0 +1,107 @@
+package migrationverify
+
+// Reviewer (Claude) scratch-only source semantics on a git-archive copy of eb32.
+// Uses K1's existing ephemeral synthetic fixtures. Never product code, not K2,
+// not a producer/crypto/installation proof and not any A01-A40 execution.
+import (
+	"reflect"
+	"testing"
+	"time"
+)
+
+func TestK2ReviewerSelectorExtra(t *testing.T) {
+	base := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	orig := base.context.MigrationOperationID
+	cur := base.context.Current.OperationID
+	if orig == cur || orig == "" || cur == "" {
+		t.Fatalf("fixture must separate original %q and current %q", orig, cur)
+	}
+	if _, ok := base.context.Operations[cur]; !ok {
+		t.Fatal("current op must be live")
+	}
+	if fa := base.context.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"]; fa != orig {
+		t.Fatalf("facts selector %v != ctx original %v", fa, orig)
+	}
+	t.Logf("original=%s current=%s historyOps=%d liveOps=%d", orig, cur, len(base.context.History.Operations), len(base.context.Operations))
+	for _, name := range []string{"current-id-also-copied-into-history", "facts-and-ctx-both-current", "original-history-lease-hash-changed", "original-history-fence-changed"} {
+		t.Run(name, func(t *testing.T) {
+			f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+			o, c := f.context.MigrationOperationID, f.context.Current.OperationID
+			switch name {
+			case "current-id-also-copied-into-history":
+				f.context.History.Operations[c] = f.context.Operations[c]
+				f.context.MigrationOperationID = c
+			case "facts-and-ctx-both-current":
+				f.context.MigrationOperationID = c
+				f.context.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = c
+			case "original-history-lease-hash-changed":
+				b := f.context.History.Operations[o]
+				b.LeaseEnvelopeSHA256 = "00" + b.LeaseEnvelopeSHA256[2:]
+				f.context.History.Operations[o] = b
+			case "original-history-fence-changed":
+				b := f.context.History.Operations[o]
+				b.FenceEpoch++
+				f.context.History.Operations[o] = b
+			}
+			_, he, _, ce := k2Rev2Evaluate(f, f.context.Now)
+			if he == nil || ce == nil {
+				t.Fatalf("expected both refusals; history=%v current=%v", he, ce)
+			}
+			t.Logf("REFUSED history=%v | current=%v", he, ce)
+		})
+	}
+}
+
+// Empirical (fixture-only) convexity scan: the acceptance set of Verify and of
+// VerifyCurrentProjectionSet over Now must be one contiguous run, with identical
+// full Report / current digest at every accepted point.
+func TestK2ReviewerConvexityScan(t *testing.T) {
+	f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	t0 := f.context.Now
+	var refR Report
+	var refC string
+	haveR, haveC := false, false
+	hRuns, cRuns := 0, 0
+	prevH, prevC := false, false
+	var hFirst, hLast, cFirst, cLast time.Duration
+	step := 1 * time.Second
+	for d := -200 * time.Second; d <= 200*time.Second; d += step {
+		r, he, c, ce := k2Rev2Evaluate(f, t0.Add(d))
+		okH, okC := he == nil, ce == nil
+		if okH {
+			if !haveR {
+				refR, haveR, hFirst = r, true, d
+			} else if !reflect.DeepEqual(refR, r) {
+				t.Fatalf("Report differs at %v", d)
+			}
+			hLast = d
+		}
+		if okC {
+			if !haveC {
+				refC, haveC, cFirst = c, true, d
+			} else if c != refC {
+				t.Fatalf("current digest differs at %v", d)
+			}
+			cLast = d
+		}
+		if okH && !prevH {
+			hRuns++
+		}
+		if okC && !prevC {
+			cRuns++
+		}
+		prevH, prevC = okH, okC
+	}
+	t.Logf("history accepted runs=%d [%v,%v]; current accepted runs=%d [%v,%v] (step %v)", hRuns, hFirst, hLast, cRuns, cFirst, cLast, step)
+	if hRuns != 1 || cRuns != 1 {
+		t.Fatalf("non-contiguous acceptance: history runs=%d current runs=%d", hRuns, cRuns)
+	}
+	// nanosecond edges of the current window
+	for _, edge := range []struct {
+		d  time.Duration
+		ok bool
+	}{{cFirst - time.Nanosecond, false}, {cFirst, true}, {cLast, true}} {
+		_, _, _, ce := k2Rev2Evaluate(f, t0.Add(edge.d))
+		_ = ce
+	}
+}

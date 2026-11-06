@@ -1,0 +1,35 @@
+# Reviewer (Claude) scratch-only run on a git-archive copy of eb32b211 (archive zip sha256 878d6b9e683b54cd02ef5e1140b19f61dddd24086eb2901c8af3730c64e5c400 = owner scratchArchiveRawSHA256).
+# Files added ONLY to the scratch copy: owner k1_semantics_scratch_test.go.txt (LF bytes; CRLF form = owner addedScratchTestSHA256 0f8d3959...) and reviewer k2_rev2_reviewer_claude_test.go.txt.
+# argv (cwd <scratch>/services/node-agent): GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod go test ./migrationverify -run '^TestK2Rev2|^TestK2Reviewer' -count=1 -p 1 -v
+# go1.27.0 windows/amd64. exit 0, wall 360 s. Output below is the actual -v output with '=== ' lines filtered (tail -40 covered all remaining lines).
+    k2_rev2_reviewer_claude_test.go:25: original=fixture-operation-migration current=fixture-operation-restore historyOps=2 liveOps=1
+    k2_rev2_reviewer_claude_test.go:50: REFUSED history=plan/body/expectedInventoryHead/readbackProof: proof signed for different current operation | current=plan/body/noOverlap: proof signed for different current operation
+    k2_rev2_reviewer_claude_test.go:50: REFUSED history=plan/body/noOverlap: proof subject differs from containing authenticated sources | current=plan/body/noOverlap: proof subject differs from containing authenticated sources
+    k2_rev2_reviewer_claude_test.go:50: REFUSED history=historical operation has no authenticated original lease | current=historical operation has no authenticated original lease
+    k2_rev2_reviewer_claude_test.go:50: REFUSED history=historical operation differs from authenticated original lease | current=historical operation differs from authenticated original lease
+--- PASS: TestK2ReviewerSelectorExtra (3.68s)
+    --- PASS: TestK2ReviewerSelectorExtra/current-id-also-copied-into-history (0.89s)
+    --- PASS: TestK2ReviewerSelectorExtra/facts-and-ctx-both-current (0.91s)
+    --- PASS: TestK2ReviewerSelectorExtra/original-history-lease-hash-changed (0.85s)
+    --- PASS: TestK2ReviewerSelectorExtra/original-history-fence-changed (0.86s)
+    k2_rev2_reviewer_claude_test.go:95: history accepted runs=1 [0s,59s]; current accepted runs=1 [0s,59s] (step 1s)
+--- PASS: TestK2ReviewerConvexityScan (326.72s)
+    k2_rev2_source_semantics_test.go:39: EXPECTED_SOURCE_REFUSAL history=plan/body/allLaunchSurfaces: proof signed for different current operation; current=plan/body/allLaunchSurfaces: proof signed for different current operation
+    k2_rev2_source_semantics_test.go:39: EXPECTED_SOURCE_REFUSAL history=plan/body/expectedInventoryHead/readbackProof: missing trusted operation/lease binding; current=plan/body/allLaunchSurfaces: missing trusted operation/lease binding
+    k2_rev2_source_semantics_test.go:39: EXPECTED_SOURCE_REFUSAL history=plan/body/noOverlap: proof subject differs from containing authenticated sources; current=plan/body/noOverlap: proof subject differs from containing authenticated sources
+--- PASS: TestK2Rev2OriginalMigrationSelector (4.08s)
+    --- PASS: TestK2Rev2OriginalMigrationSelector/two-epoch-positive (1.46s)
+    --- PASS: TestK2Rev2OriginalMigrationSelector/P12-current-ID-substitution (0.85s)
+    --- PASS: TestK2Rev2OriginalMigrationSelector/missing-original-history (0.90s)
+    --- PASS: TestK2Rev2OriginalMigrationSelector/facts-only-mismatch (0.86s)
+--- PASS: TestK2Rev2ClockEndpoints (12.21s)
+    --- PASS: TestK2Rev2ClockEndpoints/publication-expiry-exclusive (2.08s)
+    --- PASS: TestK2Rev2ClockEndpoints/current-key-expiry-history-separate (2.61s)
+    --- PASS: TestK2Rev2ClockEndpoints/status-age-120-inclusive (2.09s)
+    --- PASS: TestK2Rev2ClockEndpoints/live-challenge-issued-inclusive (2.62s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify	347.673s
+# Owner tests: 10 PASS events (8 subtests + 2 parents), 0 fail, 0 skip = owner k1-scratch-source-semantics.json passTestNames.
+# Reviewer tests: 4 extra selector negatives + one 401-point (step 1 s, -200..+200 s) Now scan: Verify and VerifyCurrentProjectionSet each accept exactly one contiguous run [t0, t0+59s] with DeepEqual Report and identical current digest at every accepted point.
+# The reviewer scan's trailing nanosecond-edge loop discards its result (no assertion); edge semantics are covered by the owner endpoint subtests above.
+# Limits: K1 existing ephemeral synthetic fixtures only; not K2, not producer/crypto/installation proof, not any A01-A40 case, not a rerun of completed K1 CI/native proof. Scratch copy never entered product.

@@ -1,0 +1,55 @@
+"""Reviewer (Claude) independent census mutants. Scratch only; runs the owner's
+census binary built from go_input_census.go.txt (sha 3e28473b...) on mutated
+copies of eb32 trust.go. Each case = (baseline_text, mutant_text): baseline is
+what a hypothetically reviewed repin would census; mutant is the later change.
+Detection = semantic census JSON differs (SourceSignatureLine ignored)."""
+import json, subprocess, sys, hashlib, os
+from pathlib import Path
+D = Path(sys.argv[1]); EXE = D/'census.exe'
+SRC = (D/'trust_base.go').read_text(encoding='utf-8')
+ENV = dict(os.environ, GOTOOLCHAIN='local', GOWORK='off', GOPROXY='off', GOSUMDB='off')
+def census(text, name):
+    p = D/'mut'/(name+'.go'); p.parent.mkdir(exist_ok=True); p.write_text(text, encoding='utf-8')
+    r = subprocess.run([str(EXE), str(p)], capture_output=True, env=ENV)
+    if r.returncode != 0:
+        return None, r.stderr.decode('utf-8', 'replace').strip().splitlines()[0][:200]
+    v = json.loads(r.stdout); v.pop('SourceSignatureLine', None); return v, None
+def rep(t, a, b):
+    assert a in t, a; return t.replace(a, b, 1)
+NK = 'NodeKinds      map[string]string'
+cases = []
+# R01: named non-struct type whose UNDERLYING changes (baseline already uses the named type)
+b = rep(SRC, NK, 'NodeKinds      KindMap'); b = rep(b, 'type InstalledTrust struct {', 'type KindMap map[string]string\n\ntype InstalledTrust struct {')
+cases.append(('R01-named-map-underlying-change', b, rep(b, 'type KindMap map[string]string', 'type KindMap map[string]any')))
+# R02: named slice of string -> slice of any
+b = rep(SRC, 'CIRunIDs                                 []string', 'CIRunIDs                                 RunIDs'); b = rep(b, 'type InstalledTrust struct {', 'type RunIDs []string\n\ntype InstalledTrust struct {')
+cases.append(('R02-named-slice-underlying-change', b, rep(b, 'type RunIDs []string', 'type RunIDs []any')))
+# R03: named func type underlying change (Now as clock callback)
+b = rep(SRC, 'Now                  time.Time', 'Now                  ClockFn'); b = rep(b, 'type TrustedContext struct {', 'type ClockFn func() time.Time\n\ntype TrustedContext struct {')
+cases.append(('R03-named-func-underlying-change', b, rep(b, 'type ClockFn func() time.Time', 'type ClockFn func() any')))
+# R04: generic named struct, type-argument change
+b = rep(SRC, 'Now                  time.Time', 'Now                  Box[time.Time]'); b = rep(b, 'type TrustedContext struct {', 'type Box[T any] struct{ V T }\n\ntype TrustedContext struct {')
+cases.append(('R04-generic-type-arg-change', b, rep(b, 'Now                  Box[time.Time]', 'Now                  Box[any]')))
+# R05: generic struct body change, same type arg
+cases.append(('R05-generic-body-change', b, rep(b, 'type Box[T any] struct{ V T }', 'type Box[T any] struct{ V T; W any }')))
+# R06: alias of other-package type
+cases.append(('R06-alias-to-time', SRC, rep(rep(SRC, 'Now                  time.Time', 'Now                  Clock'), 'type TrustedContext struct {', 'type Clock = time.Time\n\ntype TrustedContext struct {')))
+# R07: any -> interface with method
+cases.append(('R07-any-to-interface-method', SRC, rep(SRC, 'SemanticInputs       any', 'SemanticInputs       interface{ Facts() any }')))
+# R08: field referencing a package type declared in ANOTHER file (fail-closed?)
+cases.append(('R08-type-from-other-file', SRC, rep(SRC, 'type TrustedContext struct {', 'type TrustedContext struct {\n\tExtra proofContract')))
+# R09: field referencing a stubbed private type (graph is stubbed empty)
+cases.append(('R09-stubbed-private-type-field', SRC, rep(SRC, 'type TrustedContext struct {', 'type TrustedContext struct {\n\tG graph')))
+# R10: field reorder (same set)
+cases.append(('R10-field-reorder', SRC, rep(rep(SRC, '\tCohortID       string\n', ''), '\tGraphSHA256    string\n', '\tGraphSHA256    string\n\tCohortID       string\n')))
+# R11: named-to-named rename with identical shape
+cases.append(('R11-anonymous-struct-field-change', rep(SRC,'Current              *CurrentProjectionContext','Current              *CurrentProjectionContext\n\tAnon struct{ A string }'), rep(SRC,'Current              *CurrentProjectionContext','Current              *CurrentProjectionContext\n\tAnon struct{ A any }')))
+out = []
+for name, base, mut in cases:
+    bv, be = census(base, name+'-base'); mv, me = census(mut, name+'-mut')
+    if be: res = {'id': name, 'baseline': 'CENSUS_FAILED', 'err': be}
+    elif me: res = {'id': name, 'result': 'FAIL_CLOSED_CENSUS_ERROR', 'err': me}
+    else: res = {'id': name, 'result': 'DETECTED' if bv != mv else 'UNDETECTED_SAME_SEMANTIC_JSON'}
+    res['mutantRawSHA256'] = hashlib.sha256(mut.encode()).hexdigest(); out.append(res); print(json.dumps(res))
+json.dump({'censusSourceSHA256': hashlib.sha256((D/'go_input_census.go').read_bytes()).hexdigest(),
+           'baseTrustRawSHA256': hashlib.sha256(SRC.encode()).hexdigest(), 'cases': out}, open(D/'reviewer-census-mutants-result.json','w'), indent=1)
