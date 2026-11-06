@@ -1,0 +1,4 @@
+=== RUN   TestK2AExportPublicSyntheticFixture
+--- PASS: TestK2AExportPublicSyntheticFixture (1.32s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify	2.981s

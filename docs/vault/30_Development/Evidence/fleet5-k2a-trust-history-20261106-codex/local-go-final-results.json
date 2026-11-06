@@ -1,0 +1,33 @@
+{
+  "classification": "FINAL_SCOPED_LOCAL_SOURCE_TESTS",
+  "runs": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:35:37.363605+09:00",
+      "endedKST": "2026-11-06T13:35:51.271640+09:00",
+      "log": "go-focused-final.log"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:35:51.294433+09:00",
+      "endedKST": "2026-11-06T13:35:52.335825+09:00",
+      "log": "go-vet-final.log"
+    }
+  ]
+}

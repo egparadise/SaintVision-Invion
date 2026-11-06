@@ -1,0 +1,33 @@
+{
+  "reason": "Added pre-archive authorized scope/original selector check and negative test; scoped rerun only",
+  "runs": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:39:49.475234+09:00",
+      "endedKST": "2026-11-06T13:40:03.313289+09:00",
+      "log": "go-focused-final2.log"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:40:03.324994+09:00",
+      "endedKST": "2026-11-06T13:40:04.326305+09:00",
+      "log": "go-vet-final2.log"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "classification": "NO_PRODUCTION_AUTHENTICATION_IMPLEMENTATION",
+  "registeredRegistryAttestation": null,
+  "registeredArchiveAttestation": null,
+  "registeredPublicationStatusAttestation": null,
+  "registeredCertificateStatusAttestation": null,
+  "registeredClockAttestation": null,
+  "registeredRunningCodeAttestation": null,
+  "independentlyProvisionedAnchors": null,
+  "actualOwnerCustody": null,
+  "actualCARootBinding": null,
+  "actualInstalledBinary": null,
+  "actualClockStdlibMatch": null,
+  "rootReadiness": null,
+  "D-COHORT": "HOLD",
+  "D-OBSERVATION": "SEPARATE_OPEN_CONTRACT",
+  "prepublicationCurrentAuthority": "HOLD",
+  "all40RuntimeCases": "NOT_RUN",
+  "fivePCAcceptance": "INCOMPLETE",
+  "noNewWireDomainOrSigner": true,
+  "noOperationalActions": true
+}

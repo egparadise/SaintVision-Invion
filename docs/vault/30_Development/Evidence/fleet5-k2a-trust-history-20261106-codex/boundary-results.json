@@ -1,0 +1,86 @@
+{
+  "classification": "READONLY_BOUNDARY_AND_REFUSAL_SLICE_NOT_POSITIVE_AUTHENTICATION",
+  "rootChoice": "msg_f4259ea0de6b/A",
+  "grant": "msg_18271633c26c narrowed by A",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "card": "FLEET5-K2A-TRUST-HISTORY-20261106",
+  "base": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+  "kst": "2026-11-06T13:33:26.868794+09:00",
+  "productionPositiveAuthentication": "NOT_IMPLEMENTED_NOT_GRANTED",
+  "publicOpaqueIssuer": "ABSENT",
+  "productionPorts": {
+    "registry": null,
+    "archive": null,
+    "publicationStatus": null,
+    "certificateStatus": null,
+    "clock": null,
+    "runningCode": null
+  },
+  "actualBindings": null,
+  "clockMechanism": "HOLD",
+  "currentAPIs": "ABSENT",
+  "K2BEffects": "ABSENT",
+  "A01-A40": "NOT_RUN",
+  "independentCodeReview": "PENDING",
+  "newExactCI": "PENDING",
+  "local": {
+    "focusedGoExit": 0,
+    "topLevelPasses": 52,
+    "subtestPasses": 147,
+    "vetExit": 0,
+    "raceCommandExit": 2,
+    "raceExecution": "NOT_RUN_CGO_DISABLED",
+    "noCGOOrToolchainChanges": true,
+    "finalNewPackageTopLevelPasses": 11,
+    "finalNewPackageSubtestPasses": 24
+  },
+  "fullCensus": {
+    "allNonTestK1Files": 12,
+    "reachableLocalInputTypes": 13,
+    "fields": 73,
+    "embedded": 0,
+    "underlyingGraphSHA256": "7670b418ced1c650f41f9ececb0f2a06a466ebb3c174137a00d2e4ab62114bc2",
+    "baseline": "eb32b211ab3704935b9431747089ab0715582a74",
+    "baselineAndWorkingSameActualToolchain": true,
+    "sourceOrTypeStubs": false,
+    "G01-G08": "DETECTED",
+    "R01-R03": "TYPE_CORRECT_AND_DETECTED",
+    "crossFileGeneric": "DETECTED"
+  },
+  "repoBoundary": {
+    "modules": [
+      "packages/contracts-go",
+      "services/node-agent"
+    ],
+    "goFiles": 93,
+    "newProductionK1Importer": "services/node-agent/internal/migrationcontext/k1_bridge.go",
+    "externalTestImporters": []
+  },
+  "syntheticCrypto": {
+    "authenticationBypass": "PRIVATE_TEST_FIXTURE_ONLY",
+    "L_U_t0FullReportsEqual": true,
+    "records": 195,
+    "proofReferences": 112,
+    "signaturesPerEvaluation": 227,
+    "privateKeysExported": false,
+    "productionProducerProof": false
+  },
+  "nextDependency": "Separately closed/reviewed independent provisioning and attestation verification contract per purpose, actual registered anchors/ports, future explicit Root grant.",
+  "finalProductionSources": {
+    "clock.go": "fe4e7c75f474d06aee63bd9d343ef7e0414342d3cbe6c75e5aca92c699c496c7",
+    "doc.go": "5ff529bc776a7ef507061712744122dfa1e851ff3d5929b441ba2f5f1e0e68ee",
+    "errors.go": "78abff5a56d3bd9d9114514166464ed05efb81d523ee8146c7b66a5f1f1b1eb6",
+    "history.go": "ed81c0bbeca47271345a7d793a6a602a2a9499d8c354b2de972063c1dd587b8c",
+    "k1_bridge.go": "6fe4729694636c54e231aad80cd12de27383174d1a6cd21840df172112c2ee72",
+    "policy.go": "48420286b06c5c67350f1a186988224a95421309d5c660e6dbe1513390e4dc4f",
+    "ports.go": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95"
+  },
+  "requiredDocumentationGates": {
+    "count": 10,
+    "allExit0": true,
+    "syncStateSHA256Before": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
+    "syncStateSHA256After": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
+    "unchanged": true
+  }
+}

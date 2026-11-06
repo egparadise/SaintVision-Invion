@@ -1,0 +1,49 @@
+{
+  "classification": "SYNTHETIC_SOURCE_TESTS_NOT_PRODUCER_OR_RUNTIME_ACCEPTANCE",
+  "runs": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:30:47.255468+09:00",
+      "endedKST": "2026-11-06T13:32:00.483064+09:00",
+      "log": "go-focused.log"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T13:32:00.483891+09:00",
+      "endedKST": "2026-11-06T13:32:06.435464+09:00",
+      "log": "go-vet.log"
+    },
+    {
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p",
+        "1",
+        "-count=1",
+        "./internal/migrationcontext"
+      ],
+      "exit": 2,
+      "startedKST": "2026-11-06T13:32:06.436051+09:00",
+      "endedKST": "2026-11-06T13:32:06.494018+09:00",
+      "log": "go-race.log"
+    }
+  ]
+}

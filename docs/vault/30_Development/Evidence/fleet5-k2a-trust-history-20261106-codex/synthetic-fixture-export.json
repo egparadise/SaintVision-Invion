@@ -1,0 +1,19 @@
+{
+  "classification": "SYNTHETIC_ONLY_NOT_A_PRODUCER",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "command": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "-count=1",
+    "-run",
+    "^TestK2AExportPublicSyntheticFixture$",
+    "-v",
+    "./migrationverify"
+  ],
+  "exit": 0,
+  "kst": "2026-11-06T13:25:32.498429+09:00",
+  "bytes": 1842152,
+  "sha256": "76f237ceaeb88d3cbc5a5cc9f74369b15c3c56cd28dbb4dcde803c2540ea3eec"
+}

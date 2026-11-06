@@ -1,0 +1,23 @@
+{
+  "classification": "PRESERVED_AUTHORING_AND_ENVIRONMENT_FAILURES",
+  "observations": [
+    {
+      "command": "gofmt -w internal/migrationcontext",
+      "exit": 2,
+      "detail": "history.go missing outer loop brace: expected (, found checkStatusBindings; expected }, found EOF",
+      "correction": "Added missing loop brace before first successful focused compile."
+    },
+    {
+      "command": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+      "exit": 1,
+      "detail": "TestRepositoryBoundaryAndZeroEffects: module coverage changed: []",
+      "correction": "git ls-files go.mod was root-only; now explicit :(glob)**/go.mod includes both actual modules."
+    },
+    {
+      "command": "go test -race -p 1 -count=1 ./internal/migrationcontext",
+      "exit": 2,
+      "detail": "go: -race requires cgo; enable cgo by setting CGO_ENABLED=1",
+      "correction": "No environment/toolchain mutation or retry; race tests NOT_RUN locally, fresh hosted Core required."
+    }
+  ]
+}
