@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.421"
+version: "1.0.422"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T22:58:50+09:00"
+updated: "2026-11-06T23:06:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UIR2actual71f1M3L_REFUSED; NEWGeminiR3task8dfctxc8ready; BRev9cfix/K2P02candidate; requiredCoreboundedSUCCESS; physicalincomplete"
+active_card_status: "R3exactbranchreadyafter3authorizedmenus; R2actual1M3Lnotdeployable; BRev9c/K2P02continue; no5PCacceptance"
 active_card_next: "GeminiR3exactsourceCIthenONEnarrowactualreview; BRev9c/K2P02candidateparallel; doNOTdeploy9c854; actualUIreviewerexitedreleased"
 ---
+
+## 2026-11-06T23:06:51+09:00 R3 명령 대기 처리와 실제 분기 확인
+
+Root가 기존 승인 범위의 명령 메뉴3건을 처리해 Gemini의 지정 R3 branch/head 준비를 확인했다. 사용자 재승인 요청·Agent 재시작·전역 설정 변경은 없었다. 확인은 실제 메뉴 응답 receipt와 fresh git read exit0이고 R3 수정·시험·CI·독립 검토·배포는 남는다. 다음 첫 행동/담당은 Gemini의 한정 수정과 Root의 실제 메시지 처리·고정 후보 검토 연결이다.
 
 ## 2026-11-06T22:58:50+09:00 실제 UI 결함의 후속 수정
 
