@@ -1,0 +1,48 @@
+START 2026-11-07T04:28:46+09:00
+EXIT 0
+END 2026-11-07T04:32:33+09:00
+{"finalBytes": {"ownerBracketedFiles": 82, "mismatchedAgainstOwnerAfterMap": [], "calleeIdentitySHA256": "3ff62c8e30c8bba0a09c976e7376331fcf59cd6850a7dee450d4b7bb67aca39c", "lexicalBindingsSHA256": "8d85415adf78fd4b0f3a27fe0d4671f718963d20c2e352d5f2c79d785eebf8a5", "reflectionAuditSHA256": "7934ab1837c2056ae4f38e99a844fcace0322674b536dfbc01d95235065c57f3"}}
+{"case": "actual-72028-positive", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"unionParsed": 25, "unionAudited": 25, "parsedEqualsAudited": true, "productionParsed": 11, "frozenBindingCount": 576, "frozenUnresolved": 0, "currentProveError": null, "currentBindingCount": 576}
+{"case": "L1-near-import_module-relative-variable-package", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-near-import_module-relative-literal-package", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-near-dunder-import-relative-level1", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L2-near-lan_pilot-global-import-in-function", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND"}
+{"case": "L2-near-lan_pilot-star-import-shadow", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND"}
+{"case": "control-outside-benign-database-helper", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "control-outside-assigned-string-unused-import", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "control-outside-bounded-literal-json", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "control-same-function-unowned-working", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "control-unrelated-module-helper", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "control-unrelated-same-spelled-local", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-level0-positional-literal", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-level0-keyword-literal", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-near-level1-keyword", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-near-package-keyword-literal", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"}
+{"case": "L1-near-dunder-import-level-hidden-by-starred-args", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L1-near-importlib-dunder-import-level1", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-near-imported-callee-star-shadow-workspace_api", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE"}
+{"case": "L2-near-imported-callee-global-import-workspace_config", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-near-lan_pilot-global-walrus-through-comprehension", "observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND", "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND"}
+{"case": "L2-control-lan_pilot-nested-def-under-global-function", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "class-body-global-store", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "module-walrus-in-comprehension", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "global-for-target", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "global-with-target", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "module-type-alias", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "global-in-nested-only", "error": null, "unresolved": ["UNRESOLVED:CALLEE_REBOUND"], "ownedFormalsAt": {"accept": []}, "matchesExpectation": true}
+{"case": "control-global-in-sibling-other-name", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "control-lambda-arg-same-name", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "control-class-method-same-name", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "control-cross-module-import-plain", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": true}
+{"case": "near-cross-module-imported-callee-star-shadow", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": false}
+{"case": "near-cross-module-imported-callee-global-import", "error": null, "unresolved": [], "ownedFormalsAt": {"accept": ["slot"]}, "matchesExpectation": false}
+{"case": "info-nonlocal-rebind-nested-callee", "error": null, "unresolved": [], "ownedFormalsAt": {"outer.accept": ["slot"]}, "matchesExpectation": true}
+{"case": "starred-level", "expression": "__import__('workspace_config', *(globals(), None, (), 1))", "unknown": false, "reviewerWantsUnknown": true, "matchesExpectation": false}
+{"case": "starred-tail-after-four", "expression": "__import__('workspace_config', globals(), None, (), *(1,))", "unknown": true, "reviewerWantsUnknown": true, "matchesExpectation": true}
+{"case": "importlib-dunder-level1", "expression": "importlib.__import__('workspace_config', globals(), None, (), 1)", "unknown": false, "reviewerWantsUnknown": true, "matchesExpectation": false}
+{"case": "importlib-dunder-level0", "expression": "importlib.__import__('json', globals(), None, (), 0)", "unknown": false, "reviewerWantsUnknown": false, "matchesExpectation": true}
+{"case": "import_module-starred-package-absolute", "expression": "importlib.import_module('json', *('x',))", "unknown": true, "reviewerWantsUnknown": false, "matchesExpectation": false}
+{"cases": 22, "binder": 13, "units": 5, "mismatches": ["L1-near-dunder-import-level-hidden-by-starred-args", "L1-near-importlib-dunder-import-level1", "L2-near-imported-callee-global-import-workspace_config", "near-cross-module-imported-callee-star-shadow", "near-cross-module-imported-callee-global-import", "starred-level", "importlib-dunder-level1", "import_module-starred-package-absolute"]}
+
+[exited with code 0]

@@ -1,0 +1,1 @@
+{"productionPaths": 11, "starredArgImportCalls": 0, "importlibDunderImport": 0, "globalStatements": 0, "starImports": 0, "nonlocalStatements": 3}

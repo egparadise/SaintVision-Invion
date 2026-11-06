@@ -1,0 +1,19 @@
+{
+  "environment": "Windows 11, PowerShell + Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B (-I for probes), PYTHONUTF8=1, PYTHONHASHSEED=0 for probes, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9f-9cea-review-20261107 created from exact 9cea33e8. Times KST. Serial only; no installs, no OS/pagefile/process/service changes. Available memory 240-270 MB before the probe run.",
+  "provenance": [
+    {"argv": "orca orchestration worker-show --dispatch ctx_a6589fe0c3df --json", "result": "task_01cdc5e54543 state succeeded, stage settled, liveness exited, terminalState released"},
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9f-20261107 ; git rev-parse FETCH_HEAD ; git rev-parse 9cea33e8^", "result": "9cea33e8a087981fdedcddb71c4381bdc25c1507, parent 3cccfe4d7511180fa8fbb6f5742328c6a43d04bd"},
+    {"argv": "git switch -c agent/claude/fleet5-b-rev9f-9cea-review-20261107 9cea33e8a087981fdedcddb71c4381bdc25c1507", "result": "HEAD 9cea33e8"},
+    {"argv": "git diff --stat 3cccfe4d 9cea33e8", "result": "175 files added (174 Evidence/fleet5-b-rev9f-20261107-codex + 1 History), 0 modified/deleted"},
+    {"argv": "git rev-parse 764c3bf3:<764 result json> ; git hash-object <rev9f copy rev9e-review-reviewer-rev9e-delta-probes-result.json>", "result": "both 3e840fabca21a5eb54ecdcce2005b2927e4ba0f1"},
+    {"argv": "read fleet-five-orchestration-20261105 (read-only): HEAD fc02b4ae, Index 1.0.477, Codex board 1.0.438, Claude board 1.2.130, .work/b9f-source-root-verified.json (sha256 bbb1cf64...)", "result": "read only"}
+  ],
+  "reviewerRuns": [
+    {"argv": "python -B -I reviewer_rev9f_delta_probes.py.txt <rev9f dir abs> <rev9f dir abs>/rev9e-review-reviewer-rev9e-delta-probes-result.json <scratch>/reviewer-rev9f-delta-probes-result.json", "exit": 0, "kstWindow": "2026-11-07T04:28:46..04:32:33", "log": "reviewer-rev9f-delta-probes.log.txt",
+     "cases": 22, "binderFixtures": 13, "reflectionUnits": 5, "mismatches": 8, "peakWorkingSetBytes": 153198592, "run": "single run1, retained as final; the driver first checks all 82 owner-bracketed files against the last proof-final01 after-map (0 mismatches)"},
+    {"argv": "python -B -I reviewer_scan_72028_b9f_forms.py.txt <rev9f dir abs> > reviewer-scan-72028-b9f-forms.txt", "exit": 0, "kst": "2026-11-07T04:33:29", "result": "11 production paths: 0 starred import calls, 0 __import__ attribute, 0 global, 0 star imports; 3 nonlocal"},
+    {"argv": "python -B reviewer_gate_driver.py.txt 9cea33e8... <scratch>/canonical-sync-check-before.txt <scratch> sync-only", "exit": 0, "kst": "2026-11-07T04:34:10..04:34:44", "stateSHA": "before 3dda9efc3d4d20746358b0dd19bdbf8fdbf46ce93c2392612d01ff889260279f after 3dda9efc3d4d20746358b0dd19bdbf8fdbf46ce93c2392612d01ff889260279f", "result": "CHECK 4399 managed, 1975 pending exports, 0 conflicts, no writes", "file": "canonical-sync-check-before.txt"}
+  ],
+  "localGates": "see local-doc-gates.txt (8 gates after authoring, own History/Evidence only)",
+  "notRun": "owner run_checks/proof/docs commands, model/terminal/recovery suites, deterministic generation, full assembler; no Obsidian apply/adopt/resolve/state write"
+}
