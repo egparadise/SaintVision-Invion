@@ -1,69 +1,68 @@
 {
-  "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+  "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+  "parentCandidate": "854a8eab0b6e236b62878f49ee941c700e458af0",
   "initialSource": "3a83707688f43570a7eaf9008989794979b3eb9f",
-  "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
+  "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
   "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
-  "task": "PORTAL-REFRESH-FLEET-20261106",
+  "task": "PORTAL-REFRESH-POLLING-R2-20261106",
   "author": "Gemini",
-  "atKST": "2026-11-06T20:36:00+09:00",
-  "rootFindingsResolved": {
-    "R-UI-M1": "Header /healthz canonical validation (JSON + status: ok) instead of /v1/health with ANY 2xx/401/404; added Vite dev/preview /healthz reverse-proxy and nginx HTTPS 443 upstream route while preserving HTTP 80 plaintext 'OK'; truthful initial cluster count null/0 (no fake 5/5 default)",
-    "R-UI-M2": "ClusterOverview empty cluster background refresh failure displays visible cluster-stale-warning (role=alert) with lastFetchedAt snapshot time and retry button; initial pending (!lastFetchedAt) truthfully displays '클러스터 노드 정보를 확인하고 있습니다...' without claiming '정상 조회 결과: 0대'; stable empty card retained without remount or metric card flicker; 76 style attributes and border tokens preserved"
+  "atKST": "2026-11-06T21:44:00+09:00",
+  "reviewFindingsResolved": {
+    "UI-854-M1": "Slow / hung polling requests handled truthfully via monotonic sequence fence (request > appliedRef.current) and finite 10s request timeout. Responses slower than the 5s interval (e.g. 6s latency) are no longer discarded and apply cleanly (probe P6); hung requests time out at 10s and trigger explicit error/staleness (probe P7), never claiming current zero success indefinitely.",
+    "UI-854-L1": "Header /healthz failure labels discriminated: non-200, HTML 200 SPA fallback, JSON 404/503, and JSON status!=ok render 'Gateway: 비정상 응답' with offline dot; network failure (fetch reject or timeout) renders 'Gateway: Offline' with offline dot. Online is strictly reserved for HTTP 200 + application/json + { status: 'ok' } (probe H1).",
+    "UI-854-L2": "Header /healthz sequence fence (reqSeqRef) and 4000ms timeout prevent older slow success from overwriting newer failure (probe H2).",
+    "UI-854-L3": "ResourceExplorer onRetryNodes callback wrapped with onClick={() => onRetryNodes?.()}, preventing SyntheticMouseEvent from being evaluated as isBackground=true. Explicit handleManualRetryNodes, handleManualRetryRuns, handleManualRetryApprovals execute with isBackground=false.",
+    "UI-854-L4": "Comprehensive App-level test suite with fake timers and mocked apiClient in apps/web/tests/portal-refresh-fleet-ui.test.tsx (Section 10, probes P1-P9, H1-H2). 35/35 tests pass."
   },
   "CI": {
     "docs": {
-      "run": 42211247163,
+      "run": 42219586479,
       "jobIds": [
-        127870134953
+        127898008985
       ],
       "conclusion": "success",
       "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
     },
     "frontend": {
-      "run": 42211235450,
+      "run": 42219574051,
       "jobIds": [
-        127870096841,
-        127870097238
+        127897973932,
+        127897974300
       ],
       "conclusion": "success",
       "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
-    },
-    "portalLoginHarness": {
-      "run": 42207878338,
-      "jobIds": [
-        127858939110
-      ],
-      "conclusion": "success"
     }
   },
   "webArtifact": {
-    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
-    "FrontendRun": 42211235450,
-    "artifactId": 13499835128,
-    "artifactBytes": 1116712,
-    "artifactDigest": "sha256:375cec90c8ec66fe2880a8f954d7264324ae95d1925710858fe99fb1f35936fe",
-    "portalReleaseArtifactId": 13499830407,
-    "portalReleaseDigest": "sha256:65ecbb17516ab4e044921282774d5bb3df60b38d016ede65deea4c995eae499f"
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "FrontendRun": 42219574051,
+    "artifactId": 13502802678,
+    "artifactBytes": 1119071,
+    "artifactDigest": "sha256:8ab34e777e6169da9d6ffbb4fb9e6010e1c482277b701548c3ecda1f8c022388",
+    "portalReleaseArtifactId": 13501724534,
+    "portalReleaseDigest": "sha256:583b1303eeda2401bb6951f1830904d7d451770ab63c64161be09c54af9a0d15"
   },
   "localVerification": {
-    "portalRefreshFleetUiTest": "exit 0 (20/20 passed)",
-    "vitestFullSuite": "exit 0 (103 files passed, 1238 tests passed)",
+    "portalRefreshFleetUiTest": "exit 0 (35/35 passed)",
+    "acc09ContrastTokens": "exit 0 (46/46 passed)",
+    "appNodeCertificateFreshness": "exit 0 (9/9 passed)",
+    "runApprovalObservationContract": "exit 0 (6/6 passed)",
+    "liveObservation": "exit 0 (27/27 passed)",
     "typescriptCheck": "exit 0 (0 errors)",
-    "productionBuild": "exit 0 (built in 4.84s, dist bundle generated)",
+    "productionBuild": "exit 0 (built in 5.06s, dist bundle generated)",
     "frontendIntegrity": "exit 0 (94 files scanned, 9 rules, 0 violations)",
     "contractBindings": "exit 0 (57 fixtures, 21 bound types, 14 replay guards)",
-    "routeCoverage": "exit 0 (41 passed in 2.90s)",
+    "routeCoverage": "exit 0 (41 passed in 1.34s)",
     "checkDocs": "exit 0 (PASS: 24 original hashes, 1260 versioned documents)",
     "obsidianSyncCheck": "exit 0 (2828 managed files, 0 conflicts, no writes)",
-    "obsidianSyncStateSHA256": "DCFDB284A97FB048592E857DA5F80AEDE2811E82EB93FEAA4D1DFB7446660629"
+    "obsidianSyncStateSHA256": "58E776629B8945B7A1D7B196C7AC751A10C01B874FE989D1953D22EF2BB0358D"
   },
   "productChanges": {
-    "Header": "Canonical /healthz check requiring JSON response and status==='ok', truthful initial gateway state (online: null, rttMs: null) with '확인 중...', truthful cluster counts null/0 without fake 5/5 defaults, formatUserDisplayName formats raw oidc hashes",
-    "ClusterOverview": "Stable empty cluster rendering without panel unmount/flash during background polls; on background refresh failure with cached 0 nodes renders visible cluster-stale-warning (role=alert) with last snapshot time and retry button; initial pending renders loading text without claiming '정상 조회 결과: 0대'; exact 76 AST style attributes strictly preserved",
-    "App": "Parameterised isBackground=true on 5s periodic intervals to prevent cyclical loading flicker; retains truthful stale observation on error; scope fences and stale action guards prevent unauthorized actions when permissions/approvals are in error",
-    "session": "Derives user friendly displayName from OIDC claims or fallback formatting after verified server session",
-    "viteConfig": "Reverse-proxy /healthz in dev and preview to backend target",
-    "nginxConfig": "HTTPS 443 proxies /healthz to control-plane upstream while HTTP 80 preserves local plaintext 'OK'"
+    "Header": "Discriminated gateway state { kind: 'unknown' | 'healthy' | 'degraded' | 'offline' }, sequence fence reqSeqRef, 4000ms timeout, AST style ratchet preserved (20 attrs, 11 pairs)",
+    "ClusterOverview": "Stable empty cluster rendering without panel unmount/flash during background polls; on background refresh failure renders visible cluster-stale-warning (role=alert) with last snapshot time and retry button; initial pending renders loading text without claiming '정상 조회 결과: 0대'",
+    "App": "Monotonic sequence fence (request > appliedRef.current), 10s request timeout on polling, explicit manual retry callbacks (handleManualRetryNodes, handleManualRetryRuns, handleManualRetryApprovals)",
+    "ResourceExplorer": "onClick={() => onRetryNodes?.()} to prevent SyntheticMouseEvent forwarding",
+    "ObservationAPIs": "Optional options?: { signal?: AbortSignal } passed to apiClient in runApprovalObservation.ts and projectObservation.ts only when defined"
   },
   "constraintsCompliance": {
     "liveServicesUntouched": true,
