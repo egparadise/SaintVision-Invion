@@ -1,0 +1,53 @@
+{
+  "classification": "NO_K1_CONSISTENCY_REQUIREMENT_REMOVED",
+  "renamedReviewFacts": [
+    {
+      "oldFact": "reviewSHA",
+      "newFact": "effectiveReviewSHA",
+      "obligation": "Original per-review facts remain verbatim in ordered reviews[]; effective fact requires separate independently authenticated H3-EA approval. Never relabel original target/scope/verdict."
+    },
+    {
+      "oldFact": "reviewTargetSHA",
+      "newFact": "effectiveReviewTargetSHA",
+      "obligation": "Original per-review facts remain verbatim in ordered reviews[]; effective fact requires separate independently authenticated H3-EA approval. Never relabel original target/scope/verdict."
+    },
+    {
+      "oldFact": "reviewScope",
+      "newFact": "effectiveReviewScope",
+      "obligation": "Original per-review facts remain verbatim in ordered reviews[]; effective fact requires separate independently authenticated H3-EA approval. Never relabel original target/scope/verdict."
+    },
+    {
+      "oldFact": "reviewVerdict",
+      "newFact": "effectiveReviewVerdict",
+      "obligation": "Original per-review facts remain verbatim in ordered reviews[]; effective fact requires separate independently authenticated H3-EA approval. Never relabel original target/scope/verdict."
+    }
+  ],
+  "retainedDerivedFacts": [
+    "policyPayloadSHA256",
+    "graphSHA256",
+    "contractSetSHA256",
+    "semanticPinsSHA256",
+    "cohortScopeSHA256",
+    "keyGrantsSHA256",
+    "registryProofSlotsSHA256",
+    "designRegistrationSHA256"
+  ],
+  "addedExplicitPayloadComponents": [
+    "semanticPins",
+    "proofSlotRegistryHex",
+    "designRegistrationHex"
+  ],
+  "existingK1StillMandatory": [
+    "unchanged28 contract pins and registry/schema graph semantics",
+    "exact original role/scope/key intervals and current status",
+    "DER/CA/SPKI/URI/key-use/member uniqueness and grant bindings",
+    "all original K1 signature/history/consuming-time/current-status checks"
+  ],
+  "newEffectiveApproval": "H3-EA UNREGISTERED/missing; real positive projection remains HOLD until separately authenticated purpose/issuer/format/verifier and Root mapping decision",
+  "echo": {
+    "field": "runningMeasurementSHA256",
+    "authenticationWeight": 0,
+    "authority": "Only private independently authenticated H5; signer only echoes client request digest"
+  },
+  "allExistingSourceFilesUnchanged": true
+}

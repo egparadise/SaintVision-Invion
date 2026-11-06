@@ -1,0 +1,149 @@
+{
+  "classification": "REQUIRED_DOCS_GATES_REV2_CANDIDATE_ONLY",
+  "runs": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:06:38.288882+09:00",
+      "endedKST": "2026-11-07T02:07:01.984540+09:00",
+      "log": "gate-01-check_docs.log",
+      "rawLogSHA256": "1c8a60541b81e15e16f844674cf8802beed0b1ee2c9e9dd7e3ef863bd5e2ab83",
+      "publishedLF_LogSHA256": "fecab93a734c027e597c842a6f5465512935e078538317d180fa80014ecb3837"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:01.985028+09:00",
+      "endedKST": "2026-11-07T02:07:04.117656+09:00",
+      "log": "gate-02-check_ontology_generation.log",
+      "rawLogSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+      "publishedLF_LogSHA256": "9d8298b5f2bd5db7b4548a54f9a88ff16463feb7d786c45e502c0900fb1a89e7"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:04.118195+09:00",
+      "endedKST": "2026-11-07T02:07:06.060085+09:00",
+      "log": "gate-03-check_ontology.log",
+      "rawLogSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "publishedLF_LogSHA256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:06.060405+09:00",
+      "endedKST": "2026-11-07T02:07:18.317798+09:00",
+      "log": "gate-04-check_contract_bindings.log",
+      "rawLogSHA256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
+      "publishedLF_LogSHA256": "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:18.318179+09:00",
+      "endedKST": "2026-11-07T02:07:19.704992+09:00",
+      "log": "gate-05-check_frontend_integrity.log",
+      "rawLogSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+      "publishedLF_LogSHA256": "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "78468d0aec295c712dd1ea33bea1401d1d4939a4"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:19.705368+09:00",
+      "endedKST": "2026-11-07T02:07:27.318115+09:00",
+      "log": "gate-06-check_doc_path_citations.log",
+      "rawLogSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "publishedLF_LogSHA256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:27.318558+09:00",
+      "endedKST": "2026-11-07T02:07:27.703938+09:00",
+      "log": "gate-07-check_doc_single_source.log",
+      "rawLogSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "publishedLF_LogSHA256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/test_sync.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:27.704296+09:00",
+      "endedKST": "2026-11-07T02:07:32.768666+09:00",
+      "log": "gate-08-test_sync.log",
+      "rawLogSHA256": "32f1d7c9a0556ed61564c863a50f481ee1c811e0d0e88cf8d4b037a9c1f08c18",
+      "publishedLF_LogSHA256": "d1a9ef2180ad16670eff8371468c32215b0b308bdc68ed146ab75055b17a015f"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/build_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:32.769146+09:00",
+      "endedKST": "2026-11-07T02:07:40.727639+09:00",
+      "log": "gate-09-build_docs.log",
+      "rawLogSHA256": "87e8b699b540d6f411bb0c54f9e2b7f4fcc9d6f95cd751cb96eeb9c9eba86d79",
+      "publishedLF_LogSHA256": "f2c7d3018ad1faf484649e13c50063ccb63abd698f62536cc6f7374d308ddea7"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-07T02:07:40.747065+09:00",
+      "endedKST": "2026-11-07T02:07:54.830430+09:00",
+      "log": "gate-10-sync_obsidian.log",
+      "rawLogSHA256": "7d27901e668c517db266a3971f9b4d3137f638e0a635dfe5023cd2d3d11c40a3",
+      "publishedLF_LogSHA256": "a918e2fd0897a53ccf2f5106c15b33f44f79f3b1fea61eaf2db7e6ba17b65910",
+      "canonicalStatePath": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "canonicalStateSHA256Before": "3617d5455ec9c95ab6af962290b85544445e8b1ef0a373b42bdcb8c6e535e651",
+      "canonicalStateSHA256After": "3617d5455ec9c95ab6af962290b85544445e8b1ef0a373b42bdcb8c6e535e651",
+      "unchanged": true,
+      "authority": "Root explicit canonical --check --state only; no apply/adopt/resolve"
+    }
+  ],
+  "allPassed": true,
+  "noApplyAdoptResolve": true
+}

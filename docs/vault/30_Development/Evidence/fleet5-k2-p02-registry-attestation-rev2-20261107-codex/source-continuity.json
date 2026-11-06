@@ -1,0 +1,16 @@
+{
+  "classification": "IMMUTABLE_SOURCE_CONTINUITY_NOT_FRESH_GO_OR_RUNTIME_TEST",
+  "base": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "sourceRowsVerified": 129,
+  "runtimeSevenRowsVerified": 7,
+  "allMatch": true,
+  "GoTypeCensus": "13types/73baseline unchanged; NOT_RERUN",
+  "contracts": 28,
+  "GoModules": [
+    "packages/contracts-go/go.mod",
+    "services/node-agent/go.mod"
+  ],
+  "rawSeven": "UNREGISTERED",
+  "original100Rows98DistinctUnmodified": true,
+  "actual38ReviewRowsCopiedByteExact": true
+}

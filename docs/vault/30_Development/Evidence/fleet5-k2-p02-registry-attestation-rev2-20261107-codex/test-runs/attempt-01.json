@@ -1,0 +1,3689 @@
+{
+  "classification": "REV2_SYMBOLIC_CONTRACT_DELTA_ONLY_NO_PRODUCER_CRYPTO_OR_RUNTIME_PROOF",
+  "attempt": 1,
+  "startedKST": "2026-11-07T01:42:34.246513+09:00",
+  "completedKST": "2026-11-07T01:42:35.235131+09:00",
+  "executedRows": 92,
+  "distinctCompleteInputTuples": 92,
+  "duplicateRows": 0,
+  "symbolicControls": 4,
+  "refusals": 88,
+  "failures": 0,
+  "error": null,
+  "rows": [
+    {
+      "id": "C01-inherited-reviews-and-complete-projection",
+      "inputSHA256": "2bc3267402fc4fd308c530ec731407de158a1eb800bea95154537287d2a503bf",
+      "purpose": "L1 multiple raw targets plus independent effective source approval; M1 all field projections",
+      "expectedReason": "",
+      "expectedStage": "",
+      "observedLabel": "SYNTHETIC_ALREADY_BOUND",
+      "observedReason": "",
+      "observedStage": "",
+      "observedDetail": "",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "C02-fresh-ticket-new-expiry-new-H5-same-record",
+      "inputSHA256": "2a85a89005c992af3b131749123e53d27d16a8f2bf02a3fc8c0d7bd955a079d9",
+      "purpose": "L4/L5 genuinely distinct legal repeat; zero-weight echo changes, stable record unchanged",
+      "expectedReason": "",
+      "expectedStage": "",
+      "observedLabel": "SYNTHETIC_ALREADY_BOUND",
+      "observedReason": "",
+      "observedStage": "",
+      "observedDetail": "",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "C03-different-independently-provisioned-primary",
+      "inputSHA256": "96bde9275f5d244fe590cf2184c796d2254f35cf2bcd95711d00507f41900856",
+      "purpose": "M1 primary tuple comes from capsule, never first/last green response",
+      "expectedReason": "",
+      "expectedStage": "",
+      "observedLabel": "SYNTHETIC_ALREADY_BOUND",
+      "observedReason": "",
+      "observedStage": "",
+      "observedDetail": "",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "C04-Go-UTC-epoch-boundaries",
+      "inputSHA256": "fb414113578da1aaac295194da59adec54e0f323fe2cf36e8f9c69ed37992e5b",
+      "purpose": "M1 exact integer->UTC conversion, no physical clock use",
+      "expectedReason": "",
+      "expectedStage": "",
+      "observedLabel": "SYNTHETIC_ALREADY_BOUND",
+      "observedReason": "",
+      "observedStage": "",
+      "observedDetail": "",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P01-leading-space",
+      "inputSHA256": "2b7d1c72a9af735adb85fd7171c81d55bc4ed907f6d3b5c731516f820c439865",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P02-non-JSON",
+      "inputSHA256": "4e9eb6ad4035cc1dc66a99f450266c72eaab629d73338c91ae2d94c6ce29f863",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P03-trailing-LF",
+      "inputSHA256": "1890e866a54b6a87949315945af7df088a1cd5890a6d4082ac1299864b4e9233",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P04-trailing-CRLF",
+      "inputSHA256": "b9f542761ec3012b188bb0551d714623c8ed495be736a6ea5a262ec0f419755f",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P05-duplicate-key",
+      "inputSHA256": "6bb8f7c1b3d063e809f63e69acefac592f7404a6690801a01d7f3397765acc8d",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P06-self-asserted-status",
+      "inputSHA256": "5dba9dbc138e4b98523c809003f93dce85e06ece237623667b8d980425dd990d",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P06-self-asserted-RegistrySHA256",
+      "inputSHA256": "b0ff0c539e83829cf6b4cd3e7c7b7a50b2bea4e135a39b00338b93428c97bba2",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P06-self-asserted-Provenance",
+      "inputSHA256": "813c952a1c7c0c7549dde83ae5fcc62b10432b1a2237aec9665c94ac48240fe2",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P07-self-asserted-grant-status",
+      "inputSHA256": "0525a2ff125a9e6ef2fe42d0603b90f4972b9b0b1d48d7704fdbe139d9dac001",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P08-missing-semantic-component",
+      "inputSHA256": "4a5c03cc794706d1c231bdcb372ab14918c9f77ee57c374db5af85ae3ac1c2f3",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P09-missing-proof-slot-component",
+      "inputSHA256": "e488d5a5dfa84ba4e3d23087f7a74aa24612a5f581e74569f426e9cc82a7ad29",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P10-missing-registration-component",
+      "inputSHA256": "1cf9e217d1e459b04cdd769391d2ffce47f2f8e0741ae62cd30d9eeccdf44a51",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P11-non-JSON-C2-scope",
+      "inputSHA256": "5d4a6ad7fe8f19f758ba150a51c7cbd0827ae40ac7dfd9635cb364ecc2108a3a",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_C2",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_C2",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P12-wrong-C2-HTML-escaping",
+      "inputSHA256": "de90501c25dec1528df4aa9e374c596b19eed59816762e6d9971c2a91cafeb8c",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_C2",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_C2",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "P13-unknown-scope-class",
+      "inputSHA256": "125971f7f5c05b444181653c38f99aa0f3fdae7ce911a14041e3e73051299ccd",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_C2",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_C2",
+      "observedDetail": "closed-C2-authority-scope",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J01-selector",
+      "inputSHA256": "d331df7697ddb4edd89820af5b1384248ac2604de2b677ba7732f8862ca9cb0f",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "payload-selector",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J02-source",
+      "inputSHA256": "7d5e2927428ab04c85fd0f0ca33a1dc7083a37504d362d58071cf7a889f4f50d",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "payload-verifier-sourceSHA",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J03-executable-not-archive",
+      "inputSHA256": "8636283a4128743fe1539a6d1d3b6a5247fa2ef2ffe2caf3a83eea1a3b97c1d0",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "payload-verifier-artifactSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J04-effective-review-publication",
+      "inputSHA256": "1b8d0e3c5035bc0dc6dcbc6114a49a43f3318e3beedcce50f99df318e4b125d6",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "payload-verifier-reviewSHA",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J05-CI-run-membership",
+      "inputSHA256": "07abded05042523645783ee58c77cd7fe18edf5d225b92bfab92aa3761f16070",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "ordered-payload-CI-run-IDs",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J06-CI-run-order",
+      "inputSHA256": "27a70cf3dcab21cd3557c44b2b03fdad46f63c99ba0cf0dcbbb77e1c08b02f8d",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "ordered-payload-CI-run-IDs",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J07-version-mapping",
+      "inputSHA256": "f767e28125c91f75ae584aaf5b0ca9e6b87a84c457274a257c48df6a17a95b24",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "canonical-version-to-recordVersion",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J08-noncanonical-version-string",
+      "inputSHA256": "11cc4aecfdc74295589f6f8d881f43cf1dfcd0fcecedd5aa0bc49342403f0620",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "J09-boolean-CI-ID",
+      "inputSHA256": "fabf65773e004753aa674f2011a27072d4edd9341ff61f19c459ec5910689bf6",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-graphSHA256",
+      "inputSHA256": "632ce6b82fe11d62bd8db7d6b7eca8516c59a6f4375e080c4085f7e6fe5bde15",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-graphSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-contractSetSHA256",
+      "inputSHA256": "e8cdb81f60cdc7b5a648973afa8795710740d54e97cddd45ac30711e6c9ee8c0",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-contractSetSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-semanticPinsSHA256",
+      "inputSHA256": "489dcf7707a1720ab1b77a1a9c1c368eea8477ab46ad0db3c4602ae67580da1a",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-semanticPinsSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-cohortScopeSHA256",
+      "inputSHA256": "eccd0d5e8bb51b73e001084ce2a8a310e80ec12b9c919f0f5004acd0a8567667",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-cohortScopeSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-keyGrantsSHA256",
+      "inputSHA256": "c621efa752d771c5108d7974c5851f586e380766cdde97c842c212cca3a1eaec",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-keyGrantsSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-registryProofSlotsSHA256",
+      "inputSHA256": "3ae1298b6fb87dbefadba205364f271e493c94b13f0799c2868bfadfea9936ae",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-registryProofSlotsSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D01-derived-designRegistrationSHA256",
+      "inputSHA256": "30c7200792ff4b620d77a91c8b58175f7b4319db12151c9741e4d5dd55202582",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "derived-designRegistrationSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D02-nodeKinds-source",
+      "inputSHA256": "0883baf3ab195edb3ca57e354bee4cedc7a165cc3a551cfa82aab0afc5282339",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "source-component-nodeKindsSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D03-semantic-origin-k1SourcePinSetSHA256",
+      "inputSHA256": "0c6a34af52785c68fc718d0d5cb49973a56822ca6155e0c0d38800ed7a7e6ec0",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "independent-semantic-source-k1SourcePinSetSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D03-semantic-origin-recipeDefinitionsSHA256",
+      "inputSHA256": "26bc56a4f76c21f8bd7b549d1366f8c46e43effd96d6826948e3111a77bf43b5",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "independent-semantic-source-recipeDefinitionsSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D03-semantic-origin-derivedDigestContractSHA256",
+      "inputSHA256": "b9e917f30276ab033dcf1ec6aaca705328d2498963a5ea5bb60bb1c39a5755c4",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "independent-semantic-source-derivedDigestContractSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D04-graph-raw-bytes",
+      "inputSHA256": "46d8767e4ec5850ac8d835f70859477a81d99280312386d7966872082546e960",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "independent-semantic-source-graphSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D05-proof-slot-raw-bytes",
+      "inputSHA256": "eec14a903897d227964f383d406a4c42db7091550f7622e7a7b9a25691bcafcb",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "source-component-proofSlotRegistrySHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "D06-registration-no-newline-normalization",
+      "inputSHA256": "a471f5f0ca0c8d7ec0b449ce3d0f1b6c8fcd91ac6c4ddb0ab13df0e3447ee3ef",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_COMPONENTS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_COMPONENTS",
+      "observedDetail": "source-component-designRegistrationSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R01-missing-effective-producer",
+      "inputSHA256": "ab78e50fb9de197706a350c230578ddc948cdebeb15bae33de7bc08c85031a98",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "02_SOURCES",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "02_SOURCES",
+      "observedDetail": "independent-coverage",
+      "passedStages": [
+        "01_ANCHOR"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R02-original-review-target-substitution",
+      "inputSHA256": "a449ed766aaf0ef2b841d397a1cf25f2e8ac7e78c5b3fd35b2c60b9732e659c6",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "original-authenticated-review-rows",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R03-original-review-verdict-substitution",
+      "inputSHA256": "6b9780d4945497123ef489887ce55e2f3f7227b676c75a83a8dc612298a06c5f",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "original-authenticated-review-rows",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R04-original-review-scope-substitution",
+      "inputSHA256": "14a192af54a62c2d04127fa8b0b3748038ccebaad8e64959be645f4040bed28c",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "original-authenticated-review-rows",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R05-review-order",
+      "inputSHA256": "4414ce7d5f35159afe31566b28cd3c8c00f9f37c3c05effce1115ba9d9063d11",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_ENVELOPE",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_ENVELOPE",
+      "observedDetail": "ordered-closed-review-set",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R06-missing-source-part",
+      "inputSHA256": "49dcd8d311ffc57e86fa4c5f2f0f797e26cc1adf3025707990229a3fa2670afc",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "complete-ordered-source-partition",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R07-fake-reviewed-byte-equivalence",
+      "inputSHA256": "a5f16317dc398434b1acfafbf984a547ea1cae62cff746e3c3c5ac831ae5ed64",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "independent-current-and-reviewed-part-bytes",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R08-changed-current-part-bytes",
+      "inputSHA256": "5b9ff39cfbb6f20c131a2e626e548aefeaf0457a1ddf76c664d4ec4301f5643e",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "independent-current-and-reviewed-part-bytes",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R09-inherited-labelled-direct",
+      "inputSHA256": "d7faf7b7aaf931cfe272457908f26a509c448aa9faadd0ab9fac41767efcadcd",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "explicit-direct-or-inherited-relation",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R10-relabelled-original-target",
+      "inputSHA256": "6610484a9d4bb1f7d8499844ebecde8b77083297ed76fd6dad2c3359b9d98096",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "preserved-original-review-target",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "R11-effective-target-not-current",
+      "inputSHA256": "187f46c2890e490924ed7d27511d43ee07ceb6d0dcae014c28303fe520660edc",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_REVIEWS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_REVIEWS",
+      "observedDetail": "effective-approval-current-target",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q01-approved-scope-not-copied-from-facts",
+      "inputSHA256": "1fdaf7589bf3937a682d598db0e86c3b91f903c0917e03a88965379c8f3fd39a",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "effective-current-target-and-independent-approved-scope",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q02-primary-run-not-first-green",
+      "inputSHA256": "685458631291fd43507c9405f97550ae4aaedb6e624a46a54064745f69201ffd",
+      "purpose": "",
+      "expectedReason": "CI",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "CI",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "provisioned-primary-run-not-first-green",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q03-primary-job-not-first-green",
+      "inputSHA256": "8a105ccba08d21e180ea78611b80521c313ebe2ccff103eeff8ef59f37fbc80e",
+      "purpose": "",
+      "expectedReason": "CI",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "CI",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "provisioned-primary-job-not-first-green",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q04-primary-job-name",
+      "inputSHA256": "f23672a90bfcbad0016d7da08ffd08622c0e4e271d23870ca86a424906d7a8be",
+      "purpose": "",
+      "expectedReason": "CI",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "CI",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "provisioned-primary-job-not-first-green",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q05-primary-ID-boolean",
+      "inputSHA256": "14deaf5a1cf6cbc2fc32f8a67182913a6f9bba114597d2037026bc9feb779143",
+      "purpose": "",
+      "expectedReason": "CI",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "CI",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "canonical-primary-CI-identifiers",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q06-epoch-below-zero",
+      "inputSHA256": "4ccdd64140478389964fc4265ad51cf8ad999868a4f3e9098ae887e9553ea43d",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q07-epoch-above-Go-JSON-bound",
+      "inputSHA256": "4682e2b0847354e96cf04c95d11ec12da73c7c28b7a6ce314d321e413f07fedf",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q08-epoch-bool",
+      "inputSHA256": "d7a6d94774741c2e99d5047b94e619da8b19ab234e877298f846d53958836e94",
+      "purpose": "M1 new valid envelope and explicitly already-bound payload digest",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-policy-schema",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q09-inverted-original-grant-interval",
+      "inputSHA256": "3f692f45270ec9baf5f9e7f96b034c9a878b8bbda57e6585147d5942f505cd54",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "original-grant-interval-order",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q10-grant-ACTIVE-not-from-payload",
+      "inputSHA256": "ae93bc841f537c1d9f429d0a24a749bb5bc063bf659d64fd7abe5ce2dbf552b2",
+      "purpose": "",
+      "expectedReason": "STATUS",
+      "expectedStage": "06_STATUS",
+      "observedLabel": "REFUSE",
+      "observedReason": "STATUS",
+      "observedStage": "06_STATUS",
+      "observedDetail": "current-independent-grant-registration",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "Q11-duplicate-public-DER",
+      "inputSHA256": "45f61d3e69b93aa7f0181b6a69f974246bfd09ddeb86c8f05bcbbc5116cebbe6",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "07_PROJECTION",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "07_PROJECTION",
+      "observedDetail": "ordered-distinct-legacy-members",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "O01-toolchain-before-status-time",
+      "inputSHA256": "f0e5d17e5c2d7f38a38568e665edb172d66925efe16d19d03c74b1bedef3c512",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_SOURCE",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_SOURCE",
+      "observedDetail": "independent-source-acquisition-facts",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "O02-key-interval-before-toolchain",
+      "inputSHA256": "bff6325200faf9507e2de4ba98f2254f57b22d585522a7096da8a82b29e4bc8b",
+      "purpose": "",
+      "expectedReason": "TIME",
+      "expectedStage": "04_KEY_INTERVAL",
+      "observedLabel": "REFUSE",
+      "observedReason": "TIME",
+      "observedStage": "04_KEY_INTERVAL",
+      "observedDetail": "registry-key-issue-and-current-interval",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "O03-payload-join-before-status",
+      "inputSHA256": "4729539f1a2ea4eab1246db840680975c9fa6ad01b4566c8125d960e48683800",
+      "purpose": "",
+      "expectedReason": "PROVENANCE",
+      "expectedStage": "05_PAYLOAD_JOINS",
+      "observedLabel": "REFUSE",
+      "observedReason": "PROVENANCE",
+      "observedStage": "05_PAYLOAD_JOINS",
+      "observedDetail": "payload-selector",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "O04-CI-before-floor",
+      "inputSHA256": "c4585ff13bb53051bedf31c5c9e845b9d6f32c72c669dcf6866accdd1de75f3c",
+      "purpose": "",
+      "expectedReason": "CI",
+      "expectedStage": "05_CI",
+      "observedLabel": "REFUSE",
+      "observedReason": "CI",
+      "observedStage": "05_CI",
+      "observedDetail": "every-required-step-success",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H01-registry-signed-current-without-independent-current",
+      "inputSHA256": "7f28a496fc757b18990be57774138b36971902bc2b34227555bb911b5d49138a",
+      "purpose": "",
+      "expectedReason": "STATUS",
+      "expectedStage": "02_SOURCES",
+      "observedLabel": "REFUSE",
+      "observedReason": "STATUS",
+      "observedStage": "02_SOURCES",
+      "observedDetail": "independent-lifecycle",
+      "passedStages": [
+        "01_ANCHOR"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H02-correct-signed-echo-without-H5",
+      "inputSHA256": "3dd44cdf85301bfd013997f62f48806ff5ab46594dd1cb20142123a23a7a04ce",
+      "purpose": "",
+      "expectedReason": "INSTALLATION",
+      "expectedStage": "02_SOURCES",
+      "observedLabel": "REFUSE",
+      "observedReason": "INSTALLATION",
+      "observedStage": "02_SOURCES",
+      "observedDetail": "independent-h5",
+      "passedStages": [
+        "01_ANCHOR"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H03-correct-echo-foreign-component",
+      "inputSHA256": "d173f7e84266762322dc57f9609fa73df63dfee7909c0baf19923fb6c5a37cac",
+      "purpose": "",
+      "expectedReason": "INSTALLATION",
+      "expectedStage": "05_RUNNING",
+      "observedLabel": "REFUSE",
+      "observedReason": "INSTALLATION",
+      "observedStage": "05_RUNNING",
+      "observedDetail": "actual-component-process-generation-root-UID",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H04-correct-echo-wrong-purpose",
+      "inputSHA256": "5771382063c852847b9bf42cffbf1d1fb6f65abcaad98d6396fc24e8b7d306aa",
+      "purpose": "",
+      "expectedReason": "INSTALLATION",
+      "expectedStage": "05_RUNNING",
+      "observedLabel": "REFUSE",
+      "observedReason": "INSTALLATION",
+      "observedStage": "05_RUNNING",
+      "observedDetail": "independent-H5-purpose-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H05-correct-echo-stale-H5",
+      "inputSHA256": "6d5d0f23ffff9c475ea228e1ccef6ef95c201ba223198d944e1448b9a17d94d6",
+      "purpose": "",
+      "expectedReason": "TIME",
+      "expectedStage": "06_TIME",
+      "observedLabel": "REFUSE",
+      "observedReason": "TIME",
+      "observedStage": "06_TIME",
+      "observedDetail": "independent-H5-freshness-not-echo",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H06-correct-echo-wrong-receipt",
+      "inputSHA256": "6418024ab4a2f1cb2038ec713776ccfbff11b831a74f1a3036241d1c95561e6b",
+      "purpose": "",
+      "expectedReason": "INSTALLATION",
+      "expectedStage": "05_RUNNING",
+      "observedLabel": "REFUSE",
+      "observedReason": "INSTALLATION",
+      "observedStage": "05_RUNNING",
+      "observedDetail": "independent-H5-receiptSHA256",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H07-registry-signs-wrong-echo",
+      "inputSHA256": "ad0c1813d95fcac643ec69340c5dd27dbaf4e0841ec5085906ee379dd73ead78",
+      "purpose": "",
+      "expectedReason": "REPLAY",
+      "expectedStage": "06_REPLAY",
+      "observedLabel": "REFUSE",
+      "observedReason": "REPLAY",
+      "observedStage": "06_REPLAY",
+      "observedDetail": "zero-weight-H5-echo-bound-through-client-request",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "H08-registry-cannot-choose-client-request",
+      "inputSHA256": "a0ce076b27d4a0063ce83b2ff8127d8120a76716237f7a07af4a96b74e2f791e",
+      "purpose": "",
+      "expectedReason": "REPLAY",
+      "expectedStage": "06_REPLAY",
+      "observedLabel": "REFUSE",
+      "observedReason": "REPLAY",
+      "observedStage": "06_REPLAY",
+      "observedDetail": "zero-weight-H5-echo-bound-through-client-request",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B01-missing-independent-capsule",
+      "inputSHA256": "a7a13c797310da88b725229c10af9f7015fb7cab89d45af45182fb4e24802a90",
+      "purpose": "",
+      "expectedReason": "ANCHOR",
+      "expectedStage": "01_ANCHOR",
+      "observedLabel": "REFUSE",
+      "observedReason": "ANCHOR",
+      "observedStage": "01_ANCHOR",
+      "observedDetail": "missing-bound-capsule",
+      "passedStages": [],
+      "expectedEarlierStages": [],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B02-protected-floor",
+      "inputSHA256": "9ddfd08a556c9a5e59e843faf04962a88fd7fb10d7801e045ba07012d37a351f",
+      "purpose": "",
+      "expectedReason": "VERSION",
+      "expectedStage": "06_VERSION",
+      "observedLabel": "REFUSE",
+      "observedReason": "VERSION",
+      "observedStage": "06_VERSION",
+      "observedDetail": "current-stable-record-and-protected-floor",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B03-final-readback",
+      "inputSHA256": "83f271827647c6988d1a55a0dabe779ffc1b3bc93ab6e84da44581f3121e7893",
+      "purpose": "",
+      "expectedReason": "READBACK",
+      "expectedStage": "06_READBACK",
+      "observedLabel": "REFUSE",
+      "observedReason": "READBACK",
+      "observedStage": "06_READBACK",
+      "observedDetail": "mandatory-exact-final-readback",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B04-response-replay-new-client-request",
+      "inputSHA256": "0a3c5f3cd9d04aa7bd6f7a4176838c19e732730122b0aeb1b9ef03e34bd63c63",
+      "purpose": "",
+      "expectedReason": "REPLAY",
+      "expectedStage": "06_REPLAY",
+      "observedLabel": "REFUSE",
+      "observedReason": "REPLAY",
+      "observedStage": "06_REPLAY",
+      "observedDetail": "zero-weight-H5-echo-bound-through-client-request",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B05-clock-interval",
+      "inputSHA256": "1d9fb3d1a8e33d3f94e7d54b2515720f6a2ea3b0938208aaa21d5f02cb068ffc",
+      "purpose": "",
+      "expectedReason": "TIME",
+      "expectedStage": "06_TIME",
+      "observedLabel": "REFUSE",
+      "observedReason": "TIME",
+      "observedStage": "06_TIME",
+      "observedDetail": "whole-clock-interval",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "B06-artifact-byte-mismatch",
+      "inputSHA256": "0f57e3bfb5b100a6efb54938433807e10a1b7edaf2d77307e408df55bd80156a",
+      "purpose": "",
+      "expectedReason": "ARTIFACT",
+      "expectedStage": "05_ARTIFACT",
+      "observedLabel": "REFUSE",
+      "observedReason": "ARTIFACT",
+      "observedStage": "05_ARTIFACT",
+      "observedDetail": "downloaded-archive-bytes-size-digest",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-envelope-selector-LF",
+      "inputSHA256": "016dfd6c015be9b1cbce0c3179fde385350372e70e7958091169e635bc8ad81f",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_ENVELOPE",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_ENVELOPE",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {},
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-envelope-hash-LF",
+      "inputSHA256": "60e9248e049e83d9584233a62b78f6cc27eb07cf2469a12085ed1074e4b63a3e",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_ENVELOPE",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_ENVELOPE",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {},
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-selector-LF",
+      "inputSHA256": "a305ae0ecec873ad93750b53a12ebe36a567acc98fcf7e25fb5e542ba4d6d25b",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-publicKey-LF",
+      "inputSHA256": "806bf4eb5cacdd39883edaa99743d87b8ae265f468558c067c05d9d8a5d16e3f",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-componentHex-LF",
+      "inputSHA256": "896fee1d59f60acf16a2bed3cb1bf69af6788eb4955b08af7227a0926460bd09",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-envelope-selector-CRLF",
+      "inputSHA256": "c6a99ab845d64b28f02bf7b35e7f6cb33c390a7d4324df89a837b4bfc19fd519",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_ENVELOPE",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_ENVELOPE",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {},
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-envelope-hash-CRLF",
+      "inputSHA256": "4154230250ff1336856bc1b81c31c6bd848942d80c7773f0a9c4e848e8538da5",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_ENVELOPE",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_ENVELOPE",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {},
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-selector-CRLF",
+      "inputSHA256": "67fd315fdc0b6b1b044216d2537f867b29f6302832dd3d6cbfbc8d7682556b98",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-publicKey-CRLF",
+      "inputSHA256": "4c90a2d3525f81082da8d83d1bf1ebdaf525b23a269406b78f0f6a1c2698e85b",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    },
+    {
+      "id": "L3-payload-componentHex-CRLF",
+      "inputSHA256": "745e42a4cca9b91b97bde4d36f792a158ff8efbe610c720268b623e066f28d47",
+      "purpose": "",
+      "expectedReason": "FORMAT",
+      "expectedStage": "03_PAYLOAD",
+      "observedLabel": "REFUSE",
+      "observedReason": "FORMAT",
+      "observedStage": "03_PAYLOAD",
+      "observedDetail": "closed-input-shape",
+      "passedStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "expectedEarlierStages": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE"
+      ],
+      "earlierStagesExactlyPass": true,
+      "preconditions": {
+        "newEnvelopeSchema": true,
+        "newFormat": true,
+        "alreadyBoundPayloadDigest": true,
+        "alreadyBoundSignatureTuple": true
+      },
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+    }
+  ],
+  "schemaChecks": [
+    {
+      "id": "S-envelope-selector-LF",
+      "accepted": false
+    },
+    {
+      "id": "S-envelope-hash-LF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-selector-LF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-publicKey-LF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-componentHex-LF",
+      "accepted": false
+    },
+    {
+      "id": "S-envelope-selector-CRLF",
+      "accepted": false
+    },
+    {
+      "id": "S-envelope-hash-CRLF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-selector-CRLF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-publicKey-CRLF",
+      "accepted": false
+    },
+    {
+      "id": "S-payload-componentHex-CRLF",
+      "accepted": false
+    }
+  ],
+  "sourceHashes": {
+    "candidate_model.py": "e816e1f53803904d717df1fe247d75198e8ee6c2f94cf531cba238b48d868d9e",
+    "schema_defs.py": "114000ff9ef276525ca303e91621fd5ef5efd8f30e59e39dd01d6000daeec6c4",
+    "fixture_data.py": "759d7185ed486198b53cd445c25ecc5d220ef795482332834943252dbedd0e8d",
+    "test_contract.py": "7afbfb851b7c75bd9dbfad15d9f810e899df96b5a9e29547c17e997718a0c4b9"
+  },
+  "originalOwnerEvidence": "100 rows/98 distinct unchanged in78468",
+  "originalReviewer": "38 immutable de4 rows copied, not rerun",
+  "actualProducer": null,
+  "actualCryptographicAuthentication": false,
+  "productionProjectionAlwaysRefuses": true,
+  "actualA01A40": "NOT_RUN",
+  "actualBindings": "NULL_HOLD"
+}

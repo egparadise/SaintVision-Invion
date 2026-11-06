@@ -1,0 +1,131 @@
+{
+  "classification": "REV2_CANDIDATE_EXECUTION_NOT_CRYPTO_OR_PRODUCER_AUTHENTICATION",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_d888d8ceb1e3",
+  "base": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "branch": "agent/codex/fleet5-k2-p02-registry-rev2-20261107",
+  "owner": "Codex",
+  "reviewer": "Actual narrow Claude delta through Root pending",
+  "promptContextVersion": "Root exact msg_d888d8ceb1e3; actual de4 review",
+  "skills": {
+    "agentDelivery": "1.1.0",
+    "coreReliability": "1.0.0",
+    "orca": "1.4.248"
+  },
+  "agentModel": "Codex; exact runtime model ID not exposed/not invented",
+  "ROOF": "No accepted rule/authority change; new candidate only",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+  "jsonschema": "4.26.0",
+  "newDependencies": false,
+  "commands": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        ".work/make_rev2_schema.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        ".work/build_rev2_tables.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev2-20261107-codex\\test_contract.py"
+      ],
+      "exit": 0,
+      "finalAttempt": 2
+    }
+  ],
+  "pins": [
+    {
+      "file": "candidate_model.py",
+      "bytes": 27151,
+      "SHA256": "e816e1f53803904d717df1fe247d75198e8ee6c2f94cf531cba238b48d868d9e"
+    },
+    {
+      "file": "schema_defs.py",
+      "bytes": 43738,
+      "SHA256": "114000ff9ef276525ca303e91621fd5ef5efd8f30e59e39dd01d6000daeec6c4"
+    },
+    {
+      "file": "fixture_data.py",
+      "bytes": 13279,
+      "SHA256": "759d7185ed486198b53cd445c25ecc5d220ef795482332834943252dbedd0e8d"
+    },
+    {
+      "file": "test_contract.py",
+      "bytes": 23251,
+      "SHA256": "dd57289abc281b4d634775cc2da6b461d9185fefce7fedc686d4ee962bb16cb3"
+    },
+    {
+      "file": "candidate-envelope.schema.json",
+      "bytes": 20526,
+      "SHA256": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c"
+    },
+    {
+      "file": "policy-payload.schema.json",
+      "bytes": 33135,
+      "SHA256": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1"
+    },
+    {
+      "file": "authority-scope.schema.json",
+      "bytes": 2791,
+      "SHA256": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21"
+    },
+    {
+      "file": "contract.md",
+      "bytes": 21341,
+      "SHA256": "19b5835ab728f1cce76cc01f7bf7c5cb85c486c945a8164321c3b925989e95a4"
+    },
+    {
+      "file": "payload-contract.json",
+      "bytes": 23427,
+      "SHA256": "43be3be542454bceceb1a46239fc8355fcf5b95e40bde5c5e62d99968f141702"
+    },
+    {
+      "file": "gate-order.json",
+      "bytes": 3299,
+      "SHA256": "0ca6d5ae572d9a00d470930194c2f92394b46e073c72df192705ac45a63bc403"
+    },
+    {
+      "file": "fact-origins.json",
+      "bytes": 16186,
+      "SHA256": "a76da21e499eb7f9a1f626840169201addede8e3dda948f36c58502a0080c9d2"
+    },
+    {
+      "file": "review-response.json",
+      "bytes": 1772,
+      "SHA256": "77a37dea20c08115cf48081dacc125d2b3c108b726fdced88d895b53d0766491"
+    },
+    {
+      "file": "test-results.json",
+      "bytes": 113637,
+      "SHA256": "7d4811da1e003968151503ec6974bfc6f70ef92101950a13b798dd55a1b44f0d"
+    }
+  ],
+  "executedRows": 97,
+  "distinctCompleteInputTuples": 97,
+  "controls": 4,
+  "refusals": 93,
+  "schemaChecks": 10,
+  "producerSHA256": null,
+  "actualBindings": "NULL_HOLD",
+  "actualA01A40": "NOT_RUN",
+  "actualCodeGrant": "NONE",
+  "ownExactDocs": "AUTHORIZED_PENDING_AFTER_IMMUTABLE_COMMIT",
+  "sourceFinal": "SAME_FUTURE_HEAD; actual API binding external, no self-referential CI ID invented",
+  "KST": "2026-11-07T02:03:48.639008+09:00"
+}

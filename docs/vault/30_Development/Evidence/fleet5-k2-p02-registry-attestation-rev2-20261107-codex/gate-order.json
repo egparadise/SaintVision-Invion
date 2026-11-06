@@ -1,0 +1,174 @@
+{
+  "classification": "SINGLE_NORMATIVE_ORDER_DERIVED_FROM_EXECUTED_MODEL",
+  "source": "candidate_model.py:STAGES",
+  "stages": [
+    {
+      "index": 1,
+      "stage": "01_ANCHOR",
+      "allowedPrivateReasons": [
+        "ANCHOR",
+        "OWNERSHIP"
+      ]
+    },
+    {
+      "index": 2,
+      "stage": "02_SOURCES",
+      "allowedPrivateReasons": [
+        "PROVENANCE",
+        "CI",
+        "STATUS",
+        "TIME",
+        "INSTALLATION",
+        "OWNERSHIP"
+      ]
+    },
+    {
+      "index": 3,
+      "stage": "03_ENVELOPE",
+      "allowedPrivateReasons": [
+        "FORMAT"
+      ]
+    },
+    {
+      "index": 4,
+      "stage": "03_PAYLOAD",
+      "allowedPrivateReasons": [
+        "FORMAT"
+      ]
+    },
+    {
+      "index": 5,
+      "stage": "03_C2",
+      "allowedPrivateReasons": [
+        "FORMAT"
+      ]
+    },
+    {
+      "index": 6,
+      "stage": "04_SIGNATURE",
+      "allowedPrivateReasons": [
+        "SCOPE",
+        "SIGNATURE"
+      ]
+    },
+    {
+      "index": 7,
+      "stage": "04_KEY_INTERVAL",
+      "allowedPrivateReasons": [
+        "TIME"
+      ]
+    },
+    {
+      "index": 8,
+      "stage": "05_PAYLOAD_JOINS",
+      "allowedPrivateReasons": [
+        "PROVENANCE"
+      ]
+    },
+    {
+      "index": 9,
+      "stage": "05_COMPONENTS",
+      "allowedPrivateReasons": [
+        "PROVENANCE"
+      ]
+    },
+    {
+      "index": 10,
+      "stage": "05_REVIEWS",
+      "allowedPrivateReasons": [
+        "PROVENANCE"
+      ]
+    },
+    {
+      "index": 11,
+      "stage": "05_SOURCE",
+      "allowedPrivateReasons": [
+        "PROVENANCE"
+      ]
+    },
+    {
+      "index": 12,
+      "stage": "05_CI",
+      "allowedPrivateReasons": [
+        "CI"
+      ]
+    },
+    {
+      "index": 13,
+      "stage": "05_ARTIFACT",
+      "allowedPrivateReasons": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "index": 14,
+      "stage": "05_RUNNING",
+      "allowedPrivateReasons": [
+        "INSTALLATION"
+      ]
+    },
+    {
+      "index": 15,
+      "stage": "06_STATUS",
+      "allowedPrivateReasons": [
+        "STATUS"
+      ]
+    },
+    {
+      "index": 16,
+      "stage": "06_VERSION",
+      "allowedPrivateReasons": [
+        "VERSION"
+      ]
+    },
+    {
+      "index": 17,
+      "stage": "06_REPLAY",
+      "allowedPrivateReasons": [
+        "REPLAY"
+      ]
+    },
+    {
+      "index": 18,
+      "stage": "06_TIME",
+      "allowedPrivateReasons": [
+        "TIME"
+      ]
+    },
+    {
+      "index": 19,
+      "stage": "06_READBACK",
+      "allowedPrivateReasons": [
+        "READBACK"
+      ]
+    },
+    {
+      "index": 20,
+      "stage": "07_PROJECTION",
+      "allowedPrivateReasons": [
+        "PROVENANCE",
+        "CI",
+        "INSTALLATION"
+      ]
+    }
+  ],
+  "reasons": [
+    "ANCHOR",
+    "ARTIFACT",
+    "CI",
+    "FORMAT",
+    "INSTALLATION",
+    "OWNERSHIP",
+    "PROVENANCE",
+    "READBACK",
+    "REPLAY",
+    "SCOPE",
+    "SIGNATURE",
+    "STATUS",
+    "TIME",
+    "VERSION"
+  ],
+  "publicRefusal": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+  "rule": "All earlier stages must PASS; first failure wins; no provider diagnostics escape",
+  "originalR35": "Original de4 output unchanged; issuedAt800 also violates keyNotBefore900 at step4. Rev2 O02 expects TIME there, while O01 isolates step6 stale status vs step5 toolchain and expects PROVENANCE."
+}

@@ -1,0 +1,60 @@
+{
+  "classification": "PUBLIC_BYTE_ORIGIN_INSPECTION_AND_CANDIDATE_RECIPE_NOT_AUTHENTICATION",
+  "sourceComponents": [
+    {
+      "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+      "path": "services/node-agent/migrationverify/resources/source-pins.json",
+      "bytes": 15150,
+      "SHA256": "6c02c2e51f373ee74c823204e046ddc5381d3e52923f4479ece8c2ed70d56b99",
+      "authority": "CODE_SOURCE_FACT_ONLY; installed authentication H3 NULL/HOLD"
+    },
+    {
+      "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+      "bytes": 19687,
+      "SHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+      "authority": "CODE_SOURCE_FACT_ONLY; installed authentication H3 NULL/HOLD"
+    },
+    {
+      "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+      "path": "services/node-agent/migrationverify/resources/derived-digest-contract.json",
+      "bytes": 531,
+      "SHA256": "707ada226f0fc6b62372ae176b94deb424adead002f462387f0a8bc8be95956b",
+      "authority": "CODE_SOURCE_FACT_ONLY; installed authentication H3 NULL/HOLD"
+    },
+    {
+      "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json",
+      "bytes": 138128,
+      "SHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+      "authority": "CODE_SOURCE_FACT_ONLY; installed authentication H3 NULL/HOLD"
+    },
+    {
+      "source": "8874b2dfe0dda9a019bd5f334636668290702e13",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-normative-contracts-20261105-v5/artifact-reference-graph.json",
+      "bytes": 1034425,
+      "SHA256": "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+      "authority": "REGISTERED_DESIGN_SOURCE_ONLY_NOT_INSTALLED_AUTHORITY"
+    }
+  ],
+  "registrationHistory": {
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/bootstrap-v5-design-contract-registration-root.json",
+    "rows": [
+      {
+        "source": "7ec1af26f56a8a0566c589720cd00f04b89e91a3",
+        "SHA256": "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3",
+        "bytes": 15503,
+        "CRLFVariantSHA256": "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562"
+      }
+    ],
+    "target": "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562"
+  },
+  "registrationByteOriginDecision": "CANDIDATE: exact Git LF blob at7ec1 plus explicit LF-to-CRLF serialization reproduces frozen a0 hash; not an original captured artifact or installed authorization; H3 must independently approve/authenticate this recipe or supply original exact bytes",
+  "rootChoicePending": "RD-P02-R2-REGISTRATION-BYTES",
+  "oldRegisteredRawPinUnchanged": true,
+  "actualSourceAcquirer": null,
+  "authoringFailuresPreserved": [
+    "Original source graph is not in78468 candidate ancestry; exact8874 public object was resolved through canonical Git, no stale vault export",
+    "First registration history command output session was not retained; bounded later source lookup captured in .work/registration-origins.json; no CI or model suite rerun"
+  ]
+}

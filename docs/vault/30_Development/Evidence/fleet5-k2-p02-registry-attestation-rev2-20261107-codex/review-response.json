@@ -1,0 +1,37 @@
+{
+  "classification": "OWNER_REV2_RESPONSE_ACTUAL_REVIEW_PENDING",
+  "actualReview": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+  "responses": [
+    {
+      "id": "P02-M1",
+      "change": "Strict exact payload codec/schema/C2, all payload-envelope joins, closed component derivations/origins, complete41-leaf projection",
+      "evidence": "payload-contract.json; candidate_model.py stages03/05/07; P/J/D/Q cases"
+    },
+    {
+      "id": "P02-L1",
+      "change": "Ordered raw reviews plus independent complete Root coverage/equivalence and missing H3-EA named HOLD",
+      "evidence": "reviews[] schema,05_REVIEWS,07_PROJECTION,R cases,C01"
+    },
+    {
+      "id": "P02-L2",
+      "change": "Single STAGES order drives evaluator/table/prefix tests; key interval4, joins5, status/replay/floor/time6, projection7",
+      "evidence": "gate-order.json; O01-O04"
+    },
+    {
+      "id": "P02-L3",
+      "change": "Explicit full-input negative-any-character lookahead, no dollar anchor; actual LF/CRLF schema and codec probes",
+      "evidence": "three new schemas; L3 and schema checks"
+    },
+    {
+      "id": "P02-L4",
+      "change": "Genuine fresh ticket/new validUntil/new H5 repeat; independent current missing separate from anchor missing; complete-input SHA accounting excludes IDs/expectations",
+      "evidence": "C02,H01,B01; test-results executed/distinct counts"
+    },
+    {
+      "id": "P02-L5",
+      "change": "Zero-authentication-weight echo bound through independently formed client request including exact H5 digest; private H5 only",
+      "evidence": "request_projection,05_RUNNING,06_REPLAY,06_TIME,H cases"
+    }
+  ],
+  "originalEvidence": "100rows/98distinct and original38review probes preserved without rerun; superseded counts never added"
+}

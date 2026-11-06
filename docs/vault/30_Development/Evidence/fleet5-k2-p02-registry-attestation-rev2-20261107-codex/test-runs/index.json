@@ -1,0 +1,24 @@
+{
+  "classification": "ONLY_FINAL_DISTINCT_CASES_COUNTED",
+  "earlierSmoke": "1 control, .work/rev2-control-smoke.json; not added to final count",
+  "attempts": [
+    {
+      "file": "attempt-01.json",
+      "rows": 92,
+      "final": false
+    },
+    {
+      "file": "attempt-02.json",
+      "rows": 97,
+      "final": true
+    }
+  ],
+  "finalExecutedRows": 97,
+  "finalDistinctInputs": 97,
+  "finalControls": 4,
+  "finalRefusals": 93,
+  "schemaChecks": 10,
+  "supersededRowsNotSummed": true,
+  "originalParentRows100Distinct98Preserved": true,
+  "reviewerOriginal38PreservedNotRerun": true
+}

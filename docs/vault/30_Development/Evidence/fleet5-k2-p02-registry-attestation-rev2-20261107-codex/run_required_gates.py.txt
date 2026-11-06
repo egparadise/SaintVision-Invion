@@ -1,0 +1,35 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess,sys
+root=Path.cwd()
+e=root/'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex'
+rawdir=root/'.work/p02-rev2-gate-raw'
+rawdir.mkdir(exist_ok=True)
+state=Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+commands=[['tools/check_docs.py'],['tools/check_ontology_generation.py'],['tools/check_ontology.py'],['tools/check_contract_bindings.py'],['tools/check_frontend_integrity.py'],['tools/check_doc_path_citations.py','--ratchet','--base-ref','78468d0aec295c712dd1ea33bea1401d1d4939a4'],['tools/check_doc_single_source.py','--ratchet'],['tools/test_sync.py'],['tools/build_docs.py'],['tools/sync_obsidian.py','--check','--state',str(state)]]
+report=dict(classification='REQUIRED_DOCS_GATES_REV2_CANDIDATE_ONLY',runs=[],allPassed=False,noApplyAdoptResolve=True)
+for index,args in enumerate(commands,1):
+ before=hashlib.sha256(state.read_bytes()).hexdigest() if args[0].endswith('sync_obsidian.py') else None
+ argv=[sys.executable,'-B',*args]
+ start=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+ print(json.dumps(dict(starting=argv,kst=start)),flush=True)
+ p=subprocess.run(argv,capture_output=True)
+ raw=p.stdout+p.stderr
+ text=raw.replace(b'\r\n',b'\n')
+ name=f'gate-{index:02d}-{Path(args[0]).stem}.log'
+ assert not (rawdir/name).exists(), 'Preserve prior gate attempt; no overwrite'
+ (rawdir/name).write_bytes(raw)
+ (e/name).write_bytes(text)
+ row=dict(argv=argv,exit=p.returncode,startedKST=start,endedKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(),log=name,rawLogSHA256=hashlib.sha256(raw).hexdigest(),publishedLF_LogSHA256=hashlib.sha256(text).hexdigest())
+ if before is not None:
+  after=hashlib.sha256(state.read_bytes()).hexdigest()
+  row.update(canonicalStatePath=str(state),canonicalStateSHA256Before=before,canonicalStateSHA256After=after,unchanged=before==after,authority='Root explicit canonical --check --state only; no apply/adopt/resolve')
+ report['runs'].append(row)
+ (e/'local-required-gates.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+ print(json.dumps(row),flush=True)
+ if p.returncode:
+  print(text.decode(errors='replace')[-5000:],flush=True)
+  raise SystemExit(p.returncode)
+ if before is not None and before!=after:
+  raise RuntimeError('Canonical state changed during check; preserve and ask Root scope')
+report['allPassed']=True
+(e/'local-required-gates.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())

@@ -1,0 +1,129 @@
+from pathlib import Path
+import hashlib,importlib.util,json,sys
+
+E=Path('docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex')
+for name,file in [('p02_rev2_schema','schema_defs.py'),('p02_rev2_model','candidate_model.py')]:
+    spec=importlib.util.spec_from_file_location(name,E/file);mod=importlib.util.module_from_spec(spec);sys.modules[name]=mod;spec.loader.exec_module(mod)
+m=sys.modules['p02_rev2_model'];sd=sys.modules['p02_rev2_schema']
+def write(name,value):(E/name).write_bytes((json.dumps(value,indent=2)+'\n').encode())
+def row(field,origin,conversion,gate='07_PROJECTION',hold='H3/H4/H5 as named; no real binding'):
+    return dict(field=field,independentOrigin=origin,conversionAndJoin=conversion,finalConsistencyGate=gate,actualState='NULL_HOLD',remainingAuthority=hold)
+projection=[
+ row('Selector','independently installed capsule.selector','Require payload.selector==body.selector==capsule.selector; project capsule selector'),
+ row('Version','sealed payload.version plus independent current record version','Exact canonical decimal string of body.recordVersion; project string unchanged'),
+ row('RegistrySHA256','exact owned canonical payload bytes after authentication','SHA256(raw payload bytes); no payload self-field allowed'),
+ row('Verifier.ID','fixed source schema','Exact saintvision-migrationverify-k1:1'),
+ row('Verifier.SourceSHA','private H3 authenticated source facts','Exact current selected source; payload verifier and effective coverage must join'),
+ row('Verifier.ArtifactSHA256','private H3 executable artifact identity','Executable SHA256, never archive digest; payload and independent H5 must join'),
+ row('Verifier.ReviewSHA','independently authenticated H3-EA effective approval publication','Project effective publication SHA40; preserve all raw original review SHAs separately; H3-EA UNREGISTERED and absent'),
+ row('Verifier.CIRunIDs','sealed payload integers joined to exact authenticated ordered CI records','Each integer -> canonical base10 ASCII str without sign/whitespace/leading zero; same order as ciRuns'),
+]
+for field,pfield in [('ContractSHA256','contractSHA256'),('SchemaSHA256','schemaSHA256'),('Codec','codec'),('RequiredVerifier','requiredVerifier')]:
+    projection.append(row('ContractPins[*].'+field,'sealed payload plus exact immutable28 source constants','Copy payload.'+pfield+' only after closed ID set/const equality; no repin'))
+for field,origin,conversion in [
+ ('Role','independently authorized sealed grant','Exact role string; role label alone creates no authorization'),
+ ('AuthorityScope','exact payload authorityScopeC2Hex','Decode lowercase hex; strict K1 C2 roundtrip; closed NODE/COHORT/COMPONENT scope; copy primitive AST'),
+ ('PublicKeyHex','independently provisioned grant/public identity','Exact32public Ed25519 bytes in lowercase64hex; not private key or DER SPKI hash'),
+ ('NotBefore','original signed grant epoch seconds','0..253402300799 integer, no bool; time.Unix(s,0).UTC(), whole seconds; no Now substitution'),
+ ('NotAfter','original signed grant epoch seconds','Same exact UTC conversion, NotBefore<NotAfter; preserve original expired intervals for history'),
+ ('Status','private independent lifecycle.grants[GrantRegistrationID]','ACTIVE only at real current observation; never copied from payload or registry signer; missing/revoked UNKNOWN refuses'),
+]:projection.append(row('Grants[*].'+field,origin,conversion))
+projection.append(row('CohortID','independently authorized sealed cohort','Copy payload.cohortId; exact derived ordered scope digest joins capsule'))
+for field,pfield,conversion in [('Slot','slot','Exact order PC2 then PC4, old logical two-node cohort'),('Scope','scope','Closed tenantId/nodeId/recoveryEpoch map; exact public identity/C2 bindings'),('CertificateDER','certificateDERHex','Strict hex -> exact original DER bytes; independent public bindings and unchanged K1 DER/SPKI/chain/URI/signature checks still mandatory'),('CARootDER','caRootDERHex','Strict hex -> exact original CA DER bytes; no system-root discovery')]:
+    projection.append(row('Members[*].'+field,'sealed payload plus independently provisioned public member bindings','payload.'+pfield+': '+conversion))
+projection.extend([
+ row('GraphBytes','exact registered graph raw bytes from H3 source acquisition','Decode graphHex without newline/JSON normalization; model DTO represents []byte as hex'),
+ row('GraphSHA256','GraphBytes','SHA256(exact decoded raw graph); must equal fact and independent source constant'),
+ row('NodeKinds','sealed map plus independent semantic source pin','Exact primitive map; SHA256(K1-C2(map)) must equal independent nodeKinds pin; no guessed kinds'),
+])
+for field,origin,conversion in [
+ ('ReviewTargetSHA','H3-EA independently authorized effective target','Current sourceSHA from coverage, NOT any raw original reviewer target; unchanged K1 equality to SourceSHA'),
+ ('ReviewScope','H3-EA independently authorized effective scope','Coverage.effective.scopeId; no record-selected aggregate authorization'),
+ ('ApprovedReviewScope','independently installed capsule.approvedReviewScope','Never copy facts.effectiveReviewScope here; require equality to separately projected ReviewScope'),
+ ('BinaryVCS','private H3 source/artifact acquisition','Exact VCS revision equals current source; modified=false required separately'),
+ ('RuntimeLockSHA256','private independent H5','Exact authenticated running lock identity, joined to approved source lock'),
+ ('CIHeadSHA','independent capsule.primaryCI.runId selects authenticated run','Exact run.headSHA, must equal current source'),
+ ('CIRef','same provisioned primary run','Exact authenticated ref'),
+ ('CIWorkflow','same provisioned primary run','Exact authenticated workflow path'),
+ ('CIRunID','capsule.primaryCI.runId, not first green item','Select exactly one run, canonical decimal string; member of Verifier.CIRunIDs'),
+ ('CIAttempt','authenticated selected run.attempt','Canonical decimal string of positive safe integer'),
+ ('CIJobID','capsule.primaryCI.jobId plus exact jobName','Select exactly one job inside selected run; canonical decimal string; no fallback'),
+ ('ArtifactDigest','private H3 original archive acquisition','Exactly artifactZipSHA256, distinct from executable Verifier.ArtifactSHA256'),
+ ('InstallationReceiptSHA256','private independent H5 plus approved receipt','Authenticated H5 receipt joined to source approval, never signed registry echo'),
+ ('RunningExecutableSHA256','private independent H5.executableSHA256','Actual measured integration executable, not recipe/facts/echo; exact approved executable join'),
+ ('LinkedClosureSHA256','private independent H5 linked closure','Actual authenticated running/link identity joined to approved source closure'),
+]:projection.append(row('Provenance.'+field,origin,conversion))
+assert len(projection)==41
+components=[
+ dict(fact='policyPayloadSHA256',bytes='EXACT canonical payload byte slice, no trailing LF',derivation='SHA256(raw)',origin='Authenticated registry publication plus strict decoding'),
+ dict(fact='graphSHA256',bytes='decodeHex(payload.graphHex), exact registered raw graph, not normalized JSON',derivation='SHA256(raw graph)',origin='H3 graph source; exact registered design8874 graph hash'),
+ dict(fact='contractSetSHA256',bytes='K1-C2(payload.contractPins) including exact28 ID/contract/schema/codec/verifier entries',derivation='SHA256(C2)',origin='Immutable28 source constants, sealed policy'),
+ dict(fact='semanticPinsSHA256',bytes='K1-C2(payload.semanticPins), closed6-field map',derivation='SHA256(C2)',origin='Each field must equal independent installed-source constant; no missing default'),
+ dict(fact='cohortScopeSHA256',bytes='K1-C2({class:COHORT,cohortId:payload.cohortId,members:[payload.members[0].scope,payload.members[1].scope]})',derivation='SHA256(C2)',origin='Exact ordered old two-member scopes, joins private capsule and body'),
+ dict(fact='keyGrantsSHA256',bytes='K1-C2(ordered grants with role, decoded authorityScope AST, publicKeyHex, original notBefore/notAfter integers; EXCLUDES current status)',derivation='SHA256(C2)',origin='Sealed original grant facts; current ACTIVE is separate H4'),
+ dict(fact='registryProofSlotsSHA256',bytes='decodeHex(payload.proofSlotRegistryHex), exact original raw bytes',derivation='SHA256(raw)',origin='H3 immutable proof-slot registry source, no reserialization'),
+ dict(fact='designRegistrationSHA256',bytes='decodeHex(payload.designRegistrationHex), exact externally registered original bytes',derivation='SHA256(raw)',origin='H3 authenticated original a0 bytes or independently authorized explicit byte recipe; RD-P02-R2-REGISTRATION-BYTES still pending'),
+]
+payload_fields=[]
+for name,definition in sd.schema('payload')['properties'].items():
+    payload_fields.append(dict(field=name,required=True,closedSchema='policy-payload.schema.json#/properties/'+name,
+        parsing='Canonical printable-ASCII payload JSON; bounded hex components decoded separately',
+        actualOrigin='Sealed registered policy publication under independent capsule; actual NULL/HOLD'))
+write('payload-contract.json',dict(classification='NORMATIVE_REV2_CANDIDATE_PAYLOAD_TABLE_NOT_ACCEPTED',
+    onePayloadTable=True,format=m.FORMAT,payloadFields=payload_fields,derivedFacts=components,
+    semanticPinFields=dict(k1SourcePinSetSHA256='SHA256 exact immutable resources/source-pins.json',recipeDefinitionsSHA256='SHA256 exact immutable resources/recipe-definitions.json',derivedDigestContractSHA256='SHA256 exact immutable resources/derived-digest-contract.json',proofSlotRegistrySHA256='SHA256 exact payload proofSlotRegistry bytes AND independent source pin',graphSHA256='SHA256 exact graph bytes AND independent registered graph pin',nodeKindsSHA256='SHA256 K1-C2(payload.nodeKinds) AND independent source pin'),
+    grantRegistrationID='SHA256(K1-C2({role,authorityScope:DecodeC2(authorityScopeC2Hex),publicKeyHex,notBefore,notAfter})); status from independent H4 map at that ID',
+    policyProjection=projection,projectionLeafFields=41,encoding='Model DTO uses lowercase hex for Go []byte and UTC Z strings for Go time.Time; no opaque Go constructor',
+    primaryTuple='Independent capsule.primaryCI {runId,jobId,jobName}; exact lookup, no first/last green fallback',
+    noSafetyFactDeleted=True))
+write('gate-order.json',dict(classification='SINGLE_NORMATIVE_ORDER_DERIVED_FROM_EXECUTED_MODEL',
+    source='candidate_model.py:STAGES',stages=[dict(index=i,stage=s,allowedPrivateReasons=list(r)) for i,(s,r) in enumerate(m.STAGES,1)],
+    reasons=sorted(m.REASONS),publicRefusal=m.PUBLIC_REFUSAL,rule='All earlier stages must PASS; first failure wins; no provider diagnostics escape',
+    originalR35='Original de4 output unchanged; issuedAt800 also violates keyNotBefore900 at step4. Rev2 O02 expects TIME there, while O01 isolates step6 stale status vs step5 toolchain and expects PROVENANCE.'))
+old_to_new=[]
+for old,new in [('reviewSHA','effectiveReviewSHA'),('reviewTargetSHA','effectiveReviewTargetSHA'),('reviewScope','effectiveReviewScope'),('reviewVerdict','effectiveReviewVerdict')]:
+    old_to_new.append(dict(oldFact=old,newFact=new,obligation='Original per-review facts remain verbatim in ordered reviews[]; effective fact requires separate independently authenticated H3-EA approval. Never relabel original target/scope/verdict.'))
+write('obligation-map.json',dict(classification='NO_K1_CONSISTENCY_REQUIREMENT_REMOVED',renamedReviewFacts=old_to_new,
+    retainedDerivedFacts=[x['fact'] for x in components],addedExplicitPayloadComponents=['semanticPins','proofSlotRegistryHex','designRegistrationHex'],
+    existingK1StillMandatory=['unchanged28 contract pins and registry/schema graph semantics','exact original role/scope/key intervals and current status','DER/CA/SPKI/URI/key-use/member uniqueness and grant bindings','all original K1 signature/history/consuming-time/current-status checks'],
+    newEffectiveApproval='H3-EA UNREGISTERED/missing; real positive projection remains HOLD until separately authenticated purpose/issuer/format/verifier and Root mapping decision',
+    echo=dict(field=m.ECHO,authenticationWeight=0,authority='Only private independently authenticated H5; signer only echoes client request digest'),
+    allExistingSourceFilesUnchanged=True))
+write('real-bindings-HOLD.json',dict(classification='ACTUAL_REAL_BINDINGS_NOT_SYNTHETIC_MODEL',
+    H1=None,H2=None,H3=None,H3EffectiveApprovalProducer=None,H3RegistrationByteOriginAuthority=None,
+    H4=None,H5=None,H6=None,H7=None,registeredRev2Format=False,registeredRaw7=False,
+    actualCryptoOrRuntimeProof=False,actualA01A40='NOT_RUN',wholeK2OrFleet='INCOMPLETE',
+    smallestSeam='After actual narrow delta review and explicit Root grant only: bounded pure internal codec/projection/strict-signature verification on private already-authenticated types, default-refusal composition; no factory/provider/install/current/effect'))
+write('review-response.json',dict(classification='OWNER_REV2_RESPONSE_ACTUAL_REVIEW_PENDING',
+    actualReview='de4ef629220c626394a198f19aedf9aa7d2ac080',responses=[
+      dict(id='P02-M1',change='Strict exact payload codec/schema/C2, all payload-envelope joins, closed component derivations/origins, complete41-leaf projection',evidence='payload-contract.json; candidate_model.py stages03/05/07; P/J/D/Q cases'),
+      dict(id='P02-L1',change='Ordered raw reviews plus independent complete Root coverage/equivalence and missing H3-EA named HOLD',evidence='reviews[] schema,05_REVIEWS,07_PROJECTION,R cases,C01'),
+      dict(id='P02-L2',change='Single STAGES order drives evaluator/table/prefix tests; key interval4, joins5, status/replay/floor/time6, projection7',evidence='gate-order.json; O01-O04'),
+      dict(id='P02-L3',change='Explicit full-input negative-any-character lookahead, no dollar anchor; actual LF/CRLF schema and codec probes',evidence='three new schemas; L3 and schema checks'),
+      dict(id='P02-L4',change='Genuine fresh ticket/new validUntil/new H5 repeat; independent current missing separate from anchor missing; complete-input SHA accounting excludes IDs/expectations',evidence='C02,H01,B01; test-results executed/distinct counts'),
+      dict(id='P02-L5',change='Zero-authentication-weight echo bound through independently formed client request including exact H5 digest; private H5 only',evidence='request_projection,05_RUNNING,06_REPLAY,06_TIME,H cases')],
+    originalEvidence='100rows/98distinct and original38review probes preserved without rerun; superseded counts never added'))
+derived={x['fact']:x for x in components}
+effective={'effectiveReviewSHA','effectiveReviewTargetSHA','effectiveReviewScope','effectiveReviewVerdict','reviewCoverageSHA256','rootChoiceSHA256','sourceEquivalenceSHA256'}
+targets={'installationReceiptSHA256','installationSourceSHA','installationBinarySHA256','runningBinarySHA256','runningReceiptSHA256','runningRuntimeLockSHA256','runningLinkedClosureSHA256','runningSourceSHA'}
+origins=[]
+for field in sorted(sd.FACT_KEYS):
+    if field in derived:
+        origin=derived[field]['origin'];rule=derived[field]['bytes'];stage='05_COMPONENTS'
+    elif field in effective:
+        origin='Separate private independently authenticated H3-EA coverage and original review sources, actual absent'
+        rule='Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval';stage='05_REVIEWS'
+    elif field==m.ECHO:
+        origin='Client request formed from exact private independently authenticated H5 bytes'
+        rule='ZERO authentication weight; echo SHA256(H5 raw bytes), protected through requestBindingSHA256; only H5 authenticates running code';stage='06_REPLAY'
+    elif field in targets:
+        origin='H3 independently approved EXPECTED installation/executable target, not an actual running observation'
+        rule='Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5';stage='05_SOURCE/05_RUNNING'
+    else:
+        origin='Private independently authenticated H3 source/build/CI/artifact/publication acquisition'
+        rule='Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict';stage='05_SOURCE'
+    origins.append(dict(field=field,independentOrigin=origin,rule=rule,gate=stage,actualProducer=None,actualState='NULL_HOLD'))
+assert len(origins)==39
+write('fact-origins.json',dict(classification='ALL39FACT_ORIGINS_EXPLICIT_NOT_AUTHENTICATION',rows=origins,
+    unchangedAuthorities='All H1-H7 private sources must actually authenticate before a real composition can issue anything; model sources are only synthetic already-bound hypotheses'))
+print(json.dumps(dict(projectionLeafFields=41,derivedFactComponents=len(components),payloadFields=len(payload_fields),stages=len(m.STAGES))))

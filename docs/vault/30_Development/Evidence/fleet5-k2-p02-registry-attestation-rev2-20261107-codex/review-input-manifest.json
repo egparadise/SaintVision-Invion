@@ -1,0 +1,112 @@
+{
+  "classification": "ACTUAL_IMMUTABLE_REVIEW_ORIGINAL_BYTES_NOT_RERUN",
+  "review": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+  "reviewVerdict": "REVISION_REQUIRED",
+  "findings": [
+    "P02-M1",
+    "P02-L1",
+    "P02-L2",
+    "P02-L3",
+    "P02-L4",
+    "P02-L5"
+  ],
+  "files": [
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/.gitattributes",
+      "copiedAs": "review-originals/00-.gitattributes.raw",
+      "bytes": 21,
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/canonical-sync-check-before.txt",
+      "copiedAs": "review-originals/01-canonical-sync-check-before.txt.raw",
+      "bytes": 880,
+      "SHA256": "112fd97f5803306ec5e4c8bf3973bcd4630d7cabb8c63faf994de62ba19b803b",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/commands.json",
+      "copiedAs": "review-originals/02-commands.json.raw",
+      "bytes": 3705,
+      "SHA256": "4fe1bf9ee5ab2377d3c0c8a77b7524e87863a5ea7e12c47e1f41090e0569f9f2",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/local-doc-gates.txt",
+      "copiedAs": "review-originals/03-local-doc-gates.txt.raw",
+      "bytes": 3496,
+      "SHA256": "84b56e793de6f6f45ead797914c653f3711b596fb250a307e2c4886aed848e22",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/review.json",
+      "copiedAs": "review-originals/04-review.json.raw",
+      "bytes": 15594,
+      "SHA256": "e02f35582a4570ff3f592387b39b9a456054d07672936213a6c9c971248d7331",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/reviewer-p02-probes-result.json",
+      "copiedAs": "review-originals/05-reviewer-p02-probes-result.json.raw",
+      "bytes": 11217,
+      "SHA256": "432e4dabd89b15982f3e30c6be4e318abd120040986d478ab45974f27d3e719a",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/reviewer-p02-probes.log.txt",
+      "copiedAs": "review-originals/06-reviewer-p02-probes.log.txt.raw",
+      "bytes": 1292,
+      "SHA256": "fbf390580502cfdcc49a8fdc3495fdf8012f5f03e6debbde49ca5d300bd400fb",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/reviewer_gate_driver.py.txt",
+      "copiedAs": "review-originals/07-reviewer_gate_driver.py.txt.raw",
+      "bytes": 2355,
+      "SHA256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-784-review-20261106-claude/reviewer_p02_probes.py.txt",
+      "copiedAs": "review-originals/08-reviewer_p02_probes.py.txt.raw",
+      "bytes": 18136,
+      "SHA256": "c5ee0f4c16830496392345dcb213bfc744d1e291e92efd391996ef49dd653b5a",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+      "path": "docs/vault/30_Development/History/2026-11-07_00-40-00_KST_FLEET5_K2_P02_784_registry_\uacc4\uc57d\ud6c4\ubcf4_\ub3c5\ub9bd\uac80\ud1a0_Claude.md",
+      "copiedAs": "review-originals/09-2026-11-07_00-40-00_KST_FLEET5_K2_P02_784_registry_\uacc4\uc57d\ud6c4\ubcf4_\ub3c5\ub9bd\uac80\ud1a0_Claude.md.raw",
+      "bytes": 5931,
+      "SHA256": "0463149d72e116bd4ec42d5733b3cd65b9e769f2a091d9937e547b7f56fad9d0",
+      "copyByteExact": true,
+      "executed": false
+    }
+  ],
+  "originalReviewerProbeRows": 38,
+  "ownerOriginalRows": 100,
+  "ownerOriginalDistinctCompleteInputs": 98,
+  "oldEvidenceUnmodified": true,
+  "sourceFetch": "Exact public Git object fetched with --no-write-fetch-head --no-tags after object initially absent; no source ref advanced",
+  "readBeforeDesign": true,
+  "preservedKST": "2026-11-07T01:01:11.141735+09:00"
+}

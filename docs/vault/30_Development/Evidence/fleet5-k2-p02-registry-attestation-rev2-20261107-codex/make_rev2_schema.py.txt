@@ -1,0 +1,69 @@
+"""Build only new candidate schema definitions from immutable parent documents."""
+from pathlib import Path
+import copy, json, subprocess
+
+ROOT=Path.cwd()
+E=ROOT/'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex'
+OLD='docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-design-20261106-codex/'
+BASE='78468d0aec295c712dd1ea33bea1401d1d4939a4'
+def get(name): return json.loads(subprocess.check_output(['git','show',BASE+':'+OLD+name]))
+def obj(props): return dict(type='object',additionalProperties=False,properties=props,required=list(props))
+def txt(n=256): return dict(type='string',minLength=1,maxLength=n,pattern=r'^[ -~]+(?![\s\S])')
+def hx(n): return dict(type='string',minLength=n,maxLength=n,pattern='^[0-9a-f]{'+str(n)+r'}(?![\s\S])',**{'not':{'const':'0'*n}})
+def blob(n): return dict(type='string',minLength=2,maxLength=n,pattern=r'^(?:[0-9a-f]{2})+(?![\s\S])')
+def pos(): return dict(type='integer',minimum=1,maximum=9007199254740991)
+def fix_patterns(v):
+    if isinstance(v,dict):
+        for k,x in list(v.items()):
+            if k=='pattern' and isinstance(x,str) and x.endswith('$'):
+                v[k]=x[:-1]+r'(?![\s\S])'
+            else: fix_patterns(x)
+    elif isinstance(v,list):
+        for x in v: fix_patterns(x)
+env=get('candidate-envelope.schema.json');payload=get('policy-payload.schema.json')
+fix_patterns(env);fix_patterns(payload)
+env['$id']='https://fleet5-candidate.invalid/p02/registry-envelope-candidate-2'
+env['title']='UNREGISTERED P02 Rev2 candidate; schemas are not authentication or the canonical codec'
+b=env['properties']['body']['properties']
+b['format']={'const':'fleet5-p02-registry-candidate:2'}
+f=b['facts']['properties']
+for old,new in [('reviewSHA','effectiveReviewSHA'),('reviewTargetSHA','effectiveReviewTargetSHA'),('reviewScope','effectiveReviewScope'),('reviewVerdict','effectiveReviewVerdict')]:
+    f[new]=f.pop(old)
+b['facts']['required']=list(f)
+review=obj(dict(ordinal=pos(),reviewSHA=hx(40),targetSHA=hx(40),verdict=txt(),scopeId=txt(),scopeUTF8Hex=blob(32768),scopeSHA256=hx(64),reviewerId=txt(),reviewerSPKISHA256=hx(64),rawReviewSHA256=hx(64)))
+b['reviews']=dict(type='array',minItems=1,maxItems=16,items=review)
+env['properties']['body']['required']=list(b)
+payload['$id']='https://fleet5-candidate.invalid/p02/policy-payload-candidate-2'
+payload['title']='UNREGISTERED Rev2 closed payload with explicit semantic/source components'
+p=payload['properties']
+p['version']=dict(type='string',minLength=1,maxLength=16,pattern=r'^[1-9][0-9]{0,15}(?![\s\S])')
+p['proofSlotRegistryHex']=blob(4<<20)
+p['designRegistrationHex']=blob(2<<20)
+p['semanticPins']=obj({name:hx(64) for name in ['k1SourcePinSetSHA256','recipeDefinitionsSHA256','derivedDigestContractSHA256','proofSlotRegistrySHA256','graphSHA256','nodeKindsSHA256']})
+for field in ('notBefore','notAfter'):
+    p['grants']['items']['properties'][field]=dict(type='integer',minimum=0,maximum=253402300799)
+payload['required']=list(p)
+pins={cid:{k:v['const'] for k,v in definition['properties'].items()} for cid,definition in p['contractPins']['properties'].items()}
+node_scope=obj(dict(tenantId=txt(128),nodeId=txt(128),recoveryEpoch=txt(128)))
+scope=dict(oneOf=[obj(dict(**{'class':{'const':'NODE'}},scope=node_scope)),
+    obj(dict(**{'class':{'const':'COHORT'}},cohortId=txt(128),members=dict(type='array',minItems=2,maxItems=2,items=node_scope))),
+    obj(dict(**{'class':{'const':'COMPONENT'}},component=txt(256)))])
+defs={'envelope':env,'payload':payload,'authorityScope':scope}
+code='''"""Fixed unregistered Rev2 schema definitions; no I/O or authority installation."""
+import json
+'''
+code+='PIN_MAP = '+repr(pins)+'\n'
+code+='FACT_KEYS = frozenset('+repr(tuple(f))+')\n'
+code+='_SCHEMAS = '+repr(defs)+'\n'
+code+='''
+def schema_bytes(kind):
+    return json.dumps(_SCHEMAS[kind],sort_keys=True,separators=(',',':'),ensure_ascii=False).encode('utf-8')
+
+def schema(kind):
+    # A fresh primitive tree, never an alias that callers can mutate in place.
+    return json.loads(schema_bytes(kind))
+'''
+(E/'schema_defs.py').write_bytes(code.encode())
+for name,kind in [('candidate-envelope.schema.json','envelope'),('policy-payload.schema.json','payload'),('authority-scope.schema.json','authorityScope')]:
+    (E/name).write_bytes((json.dumps(defs[kind],indent=2)+'\n').encode())
+print(json.dumps(dict(newSchemas=3,facts=len(f),contracts=len(pins),format=b['format']['const'],source=BASE)))

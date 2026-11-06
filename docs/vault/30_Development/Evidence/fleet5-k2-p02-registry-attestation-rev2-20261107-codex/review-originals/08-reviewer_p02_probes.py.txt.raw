@@ -1,0 +1,191 @@
+"""Reviewer (Claude) independent probes of the P02 candidate 78468d0a. Symbolic only.
+
+Imports a byte-verified scratch COPY of candidate_model.py (owner test_candidate.py is NOT
+executed: it rewrites owner Evidence). Reconstructs the owner control fixture and asserts it equals
+the committed synthetic-control.json envelope. No crypto, provider, clock, OS or network action.
+Usage: python -I -B reviewer_p02_probes.py <worktree> <scratch-model-dir> <out.json>
+A row whose `observed` differs from `contractExpects` is a FINDING, not a harness failure.
+"""
+import copy, datetime, hashlib, importlib.util, json, subprocess, sys
+from dataclasses import replace
+from pathlib import Path
+
+WT = Path(sys.argv[1]); SCR = Path(sys.argv[2]); OUT = Path(sys.argv[3])
+TARGET = '78468d0aec295c712dd1ea33bea1401d1d4939a4'
+EV = 'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-design-20261106-codex'
+def blob(path): return subprocess.run(['git', '-C', str(WT), 'show', TARGET + ':' + path], capture_output=True, check=True).stdout
+def sha(b): return hashlib.sha256(b).hexdigest()
+
+model_src = blob(EV + '/candidate_model.py')
+assert sha(model_src) == '533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67'
+(SCR / 'candidate_model.py').write_bytes(model_src)
+spec = importlib.util.spec_from_file_location('p02_model_reviewer_copy', SCR / 'candidate_model.py')
+m = importlib.util.module_from_spec(spec); sys.modules[spec.name] = m; spec.loader.exec_module(m)
+import jsonschema
+env_schema = json.loads(blob(EV + '/candidate-envelope.schema.json'))
+pay_schema = json.loads(blob(EV + '/policy-payload.schema.json'))
+EV_V = jsonschema.Draft202012Validator(env_schema); PAY_V = jsonschema.Draft202012Validator(pay_schema)
+
+# ---- owner control fixture, reconstructed verbatim from test_candidate.py lines 16-53 ----
+POLICY = b'SYNTHETIC_ALREADY_BOUND_POLICY_BYTES_NOT_A_CERTIFICATE_OR_RUNTIME_PROOF'
+ARTIFACT = b'SYNTHETIC_ALREADY_BOUND_ARTIFACT_BYTES_NOT_A_BINARY'
+facts = {k: 'a1' * (20 if k in m.HASH40 else 32) for k in m.HASH40 | m.HASH64}
+facts.update(reviewScope='synthetic-exact-scope', reviewVerdict='SYNTHETIC_SCOPED_ACCEPT', toolchain='synthetic-toolchain',
+             artifactId=303, artifactZipBytes=len(ARTIFACT), binaryVCSModified=False)
+facts['policyPayloadSHA256'] = m.sha(POLICY); facts['artifactZipSHA256'] = m.sha(ARTIFACT); facts['cohortScopeSHA256'] = '91' * 32
+for k in ('binarySHA256', 'installationBinarySHA256', 'runningBinarySHA256'): facts[k] = 'b2' * 32
+facts['installationReceiptSHA256'] = facts['runningReceiptSHA256'] = 'c3' * 32
+facts['runtimeLockSHA256'] = facts['runningRuntimeLockSHA256'] = 'd4' * 32
+facts['linkedClosureSHA256'] = facts['runningLinkedClosureSHA256'] = 'e5' * 32
+ci = [dict(runId=101, repository='synthetic/repo', headSHA=facts['sourceSHA'], ref='synthetic/ref', event='workflow_dispatch',
+           workflow='.github/workflows/core.yml', correlation='synthetic-one', attempt=1, conclusion='success',
+           jobs=[dict(id=201, name='core', conclusion='success', steps=[dict(number=1, name='actual-required-build', conclusion='success'),
+                 dict(number=2, name='actual-required-test', conclusion='success'), dict(number=3, name='explicit-optional-proof', conclusion='skipped')])]),
+      dict(runId=102, repository='synthetic/repo', headSHA=facts['sourceSHA'], ref='synthetic/ref', event='workflow_dispatch',
+           workflow='.github/workflows/docs.yml', correlation='synthetic-two', attempt=1, conclusion='success',
+           jobs=[dict(id=202, name='docs', conclusion='success', steps=[dict(number=1, name='actual-required-docs', conclusion='success')])])]
+control = dict(body=dict(format=m.FORMAT, purpose=m.PURPOSE, selector='synthetic_legacy_two', scopeSHA256='91' * 32, capsuleSHA256='95' * 32,
+               provisioningGeneration='synthetic-install-1', anchorVersion=1, recordVersion=7, requestBindingSHA256='92' * 32,
+               issuedAt=990, validUntil=1100, facts=facts, ciRuns=ci), signer=dict(keySPKISHA256='93' * 32), signatureHex='94' * 64)
+required = ((101, 'core', 1, 'actual-required-build'), (101, 'core', 2, 'actual-required-test'), (102, 'docs', 1, 'actual-required-docs'))
+optional = ((101, 'core', 3, 'explicit-optional-proof'),)
+committed = json.loads(blob(EV + '/synthetic-control.json'))
+assert committed['envelope'] == control and bytes.fromhex(committed['policyBytesHex']) == POLICY, 'fixture reconstruction drift'
+
+def bound(envelope=control, **ch):
+    d = dict(key_spki='93' * 32, selector='synthetic_legacy_two', scope='91' * 32, anchor_version=1, capsule_sha='95' * 32,
+             generation='synthetic-install-1', purpose=m.PURPOSE, facts=m.canonical(envelope['body']['facts']) if ch.pop('rebind_facts', False) else m.canonical(facts),
+             ci=m.canonical(envelope['body']['ciRuns']) if ch.pop('rebind_ci', False) else m.canonical(ci), required_steps=required, allowed_skips=optional,
+             signatures=frozenset(((m.sha(m.projection(envelope)), envelope['signatureHex'], '93' * 32),)), minimum_version=7, current_version=7,
+             current_digest=m.record_identity(envelope), request_binding='92' * 32, lower=1000, upper=1001, checked=995, status_expires=1100,
+             ticket_issued=985, ticket_expires=1100, key_before=900, key_after=1200, status='ACTIVE', v0=b'synthetic-V0', v1=b'synthetic-V0')
+    d.update(ch); return m.SyntheticBoundInputs(**d)
+def ch(path, value, base=control):
+    e = copy.deepcopy(base); t = e
+    for k in path[:-1]: t = t[k]
+    t[path[-1]] = value; return e
+
+rows = []
+def probe(pid, area, expects, observed, note):
+    rows.append(dict(id=pid, area=area, contractExpects=expects, observed=observed, finding=(expects != observed), note=note))
+def ev(raw, a, policy=POLICY, artifact=ARTIFACT):
+    r = m.evaluate(raw, policy, artifact, a)
+    assert m.production_projection(r) == m.PUBLIC_REFUSAL
+    return r.internal_reason or r.label
+
+# ---- R01-R03 benign controls (independent re-derivation) ----
+probe('R01', 'control', 'SYNTHETIC_ALREADY_BOUND', ev(m.canonical(control), bound()), 'owner control re-evaluated on reviewer copy')
+e = ch(['body', 'requestBindingSHA256'], 'b7' * 32); e['body']['issuedAt'] = 999; e['body']['validUntil'] = 1050
+probe('R02', 'fresh-same-record', 'SYNTHETIC_ALREADY_BOUND', ev(m.canonical(e), bound(e, request_binding='b7' * 32, current_digest=m.record_identity(control))),
+      'new ticket, new issuedAt AND new validUntil (owner C04 kept validUntil): same stable identity legal repeat')
+e2 = ch(['body', 'facts', 'runningMeasurementSHA256'], 'f6' * 32, e)
+probe('R03', 'fresh-same-record', 'SYNTHETIC_ALREADY_BOUND', ev(m.canonical(e2), bound(e2, request_binding='b7' * 32, rebind_facts=True, current_digest=m.record_identity(control))),
+      'fresh running proof digest changes; stable identity unchanged; independent running snapshot rebound')
+assert m.record_identity(e2) == m.record_identity(control)
+
+# ---- R04-R08 stable identity / equivocation / substitution ----
+stable_excl = []
+for k in sorted(m.BODY_KEYS - {'facts', 'ciRuns'}):
+    v = control['body'][k]; nv = (v + 1) if type(v) is int else ('b8' * 32 if len(v) == 64 else v + 'x')
+    if m.record_identity(ch(['body', k], nv)) == m.record_identity(control): stable_excl.append('body.' + k)
+for k in sorted(m.FACT_KEYS):
+    v = facts[k]; nv = (not v) if type(v) is bool else ((v + 1) if type(v) is int else ('b8' * (len(v) // 2) if all(c in '0123456789abcdef' for c in v) else v + 'x'))
+    if m.record_identity(ch(['body', 'facts', k], nv)) == m.record_identity(control): stable_excl.append('facts.' + k)
+if m.record_identity(ch(['body', 'ciRuns', 0, 'correlation'], 'x')) == m.record_identity(control): stable_excl.append('ciRuns')
+probe('R04', 'stable-identity', ['body.issuedAt', 'body.requestBindingSHA256', 'body.validUntil', 'facts.runningMeasurementSHA256'], stable_excl,
+      'exhaustive single-field mutation: only the four contract-named fresh fields leave RegistryRecordIdentity unchanged; signer/signature outside body by definition')
+fork = ch(['body', 'facts', 'toolchain'], 'forked-toolchain')
+probe('R05', 'version-equivocation', 'VERSION', ev(m.canonical(fork), bound(fork, rebind_facts=True, current_digest=m.record_identity(control))),
+      'signed fork with same recordVersion=7 and even matching independent facts; independent current stable digest pins the approved record')
+probe('R06', 'generation-substitution', 'SCOPE', ev(m.canonical(control), bound(generation='synthetic-install-2')), 'capsule says new generation, registry replays old generation record')
+probe('R07', 'capsule-substitution', 'SCOPE', ev(m.canonical(control), bound(capsule_sha='96' * 32)), 'reused key/selector under a different capsule')
+probe('R08', 'floor', 'VERSION', ev(m.canonical(control), bound(current_version=7, minimum_version=9)), 'lifecycle current lags independent floor')
+
+# ---- R09-R13 CI policy logic actually exercised (owner N42-N47 stop at a.ci byte equality) ----
+e = ch(['body', 'ciRuns', 0, 'headSHA'], 'b9' * 20)
+probe('R09', 'ci', 'CI', ev(m.canonical(e), bound(e, rebind_ci=True)), 'authenticated CI run for another head (line 237 path)')
+e = ch(['body', 'ciRuns', 1, 'conclusion'], 'failure')
+probe('R10', 'ci', 'CI', ev(m.canonical(e), bound(e, rebind_ci=True)), 'run conclusion failure although all steps success')
+e = ch(['body', 'ciRuns', 0, 'jobs', 0, 'steps', 1, 'conclusion'], 'neutral')
+probe('R11', 'ci', 'CI', ev(m.canonical(e), bound(e, rebind_ci=True)), 'required step neutral is not success')
+probe('R12', 'ci', 'CI', ev(m.canonical(control), bound(allowed_skips=optional + ((101, 'core', 2, 'actual-required-test'),))), 'required step also listed optional (overlap)')
+e = copy.deepcopy(control); e['body']['ciRuns'] = [ci[1], ci[0]]
+probe('R13', 'ci-order', 'FORMAT', ev(m.canonical(e), bound(e, rebind_ci=True)), 'noncanonical run order refused before signature')
+
+# ---- R14-R21 canonical bytes / limits ----
+raw = m.canonical(control)
+probe('R14', 'codec', 'FORMAT', ev(raw.replace(b'"synthetic_legacy_two"', b'"synthetic_legacy_tw\\u006f"'), bound()), 'unicode escape alias of selector')
+probe('R15', 'codec', 'FORMAT', ev(raw.replace(b'"synthetic/repo"', b'"synthetic\\/repo"', 1), bound()), 'solidus escape alias')
+probe('R16', 'codec', 'FORMAT', ev(raw.replace(b'"anchorVersion":1', b'"anchorVersion":9007199254740992'), bound()), '2^53 integer')
+probe('R17', 'codec', 'FORMAT', ev(raw.replace(b'"anchorVersion":1', b'"anchorVersion":1e0'), bound()), 'exponent integer alias')
+probe('R18', 'codec', 'FORMAT', ev(m.canonical(ch(['body', 'facts', 'toolchain'], 'tool\x7fchain')), bound()), 'DEL in manifest string')
+probe('R19', 'ownership', 'OWNERSHIP', ev(type('B', (bytes,), {})(raw), bound()), 'bytes subclass envelope')
+probe('R20', 'ownership', 'FORMAT', ev(raw, bound(required_steps=(list(required[0]),))), 'unhashable mutable element inside tuple maps to FORMAT via TypeError')
+probe('R21', 'time', 'TIME', ev(raw, bound(lower=True)), 'bool clock value')
+
+# ---- R22-R24 schema vs model divergence (owner harness uses Python jsonschema) ----
+nl = ch(['body', 'selector'], 'synthetic_legacy_two\n')
+probe('R22', 'schema-vs-model', 'SCHEMA_REFUSES', 'SCHEMA_ACCEPTS' if not list(EV_V.iter_errors(nl)) else 'SCHEMA_REFUSES',
+      'Python jsonschema `$` matches before a final newline: ^[A-Za-z0-9_-]{1,128}$ accepts a trailing LF; model fullmatch/ASCII walk refuses')
+nlh = ch(['body', 'scopeSHA256'], '91' * 32 + '\n')
+probe('R23', 'schema-vs-model', 'SCHEMA_REFUSES', 'SCHEMA_ACCEPTS' if not list(EV_V.iter_errors(nlh)) else 'SCHEMA_REFUSES', 'same for a 64-hex digest field')
+probe('R24', 'schema-vs-model', 'FORMAT', ev(m.canonical(nl), bound()), 'model correctly refuses the trailing-LF selector')
+
+# ---- R25-R30 sealed policy payload: contract sec.4/5 vs model ----
+payload = json.loads(blob(EV + '/synthetic-policy-shape.json'))['payload']
+assert not list(PAY_V.iter_errors(payload))
+def with_payload(pbytes):
+    f = dict(facts); f['policyPayloadSHA256'] = m.sha(pbytes); e = ch(['body', 'facts'], f)
+    return ev(m.canonical(e), bound(e, rebind_facts=True), policy=pbytes)
+probe('R25', 'payload-codec', 'FORMAT', with_payload(b' ' + m.canonical(payload)), 'noncanonical (leading space) payload whose digest is independently bound: contract sec.4 requires exact canonical bytes')
+probe('R26', 'payload-codec', 'FORMAT', with_payload(b'not json at all'), 'non-JSON payload bytes with bound digest')
+bad = copy.deepcopy(payload); bad['status'] = 'ACTIVE'; bad['RegistrySHA256'] = 'a1' * 32
+probe('R27', 'payload-schema', 'FORMAT', with_payload(m.canonical(bad)), 'payload self-asserting status/RegistrySHA256 (schema refuses; evaluate never applies schema)')
+j = copy.deepcopy(payload); j['selector'] = 'another_selector'; j['verifier']['artifactSHA256'] = 'ce' * 32; j['verifier']['sourceSHA'] = 'cf' * 20; j['verifier']['ciRunIDs'] = [777]
+assert not list(PAY_V.iter_errors(j))
+probe('R28', 'payload-join', 'REFUSE', with_payload(m.canonical(j)),
+      'schema-valid payload whose selector/verifier.sourceSHA/artifactSHA256/ciRunIDs disagree with body.selector/facts/ciRuns; contract sec.5 requires exact payload joins')
+gh = {'graphSHA256': m.sha(bytes.fromhex(payload['graphHex']))}
+probe('R29', 'payload-join', 'graphSHA256 == SHA256(payload graph bytes) enforced', 'NOT_ENFORCED' if with_payload(m.canonical(payload)) == 'SYNTHETIC_ALREADY_BOUND' and facts['graphSHA256'] != gh['graphSHA256'] else 'ENFORCED',
+      'facts.graphSHA256 (a1..) differs from SHA256(payload.graphHex) yet the bound control passes; no derivation is defined for graph/contractSet/semanticPins/cohortScope/keyGrants/proofSlots/designRegistration digests')
+k1_prov = ['ReviewTargetSHA', 'ReviewScope', 'ApprovedReviewScope', 'BinaryVCS', 'RuntimeLockSHA256', 'CIHeadSHA', 'CIRef', 'CIWorkflow', 'CIRunID', 'CIAttempt', 'CIJobID',
+           'ArtifactDigest', 'InstallationReceiptSHA256', 'RunningExecutableSHA256', 'LinkedClosureSHA256']
+contract = blob(EV + '/contract.md').decode()
+probe('R30', 'k1-projection', 'mapping defined', 'defined: ' + ','.join(x for x in k1_prov if x in contract) if any(x in contract for x in k1_prov) else 'NO policyData.Provenance mapping in contract.md',
+      'c76 policy.go:57-61 provenance{15 fields} incl. single CIRunID/CIJobID and ApprovedReviewScope; contract maps only RegistrySHA256 (contract.md:193)')
+
+# ---- R31-R32 inherited review coverage (contract sec.5 permits; model and K1 force equality) ----
+e = ch(['body', 'facts', 'reviewTargetSHA'], 'ab' * 20)
+probe('R31', 'inherited-coverage', 'SYNTHETIC_ALREADY_BOUND', ev(m.canonical(e), bound(e, rebind_facts=True)),
+      'independently bound byte-equivalent successor (review target != source, Root equivalence+choice bound): contract.md:216-217/248-250 pattern; model line 231 and policy.go:228 pr.ReviewTargetSHA!=v.SourceSHA refuse')
+probe('R32', 'inherited-coverage', 'multiple reviews representable', 'single reviewSHA/reviewTargetSHA/reviewVerdict/reviewScope fact' ,
+      'contract sec.5 "each actual review issuer, verdict, exact target and scope" vs one-review facts shape')
+
+# ---- R33-R36 accounting, closed reasons, gate order ----
+tsrc = blob(EV + '/test_candidate.py').decode()
+probe('R33', 'accounting', 'distinct inputs per case', "C02 == C01 (no args) and N89 == N01 (anchor=False)" if "run('C02-idempotent-same-ticket-read','')" in tsrc and "run('N89-self-current-publication-without-independent-anchor','ANCHOR',anchor=False)" in tsrc else 'distinct',
+      '100 = 98 distinct inputs; C02 is a re-evaluation of C01 by a pure function; N89 does not model a self-current publication')
+rm = json.loads(blob(EV + '/refusal-matrix.json'))
+probe('R34', 'closed-reasons', sorted(r['id'] for r in rm['rows']), sorted(m.REASONS), 'closed 14 private reasons == refusal matrix; public projection constant')
+both = ch(['body', 'facts', 'toolchain'], 'x-toolchain'); both['body']['issuedAt'] = 800
+probe('R35', 'gate-order', 'PROVENANCE (contract sec.7: step5 joins before step6 time)', ev(m.canonical(both), bound(both)),
+      'record failing both a step-5 join and step-6 time; model evaluates STATUS/VERSION/REPLAY/TIME before PROVENANCE/CI/ARTIFACT/INSTALLATION')
+results = json.loads(blob(EV + '/candidate-test-results.json'))
+probe('R36', 'final-output', [100, 4, 96, 0], [results['cases'], results['syntheticControls'], results['negativeRefusals'], results['failures']], 'committed final report counts')
+
+base = 'services/node-agent/migrationverify/resources/proposed-contracts/'
+idx = json.loads(blob(base + 'index.json')); pins = pay_schema['properties']['contractPins']['properties']; good = 0
+for c in idx['contracts']:
+    rawc = blob(base + c['file']); p = {k: v['const'] for k, v in pins[c['contractId']]['properties'].items()}; flat = json.dumps(json.loads(rawc))
+    good += p['contractSHA256'] == c['rawSHA256'] == sha(rawc) and p['schemaSHA256'] == c['schemaSHA256'] and p['codec'] in flat and p['requiredVerifier'] in flat
+probe('R37', 'contract-pins', [28, 28, 28], [len(idx['contracts']), len(pins), good], 'payload schema consts equal c76 proposed-contracts index raw/schema SHA and codec/requiredVerifier strings in each contract file')
+si = json.loads(blob(EV + '/source-inspection.json')); good = sum(sha(blob(f['path'])) == f['SHA256'] for f in si['sourceFiles'])
+probe('R38', 'source-pins', [129, 129], [len(si['sourceFiles']), good], 'source-inspection sourceFiles SHA256 recomputed from target blobs')
+
+finds = [r['id'] for r in rows if r['finding']]
+out = dict(classification='REVIEWER_SYMBOLIC_PROBES_NO_CRYPTO_NO_PROVIDER_NO_RUNTIME', target=TARGET, modelSHA256=sha(model_src),
+           probes=len(rows), findingsWhereObservedDiffers=finds, rows=rows,
+           completedKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%dT%H:%M:%S+09:00'))
+OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+for r in rows: print(r['id'], 'FINDING' if r['finding'] else 'ok', '|', r['observed'] if not isinstance(r['observed'], list) else json.dumps(r['observed']))
+print('findings', finds)

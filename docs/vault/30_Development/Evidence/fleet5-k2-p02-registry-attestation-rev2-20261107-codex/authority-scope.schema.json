@@ -1,0 +1,119 @@
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "class": {
+          "const": "NODE"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tenantId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[ -~]+(?![\\s\\S])"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[ -~]+(?![\\s\\S])"
+            },
+            "recoveryEpoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[ -~]+(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "tenantId",
+            "nodeId",
+            "recoveryEpoch"
+          ]
+        }
+      },
+      "required": [
+        "class",
+        "scope"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "class": {
+          "const": "COHORT"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[ -~]+(?![\\s\\S])"
+        },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenantId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[ -~]+(?![\\s\\S])"
+              },
+              "nodeId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[ -~]+(?![\\s\\S])"
+              },
+              "recoveryEpoch": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[ -~]+(?![\\s\\S])"
+              }
+            },
+            "required": [
+              "tenantId",
+              "nodeId",
+              "recoveryEpoch"
+            ]
+          }
+        }
+      },
+      "required": [
+        "class",
+        "cohortId",
+        "members"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "class": {
+          "const": "COMPONENT"
+        },
+        "component": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[ -~]+(?![\\s\\S])"
+        }
+      },
+      "required": [
+        "class",
+        "component"
+      ]
+    }
+  ]
+}

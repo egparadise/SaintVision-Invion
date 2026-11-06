@@ -1,0 +1,318 @@
+{
+  "classification": "ALL39FACT_ORIGINS_EXPLICIT_NOT_AUTHENTICATION",
+  "rows": [
+    {
+      "field": "artifactId",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "artifactZipBytes",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "artifactZipSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "binarySHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "binaryVCSModified",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "binaryVCSRevision",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "cohortScopeSHA256",
+      "independentOrigin": "Exact ordered old two-member scopes, joins private capsule and body",
+      "rule": "K1-C2({class:COHORT,cohortId:payload.cohortId,members:[payload.members[0].scope,payload.members[1].scope]})",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "contractSetSHA256",
+      "independentOrigin": "Immutable28 source constants, sealed policy",
+      "rule": "K1-C2(payload.contractPins) including exact28 ID/contract/schema/codec/verifier entries",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "designRegistrationSHA256",
+      "independentOrigin": "H3 authenticated original a0 bytes or independently authorized explicit byte recipe; RD-P02-R2-REGISTRATION-BYTES still pending",
+      "rule": "decodeHex(payload.designRegistrationHex), exact externally registered original bytes",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "effectiveReviewSHA",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "effectiveReviewScope",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "effectiveReviewTargetSHA",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "effectiveReviewVerdict",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "graphSHA256",
+      "independentOrigin": "H3 graph source; exact registered design8874 graph hash",
+      "rule": "decodeHex(payload.graphHex), exact registered raw graph, not normalized JSON",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "helperClosureSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "installationBinarySHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "installationReceiptSHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "installationSourceSHA",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "keyGrantsSHA256",
+      "independentOrigin": "Sealed original grant facts; current ACTIVE is separate H4",
+      "rule": "K1-C2(ordered grants with role, decoded authorityScope AST, publicKeyHex, original notBefore/notAfter integers; EXCLUDES current status)",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "linkedClosureSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "moduleClosureSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "policyPayloadSHA256",
+      "independentOrigin": "Authenticated registry publication plus strict decoding",
+      "rule": "EXACT canonical payload byte slice, no trailing LF",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "registryProofSlotsSHA256",
+      "independentOrigin": "H3 immutable proof-slot registry source, no reserialization",
+      "rule": "decodeHex(payload.proofSlotRegistryHex), exact original raw bytes",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "reviewCoverageSHA256",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "rootChoiceSHA256",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningBinarySHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningLinkedClosureSHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningMeasurementSHA256",
+      "independentOrigin": "Client request formed from exact private independently authenticated H5 bytes",
+      "rule": "ZERO authentication weight; echo SHA256(H5 raw bytes), protected through requestBindingSHA256; only H5 authenticates running code",
+      "gate": "06_REPLAY",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningReceiptSHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningRuntimeLockSHA256",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runningSourceSHA",
+      "independentOrigin": "H3 independently approved EXPECTED installation/executable target, not an actual running observation",
+      "rule": "Match private H5 actual receipt/source/executable/runtime/link/process/root/UID at05_RUNNING; project actual values only from H5",
+      "gate": "05_SOURCE/05_RUNNING",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "runtimeLockSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "semanticPinsSHA256",
+      "independentOrigin": "Each field must equal independent installed-source constant; no missing default",
+      "rule": "K1-C2(payload.semanticPins), closed6-field map",
+      "gate": "05_COMPONENTS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "sourceAcquisitionSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "sourceEquivalenceSHA256",
+      "independentOrigin": "Separate private independently authenticated H3-EA coverage and original review sources, actual absent",
+      "rule": "Exact effective fields/coverage statement/original reviews and complete scope-to-part mapping; not registry approval",
+      "gate": "05_REVIEWS",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "sourcePublicationAnchorSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "sourceSHA",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "sourceTreeSHA256",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "toolchain",
+      "independentOrigin": "Private independently authenticated H3 source/build/CI/artifact/publication acquisition",
+      "rule": "Exact original source/tree/toolchain/module/helper/lock/link/artifact/original publication bytes and purpose; no payload-selected provider or green verdict",
+      "gate": "05_SOURCE",
+      "actualProducer": null,
+      "actualState": "NULL_HOLD"
+    }
+  ],
+  "unchangedAuthorities": "All H1-H7 private sources must actually authenticate before a real composition can issue anything; model sources are only synthetic already-bound hypotheses"
+}
