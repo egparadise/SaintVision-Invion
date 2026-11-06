@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.403"
+version: "1.0.404"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T14:39:44+09:00"
+updated: "2026-11-06T15:02:33+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2A49d0 boundedCODEAXIS_ACCEPT/CoreFAILURE remains; sameCodex ownStage1push+separateLowdelta; B7actualClaudectxe6active/21criticalUNSUPPORTED; wholephysicalincomplete"
-active_card_next: "Codex pushsinglebranch/pathStage1bootstrap/capture thenR1R5lowdelta; ClaudeactualwholeB7verdict/portcut; Root nextreview/combinedsource/freshCoreDocs; no positiveauth/Stage2guardrelaxation"
+active_card_status: "52factual3sampleFAILURE/order-onlynewcaseverified; Root53caseproposalreviewdone/Stage2candidatescopegranted; CodexLowcheckpointthenStage2; B7actualreviewactive/wholeCorestillFAILED"
+active_card_next: "Codex Lowcleancheckpoint/minimalStage2implementation+guardnegatives/singleexactfocusedCI/Docs; actualcode-deltareviewthenRootcombinedfreshCoreDocs; ClaudeB7verdict/portcut pending"
 ---
+
+## 2026-11-06T15:02:33+09:00 실제 Stage1 순서 차이와 독립 비교 경계 검토
+
+작업한 것과 확인: Root가 실제 Stage1 run42170068364/artifact를 파싱해 세 표본0/0/1과 새 세 번째 표본의 Mounts 순서만 다른 사례를 확인했다. 원래 de71 원인은 계속 UNKNOWN이다. 별도 Root의 실제 비교 경계 모형53건/45negative 통과 뒤, 모든 mount 필드와 나머지 guard를 보존하는 최소 Stage2 후보 구현을 같은 Codex에게 지시했다. 새 코드 CI·독립 검토·결합 전체 Core/Docs는 아직 필요하다. 상태msg_9252ccef3169의 증거를 읽고 같은 활성 task에 msg_a29466460f6d로 정확한 후보 범위를 전달했다. 다음 첫 행동/담당은 Codex의 clean checkpoint/별도 Stage2 구현, Claude의 B rev7 판정과 후속 실제 코드 검토, Root의 결합 소스 결정이다.
 
 ## 2026-11-06T14:39:44+09:00 K2A 코드 축 수락·진단 push와 B rev7 실제 검토
 

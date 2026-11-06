@@ -16,7 +16,7 @@
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T14:39:44+09:00",
+  "latestObservationAtKST": "2026-11-06T15:02:33+09:00",
   "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
   "proposalDocs": 42146482617,
   "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
@@ -28,7 +28,7 @@
   "actualDirectReply": "msg_6df22674ff19",
   "actualReview": "5623dc00b676ce0b535350897069a3b7f1154eab",
   "actualVerdict": "REVISION_REQUIRED3Major5Low",
-  "currentAuthorization": "ownnewworkflowbranchpushbootstrap; separateK2R1R5lowdelta/R4explicitHOLD; no default/existingworkflowchange/guardrelaxation; actualcombinedfullCoreDocsandreviewstillrequired",
+  "currentAuthorization": "currentLowcheckpoint thenseparateStage2fullMountsorder-onlycandidate/sourceunitCI+actualcodereview; no realfielddrop/liveactions/positiveauth; wholeCoreFAILUREpreserved",
   "decision": "k2-rev2-concrete-root-decision.json",
   "latestProposalSource": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
   "latestProposalDocs": 42155660700,
@@ -71,5 +71,8 @@
   "actualCodeAxisAcceptance": "de71-actual-code-axis-root-acceptance.json",
   "implementationWholeCISourceReportAccepted": false,
   "currentScopeDecision": "stage1-push-bootstrap-and-k2a-lows-root-decision.json",
-  "latestScopeAnswer": "msg_37da39cf72b3"
+  "latestScopeAnswer": "msg_37da39cf72b3",
+  "actualNewStage1Capture": "stage1-52f-actual-capture-root-audit.json",
+  "Stage2CandidateScope": "stage2-mount-order-root-candidate-grant.json",
+  "latestSourceScopeMessage": "msg_a29466460f6d"
 }

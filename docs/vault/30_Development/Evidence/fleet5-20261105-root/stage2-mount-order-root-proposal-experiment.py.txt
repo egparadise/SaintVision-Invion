@@ -1,0 +1,145 @@
+"""Independent Root review of the worker's order-canonical Mounts proposal; scratch only."""
+import ast,copy,datetime,hashlib,itertools,json,subprocess,sys,types
+from pathlib import Path
+sys.stdout.reconfigure(encoding='utf-8')
+r=Path(__file__).resolve().parents[1];w=r/'.work'
+sha='52f935acced837d500af5932c3d26882e091f25a'
+raw=subprocess.check_output(['git','show',sha+':deploy/lan/worker_peer_floor.py'],cwd=r)
+tree=ast.parse(raw)
+observe=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='observe')
+pureNames={'_diagnostic_hash','_diagnostic_paths','_observation_diagnostic'}
+pure=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name in pureNames]
+constants=[n for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in {'OBSERVATION_CHANGE_PREFIX','_CONFIG_DIAGNOSTIC_FIELDS','_MOUNT_DIAGNOSTIC_FIELDS','_VOLUME_DIAGNOSTIC_FIELDS'} for t in n.targets)]
+
+def mounts_vector(mounts):
+    """Only the supported plain, nonoverlapping mount destinations; retain ALL dictionary fields."""
+    if type(mounts) is not list or not 1 <= len(mounts) <= 2:
+        raise ValueError('ambiguous plain mount topology')
+    seen=set()
+    for m in mounts:
+        if type(m) is not dict or any(type(k) is not str for k in m):
+            raise ValueError('typed mount required')
+        destination=m.get('Destination')
+        if type(destination) is not str or destination not in {'/state','/var/run/docker.sock'} or destination in seen:
+            raise ValueError('unknown/duplicate mount destination')
+        seen.add(destination)
+        if m.get('Type') != ('volume' if destination=='/state' else 'bind'):
+            raise ValueError('plain mount type differs')
+        for key in ('Name','Source','Driver','Mode','Propagation'):
+            if key in m and type(m[key]) is not str:
+                raise ValueError('non-string mount field')
+        if type(m.get('RW')) is not bool or not m['RW']:
+            raise ValueError('plain writable state/socket type differs')
+    if '/state' not in seen:
+        raise ValueError('state mount missing')
+    # Exact existing dictionaries, not hashes or projected field allowlists.
+    return tuple(sorted(mounts,key=lambda m:m['Destination']))
+
+class CanonicalizeMounts(ast.NodeTransformer):
+    replacements=0
+    def visit_Subscript(self,node):
+        node=self.generic_visit(node)
+        if isinstance(node.value,ast.Name) and node.value.id in {'before','after'} and isinstance(node.slice,ast.Constant) and node.slice.value=='Mounts':
+            self.replacements+=1
+            return ast.Call(func=ast.Name(id='root_mounts_vector',ctx=ast.Load()),args=[node],keywords=[])
+        return node
+change=CanonicalizeMounts();candidate=change.visit(copy.deepcopy(observe));assert change.replacements==2
+moduleOld=ast.fix_missing_locations(ast.Module(body=copy.deepcopy(constants+pure+[observe]),type_ignores=[]))
+moduleNew=ast.fix_missing_locations(ast.Module(body=copy.deepcopy(constants+pure+[candidate]),type_ignores=[]))
+oldCode=compile(moduleOld,'actual-52f-observe-snapshot-boundary','exec')
+newCode=compile(moduleNew,'scratch-proposed-order-canonical-observe','exec')
+expectedDER=b'ALREADY_VALID_SYNTHETIC_DER_FOR_SNAPSHOT_TEST_ONLY'
+certHash=hashlib.sha256(expectedDER).hexdigest()
+manifest={'nodeId':'nod_fixture','tenantId':'tenant_fixture','epoch':'epoch_fixture'}
+rotation={'nodeId':'nod_fixture','tenantId':'tenant_fixture','recoveryEpoch':'epoch_fixture'}
+args=['--state','/state/journal','--peer-policy','/state/peer-policy.json','--tls-cert','/state/node-cert.pem','--tls-key','/state/node-key.pem']
+state={'Type':'volume','Name':'saintvision-nod_fixture-state','Source':'/synthetic/owned-volume','Destination':'/state','Driver':'local','Mode':'z','RW':True,'Propagation':''}
+socket={'Type':'bind','Source':'/var/run/docker.sock','Destination':'/var/run/docker.sock','Mode':'rw','RW':True,'Propagation':'rprivate'}
+base={'Id':'a'*64,'Image':'sha256:'+'b'*64,'Config':{'Cmd':args,'Labels':{'ai.saintvision.node':'nod_fixture'},'Env':['SYNTHETIC=1']},'Mounts':[state,socket],'State':{'Running':True,'Restarting':False,'StartedAt':'synthetic-start-generation'},'RestartCount':0}
+volume={'Name':'saintvision-nod_fixture-state','Labels':{'ai.saintvision.node':'nod_fixture'},'CreatedAt':'synthetic-original-creation','Driver':'local','Mountpoint':'/synthetic/owned-volume'}
+consumers=['a'*64,'c'*64]
+class Cert:
+    def public_bytes(self,encoding):return expectedDER
+def execute(code,before,after,volBefore=None,volAfter=None,consBefore=None,consAfter=None,*,floorPID=1,der=certHash,requested=None):
+    snapshots=iter([(before,volume if volBefore is None else volBefore,consumers if consBefore is None else consBefore),(after,volume if volAfter is None else volAfter,consumers if consAfter is None else consAfter)])
+    def target(_):
+        item,v,c=next(snapshots)
+        return copy.deepcopy(manifest),'saintvision-nod_fixture',copy.deepcopy(item),list(args),copy.deepcopy(v),copy.deepcopy(c)
+    # Uninterpreted already-valid surrounding facts. This is NOT a signature,
+    # Docker, ownership acquisition, nonce issuance or runtime verification test.
+    namespace={'json':json,'hashlib':hashlib,'root_mounts_vector':mounts_vector,'target':target,
+        'docker':lambda *a:json.dumps({'servingPID':floorPID,'certificateDER_SHA256':der}).encode(),
+        'phase':types.SimpleNamespace(strict=json.loads,digest=lambda b:hashlib.sha256(b).hexdigest(),verify_floor=lambda *a,**k:None),
+        'x509':types.SimpleNamespace(load_pem_x509_certificate=lambda b:Cert()),
+        'serialization':types.SimpleNamespace(Encoding=types.SimpleNamespace(DER='synthetic-DER'))}
+    exec(code,namespace)
+    try:
+        namespace['observe']('NO_FILESYSTEM_CALL',rotation if requested is None else requested,{'node-cert.pem':b'ALREADY_VALID_SYNTHETIC_CERT'},nonce='fixed-synthetic-nonce-not-an-issuance')
+        return True
+    except (ValueError,KeyError,TypeError,AttributeError,IndexError):return False
+results=[]
+def case(name,before,after,want,**kwargs):
+    result=execute(newCode,before,after,**kwargs)
+    assert result is want,(name,result,want)
+    results.append({'case':name,'accepted':result,'expected':want,'pass':True})
+for left in itertools.permutations([state,socket]):
+    for right in itertools.permutations([state,socket]):
+        a=copy.deepcopy(base);b=copy.deepcopy(base);a['Mounts']=list(left);b['Mounts']=list(right)
+        case('permutation-'+str(len(results)),a,b,True)
+a=copy.deepcopy(base);a['Mounts']=[state]
+case('state-only-no-socket',a,a,True)
+reverse=copy.deepcopy(base);reverse['Mounts'].reverse()
+assert execute(oldCode,base,reverse) is False
+assert execute(newCode,base,reverse) is True
+results.append({'case':'actual-source-old-order-refuses-proposed-order-accepts','oldAccepted':False,'newAccepted':True,'pass':True})
+for index,mount in enumerate(base['Mounts']):
+    for key in mount:
+        b=copy.deepcopy(base);value=b['Mounts'][index][key]
+        b['Mounts'][index][key]=not value if type(value) is bool else value+'-CHANGED'
+        case('preserve-every-complete-mount-field-'+str(index)+'-'+key,base,b,False)
+    b=copy.deepcopy(base);b['Mounts'][index]['NEW_UNKNOWN_COMPLETE_FIELD']={'value':'a'}
+    case('unknown-field-addition-still-diff-'+str(index),base,b,False)
+    a=copy.deepcopy(base);a['Mounts'][index]['NEW_UNKNOWN_COMPLETE_FIELD']={'value':'a'}
+    b=copy.deepcopy(a);b['Mounts'][index]['NEW_UNKNOWN_COMPLETE_FIELD']['value']='b'
+    case('unknown-nested-field-change-still-diff-'+str(index),a,b,False)
+    case('equal-unknown-fields-retained-not-projected-'+str(index),a,a,True)
+for name,mounts in [('duplicate-state',[state,state]),('duplicate-socket',[state,socket,socket]),('missing-state',[socket]),('empty',[]),('unknown-destination',[state,{**socket,'Destination':'/unexpected'}]),('overlapping-destination',[state,{**socket,'Destination':'/state/nested'}]),('bad-rw-type',[{**state,'RW':1},socket]),('bad-map-type',[None]),('not-list',(state,socket))]:
+    b=copy.deepcopy(base);b['Mounts']=mounts
+    case('reject-topology-'+name,base,b,False)
+for field in ['Id','Image','Config','StartedAt','RestartCount']:
+    b=copy.deepcopy(base)
+    if field=='Config':b[field]['Env'].append('CHANGED=1')
+    elif field=='StartedAt':b['State'][field]='changed-generation'
+    elif field=='RestartCount':b[field]=1
+    else:b[field]+='CHANGED'
+    case('preserve-original-nonmount-guard-'+field,base,b,False)
+for key in volume:
+    v=copy.deepcopy(volume)
+    if type(v[key]) is dict:v[key]['other']='CHANGED'
+    else:v[key]+='CHANGED'
+    case('preserve-full-volume-including-'+key,base,base,False,volAfter=v)
+case('preserve-consumers',base,base,False,consAfter=consumers+['d'*64])
+for which in ['before','after']:
+    for stateKey in ['Running','Restarting']:
+        a=copy.deepcopy(base);b=copy.deepcopy(base);chosen=a if which=='before' else b
+        chosen['State'][stateKey]=stateKey=='Restarting'
+        case('preserve-running-restarting-'+which+'-'+stateKey,a,b,False)
+case('preserve-serving-pid',base,base,False,floorPID=2)
+case('preserve-certificate-referent',base,base,False,der='wrong-cert')
+case('preserve-rotation-scope',base,base,False,requested={**rotation,'nodeId':'wrong'})
+source=Path(__file__).read_bytes()
+proof={'schemaVersion':'fleet5-root-independent-stage2-mount-order-proposal-review:1',
+    'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),
+    'actualProposalAuthor':'Codex worker task_a95ef3d8ccce/ctx_ed23b4a777d0 statusmsg_9252ccef3169',
+    'actualIndependentReviewer':'Root Codex; NOT claimed Claude review',
+    'source':sha,'actualHelperSHA256':hashlib.sha256(raw).hexdigest(),'experimentSHA256':hashlib.sha256(source).hexdigest(),
+    'scope':'scratch-only workerproposal review/reference refinement; NO product file edited',
+    'actualObserveASTChange':'ONLY two Mounts operands wrapped; all other statements/guards preserved',
+    'proofDomain':'already-target-validated plain /state volume plus optional disjoint /var/run/docker.sock bind; exact destination uniqueness; full original dictionaries preserved',
+    'sourceBindingsRead':['worker_peer_floor.target/_plain/observe','worker_config.repair_target:239-261','actual52fsource+artifact sample3 classifier'],
+    'equivalenceClaim':'Within supported unique-destination plain topology, sorted complete Mounts vectors equal iff each exact full dictionary for each destination equals. Only list enumeration order is quotiented; duplicate/overlap/unknown topology rejects.',
+    'cases':results,'executed':len(results),'passed':len(results),'failed':0,'negativeCases':sum(x.get('expected') is False for x in results),
+    'limits':['Surrounding target/Docker/floor-signature facts mocked as ALREADY_VALID only to isolate actual observe comparison; no real ownership/crypto/Node/PKI test','Existing source guards unchanged and new52f realDocker sample alreadypassed crypto/target before order-only refusal','Not product Stage2 code, not deployed binding/trust, not fullCore success','Unknown Mounts fields retained and compared; unknown mount topology refused; fullvolume CreatedAt never excluded'],
+    'originalDe71TupleField':'UNKNOWN','actualFullCore':'FAILURE42164071724 preserved','wholeProgramComplete':False}
+(w/'root-stage2-mounts-independent-proposal-proof.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:v for k,v in proof.items() if k not in ['cases','sourceBindingsRead','limits']},ensure_ascii=False),flush=True)

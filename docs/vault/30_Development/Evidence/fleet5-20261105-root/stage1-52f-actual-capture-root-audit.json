@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "fleet5-stage1-52f-root-actual-capture-audit:1",
+  "atKST": "2026-11-06T14:54:14+09:00",
+  "source": "52f935acced837d500af5932c3d26882e091f25a",
+  "run": 42170068364,
+  "job": 127735558839,
+  "event": "push",
+  "attempt": 1,
+  "path": ".github/workflows/peer-floor-observation-diagnostic.yml",
+  "correlation": "FLEET5-peer-floor-stage1-52f935acced837d500af5932c3d26882e091f25a",
+  "actualOverallConclusion": "failure",
+  "onlyFailedStep": [
+    "Three predeclared diagnostic samples of the exact failed test"
+  ],
+  "rootVerifiedExactSourceEventRefJobs": true,
+  "artifactId": 13479979191,
+  "artifactSHA256": "38634e7deecfd13b44451c04906975aa8840aa0a08e23999d031fd8ec5675814",
+  "artifactBytes": 2015,
+  "rootDownloadedAndDigestMatched": true,
+  "resultSHA256": "f0e8b0cb4ae8d58e94b313db18cbc28d3c3ca80149728037c3b3f944ed28939f",
+  "manifestSHA256": "cd04234d36b817a4ad34c12b3c8639dd2ccce2def8a4c88d087eee033d137b5a",
+  "samples": [
+    {
+      "sampleId": "OBSERVATION_SAMPLE_1",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "4bf2db5393e8753dd0d8abfac2d4a505f5681bfd968c8d24cb1b96789d0b8017",
+      "diagnostics": [],
+      "outcome": "NOT_REPRODUCED",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_2",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "7a5d103f271b204bfd58263afdde0f473393165dc7848b2461eb5bad906f6a77",
+      "diagnostics": [],
+      "outcome": "NOT_REPRODUCED",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_3",
+      "exit": 1,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "d7987e8c825d87295ca36a33b3ff161d515a70acb70acfe2f3ed20752c3b00c8",
+      "diagnostics": [
+        {
+          "diagnosticVersion": 1,
+          "classification": "REFUSAL_DIAGNOSTIC_ONLY",
+          "changedPaths": [
+            "container.Mounts"
+          ],
+          "categories": [
+            "MOUNTS_ORDER_ONLY"
+          ],
+          "hashes": {
+            "container.Mounts": {
+              "afterSHA256": "6459769ad96f3c3f292f84aca90172ad4500a11a2581e529fa3200f6d7f79405",
+              "beforeSHA256": "f1c4240485b916674a6724a17280fc7bc334aec4b4767e810e089437d3b67ce1"
+            }
+          },
+          "truncated": false
+        }
+      ],
+      "outcome": "ACTUAL_GUARD_DIAGNOSTIC_CAPTURED",
+      "acceptancePassed": false
+    }
+  ],
+  "newSample3GuardDifference": {
+    "diagnosticVersion": 1,
+    "classification": "REFUSAL_DIAGNOSTIC_ONLY",
+    "changedPaths": [
+      "container.Mounts"
+    ],
+    "categories": [
+      "MOUNTS_ORDER_ONLY"
+    ],
+    "hashes": {
+      "container.Mounts": {
+        "afterSHA256": "6459769ad96f3c3f292f84aca90172ad4500a11a2581e529fa3200f6d7f79405",
+        "beforeSHA256": "f1c4240485b916674a6724a17280fc7bc334aec4b4767e810e089437d3b67ce1"
+      }
+    },
+    "truncated": false
+  },
+  "bindingProof": "Rootreadexact17378helper classifier; allotheroriginaltuplefieldsequal perexactfixedfieldclassifier; identicalcompletecanonicalmountdigestmultiset/count only classification; notoperationaltrust",
+  "originalDe71TupleField": "UNKNOWN_NOT_RETROACTIVELY_INFERRED",
+  "sourceManifest": {
+    "classification": "NEW_UNREGISTERED_RAW_SEVEN_FILE_CANDIDATE_NOT_INSTALLED_TRUST",
+    "sourceSHA": "52f935acced837d500af5932c3d26882e091f25a",
+    "files": {
+      "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "worker_peer_floor.py": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406",
+      "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+    },
+    "rawSevenFileCandidateSHA256": "d9ddc67bfe7250d9276f7e2a88c0f994caed8fa9d0972239d3ce33303dfab3fb",
+    "binarySHA256": "99cac1bb65334f2f2502e87e80ac8d0e37490846164d2e05a09ceb1482af85e7"
+  },
+  "Stage2BehaviorGranted": false,
+  "rawArtifacts": "ignoredprivateZIP only",
+  "wholeCoreAccepted": false,
+  "wholeProgramComplete": false
+}

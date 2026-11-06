@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "04fdc5e8aa6fe4bd37831784f5f55c3cc001ad94",
-    "Docs": 42168827317,
+    "SHA": "66cfda0bc2de3babc742c52c2b85a8cd993f7799",
+    "Docs": 42169952300,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2793,
+    "independentlyMatchedNormalizedDestinationHashes": 2796,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T14:31:54+09:00"
+    "verifiedAtKST": "2026-11-06T14:44:45+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T14:39:44+09:00",
+  "latestRecordAtKST": "2026-11-06T15:02:33+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3153,5 +3153,8 @@
   "BRev7ReviewNotYetStarted": false,
   "K2ActualCodeAxisAccepted": "de71-actual-code-axis-root-acceptance.json",
   "Stage1GuardUnchangedASTAudit": "stage1-original-guard-root-ast-audit.json",
-  "K2NextPushAndLowScope": "stage1-push-bootstrap-and-k2a-lows-root-decision.json"
+  "K2NextPushAndLowScope": "stage1-push-bootstrap-and-k2a-lows-root-decision.json",
+  "ActualStage1NewSampleCapture": "stage1-52f-actual-capture-root-audit.json",
+  "RootIndependentStage2ProposalProof": "stage2-mount-order-independent-root-proposal-review.json",
+  "Stage2CandidateImplementationGrant": "stage2-mount-order-root-candidate-grant.json"
 }

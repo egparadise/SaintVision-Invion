@@ -543,9 +543,9 @@
     "reviewStartedOrAccepted": false
   },
   "monitorLifecycle": "CLOSED actualfailurecallback13:54:36KST; session12251finishedexit0",
-  "nextAction": "sameCodex bootstrapnewworkflowpush thenseparateK2lowdelta; B7actualreviewactive; capture/rootdelta-review/combinedsourcechoice thenfreshfullCoreDocs",
+  "nextAction": "Codex LowcleancheckpointthenminimalStage2candidate/localnegative+singleexactfocusedCI/Docs; actualindependentcode review beforeRootcombinedsourcechoice/freshwholeCoreDocs",
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T14:39:44+09:00",
+  "latestObservationAtKST": "2026-11-06T15:02:33+09:00",
   "latestActualCI": "de71-failed-core-qualified-report-root-verification.json",
   "failureQualifiedReport": "ff3169d360a707415d9b03484cf0cf3031f3912c",
   "reportDocs": 42165778183,
@@ -563,5 +563,13 @@
   "codeAcceptanceScope": "ONLYboundedArefusal/purelogiccodeaxis, notwholeCI/delivery/operationalauth",
   "fullCISourceReportAccepted": false,
   "Stage1OriginalGuardASTAudit": "stage1-original-guard-root-ast-audit.json",
-  "nextRootDecision": "stage1-push-bootstrap-and-k2a-lows-root-decision.json"
+  "nextRootDecision": "stage1-push-bootstrap-and-k2a-lows-root-decision.json",
+  "Stage1ActualCaptureRootAudit": "stage1-52f-actual-capture-root-audit.json",
+  "Stage1ActualRun": 42170068364,
+  "Stage1ActualConclusion": "FAILURE2pass1guardfail/3executed",
+  "newActualSample3Difference": "ONLYMountscomplete-dictionarymultiset order; no otheroriginaltupledifference",
+  "originalDe71ActualTupleField": "UNKNOWN",
+  "Stage2IndependentProposalReview": "stage2-mount-order-independent-root-proposal-review.json",
+  "Stage2CandidateGrant": "stage2-mount-order-root-candidate-grant.json",
+  "Stage2ImplementationAccepted": false
 }

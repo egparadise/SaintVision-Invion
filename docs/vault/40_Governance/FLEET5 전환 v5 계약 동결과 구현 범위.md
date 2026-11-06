@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.10"
+version: "1.0.11"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T14:39:44+09:00"
+updated: "2026-11-06T15:02:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -126,3 +126,14 @@ Root는 같은 담당자에게 새 결합 CI 이전의 별도 Low 수정 범위�
 Stage1 source0dfd1e8b의 기존 helper 함수는 Root AST 비교에서 observe의 실패 Raise 하나를 제외하고 동일했다. guard 식과 반환·기존 소유권 검사도 동일하다. gap report34e7e73c/Docs42168635615는 성공했으나 수동 workflow 최초 실행은 HTTP404로 sample0이다. Root는 새 workflow 파일 자체만 정확한 진단 branch와 workflow path의 push trigger로 한 번 실행하도록 허용했다. job은 push/수동 이벤트 모두 동일 branch에서만 허용하고 source SHA의 고정 run name을 둔다. 기존 preparation-rate-clock/Core/Backend/default branch/Actions 설정은 바꾸지 않는다.
 
 GitHub 공식 push 이벤트 규칙과 기존 branch/path 방식의 실제 실행 사례를 확인했다. [공식 push 규칙](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push)에 따라 새 파일을 포함한 단일 commit push의 새 run을 확인한다. 수동 dispatch를 중복 실행하거나 empty commit/retry로 green을 찾지 않는다. Stage2 동작 변경은 미허용이며 Stage1 새 raw helper/7-file closure는 unregistered 후보로 남는다. 상세 지시와 검증은 Root Evidence stage1-push-bootstrap-and-k2a-lows-root-decision.json에 고정했다.
+
+
+## 실제52f 표본의 mount 순서 차이와 Stage2 후보 범위
+
+Root는 실제 push run42170068364/job127735558839/attempt1/source52f935ac와 artifact13479979191의 digest·결과·manifest를 대조했다. 세 고정 표본은0/0/1이고 세 번째만 container.Mounts의 MOUNTS_ORDER_ONLY·truncated=false였다. 정확한 source classifier는 완전한 mount dictionary별 canonical digest의 multiset·개수가 같을 때만 이 범주를 낸다. 다른 원래 tuple 필드는 같은 새 표본이다. 이 실행은 계속 FAILURE이며 과거 de71의 바뀐 필드는 UNKNOWN으로 유지한다.
+
+작성자 Codex worker의 제안을 별도 Root Codex가 독립 검토했다. 실제 target/_plain/repair_target의 허용 범위는 하나의 /state volume과 선택적이고 겹치지 않는 /var/run/docker.sock bind다. 이 범위에서 destination이 고유하면 전체 dictionary를 destination순으로 비교하는 것은 필드 내용을 보존하면서 열거 순서만 무관하게 만든다. Root는 실제 observe AST의 Mounts 두 operand만 바꾼 scratch reference를53건 실행해53통과·45negative를 확인했다. 주변 Docker/target/signature 사실은 이미 유효한 합성 자료로 대체한 비교 경계 시험이며 실제 장비·암호·제품 구현 시험이 아니다. Claude 검토라고 쓰지 않는다.
+
+이 근거로 같은 Codex에게 Stage2 후보 구현만 허용했다. 현재 Low 수정의 clean checkpoint 뒤 정확한52f를 base로 별도 stage2 branch를 만든다. typed list/dict·고유하고 알려진 두 destination·원래 plain mount type과 writable 사실을 검사하며 전체 mount dictionary의 모든 알려진/알려지지 않은 key·값을 유지한다. hash나 일부 필드 projection으로 비교하지 않는다. Id/Image/Config/StartedAt/RestartCount/full volume의 CreatedAt/consumers·nonce/DER/signature/owner·기존 target 호출은 그대로다. 중복·겹침·알 수 없는 mount topology는 거부한다. storage/profile/권한을 확장하지 않는다.
+
+새 branch의 own 진단 workflow만 정확한 stage2 branch/path/run label과 새 unit 목록으로 한 번 실행할 수 있다. 원래 Stage1 branch·52f failure·기존 unrelated workflow/default branch는 보존한다. 새 helper/7-file closure는 unregistered 후보이며 제품/실장비에는 적용하지 않는다. 새 구현의 local negative·정확한 focused CI/Docs와 실제 독립 코드 검토 이후에만 Root가 최종 결합 소스를 선택하고 새 전체 Core/Docs를 요구한다. 상세53개 실행과 source 제한은 stage2-mount-order-independent-root-proposal-review.json·실행 원문 txt·stage2-mount-order-root-candidate-grant.json에 있다.

@@ -1,0 +1,351 @@
+{
+  "schemaVersion": "fleet5-root-independent-stage2-mount-order-proposal-review:1",
+  "atKST": "2026-11-06T14:56:50+09:00",
+  "actualProposalAuthor": "Codex worker task_a95ef3d8ccce/ctx_ed23b4a777d0 statusmsg_9252ccef3169",
+  "actualIndependentReviewer": "Root Codex; NOT claimed Claude review",
+  "source": "52f935acced837d500af5932c3d26882e091f25a",
+  "actualHelperSHA256": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406",
+  "experimentSHA256": "957746f0a7c308805b1206aadc96caac6e9929fa8622982e7e6f496bad2baec1",
+  "scope": "scratch-only workerproposal review/reference refinement; NO product file edited",
+  "actualObserveASTChange": "ONLY two Mounts operands wrapped; all other statements/guards preserved",
+  "proofDomain": "already-target-validated plain /state volume plus optional disjoint /var/run/docker.sock bind; exact destination uniqueness; full original dictionaries preserved",
+  "sourceBindingsRead": [
+    "worker_peer_floor.target/_plain/observe",
+    "worker_config.repair_target:239-261",
+    "actual52fsource+artifact sample3 classifier"
+  ],
+  "equivalenceClaim": "Within supported unique-destination plain topology, sorted complete Mounts vectors equal iff each exact full dictionary for each destination equals. Only list enumeration order is quotiented; duplicate/overlap/unknown topology rejects.",
+  "cases": [
+    {
+      "case": "permutation-0",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "permutation-1",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "permutation-2",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "permutation-3",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "state-only-no-socket",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "actual-source-old-order-refuses-proposed-order-accepts",
+      "oldAccepted": false,
+      "newAccepted": true,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Type",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Name",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Source",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Destination",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Driver",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Mode",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-RW",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-0-Propagation",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "unknown-field-addition-still-diff-0",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "unknown-nested-field-change-still-diff-0",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "equal-unknown-fields-retained-not-projected-0",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-Type",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-Source",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-Destination",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-Mode",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-RW",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-every-complete-mount-field-1-Propagation",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "unknown-field-addition-still-diff-1",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "unknown-nested-field-change-still-diff-1",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "equal-unknown-fields-retained-not-projected-1",
+      "accepted": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-duplicate-state",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-duplicate-socket",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-missing-state",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-empty",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-unknown-destination",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-overlapping-destination",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-bad-rw-type",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-bad-map-type",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "reject-topology-not-list",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-original-nonmount-guard-Id",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-original-nonmount-guard-Image",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-original-nonmount-guard-Config",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-original-nonmount-guard-StartedAt",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-original-nonmount-guard-RestartCount",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-full-volume-including-Name",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-full-volume-including-Labels",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-full-volume-including-CreatedAt",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-full-volume-including-Driver",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-full-volume-including-Mountpoint",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-consumers",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-running-restarting-before-Running",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-running-restarting-before-Restarting",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-running-restarting-after-Running",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-running-restarting-after-Restarting",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-serving-pid",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-certificate-referent",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "case": "preserve-rotation-scope",
+      "accepted": false,
+      "expected": false,
+      "pass": true
+    }
+  ],
+  "executed": 53,
+  "passed": 53,
+  "failed": 0,
+  "negativeCases": 45,
+  "limits": [
+    "Surrounding target/Docker/floor-signature facts mocked as ALREADY_VALID only to isolate actual observe comparison; no real ownership/crypto/Node/PKI test",
+    "Existing source guards unchanged and new52f realDocker sample alreadypassed crypto/target before order-only refusal",
+    "Not product Stage2 code, not deployed binding/trust, not fullCore success",
+    "Unknown Mounts fields retained and compared; unknown mount topology refused; fullvolume CreatedAt never excluded"
+  ],
+  "originalDe71TupleField": "UNKNOWN",
+  "actualFullCore": "FAILURE42164071724 preserved",
+  "wholeProgramComplete": false
+}
