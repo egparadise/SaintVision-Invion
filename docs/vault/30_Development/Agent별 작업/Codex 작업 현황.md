@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.397"
+version: "1.0.398"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T12:25:24+09:00"
+updated: "2026-11-06T12:57:56+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2rev2immutable4ce exactDocsSUCCESS/actualClaudef8bactive; B targetedrev7continues; K1boundedcomplete; noK2/Bimplementationgrant; wholephysicalincomplete"
-active_card_next: "ClaudeactualK2rev2verdict/ownDocs; Root exactreadonlyportsgrantorrevisions; BCodex targetedrev7/exactDocs thennextoneClaude; noeffect/installgrant"
+active_card_status: "K2rev2fe7e boundedreadonlydesignACCEPT/RootK2Acodegrantdelivered; B targetedrev7; observationMediumOPEN; K1boundedcomplete; wholephysicalincomplete"
+active_card_next: "Codex boundedK2Areadonlycode/boundary+censusgates/freshCoreDocs thenactualClaude; B rev7immutableDocs thenoneClaude; separateobservationstepcontractfix remainsHOLD"
 ---
+
+## 2026-11-06T12:57:56+09:00 K2 readonly 설계 수락과 정확한 구현 지시
+
+작업한 것과 확인: 실제 K2 rev2 검토 fe7e1ea0/Docs42158896721가 readonly trust/history 준비에 한해 설계를 수락했다. Root는 기존 Codex에게 internal/migrationcontext의 typed ports·checked factories·기본 거부 구현을 허용했다. 저장소 전체 Go 권한 경계와 underlying-type census 보강, 새 코드의 CI·독립 검토가 필수다. 관측 step 계약의 Medium은 별도 미완료이며 현재 파생·효과·설치는 보류다. 원질문 msg_ca431d7c508f에 msg_18271633c26c로 직접 답했고 기존 task_a95ef3d8ccce/ctx_ed23b4a777d0를 유지한다. 다음 첫 행동/담당은 Codex의 한정 구현과 새 검증 제출, Root의 실제 코드 검토 배정이다.
 
 ## 2026-11-06T12:25:24+09:00 K2 rev2 원문 확인과 실제 재검토
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.6"
+version: "1.0.7"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T11:44:14+09:00"
+updated: "2026-11-06T12:57:56+09:00"
 source_of_truth: "Git"
 ---
 
@@ -82,3 +82,16 @@ Root는 실제 eb32/Core42138733821 두 job·f28fb41d 최종 보고/Docs42142783
 TrustedContext.MigrationOperationID는 원래 계획·역사의 migration operation이며 현재 active operation으로 대체하지 않는다. facts와의 동일성 및 역사 HELD lease의 인증을 요구한다. 40개 시험의 원래 문구는 그대로 두고 readonly 소비·거부와 producer·효과의 green 의무를 분리한다. 시간 양 끝점의 동일한 보안 결과와 모든 Now 조건의 convexity 증명, 하나의 오류 catalog, Go types 기반 inventory, internal·opaque DTO 경계, 실제 실행 중 verifier executable의 독립 설치 인증을 rev2에서 닫아야 한다.
 
 상세 선택·반례·보류 조건은 Root Evidence의 k2-rev2-concrete-root-decision.json에 고정했다. 실제 rev2 독립 검토 이후에만 Root가 작은 K2A trust/history 읽기 전용 구현을 검토한다. 40 runtime·현재 view·관측/회전·설치·5PC 인수는 계속 미완료다.
+
+
+## K2 rev2 한정 설계 수락과 readonly trust/history 구현 범위
+
+실제 Claude fe7e1ea0/Docs42158896721는4ce63e8e를 K2A-TRUST/HISTORY readiness에 한해 수락했다. M1은 관측의 명시적 HOLD로, M2/M3/L2는 종결됐고 clock proof는 실제 clock·running stdlib 미확인의 HOLD를 유지한다. 이 판정은 관측·현재 상태 파생·효과·설치의 수락이 아니다.
+
+Root는 msg_18271633c26c로 카드 FLEET5-K2A-TRUST-HISTORY-20261106의 구현을 같은 Codex 담당자에게 허용했다. 허용 제품 경로는 services/node-agent/internal/migrationcontext와 그 내부 시험·문서뿐이며, LoadInstalledPolicy/ReadHistory/ValidateHistory의 typed readonly ports·checked factories·closed refusals를 구현한다. 실제 registry/archive/status/clock/running-code 측정 연결은 null이며 근거가 없으면 거부해야 한다. 공개 constructor나 옵션으로 caller의 provider/Now/key/path/authenticated DTO를 주입해 인증을 우회하지 못한다. 테스트에서만 package 내부의 합성 port·임시 fixture를 사용할 수 있다.
+
+ReadCurrent/현재 Assemble/DeriveCurrent/CurrentView/current SnapshotToken은 stub 없이 API 자체를 두지 않는다. K2B permit/attempt/nonce/challenge·저널/잠금/임시 파일·서명/Engine·entrypoint·실제 측정/packaging/설치는 이 범위에 없다. null running-code port의 오류는 기존 INSTALLATION_OR_RUNTIME_CAPABILITY_UNKNOWN으로 고정한다. 경계 검사는 저장소 전체 first-party Go module의 import/call/constructor를 검사하며, 기존 K1 내부 구현과 시험 fixture를 구분한 뒤 새 production 외부 구성은 k1_bridge.go만 허용한다.
+
+K2R2-L1은 code gate에서 수정한다. 모든 non-test K1 파일을 실제 go/types로 검사하고 named map/slice/function의 underlying type을 포함한다. 기존 G01–G08과 R01–R03 변형을 검출하고 input stub으로 형태를 숨기지 않는다. 새 코드의 실제 로컬 검사·정확한 SHA의 새 Core/Docs·실제 Claude 코드 검토가 필요하며 이전 K1 CI를 차용하지 않는다.
+
+K2R2-M1은 관측 계약 안의 Medium으로 계속 열려 있다. immutable attempt body와 method별 permit/step idempotency·합법 상태 전이·UNKNOWN 재조정·ExecCreate 후 만료·normal:3 별도 slot을 별도 문서 delta와 실제 계약 검토로 닫아야 한다. 이 보완은 readonly 구현의 선행 조건이 아니며, 현재 attempt/permit 코드를 허용하지 않는다. 상세 범위·오류·검사·차단 항목은 Root Evidence k2a-trust-history-root-implementation-grant.json에 고정했다. 실제 연결·40runtime·5PC 운영 인수·전체 개발은 미완료다.
