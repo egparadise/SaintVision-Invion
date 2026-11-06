@@ -1,0 +1,24 @@
+{
+  "environment": "Windows 11, PowerShell 5.1 + D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 (-I/-B), jsonschema 4.26.0 (existing, nothing installed), PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-k2-p02-784-review-20261106 created from exact 78468d0a. Times KST. Serial only; no live service/PG/Docker/SSH/issuer/private key/OS/pagefile/clock/process action; owner Evidence untouched (git status clean before own files).",
+  "provenance": [
+    {"argv": "git rev-parse HEAD origin/agent/claude/fleet5-b-rev9c-5ea-review-20261106", "result": "both 4288a1c4: prior B Rev9c review committed and pushed before reuse"},
+    {"argv": "git fetch origin agent/codex/fleet5-k2-p02-registry-design-20261106 ; git rev-parse FETCH_HEAD ; git rev-parse 78468d0a^", "result": "78468d0aec295c712dd1ea33bea1401d1d4939a4 ; parent c76d0d66895503adde39288544929ff35cd6c281"},
+    {"argv": "git diff --stat/--name-status c76d0d66 78468d0a", "result": "35 A (34 Evidence/fleet5-k2-p02-registry-attestation-design-20261106-codex + 1 History), 0 M/D"},
+    {"argv": "git switch -c agent/claude/fleet5-k2-p02-784-review-20261106 78468d0aec295c712dd1ea33bea1401d1d4939a4", "result": "HEAD 78468d0a"},
+    {"argv": "read-only Root worktree fleet-five-orchestration-20261105: .work/p02-source-root-verified.json ; git rev-parse HEAD ; board version lines", "result": "Root HEAD f748a970 clean; Index 1.0.464; Claude board 1.2.130; Root verification atKST 23:38:08, actualIndependentReview null"}
+  ],
+  "staticReads": [
+    "owner History, contract.md (all 380 lines), candidate_model.py, test_candidate.py, refusal-matrix, authority-matrix (39 rows), provisioning-parameters, real-bindings-HOLD, attempts 01/02, local-execution-and-pins, source-inspection summary, both schemas",
+    "c76 source: services/node-agent/internal/migrationcontext/policy.go:20-290, ports.go:58, k1_bridge.go:29"
+  ],
+  "runs": [
+    {"atKST": "before 2026-11-07T00:26:11 (not individually stamped)", "argv": "python -I -B -c <recompute 33 manifest inputs from target blobs>", "exit": 0, "result": "33/33 match, 358866 B, manifest self excluded"},
+    {"argv": "python -I -B -c <28 contractPins vs proposed-contracts/index.json + contract files>", "exit": 0, "result": "28/28; services unchanged c76..784"},
+    {"argv": "python -I -B -c <129 source-inspection pins vs target blobs>", "exit": 0, "result": "129/129"},
+    {"atKST": "2026-11-07T00:26:11..00:26:13", "argv": "python -I -B reviewer_p02_probes.py.txt <worktree> <scratch>/model <scratch>/reviewer-p02-probes-result.json (run1, 36 probes)", "exit": 0, "note": "superseded by final run after R37/R38 were added; identical R01-R36 rows; log not retained"},
+    {"atKST": "2026-11-07T00:27:26", "argv": "python -I -B reviewer_p02_probes.py.txt <worktree> <scratch>/model reviewer-p02-probes-result.json (final, 38 probes)", "exit": 0, "log": "reviewer-p02-probes.log.txt (PowerShell capture normalized from UTF-8 BOM/CRLF to LF)", "observedDiffersFromContract": 12},
+    {"atKST": "2026-11-07T00:28:30..00:28:48", "argv": "python -B reviewer_gate_driver.py.txt 78468d0a canonical-sync-check-before.txt <scratch> sync-only", "exit": 0, "result": "3829 managed / 1377 pending / 0 conflicts; state 6367d282... unchanged before/after"}
+  ],
+  "notRun": ["owner test_candidate.py (rewrites owner Evidence)", "owner generators", "Core/Go tests", "any crypto/provider/runtime"],
+  "syncCheck": "tools/sync_obsidian.py --check with canonical state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; SHA256 of the state recorded immediately before/after each check; no apply/adopt/resolve/state write/export"
+}

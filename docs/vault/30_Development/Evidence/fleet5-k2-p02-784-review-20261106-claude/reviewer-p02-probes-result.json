@@ -1,0 +1,391 @@
+{
+  "classification": "REVIEWER_SYMBOLIC_PROBES_NO_CRYPTO_NO_PROVIDER_NO_RUNTIME",
+  "target": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "modelSHA256": "533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67",
+  "probes": 38,
+  "findingsWhereObservedDiffers": [
+    "R22",
+    "R23",
+    "R25",
+    "R26",
+    "R27",
+    "R28",
+    "R29",
+    "R30",
+    "R31",
+    "R32",
+    "R33",
+    "R35"
+  ],
+  "rows": [
+    {
+      "id": "R01",
+      "area": "control",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": false,
+      "note": "owner control re-evaluated on reviewer copy"
+    },
+    {
+      "id": "R02",
+      "area": "fresh-same-record",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": false,
+      "note": "new ticket, new issuedAt AND new validUntil (owner C04 kept validUntil): same stable identity legal repeat"
+    },
+    {
+      "id": "R03",
+      "area": "fresh-same-record",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": false,
+      "note": "fresh running proof digest changes; stable identity unchanged; independent running snapshot rebound"
+    },
+    {
+      "id": "R04",
+      "area": "stable-identity",
+      "contractExpects": [
+        "body.issuedAt",
+        "body.requestBindingSHA256",
+        "body.validUntil",
+        "facts.runningMeasurementSHA256"
+      ],
+      "observed": [
+        "body.issuedAt",
+        "body.requestBindingSHA256",
+        "body.validUntil",
+        "facts.runningMeasurementSHA256"
+      ],
+      "finding": false,
+      "note": "exhaustive single-field mutation: only the four contract-named fresh fields leave RegistryRecordIdentity unchanged; signer/signature outside body by definition"
+    },
+    {
+      "id": "R05",
+      "area": "version-equivocation",
+      "contractExpects": "VERSION",
+      "observed": "VERSION",
+      "finding": false,
+      "note": "signed fork with same recordVersion=7 and even matching independent facts; independent current stable digest pins the approved record"
+    },
+    {
+      "id": "R06",
+      "area": "generation-substitution",
+      "contractExpects": "SCOPE",
+      "observed": "SCOPE",
+      "finding": false,
+      "note": "capsule says new generation, registry replays old generation record"
+    },
+    {
+      "id": "R07",
+      "area": "capsule-substitution",
+      "contractExpects": "SCOPE",
+      "observed": "SCOPE",
+      "finding": false,
+      "note": "reused key/selector under a different capsule"
+    },
+    {
+      "id": "R08",
+      "area": "floor",
+      "contractExpects": "VERSION",
+      "observed": "VERSION",
+      "finding": false,
+      "note": "lifecycle current lags independent floor"
+    },
+    {
+      "id": "R09",
+      "area": "ci",
+      "contractExpects": "CI",
+      "observed": "CI",
+      "finding": false,
+      "note": "authenticated CI run for another head (line 237 path)"
+    },
+    {
+      "id": "R10",
+      "area": "ci",
+      "contractExpects": "CI",
+      "observed": "CI",
+      "finding": false,
+      "note": "run conclusion failure although all steps success"
+    },
+    {
+      "id": "R11",
+      "area": "ci",
+      "contractExpects": "CI",
+      "observed": "CI",
+      "finding": false,
+      "note": "required step neutral is not success"
+    },
+    {
+      "id": "R12",
+      "area": "ci",
+      "contractExpects": "CI",
+      "observed": "CI",
+      "finding": false,
+      "note": "required step also listed optional (overlap)"
+    },
+    {
+      "id": "R13",
+      "area": "ci-order",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "noncanonical run order refused before signature"
+    },
+    {
+      "id": "R14",
+      "area": "codec",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "unicode escape alias of selector"
+    },
+    {
+      "id": "R15",
+      "area": "codec",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "solidus escape alias"
+    },
+    {
+      "id": "R16",
+      "area": "codec",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "2^53 integer"
+    },
+    {
+      "id": "R17",
+      "area": "codec",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "exponent integer alias"
+    },
+    {
+      "id": "R18",
+      "area": "codec",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "DEL in manifest string"
+    },
+    {
+      "id": "R19",
+      "area": "ownership",
+      "contractExpects": "OWNERSHIP",
+      "observed": "OWNERSHIP",
+      "finding": false,
+      "note": "bytes subclass envelope"
+    },
+    {
+      "id": "R20",
+      "area": "ownership",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "unhashable mutable element inside tuple maps to FORMAT via TypeError"
+    },
+    {
+      "id": "R21",
+      "area": "time",
+      "contractExpects": "TIME",
+      "observed": "TIME",
+      "finding": false,
+      "note": "bool clock value"
+    },
+    {
+      "id": "R22",
+      "area": "schema-vs-model",
+      "contractExpects": "SCHEMA_REFUSES",
+      "observed": "SCHEMA_ACCEPTS",
+      "finding": true,
+      "note": "Python jsonschema `$` matches before a final newline: ^[A-Za-z0-9_-]{1,128}$ accepts a trailing LF; model fullmatch/ASCII walk refuses"
+    },
+    {
+      "id": "R23",
+      "area": "schema-vs-model",
+      "contractExpects": "SCHEMA_REFUSES",
+      "observed": "SCHEMA_ACCEPTS",
+      "finding": true,
+      "note": "same for a 64-hex digest field"
+    },
+    {
+      "id": "R24",
+      "area": "schema-vs-model",
+      "contractExpects": "FORMAT",
+      "observed": "FORMAT",
+      "finding": false,
+      "note": "model correctly refuses the trailing-LF selector"
+    },
+    {
+      "id": "R25",
+      "area": "payload-codec",
+      "contractExpects": "FORMAT",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": true,
+      "note": "noncanonical (leading space) payload whose digest is independently bound: contract sec.4 requires exact canonical bytes"
+    },
+    {
+      "id": "R26",
+      "area": "payload-codec",
+      "contractExpects": "FORMAT",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": true,
+      "note": "non-JSON payload bytes with bound digest"
+    },
+    {
+      "id": "R27",
+      "area": "payload-schema",
+      "contractExpects": "FORMAT",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": true,
+      "note": "payload self-asserting status/RegistrySHA256 (schema refuses; evaluate never applies schema)"
+    },
+    {
+      "id": "R28",
+      "area": "payload-join",
+      "contractExpects": "REFUSE",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "finding": true,
+      "note": "schema-valid payload whose selector/verifier.sourceSHA/artifactSHA256/ciRunIDs disagree with body.selector/facts/ciRuns; contract sec.5 requires exact payload joins"
+    },
+    {
+      "id": "R29",
+      "area": "payload-join",
+      "contractExpects": "graphSHA256 == SHA256(payload graph bytes) enforced",
+      "observed": "NOT_ENFORCED",
+      "finding": true,
+      "note": "facts.graphSHA256 (a1..) differs from SHA256(payload.graphHex) yet the bound control passes; no derivation is defined for graph/contractSet/semanticPins/cohortScope/keyGrants/proofSlots/designRegistration digests"
+    },
+    {
+      "id": "R30",
+      "area": "k1-projection",
+      "contractExpects": "mapping defined",
+      "observed": "NO policyData.Provenance mapping in contract.md",
+      "finding": true,
+      "note": "c76 policy.go:57-61 provenance{15 fields} incl. single CIRunID/CIJobID and ApprovedReviewScope; contract maps only RegistrySHA256 (contract.md:193)"
+    },
+    {
+      "id": "R31",
+      "area": "inherited-coverage",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "PROVENANCE",
+      "finding": true,
+      "note": "independently bound byte-equivalent successor (review target != source, Root equivalence+choice bound): contract.md:216-217/248-250 pattern; model line 231 and policy.go:228 pr.ReviewTargetSHA!=v.SourceSHA refuse"
+    },
+    {
+      "id": "R32",
+      "area": "inherited-coverage",
+      "contractExpects": "multiple reviews representable",
+      "observed": "single reviewSHA/reviewTargetSHA/reviewVerdict/reviewScope fact",
+      "finding": true,
+      "note": "contract sec.5 \"each actual review issuer, verdict, exact target and scope\" vs one-review facts shape"
+    },
+    {
+      "id": "R33",
+      "area": "accounting",
+      "contractExpects": "distinct inputs per case",
+      "observed": "C02 == C01 (no args) and N89 == N01 (anchor=False)",
+      "finding": true,
+      "note": "100 = 98 distinct inputs; C02 is a re-evaluation of C01 by a pure function; N89 does not model a self-current publication"
+    },
+    {
+      "id": "R34",
+      "area": "closed-reasons",
+      "contractExpects": [
+        "ANCHOR",
+        "ARTIFACT",
+        "CI",
+        "FORMAT",
+        "INSTALLATION",
+        "OWNERSHIP",
+        "PROVENANCE",
+        "READBACK",
+        "REPLAY",
+        "SCOPE",
+        "SIGNATURE",
+        "STATUS",
+        "TIME",
+        "VERSION"
+      ],
+      "observed": [
+        "ANCHOR",
+        "ARTIFACT",
+        "CI",
+        "FORMAT",
+        "INSTALLATION",
+        "OWNERSHIP",
+        "PROVENANCE",
+        "READBACK",
+        "REPLAY",
+        "SCOPE",
+        "SIGNATURE",
+        "STATUS",
+        "TIME",
+        "VERSION"
+      ],
+      "finding": false,
+      "note": "closed 14 private reasons == refusal matrix; public projection constant"
+    },
+    {
+      "id": "R35",
+      "area": "gate-order",
+      "contractExpects": "PROVENANCE (contract sec.7: step5 joins before step6 time)",
+      "observed": "TIME",
+      "finding": true,
+      "note": "record failing both a step-5 join and step-6 time; model evaluates STATUS/VERSION/REPLAY/TIME before PROVENANCE/CI/ARTIFACT/INSTALLATION"
+    },
+    {
+      "id": "R36",
+      "area": "final-output",
+      "contractExpects": [
+        100,
+        4,
+        96,
+        0
+      ],
+      "observed": [
+        100,
+        4,
+        96,
+        0
+      ],
+      "finding": false,
+      "note": "committed final report counts"
+    },
+    {
+      "id": "R37",
+      "area": "contract-pins",
+      "contractExpects": [
+        28,
+        28,
+        28
+      ],
+      "observed": [
+        28,
+        28,
+        28
+      ],
+      "finding": false,
+      "note": "payload schema consts equal c76 proposed-contracts index raw/schema SHA and codec/requiredVerifier strings in each contract file"
+    },
+    {
+      "id": "R38",
+      "area": "source-pins",
+      "contractExpects": [
+        129,
+        129
+      ],
+      "observed": [
+        129,
+        129
+      ],
+      "finding": false,
+      "note": "source-inspection sourceFiles SHA256 recomputed from target blobs"
+    }
+  ],
+  "completedKST": "2026-11-07T00:27:45+09:00"
+}

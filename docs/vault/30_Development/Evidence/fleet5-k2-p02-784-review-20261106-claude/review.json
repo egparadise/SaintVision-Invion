@@ -1,0 +1,109 @@
+{
+  "classification": "ACTUAL_INDEPENDENT_CLAUDE_CONTRACT_CANDIDATE_REVIEW_NO_CODE_OR_TRUST_GRANT",
+  "reviewer": "Claude (Opus 5.5), one reviewer, no helpers/subagents",
+  "orca": {"task": "task_da1378fed8fe", "dispatch": "ctx_9785b4d4f081", "authorTask": "task_a95ef3d8ccce", "authorDispatch": "ctx_ed23b4a777d0", "authorAsk": "msg_5bf8ccb0d95d", "rootGrant": "msg_f68dc38baa0f"},
+  "target": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "base": "c76d0d66895503adde39288544929ff35cd6c281",
+  "targetBranch": "agent/codex/fleet5-k2-p02-registry-design-20261106",
+  "reviewBranch": "agent/claude/fleet5-k2-p02-784-review-20261106 (from exact 78468d0a)",
+  "priorReviewReleased": "B Rev9c review 4288a1c4 committed/pushed (local HEAD == origin) before this branch was created; same workspace reused after its exit",
+  "scope": "ONLY the P02 installed-policy/registry READ-SNAPSHOT independently provisioned attestation as a PROPOSED/UNREGISTERED design: contract.md, authority/refusal/provisioning tables, two candidate schemas, candidate_model.py/test_candidate.py, final candidate-test-results.json, local-execution-and-pins.json, source-inspection.json, frozen manifest and owner History. Not K1/PL/merge/pins/Core, not the six other providers, not any producer, wire, domain, ABI, key, anchor or runtime.",
+  "rootFactsAcceptedNotRerun": "Root .work/p02-source-root-verified.json (23:38:08 KST): direct parent, 35 own added docs only, base/non-docs unchanged, remote exact, Docs 42234905242 / job 127949897305 all 19 SUCCESS, correlation FLEET5-K2-P02-REGISTRY-DESIGN-78468d0a-msg_f68dc38baa0f. This reviewer did not re-query that run.",
+  "reviewerVerified": {
+    "remoteRef": "git fetch: origin/agent/codex/fleet5-k2-p02-registry-design-20261106 == 78468d0a; parent == c76d0d66; diff c76..784 = 35 A, 0 M/D (34 Evidence + 1 History)",
+    "manifest": "33/33 frozen-candidate-manifest inputs recomputed from target blobs, 358866 B, working tree == blob, manifest self excluded",
+    "primaryHashes": "candidate_model.py 533cc4a7..., contract.md 4a3d4a0e..., both schemas match Root and local-execution-and-pins",
+    "sourcePins": "source-inspection sourceFiles 129/129 SHA256 equal target blobs; services/** unchanged c76..784",
+    "contractPins": "policy-payload.schema 28 contractPins consts equal c76 proposed-contracts/index.json rawSHA256 (== SHA256 of each contract file) and schemaSHA256; codec/requiredVerifier strings present in each contract file (codecs normalized-proof-v1, native-m2-v2; verifiers pretrusted:*)",
+    "k1Source": "ports.go:58 authenticateRegistry always refuses; policy.go:68-81 LoadInstalledPolicy has no positive constructor; checkPolicyBindings (policy.go:222-279) is consistency only"
+  },
+  "verdict": "REVISION_REQUIRED",
+  "verdictSummary": "One MEDIUM contract/model gap on the sealed policy payload side (P02-M1) plus five LOW. The envelope side is sound in every reviewer probe: authority originates outside the registry, closed bounded canonical envelope codec, fixed domain projection, stable RegistryRecordIdentity, fresh same-record repeat vs replay/equivocation, generation/capsule/floor substitution, full-interval time predicates, CI required/optional sets, V0/V1, closed 14 private reasons and constant opaque public refusal. No HIGH. Not ACCEPT_FOR_BOUNDED_DESIGN because the contract claims precise verification semantics before a factory and the normative authority matrix leaves the payload origin/join/projection undefined.",
+  "accepted": [
+    "Authority graph starts at an independently provisioned capsule/bootstrap decision; registry, provider, plan and payload cannot choose anchor, expected selector/scope/version, verifier, verdict or CI policy; real custody/bootstrap/capsule/anchors NULL/HOLD and not simulated (real-bindings-HOLD.json).",
+    "Existing normalized-proof-v1, node-leaf/planning/TLS and the 28 descriptor purposes are explicitly NOT registry authorization; candidate format/purpose/domain stay UNREGISTERED.",
+    "Envelope codec: strict UTF-8, no BOM/duplicate/trailing/float/NaN/-0/escape alias, ints 0..2^53-1 excluding bool, size/depth/node/string budgets, canonical round-trip, fixed run/job/step order (R13-R21 all refuse as specified).",
+    "Signature message = domain || NUL || canonical {body,signer}; SPKI fingerprint over DER from the capsule; whole raw response digest separate from projection digest.",
+    "RegistryRecordIdentity: exhaustive single-field mutation (R04) shows exactly issuedAt, requestBindingSHA256, validUntil and facts.runningMeasurementSHA256 are excluded, matching contract.md:148-156; every other safety-relevant body/facts/ciRuns field is bound.",
+    "Fresh same-record repeat with new ticket, issuedAt, validUntil and running proof is legal (R02/R03); signed fork with same recordVersion refuses VERSION (R05); generation/capsule substitution SCOPE (R06/R07); floor ahead VERSION (R08); old response into new ticket REPLAY (owner N10).",
+    "Original source anchors precede the record; current head/status/running acquired independently; first publication ABSENT stays HOLD; H1-H7 remain named dependencies with actual NULL.",
+    "CI: authenticated run for another head, run failure with green steps, required neutral, required/optional overlap all refuse CI (R09-R12), exercising model lines 236-247 that owner N42-N47 never reach (they stop at a.ci byte equality).",
+    "Closed 14 private reasons equal refusal-matrix ids; production_projection is constant TRUST_UNKNOWN_OR_PIN_MISMATCH for every probe (R34).",
+    "Owner evidence honesty: 100 cases / 4 SYNTHETIC_ALREADY_BOUND / 96 refusals / 0 failures, signature table explicitly already-bound, no Ed25519/X509/OS/provider/clock authentication; N46 fixture-order failure and generator SyntaxError preserved; two superseded passing reports labelled non-final. Accepted as OWNER STATIC SYMBOLIC proof only; no positive authentication is granted from it."
+  ],
+  "findings": [
+    {
+      "id": "P02-M1",
+      "severity": "MEDIUM",
+      "title": "Sealed policy payload is opaque: no codec in the model, no payload-envelope joins, no digest derivations, no policyData projection",
+      "source": "contract.md:187-199 and 203-211 (payload codec, 'exact payload/hash/graph/contracts/grants/member bindings', authority matrix normative, 'missing or ambiguous origin fails'); candidate_model.py:249 (payload only hashed); authority-matrix.json rows cover only envelope fields; policy.go:43-62 policyData/provenance",
+      "counterexamples": [
+        "R25 leading-space noncanonical payload, R26 non-JSON bytes, R27 payload self-asserting status and RegistrySHA256: each with independently bound policyPayloadSHA256 returns SYNTHETIC_ALREADY_BOUND although contract.md:187-191 requires exact canonical bytes and the closed schema with no status/RegistrySHA256.",
+        "R28 schema-valid payload with selector 'another_selector', verifier.sourceSHA/artifactSHA256 different from facts and ciRunIDs [777] not in ciRuns returns SYNTHETIC_ALREADY_BOUND; contract step 5 requires exact payload joins.",
+        "R29 facts.graphSHA256 differs from SHA256(payload.graphHex) and the bound control still passes: no derivation is defined for graphSHA256, contractSetSHA256, semanticPinsSHA256 (the payload has no semantic-pins member at all), cohortScopeSHA256, keyGrantsSHA256, registryProofSlotsSHA256, designRegistrationSHA256.",
+        "R30 contract.md defines only policyData.RegistrySHA256 (line 193). K1 policyData.Provenance has 15 fields with a single CIRunID/CIJobID/ArtifactDigest and ApprovedReviewScope; with up to 8 ciRuns, integer ciRunIDs vs K1 []string, integer grant times vs time.Time, authorityScopeC2Hex decoding and grant Status from independent status, the step-7 checkPolicyBindings input is not determined. If a future factory filled both ReviewScope and ApprovedReviewScope from facts.reviewScope, the K1 scope check would be vacuous."
+      ],
+      "whyNotProductionPrerequisite": "These are contract content the candidate claims to provide (byte/identity mapping, joins, projection), not H1-H7 authorities.",
+      "blocks": "Acceptance of the payload codec/projection part of D04 and any D07 factory. Does NOT block an envelope-only codec/projection/strict-signature seam if Root chooses one.",
+      "minimalCorrection": "Add a normative payload table: (a) strict canonical codec identical to the envelope rules plus hex round-trip and the closed payload schema, modelled in evaluate before any join; (b) exact joins payload.selector==body.selector, payload.verifier.sourceSHA==facts.sourceSHA, artifactSHA256==facts.binarySHA256, reviewSHA==facts.reviewSHA, ciRunIDs==ordered ciRuns[*].runId, version mapping to recordVersion or an explicit independent version fact; (c) a defined derivation (exact canonical bytes) for every payload-derived facts digest, or delete facts that have none; (d) a policyData projection table field-by-field with origin, including which run/job populates CIRunID/CIJobID, ArtifactDigest==artifactZipSHA256, RunningExecutableSHA256 origin, and ApprovedReviewScope from the capsule/Root coverage mapping, never from facts.reviewScope; (e) model cases for each with benign controls."
+    },
+    {
+      "id": "P02-L1",
+      "severity": "LOW",
+      "title": "Inherited/multi-review coverage permitted by the contract is unrepresentable",
+      "source": "contract.md:212-217, 248-250 vs candidate_model.py:231 and policy.go:228 (pr.ReviewTargetSHA != v.SourceSHA refuses); facts carry one reviewSHA/reviewTargetSHA/reviewVerdict/reviewScope",
+      "counterexample": "R31: independently bound byte-equivalent successor (reviewTargetSHA != sourceSHA, sourceEquivalence and rootChoice bound) refuses PROVENANCE. The real c76/ea276 acceptance rests on several scoped reviews, so the actual positive path cannot be expressed. Fail-closed: liveness/consistency, not safety.",
+      "minimalCorrection": "Either state that P02 requires one whole-target review whose target equals sourceSHA and drop the inherited text, or add an ordered closed reviews[] list plus the Root coverage mapping with a defined join, while keeping the projected K1 ReviewTargetSHA == SourceSHA meaning explicit."
+    },
+    {
+      "id": "P02-L2",
+      "severity": "LOW",
+      "title": "Normative gate order differs from the model's internal reason order",
+      "source": "contract.md:300-313 (joins at step 5, status/replay/floor/time at step 6, key interval at step 4) and authority-matrix 'first failed gate wins' vs candidate_model.py:222-252",
+      "counterexample": "R35: record failing both a step-5 join (toolchain) and a step-6 time predicate returns TIME, not PROVENANCE. Internal only; public result stays opaque.",
+      "minimalCorrection": "Make one order normative (reorder the model or restate section 7) before D04 tests pin internal reasons."
+    },
+    {
+      "id": "P02-L3",
+      "severity": "LOW",
+      "title": "Owner schema harness accepts trailing LF in pattern fields",
+      "source": "candidate-envelope.schema.json patterns ^...$ evaluated by Python jsonschema 4.26.0 (re.search, $ matches before a final newline); contract.md:178-179 'schema and pure model pin the same field set and limits'",
+      "counterexample": "R22/R23: selector 'synthetic_legacy_two\\n' and a 64-hex digest + LF are schema-valid; R24 the model refuses FORMAT. The model, not the schema, is the gate, so no acceptance results.",
+      "minimalCorrection": "State that schema patterns use ECMA-262 end-of-input semantics (or full-match), add a trailing-LF schema mutant, and never treat schema validity as the codec."
+    },
+    {
+      "id": "P02-L4",
+      "severity": "LOW",
+      "title": "Two of 100 cases repeat identical inputs",
+      "source": "test_candidate.py:72-73 (C02 == C01, no arguments) and :75/:161 (N89 == N01, anchor=False)",
+      "counterexample": "R33: 100 cases = 98 distinct inputs. C02 re-evaluates a pure function; N89 does not model a self-current publication.",
+      "minimalCorrection": "Relabel as duplicates or replace with distinct cases, e.g. R02/R03 (new ticket with new validUntil and new running proof) and a registry-signed current-head claim with no independent current digest."
+    },
+    {
+      "id": "P02-L5",
+      "severity": "LOW",
+      "title": "Consumer-side fresh running proof digest is signed by the read-snapshot issuer",
+      "source": "contract.md:153-156, BODY facts.runningMeasurementSHA256; authority-matrix row says independent producer, never record self-measurement",
+      "counterexample": "None unsafe: the value must equal the independent running snapshot (R03). But the registry signer must learn the consumer's fresh measurement for every read, which couples H5 to the registry issuer and reads like registry attestation of running code.",
+      "minimalCorrection": "Remove it from the signed body (keep approved target identities), or state that it is an echo bound through requestBindingSHA256 with zero authentication weight and that only the H5 measurement authenticates."
+    }
+  ],
+  "factProducersAndRemainingObligations": {
+    "capsule/bootstrap/issuer authorization": "producer Root custody + bootstrap loader; origin NULL; H1/H2 HOLD",
+    "source/review/CI/artifact": "producer future independently authorized acquirer; GitHub/reviewer/Root publications authenticate only within their own purposes; H3 HOLD",
+    "lifecycle/ticket/clock": "separate status, read-ticket and clock purposes; H4 HOLD",
+    "installation receipt and running measurement (V0/V1 joins)": "separate installation and RunningCodeMeasurementPort; H5 HOLD",
+    "antirollback floor": "H6 HOLD; P02 consumes, never resets/advances",
+    "linked K2 entrypoint": "H7 HOLD",
+    "rule": "Hash/string equality inside the record is consistency only; no registry self-attestation of its own current authenticity or running executable is accepted."
+  },
+  "limitations": [
+    "Symbolic review only: no Ed25519/X509/OS/provider/clock/runtime authentication, no producer executed (none exists), owner test_candidate.py not executed because it rewrites owner Evidence; the model was imported from a byte-verified scratch copy and the control fixture reconstructed and asserted equal to synthetic-control.json.",
+    "Root-verified Docs/job facts accepted, not re-queried; no Core rerun, install, browser, TLS, SSO or physical claim.",
+    "Contract-pin check confirms consts and string presence, not semantic equivalence of codec/verifier behaviour.",
+    "Prior 4ce/fe7/7d979761/0c5 decisions consulted only through source-inspection pins; not reopened."
+  ],
+  "smallestFollowOnSeam": "P02 Rev2 fix-only on Codex's own Evidence/History: close P02-M1 (payload codec, joins, digest derivations, policyData projection table, model cases) and L1-L5, then ONE narrow Claude delta review. After that Root may consider D04 as a pure internal bounded codec/projection/strict-signature seam on private already-authenticated types with default-refusal composition. If Root prefers to start D04 earlier, only its envelope part is unaffected by P02-M1. No factory, port, provider, key, anchor registration, read clock, installer, current view or effect grant.",
+  "stillHold": "All real custody/anchors/status/clock/running/receipt/entrypoint NULL/HOLD; raw7 UNREGISTERED; A01-A40 NOT_RUN; whole K2/fleet INCOMPLETE.",
+  "probes": {"file": "reviewer_p02_probes.py.txt", "result": "reviewer-p02-probes-result.json", "count": 38, "observedDiffersFromContract": ["R22", "R23", "R25", "R26", "R27", "R28", "R29", "R30", "R31", "R32", "R33", "R35"]}
+}
