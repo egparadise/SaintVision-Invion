@@ -1,0 +1,154 @@
+"""Reviewer A7 snapshot R1 probes: AST/source-only, serial, one process.
+
+Usage: python -B -I reviewer_a7_probes.py <a7 evidence dir abs> <out.json>
+Calls the owner's final a7_body.prove / a7_inventory.census on in-memory
+mutated sources. Nothing from the product or a mutant is imported or executed;
+every mutant is only compile()d for syntax.
+"""
+import ast, hashlib, json, sys, time
+from collections import Counter
+from pathlib import Path
+
+E = Path(sys.argv[1]).resolve(); OUT = Path(sys.argv[2])
+assert E.is_dir() and (E / 'a7_body.py').exists(), E
+sys.path.insert(0, str(E))
+
+# Precondition 1: every manifest-pinned file/producer equals the committed bytes.
+manifest_bytes = (E / 'proof-producer-hashes.json').read_bytes()
+manifest = json.loads(manifest_bytes)
+mism = [r['file'] for r in manifest['files'] if hashlib.sha256((E / r['file']).read_bytes()).hexdigest() != r['sha256']]
+pmism = [k for k, v in manifest['producers'].items()
+         if hashlib.sha256(((E.parent / k[3:]) if k.startswith('../') else (E / k)).read_bytes()).hexdigest() != v]
+pre = {'manifestSHA256': hashlib.sha256(manifest_bytes).hexdigest(), 'manifestFiles': len(manifest['files']), 'fileMismatches': mism,
+       'producers': len(manifest['producers']), 'producerMismatches': pmism}
+assert pre['manifestSHA256'] == '2a75a22f883f9ab9eba13e8b618c213710f7880f5df39769f10d8ab6bcf4ee43' and not mism and not pmism, pre
+
+import a7_body as body, a7_inventory as inventory, use_sites as u, reflection_audit as ra
+from a7_common import NC, CT, DB, ER, PROTECTED, frozen_source, sha
+from source_bindings import Facts
+
+rows = []
+def log(row):
+    rows.append(row); print(json.dumps(row, sort_keys=True)[:1500], flush=True)
+
+def replace(path, old, new):
+    s = frozen_source(path); assert s.count(old) == 1, (path, old, s.count(old)); return {path: s.replace(old, new, 1)}
+def append(path, extra):
+    return {path: frozen_source(path) + extra}
+
+def injected_spans(path, world, marker):
+    s = world[path]; t = ast.parse(s); out = []
+    for n in ast.walk(t):
+        if isinstance(n, ast.stmt) and marker in (ast.get_source_segment(s, n) or '') and not isinstance(n, (ast.FunctionDef, ast.ClassDef, ast.With, ast.If)):
+            out.append({'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset], 'text': ast.get_source_segment(s, n)})
+    return out
+
+def precheck(world):
+    for p, s in world.items(): compile(s, p, 'exec', dont_inherit=True)
+    return {'inputSHA256': {p: sha(s) for p, s in world.items()}, 'frozenSHA256': {p: sha(frozen_source(p)) for p in world if not p.endswith('a7_reviewer_new_file.py')},
+            'unchangedSelected': {p: sha(frozen_source(p)) for p in (NC, CT, DB, ER) if p not in world}}
+
+def run_body(name, world, expect, note=''):
+    pc = precheck(world); t0 = time.monotonic()
+    with body.target_scope():
+        r = body.prove(world)
+    row = {'layer': 'BODY', 'case': name, 'accepted': r['bodyAccepted'], 'reason': r['reason'], 'detail': r.get('detail'), 'expected': expect,
+           'gatesBeforeRefusal': [c['gate'] for c in r['checks']], 'seconds': round(time.monotonic() - t0, 1), 'note': note, **pc}
+    row['matches'] = (r['bodyAccepted'] if expect == 'ACCEPT' else (not r['bodyAccepted'] and (expect == 'REFUSE' or expect in str(r['reason']))))
+    log(row); return row
+
+BASE = None
+def obl_key(o):
+    s = o.get('source') or {}
+    return (o['code'], s.get('path') if isinstance(s, dict) else str(s), tuple(s.get('span', [])) if isinstance(s, dict) else ())
+
+def run_census(name, world, note=''):
+    pc = precheck(world); t0 = time.monotonic()
+    try:
+        with body.target_scope():
+            c = inventory.census(world)
+    except Exception as e:  # recorded as a harness/precondition crash, never as a refusal or a pass
+        row = {'layer': 'CENSUS', 'case': name, 'exception': type(e).__name__ + ':' + str(e)[:300], 'note': note, **pc}; log(row); return row
+    cur = Counter(obl_key(o) for o in c['obligations'])
+    added = sorted([list(map(str, k)) + [n] for k, n in (cur - BASE['obl']).items()]); removed = sorted([list(map(str, k)) + [n] for k, n in (BASE['obl'] - cur).items()])
+    files = {x['path']: x['retainedForCallClosure'] for x in c['sourceFiles']}
+    row = {'layer': 'CENSUS', 'case': name, 'obligations': len(c['obligations']), 'addedVsBaseline': added, 'removedVsBaseline': removed,
+           'constructors': len(c['constructorSites']), 'snapshots': len(c['snapshotSites']),
+           'otherReceivers': [{'path': x['source']['path'], 'span': x['source']['span'], 'receiver': x['receiver'], 'purpose': x['purpose']} for x in c['otherSnapshotReceivers']],
+           'retainedForCallClosure': {p: files.get(p) for p in world}, 'seconds': round(time.monotonic() - t0, 1), 'note': note, **pc}
+    log(row); return row
+
+def guard_only(name, path, source):
+    with body.target_scope():
+        f = Facts(path, source); a = ra.audit(f, PROTECTED); uses, error = u.module_uses(source, path, instances=True, factories=(), parameter_context={})
+    row = {'layer': 'GUARD_ONLY', 'case': name, 'path': path, 'inputSHA256': sha(source), 'reflectionNewRelevantHits': a['newRelevantHits'], 'useSiteError': error}
+    log(row); return row
+
+# ---- baseline (actual 72028) ----
+with body.target_scope():
+    c0 = inventory.census(None)
+BASE = {'obl': Counter(obl_key(o) for o in c0['obligations'])}
+log({'layer': 'CENSUS', 'case': 'baseline-actual-72028', 'censusObligations': len(c0['obligations']), 'constructors': len(c0['constructorSites']), 'snapshots': len(c0['snapshotSites']),
+     'other': len(c0['otherSnapshotReceivers']), 'parsed': len(c0['sourceFiles']), 'retained': sum(x['retainedForCallClosure'] for x in c0['sourceFiles']), 'pre': pre})
+NONRETAINED = [x['path'] for x in c0['sourceFiles'] if not x['retainedForCallClosure']]
+
+# ---- body layer: controls ----
+run_body('control-actual', {}, 'ACCEPT')
+run_body('control-leading-comment-shifts-all-nc-spans', {NC: '# reviewer benign leading comment\n' + frozen_source(NC)}, 'ACCEPT')
+run_body('control-comment-inside-snapshot', replace(NC, '            result = proof(channel)\n', '            # reviewer benign comment\n            result = proof(channel)\n'), 'ACCEPT')
+run_body('control-containment-trailing-comment', append(CT, '\n# reviewer benign comment\n'), 'ACCEPT')
+run_body('control-db-trailing-comment', append(DB, '\n# reviewer benign comment\n'), 'ACCEPT')
+run_body('control-errors-trailing-comment', append(ER, '\n# reviewer benign comment\n'), 'ACCEPT')
+
+# ---- body layer: containment module (callee definition side) ----
+run_body('ct-module-rebinding-after-def', append(CT, '\nrequire_execution = lambda conn: None\n'), 'REFUSE')
+run_body('ct-duplicate-noop-def-after', append(CT, '\n\ndef require_execution(conn):\n    return None\n'), 'REFUSE')
+run_body('ct-duplicate-noop-def-before', replace(CT, 'def require_execution(conn):\n', 'def require_execution(conn):\n    return None\n\n\ndef require_execution(conn):\n'), 'REFUSE')
+run_body('ct-del-after-def', append(CT, '\ndel require_execution\n'), 'REFUSE')
+run_body('ct-domainerror-rebound', append(CT, '\nDomainError = RuntimeError\n'), 'REFUSE')
+
+# ---- body layer: node_channels helpers / data ----
+run_body('nc-assert-channel-module-rebinding', append(NC, '\nassert_channel = lambda conn, expected: None\n'), 'REFUSE')
+run_body('nc-channelproof-eq-patch', append(NC, '\nChannelProof.__eq__ = lambda a, b: True\n'), 'REFUSE')
+run_body('nc-domainerror-rebound', append(NC, '\nDomainError = RuntimeError\n'), 'REFUSE')
+run_body('nc-heartbeat-lower-bound-weakened', replace(NC, 'not 0 <= (row["now"]', 'not -1 <= (row["now"]'), 'NORMAL_ONLINE')
+run_body('nc-online-check-forced-into-observation', replace(NC, '            if not observation_only and (\n', '            if (\n'), 'NORMAL_ONLINE')
+run_body('nc-assert-channel-host-clock', replace(NC, 'now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]', 'now = datetime.now(timezone.utc)'), 'CURRENT_CHANNEL_CERTIFICATE')
+run_body('nc-snapshot-default-true', replace(NC, 'def snapshot(self, node, *, observation_only=False):', 'def snapshot(self, node, *, observation_only=True):'), 'SIGNATURE')
+
+# ---- declared class-monkeypatch category outside node_channels.py ----
+PATCH = '\nfrom .node_channels import NodeChannels as _ReviewerA7NC\n_ReviewerA7NC.snapshot = lambda self, node, **kw: None\n'
+nr = 'services/control-plane/src/inv/node_certificates.py'
+assert nr in NONRETAINED, NONRETAINED
+w = append(nr, PATCH)
+log({'layer': 'SPAN', 'case': 'nonretained-candidate-class-monkeypatch', 'path': nr, 'injected': injected_spans(nr, w, '_ReviewerA7NC')})
+run_body('nonretained-candidate-class-monkeypatch', w, 'ACCEPT', 'body layer reads only node_channels/containment/db/errors; ACCEPT here is expected at this layer')
+run_census('nonretained-candidate-class-monkeypatch', w, 'parsed lexical candidate with no NodeChannels call and no .snapshot call')
+guard_only('nonretained-candidate-class-monkeypatch', nr, w[nr])
+ret = OBS = 'services/control-plane/src/inv/observation.py'
+w2 = append(ret, PATCH)
+run_census('retained-candidate-class-monkeypatch', w2, 'same patch in a retained candidate')
+w3 = append(nr, '\nfrom . import node_channels as _ReviewerA7M\n_ReviewerA7M.assert_channel = lambda conn, expected: None\n')
+run_census('nonretained-candidate-module-attribute-store', w3, 'module attribute store: outside the declared categories (B9g INFO novel family); informational only')
+guard_only('nonretained-candidate-module-attribute-store', nr, w3[nr])
+newp = 'services/control-plane/src/inv/a7_reviewer_new_file.py'
+run_census('new-production-file-class-monkeypatch', {newp: PATCH.lstrip()}, 'new file inside the declared production universe')
+
+# ---- correction cost: apply the retained guards to every non-retained parsed candidate at frozen bytes ----
+for p in NONRETAINED:
+    guard_only('frozen-nonretained-guard', p, frozen_source(p))
+
+# ---- snapshot receivers that are not inline or self.<single init store> ----
+old = '        channel = self.channels.snapshot(node)\n'
+run_census('local-alias-receiver-dynamic-mode', replace('services/control-plane/src/inv/node_transfer.py', old,
+           '        channels = self.channels\n        channel = channels.snapshot(node, observation_only=bool(size))\n'), 'NodeChannels instance reached through a local alias, dynamic mode')
+run_census('local-alias-receiver-literal-normal', replace('services/control-plane/src/inv/node_transfer.py', old,
+           '        channels = self.channels\n        channel = channels.snapshot(node)\n'), 'near control: same alias, literal default mode')
+run_census('control-inline-dynamic-mode', replace('services/control-plane/src/inv/node_transfer.py', old,
+           '        channel = self.channels.snapshot(node, observation_only=bool(size))\n'), 'control: self.channels receiver with dynamic mode is counted')
+
+# ---- oracle check of the owner caller-dynamic-purpose case ----
+run_census('owner-caller-dynamic-purpose-recomputed', replace(OBS, 'observation_only=True', 'observation_only=foreign'), 'owner case; added-vs-baseline shows whether the purpose obligation is new')
+
+OUT.write_text(json.dumps({'preconditions': pre, 'rows': rows}, indent=1, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'rows': len(rows)}))
