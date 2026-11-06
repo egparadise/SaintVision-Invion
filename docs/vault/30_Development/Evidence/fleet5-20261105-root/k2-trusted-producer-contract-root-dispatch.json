@@ -16,19 +16,19 @@
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T16:18:44+09:00",
+  "latestObservationAtKST": "2026-11-06T17:02:04+09:00",
   "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
   "proposalDocs": 42146482617,
   "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
   "actualReviewGate": "k2-551-root-actual-review-gate.json",
-  "ownerQuestionPending": null,
+  "ownerQuestionPending": "msg_37790154ccf1",
   "actualDesignAccepted": true,
   "actualCodeGrant": true,
   "answeredQuestion": "msg_e880984e98ec",
   "actualDirectReply": "msg_6df22674ff19",
   "actualReview": "5623dc00b676ce0b535350897069a3b7f1154eab",
   "actualVerdict": "REVISION_REQUIRED3Major5Low",
-  "currentAuthorization": "PLR1a TEST/README then210594+newLow normal2parentmerge + exact one-line7665 sourcepin candidate; no finalCore untilactualcombinedreview/Rootdecision",
+  "currentAuthorization": "frozen combined candidate actual finalsource review only; no finalCore untilactualverdict/Root decision; no new product/runtime/auth",
   "decision": "k2-rev2-concrete-root-decision.json",
   "latestProposalSource": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
   "latestProposalDocs": 42155660700,
@@ -52,7 +52,11 @@
   "latestFailureReportDocs": 42165778183,
   "latestRootArtifactAudit": "de71-root-actual-race-artifact-audit.json",
   "rootAnswer": "msg_94f6f2679db5",
-  "activeActualCodeAxisReview": null,
+  "activeActualCodeAxisReview": {
+    "task": "task_b234a0f9df1a",
+    "dispatch": "ctx_aabf96f33707",
+    "source": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e"
+  },
   "separateSourceDiagnosticScope": "peer-floor-observation-diagnostic-root-scope.json",
   "implementationCodeAxisAccepted": true,
   "actualCodeAxisReview": {
@@ -84,5 +88,10 @@
   "latestBoundedCodeAxesAccepted": true,
   "combinedSourceAccepted": false,
   "PLR1aClosed": false,
-  "actualAuthBindings": null
+  "actualAuthBindings": null,
+  "latestCombinedFinal": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "latestCombinedProduct": "66d4cd5175cbe28c19541cbfcbf3cb20b006370a",
+  "latestCombinedDocs": 42183480798,
+  "latestCombinedSourceProof": "k2a-stage2-combined-source-root-verification.json",
+  "latestCombinedReviewGate": "k2a-stage2-combined-final-review-root-gate.json"
 }

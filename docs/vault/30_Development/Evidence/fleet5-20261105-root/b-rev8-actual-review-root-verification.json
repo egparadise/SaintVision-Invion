@@ -1,0 +1,12 @@
+{
+  "atKST": "2026-11-06T16:52:07+09:00",
+  "source": "6a65665819d7479073189c524abf585636c3079d",
+  "actualReview": "0440d1cabcb74ce24d9b43c95970dae795957952",
+  "branch": "agent/claude/fleet5-b-rev8-6a65-review-20261106",
+  "Docs": 42183423923,
+  "job": 127778067293,
+  "correlation": "claude-b-rev8-6a65-review-0440d1ca-ctx_a3cf08fa935b",
+  "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true,
+  "remoteExact": true,
+  "reviewOnlyAddedPaths": 18
+}

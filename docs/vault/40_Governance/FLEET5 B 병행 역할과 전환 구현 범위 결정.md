@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.2"
+version: "1.4.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T15:18:50+09:00"
+updated: "2026-11-06T17:02:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -108,3 +108,18 @@ Root는 msg_aca0d787de3d로 같은 담당자에게 좁은 rev8을 지시했다. 
 시범 경로는 inv.node_channels.revoke_channel이다. 기존3개 미해결은 DomainError와 이미 기록된 DB call의 cursor 결과라 분석 근거를 닫는 대상이다. A1–A8의 타입·import·body provenance 규칙과 변형 반례를 작은 sidecar로 증명하고 다른 경로의 byte/reference를 유지한다. 전체644MB급 assembler를 반복 실행하지 않는다. T1 DB transaction/자격증명 역할·T2 기존 IO catalog 연결·T3 보호된 로컬 읽기는 기존 인터페이스의 설계 계약으로 묶되 실제 연결은 미제공이다. P-INJECT-BUILD/P-DBFUNC/P-API-DI/P-GETATTR/P-LOCKRANK/P-SQLSCOPE는 구체 미래 계약으로 이름만 정하며 구현·등록하지 않는다.
 
 ORM session.delete/merge writer 누락과 ServeHTTP/rawPath anchor·선택 hook 부재·39 source lock plan 중33 procedure join이라는 차이도 바로잡는다. Runtime crypto/PG/role/race·실장비 증거는 아직0이고 A1–A16은 PENDING이다. 실제 rev8 독립 판정 뒤에만 Root가 다음 한정 계약·구현 범위를 결정한다. 상세 조건은 Root Evidence b-rev8-revoke-pilot-root-decision.json에 있다.
+
+
+## Rev8 실제 판정과 작은 Rev9-T1 범위
+
+Root는 실제0440d1cabcb74ce24d9b43c95970dae795957952 검토와 exact Docs42183423923/job127778067293/19단계 성공·remote·고유 검토 문서18개를 대조했다. B7의 CANCEL/RECEIPT 복구·시범 revoke 분석·writer389와 authority34·후보별 hint·I1–I4는 실제로 닫혔다. 그러나 이미 해제된 같은 claim의 터미널 frame을 다른 live claim 때문에 허용하는 B8-M1 Medium과 A1/A2 mutation 시험·분류 정확도·hint 인증 guard의 Low가 남아 전체 Rev8은 한정 수정 필요다.
+
+Root는 같은 B Codex에게 msg_78b82487362a로 docs/static/symbolic Rev9-T1만 지시했다. TERMINAL_FRAME은 같은 원래 EXECUTE parent가 PENDING/LIVE/current-incarnation이고 같은 claimVersion·activeClaim·실행 중 workload·유효한 해당 run lease·now+5 deadline을 모두 만족해야 한다. 다른 Node claim의 bool은 대체하지 못한다. 원래 typed terminal receipt가 맞는 claim만 release/tombstone/version 갱신하며 원래 UNKNOWN·durable recovery identity는 보존한다. DRAIN 예외는 그대로고 준비 뒤 release된 frame도 거부한다.
+
+공유 predicate였던 BUILD_CLEANUP_READ는 별도 기존 목적의 protected build evidence read로 분리한다. 원래 BUILD_DISPATCH와 정확한 admitted session/request/approval/decision/daemon/lease/resource/fencing descriptor, 현재 인증과 소유 protected transport root가 필요하다. 물리 종료 뒤에도 cleanup 증거를 읽을 수 있어야 하므로 terminal의 실행 중·lease/now+5 조건을 그대로 이식하지 않는다. 읽기만으로 claim·UNKNOWN·capability·거부 상태를 바꾸지 않고 원래 _commit_consequences와 typed physical receipt/CAS·duplicate 규칙만 적용한다. 보호된 read binding이 입증되지 않으면 T3/HOLD로 남고 새 wire/port 권한을 만들지 않는다.
+
+같은 delta에서 hint의 channel/key/cert/epoch 독립 인증 guard와 span을 다시 계산하는 A1/A2 mutation 시험을 보완한다. cursor/Connection monkeypatch·metaclass·dataclass/Exception/constructor shadowing을 실제 producer/span provenance로 거부하며 오래된 span hash 불일치를 음성 증거로 쓰지 않는다. 분류 정밀화는 T1 대상 edge와 실제6개 오분류의 작은 sidecar로 한정하고 나머지는 원본 hash·blocksGrant로 보존한다.
+
+다음 정적 시범은 inv.observation.NodeObservation.mark_offline과 Database.transaction이다. 필요한 A1c는 Connection/_ObservedConnection union과 원래 execute 결과를 증명하고 A3 ContextVar·A5 local container·좁은 A8 production NodeObservation.db constructor·T1 observability를 닫는다. 실제12개 공유 critical entry 집합을 이름으로 고정하고 다른 entry 상태는 올리지 않는다. A7 tools runtime import는 이 경로에 필요 없어 후속 snapshot/deliver로 미룬다. 출력 t1-mark-offline-closure.json은 SOURCE_STATIC_CLOSED_RUNTIME_PENDING이며 권한이 아니다.
+
+P-DBROLE/실제 PG role·READ COMMITTED·SET LOCAL·두 세션 lock·DB clock·logging handler·현재 인증·B cutover는 계속 NULL/HOLD다. statement_observer는 잠금 안에서 호출되므로 in-process/nonblocking/no-network/예외 격리 계약이 필요하고 현재 production observer/sink None의 출처를 증명한다. 전체523파일/3485계획을 다시 생성하지 않는다. pending_contracts 뒤 edge_categories의 두 producer 순서·fresh canonical state 해시를 기록하고 기존46면/R4/C2/C-P-R·signer/outbox/root/owner 권리와 미실행 증거를 보존한다. 실제 독립 Rev9 검토 전 B 제품 코드/port/freeze/runtime grant는 없다. 정확한 범위와 원문은 b-rev9-t1-root-scope.json에 둔다.

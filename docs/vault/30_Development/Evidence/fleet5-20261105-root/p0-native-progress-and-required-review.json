@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "62f8ce2d2fbd97c11eb4436ada5b7d9e763fa726",
-    "Docs": 42178811252,
+    "SHA": "ed2f088f8fedd6fa7186d5b89288780e9261c42e",
+    "Docs": 42180103566,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2806,
+    "independentlyMatchedNormalizedDestinationHashes": 2808,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T16:09:10+09:00"
+    "verifiedAtKST": "2026-11-06T16:20:56+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T16:18:44+09:00",
+  "latestRecordAtKST": "2026-11-06T17:02:04+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,9 +3109,9 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "task": "task_ac6f831f2c53",
-    "dispatch": "ctx_a3cf08fa935b",
-    "source": "6a65665819d7479073189c524abf585636c3079d",
+    "task": "task_b234a0f9df1a",
+    "dispatch": "ctx_aabf96f33707",
+    "source": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
     "verdict": null
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
@@ -3166,5 +3166,9 @@
   "queuedActualReview": null,
   "LowStage2ActualReviewVerification": "k2a-low-stage2-actual-review-root-verification.json",
   "LowStage2ConcreteIntegrationScope": "k2a-low-stage2-combined-root-scope.json",
-  "combinedSourceAccepted": false
+  "combinedSourceAccepted": false,
+  "B8ActualReviewRootVerification": "b-rev8-actual-review-root-verification.json",
+  "B9ConcreteScope": "b-rev9-t1-root-scope.json",
+  "CombinedSourceVerification": "k2a-stage2-combined-source-root-verification.json",
+  "CombinedActualReviewGate": "k2a-stage2-combined-final-review-root-gate.json"
 }

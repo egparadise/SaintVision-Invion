@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T16:18:44+09:00",
+  "atKST": "2026-11-06T17:02:04+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,22 +13,22 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "task": "task_ac6f831f2c53",
-    "dispatch": "ctx_a3cf08fa935b",
-    "source": "6a65665819d7479073189c524abf585636c3079d",
-    "scope": "ONE actual WHOLE Rev8 bounded design/analysis delta and concrete next cut",
+    "task": "task_b234a0f9df1a",
+    "dispatch": "ctx_aabf96f33707",
+    "source": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+    "scope": "ONE actual final combined-source review PL-R1a/merge/pin/diagnostics",
     "state": "ready actualdispatch/verdictpending"
   },
   "pending": null,
-  "authorParallelWork": "K2 sameCodex authorized new PLR1a TEST/README, actual disjoint2parentmerge210594+Low and exact one-line sourcepin candidate; B owner awaits actualwholeRev8 verdict",
-  "reason": "actual9c37 separatecodeacceptances/Rootconcretescope delivered; B8 priorreadytask startedonce afteractualpriorrelease",
+  "authorParallelWork": "sameB owner Rev9-T1 bounded docs/static/symbolic per Root exact scope; K2 owner holds frozencombinedac7498",
+  "reason": "B8 actual0440 review delivered; Rootverified combined5353modeblobs/onepin/twoDocs; predecessor exited/releasedbeforeoneClaude start",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "B8 actualverdict first; after exact combined candidate/Docs exists and reviewer exited/released, one actualcombinedreview inclPLR1a/merge/pin/diagnostics",
+  "nextActualReviewTrigger": "handle actual combined verdict first; source acceptance thenRoot exactoneCoredecision; B9 actualreview after immutableDocs/oneClaudeavailability",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -230,5 +230,27 @@
     },
     "RootConcreteReply": "msg_256747ff9f44"
   },
-  "sourceIntegratorState": "same K2 owner scope reply delivered; actual final source notyetpublished"
+  "sourceIntegratorState": "combinedac7498 frozen/Rootverified; sameownerawaitsactualreview andRootnextCIdecision",
+  "completedB8": {
+    "task": "task_ac6f831f2c53",
+    "dispatch": "ctx_a3cf08fa935b",
+    "source": "6a65665819d7479073189c524abf585636c3079d",
+    "actualReview": "0440d1cabcb74ce24d9b43c95970dae795957952",
+    "Docs": 42183423923,
+    "verdict": "REVISION_REQUIRED (bounded, narrow)",
+    "actualWorkerDone": "msg_d8b4519a4bb8",
+    "resource": {
+      "dispatchId": "ctx_a3cf08fa935b",
+      "taskId": "task_ac6f831f2c53",
+      "runId": "run_e57ecd84a7bc",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_059857a9-6459-496d-adde-5b21f2114f45",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+      "waitingOnHuman": "unknown"
+    },
+    "RootConcreteReply": "msg_78b82487362a"
+  }
 }

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.408"
+version: "1.0.409"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T16:18:44+09:00"
+updated: "2026-11-06T17:02:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "ActualLowStage2codeaccept/PLR1a nonblocking; sameCodex granted TEST+merge+exactpin candidate; B8ctxa3 actualreviewactive; wholeCore/physical incomplete"
-active_card_next: "Codex PLR1a+2parentmerge+onepin candidate with exactDocs; Claude wholeB8 review; Root nextscope and one combinedreview after candidate ready/reviewer exit; then decidefreshCore"
+active_card_status: "combinedac74 actualfinalreviewctxaabactive/5353blobs+onepin+2Docsverified; B8M1+Low -> sameBownerB9T1; combinedCore/physicalNOTRUN"
+active_card_next: "Claude actualcombinedverdict inclPLR1a/merge/pin/diagnostics; Root oneexactCoredecision onlyafteracceptance; B Codex perclaimterminal+hints+rulehardening+narrowT1markoffline; no generic approval"
 ---
+
+## 2026-11-06T17:02:04+09:00 結합 최종 코드 검토와 B Rev9-T1 지시
+
+작업한 것과 확인: B rev8 실제0440 검토의 종료 claim 터미널 Medium·관련 Low를 확인하고 같은 Codex에게 작은 Rev9-T1 문서·분석 수정을 지시했다. 별도 결합 ac7498은 Root가5353개 merge mode/blob·단일 pin·두 exact Docs 성공을 검증했다. 이전 reviewer의 실제 exit/release 뒤 Claude task_b234a0f9df1a/ctx_aabf96f33707에 PL-R1a/merge/pin/진단을 포함한 최종 코드 검토를 한 번 시작했다. 새 전체 Core와 운영 인수는 아직 아니다. B 원질문 msg_7adb81131096에 msg_78b82487362a로 실제 판정·다음 범위를 답했다. K2 원질문 msg_37790154ccf1은 실제 최종 판정과 Root CI 선택까지 pending이다. 다음 첫 행동/담당은 Claude의 고정 결합 코드 판정, B Codex의 제한된 Rev9-T1 수정, Root의 실제 증거에 따른 CI 결정이다.
 
 ## 2026-11-06T16:18:44+09:00 실제 두 코드 축 판정과 결합 후보 지시
 
