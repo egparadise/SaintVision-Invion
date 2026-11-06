@@ -6,6 +6,14 @@ import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { Header } from '@/shared/ui/Header';
+import { App } from '@/app/App';
+import * as session from '@/features/auth/session';
+import * as client from '@/shared/api/client';
+import * as projects from '@/shared/api/projectObservation';
+import * as runs from '@/shared/api/runApprovalObservation';
+import * as fabric from '@/features/desktop/fabricControlApi';
+import * as storage from '@/shared/api/storageObservation';
+import * as mutations from '@/shared/api/kernelMutations';
 import type { NodeItem, RunItem } from '@/contracts/types';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
@@ -334,7 +342,10 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
         await new Promise((r) => setTimeout(r, 10));
       });
 
-      expect(fetchSpy).toHaveBeenCalledWith('/healthz');
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/healthz',
+        expect.objectContaining({ signal: expect.any(Object) })
+      );
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
       expect(gatewayContainer?.textContent).toMatch(/Gateway:\s*\d+ms/);
       const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
@@ -368,7 +379,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       });
 
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
-      expect(gatewayContainer?.textContent).toContain('Gateway: Offline');
+      expect(gatewayContainer?.textContent).toContain('Gateway: 비정상 응답');
       const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
       expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
     });
@@ -399,7 +410,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       });
 
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
-      expect(gatewayContainer?.textContent).toContain('Gateway: Offline');
+      expect(gatewayContainer?.textContent).toContain('Gateway: 비정상 응답');
       const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
       expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
     });
@@ -594,6 +605,390 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       expect(() => isActionAllowed('error')).toThrow('안건 목록이 갱신 실패(stale) 상태이므로');
       expect(isActionAllowed('success')).toBe(true);
       expect(isActionAllowed('idle')).toBe(true);
+    });
+  });
+
+  describe('10. App-level Polling Lifecycle, Slow/Hung Request Invariants, and Header Discrimination (Claude Reviewer Probes P1-P9, H1-H2)', () => {
+    let pRoot: Root;
+    let pContainer: HTMLDivElement;
+    let nodeMode: 'empty' | 'one' | 'reject' | 'pending' | 'slow6s';
+    let nodeCalls: string[];
+    let pendingRequests: Array<{ path: string; resolve: (v: any) => void; reject: (e: any) => void }>;
+
+    const t0 = Date.parse('2026-11-06T11:00:00Z');
+    const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+    const projectB = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAW';
+    const nodeA = 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(t0);
+      localStorage.clear();
+      pContainer = document.createElement('div');
+      document.body.appendChild(pContainer);
+      pRoot = createRoot(pContainer);
+      nodeMode = 'empty';
+      nodeCalls = [];
+      pendingRequests = [];
+
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+        new Response(JSON.stringify({ status: 'ok', version: 'probe' }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        })
+      );
+      vi.spyOn(session, 'hasLoginCallback').mockReturnValue(true);
+      vi.spyOn(session, 'completeLogin').mockImplementation(async () => ({
+        token: 'probe-token',
+        user: { id: 'oidc:' + 'a'.repeat(64), name: 'Probe User', role: '프로젝트별 권한', tenantId: 'ten_probe' },
+        expiresAt: Math.floor(Date.now() / 1000) + 1800,
+      }));
+      vi.spyOn(session, 'commitSession').mockImplementation(() => {});
+      vi.spyOn(client, 'onUnauthorized').mockImplementation(() => {});
+      vi.spyOn(projects, 'fetchProjects').mockResolvedValue(
+        [projectA, projectB].map((id) => ({
+          id,
+          name: id,
+          tenantId: 'ten_probe',
+          createdAt: new Date(t0).toISOString(),
+        }))
+      );
+      vi.spyOn(projects, 'fetchProjectWorkspaces').mockResolvedValue([]);
+      vi.spyOn(runs, 'fetchObservedRuns').mockResolvedValue([]);
+      vi.spyOn(runs, 'fetchObservedApprovals').mockResolvedValue([
+        {
+          id: 'app_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+          projectId: projectA,
+          status: 'pending' as const,
+          target: 'restart-node-nod_01',
+          riskLevel: 'high' as const,
+          requiredApprovals: 2,
+          actionDigest: 'dig_abc123',
+          firstApprovedBy: null,
+          firstApprovedAt: null,
+          secondApprovedBy: null,
+          secondApprovedAt: null,
+          expiresAt: new Date(t0 + 3600000).toISOString(),
+          createdAt: new Date(t0).toISOString(),
+        },
+      ]);
+      vi.spyOn(fabric, 'getDiscoveryCandidates').mockResolvedValue([]);
+      vi.spyOn(fabric, 'getStorageContributions').mockResolvedValue([]);
+      vi.spyOn(fabric, 'getNodeResourceUsage').mockResolvedValue(null);
+      vi.spyOn(storage, 'fetchStorageObservation').mockResolvedValue(null);
+
+      vi.spyOn(client, 'apiClient').mockImplementation(async (path: string, options?: any) => {
+        if (path.endsWith('/node-certificates')) throw new Error('certificate observation unavailable');
+        if (path.endsWith('/nodes')) {
+          nodeCalls.push(path);
+          const one = {
+            items: [
+              {
+                nodeId: nodeA,
+                hostname: 'observed-node',
+                status: 'online',
+                osType: 'linux',
+                cpuCores: 16,
+                memoryTotalBytes: 32 * 1024 ** 3,
+                roles: ['compute'],
+                tags: { zone: 'default' },
+                heartbeatAt: new Date(t0).toISOString(),
+              },
+            ],
+            total: 1,
+          };
+          if (nodeMode === 'empty') return { items: [], total: 0 };
+          if (nodeMode === 'one') return one;
+          if (nodeMode === 'reject') throw new Error('PROBE-NODES-DOWN');
+          if (nodeMode === 'slow6s') {
+            return new Promise((resolve, reject) => {
+              const timer = setTimeout(() => resolve(one), 6000);
+              if (options?.signal) {
+                options.signal.addEventListener('abort', () => {
+                  clearTimeout(timer);
+                  reject(options.signal.reason || new Error('Aborted'));
+                });
+              }
+            });
+          }
+          return new Promise((resolve, reject) => {
+            const entry = { path, resolve, reject };
+            pendingRequests.push(entry);
+            if (options?.signal) {
+              options.signal.addEventListener('abort', () => {
+                reject(options.signal.reason || new Error('Aborted'));
+              });
+            }
+          });
+        }
+        return {};
+      });
+    });
+
+    afterEach(() => {
+      act(() => {
+        pRoot.unmount();
+      });
+      pContainer.remove();
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    });
+
+    async function advance(ms: number) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(ms);
+      });
+    }
+
+    async function mountApp() {
+      await act(async () => {
+        pRoot.render(<App />);
+      });
+      await advance(0);
+    }
+
+    async function chooseProject(id: string) {
+      const selector = pContainer.querySelector<HTMLSelectElement>('[data-testid="project-selector"]');
+      expect(selector).not.toBeNull();
+      await act(async () => {
+        selector!.value = id;
+        selector!.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+
+    const appText = () => pContainer.textContent ?? '';
+    const emptyCard = () => pContainer.querySelector('[data-testid="cluster-overview-empty-state"]');
+    const staleWarning = () => pContainer.querySelector('[data-testid="cluster-stale-warning"]');
+
+    it('P1: repeated empty polls keep the same empty card element, never flip to metrics, header 0/0 only after observation', async () => {
+      nodeMode = 'pending';
+      await mountApp();
+      expect(appText()).toContain('클러스터 노드 정보를 확인하고 있습니다');
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+      expect(appText()).toContain('확인 중...');
+
+      pendingRequests.splice(0).forEach((p) => p.resolve({ items: [], total: 0 }));
+      nodeMode = 'empty';
+      await advance(0);
+
+      const firstEmpty = emptyCard();
+      expect(firstEmpty).not.toBeNull();
+      expect(appText()).toContain('정상 조회 결과: 0대');
+      expect(appText()).toContain('0/0');
+
+      let sameEveryCycle = true;
+      for (let i = 0; i < 6; i++) {
+        await advance(5000);
+        if (emptyCard() !== firstEmpty) sameEveryCycle = false;
+        if (appText().includes('CPU 코어')) sameEveryCycle = false;
+      }
+      expect(sameEveryCycle).toBe(true);
+      expect(nodeCalls.length).toBeGreaterThanOrEqual(7);
+    });
+
+    it('P2: empty snapshot then background failure shows role=alert stale banner with retry; recovery clears it', async () => {
+      await mountApp();
+      expect(appText()).toContain('정상 조회 결과: 0대');
+      const firstEmpty = emptyCard();
+
+      nodeMode = 'reject';
+      await advance(5000);
+
+      expect(staleWarning()).not.toBeNull();
+      expect(staleWarning()!.getAttribute('role')).toBe('alert');
+      expect(appText()).toContain('PROBE-NODES-DOWN');
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+      expect(pContainer.querySelector('[data-testid="cluster-stale-retry-btn"]')).not.toBeNull();
+      expect(emptyCard()).toBe(firstEmpty);
+
+      nodeMode = 'empty';
+      await advance(5000);
+
+      expect(staleWarning()).toBeNull();
+      expect(appText()).toContain('정상 조회 결과: 0대');
+    });
+
+    it('P3: non-empty snapshot retained on background failure with stale banner', async () => {
+      nodeMode = 'one';
+      await mountApp();
+      expect(appText()).toContain('observed-node');
+
+      nodeMode = 'reject';
+      await advance(5000);
+
+      expect(staleWarning()).not.toBeNull();
+      expect(appText()).toContain('observed-node');
+    });
+
+    it('P4: late older response is ignored after a newer poll completes (response order / latest-wins)', async () => {
+      await mountApp();
+      nodeMode = 'pending';
+      await advance(5000); // poll #2 pending
+      await advance(5000); // poll #3 pending
+      expect(pendingRequests.length).toBe(2);
+
+      pendingRequests[1].resolve({ items: [], total: 0 }); // newer resolves first
+      await advance(0);
+
+      pendingRequests[0].resolve({
+        items: [{ nodeId: nodeA, hostname: 'late-old-node', status: 'online', osType: 'linux' }],
+        total: 1,
+      });
+      await advance(0);
+
+      expect(appText()).not.toContain('late-old-node');
+    });
+
+    it('P5: project switch resets to unknown and drops the old project late response', async () => {
+      nodeMode = 'one';
+      await mountApp();
+      expect(appText()).toContain('observed-node');
+
+      nodeMode = 'pending';
+      await advance(5000);
+      const oldA = pendingRequests.splice(0);
+      expect(oldA.length).toBe(1);
+      expect(oldA[0].path).toContain(projectA);
+
+      await chooseProject(projectB);
+      await advance(0);
+
+      expect(appText()).not.toContain('observed-node');
+      expect(appText()).toContain('클러스터 노드 정보를 확인하고 있습니다');
+      expect(appText()).toContain('확인 중...');
+
+      oldA[0].resolve({
+        items: [{ nodeId: nodeA, hostname: 'leaked-A-node', status: 'online', osType: 'linux' }],
+        total: 1,
+      });
+      await advance(0);
+
+      expect(appText()).not.toContain('leaked-A-node');
+      const bReq = pendingRequests.filter((p) => p.path.includes(projectB));
+      expect(bReq.length).toBeGreaterThan(0);
+    });
+
+    it('P6: slow positive response (6s with 5s interval) within 10s timeout successfully applies', async () => {
+      await mountApp(); // first observation: 0 nodes
+      expect(appText()).toContain('정상 조회 결과: 0대');
+
+      nodeMode = 'slow6s'; // server returns 1 node after 6s
+      await advance(60000);
+
+      expect(appText()).toContain('observed-node');
+      expect(staleWarning()).toBeNull();
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+      expect(nodeCalls.length).toBeGreaterThan(5);
+    });
+
+    it('P7: hanging request times out at 10s, triggering explicit stale warning', async () => {
+      await mountApp();
+      expect(appText()).toContain('정상 조회 결과: 0대');
+
+      nodeMode = 'pending';
+      await advance(5000); // background poll #2 issued
+      await advance(10000); // 10s timeout expires
+
+      expect(staleWarning()).not.toBeNull();
+      expect(staleWarning()!.getAttribute('role')).toBe('alert');
+      expect(appText()).toContain('초과');
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+    });
+
+    it('P8: when approvalsState === error, actions throw and do not call decideApproval API', async () => {
+      const decideSpy = vi.spyOn(mutations, 'decideApproval');
+      await mountApp();
+
+      // Switch to approvals tab
+      const approvalsTab = pContainer.querySelector<HTMLButtonElement>('[data-testid="header-tab-approvals"]');
+      if (approvalsTab) {
+        await act(async () => {
+          approvalsTab.click();
+        });
+        await advance(0);
+      }
+
+      // Cause approvals to fail on next tick
+      vi.spyOn(runs, 'fetchObservedApprovals').mockRejectedValue(new Error('PROBE-APPROVALS-DOWN'));
+      await advance(5000);
+
+      expect(pContainer.querySelector('[data-testid="approval-stale-warning"]')).not.toBeNull();
+      expect(decideSpy).not.toHaveBeenCalled();
+    });
+
+    it('P9: clicking nodes-retry-btn in ResourceExplorer triggers manual retry with isBackground=false', async () => {
+      await mountApp();
+
+      // Switch to fabric tab where ResourceExplorer is rendered
+      const fabricTab = pContainer.querySelector<HTMLButtonElement>('[data-testid="header-tab-fabric"]');
+      expect(fabricTab).not.toBeNull();
+      await act(async () => {
+        fabricTab!.click();
+      });
+      await advance(0);
+
+      // Fail background poll
+      nodeMode = 'reject';
+      await advance(5000);
+
+      const retryBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="nodes-retry-btn"]');
+      expect(retryBtn).not.toBeNull();
+
+      // Next call recovers
+      nodeMode = 'empty';
+      const callsBefore = nodeCalls.length;
+      await act(async () => {
+        retryBtn!.click();
+      });
+      await advance(0);
+
+      expect(nodeCalls.length).toBeGreaterThan(callsBefore);
+      expect(pContainer.textContent).toContain('0대');
+    });
+
+    it.each([
+      ['html200', () => new Response('<!doctype html><html></html>', { status: 200, headers: { 'content-type': 'text/html' } }), '비정상 응답'],
+      ['json404', () => new Response(JSON.stringify({ detail: 'nf' }), { status: 404, headers: { 'content-type': 'application/json' } }), '비정상 응답'],
+      ['json503', () => new Response(JSON.stringify({ status: 'not_ready' }), { status: 503, headers: { 'content-type': 'application/json' } }), '비정상 응답'],
+      ['jsonStatusDown', () => new Response(JSON.stringify({ status: 'down' }), { status: 200, headers: { 'content-type': 'application/json' } }), '비정상 응답'],
+      ['network', () => { throw new TypeError('Failed to fetch'); }, 'Offline'],
+    ] as const)('H1: Header failure discrimination for %s renders %s', async (name, mk, expectedLabel) => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async () => (mk as any)());
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+      await advance(0);
+      const t = pContainer.textContent ?? '';
+      expect(t).toContain(`Gateway: ${expectedLabel}`);
+      expect(t).not.toMatch(/Gateway:\s*\d+ms/);
+    });
+
+    it('H2: Header sequence fence prevents older slow success from overwriting newer failure', async () => {
+      let call = 0;
+      let resolveFirst: ((r: Response) => void) | null = null;
+      vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
+        call++;
+        if (call === 1) return new Promise<Response>((r) => { resolveFirst = r; });
+        return Promise.reject(new TypeError('Failed to fetch'));
+      });
+
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+
+      // Poll #2 starts after 5000ms and fails -> Offline
+      await advance(5000);
+      expect(pContainer.textContent).toContain('Gateway: Offline');
+
+      // Now resolve the older slow call #1
+      await act(async () => {
+        resolveFirst!(new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+      });
+      await advance(0);
+
+      // Sequence fence ensures newer Offline is not overwritten by older slow call
+      expect(pContainer.textContent).toContain('Gateway: Offline');
+      expect(pContainer.textContent).not.toMatch(/Gateway:\s*\d+ms/);
     });
   });
 });

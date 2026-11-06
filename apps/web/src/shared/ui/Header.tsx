@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 
 export interface HeaderProps {
@@ -20,6 +20,12 @@ function formatUserDisplayName(name: string): string {
   return name;
 }
 
+type GatewayState =
+  | { kind: 'unknown' }
+  | { kind: 'healthy'; rttMs: number }
+  | { kind: 'degraded' }
+  | { kind: 'offline' };
+
 export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onToggleTheme,
@@ -31,44 +37,59 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onSwitchToDesktop,
 }) => {
-  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean | null; rttMs: number | null }>({
-    online: null,
-    rttMs: null,
-  });
+  const [gatewayStatus, setGatewayStatus] = useState<GatewayState>({ kind: 'unknown' });
+  const reqSeqRef = useRef(0);
 
   useEffect(() => {
     let isMounted = true;
+    let activeAbortController: AbortController | null = null;
+
     const checkGateway = async () => {
+      const reqId = ++reqSeqRef.current;
+
+      activeAbortController = new AbortController();
+      const currentController = activeAbortController;
+      const timeoutId = setTimeout(() => {
+        currentController.abort();
+      }, 4000);
+
       const start = performance.now();
       try {
-        const res = await fetch('/healthz');
+        const res = await fetch('/healthz', { signal: currentController.signal });
+        clearTimeout(timeoutId);
         const rtt = Math.round(performance.now() - start);
         const contentType = res.headers.get('content-type') || '';
-        if (isMounted) {
-          // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
-          // HTML fallback (200 text/html) or 401/404/500/503 is not health success
-          if (res.ok && contentType.includes('application/json')) {
-            const data = await res.json().catch(() => null);
-            if (data && data.status === 'ok') {
-              setGatewayStatus({ online: true, rttMs: rtt });
-            } else {
-              setGatewayStatus({ online: false, rttMs: null });
-            }
+
+        if (!isMounted || reqId !== reqSeqRef.current) return;
+
+        // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
+        // HTML fallback (200 text/html) or 401/404/500/503 is not health success
+        if (res.ok && contentType.includes('application/json')) {
+          const data = await res.json().catch(() => null);
+          if (!isMounted || reqId !== reqSeqRef.current) return;
+          if (data && data.status === 'ok') {
+            setGatewayStatus({ kind: 'healthy', rttMs: rtt });
           } else {
-            setGatewayStatus({ online: false, rttMs: null });
+            setGatewayStatus({ kind: 'degraded' });
           }
+        } else {
+          setGatewayStatus({ kind: 'degraded' });
         }
       } catch {
-        if (isMounted) {
-          setGatewayStatus({ online: false, rttMs: null });
-        }
+        clearTimeout(timeoutId);
+        if (!isMounted || reqId !== reqSeqRef.current) return;
+        setGatewayStatus({ kind: 'offline' });
+      } finally {
+        clearTimeout(timeoutId);
       }
     };
+
     checkGateway();
     const interval = setInterval(checkGateway, 5000);
     return () => {
       isMounted = false;
       clearInterval(interval);
+      activeAbortController?.abort();
     };
   }, []);
 
@@ -213,9 +234,9 @@ export const Header: React.FC<HeaderProps> = ({
               height: '8px',
               borderRadius: '50%',
               backgroundColor:
-                gatewayStatus.online === null
+                gatewayStatus.kind === 'unknown'
                   ? 'var(--color-status-unknown)'
-                  : gatewayStatus.online
+                  : gatewayStatus.kind === 'healthy'
                     ? 'var(--color-status-online)'
                     : 'var(--color-status-offline)',
               display: 'inline-block',
@@ -223,12 +244,14 @@ export const Header: React.FC<HeaderProps> = ({
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
             Gateway:{' '}
-            {gatewayStatus.online === null ? (
+            {gatewayStatus.kind === 'unknown' ? (
               <strong>확인 중...</strong>
-            ) : gatewayStatus.online ? (
-              <strong>{gatewayStatus.rttMs ?? 0}ms</strong>
+            ) : gatewayStatus.kind === 'healthy' ? (
+              <strong>{gatewayStatus.rttMs}ms</strong>
             ) : (
-              <strong style={{ color: 'var(--color-status-offline)' }}>Offline</strong>
+              <strong style={{ color: 'var(--color-status-offline)' }}>
+                {gatewayStatus.kind === 'degraded' ? '비정상 응답' : 'Offline'}
+              </strong>
             )}
           </span>
         </div>

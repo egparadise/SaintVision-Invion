@@ -3,8 +3,9 @@ import type { ApprovalPage as KernelApprovalPage, ControlRunPage } from '@/contr
 import { apiClient } from './client';
 const states: RunState[] = ['draft', 'validated', 'planned', 'awaiting_approval', 'scheduled',
   'running', 'verifying', 'recovering', 'succeeded', 'failed', 'cancelled'];
-export async function fetchObservedRuns(projectId: string): Promise<RunItem[]> {
-  const page = await apiClient<ControlRunPage>(`/v1/projects/${encodeURIComponent(projectId)}/runs`);
+export async function fetchObservedRuns(projectId: string, options?: { signal?: AbortSignal }): Promise<RunItem[]> {
+  const url = `/v1/projects/${encodeURIComponent(projectId)}/runs`;
+  const page = options ? await apiClient<ControlRunPage>(url, options) : await apiClient<ControlRunPage>(url);
   if (!Array.isArray(page.items) || (page.nextCursor !== null && typeof page.nextCursor !== 'string')) throw new Error('Run 응답 형식 불일치');
   return page.items.map(run => {
     if (run.projectId !== projectId || !run.runId || !states.includes(run.state) ||
@@ -13,8 +14,9 @@ export async function fetchObservedRuns(projectId: string): Promise<RunItem[]> {
     return { id: run.runId, projectId: run.projectId, state: run.state, version: run.version, attempt: run.attempt };
   });
 }
-export async function fetchObservedApprovals(projectId: string): Promise<ApprovalItem[]> {
-  const page = await apiClient<KernelApprovalPage>(`/v1/projects/${encodeURIComponent(projectId)}/approvals`);
+export async function fetchObservedApprovals(projectId: string, options?: { signal?: AbortSignal }): Promise<ApprovalItem[]> {
+  const url = `/v1/projects/${encodeURIComponent(projectId)}/approvals`;
+  const page = options ? await apiClient<KernelApprovalPage>(url, options) : await apiClient<KernelApprovalPage>(url);
   if (!Array.isArray(page.items) || (page.nextCursor !== null && typeof page.nextCursor !== 'string')) throw new Error('승인 응답 형식 불일치');
   return page.items.map(item => {
     if (item.projectId !== projectId || !item.approvalId || !item.runId || !item.requesterId ||
