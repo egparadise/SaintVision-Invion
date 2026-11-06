@@ -1,0 +1,31 @@
+"""Claude reviewer hash/receipt checks over committed blobs (read-only git show)."""
+import hashlib,json,subprocess,sys
+T='54549b90774aab3599c0486a5217d0d1634baca8';B='5ea87937f1b542f8cbe32c08dc224526965a8e2d';RV='4288a1c403bc15ac1174c49e512ab8c7314d522f'
+N='docs/vault/30_Development/Evidence/fleet5-b-rev9d-20261107-codex/';O='docs/vault/30_Development/Evidence/fleet5-b-rev9c-20261106-codex/';RD='docs/vault/30_Development/Evidence/fleet5-b-rev9c-5ea-review-20261106-claude/'
+def blob(c,p):
+    r=subprocess.run(['git','show',c+':'+p],stdout=subprocess.PIPE,stderr=subprocess.PIPE);return r.stdout if r.returncode==0 else None
+def h(b):return hashlib.sha256(b).hexdigest()
+out={}
+ph=json.loads(blob(T,N+'proof-producer-hashes.json'))
+bad=[x['file'] for x in ph['producersAndRetainedScripts'] if (lambda b:b is None or h(b)!=x['sha256'] or len(b)!=x['bytes'])(blob(T,N+x['file']))]
+out['producers']={'count':len(ph['producersAndRetainedScripts']),'bytes':sum(x['bytes'] for x in ph['producersAndRetainedScripts']),'mismatch':bad}
+bad=[];vs4288=[]
+for x in ph['originalReviewCopiesVerified']:
+    b=blob(T,N+x['file'])
+    if b is None or h(b)!=x['sha256']:bad.append(x['file'])
+    if x['file'].startswith('rev9c-review-'):
+        o=blob(RV,RD+x['file'][len('rev9c-review-'):]);vs4288.append((x['file'],o is not None and h(o)==h(b)))
+out['rawCopies']={'count':len(ph['originalReviewCopiesVerified']),'mismatch':bad,'rev9cReviewCopiesEqual4288Blob':sum(1 for _,ok in vs4288 if ok),'rev9cReviewCopies':len(vs4288)}
+seal=json.loads(blob(T,N+'completed-regression-source-seal.json'))
+out['seal']={'sha':h(blob(T,N+'completed-regression-source-seal.json')),'recorded':ph['completedRegressionSealSHA256'],'kst':seal['kst'],
+  'sourceMismatch':[x['file'] for x in seal['sourceFiles'] if h(blob(T,N+x['file']) or b'')!=x['sha256']],'artifactMismatch':[x['file'] for x in seal['artifacts'] if h(blob(T,N+x['file']) or b'')!=x['sha256']],'sources':len(seal['sourceFiles']),'artifacts':len(seal['artifacts'])}
+out['completedTargetedCommands']=[{k:(v if k!='command' else [a.replace(chr(92),'/').rsplit('/',1)[-1] for a in v]) for k,v in c.items()} for c in ph['completedTargetedCommands']]
+out['model']={f:h(blob(T,N+f))==ph['modelLifecycleFrozen'][f] and blob(T,N+f)==blob(B,O+f) for f in ('model.py','lifecycle.py')}
+acc=['targeted-category-delta.json','writer-census-delta.json','reader-io-catalog.json','authority-matrix.json','contract.schema.json','pilot-closure.json']
+out['accounting']={f:blob(T,N+f)==blob(B,O+f) for f in acc}
+want={'manifest':'925631922be9c8c60abf290423e50e60ecabb91ff55b069b9c90fc959a1ecbb7','stage1':'dee5bde089674eb41800fb834a59fb4c309ff9eb4cd4bc4dfcdef4b83ccc3a86','final':'5c9a4e4262a30f2d4af6f65a0b3fc81fed4105b0ec51f5c2a567cde2e0b4934b','closure':'0b25575952ecb7a390c87393e783c9c777eec237f67a4dfded9216fb1a399694'}
+files=subprocess.check_output(['git','ls-tree','--name-only',T,N]).decode().split()
+hashes={f.rsplit('/',1)[-1]:h(blob(T,f)) for f in files}
+out['namedHashes']={k:[f for f,x in hashes.items() if x==v] for k,v in want.items()}
+po=json.loads(blob(T,N+'producer-order.json'));out['producerOrder']=po
+print(json.dumps(out,indent=1))

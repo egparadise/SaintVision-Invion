@@ -1,0 +1,112 @@
+{
+ "producers": {
+  "count": 60,
+  "bytes": 461755,
+  "mismatch": []
+ },
+ "rawCopies": {
+  "count": 42,
+  "mismatch": [],
+  "rev9cReviewCopiesEqual4288Blob": 10,
+  "rev9cReviewCopies": 10
+ },
+ "seal": {
+  "sha": "c79faaf340e99cf6ae92caa848badb567b20cc7466ef75a3e9e88b4fedd12be1",
+  "recorded": "c79faaf340e99cf6ae92caa848badb567b20cc7466ef75a3e9e88b4fedd12be1",
+  "kst": "2026-11-07T01:04:05.439661+09:00",
+  "sourceMismatch": [],
+  "artifactMismatch": [],
+  "sources": 15,
+  "artifacts": 7
+ },
+ "completedTargetedCommands": [
+  {
+   "command": [
+    "python.exe",
+    "-B",
+    "measured_run.py",
+    "rev9d_gap_driver.py",
+    "fleet5-b-rev9c-20261106-codex",
+    "old-gap-results.json"
+   ],
+   "actualExit": 0,
+   "log": "old-gap-contrast.log",
+   "logSHA256": "4e186cefeff63d0cd8c934be3ac8242a5ae2e5176466bb1c0ab18f88ffe2b8cd",
+   "kst": "2026-11-07T00:53:20.234578+09:00"
+  },
+  {
+   "command": [
+    "python.exe",
+    "-B",
+    "measured_run.py",
+    "rev9d_gap_driver.py",
+    "fleet5-b-rev9d-20261107-codex",
+    "new-gap-results.json"
+   ],
+   "actualExit": 0,
+   "log": "new-gap-contrast.log",
+   "logSHA256": "457458feb5557be5e1d5a69e0c1b2bcc62693badc89bd72962b6d62d8a002b37",
+   "kst": "2026-11-07T00:54:38.467915+09:00"
+  },
+  {
+   "command": [
+    "python.exe",
+    "-B",
+    "measured_run.py",
+    "rev9c-review-reviewer_rev9c_delta_probes.py.txt",
+    "fleet5-b-rev9d-20261107-codex",
+    "owner-original47-results.json"
+   ],
+   "actualExit": 0,
+   "log": "owner-original47-replay.log",
+   "logSHA256": "9dadf56cde1a98ddae41cfc470dbbe76b6d4cd61e301390d4cf26f1fccbe1792",
+   "kst": "2026-11-07T01:01:18.593837+09:00"
+  }
+ ],
+ "model": {
+  "model.py": true,
+  "lifecycle.py": true
+ },
+ "accounting": {
+  "targeted-category-delta.json": true,
+  "writer-census-delta.json": true,
+  "reader-io-catalog.json": true,
+  "authority-matrix.json": true,
+  "contract.schema.json": true,
+  "pilot-closure.json": true
+ },
+ "namedHashes": {
+  "manifest": [
+   "proof-producer-hashes.json"
+  ],
+  "stage1": [
+   "pending-interface-contracts.stage1.json"
+  ],
+  "final": [
+   "pending-interface-contracts.json"
+  ],
+  "closure": [
+   "t1-mark-offline-closure.json"
+  ]
+ },
+ "producerOrder": {
+  "requiredOrder": [
+   "pending_contracts.py",
+   "edge_categories.py"
+  ],
+  "stage1": {
+   "artifact": "pending-interface-contracts.stage1.json",
+   "sha256": "dee5bde089674eb41800fb834a59fb4c309ff9eb4cd4bc4dfcdef4b83ccc3a86",
+   "producerSHA256": "8669d801bdf83b71a17047d3880d9127c6e442a3e24b145e540f37a0343b407a",
+   "acceptedFinalProof": false
+  },
+  "final": {
+   "artifact": "pending-interface-contracts.json",
+   "sha256": "5c9a4e4262a30f2d4af6f65a0b3fc81fed4105b0ec51f5c2a567cde2e0b4934b",
+   "producerSHA256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd",
+   "acceptedFinalProof": "ORDERED_STATIC_ARTIFACT_ONLY_NOT_REVIEW_OR_RUNTIME_ACCEPTANCE"
+  },
+  "kst": "2026-11-07T01:23:24.392282+09:00",
+  "actualRuntimeB": 0
+ }
+}

@@ -1,0 +1,1033 @@
+{
+ "reviewer": "Claude independent",
+ "target": "fleet5-b-rev9d-20261107-codex",
+ "frozenRootKeys": 6,
+ "info": {
+  "parsedUniverse": {
+   "censusFiles": 20,
+   "discoveryFiles": 11,
+   "unionParsed": 25,
+   "unionAudited": 25,
+   "parsedEqualsAudited": true,
+   "paths": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/db.py",
+    "services/control-plane/src/inv/errors.py",
+    "services/control-plane/src/inv/observation.py",
+    "services/control-plane/src/inv/observer_worker.py",
+    "services/control-plane/src/inv/worker.py",
+    "services/control-plane/src/inv/workspace_api.py",
+    "services/control-plane/src/inv/workspace_config.py",
+    "tests/core/test_object_store_provider_binding.py",
+    "tests/core/test_s08_be_kill_switch_execution_gate.py",
+    "tests/integration/test_containment.py",
+    "tests/integration/test_lan_bootstrap.py",
+    "tests/integration/test_lock_wait_real_pg.py",
+    "tests/integration/test_model_node.py",
+    "tests/integration/test_node_control.py",
+    "tests/integration/test_node_extensions.py",
+    "tests/integration/test_placement.py",
+    "tests/integration/test_placement_short_commit.py",
+    "tests/integration/test_shard_recovery.py",
+    "tests/integration/test_workspace_api.py",
+    "tests/integration/test_workspace_start.py",
+    "tests/test_lan_leaf_rotation.py",
+    "tools/lan_execution.py",
+    "tools/lan_pilot.py",
+    "tools/remote_workspace_entry.py"
+   ],
+   "productionParsed": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/db.py",
+    "services/control-plane/src/inv/errors.py",
+    "services/control-plane/src/inv/observation.py",
+    "services/control-plane/src/inv/observer_worker.py",
+    "services/control-plane/src/inv/worker.py",
+    "services/control-plane/src/inv/workspace_api.py",
+    "services/control-plane/src/inv/workspace_config.py",
+    "tools/lan_execution.py",
+    "tools/lan_pilot.py",
+    "tools/remote_workspace_entry.py"
+   ],
+   "frozenRelevantHitsByPath": {},
+   "discoveryProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ]
+  }
+ },
+ "cases": [
+  {
+   "case": "actual-72028-positive",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {},
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-4288-repro-attrgetter-sys-modules-root",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNRESOLVED:RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": false,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "b6fdaa11768967a0f75bba0d7fcc9ae387d0b23614c97cf69ac886f1e5362989"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 2
+   },
+   "note": null
+  },
+  {
+   "case": "L1-4288-repro-importlib-configured_workspace",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNRESOLVED:RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": false,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "7972c791dfeb17bc720ff76cd0a7dc26ca37d2597748d0af395b98e76ee8d7e1"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": null
+  },
+  {
+   "case": "L1-4288-repro-sys-modules-configured_workspace",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNRESOLVED:RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": false,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "231d002a4a91170061d2a9c583c75edadaa57f46b8d7687236256a59eeb9f9a2"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": null
+  },
+  {
+   "case": "L1-retained-outside-importlib-attribute",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5b10a4e2fc6e69eb9d550e7f3a2eb424ab952c749e935484a3b47c441fac27bd"
+   },
+   "visibleProductionRoots": 7,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": null
+  },
+  {
+   "case": "L1-retained-outside-module-getattr",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "e32ea6c8e50acb2f1cc53e9aa26a874d6f6e7913d17831723642c3cc0ee2506f"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": null
+  },
+  {
+   "case": "L1-control-outside-benign-database-helper",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "85d17fdc376c1c463aa78cac207140eaaef46f0b93507b815db61641df5c49af"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-control-outside-assigned-string-unused-import",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "52597349fa92460856212d0240eea975f91dc7d38de4188eb0e2b4067f6dc46d"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-independent-nonliteral-key-sys-modules-string-variable-forwarder",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "edf5970adcb86601a26320b118fdaa3e0076e85b2042ceb9822e17f988bd2c5e"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "enumerated API (sys.modules/importlib/getattr) with computed/variable key naming a protected module/constructor; six genuine roots retained"
+  },
+  {
+   "case": "L1-independent-nonliteral-key-sys-modules-fstring-forwarder",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5c6e3b280379dcb4873915c427d8644c0be35eb9e8e0f6ce035b4ec612685f74"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "enumerated API (sys.modules/importlib/getattr) with computed/variable key naming a protected module/constructor; six genuine roots retained"
+  },
+  {
+   "case": "L1-independent-nonliteral-key-importlib-join-forwarder",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "ddd536e194c30b7ca83d1884ad03cce0033573abb18e07708e92b7ceea314aec"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "enumerated API (sys.modules/importlib/getattr) with computed/variable key naming a protected module/constructor; six genuine roots retained"
+  },
+  {
+   "case": "L1-independent-nonliteral-key-getattr-importlib-variable-constructor-root",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "82a29a2a66b3c2c38b2517a8549b75c82253ce12f8db105a8d671ea5f63cd853"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "enumerated API (sys.modules/importlib/getattr) with computed/variable key naming a protected module/constructor; six genuine roots retained"
+  },
+  {
+   "case": "L1-dotted-pkgutil-literal",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "479d03ec66f0ecd58a273d70b2fd06b48af936f48acca18f4ca74e88016c5cec"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": null
+  },
+  {
+   "case": "L1-dotted-pkgutil-concat-4",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "936accd3a3ba98cc33dedac58a4890a85f1beff0d71c969545f7f05cbe26c060"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": "4 additions: inside the declared bound"
+  },
+  {
+   "case": "L1-dotted-pkgutil-concat-5-beyond-bound",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": null,
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "7bfc314033d88dd65dab1253f0c39a548651cfb33adf526c8556314e1d147ae8"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "declared-bound observation only (>4 levels); not a demand"
+  },
+  {
+   "case": "L1-dotted-pkgutil-join-beyond-bound",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": null,
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "f76c2194a88bd8584ac92786d5e26696a1df0ffef0279bb44212905eb5450a0c"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "declared-bound observation only (non-literal argument to a non-enumerated resolver); not a demand"
+  },
+  {
+   "case": "L1-dotted-control-pkgutil-unrelated",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "631156ca01ffdd8332a8a7b3be69088ff8f4b6a699169d00b59ab79584cbd68a"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-dotted-control-log-message",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "c7232aee8ab71a1f0e06229476b36a383ee1c1b2ce56f998b301f2c50ef9ffee"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-dotted-conservative-log-dotted-prefix",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": null,
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "8ff8f73076ef1a2e9f9efdf1cf265b40470a3eb8ff9533d806a534b398fb684f"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": 1
+   },
+   "note": "records conservative false-positive behavior of the dotted tightening (fail closed)"
+  },
+  {
+   "case": "L2-4288-repro-WorkspaceAPI-init-runtime",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "90129123a8500a77b909775c20dc8be3f8952fef695f4d27aca8e2f69f12302d"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-4288-repro-WorkspaceAPI-init-runtime.db",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "d0964a7cdb6c98223cb4ab2f7eaccac37bed3ccb0b07f48e1f96d43d0bc19c28"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-4288-repro-WorkspaceAPI-init-runtime.db.transaction",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "30cce2a131e88680747e986a06f2d049efc4e37f11443e4c7e91b8a1b626fcb4"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-4288-repro-create_app-workspace_service-workspace",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "5dcc3e5f1dfbfd507830627d9e0aeb362c00ea31beece1413cdcc8e5134a5c90"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-4288-repro-create_app-workspace_service-workspace.runtime.db",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "a97599dcf153bc2e0f58495ff849ce177525fa353dccb1777ed0a9b85e37c174"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-WorkspaceAPI-init-unowned-working",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "141c63b1bab2584193046d467ae87d06d26f4434e9a8cf52985a9f2ddbaee79d"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-retained-loop-derived-runtime-db",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "5ebbf56bd8c018b1497f4603ada95799d0594a5915a416cc189060598f0e0364"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-retained-dict-comprehension",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:mirror",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "696e99ddf8cc1c6c0dae79edf6e00aca282008543aa5d83967f921563ff752ac"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-independent-WorkspaceAPI-__new__-receives-runtime",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L2 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "a1aa1dc947ce0b32119b5f27e74a5152b998b28f76df07ee77b688cbf6abebf7"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "workspace_config.py:44 WorkspaceAPI(database, working, runtime) runs WorkspaceAPI.__new__(cls, database, working, runtime) before __init__; binder maps class calls to __init__ only. Blank line 130 replaced, no line shift."
+  },
+  {
+   "case": "L2-independent-lan_pilot-callee-rebinding-conn",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9d-L2 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "182012981b9b3cab0e2210b644ac73f5b0576fb8bc3068f20e1667c4370f5919"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "frozen calls lan_pilot:1872/1990 pass conn as 5th positional to _current_finalized_batch; a module-level rebinding before the __main__ guard makes the real callee the wrapper. Two blank lines replaced, no line shift before the guard."
+  },
+  {
+   "case": "L2-control-app-factory-rebinding",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:FORWARDING_FACTORY_SYMBOL:inv.app.create_app",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "a9940ae84d50a13433632c62da6142be753859ba1c65b6dc9cec4a400a5bdfc1"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": "create_app is an owner factory symbol; its rebinding is an audited FORWARDING_FACTORY_SYMBOL use"
+  },
+  {
+   "case": "KW-keyword-forwarder-higher-hop-inventory",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py,services/control-plane/src/inv/business_handoff.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5c2e7e8f865d7efe2e16c084207cf71063c16d0f592415e4e9af3f0aef082f45",
+    "services/control-plane/src/inv/business_handoff.py": "55841f6d0332a46430b07b5aea76ac1d104ae6cfc3e26c1b197fc1c18a8fe2f8"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/business_handoff.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null,
+   "higherHopInventoried": true
+  },
+  {
+   "case": "KW-keyword-object-in-source-graph-only",
+   "observed": "REFUSE",
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "cg.prove graph only",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "f9b37a4ac65963401540a5c85de60f14b977cad891cc6ee62790d1c9041f5023"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "KW-keyword-object-in-source-full",
+   "observed": "REFUSE",
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "f9b37a4ac65963401540a5c85de60f14b977cad891cc6ee62790d1c9041f5023"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "newRelevantReflectionHitsByPath": {},
+   "note": null,
+   "independentUseSiteCheckReason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_claude_extra"
+  }
+ ],
+ "binderFixtures": [
+  {
+   "case": "posonly-formal",
+   "sourceSHA256": "ec2c4de2b08791ceb642dccbe6d99fc167cafe1f1d26043a393e9d84181e1e3d",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.accept",
+     "slot",
+     false
+    ]
+   ],
+   "expectedFormalOwned": true,
+   "formalOwned": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "kwonly-formal",
+   "sourceSHA256": "1fa931ecaf30e5c139568e824194a83aca1c735109c257c420257cfabbae7ae5",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.accept",
+     "slot",
+     false
+    ]
+   ],
+   "expectedFormalOwned": true,
+   "formalOwned": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "explicit-kw-into-kwargs",
+   "sourceSHA256": "c09f46e15bfa7ea530809be458fd24d150b27fc9d20b2eab09d4bfa43cc61199",
+   "error": "UNRESOLVED:PARAMETER_OWNERSHIP_DID_NOT_CONVERGE",
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": null
+   },
+   "bindings": [],
+   "expectedFormalOwned": true,
+   "formalOwned": false,
+   "matchesExpectation": false
+  },
+  {
+   "case": "unowned-same-function",
+   "sourceSHA256": "1985b9a5a6d5b770df3a9f3d4788823384726ef3825f45e3852e4deb43d4860d",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.accept",
+     "slot",
+     false
+    ]
+   ],
+   "expectedFormalOwned": false,
+   "formalOwned": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "class-call-__new__",
+   "sourceSHA256": "c6c8d4677a8cb2ae148e86359ab210377aebec3d206aa232415dc68a5ab1d60b",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "Box.__new__": []
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.Box.__init__",
+     "slot",
+     true
+    ]
+   ],
+   "expectedFormalOwned": null,
+   "formalOwned": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "decorated-callee",
+   "sourceSHA256": "2426e7b4ed92a5476ad7499a0c109c2fe4fdd1f103afe00b0f105472132edb2c",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "note"
+    ]
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.accept",
+     "note",
+     false
+    ]
+   ],
+   "expectedFormalOwned": null,
+   "formalOwned": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "rebound-callee",
+   "sourceSHA256": "1933895b4df3cc4c37e98a5e38462a572a730b96dd4764502fa40ca3d3c8e936",
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "bindings": [
+    [
+     "fixtures.claude_b9d_binder.accept",
+     "slot",
+     false
+    ]
+   ],
+   "expectedFormalOwned": null,
+   "formalOwned": true,
+   "matchesExpectation": true
+  }
+ ],
+ "mismatches": [
+  "L1-4288-repro-attrgetter-sys-modules-root",
+  "L1-4288-repro-importlib-configured_workspace",
+  "L1-4288-repro-sys-modules-configured_workspace",
+  "L1-independent-nonliteral-key-sys-modules-string-variable-forwarder",
+  "L1-independent-nonliteral-key-sys-modules-fstring-forwarder",
+  "L1-independent-nonliteral-key-importlib-join-forwarder",
+  "L1-independent-nonliteral-key-getattr-importlib-variable-constructor-root",
+  "L2-independent-WorkspaceAPI-__new__-receives-runtime",
+  "L2-independent-lan_pilot-callee-rebinding-conn",
+  "explicit-kw-into-kwargs"
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "productFilesWritten": 0
+}
