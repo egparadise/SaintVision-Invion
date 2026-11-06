@@ -1,0 +1,40 @@
+{
+  "atKST": "2026-11-06T14:39:44+09:00",
+  "source": "0dfd1e8b8584df6982ebf7ce32d4d9daf967ee67",
+  "helperSHA256": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406",
+  "unchangedAllOriginalFunctionsExceptObserve": [
+    "regular",
+    "_stopped_archive",
+    "stopped_entries",
+    "docker",
+    "_plain",
+    "target",
+    "context"
+  ],
+  "observeASTUnchangedExceptOneFailureRaise": true,
+  "newFunctions": [
+    "_diagnostic_hash",
+    "_diagnostic_paths",
+    "_observation_diagnostic"
+  ],
+  "stage2BehaviorAccepted": false,
+  "gapReportExactDocs": {
+    "source": "34e7e73c84882c75809ef61b71d01cebcd672bd2",
+    "branch": "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106",
+    "Docs": 42168635615,
+    "jobIds": [
+      127730985694
+    ],
+    "correlation": "FLEET5-peer-floor-stage1-gap-Docs-34e7e73c8488-20261106T1429KST",
+    "status": "completed",
+    "conclusion": "success",
+    "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true,
+    "remoteExact": true
+  },
+  "rootRanOwner65UnitTests": false,
+  "ownerReportedUnits": "65PASS/exit0; notRootreproduction",
+  "actualHostedSamples": 0,
+  "registrationGap": "firstmanualdispatchHTTP404 unknownworkflow/defaultregistration; no actualrun",
+  "RootChoice": "branch-and-new-workflow-pathpush bootstrap, notdefaultbranch/existingregisteredpathchange",
+  "newBootstrapRunObserved": false
+}

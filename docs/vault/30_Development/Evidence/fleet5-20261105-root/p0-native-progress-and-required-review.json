@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "645264e1563d71af3a7d8af511bcdd8bbcc4dec4",
-    "Docs": 42167197579,
+    "SHA": "04fdc5e8aa6fe4bd37831784f5f55c3cc001ad94",
+    "Docs": 42168827317,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2792,
+    "independentlyMatchedNormalizedDestinationHashes": 2793,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T14:15:28+09:00"
+    "verifiedAtKST": "2026-11-06T14:31:54+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T14:29:13+09:00",
+  "latestRecordAtKST": "2026-11-06T14:39:44+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,10 +3109,9 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "task": "task_c067a20c86ed",
-    "dispatch": "ctx_adf96c8d66b4",
-    "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
-    "scope": "CODEAXISONLY/fullCoreFAILED",
+    "task": "task_c1e820194621",
+    "dispatch": "ctx_e6c9e8f7b819",
+    "source": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
     "verdict": null
   },
   "nextReviewRequires": "de71actualcodeverdict thenreadyB7task afterprovensettled/exited/released; fullCorefailure/Stage1diagnosisunchanged",
@@ -3151,5 +3150,8 @@
   "de71FiniteMonitorClosed": true,
   "BRev7FinalImmutableRootObservation": "b-rev7-final-source-and-review-queue-root-gate.json",
   "BRev7ActualReviewQueuedTask": "task_c1e820194621",
-  "BRev7ReviewNotYetStarted": true
+  "BRev7ReviewNotYetStarted": false,
+  "K2ActualCodeAxisAccepted": "de71-actual-code-axis-root-acceptance.json",
+  "Stage1GuardUnchangedASTAudit": "stage1-original-guard-root-ast-audit.json",
+  "K2NextPushAndLowScope": "stage1-push-bootstrap-and-k2a-lows-root-decision.json"
 }

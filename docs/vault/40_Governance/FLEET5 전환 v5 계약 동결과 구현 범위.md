@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.9"
+version: "1.0.10"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T14:12:15+09:00"
+updated: "2026-11-06T14:39:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -115,3 +115,14 @@ Core42164071724는 기존 LAN upgrade 시험의 worker_peer_floor.py:217 소유 
 Mounts 순서나 volume CreatedAt의 제외·정규화·retry·경고 후 성공은 현재 허용하지 않는다. 원래 실패의 실제 바뀐 tuple 필드는 로그에 snapshot이 없어 UNKNOWN이다. 인접 context의 정렬/CreatedAt 제외는 가설이며 새 합성 반례나 새 실행 통과가 과거의 무해한 원인을 입증하지 않는다. 동작 변경은 실제 차이와 identity 위협 경계를 확인하고 별도 Root 범위 및 실제 검토를 거쳐야 한다. helper 원문 변경은 새 closure 후보로 표시하며 예전 승인 hash를 재사용하거나 K1의28pin을 다시 묶지 않는다.
 
 현재 실제 Claude는 task_c067a20c86ed/ctx_adf96c8d66b4에서 immutable de71 코드 축만 검토한다. 실제 전체 Core 실패와 ff3169 failure-qualified 보고를 보존한다. 상세 권한·증거·결합 계획은 Root Evidence peer-floor-observation-diagnostic-root-scope.json에 있다. 관측 Medium·실제 인증/설치·5PC 운영 인수는 계속 미완료다.
+
+
+## de71 코드 축 수락·5 Low 처리와 Stage1 CI 실행 경로
+
+실제 Claude49d0f904/Docs42168779010는de71의 한정 A 거부·순수 검증 구현을 코드 축에서 수락했다. High/Medium은0이고 Low5건은 비차단 권고다. Root는 코드 축만 수락하며 전체 Core42164071724 실패·mainpytest/build/finalgotest skip·최종 한정 납품 미완료를 유지한다.
+
+Root는 같은 담당자에게 새 결합 CI 이전의 별도 Low 수정 범위를 정했다. R1은 types.Object 기반 alias 독립 allowlist와 ambient clock/서명/OS roots/비Go source/bodyless function 차단, R2는 두 Node의 중복 scope/leaf DER/SPKI 거부, R3은 모든 역사 operation과 lease hash 중복을 K1 이전에 검사, R5는 bridge가 실제 참조하는 Packet/Report/Verify/CanonicalJSON 및 method set까지 census하는 범위다. R4의 누락 P02 provenance 항목은 독립 검토된 목적별 인증 계약이 없는 상태에서 새 ABI로 만들지 않고 future HOLD를 문서에 명시한다. 이를 전체 provenance 구현으로 부르지 않는다.
+
+Stage1 source0dfd1e8b의 기존 helper 함수는 Root AST 비교에서 observe의 실패 Raise 하나를 제외하고 동일했다. guard 식과 반환·기존 소유권 검사도 동일하다. gap report34e7e73c/Docs42168635615는 성공했으나 수동 workflow 최초 실행은 HTTP404로 sample0이다. Root는 새 workflow 파일 자체만 정확한 진단 branch와 workflow path의 push trigger로 한 번 실행하도록 허용했다. job은 push/수동 이벤트 모두 동일 branch에서만 허용하고 source SHA의 고정 run name을 둔다. 기존 preparation-rate-clock/Core/Backend/default branch/Actions 설정은 바꾸지 않는다.
+
+GitHub 공식 push 이벤트 규칙과 기존 branch/path 방식의 실제 실행 사례를 확인했다. [공식 push 규칙](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push)에 따라 새 파일을 포함한 단일 commit push의 새 run을 확인한다. 수동 dispatch를 중복 실행하거나 empty commit/retry로 green을 찾지 않는다. Stage2 동작 변경은 미허용이며 Stage1 새 raw helper/7-file closure는 unregistered 후보로 남는다. 상세 지시와 검증은 Root Evidence stage1-push-bootstrap-and-k2a-lows-root-decision.json에 고정했다.

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "fleet5-de71-actual-code-axis-root-acceptance:1",
+  "atKST": "2026-11-06T14:39:44+09:00",
+  "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "actualReview": {
+    "source": "49d0f904ee8b42d3c6d7b770a3514355c21309c9",
+    "branch": "agent/claude/fleet5-k2a-de71-code-review-20261106",
+    "Docs": 42168779010,
+    "jobIds": [
+      127731460933
+    ],
+    "correlation": "FLEET5-K2A-de71-code-review-Claude-Docs-49d0f904ee8b-20261106T1431KST",
+    "status": "completed",
+    "conclusion": "success",
+    "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true,
+    "remoteExact": true
+  },
+  "actualWorkerDone": "msg_a2e865ee9c60",
+  "reviewTask": "task_c067a20c86ed",
+  "reviewDispatch": "ctx_adf96c8d66b4",
+  "actualVerdict": "CODE_AXIS_ACCEPT_FOR_BOUNDED_A_REFUSAL_SLICE",
+  "RootAccepted": "CODEAXIS_ONLY_BOUNDED_A_REFUSAL_SLICE",
+  "actualHighMediumFindings": 0,
+  "actualNonBlockingLowIDs": [
+    "K2A-R1",
+    "K2A-R2",
+    "K2A-R3",
+    "K2A-R4",
+    "K2A-R5"
+  ],
+  "RootNextLowDecision": "R1R2R3R5 codegate/selector/censusdelta; R4 explicitmissingP02futureHOLDdocs, notnewauthABI",
+  "rootReply": "msg_37da39cf72b3",
+  "wholeCore": "42164071724 FAILURE preserved/mainpytest-build-finalgotestSKIPPED",
+  "fullBoundedSourceCIReportComplete": false,
+  "actualBindings": null,
+  "A01_A40": "NOTRUN/null",
+  "operationalCurrentEffectsInstallationAccepted": false,
+  "wholeProgramComplete": false
+}
