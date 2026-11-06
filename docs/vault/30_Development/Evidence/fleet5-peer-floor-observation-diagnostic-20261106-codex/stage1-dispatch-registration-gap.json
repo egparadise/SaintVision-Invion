@@ -1,0 +1,27 @@
+{
+  "sourceSHA": "0dfd1e8b8584df6982ebf7ce32d4d9daf967ee67",
+  "branch": "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106",
+  "runs": [
+    {
+      "argv": [
+        "gh",
+        "workflow",
+        "run",
+        "peer-floor-observation-diagnostic.yml",
+        "--ref",
+        "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106",
+        "-f",
+        "correlation_id=FLEET5-peer-floor-stage1-0dfd1e8b8584-20261106T1425KST"
+      ],
+      "exit": 1,
+      "receipt": "HTTP 404: workflow peer-floor-observation-diagnostic.yml not found on the default branch (https://api.github.com/repos/egparadise/SaintVision-Invion/actions/workflows/peer-floor-observation-diagnostic.yml)\n"
+    }
+  ],
+  "noExistingCoreRerun": true,
+  "stage2": "NOT_GRANTED",
+  "classification": "ACTUAL_WORKFLOW_REGISTRATION_BLOCKER_NO_FOCUSED_RUN_CREATED",
+  "observedKST": "2026-11-06T14:26:33.566701+09:00",
+  "noRedispatch": true,
+  "noTriggerOrDefaultBranchChanges": true,
+  "actualChangedField": "UNKNOWN_NOT_REPRODUCED_OR_CAPTURED"
+}

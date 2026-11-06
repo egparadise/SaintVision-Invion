@@ -1,0 +1,114 @@
+{
+  "classification": "READ_ONLY_REGISTRATION_INVENTORY_NOT_GRANT_TO_MODIFY_OR_DISPATCH",
+  "argv": [
+    "gh",
+    "workflow",
+    "list",
+    "--all",
+    "--limit",
+    "200",
+    "--json",
+    "id,name,path,state"
+  ],
+  "observedKST": "2026-11-06T14:27:54.015132+09:00",
+  "workflowCount": 16,
+  "limit": 200,
+  "workflows": [
+    {
+      "id": 371789736,
+      "name": "AC-11 Accessibility E2E Evidence",
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "state": "active"
+    },
+    {
+      "id": 372534717,
+      "name": "AC-11 Axis Aggregation",
+      "path": ".github/workflows/ac11-aggregate.yml",
+      "state": "active"
+    },
+    {
+      "id": 368758712,
+      "name": "AC-11 Migration Rehearsal",
+      "path": ".github/workflows/ac11-migration-rehearsal.yml",
+      "state": "active"
+    },
+    {
+      "id": 369235509,
+      "name": ".github/workflows/ac11-security-scan.yml",
+      "path": ".github/workflows/ac11-security-scan.yml",
+      "state": "active"
+    },
+    {
+      "id": 353858306,
+      "name": "Backend Build",
+      "path": ".github/workflows/backend.yml",
+      "state": "active"
+    },
+    {
+      "id": 353850074,
+      "name": "Core Build",
+      "path": ".github/workflows/core.yml",
+      "state": "active"
+    },
+    {
+      "id": 358615324,
+      "name": "Desktop HTTP Browser Acceptance",
+      "path": ".github/workflows/desktop-browser.yml",
+      "state": "active"
+    },
+    {
+      "id": 353763799,
+      "name": "Documentation Build",
+      "path": ".github/workflows/docs.yml",
+      "state": "active"
+    },
+    {
+      "id": 354100025,
+      "name": "Frontend Build & Test",
+      "path": ".github/workflows/frontend.yml",
+      "state": "active"
+    },
+    {
+      "id": 371744158,
+      "name": "Portal Login Journey Harness",
+      "path": ".github/workflows/portal-login-harness.yml",
+      "state": "active"
+    },
+    {
+      "id": 408793424,
+      "name": "Preparation rate clock real PG",
+      "path": ".github/workflows/preparation-rate-clock.yml",
+      "state": "active"
+    },
+    {
+      "id": 368637810,
+      "name": "S05 Hosted Placement Wave",
+      "path": ".github/workflows/s05-hosted-wave.yml",
+      "state": "active"
+    },
+    {
+      "id": 368661503,
+      "name": "S05 Legacy Concurrency Staircase",
+      "path": ".github/workflows/s05-legacy-staircase.yml",
+      "state": "active"
+    },
+    {
+      "id": 372445323,
+      "name": "S08 BuildKit Reference",
+      "path": ".github/workflows/s08-buildkit-reference.yml",
+      "state": "active"
+    },
+    {
+      "id": 368926754,
+      "name": "S11 Storage Failure Hosted Reference",
+      "path": ".github/workflows/s11-storage-failure-hosted.yml",
+      "state": "active"
+    },
+    {
+      "id": 372029680,
+      "name": "S12 Acceptance Evidence",
+      "path": ".github/workflows/s12-acceptance-evidence.yml",
+      "state": "active"
+    }
+  ]
+}

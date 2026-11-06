@@ -81,3 +81,19 @@ Next: commit/push exact stage1 candidate, fresh own Docs and one purpose-specifi
 hosted diagnostic run with three predeclared samples. Actual capture/CI/review
 remain PENDING; old failure field UNKNOWN. Return actual evidence and a small
 separate stage2 proposal to Root, never normalize/retry/weaken a guard here.
+
+
+Actual source candidate0dfd1e8b8584df6982ebf7ce32d4d9daf967ee67 was normally
+committed/pushed from exactff3169. Its staged raw helper hashes matched the
+recorded new UNREGISTERED closure. The FIRST manual focused dispatch exited1:
+HTTP404 workflow peer-floor-observation-diagnostic.yml not found on the default
+branch. No focused run was created, no sample ran and no actual field was captured.
+No retry, push trigger, existing workflow edit, default branch publication or Core
+rerun was attempted. The chained source Docs dispatch was not reached; a fresh
+exact report Docs run is still required. Read-only registered workflow inventory
+is Evidence, not authorization to repurpose a historical lane. Root must choose
+a separately scoped registration/existing-lane path; the optional branch-only
+manual workflow cannot supply hosted evidence while unregistered. Stage1 source/
+unit evidence remains valid, original de71 field UNKNOWN and stage2 NOT_GRANTED.
+
+The registration-gap report has all10 required documentation gates exit0 at14:26:34-14:27:11 KST. Fresh records are separate dispatch-gap-gates, preserving original source checks. Canonical state before/after remains49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a, unchanged. Source/helper/test/workflow bytes remain exactly0dfd; only this unique report changes. Next Root action is the specific default-branch workflow registration or separately named existing-lane grant; no generic approval/behavior fix is requested.
