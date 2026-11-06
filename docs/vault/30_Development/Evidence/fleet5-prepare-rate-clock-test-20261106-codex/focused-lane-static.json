@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-06T09:22:21.053719+09:00",
+  "rootScope": "msg_2f135030b23c",
+  "workflowRawSHA256": "cd37868109d70806c72b79de2969f9143bcc8b33040aaec3b19fae6d2b4f680f",
+  "ASTExit": 0,
+  "YAMLParsed": true,
+  "onlyExactBranchPush": true,
+  "noArbitraryInputs": true,
+  "jobLimitMinutes": 20,
+  "permissions": {
+    "contents": "read"
+  },
+  "PG16Service": true,
+  "fullAffectedFileRequired": true,
+  "zeroSkipFailureGate": true,
+  "wholeCore": false,
+  "actualRealPGResult": "NOT_RUN_UNTIL_FIRST_SOURCE_PUSH"
+}

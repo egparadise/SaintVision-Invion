@@ -1,0 +1,26 @@
+def test_prepare_rate_limit_is_enforced_before_repeated_failed_work(workspace_http):
+    context = _setup_prepared_build(workspace_http, key="rate-1")
+    a, service = context["a"], context["service"]
+    for index in range(2, 6):
+        with pytest.raises(DomainError) as refused:
+            service.prepare(
+                context["requester"],
+                a.e.project,
+                context["build_run"]["runId"],
+                context["prepare_input"],
+                key=f"rate-{index}",
+            )
+        assert refused.value.code != "RES-0007"
+    with pytest.raises(DomainError) as exhausted:
+        service.prepare(
+            context["requester"],
+            a.e.project,
+            context["build_run"]["runId"],
+            context["prepare_input"],
+            key="rate-6",
+        )
+    assert (exhausted.value.code, exhausted.value.status, exhausted.value.retryable) == (
+        "RES-0007",
+        429,
+        True,
+    )

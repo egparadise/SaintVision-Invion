@@ -1,0 +1,25 @@
+{
+  "card": "FLEET5-CORE-PREP-RATE-CLOCK-20261106",
+  "orcaTask": "task_38393b5d1865",
+  "dispatch": "ctx_ceecb3824e33",
+  "rootInstructions": [
+    "msg_03792925724e",
+    "msg_b56d7fd0b616"
+  ],
+  "owner": "Codex",
+  "reviewer": "Root Codex independent test+README review pending",
+  "base": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "branch": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+  "atKST": "2026-11-06T09:04:35.878202+09:00",
+  "indexVersion": "1.0.429",
+  "codexBoardVersion": "1.0.390",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "INV_TEST_ADMIN_DSN_present": false,
+  "CI_set": false,
+  "PostgresBinariesOnPATH": [],
+  "realPG": "NOT_RUN_RESOURCE_UNAVAILABLE",
+  "actualK1Review": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+  "K1ImplementationVerdict": "ACCEPT_ONLY_NOT_FULL_CORE",
+  "originalCoreConclusion": "failure",
+  "newWholeCoreDispatched": false
+}

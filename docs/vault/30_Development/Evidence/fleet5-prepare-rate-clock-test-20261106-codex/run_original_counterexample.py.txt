@@ -1,0 +1,78 @@
+"""Real-PG original-test probe, ONLY in Root-verified disposable Linux harness.
+
+Uses the unchanged original56651 test function with the new TEST-local clock.
+Writes one unique temporary integration test and preserves its exact source,
+opaque logs/JUnit in ignored scratch, parsed public counts/clock rows only.
+No CI dispatch, product edit, clock change, fake counter, or container operation.
+"""
+import ast, datetime, hashlib, json, os, pathlib, subprocess, sys
+import xml.etree.ElementTree as ET
+
+root=pathlib.Path.cwd()
+evidence=pathlib.Path(__file__).resolve().parent
+if sys.platform!='linux' or not os.environ.get('INV_TEST_ADMIN_DSN'):
+    raise SystemExit('NOT RUN: verified disposable Linux/PG16+ integration harness required')
+source=subprocess.check_output(['git','show','56651cba697f2ab6fcd7166ca4e6ea11eac28113:tests/integration/test_build_preparations_real_pg.py']).decode('utf-8')
+function=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='test_prepare_rate_limit_is_enforced_before_repeated_failed_work')
+original=ast.get_source_segment(source,function)
+stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+scratch=root/'.work'/('rate-clock-original-'+stamp);scratch.mkdir(parents=True,exist_ok=False)
+result=[]
+for label,offsets,buckets,want_exit in [
+    ('same-window',(1,5,10,15,20,50),{0:5},0),
+    ('forced-rollover',(1,5,10,15,20,60),{0:5,60:1},1),
+]:
+    probe=root/'tests/integration/test_fleet5_rate_original_counterexample.py'
+    assert not probe.exists()
+    text='''import json
+import pytest
+from test_build_preparations_real_pg import (
+    DomainError, approval, remote, node_runtime, storage, workspace_http,
+    _setup_prepared_build as base_setup, _assert_rate_rows,
+)
+pytestmark=pytest.mark.postgres
+contexts=[]
+def _setup_prepared_build(*args,**kwargs):
+    kwargs['rate_offsets']=OFFSETS
+    context=base_setup(*args,**kwargs)
+    contexts.append(context)
+    return context
+@pytest.fixture(autouse=True)
+def actual_clock_rows(workspace_http):
+    yield
+    assert len(contexts)==1
+    context=contexts[0]
+    clock=context['service'].rate_clock
+    clock.assert_observations()
+    _assert_rate_rows(context,BUCKETS)
+    a=context['a']
+    with a.e.db.transaction(a.e.tenant) as conn:
+        identity=conn.execute("SELECT current_database() AS db,current_user AS role,current_setting('server_version_num') AS version").fetchone()
+    assert identity['db'].startswith('inv_test_') and len(identity['db'])==41
+    assert identity['role'].startswith('inv_app_')
+    assert int(identity['version'])>=160000
+    print('FLEET5_RATE_REAL_PG '+json.dumps({'identity':identity,'anchor':clock.anchor.isoformat(),'observed':[x.isoformat() for x in clock.observed],'buckets':BUCKETS,'actualPostgres':True}))
+'''.replace('OFFSETS',repr(offsets)).replace('BUCKETS',repr(buckets))+'\n'+original+'\n'
+    raw=text.encode('utf-8');probe.write_bytes(raw)
+    (evidence/(label+'-original-probe.py.txt')).write_bytes(raw)
+    xml=scratch/(label+'.xml');log=scratch/(label+'.log')
+    argv=[sys.executable,'-B','-m','pytest',str(probe),'--junitxml='+str(xml),'-q','-s']
+    try:
+        p=subprocess.run(argv,cwd=root,capture_output=True,text=True,encoding='utf-8')
+        log.write_text(p.stdout+p.stderr,encoding='utf-8')
+    finally:
+        assert hashlib.sha256(probe.read_bytes()).digest()==hashlib.sha256(raw).digest()
+        probe.unlink()  # Only this newly created exact file; source preserved above.
+    cases=list(ET.fromstring(xml.read_bytes()).iter('testcase'))
+    skipped=sum(c.find('skipped') is not None for c in cases)
+    failures=sum(c.find('failure') is not None for c in cases)
+    errors=sum(c.find('error') is not None for c in cases)
+    real=[json.loads(line.split('FLEET5_RATE_REAL_PG ',1)[1]) for line in p.stdout.splitlines() if 'FLEET5_RATE_REAL_PG ' in line]
+    row={'label':label,'argv':argv,'exit':p.returncode,'expectedExit':want_exit,'testcases':len(cases),'failures':failures,'errors':errors,'skips':skipped,'realPG':real,'probeSHA256':hashlib.sha256(raw).hexdigest(),'rawLogSHA256':hashlib.sha256(log.read_bytes()).hexdigest(),'rawJUnitSHA256':hashlib.sha256(xml.read_bytes()).hexdigest(),'rawLogJUnitExported':False,'historicalCICauseProven':False}
+    result.append(row)
+    (evidence/'original-counterexample-results.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+    assert p.returncode==want_exit and len(cases)==1 and skipped==0 and errors==0 and len(real)==1
+    assert failures==(1 if want_exit else 0)
+    if want_exit:
+        assert "('GRAPH-0003', 409, False)" in p.stdout and "('RES-0007', 429, True)" in p.stdout
+    print(json.dumps({'label':label,'exit':p.returncode,'failures':failures,'actualPG':True}))

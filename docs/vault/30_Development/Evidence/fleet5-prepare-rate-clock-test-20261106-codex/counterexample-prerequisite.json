@@ -1,0 +1,10 @@
+{
+  "atKST": "2026-11-06T09:12:25.383497+09:00",
+  "scriptASTExit": 0,
+  "executed": false,
+  "realPG": "NOT_RUN",
+  "reason": "No verified disposable Linux+PG harness/INV_TEST_ADMIN_DSN; awaiting Root resource response",
+  "productGoChanges": false,
+  "clockChange": false,
+  "rawJUnitExport": false
+}

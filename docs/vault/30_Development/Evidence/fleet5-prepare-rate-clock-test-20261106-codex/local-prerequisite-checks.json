@@ -1,0 +1,54 @@
+[
+  {
+    "label": "core-unit",
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/core/test_build_preparations.py",
+      "-q",
+      "--junitxml=D:\\Project\\SaintVisionI-Invion\\fleet5-prepare-rate-clock-test-20261106\\.work\\rate-clock-local-prerequisite\\core-unit.xml"
+    ],
+    "exit": 0,
+    "cases": 29,
+    "passed": 29,
+    "skips": 0,
+    "failures": 0,
+    "errors": 0,
+    "skipReasons": [],
+    "rawLogSHA256": "e7db5a6f23533667a19c295760bee3d2ff7ae2cd7e5e7136e17d4a48a1311ef3",
+    "rawJUnitSHA256": "dbdfc9dfee56e900af242dfbae98768ac7a09ca426a1ff3deb7976ba0a5d6afb",
+    "rawExported": false,
+    "classification": "UNIT_ONLY_NOT_REAL_PG",
+    "atKST": "2026-11-06T09:14:50.564653+09:00"
+  },
+  {
+    "label": "pg-focused-prerequisite",
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/integration/test_build_preparations_real_pg.py::test_prepare_rate_limit_is_enforced_before_repeated_failed_work",
+      "tests/integration/test_build_preparations_real_pg.py::test_prepare_rate_limit_uses_exact_minute_boundaries",
+      "-q",
+      "--junitxml=D:\\Project\\SaintVisionI-Invion\\fleet5-prepare-rate-clock-test-20261106\\.work\\rate-clock-local-prerequisite\\pg-focused-prerequisite.xml"
+    ],
+    "exit": 0,
+    "cases": 2,
+    "passed": 0,
+    "skips": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipReasons": [
+      "Set INV_TEST_ADMIN_DSN to a disposable PostgreSQL 16+ test server",
+      "Set INV_TEST_ADMIN_DSN to a disposable PostgreSQL 16+ test server"
+    ],
+    "rawLogSHA256": "527e3e511a1798c38d93a19ed81b958ee2b6021a5e8cbe5aa6287943d00f0b87",
+    "rawJUnitSHA256": "e980fc7242033edcf001fbf27abfe63cddc5d951ce9701dad4023a710105e063",
+    "rawExported": false,
+    "classification": "NOT_RUN_IF_SKIPPED_NO_REAL_PG_CLAIM",
+    "atKST": "2026-11-06T09:14:55.054338+09:00"
+  }
+]

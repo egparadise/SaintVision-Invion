@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import base64
+from contextlib import contextmanager
+import json
 from datetime import datetime, timedelta, timezone
 from itertools import product
 from uuid import uuid4
@@ -45,6 +47,103 @@ class _MeasuredService:
         return BuildExecutionResult(new_id("evd"), "a" * 64, True, True)
 
 
+class _RateClockCursor:
+    """Observe the actual parameterized PostgreSQL row; never manufacture it."""
+
+    def __init__(self, cursor, clock, expected):
+        self._cursor, self._clock, self._expected = cursor, clock, expected
+
+    def fetchone(self):
+        row = self._cursor.fetchone()
+        assert row["now"] == self._expected
+        self._clock.observed.append(row["now"])
+        return row
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+
+class _RateClockConnection:
+    def __init__(self, connection, clock):
+        self._connection, self._clock = connection, clock
+
+    def execute(self, query, params=None, **kwargs):
+        if query == "SELECT clock_timestamp() AS now" and params is None and not kwargs:
+            stamp = self._clock.next_timestamp()
+            cursor = self._connection.execute("SELECT %s::timestamptz AS now", (stamp,))
+            return _RateClockCursor(cursor, self._clock, stamp)
+        return self._connection.execute(query, params, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self._connection, name)
+
+
+class _RateWindowDatabase:
+    """TEST ONLY: intercept the rate SELECT solely while _reserve is active.
+
+    Real Database.transaction opens/closes the connection, checks epoch/RLS and
+    tenant/grants, and commits/rolls back. Retention/approval/other SQL clocks are
+    untouched. Each test owns its synchronous service instance exclusively.
+    """
+
+    def __init__(self, database, tenant, offsets):
+        self._database = database
+        with database.transaction(tenant) as conn:
+            sample = conn.execute(
+                """SELECT clock_timestamp() AS sampled_at,current_database() AS database,
+                current_user AS role,current_setting('server_version_num') AS version"""
+            ).fetchone()
+        assert sample["database"].startswith("inv_test_") and len(sample["database"]) == 41
+        assert sample["role"].startswith("inv_app_") and int(sample["version"]) >= 160000
+        self.identity = {k: sample[k] for k in ("database", "role", "version")}
+        actual_now = sample["sampled_at"]
+        self.anchor = actual_now.astimezone(timezone.utc).replace(second=0, microsecond=0)
+        self.offsets = tuple(offsets)
+        assert self.offsets and all(type(n) is int and 0 <= n < 180 for n in self.offsets)
+        self.observed = []
+        self._chosen = 0
+        self._reserving = False
+
+    def next_timestamp(self):
+        assert self._reserving
+        assert self._chosen < len(self.offsets), "unexpected extra rate-clock SELECT"
+        result = self.anchor + timedelta(seconds=self.offsets[self._chosen])
+        self._chosen += 1
+        return result
+
+    @contextmanager
+    def reserve_clock(self):
+        assert not self._reserving
+        self._reserving = True
+        try:
+            yield
+        finally:
+            self._reserving = False
+
+    @contextmanager
+    def transaction(self, *args, **kwargs):
+        with self._database.transaction(*args, **kwargs) as conn:
+            yield _RateClockConnection(conn, self) if self._reserving else conn
+
+    def assert_observations(self):
+        assert self._chosen == len(self.offsets)
+        assert self.observed == [self.anchor + timedelta(seconds=n) for n in self.offsets]
+        assert not self._reserving
+
+    def __getattr__(self, name):
+        return getattr(self._database, name)
+
+
+class _RateWindowPreparationService(BuildPreparationService):
+    def __init__(self, database, capsule_store, *, tenant, offsets, **kwargs):
+        self.rate_clock = _RateWindowDatabase(database, tenant, offsets)
+        super().__init__(self.rate_clock, capsule_store, **kwargs)
+
+    def _reserve(self, *args, **kwargs):
+        with self.rate_clock.reserve_clock():
+            return super()._reserve(*args, **kwargs)
+
+
 def _setup_prepared_build(
     workspace_http,
     *,
@@ -52,6 +151,7 @@ def _setup_prepared_build(
     profile_budget=(10, 1048576, 1048576),
     profile_digest=BASE_IMAGE_DIGEST,
     profile_drift=None,
+    rate_offsets=None,
 ):
     a = workspace_http
     source_url = a.url + "/checkouts/" + a.checkout_id + "/files"
@@ -162,7 +262,13 @@ def _setup_prepared_build(
 
         capsule_store = _DriftingCapsuleStore(capsule_store)
 
-    service = BuildPreparationService(a.e.db, capsule_store, plan_factory=authority)
+    if rate_offsets is None:
+        service = BuildPreparationService(a.e.db, capsule_store, plan_factory=authority)
+    else:
+        service = _RateWindowPreparationService(
+            a.e.db, capsule_store, plan_factory=authority,
+            tenant=a.e.tenant, offsets=rate_offsets,
+        )
     prepared = service.prepare(
         requester, a.e.project, build_run["runId"],
         {"checkoutId": a.checkout_id, "buildPolicyProfileId": profile_id,
@@ -435,7 +541,9 @@ def test_build_authority_rows_are_immutable_even_to_the_owner(workspace_http):
 
 
 def test_prepare_rate_limit_is_enforced_before_repeated_failed_work(workspace_http):
-    context = _setup_prepared_build(workspace_http, key="rate-1")
+    context = _setup_prepared_build(
+        workspace_http, key="rate-1", rate_offsets=(1, 5, 10, 15, 20, 50)
+    )
     a, service = context["a"], context["service"]
     for index in range(2, 6):
         with pytest.raises(DomainError) as refused:
@@ -446,7 +554,16 @@ def test_prepare_rate_limit_is_enforced_before_repeated_failed_work(workspace_ht
                 context["prepare_input"],
                 key=f"rate-{index}",
             )
-        assert refused.value.code != "RES-0007"
+        assert (refused.value.code, refused.value.status, refused.value.retryable) == (
+            "GRAPH-0003", 409, False,
+        )
+    _assert_rate_rows(context, {0: 5})
+    # Replaying the successful first request charges neither clock nor counters.
+    assert service.prepare(
+        context["requester"], a.e.project, context["build_run"]["runId"],
+        context["prepare_input"], key="rate-1",
+    ) == context["prepared"]
+    assert len(service.rate_clock.observed) == 5
     with pytest.raises(DomainError) as exhausted:
         service.prepare(
             context["requester"],
@@ -459,6 +576,89 @@ def test_prepare_rate_limit_is_enforced_before_repeated_failed_work(workspace_ht
         "RES-0007",
         429,
         True,
+    )
+    service.rate_clock.assert_observations()
+    _assert_rate_rows(context, {0: 5})
+    _assert_rate_idempotency(context, [f"rate-{index}" for index in range(1, 6)], "rate-6")
+
+
+def _assert_rate_rows(context, buckets):
+    a, clock = context["a"], context["service"].rate_clock
+    with a.e.db.transaction(a.e.tenant) as conn:
+        rows = conn.execute(
+            """SELECT scope,subject_id,operation,window_started_at,count
+            FROM inv.build_preparation_rate_windows WHERE project_id=%s
+            ORDER BY window_started_at,scope""", (a.e.project,),
+        ).fetchall()
+    expected = {
+        (scope, context["requester"].subject_id if scope == "subject" else "*",
+         operation, clock.anchor + timedelta(seconds=offset), count)
+        for offset, count in buckets.items()
+        for scope, operation in (("subject", "prepare"), ("project", "combined"),
+                                 ("tenant-project", "combined"))
+    }
+    assert {(r["scope"], r["subject_id"], r["operation"], r["window_started_at"], r["count"])
+            for r in rows} == expected
+    assert len(rows) == len(expected)
+    print("FLEET5_RATE_WINDOW " + json.dumps({
+        "identity": clock.identity, "anchor": clock.anchor.isoformat(),
+        "observed": [stamp.isoformat() for stamp in clock.observed],
+        "rows": [{**row, "window_started_at": row["window_started_at"].isoformat()}
+                 for row in rows],
+    }, sort_keys=True))
+
+
+def _assert_rate_idempotency(context, charged_keys, refused_key):
+    a = context["a"]
+    with a.e.db.transaction(a.e.tenant) as conn:
+        rows = conn.execute(
+            "SELECT key,response FROM inv.idempotency WHERE project_id=%s AND operation='build.prepare'",
+            (a.e.project,),
+        ).fetchall()
+    by_key = {r["key"]: r["response"] for r in rows}
+    assert set(by_key) == set(charged_keys)
+    assert by_key[charged_keys[0]] is not None
+    assert all(by_key[key] is None for key in charged_keys[1:])
+    assert refused_key not in by_key  # over-budget transaction rolled back
+
+
+def test_prepare_rate_limit_uses_exact_minute_boundaries(workspace_http):
+    context = _setup_prepared_build(
+        workspace_http, key="boundary-1",
+        rate_offsets=(1, 5, 10, 15, 20, 60, 65, 70, 80, 100, 110),
+    )
+    a, service = context["a"], context["service"]
+
+    def failed_work(index):
+        with pytest.raises(DomainError) as refused:
+            service.prepare(
+                context["requester"], a.e.project, context["build_run"]["runId"],
+                context["prepare_input"], key=f"boundary-{index}",
+            )
+        assert (refused.value.code, refused.value.status, refused.value.retryable) == (
+            "GRAPH-0003", 409, False,
+        )
+
+    for index in range(2, 6):
+        failed_work(index)
+    _assert_rate_rows(context, {0: 5})
+    failed_work(6)  # EXACT next minute: real reserve succeeds, later work refuses.
+    _assert_rate_rows(context, {0: 5, 60: 1})
+    for index in range(7, 11):
+        failed_work(index)
+    _assert_rate_rows(context, {0: 5, 60: 5})
+    with pytest.raises(DomainError) as exhausted:
+        service.prepare(
+            context["requester"], a.e.project, context["build_run"]["runId"],
+            context["prepare_input"], key="boundary-11",
+        )
+    assert (exhausted.value.code, exhausted.value.status, exhausted.value.retryable) == (
+        "RES-0007", 429, True,
+    )
+    service.rate_clock.assert_observations()
+    _assert_rate_rows(context, {0: 5, 60: 5})
+    _assert_rate_idempotency(
+        context, [f"boundary-{index}" for index in range(1, 11)], "boundary-11"
     )
 
 

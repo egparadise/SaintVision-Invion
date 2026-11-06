@@ -107,6 +107,11 @@ original producer bytes verified separately at Now against the current scoped
 operation/epoch/nonce, expected state and the unchanged 120-second age bound.
 Historical receipts do not automatically fill these current witness slots.
 
+Current derivation requires a PRESENT authenticated inventory head. An ABSENT
+pre-publication head fails closed without a current view; `Verify` still
+authenticates history. K2 must independently authenticate producers of current
+and historical contexts and enforce cohort fencing across migrations.
+
 Each packet verification takes one bounded map/byte snapshot and uses it for all
 hashes, parsing, native raw identity and returned authentication data. Callers
 must own maps/slices without concurrent mutation during the call; a defensive

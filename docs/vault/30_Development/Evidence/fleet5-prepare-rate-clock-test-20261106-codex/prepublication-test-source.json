@@ -1,0 +1,19 @@
+{
+  "rootExtendedScope": "msg_2f135030b23c",
+  "base": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "atKST": "2026-11-06T09:24:19.939747+09:00",
+  "workspaceRawSHA256": {
+    "tests/integration/test_build_preparations_real_pg.py": "481421865d02acf7c6b185756bf5d29bddc4a5f6c42e2e4fd2c458024a6191a7",
+    "tests/proofs/run_preparation_rate_clock.py": "60856bea2dc258e37469d43ff2efe8989d2f40095f6c55b4736a89fed553ef28",
+    ".github/workflows/preparation-rate-clock.yml": "cd37868109d70806c72b79de2969f9143bcc8b33040aaec3b19fae6d2b4f680f",
+    "services/node-agent/migrationverify/README.md": "65912af40f579bf17b307da1ab59becfaf59b910fae48732d8e2a11d7116eb1d"
+  },
+  "runtimeGoSchemaPinsMigrationsExistingWorkflowDependencyDiff": 0,
+  "READMEOnlyR1": true,
+  "localUnitPassed": 29,
+  "localPGPassed": 0,
+  "localPGSkipped": 2,
+  "realPG": "PENDING_FIRST_EXACT_SOURCE_PUSH",
+  "noWholeCore": true,
+  "noLocalDockerPGInstall": true
+}

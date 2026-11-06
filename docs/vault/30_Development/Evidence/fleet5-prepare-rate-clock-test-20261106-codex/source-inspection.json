@@ -1,0 +1,12 @@
+{
+  "base": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "sourceFileRawSHA256": "709581f43e0a67435bda6079e577240022cf1bba9f3d020d8cc8800fe8213a30",
+  "originalFunctionTextSHA256": "4452bf5b87fcecbc037e8adbab48b5882d348f34427f25f814117ed666ae1e97",
+  "currentTestASTExit": 0,
+  "currentTestRawSHA256": "8caf3073446199063e9caea6f102d5753a46b650cdf2fbe32b2ef150571e25c1",
+  "GoSchemasPinsRuntimeWorkflowDiff": 0,
+  "READMEOnlyR1ChangeAllowed": true,
+  "realPG": "NOT_RUN_RESOURCE_UNAVAILABLE",
+  "historyCause": "UNKNOWN; source rollover hypothesis only",
+  "atKST": "2026-11-06T09:11:20.453646+09:00"
+}
