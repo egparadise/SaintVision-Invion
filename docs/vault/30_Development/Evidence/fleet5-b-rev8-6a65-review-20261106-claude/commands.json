@@ -1,0 +1,37 @@
+{
+ "schemaVersion": "fleet5-b-rev8-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (same released review workspace; clean on agent/claude/fleet5-k2a-low-stage2-pair-review-20261106 at start)",
+  "branch": "agent/claude/fleet5-b-rev8-6a65-review-20261106 created FROM 6a65665819d7479073189c524abf585636c3079d (remote ref absent before creation)",
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe = Python 3.14.7, jsonschema 4.26.0 (owner interpreter; read-only use, no installs)",
+  "memory": "about 300 MB FreePhysical at 16:05 KST; all runs serial; no OS limit enforced or changed",
+  "noDB_PG_Docker_Node_Go_SSH_PKI_VM_clock_schedule": true
+ },
+ "commands": [
+  {"atKST": "2026-11-06T16:03", "argv": "orca orchestration task-list --run run_e57ecd84a7bc", "exit": 0, "result": "task_de20693ba7c9 completed; task_ac6f831f2c53 dispatched to this terminal"},
+  {"atKST": "2026-11-06T16:04", "argv": "git fetch origin agent/codex/fleet5-b-rev8-revoke-portcut-20261106; git cat-file -t <6a65,33f7,72028,8b8af,97bb>; git log 33f7c6b4..6a656658", "exit": 0, "result": "FETCH_HEAD 6a65665819d7; two commits 8b8af787, 6a656658"},
+  {"atKST": "2026-11-06T16:04", "argv": "git diff --name-status 33f7c6b4 6a656658; git diff --name-only 72028cba 6a656658 (non-docs filter); git merge-base --is-ancestor 72028cba 6a656658", "exit": 0, "result": "71 A; 0 non-docs paths vs 72028; ancestry true"},
+  {"atKST": "2026-11-06T16:05", "argv": "read-only Root canonical worktree: AGENTS.md, skills, b-rev8-revoke-pilot-root-decision.json (sha256 2b24b0fd...347b), queue gate, final-source verification", "exit": 0},
+  {"atKST": "2026-11-06T16:06", "argv": "git checkout -b agent/claude/fleet5-b-rev8-6a65-review-20261106 6a65665819d7479073189c524abf585636c3079d", "exit": 0},
+  {"atKST": "2026-11-06T16:08", "argv": "gh run view 42177211155 --json headSha,headBranch,event,workflowName,attempt,status,conclusion,displayTitle,jobs; gh api repos/egparadise/SaintVision-Invion/actions/runs/42177211155 --jq .path,.run_attempt,.head_sha,.event", "exit": 0, "result": "6a65665819d7, workflow_dispatch, attempt 1, .github/workflows/docs.yml, success, job 127758314008 docs 19/19 success"},
+  {"atKST": "2026-11-06T16:10", "argv": "git rev-parse HEAD:<Rev8 prior-*> vs 97bb2f67:<review files>", "exit": 0, "result": "4/4 blob ids equal"},
+  {"atKST": "2026-11-06T16:12-16:25", "argv": "git show 72028cba:<node_channels.py, errors.py, db.py, observation.py, terminal.py, observer_worker.py, worker.py, app.py, workspace_api.py, workspace_config.py, lock_wait.py, server.go>; git grep (migrations 0027/0031, materialize_source_capsule, session.delete/merge/add, Database(, class *Database)", "exit": 0},
+  {"atKST": "2026-11-06T16:14", "argv": "python -B (import owner bounded_analysis read-only) stream classifiedCalls/records/criticalEntries/writers", "exit": 0, "result": "pilot 10 calls, 4 records; 21/757/1071/598; 387 writers"},
+  {"atKST": "2026-11-06T16:20", "argv": "python -B reviewer_l1_orm_site_census.py <Rev8 E>", "exit": 0, "result": "59 sites (57 add/add_all + 2 delete), 0 uncovered, 0 merge; 21 files 396141 B"},
+  {"atKST": "2026-11-06T16:24", "argv": "python -B reviewer_m1_l2_rev8_attacks.py <Rev8 E> (first attempt as bash heredoc failed to parse: exit 2, no Python run; rewritten as a file)", "exits": [2, 0], "result": "79 cases, 4 defects (TERMINAL_FRAME after release)"},
+  {"atKST": "2026-11-06T16:25", "argv": "python -B reviewer_tf_released_claim_probe.py <Rev7 E>; ... <Rev8 E>", "exits": [0, 0], "result": "defect true in both"},
+  {"atKST": "2026-11-06T16:27", "argv": "python -B reviewer_m2_rule_mutations.py <Rev8 E> (first run inserted mutations into provision_channel because its with-header is byte-identical at line 162: reviewer probe bug; fixed to the pilot function range and rerun; benign controls relabelled)", "exits": [0, 0, 0], "result": "final 16 cases, 7 defects -> B8-L1"},
+  {"atKST": "2026-11-06T16:29", "argv": "python -B reviewer_i1_anchor_mutations.py <Rev8 E>", "exit": 0, "result": "7 cases, 0 defects"},
+  {"atKST": "2026-11-06T16:30", "argv": "python -B (owner model) hint with channelEnabled/keyLive/certNotAfter/fenced/grantLive negated", "exit": 0, "result": "HINT_AVAILABLE for channel/key/cert -> B8-L3"},
+  {"atKST": "2026-11-06T16:32-16:33", "argv": "owner proof commands individually via owner measured_run.py, git status after each, git checkout -- <Rev8 E> after each; see owner-reruns.tsv.txt", "exits": [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], "result": "all expected; only pending_contracts.py alone changes pending-interface-contracts.json (two-producer order, B8-I1); restored; tree clean"},
+  {"atKST": "2026-11-06T16:33", "argv": "sha256sum D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; Root git log", "exit": 0, "result": "26c355f564b4...abc4 (mtime 16:20) vs owner-time 4f35e536...; Root head ed2f088f"},
+  {"atKST": "2026-11-06T16:35", "argv": "python verify proof-producer-hashes.json vs HEAD bytes and proof-producer-hashes-at-8b8af.json vs git show 8b8af blobs", "exit": 0, "result": "28/28 equal; at-8b8af equal; changed 8b8af->6a65: critical-edge-categories.json, edge_categories.py, packet_checks.py"},
+  {"atKST": "2026-11-06T16:38", "argv": "python -I -B reviewer_category_triage.py <Rev8 E>/critical-edge-categories.json", "exit": 0, "result": "DYNAMIC_BLOCK 227 (value 164, sqlalchemy 22, logger 4, crypto/resource 8, TYPE_JOIN 6, other 23); 6 flagged; 0 IO_CATALOG_LINK edges; 0 non-pilot unblocked"},
+  {"atKST": "2026-11-06T16:45", "argv": "reviewer serial gate runner (scratchpad run_gates.sh): first attempt", "exit": 1, "result": "check_docs.py ran exit 0, then the runner itself aborted on its own 'set -u' unbound $3 (reviewer script bug, not a gate failure); runner fixed with ${3:-}; full gate set rerun from the start"},
+  {"atKST": "2026-11-06T16:46-16:47", "argv": "reviewer gate runner second attempt: 9 gates serially, each exit recorded individually, canonical state sha256 before/after", "exit": 0, "result": "all 9 exit 0; state 26c355f5... unchanged; Git Bash ignored TZ=Asia/Seoul (no tzdata) and printed UTC, so local-doc-gates.txt times were converted +09:00 and labelled"},
+  {"atKST": "2026-11-06T16:48-16:50", "argv": "final gate rerun after this commands.json update (the published local-doc-gates.txt); see that file", "exit": 0}
+ ],
+ "reviewerScripts": "sha256 of each *.py.txt is listed in local-doc-gates.txt section 'evidence hashes'",
+ "notRun": ["owner run_checks.py wrappers (rewrite ledgers)", "full assembler / 523 files / 3485 plans / aggregate loads", "any PG/Docker/Node/Go/crypto/TLS/crash/concurrency/equipment/VM/clock/SSH/PKI", "Obsidian apply/adopt/resolve/state write"]
+}

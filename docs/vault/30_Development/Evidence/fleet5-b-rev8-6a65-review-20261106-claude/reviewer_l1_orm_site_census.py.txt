@@ -1,0 +1,30 @@
+"""Reviewer L1 census: every product session.add/add_all/delete/merge site -> Rev7 ORM writer in same function."""
+import ast,json,subprocess,sys,collections
+sys.path.insert(0,sys.argv[1]);sys.dont_write_bytecode=True
+import bounded_analysis as a
+ROOT=a.ROOT;SRC=a.SOURCE
+out=subprocess.check_output(['git','grep','-n','-E',r'session\.(add|add_all|delete|merge)\(',SRC,'--','src/*.py','services/*.py'],cwd=ROOT).decode()
+sites=collections.defaultdict(list)
+for line in out.splitlines():
+    _,path,ln,_=line.split(':',3);sites[path].append(int(ln))
+writers=list(a.rows('writers'));byfn=collections.defaultdict(list)
+for w in writers:byfn[(w['path'],w['function'])].append(w)
+rows=[];files=0;nbytes=0
+for path,lines in sorted(sites.items()):
+    raw=subprocess.check_output(['git','show',SRC+':'+path],cwd=ROOT);files+=1;nbytes+=len(raw);t=ast.parse(raw.decode('utf-8-sig'))
+    mod=path.replace('src/','').replace('services/control-plane/src/','').removesuffix('.py').replace('/','.')
+    fns=[]
+    for n in ast.walk(t):
+        if isinstance(n,ast.ClassDef):
+            for m in n.body:
+                if isinstance(m,(ast.FunctionDef,ast.AsyncFunctionDef)):fns.append((mod+'.'+n.name+'.'+m.name,m))
+    for n in t.body:
+        if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)):fns.append((mod+'.'+n.name,n))
+    for ln in lines:
+        enc=[(q,f) for q,f in fns if f.lineno<=ln<=f.end_lineno];q=min(enc,key=lambda x:x[1].end_lineno-x[1].lineno)[0] if enc else None
+        ws=byfn.get((path,q),[])
+        kinds=collections.Counter(w['kind'] for w in ws)
+        src=raw.decode('utf-8-sig').splitlines()[ln-1].strip()
+        rows.append({'path':path,'line':ln,'function':q,'expression':src[:100],'rev7WritersInFunction':dict(kinds),'covered':bool(ws) or 'delete(' in src})
+res={'sites':len(rows),'uncovered':[r for r in rows if not r['covered']],'deleteSites':[r for r in rows if '.delete(' in r['expression']],'mergeSites':[r for r in rows if '.merge(' in r['expression']],'files':files,'bytes':nbytes}
+print(json.dumps(res,indent=1))

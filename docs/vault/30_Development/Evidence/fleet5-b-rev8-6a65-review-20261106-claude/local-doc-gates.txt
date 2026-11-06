@@ -1,0 +1,45 @@
+Local publication gates, 2026-11-06 KST, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7, PYTHONUTF8=1, cwd=worktree root, times KST (+09:00 computed from epoch), tree = 6a65665819d7 + this review's own uncommitted History/Evidence only.
+sync_obsidian ran CHECK only (default state and canonical Root state). No apply/adopt/resolve/state write.
+stateBefore 26c355f564b4197cfe1a3a6d665d45d2d79e2ae2c13272aeea29bbb343f8abc4 435531 mtime=2026-11-06T16:20:38+09:00
+16:47:42..16:48:02 exit=0 logsha=5c97b68db210f6161e1614616c7c64df01461c11b57cd39a8d1d47a1a2e853a3 :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1256 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+16:48:03..16:48:08 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+16:48:08..16:48:24 exit=0 logsha=29e5045da5f0d1aa32235e978eca45157e6aab53c9f44fa91bb7eebfc0179974 :: python -B tools/sync_obsidian.py --check
+    CHECK: 3536 managed files, 1111 pending exports, 0 conflicts. No writes.
+16:48:24..16:48:29 exit=0 logsha=29e5045da5f0d1aa32235e978eca45157e6aab53c9f44fa91bb7eebfc0179974 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 3536 managed files, 1111 pending exports, 0 conflicts. No writes.
+  stateAfterThisCheck 26c355f564b4197cfe1a3a6d665d45d2d79e2ae2c13272aeea29bbb343f8abc4 435531 mtime=2026-11-06T16:20:38+09:00
+16:48:29..16:48:38 exit=0 logsha=7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed :: python -B tools/check_contract_bindings.py
+    PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.
+      UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+16:48:38..16:48:39 exit=0 logsha=2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949 :: python -B tools/check_frontend_integrity.py
+    Scanning 94 frontend production source files under apps/web/src ...
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+16:48:39..16:48:40 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+16:48:40..16:48:40 exit=0 logsha=ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc :: python -B tools/check_response_freshness.py
+      ok      kernel:StorageObservationView.createdAt
+      ok      saintvision:NodeResponse.lastHeartbeatAt
+      ok      saintvision:ReplicaObservationResponse.observedAt
+      (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)
+16:48:41..16:48:45 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: python -B tools/check_doc_path_citations.py --ratchet --base-ref 6a65665819d7479073189c524abf585636c3079d
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+stateAfter 26c355f564b4197cfe1a3a6d665d45d2d79e2ae2c13272aeea29bbb343f8abc4 435531 mtime=2026-11-06T16:20:38+09:00
+evidence hashes (sha256, working-tree bytes; .gitattributes '* -text' keeps them byte-exact):
+  c2288c0951d162bbe13037f3c84267247ac4809b036d8e1e0989ab04f2b0de39  commands.json
+  ee70d1277f00e9addb289939fd9ce8d6de649a4f10a238d2a74703157bc9830f  owner-reruns.tsv.txt
+  39c0745e8d5dfc51000d775eab798825a865f6e1d3be64e4666ba9da2abe0f48  review.json
+  04b36d0298138322ef61b5e3f68333b8e94f35458cc5d3223ceacd8edd0c9ca2  reviewer_category_triage.py.txt
+  d72d2f51fd2a8c464af9edb3c0e7ac92bf7b054efe25957624dcf6b6800e2060  reviewer_i1_anchor_mutations.py.txt
+  2a4a1b56a45e856014d88df7172c56d0756b62bc92685866046d9c7a497e3e02  reviewer_l1_orm_site_census.py.txt
+  b51a88933dc528b57bdf759bcdcbbeff652f3e19496ad86850dc936d61df43dc  reviewer_m1_l2_rev8_attacks.py.txt
+  3743d1010ed866bc0e8f8414f84ad12893bc7f20c779adc6588ce363d0cd8a47  reviewer_m2_rule_mutations.py.txt
+  1cc13e8b8428afb2737e763b0fe8e4dca6498b70007e8f2d7dc23206044ac4e8  reviewer_tf_released_claim_probe.py.txt
+  a8313307169cdd00d9865d6251b46fe72de983f5a8ecaf269be477cfdc77cef8  reviewer-category-triage-result.json
+  ba36efa23c9d10c2ff5724bf30a6673f671792f256f91bf29251b641a00f360d  reviewer-i1-anchor-mutations-result.json
+  74d1bcad5a2fa06feaa6929f07172aa69a1bba1ed6ba48100c7f1b2573d73288  reviewer-l1-orm-site-census-result.json
+  a7a3710ad2656d0f36740cbe44f8f8b5eb761c43bf58617f9ad5ef069500f4eb  reviewer-m1-l2-rev8-attacks-result.json
+  7a1fce310f70fe1e08f77caed01179fc957096adee343577438cf5f31dd8e378  reviewer-m2-rule-mutations-result.json
+  52b1c00710b5da2a3d33323c5bf2c40d098805a01e471f0389503bdb8f10e5cb  reviewer-tf-released-claim-probe-result.jsonl.txt

@@ -1,0 +1,15 @@
+n	KST	expected	actual	peakWorkingSetBytes	gitChangedAfterRun	command
+1	2026-11-06T16:32:05.672+09:00	exp=0	act=0	peak=21708800	changed=[]	schema.py 
+2	2026-11-06T16:32:07.297+09:00	exp=0	act=0	peak=50565120	changed=[]	authority.py 
+3	2026-11-06T16:32:10.085+09:00	exp=1	act=1	peak=62107648	changed=[]	regression_red_green.py docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex
+4	2026-11-06T16:32:11.895+09:00	exp=0	act=0	peak=62341120	changed=[]	regression_red_green.py docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex
+5	2026-11-06T16:32:13.736+09:00	exp=0	act=0	peak=62406656	changed=[]	proof_tests.py 
+6	2026-11-06T16:32:16.989+09:00	exp=0	act=0	peak=36802560	changed=[]	bounded_analysis.py 
+7	2026-11-06T16:32:22.054+09:00	exp=0	act=0	peak=26382336	changed=[]	analysis_tests.py 
+8	2026-11-06T16:32:35.457+09:00	exp=0	act=0	peak=25092096	changed=[ M docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/pending-interface-contracts.json ]	pending_contracts.py 
+9	2026-11-06T16:32:38.829+09:00	exp=0	act=0	peak=31354880	changed=[]	edge_categories.py 
+10	2026-11-06T16:32:40.945+09:00	exp=0	act=0	peak=23166976	changed=[]	transport_delta.py 
+11	2026-11-06T16:32:54.699+09:00	exp=0	act=0	peak=62476288	changed=[]	retained_tests.py 
+12	2026-11-06T16:32:57.786+09:00	exp=0	act=0	peak=62169088	changed=[]	packet_checks.py 
+13	2026-11-06T16:33:01.453+09:00	exp=0	act=0	peak=25518080	changed=[]	fleet5_compute_storage_contract_probe.py 
+14	2026-11-06T16:33:02.731+09:00	exp=1	act=1	peak=25714688	changed=[]	fleet5_compute_storage_contract_probe.py --require-coexistence

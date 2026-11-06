@@ -1,0 +1,111 @@
+{
+ "branches": {
+  "CANCEL": [
+   "if cancelling {",
+   272,
+   281,
+   280
+  ],
+  "EXECUTE": [
+   "else {",
+   283,
+   285,
+   284
+  ],
+  "GPU_ACTIVE_OBSERVE": [
+   "if snapshot {",
+   226,
+   236,
+   230
+  ],
+  "HEARTBEAT_OBSERVE": [
+   "if probe || snapshot {",
+   218,
+   249,
+   223
+  ],
+  "OBJECT_READ": [
+   "if chunk {",
+   198,
+   217,
+   203
+  ],
+  "QUARANTINE_RECONCILE": [
+   "if quarantine {",
+   144,
+   172,
+   154
+  ],
+  "RECEIPT_OBSERVE": [
+   "else if r.URL.Path == \"/v1/executions/receipts\" {",
+   281,
+   283,
+   282
+  ],
+  "STORAGE_SAMPLE": [
+   "if storageSample {",
+   126,
+   143,
+   129
+  ],
+  "TERMINAL_FRAME": [
+   "if terminal {",
+   173,
+   197,
+   183
+  ]
+ },
+ "cases": [
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "swap-cancel-observe"
+  },
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "swap-observe-execute"
+  },
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "cancel-selector-path-changed"
+  },
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "rawpath-guard-removed"
+  },
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "receipts-branch-condition-changed"
+  },
+  {
+   "actualRefused": true,
+   "defect": false,
+   "expectedRefused": true,
+   "id": "duplicate-needle-inside-servehttp"
+  },
+  {
+   "actualRefused": false,
+   "defect": false,
+   "expectedRefused": false,
+   "id": "needle-outside-servehttp-is-ignored"
+  }
+ ],
+ "defects": [],
+ "reviewer": "Claude independent",
+ "serveHTTP": {
+  "endLine": 303,
+  "name": "func (h *handler) ServeHTTP(",
+  "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b",
+  "startLine": 55
+ },
+ "serverGoSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2"
+}

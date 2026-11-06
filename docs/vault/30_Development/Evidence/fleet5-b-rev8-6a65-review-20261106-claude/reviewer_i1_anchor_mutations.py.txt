@@ -1,0 +1,40 @@
+"""Reviewer I1 probe: owner transport_delta.anchors() against additional Go substitution mutants.
+
+Reads only services/node-agent/transport/server.go at 72028 via git show. No Go build/run.
+"""
+import sys, json, subprocess, hashlib
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import transport_delta as t  # noqa: E402
+
+text = t.raw('services/node-agent/transport/server.go').decode()
+base = t.anchors(text)
+results = []
+
+
+def refused(mutant):
+    try:
+        t.anchors(mutant)
+        return False
+    except (AssertionError, ValueError, StopIteration):
+        return True
+
+
+def case(cid, mutant, expect_refuse=True):
+    got = refused(mutant)
+    results.append({'id': cid, 'expectedRefused': expect_refuse, 'actualRefused': got, 'defect': got != expect_refuse})
+
+
+swap = lambda s, a, b: s.replace(a, '\0SWAP\0').replace(b, a).replace('\0SWAP\0', b)
+case('swap-cancel-observe', swap(text, 'stopper.Cancel(ctx, raw)', 'h.runner.Observe(ctx, raw)'))
+case('swap-observe-execute', swap(text, 'h.runner.Observe(ctx, raw)', 'h.runner.Execute(ctx, raw)'))
+case('cancel-selector-path-changed', text.replace('cancelling := r.URL.Path == "/v1/executions/cancel"', 'cancelling := r.URL.Path == "/v1/executions/cancel2"'))
+case('rawpath-guard-removed', text.replace(' || r.URL.RawPath != ""', ''))
+case('receipts-branch-condition-changed', text.replace('} else if r.URL.Path == "/v1/executions/receipts" {', '} else if r.URL.Path == "/v1/executions/receipt" {'))
+case('duplicate-needle-inside-servehttp', text.replace('\tvar result node.Result\n', '\tvar result node.Result\n\t_ = func() { h.runner.Observe(ctx, raw) }\n', 1))
+case('needle-outside-servehttp-is-ignored', text + '\nfunc decoy(h *handler) { h.runner.Observe(nil, nil) }\n', expect_refuse=False)
+out = {'reviewer': 'Claude independent', 'serveHTTP': base['CANCEL']['enclosingFunction'],
+       'branches': {k: [v['branch']['condition'], v['branch']['startLine'], v['branch']['endLine'], v['line']] for k, v in base.items()},
+       'serverGoSHA256': hashlib.sha256(text.encode()).hexdigest(), 'cases': results,
+       'defects': [r['id'] for r in results if r['defect']]}
+print(json.dumps(out, indent=1, sort_keys=True))

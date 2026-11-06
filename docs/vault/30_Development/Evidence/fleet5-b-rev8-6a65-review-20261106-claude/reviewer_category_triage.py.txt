@@ -1,0 +1,58 @@
+"""Reviewer triage of Rev8 critical-edge-categories.json (TRIAGE ONLY, not proof or allowlist).
+
+Counts DYNAMIC_BLOCK edges by receiver shape, lists IO/rule-covered edges that fell to
+DYNAMIC_BLOCK, checks IO_CATALOG_LINK usage and blocksGrant on every non-pilot edge.
+"""
+import sys, json, collections
+
+d = json.load(open(sys.argv[1], encoding='utf-8'))
+VALUE = {'get', 'add', 'append', 'join', 'replace', 'strip', 'startswith', 'endswith', 'casefold', 'split', 'isoformat',
+         'total_seconds', 'fullmatch', 'is_finite', 'lower', 'encode', 'isascii', 'items', 'keys', 'values', 'upper', 'pop',
+         'move_to_end', 'from_bytes', 'extend', 'setdefault', 'update', 'decode', 'hex', 'rstrip', 'lstrip', 'count', 'index',
+         'partition', 'format', 'copy', 'discard', 'isdigit', 'match', 'search', 'astimezone', 'timestamp', 'utcoffset', 'date',
+         'sort', 'splitlines', 'removeprefix', 'rsplit', 'isspace', 'popitem'}
+
+
+def expr(e):
+    r = e.get('receiver')
+    return r.get('expression', '') if isinstance(r, dict) else (r or '')
+
+
+def shape(e):
+    x, t = expr(e), e.get('type') or ''
+    m = x.rsplit('.', 1)[-1]
+    if m in VALUE:
+        return 'BUILTIN_OR_VALUE_METHOD'
+    if t.startswith('sqlalchemy.') or any(s in x for s in ('select(', 'insert(', '.where', '.values', '.in_', '.is_', 'execution_options')) or x in ('select', 'insert', 'text'):
+        return 'SQLALCHEMY_BUILDER'
+    if 'logger' in x.lower():
+        return 'LOGGER'
+    if t.startswith('TYPE_JOIN'):
+        return 'TYPE_JOIN_UNRESOLVED'
+    if any(s in x for s in ("files(", 'cert.', 'certificate_key', 'x509')):
+        return 'CRYPTO_PUBLIC_OR_PACKAGE_RESOURCE'
+    return 'OTHER'
+
+
+dyn = [e for e in d['edges'] if e['category'] == 'DYNAMIC_BLOCK']
+counts = collections.Counter(shape(e) for e in dyn)
+flagged = []
+for e in dyn:
+    fn = e['source'].get('function') or ''
+    x = expr(e)
+    if fn.startswith('inv.node_transport.OneConnection.') and 'connect' in x:
+        flagged.append({'callRef': e['callRef'], 'function': fn, 'expression': x, 'why': 'TLS socket connect = existing network IO (T2), not dynamic dispatch'})
+    if fn == 'saintvision.errors.InvError.__post_init__' or (fn == 'saintvision.errors.category_of' and x == 'ErrorCategory'):
+        flagged.append({'callRef': e['callRef'], 'function': fn, 'expression': x, 'why': 'covered by the stated A2 InvError contract'})
+    if "files('inv')" in x:
+        flagged.append({'callRef': e['callRef'], 'function': fn, 'expression': x, 'why': "covered by the stated A4 files('inv') readonly resource contract"})
+    if 'certificate_key(' in x and x.endswith('.verify'):
+        flagged.append({'callRef': e['callRef'], 'function': fn, 'expression': x, 'why': 'signature VERIFY: authority-bearing crypto check, needs its own named contract'})
+nonpilot_unblocked = [e['callRef'] for e in d['edges'] if not e['blocksGrant'] and e.get('closedOnlyForEntry') != 'inv.node_channels.revoke_channel']
+print(json.dumps({'reviewer': 'Claude independent', 'scope': 'TRIAGE ONLY; categories remain proof obligations',
+                  'edges': len(d['edges']), 'categoryCounts': d['categoryCounts'], 'dynamicBlock': len(dyn),
+                  'dynamicBlockByShape': dict(counts), 'flaggedMiscategorized': flagged,
+                  'edgesWithIOCatalogLinkCategory': sum(e['category'].startswith('IO_CATALOG_LINK:') for e in d['edges']),
+                  'separateExistingCallerIOCatalogLinks': len(d['existingCallerIOCatalogLinks']),
+                  'nonPilotEdgesNotBlockingGrant': nonpilot_unblocked,
+                  'pilotEdgesClosed': sum(1 for e in d['edges'] if not e['blocksGrant'])}, indent=1, sort_keys=True))

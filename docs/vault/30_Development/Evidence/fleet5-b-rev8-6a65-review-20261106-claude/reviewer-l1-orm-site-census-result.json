@@ -1,0 +1,25 @@
+{
+ "sites": 59,
+ "uncovered": [],
+ "deleteSites": [
+  {
+   "path": "src/saintvision/services/pools.py",
+   "line": 168,
+   "function": "saintvision.services.pools.remove_member",
+   "expression": "session.delete(member)",
+   "rev7WritersInFunction": {},
+   "covered": true
+  },
+  {
+   "path": "src/saintvision/services/settings.py",
+   "line": 310,
+   "function": "saintvision.services.settings.remove_member",
+   "expression": "session.delete(existing)",
+   "rev7WritersInFunction": {},
+   "covered": true
+  }
+ ],
+ "mergeSites": [],
+ "files": 21,
+ "bytes": 396141
+}
