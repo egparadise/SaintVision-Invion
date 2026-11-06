@@ -1,0 +1,33 @@
+{
+  "atKST": "2026-11-06T19:43:43+09:00",
+  "publicCertThumbprint": "5105ED0FA68391A85DAC1DABC3347E2A6ECDCC38",
+  "stores": [
+    {
+      "store": "ROOT",
+      "matchingCertificates": []
+    },
+    {
+      "store": "CA",
+      "matchingCertificates": []
+    },
+    {
+      "store": "MY",
+      "matchingCertificates": []
+    }
+  ],
+  "HTTPS": [
+    {
+      "trust": "defaultWindows",
+      "error": "URLError",
+      "reasonType": "SSLCertVerificationError",
+      "verifyCode": 18,
+      "verifyMessage": "self-signed certificate"
+    },
+    {
+      "trust": "exactPublicCA",
+      "http": 200
+    }
+  ],
+  "storeModified": false,
+  "passwordUsed": false
+}

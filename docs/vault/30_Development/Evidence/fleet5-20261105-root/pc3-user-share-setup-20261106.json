@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-06T19:45:04+09:00",
+  "pc": "PC3",
+  "sshExit": 0,
+  "knownHostsUnchanged": true,
+  "nodeRegistrationAttempted": false,
+  "resourceOfferCreated": false,
+  "shareCreated": true,
+  "shareOwnedBySSHUser": true,
+  "shareRead": true,
+  "shareWrite": true,
+  "shareMode": "0o700",
+  "nonInteractiveSudoExit": 1,
+  "dockerGroupChanged": false,
+  "passwordPrompted": false
+}

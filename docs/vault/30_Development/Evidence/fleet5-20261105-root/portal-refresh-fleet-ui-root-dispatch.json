@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-06T19:48:35+09:00",
+  "taskId": "task_9d814a8270e1",
+  "dispatchId": "ctx_d855f1849f6b",
+  "terminal": "term_8b773c12-fcd0-495e-946c-d2a67bd2b029",
+  "receipt": "ready",
+  "agent": "antigravity/Gemini",
+  "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+  "worktree": "portal-refresh-fleet-ui-20261106",
+  "scope": "stablebackgroundrefresh/realhealthcontract+proxy/tests; no fabricatedNodes/auth/runtime",
+  "RootGatewayEvidence": "portal-health-route-mismatch-20261106.json",
+  "scopeClarification": "msg_f7e4f80d268c",
+  "source": null,
+  "review": null,
+  "deployment": null,
+  "hostChromePermissionBypass": false,
+  "fivePCEnrolled": false
+}

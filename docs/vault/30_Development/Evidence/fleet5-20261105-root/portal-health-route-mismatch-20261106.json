@@ -1,0 +1,58 @@
+{
+  "atKST": "2026-11-06T19:46:27+09:00",
+  "requests": [
+    {
+      "port": 8080,
+      "path": "/v1/health",
+      "http": 404
+    },
+    {
+      "port": 8080,
+      "path": "/health",
+      "http": 404
+    },
+    {
+      "port": 8080,
+      "path": "/healthz",
+      "http": 200,
+      "contentType": "application/json",
+      "bodySuppressed": true,
+      "keys": [
+        "status",
+        "version"
+      ],
+      "status": "ok"
+    },
+    {
+      "port": 8080,
+      "path": "/v1/session",
+      "http": 401
+    },
+    {
+      "port": 3100,
+      "path": "/v1/health",
+      "http": 404
+    },
+    {
+      "port": 3100,
+      "path": "/health",
+      "http": 200,
+      "contentType": "text/html",
+      "bodySuppressed": true
+    },
+    {
+      "port": 3100,
+      "path": "/healthz",
+      "http": 200,
+      "contentType": "text/html",
+      "bodySuppressed": true
+    },
+    {
+      "port": 3100,
+      "path": "/v1/session",
+      "http": 401
+    }
+  ],
+  "authenticated": false,
+  "mutation": false
+}

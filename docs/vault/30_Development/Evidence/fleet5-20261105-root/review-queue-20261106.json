@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T19:17:15+09:00",
+  "atKST": "2026-11-06T19:48:35+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,18 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "taskId": "task_26dd9ebd51dd",
+    "dispatchId": "ctx_63ce6b6612b7",
+    "terminal": "term_b1366203-1a64-45bf-b3b8-b577d89fc9ae",
+    "receipt": "ready",
+    "source": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+    "scope": "ONEactualClaudeNARROWpointeeconversiontestdelta",
+    "predecessor": "ctx_94f4cd146419 succeeded/settled/exited/released actualverified",
+    "verdict": null
+  },
   "pending": null,
-  "authorParallelWork": "B sameowner fix-onlyRev9b; K2 sameowner PL-R1c TEST/README; Root requestedlocaladministratoraccount/build/report/deploy",
+  "authorParallelWork": "B9bfix-only; Geminiportalrefresh; RootactualfleetOSreadiness/report; K2awaitsactualPLR1creview",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +31,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "newimmutablecandidate+Docs thenoneactualClaudeafterfreshpriorrelease; no Core beforePLacceptance/Rootchoice",
+  "nextActualReviewTrigger": "actualPLR1cverdict+exit/release thennextfrozenB9borUIcandidate; ONEClaude; RootexplicitCIchoiceonlyafteractualacceptance",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -284,5 +293,20 @@
     "verdict": "REVISION_REQUIRED PL-R1cLOW",
     "actualWorkerDone": "msg_66fc559d7308",
     "rootReply": "msg_a58269f30929"
+  },
+  "frontendAuthor": {
+    "taskId": "task_9d814a8270e1",
+    "dispatchId": "ctx_d855f1849f6b",
+    "terminal": "term_8b773c12-fcd0-495e-946c-d2a67bd2b029",
+    "receipt": "ready",
+    "agent": "antigravity/Gemini",
+    "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+    "worktree": "portal-refresh-fleet-ui-20261106",
+    "scope": "stablebackgroundrefresh/realhealthcontract+proxy/tests; no fabricatedNodes/auth/runtime",
+    "RootGatewayEvidence": "portal-health-route-mismatch-20261106.json",
+    "scopeClarification": "msg_f7e4f80d268c",
+    "source": null,
+    "review": null,
+    "deployment": null
   }
 }

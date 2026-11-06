@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.414"
+version: "1.0.415"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T19:17:15+09:00"
+updated: "2026-11-06T19:48:35+09:00"
 source_of_truth: "Git"
-active_card: "ADMIN-LOGIN-20261106 with parallel FLEET5 supervision"
-active_card_status: "Requestedaccount actualSSO/adminAPI200/unauth401; source/buildCI/artifactverified; report-beforedeploy; defaultWindowstrust/GUIpending; B9bPLR1ccontinued"
-active_card_next: "Root Obsidianreport thenverifiedartifactlocalfrontenddeployment/postcheck; separateB9b/PLR1c candidates needactualreviewbeforeanyCore/runtimeacceptance"
+active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
+active_card_status: "Adminactualartifactdeployed13hash/SSO200; GeminiUIrefresh+healthfixactive; PLR1cb47oneClaudeactive; B9bcontinues; realfleetprerequisitespending"
+active_card_next: "RootprocessactualPLverdictthenpreciseoneCorechoice; frozenUIcandidateactualreviewthenbuildartifactdeploy; PC1publickeyandPC3groupOSresultsawaitfreshSSH; PC5APIneedsverifiedruntimepath"
 ---
+
+## 2026-11-06T19:48:35+09:00 실제 배포 사후 검증·화면 수정과 장비 연결 계속
+
+관리자 포털은 검증된 production 빌드로 배포했고 실제13파일 hash와 배포 후 SSO·session·관리자 API200/비인증401을 확인했다. 화면 깜빡임·실제 health 경로 불일치는 Gemini에 배정했다. 5대 재측정에서 PC1 SSH 인증·PC3 Docker 권한·PC5 Docker API가 남았고 PC3 공유 폴더는 생성했다. K2의 test-only 후보b47과 정확한 두 Docs 성공을 확인해 한 명의 Claude에게 독립 검토를 시작했다. B9b 수정도 계속한다. 확인은 공개 credential-free Evidence와 실제 Git/CI receipt를 따르며 OS 접근·코드 검토·노드 인수를 구분한다. 다음 첫 행동/담당: Root가 실제 PL 판정과 Gemini 후보를 처리하고 장비 OS 반영 뒤 새 SSH로 재검증한다.
 
 ## 2026-11-06T19:17:15+09:00 관리자 로그인 실제 검증과 배포 전 보고
 

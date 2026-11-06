@@ -16,12 +16,12 @@
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T19:17:15+09:00",
+  "latestObservationAtKST": "2026-11-06T19:48:35+09:00",
   "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
   "proposalDocs": 42146482617,
   "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
   "actualReviewGate": "k2-551-root-actual-review-gate.json",
-  "ownerQuestionPending": null,
+  "ownerQuestionPending": "msg_7215f61639b2",
   "actualDesignAccepted": true,
   "actualCodeGrant": true,
   "answeredQuestion": "msg_e880984e98ec",
@@ -104,6 +104,16 @@
   "latestPLR1bFinal": "084bd9471673f7f4f41dc547c76a2411c066109b",
   "latestPLR1bSourceProof": "k2a-pl-r1b-source-root-verification.json",
   "latestPLR1bReviewGate": "k2a-pl-r1b-root-narrow-review-queue-gate.json",
-  "queuedActualNarrowReview": null,
-  "latestPLR1cScope": "k2a-pl-r1c-root-scope.json"
+  "queuedActualNarrowReview": {
+    "taskId": "task_26dd9ebd51dd",
+    "dispatchId": "ctx_63ce6b6612b7",
+    "terminal": "term_b1366203-1a64-45bf-b3b8-b577d89fc9ae",
+    "receipt": "ready",
+    "source": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+    "scope": "ONEactualClaudeNARROWpointeeconversiontestdelta",
+    "predecessor": "ctx_94f4cd146419 succeeded/settled/exited/released actualverified",
+    "verdict": null
+  },
+  "latestPLR1cScope": "k2a-pl-r1c-root-scope.json",
+  "currentSource": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5"
 }

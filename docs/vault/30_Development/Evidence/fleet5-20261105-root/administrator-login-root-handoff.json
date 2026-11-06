@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-06T19:17:15+09:00",
+  "atKST": "2026-11-06T19:48:35+09:00",
   "scope": "explicit user-requested local portal account/project administrator",
   "sourceImport": {
     "priorRoot": "05b8d2bc666690a82a6268f744e78fbbc2294406",
@@ -19,7 +19,7 @@
     "applicationCodeChanged": false
   },
   "login": {
-    "atKST": "2026-11-06T18:49:53+09:00",
+    "atKST": "2026-11-06T19:24:23+09:00",
     "SSOAuthorizationCodePKCES256": true,
     "tokenExchangeHTTP": 200,
     "sessionHTTP": 200,
@@ -70,9 +70,85 @@
   },
   "passwordDSNTokenPrivateKeyRecorded": false,
   "backendRestored": true,
-  "frontendProductionDeployment": "NEXT_AFTER_THIS_OBSIDIAN_REPORT",
-  "defaultWindowsCertificateTrust": "NOT_VERIFIED/import waited/certutil timeout",
+  "frontendProductionDeployment": "DEPLOYED_VERIFIED_CI_ARTIFACT_LOOPBACK_PREVIEW",
+  "defaultWindowsCertificateTrust": "NOT_VERIFIED exactthumb absent; defaultTLS selfsigned; pinnedpublicCA200",
   "browserGUI": "NOT_RUN_ComputerUse_Chrome_permission_denied",
   "independentReview": "NOTRUN for operator account action; actual existing auth/provisioning path used",
-  "fivePCFLEETAuthorityChanged": false
+  "fivePCFLEETAuthorityChanged": false,
+  "deployment": {
+    "deployedAtKST": "2026-11-06T19:24:04+09:00",
+    "target": "http://127.0.0.1:3100/",
+    "mode": "loopback production-build preview",
+    "frontendPID": 62056,
+    "replacedOwnedDevelopmentPID": 58856,
+    "buildSource": "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+    "artifactId": 13492269040,
+    "artifactSHA256": "9f8765598305530e873838a91281198111569ef220f32be4d50b2fcabc43a12d",
+    "servedFilesHashVerified": 13,
+    "runtimePublicAuthConfigOnlyOverride": true,
+    "originalDirtyAuthConfigPreserved": true,
+    "anonymousSessionHTTP": 401,
+    "ObsidianReportBeforeDeploy": {
+      "rootSHA": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+      "Docs": 42201651730,
+      "syncExits": [
+        0,
+        0,
+        0
+      ]
+    },
+    "SSOPostDeployment": {
+      "atKST": "2026-11-06T19:24:23+09:00",
+      "SSOAuthorizationCodePKCES256": true,
+      "tokenExchangeHTTP": 200,
+      "sessionHTTP": 200,
+      "administratorPermissionHTTP": 200,
+      "membersHTTP": 200,
+      "roleCode": "owner",
+      "canAdminister": true,
+      "canRequest": true,
+      "canApprove": true,
+      "anonymousSessionHTTP": 401,
+      "tokenPersisted": false,
+      "passwordPersisted": false,
+      "subjectLinked": true
+    },
+    "defaultWindowsCertificateTrust": {
+      "atKST": "2026-11-06T19:43:43+09:00",
+      "publicCertThumbprint": "5105ED0FA68391A85DAC1DABC3347E2A6ECDCC38",
+      "stores": [
+        {
+          "store": "ROOT",
+          "matchingCertificates": []
+        },
+        {
+          "store": "CA",
+          "matchingCertificates": []
+        },
+        {
+          "store": "MY",
+          "matchingCertificates": []
+        }
+      ],
+      "HTTPS": [
+        {
+          "trust": "defaultWindows",
+          "error": "URLError",
+          "reasonType": "SSLCertVerificationError",
+          "verifyCode": 18,
+          "verifyMessage": "self-signed certificate"
+        },
+        {
+          "trust": "exactPublicCA",
+          "http": 200
+        }
+      ],
+      "storeModified": false,
+      "passwordUsed": false
+    },
+    "otherServicesOrFleetChanged": false,
+    "launcherReconciliation": "Start-Process launched serving node62056 but parent capture remained blocked; stopped ONLY owned launcher processes after verifying serving commandline; no relaunch or rollback",
+    "observationScope": "actual deployment13fileHTTP hashes and PKCE/API; host Chrome GUI not authorized"
+  },
+  "fleetOrWholeProgramComplete": false
 }

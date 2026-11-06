@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "05b8d2bc666690a82a6268f744e78fbbc2294406",
-    "Docs": 42194711836,
+    "SHA": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+    "Docs": 42201651730,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2818,
+    "independentlyMatchedNormalizedDestinationHashes": 2826,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T18:25:04+09:00"
+    "verifiedAtKST": "2026-11-06T19:20:01+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T19:17:15+09:00",
+  "latestRecordAtKST": "2026-11-06T19:48:35+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2584,7 +2584,7 @@
     "onlyFourDraftToolPointerFieldsDiffered": true,
     "rootProductChanged": false
   },
-  "physicalRefresh": "physical-readiness-refresh-20261106-0325.json",
+  "physicalRefresh": "physical-readiness-refresh-20261106-1933.json",
   "sourceDocCitationAdaptations": [
     {
       "source": "100f6f132132199d1204a76190f04712dd82de00",
@@ -2631,7 +2631,7 @@
   },
   "implementationScopeDecision": "implementation-scope-decision-root.json",
   "previousPhysicalRefreshPreserved": "physical-readiness-refresh-20261106.json",
-  "pendingUserInput": "actual local OS setup results PC1/PC3; no generic approval",
+  "pendingUserInput": "PC1authorizedpublickeyandPC3dockergroupOSresults; concretebootstrapprovided, no genericapproval",
   "bootstrapV4ActualReview": {
     "reviewSHA": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
     "reviewDocs": 42088999346,
@@ -3108,7 +3108,16 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": null,
+  "activeActualReview": {
+    "taskId": "task_26dd9ebd51dd",
+    "dispatchId": "ctx_63ce6b6612b7",
+    "terminal": "term_b1366203-1a64-45bf-b3b8-b577d89fc9ae",
+    "receipt": "ready",
+    "source": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+    "scope": "ONEactualClaudeNARROWpointeeconversiontestdelta",
+    "predecessor": "ctx_94f4cd146419 succeeded/settled/exited/released actualverified",
+    "verdict": null
+  },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3184,5 +3193,7 @@
   "B9bScope": "b-rev9b-root-scope.json",
   "PLR1bActualReview": "k2a-pl-r1b-actual-review-root-verification.json",
   "PLR1cScope": "k2a-pl-r1c-root-scope.json",
-  "administratorLogin": "administrator-login-root-handoff.json"
+  "administratorLogin": "administrator-login-root-handoff.json",
+  "frontendRefresh": "portal-refresh-fleet-ui-root-dispatch.json",
+  "physicalShareFollowup": "pc3-user-share-setup-20261106.json"
 }
