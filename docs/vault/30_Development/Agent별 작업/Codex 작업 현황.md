@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.442"
+version: "1.0.443"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T05:31:06+09:00"
+updated: "2026-11-07T05:51:57+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "D04exact08e0published/Docs19SUCCESS/Core42287980945pending/CODEreview6d952dependsB9g; actual23top228subGoPASS; fleetincomplete"
-active_card_next: "Root verifies actual Core final jobs/steps/artifacts, handles B9g actual verdict then proven reviewer release and starts D04CODEreview6d952; owner questions74e711 and2fb349 pending"
+active_card_status: "B9gactual90ccACCEPT/LOW2CLOSED/INFOonly; A7STATICsnapshotnewcut; D04actualCODEreview1ddcfactive/Corefinalevidencepending; fleetincomplete"
+active_card_next: "B Codex A7snapshot-only static closure/candidate; Claude D04actualCODEverdict; Root exact Core final/artifacts/failures then concrete next cuts, no runtime or positive factory grant"
 ---
+
+## 2026-11-07T05:51:57+09:00 实際 Rev9g 수락과 다음 정적 시범·Go 코드 검토
+
+B Rev9g의실제90cc검토는Low2를닫고INFO만남겨ACCEPT했다. Root가3원래반례의동일입력SHA·현재거부·선언변경되돌림수락과exactDocs를대조한뒤같은작성자에NodeChannels.snapshot한정정적증명A7을별도허용했다. 검토자의실제종료·해제를확인하고D04 Go의단일독립CODE검토ctx_1ddcf22e6a4c를시작했다. Core42287980945최종증거대조와실제5대인수는아직남는다. 작업한것·확인한실제명령/exit·GitSHA/CI/원래입력hash/반례인과성·실제검토자수명과권한범위는Root History/Evidence에보존했다. 다음첫행동/담당은B Codex의A7한정정적증명,Claude의D04CODE판정,Root의Core최종/필수step/skip/artifact대조와실제후속cut이다.
 
 ## 2026-11-07T05:31:06+09:00 실제 Go 코드 게시 검증과 제품 CI·독립 코드 검토 대기
 

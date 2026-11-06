@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T05:14:32+09:00",
+  "atKST": "2026-11-07T05:51:57+09:00",
   "source": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
   "base": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
   "Docs": 42285078981,
@@ -7,10 +7,16 @@
   "task": "task_6e4ff78a4444",
   "dispatch": "ctx_b48554022c90",
   "actualPredecessor": "ctx_7fb26ffb3970 succeeded_settled_exited_released",
-  "status": "DISPATCHED_PENDING_ACTUAL_VERDICT",
+  "status": "ACTUAL_ACCEPT_LOW1_LOW2_CLOSED_INFO_ONLY",
   "activityEvidence": "Root worker-read actual tool output compares reflection/caller/lexical producer deltas; worker-show live active/input_accepted. No verdict inferred",
   "ownerQuestion": "msg_2fb3495abff5",
   "queueReply": "msg_4895d4e49c20",
   "A7Granted": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "actualReview": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+  "actualDocs": 42290423828,
+  "actualWorkerDone": "msg_67c08e537aee",
+  "actualReviewerFinalLifecycle": "succeeded_settled_exited_released",
+  "ownerQuestionPending": null,
+  "next": "b-a7-snapshot-r1-root-cut.json"
 }

@@ -1,0 +1,58 @@
+{
+  "atKST": "2026-11-07T05:44:51+09:00",
+  "target": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+  "actualReview": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+  "branch": "agent/claude/fleet5-b-rev9g-0e66-review-20261107",
+  "Docs": 42290423828,
+  "job": 128142107526,
+  "correlation": "claude-b-rev9g-0e66-review-90cccfb3-ctx_b48554022c90",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 19,
+  "actualWorkerDone": "msg_67c08e537aee",
+  "verdict": "ACCEPT",
+  "closed": [
+    "B9f-L1",
+    "B9f-L2"
+  ],
+  "blockingFindings": [],
+  "info": [
+    "I-1 binder-only local shadow (pre-existing, identical at 9cea and 0e66): with no frozen baseline, `from M import accept` + `def use(): accept = receive; return accept(held)` still binds held to M.accept.slot; caller_error returns None because the call's binding scope `use` has no import event. At full provenance it was not reachable in this review: a local shadow in a frozen function refuses through the frozen-scope comparison (workspace_config :44 -> CALLEE_REBOUND), and routing an owned database into a new file with this shape refuses (CALLEE_REBOUND; DYNAMIC_BLOCK when reverted). Optional hardening, not required here: in binder-only mode refuse when the resolver's import-alias scope differs from the lexical binding scope.",
+    "The 576 current bindings use 559 Name callees and 17 self-attribute callees; no module-alias attribute callee, so caller-side module-alias rebinding is not a relevant 72028 path.",
+    "nonlocal stays INFO / outside this cut (binder fixture binds; binding_scope returns None at a nonlocal declaration).",
+    "Not exercised, outside the declared categories (novel families): __package__/__spec__ edits that retarget a textually unchanged relative import, attribute stores on imported modules, globals()/sys.modules writes, importlib._bootstrap private functions."
+  ],
+  "RootVerifiedThreeExactOriginalInputHashesAndCausalReversions": true,
+  "reviewerFullMainProbes": 34,
+  "reviewerBinderFixtures": 11,
+  "reviewerUnits": 10,
+  "reviewerGuardOverlays": 21,
+  "mainProbeMismatchesExplainedNotSilentlyPassed": [
+    "L2-equal-count-replaced-import",
+    "L2-control-global-declaration-alone",
+    "L2-control-nested-local-same-name",
+    "L2-control-class-body-same-name",
+    "L2-control-comprehension-iteration-same-name",
+    "L2-control-lambda-arg-same-name",
+    "b-imported-function-scope-call-shadowed-local"
+  ],
+  "currentPositive": {
+    "finalProducerRun": "actual-72028-positive ACCEPT via t1_provenance.provenance at final 0e66 producers",
+    "parsedAudited": 25,
+    "production": 11,
+    "parsedEqualsAudited": true,
+    "frozenBindings": 576,
+    "currentBindings": 576,
+    "unresolved": 0,
+    "callerBindingProofs": 13,
+    "notRecomputedByReviewer": "19 edges (16/3), 12 entries, the six accounting artifacts, stage1/final contract hashes and model/lifecycle byte equality are Root-verified (b9g receipt), not re-derived"
+  },
+  "resources": {
+    "peakWorkingSetBytes": 168812544,
+    "elapsedSeconds": 660,
+    "scope": "observed peak of the main reviewer probe process only; the three smaller follow-up processes were not measured; no aggregate or hard quota"
+  },
+  "RootReranReviewerProbes": false,
+  "A7GrantedByReview": false,
+  "wholeProgramComplete": false
+}

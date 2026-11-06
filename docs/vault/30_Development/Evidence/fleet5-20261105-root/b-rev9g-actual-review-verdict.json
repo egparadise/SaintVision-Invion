@@ -1,0 +1,179 @@
+{
+  "review": "Actual independent Claude NARROW Rev9g delta review",
+  "orca": {
+    "task": "task_6e4ff78a4444",
+    "dispatch": "ctx_b48554022c90",
+    "reviewerBranch": "agent/claude/fleet5-b-rev9g-0e66-review-20261107",
+    "reviewerBase": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+    "precondition": "predecessor task_12e7a699ad90 / ctx_7fb26ffb3970 worker-show: succeeded / settled / exited / released (read before start)"
+  },
+  "owner": {
+    "agent": "Codex",
+    "task": "task_a8fd2969f0b3",
+    "dispatch": "ctx_6f0f8253b8a7",
+    "pendingQuestion": "msg_13ccbb81f97b",
+    "rootGrant": "msg_6a4d15e35b3e"
+  },
+  "target": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+  "base": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "priorActualReview": {
+    "commit": "ce713a85fc428198468ea078c2fef035ac704ba8",
+    "verdict": "LOW-only REVISION_REQUIRED (B9f-L1/L2)",
+    "readFirst": "ce713 History, review.json, reviewer_rev9f_delta_probes driver, result json, commands.json read from the ce713 commit itself",
+    "blobCheck": "ce713 result json blob 0d9c2711 = Rev9g copy rev9f-review-reviewer-rev9f-delta-probes-result.json; driver 10d748d5, review.json 05f63381, commands.json aba802ff also equal their Rev9g copies"
+  },
+  "rootSourceReceiptAccepted": {
+    "path": "fleet-five-orchestration-20261105/.work/b9g-source-root-verified.json",
+    "sha256": "6bf4fc6d033bcb65fb8e7b5f887d0bbbfeddb891ee317c5f844b9bc284e6a235",
+    "docs": 42285078981,
+    "job": 128123693430,
+    "rerunByReviewer": false,
+    "note": "Root CI/raw-hash/bracket receipt taken as Root evidence, not semantic review; reviewer did not re-query that run"
+  },
+  "rootBoardsRead": {
+    "head": "aaf957a23f41e0ea9c7c3a8bfb2fb531b30ad7f6 (working tree has Root's uncommitted board edits)",
+    "index": "1.0.479",
+    "codexBoard": "1.0.440",
+    "claudeBoard": "1.2.130",
+    "mode": "read-only"
+  },
+  "readStatic": [
+    "owner History 2026-11-07_FLEET5_B_Rev9g_FixOnly_Codex.md",
+    "diffs vs 9cea copies: reflection_audit.py (+3 lines), callee_identity.py (caller_error), lexical_bindings.py (event multiset, binding_scope), parameter_flow.py (caller proofs); all other 82 retained producers byte-equal to 9cea copies",
+    "full reflection_audit.py, lexical_bindings.py, callee_identity.py, parameter_flow.solve",
+    "rev9g_gap_driver.py, rev9g-gap-results.json, rev9g-unit-results.json, rev9g-current-verification.json, proof-final01.json last-command producerHashesAfter"
+  ],
+  "verdict": "ACCEPT",
+  "severity": "No MEDIUM, no LOW. INFO only (below). The three exact actual ce713 full counterexamples refuse at the final 0e66 producers with input SHA bound to the ce713 ACCEPT rows, and each returns to ACCEPT when only its declared Rev9g change is reverted in the reviewer process. Benign controls and the actual 72028 positive ACCEPT.",
+  "finalBytes": {
+    "ownerLastProofCommandBracketedFiles": 93,
+    "mismatches": 0,
+    "reflection_audit.py": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c",
+    "callee_identity.py": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa",
+    "lexical_bindings.py": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc"
+  },
+  "items": {
+    "B9f-L1": {
+      "status": "CLOSED",
+      "source": "reflection_audit.py:56 supplied(): any ast.Starred in call.args[:index+1] -> [None]; :9 IMPORTERS={builtins.__import__, importlib.__import__} used by keys():49 and relative_import_unknown():63",
+      "exactCe713": [
+        {
+          "case": "L1-near-dunder-import-level-hidden-by-starred-args",
+          "inputSHA256": "b27a732d563ba16316d070bf866be00e938469d6e0adcab4c5a2a1c615359a50",
+          "final": "REFUSE UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+          "supplied-line-reverted": "ACCEPT"
+        },
+        {
+          "case": "L1-near-importlib-dunder-import-level1",
+          "inputSHA256": "1194ca93cba6c27c33c2adb66106ecf011f2128d3802f5ed020596dcc085cd07",
+          "final": "REFUSE UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+          "IMPORTERS-reverted": "ACCEPT"
+        }
+      ],
+      "nearVariantsRefuse": [
+        "Starred ending at slot 3 (__import__(n, g, None, *((), 1))): REFUSE, reverted ACCEPT",
+        "Starred name slot 0",
+        "Starred at slot 1 with level positional after it (old code also refused: args[4] visible)",
+        "importlib.__import__ level= keyword, from-import alias, module alias (each reverted -> ACCEPT)",
+        "importlib.__import__ with Starred level",
+        "builtins.__import__ with Starred level (reverted -> ACCEPT)"
+      ],
+      "controlsAccept": [
+        "importlib.__import__('json', globals(), None, (), 0)",
+        "importlib.__import__('json') (no Starred, signature default)",
+        "__import__('json', globals(), None, (), 0, *rest) (Starred only after slot 4)",
+        "__import__ level 0 positional and keyword literals",
+        "outside benign Database helper"
+      ],
+      "units": "10 AST units match: Starred prefix/ends-before-slot4/slot1 UNKNOWN, Starred after slot4 not UNKNOWN, importlib.__import__ level1/dotted/variable UNKNOWN and level0 not, import_module Starred package UNKNOWN, plain absolute not"
+    },
+    "B9f-L2": {
+      "status": "CLOSED",
+      "source": "callee_identity.py:72-92 caller_error() (called first in error():95 and in parameter_flow.solve:23); lexical_bindings.py:16-27 event multiset key (effectiveScope, name, kind, bindingScope, occurrenceScope, originNodeType, originExpressionSHA256), :100-110 binding_scope/events_for/imported/stars_for",
+      "exactCe713": {
+        "case": "L2-near-imported-callee-global-import-workspace_config",
+        "inputSHA256": "7f3fa416ae4dd0a456039a06331c735befe1d06de610769f5e64b92333bcb8f7",
+        "final": "REFUSE UNRESOLVED:CALLEE_REBOUND",
+        "caller_error-reverted": "ACCEPT",
+        "guardLevel": "caller_error at workspace_config.py:44 WorkspaceAPI = CALLEE_REBOUND; :47 and :64 None"
+      },
+      "nearVariantsFull": [
+        "installer for RestrictedWorkspaceRuntime (:47): REFUSE CALLEE_REBOUND, reverted ACCEPT (Rev9g-causal)",
+        "class-body global import of WorkspaceAPI: REFUSE CALLEE_REBOUND, reverted ACCEPT (Rev9g-causal)",
+        "plain module reassignment, same-line second import, module walrus in comprehension, global del: REFUSE CALLEE_REBOUND; reverted still REFUSE via older DYNAMIC_BLOCK use-site guards",
+        "function-scope SnapshotStore (:64) second import on blank line 62 and equal-count replaced import on line 60: REFUSE CALLEE_REBOUND; reverted REFUSE DYNAMIC_BLOCK WRITE_USE:result.recovery",
+        "module star import in workspace_config: REFUSE CALLEE_REBOUND also with caller_error reverted (older def/star guard) -> not a new full-star proof; guard level caller_error refuses at :44 and :47",
+        "owned database routed from frozen :57 into a new production file whose function shadows the imported WorkspaceAPI locally: REFUSE CALLEE_REBOUND; reverted REFUSE DYNAMIC_BLOCK INSTANCE:database"
+      ],
+      "invalidInput": "equal-count replacement of the module import line 9 breaks six-root preservation: not counted as a semantic result; guard level caller_error refuses it at :44 and :47",
+      "controls": {
+        "fullAccept": [
+          "unrelated alias import",
+          "module-level foreign SnapshotStore import (function-scope import at :60 binds :64)",
+          "actual 72028 positive"
+        ],
+        "fullRefuseByOlderGuardNotRev9g": "global-declaration-alone, nested local, class-body, comprehension-iteration and lambda-arg controls that spell WorkspaceAPI refuse DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI with and without caller_error; caller_error returns None at all three sites for each, so Rev9g adds no false positive there",
+        "binderAccept": [
+          "exact ce713 control-cross-module-import-plain",
+          "imported global-declaration-alone",
+          "imported nested local in another scope",
+          "imported unrelated alias"
+        ]
+      },
+      "binderRegressions": "exact ce713 inputs near-cross-module-imported-callee-star-shadow and near-cross-module-imported-callee-global-import (source SHA equal to the ce713 rows) -> UNRESOLVED:CALLEE_REBOUND, owned formal not bound; plain reassignment, duplicate same import, global for-target -> CALLEE_REBOUND. BINDER-ONLY, not full semantic proof",
+      "currentPositive": "13 caller binding proofs, all EXACT_FROZEN_EVENT_MULTISET, current multiset = frozen, 1 frozen event each, 0 stars, reason None; includes workspace_config.py:44 WorkspaceAPI and :47 RestrictedWorkspaceRuntime"
+    }
+  },
+  "info": [
+    "I-1 binder-only local shadow (pre-existing, identical at 9cea and 0e66): with no frozen baseline, `from M import accept` + `def use(): accept = receive; return accept(held)` still binds held to M.accept.slot; caller_error returns None because the call's binding scope `use` has no import event. At full provenance it was not reachable in this review: a local shadow in a frozen function refuses through the frozen-scope comparison (workspace_config :44 -> CALLEE_REBOUND), and routing an owned database into a new file with this shape refuses (CALLEE_REBOUND; DYNAMIC_BLOCK when reverted). Optional hardening, not required here: in binder-only mode refuse when the resolver's import-alias scope differs from the lexical binding scope.",
+    "The 576 current bindings use 559 Name callees and 17 self-attribute callees; no module-alias attribute callee, so caller-side module-alias rebinding is not a relevant 72028 path.",
+    "nonlocal stays INFO / outside this cut (binder fixture binds; binding_scope returns None at a nonlocal declaration).",
+    "Not exercised, outside the declared categories (novel families): __package__/__spec__ edits that retarget a textually unchanged relative import, attribute stores on imported modules, globals()/sys.modules writes, importlib._bootstrap private functions."
+  ],
+  "ownerReceiptAssessment": "proof-final01 last command brackets 93 files; the reviewer recomputed all 93 at the committed bytes and they equal the after-map, so reviewer probes ran on the final bytes. Bracketing is not continuous instrumentation. Owner 28 units / 9 controls / 17 commands were not re-run; the reviewer's own runs are listed in commands.json.",
+  "reviewerRun": {
+    "fullProvenanceCases": 34,
+    "invalidPrecondition": 1,
+    "singleChangeRevertedRuns": "17 in the main run + 4 in follow-ups",
+    "binderFixtures": 11,
+    "reflectionUnits": 10,
+    "guardLevelOverlays": 21,
+    "fullFollowUps": 4,
+    "mismatchesExplained": [
+      "L2-equal-count-replaced-import: invalid precondition (roots), not a result",
+      "five full L2 controls spelling WorkspaceAPI: older use-site guard, not Rev9g (guard level None)",
+      "b-imported-function-scope-call-shadowed-local: I-1, pre-existing binder-only"
+    ]
+  },
+  "currentPositive": {
+    "finalProducerRun": "actual-72028-positive ACCEPT via t1_provenance.provenance at final 0e66 producers",
+    "parsedAudited": 25,
+    "production": 11,
+    "parsedEqualsAudited": true,
+    "frozenBindings": 576,
+    "currentBindings": 576,
+    "unresolved": 0,
+    "callerBindingProofs": 13,
+    "notRecomputedByReviewer": "19 edges (16/3), 12 entries, the six accounting artifacts, stage1/final contract hashes and model/lifecycle byte equality are Root-verified (b9g receipt), not re-derived"
+  },
+  "resources": {
+    "peakWorkingSetBytes": 168812544,
+    "elapsedSeconds": 660,
+    "scope": "observed peak of the main reviewer probe process only; the three smaller follow-up processes were not measured; no aggregate or hard quota"
+  },
+  "notRun": [
+    "owner run_checks/proof/docs commands",
+    "model/terminal/recovery suites",
+    "owner 70/19/31/83/29/82 replays",
+    "full 523 assembler / 3485 plans / giant ledger / whole Core",
+    "mutant import or execution",
+    "Obsidian apply/adopt/resolve/state write"
+  ],
+  "unchanged": "actualRuntimeB 0; all real bindings NULL/HOLD; A1-A16 PENDING; observer lock outside 19; storage R4 0/1 expected; model f7384016.../lifecycle 710c6aaf... untouched",
+  "A7": "UNSTARTED / NOT_GRANTED. This ACCEPT only lets Root consider a separate concrete A7 NodeChannels.snapshot-alone implementation cut; it is not a grant",
+  "nextFirstAction": {
+    "owner": "Root",
+    "action": "relay this ACCEPT to msg_13ccbb81f97b and decide whether to grant a separate A7 NodeChannels.snapshot-alone cut"
+  }
+}
