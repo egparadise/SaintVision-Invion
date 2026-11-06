@@ -2,11 +2,23 @@
   "scope": "OWNER development checks; not runtime evidence",
   "failures": [
     {
-      "command": ["D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe", "-B", "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/transport_delta.py"],
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/transport_delta.py"
+      ],
       "actualExit": 1,
       "failure": "AssertionError at assert refused: initial two-step source replacement canceled itself and produced the original source",
       "fix": "Swap Observe/Execute with a unique placeholder so the mutation actually substitutes the two handler branches; anchor generator must reject it",
       "resolution": "See subsequent exact proof-check log/exit; no product source changed"
     }
-  ]
+  ],
+  "finalInspectionCorrection": {
+    "initialSHA": "8b8af7876fd4656efb8958e6f646111f6bc45d75",
+    "initialDocs": 42176380292,
+    "initialJob": 127755688389,
+    "status": "SUCCESS but superseded",
+    "finding": "One SQL-scope unknown lacked its exact source; transaction-owner categorization hid analysis obligations; existing SQL function bodies lacked explicit per-edge P-DBFUNC link",
+    "resolution": "Exact sqlScopeIssues source join, reordered non-authorizing category obligations, two P-DBFUNC bindings; changed checks rerun with receipts; no product change"
+  }
 }

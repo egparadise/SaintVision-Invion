@@ -11,4 +11,4 @@ REPORT check_response_freshness (advisory): 11/11 curated freshness-field checks
   ok      saintvision:NodeResponse.lastHeartbeatAt
   ok      saintvision:ReplicaObservationResponse.observedAt
   (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)
-{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_response_freshness.py", "peakWorkingSetBytes": 18825216, "elapsedSeconds": 0.045, "OSMemoryLimitEnforced": false, "serial": true}}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_response_freshness.py", "peakWorkingSetBytes": 18640896, "elapsedSeconds": 0.082, "OSMemoryLimitEnforced": false, "serial": true}}

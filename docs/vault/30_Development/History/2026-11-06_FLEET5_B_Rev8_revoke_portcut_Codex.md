@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-FLEET5-B-REV8-REVOKE-PORTCUT-001"
 title: "FLEET5 Rev8 recovery lanes, candidate hints and bounded revoke analysis pilot"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Actual independent Claude Rev8 delta review via Root pending"
-updated: "2026-11-06T15:40:00+09:00"
+updated: "2026-11-06T15:46:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -248,3 +248,11 @@ analysis cut is T1+A7/A8 constructor/import provenance and narrow mark_offline
 demonstrator with mutation negatives, before any broader source upgrade. A3-A8,
 T1-T3 and P-* labels are not grants. B remains pending; no worker_done for the
 whole assigned B deliverable, no self-acceptance, registration or partial freeze.
+
+Final inspection corrected one nested SQL-scope reference to its exact
+lock_wait source:82, separated ContextVar/constructor/result analysis obligations
+inside transaction/transport owners from real interface dependencies, and bound
+the two existing SQL functions to P-DBFUNC. Initial8b8af/Docs42176380292 succeeded
+but is superseded by the corrected publication. The two changed packet/category
+producers have exact followup-checks receipts; original executed producer hashes
+remain at8b8af. No product or runtime behavior changed.

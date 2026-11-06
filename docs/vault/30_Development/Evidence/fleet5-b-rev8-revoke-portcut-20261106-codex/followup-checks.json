@@ -1,0 +1,42 @@
+{
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\edge_categories.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.379,
+      "kst": "2026-11-06T15:49:08.414124+09:00",
+      "log": "followup-checks-1.log",
+      "sha256": "7694f0f5df86b60e22d453eb5b30dc8fba2f2194371612eb241ae669cffe6c8a"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\packet_checks.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 5.135,
+      "kst": "2026-11-06T15:49:13.567985+09:00",
+      "log": "followup-checks-2.log",
+      "sha256": "c834236640154b33db1262d46c916fba528ca95884646c4a8a3fa09c70a88c49"
+    }
+  ],
+  "reason": "Final packet inspection: attach exact nested SQL scope source, separate ContextVar/constructor/result analysis obligations from shared owner, link actual SQL function body dependencies",
+  "initialPublication": {
+    "sha": "8b8af7876fd4656efb8958e6f646111f6bc45d75",
+    "Docs": 42176380292,
+    "job": 127755688389,
+    "status": "SUCCESS; superseded by final corrected head"
+  },
+  "unchangedProofCommands": "Original fourteen expected exits retained; only these two changed proof producers rerun",
+  "actualRuntimeB": 0,
+  "independentReview": "PENDING through Root"
+}

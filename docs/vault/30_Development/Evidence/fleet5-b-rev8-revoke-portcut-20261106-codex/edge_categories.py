@@ -17,6 +17,11 @@ RULES={
  'A8':{'contract':'Interprocedural self.db constructor argument propagation across ALL production wiring; exact Database/BoundDatabase implementation types only. Keep nonproduction harness object doubles separate with provenance and counts.','implemented':False,'negative':'Unknown production receiver or Database subclass transaction override BLOCK; no harness evidence dropped'}}
 def choose(c):
     fn=c.get('function','');sp=c.get('spelling','');target=c.get('inferredTarget','');receiver=c.get('receiverType') or ''
+    # Analysis obligations remain analysis even inside the transaction owner.
+    if target in ('inv.errors.DomainError','saintvision.errors.InvError'):return 'ANALYSIS_RULE:A2'
+    if fn in ('saintvision.services.settings._apply_to_kernel','saintvision.services.settings.require_global_administrator') and any(x in sp for x in ('public.apply_capability_offer','public.business_admin_allowed')):return 'NAMED_PORT:P-DBFUNC'
+    if any(x in sp for x in ('.fetchone','.fetchall','.scalar_one','.scalar(')):return 'ANALYSIS_RULE:A1'
+    if '_statement_phase.' in sp or fn=='inv.db.Database.transaction' and sp=='phase.get':return 'ANALYSIS_RULE:A3'
     if fn.startswith(('inv.db.Database.transaction','inv.db.BoundDatabase.transaction')):
         return 'NAMED_PORT:P-DBROLE' if 'psycopg.connect' in sp else 'NAMED_PORT:T1'
     if fn.startswith('inv.node_transport.NodeTLSClient.'):
@@ -25,9 +30,6 @@ def choose(c):
     if sp=='getattr' or 'getattr(' in sp:return 'NAMED_PORT:P-GETATTR'
     if fn.startswith('saintvision.api.v1.settings.') and sp in ('Depends','Header','router.put'):return 'NAMED_PORT:P-API-DI'
     if fn.startswith(('inv.build_execution.','inv.buildkit_transport.')) and any(x in sp for x in ('_clock','_now','_request_id_factory','_runner.run')):return 'NAMED_PORT:P-INJECT-BUILD'
-    if target in ('inv.errors.DomainError','saintvision.errors.InvError'):return 'ANALYSIS_RULE:A2'
-    if any(x in sp for x in ('.fetchone','.fetchall','.scalar_one','.scalar(')):return 'ANALYSIS_RULE:A1'
-    if '_statement_phase.' in sp:return 'ANALYSIS_RULE:A3'
     if any(x in target for x in ('jsonschema','psycopg.types.json.Jsonb','importlib.resources','cryptography','ipaddress','urllib.parse','hashlib','unicodedata','PurePosixPath','nullcontext','deepcopy')):return 'ANALYSIS_RULE:A4'
     if 'runtime' in target and fn.startswith('tools.'):return 'ANALYSIS_RULE:A7'
     if sp=='self.db.transaction':return 'ANALYSIS_RULE:A8'
@@ -40,6 +42,7 @@ def main():
     for c in a.rows('classifiedCalls'):
         if c['id'] in wanted:calls[c['id']]=c
     pilot=json.loads((E/'pilot-closure.json').read_bytes());closed={r['callRef']:r for r in pilot['closedAnalysisEdges']}
+    sqlissues={r['id']:r for r in a.rows('sqlScopeIssues') if r['id'] in wanted}
     byentry={r['function']:r for r in critical};edges=[];planrows=[]
     # Referenced parent rows are immutable, even if a category suggests a future
     # rule. No other entry receives a support-status upgrade.
@@ -57,6 +60,13 @@ def main():
               'futureWork':{'callee':c['inferredTarget'],'sourceFunction':c['function'],'span':[c['line'],c['column'],c['endLine'],c['endColumn']],
                 'action':'Prove exact selected import/producer/type/effect closure under '+cat+'; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label'},
               'blocksGrant':True,'originalEntryStatusRetained':True}
+        elif callid in sqlissues:
+            issue=sqlissues[callid]
+            row={'callRef':callid,'affectedEntryRefs':refs,'category':'NAMED_PORT:P-SQLSCOPE' if issue['function']=='saintvision.api.lock_wait.bound_lock_wait' else 'DYNAMIC_BLOCK',
+              'source':{k:issue[k] for k in ('path','function','line','fileSHA256','exactLine')},'type':'RECORDED_SESSION_SQL_SCOPE','receiver':{'expression':'session.execute','inferredType':'sqlalchemy.orm.Session; owning transaction proof pending'},
+              'binding':{'actual':None,'requiredOwner':'existing tenant-scoped Session','formatter':'validate_lock_timeout(timeout_ms) -> fixed SET LOCAL lock_timeout'},
+              'proof':{'status':'UNRESOLVED_SQL_SCOPE_RETAINED','parentLedger':'sqlScopeIssues','parentLedgerSHA256':a.M['ledgers']['sqlScopeIssues']['sha256'],'originalReason':issue['reason']},
+              'futureWork':{'exactUnknownRef':callid,'sourceFunction':issue['function'],'line':issue['line'],'action':'Prove bounded validated-integer SET LOCAL formatter and existing transaction/tenant scope; bind P-SQLSCOPE before affected grant'},'blocksGrant':True}
         else:
             # SQL-scope identifiers are not fictional Python receiver calls.
             row={'callRef':callid,'affectedEntryRefs':refs,'category':'NAMED_PORT:P-SQLSCOPE' if any('lock_wait' in x for x in refs) else 'DYNAMIC_BLOCK',

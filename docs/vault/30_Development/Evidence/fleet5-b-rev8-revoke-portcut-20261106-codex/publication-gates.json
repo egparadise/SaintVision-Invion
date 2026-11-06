@@ -10,14 +10,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 26.811,
-      "kst": "2026-11-06T15:41:03.122713+09:00",
+      "seconds": 33.278,
+      "kst": "2026-11-06T15:49:58.149052+09:00",
       "log": "publication-gates-1.log",
-      "sha256": "e9b053694d6c41436a69ec58f89bbe8a06ed12ea39e93981b2926c7aefe16e06",
+      "sha256": "d64bd75a0805522074457772917466815cf9dd6e64cbf12363c68092851d9f67",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py",
-        "peakWorkingSetBytes": 178241536,
-        "elapsedSeconds": 26.597,
+        "peakWorkingSetBytes": 178409472,
+        "elapsedSeconds": 33.107,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -31,14 +31,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 2.95,
-      "kst": "2026-11-06T15:41:06.095986+09:00",
+      "seconds": 6.576,
+      "kst": "2026-11-06T15:50:04.759428+09:00",
       "log": "publication-gates-2.log",
-      "sha256": "85586d5f1f28e2d008441bd6edd3d8cc5d01e292f5f01ee8b1e58a48f76aa4a3",
+      "sha256": "15e51394ea938b90588d4dfa947e6ca0c8e1197a47a6f3f4fcc94c8727581be7",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_ontology.py",
-        "peakWorkingSetBytes": 67436544,
-        "elapsedSeconds": 2.599,
+        "peakWorkingSetBytes": 67555328,
+        "elapsedSeconds": 6.035,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -57,14 +57,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 14.194,
-      "kst": "2026-11-06T15:41:20.291519+09:00",
+      "seconds": 50.158,
+      "kst": "2026-11-06T15:50:54.966086+09:00",
       "log": "publication-gates-3.log",
-      "sha256": "8f7f9fd06f07bb9a426150b6241e75bbe2d0b6107d8364b01080f97c7c0582ef",
+      "sha256": "b99dc52fa73b6d7018840d0fce9ba57eae6c8564a99f8f2c35e6395ef6ee75a2",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\sync_obsidian.py",
-        "peakWorkingSetBytes": 107565056,
-        "elapsedSeconds": 13.89,
+        "peakWorkingSetBytes": 106364928,
+        "elapsedSeconds": 49.639,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -78,14 +78,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 12.179,
-      "kst": "2026-11-06T15:41:32.492637+09:00",
+      "seconds": 19.33,
+      "kst": "2026-11-06T15:51:14.437008+09:00",
       "log": "publication-gates-4.log",
-      "sha256": "08997658887b7e2c8fcf8dc19e117ae9b0db57d198b5c83ec938132a98281354",
+      "sha256": "8f61c1daa525e9c0f0a10b9afcee687568435ac3a0d6be4e94529d96f92ff1fa",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_contract_bindings.py",
-        "peakWorkingSetBytes": 30294016,
-        "elapsedSeconds": 11.855,
+        "peakWorkingSetBytes": 31195136,
+        "elapsedSeconds": 18.766,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -99,14 +99,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 1.524,
-      "kst": "2026-11-06T15:41:34.037781+09:00",
+      "seconds": 3.549,
+      "kst": "2026-11-06T15:51:18.060516+09:00",
       "log": "publication-gates-5.log",
-      "sha256": "f69367e40d2b110893ef44870d82c96bfee5180b086a2ec1bbf6bd4ae2f90804",
+      "sha256": "8ee2d6fa9cde9c0fd1b716d97e8530e6bb56a7a59634b399cc71b9e8359fb763",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_frontend_integrity.py",
-        "peakWorkingSetBytes": 24207360,
-        "elapsedSeconds": 1.218,
+        "peakWorkingSetBytes": 23347200,
+        "elapsedSeconds": 3.167,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -121,14 +121,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 0.798,
-      "kst": "2026-11-06T15:41:34.837231+09:00",
+      "seconds": 5.188,
+      "kst": "2026-11-06T15:51:23.285854+09:00",
       "log": "publication-gates-6.log",
-      "sha256": "7c6c73dcb9a706b7ec46888cb9eed7582eecf9ef03f9bf4aee5724c5228ec387",
+      "sha256": "e0aadc3f20d95e699759e8dd7e6bb9e6645a4e5c222aaacb5a61a877fb63c766",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_doc_single_source.py",
-        "peakWorkingSetBytes": 32866304,
-        "elapsedSeconds": 0.695,
+        "peakWorkingSetBytes": 33071104,
+        "elapsedSeconds": 4.703,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -142,14 +142,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 0.163,
-      "kst": "2026-11-06T15:41:35.001874+09:00",
+      "seconds": 0.536,
+      "kst": "2026-11-06T15:51:23.822688+09:00",
       "log": "publication-gates-7.log",
-      "sha256": "41451dfbebf2465e8b926d3edd4fe9de2dd1ee7daa82b7deb2cf816301348254",
+      "sha256": "e6c52f3ed1878b4d9619ebf8e7af229393e107dfea030b2847dfc00e9bd33d2b",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_response_freshness.py",
-        "peakWorkingSetBytes": 18825216,
-        "elapsedSeconds": 0.045,
+        "peakWorkingSetBytes": 18640896,
+        "elapsedSeconds": 0.082,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }
@@ -166,14 +166,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 4.928,
-      "kst": "2026-11-06T15:41:39.931823+09:00",
+      "seconds": 33.429,
+      "kst": "2026-11-06T15:51:57.254078+09:00",
       "log": "publication-gates-8.log",
-      "sha256": "ff6bd2b46cd45929962d2bd73ef1a89324714b60fa032ed9bf4520891a4c79a4",
+      "sha256": "4de33d1a642c1f0f2602a465bdd7619681c4ac3daf2a283c83c5c3656908ce82",
       "resource": {
         "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_doc_path_citations.py",
-        "peakWorkingSetBytes": 29286400,
-        "elapsedSeconds": 4.824,
+        "peakWorkingSetBytes": 28774400,
+        "elapsedSeconds": 33.298,
         "OSMemoryLimitEnforced": false,
         "serial": true
       }

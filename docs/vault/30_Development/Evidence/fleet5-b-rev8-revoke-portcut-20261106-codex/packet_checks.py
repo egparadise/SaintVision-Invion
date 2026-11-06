@@ -15,8 +15,12 @@ def main():
     pilot=json.loads((E/'pilot-closure.json').read_bytes());assert pilot['entry']=='inv.node_channels.revoke_channel' and pilot['notGrantable'] and len(pilot['closedAnalysisEdges'])==3
     cat=json.loads((E/'critical-edge-categories.json').read_bytes());assert cat['criticalEntryCount']==21 and cat['nonPilotEntryStatusChanges']==0 and cat['sourceLockPlanCounts']=={'all':39,'withProcedureRefs':33,'withoutProcedureRefs':6}
     assert cat['missingPortOccurrences']==757 and cat['distinctReferencedUnknowns']==598
+    assert cat['categoryCounts']['NAMED_PORT:P-SQLSCOPE']==1
+    assert cat['categoryCounts']['NAMED_PORT:P-DBFUNC']==2
+    assert cat['categoryCounts']['ANALYSIS_RULE:A3']==4
     for edge in cat['edges']:
         assert all(k in edge for k in ('source','type','receiver','binding','proof','futureWork','blocksGrant'))
+        assert 'path' in edge['source'] and ('span' in edge['source'] or 'line' in edge['source'])
         assert edge['category']=='DYNAMIC_BLOCK' or edge['category'].startswith(('ANALYSIS_RULE:A','NAMED_PORT:','IO_CATALOG_LINK:'))
         if not edge['blocksGrant']:assert edge['closedOnlyForEntry']=='inv.node_channels.revoke_channel'
     c=json.loads((E/'pending-interface-contracts.json').read_bytes());assert len(c['contracts'])==10

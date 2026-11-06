@@ -2540,7 +2540,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -2568,7 +2568,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -2580,7 +2580,7 @@
           230,
           21
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -2850,7 +2850,7 @@
       "affectedEntryRefs": [
         "inv.runs.RunStore.complete"
       ],
-      "category": "NAMED_PORT:T3",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/storage.py",
         "function": "inv.storage.verify_content",
@@ -2878,7 +2878,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T3",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -2890,7 +2890,7 @@
           95,
           80
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -2969,7 +2969,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -2997,7 +2997,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -3009,7 +3009,7 @@
           207,
           21
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -4405,7 +4405,7 @@
       "affectedEntryRefs": [
         "inv.build_execution.BuildExecutionService.execute"
       ],
-      "category": "NAMED_PORT:T3",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/buildkit_transport.py",
         "function": "inv.buildkit_transport._protected_json",
@@ -4433,7 +4433,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T3",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -4445,7 +4445,7 @@
           373,
           9
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -4765,7 +4765,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -4793,7 +4793,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -4805,7 +4805,7 @@
           152,
           71
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -6024,7 +6024,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A3",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -6054,7 +6054,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A3",
         "noAllowlist": true
       },
       "futureWork": {
@@ -6066,7 +6066,7 @@
           233,
           42
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -8121,7 +8121,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A1",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -8151,7 +8151,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A1",
         "noAllowlist": true
       },
       "futureWork": {
@@ -8163,7 +8163,7 @@
           203,
           28
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -8281,7 +8281,7 @@
       "affectedEntryRefs": [
         "inv.runs.RunStore.complete"
       ],
-      "category": "NAMED_PORT:T3",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/storage.py",
         "function": "inv.storage.verify_content",
@@ -8309,7 +8309,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T3",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -8321,7 +8321,7 @@
           84,
           71
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -8332,7 +8332,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -8360,7 +8360,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -8372,7 +8372,7 @@
           219,
           13
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -9115,7 +9115,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A3",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -9145,7 +9145,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A3",
         "noAllowlist": true
       },
       "futureWork": {
@@ -9157,7 +9157,7 @@
           177,
           76
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -10661,7 +10661,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A3",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -10691,7 +10691,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A3",
         "noAllowlist": true
       },
       "futureWork": {
@@ -10703,7 +10703,7 @@
           234,
           47
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -13628,7 +13628,7 @@
       "affectedEntryRefs": [
         "inv.runs.RunStore.complete"
       ],
-      "category": "NAMED_PORT:T3",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/storage.py",
         "function": "inv.storage.verify_content",
@@ -13656,7 +13656,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T3",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -13668,7 +13668,7 @@
           91,
           87
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -15598,7 +15598,7 @@
         "saintvision.api.v1.settings.set_resource_offer",
         "saintvision.services.settings.set_resource_offer"
       ],
-      "category": "ANALYSIS_RULE:A6",
+      "category": "NAMED_PORT:P-DBFUNC",
       "source": {
         "path": "src/saintvision/services/settings.py",
         "function": "saintvision.services.settings._apply_to_kernel",
@@ -15628,7 +15628,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "ANALYSIS_RULE:A6",
+        "ruleContract": "NAMED_PORT:P-DBFUNC",
         "noAllowlist": true
       },
       "futureWork": {
@@ -15640,7 +15640,7 @@
           583,
           11
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A6; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:P-DBFUNC; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -15867,7 +15867,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A1",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -15897,7 +15897,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A1",
         "noAllowlist": true
       },
       "futureWork": {
@@ -15909,7 +15909,7 @@
           216,
           32
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -16446,7 +16446,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -16474,7 +16474,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -16486,7 +16486,7 @@
           184,
           87
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -19308,7 +19308,7 @@
       "affectedEntryRefs": [
         "inv.build_execution.BuildExecutionService.execute"
       ],
-      "category": "NAMED_PORT:T3",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/buildkit_transport.py",
         "function": "inv.buildkit_transport._protected_json",
@@ -19336,7 +19336,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T3",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -19348,7 +19348,7 @@
           375,
           100
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -19664,7 +19664,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -19692,7 +19692,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -19704,7 +19704,7 @@
           212,
           83
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -22570,7 +22570,7 @@
         "saintvision.api.v1.settings.set_resource_offer",
         "saintvision.services.settings.set_resource_offer"
       ],
-      "category": "ANALYSIS_RULE:A1",
+      "category": "NAMED_PORT:P-DBFUNC",
       "source": {
         "path": "src/saintvision/services/settings.py",
         "function": "saintvision.services.settings.require_global_administrator",
@@ -22600,7 +22600,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "ANALYSIS_RULE:A1",
+        "ruleContract": "NAMED_PORT:P-DBFUNC",
         "noAllowlist": true
       },
       "futureWork": {
@@ -22612,7 +22612,7 @@
           132,
           18
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:P-DBFUNC; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -23151,7 +23151,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A3",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -23181,7 +23181,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A3",
         "noAllowlist": true
       },
       "futureWork": {
@@ -23193,7 +23193,7 @@
           235,
           65
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A3; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -25684,7 +25684,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -25712,7 +25712,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -25724,7 +25724,7 @@
           218,
           101
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -25735,7 +25735,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -25763,7 +25763,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -25775,7 +25775,7 @@
           209,
           17
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -26253,7 +26253,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -26281,7 +26281,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -26293,7 +26293,7 @@
           200,
           17
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -28150,7 +28150,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A1",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -28180,7 +28180,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A1",
         "noAllowlist": true
       },
       "futureWork": {
@@ -28192,7 +28192,7 @@
           186,
           65
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -31341,7 +31341,7 @@
       "affectedEntryRefs": [
         "inv.runs.RunStore.complete"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.BoundDatabase.transaction",
@@ -31369,7 +31369,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -31381,7 +31381,7 @@
           132,
           83
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -31611,7 +31611,7 @@
         "inv.runs.RunStore.complete",
         "inv.shard_completion.ShardCompletion.once"
       ],
-      "category": "NAMED_PORT:T1",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/db.py",
         "function": "inv.db.Database.transaction",
@@ -31639,7 +31639,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T1",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -31651,7 +31651,7 @@
           192,
           21
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T1; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -31871,7 +31871,7 @@
         "inv.build_execution.BuildExecutionService.execute",
         "inv.node_transport.NodeDelivery.deliver"
       ],
-      "category": "NAMED_PORT:T2",
+      "category": "ANALYSIS_RULE:A2",
       "source": {
         "path": "services/control-plane/src/inv/node_transport.py",
         "function": "inv.node_transport.NodeTLSClient._request",
@@ -31899,7 +31899,7 @@
       "proof": {
         "status": "NOT_APPLIED_TO_NONPILOT",
         "originalReason": "unproven receiver/dispatch; resolve exact installed type or named mediated port before affected grant",
-        "ruleContract": "NAMED_PORT:T2",
+        "ruleContract": "ANALYSIS_RULE:A2",
         "noAllowlist": true
       },
       "futureWork": {
@@ -31911,7 +31911,7 @@
           176,
           86
         ],
-        "action": "Prove exact selected import/producer/type/effect closure under NAMED_PORT:T2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
+        "action": "Prove exact selected import/producer/type/effect closure under ANALYSIS_RULE:A2; unknown dynamic receiver stays blocked; do not register a production port from a taxonomy label"
       },
       "blocksGrant": true,
       "originalEntryStatusRetained": true
@@ -33149,22 +33149,35 @@
       "affectedEntryRefs": [
         "saintvision.api.v1.settings.set_resource_offer"
       ],
-      "category": "DYNAMIC_BLOCK",
+      "category": "NAMED_PORT:P-SQLSCOPE",
       "source": {
-        "parentLedger": "criticalEntries",
-        "parentLedgerSHA256": "18eb25cbcf70fbee42b42f12cf85f158adc03d859d63b728c23b533512fba32a",
-        "exactUnknownRef": "sql:cdaeba7d716ef465d4b901997e9eea4c7596623b6fa96c12967b35bfc7051cd0"
+        "path": "src/saintvision/api/lock_wait.py",
+        "function": "saintvision.api.lock_wait.bound_lock_wait",
+        "line": 82,
+        "fileSHA256": "1dcd88d246915a99ad697964c40028b0409f01d70a495542e356dd47b9c6b30b",
+        "exactLine": "    session.execute(text(f\"SET LOCAL lock_timeout = '{value}ms'\"))"
       },
-      "type": "SQL_OR_UNRESOLVED_SCOPE",
-      "receiver": null,
-      "binding": null,
-      "proof": "No Python producer identified; no inferred exemption",
+      "type": "RECORDED_SESSION_SQL_SCOPE",
+      "receiver": {
+        "expression": "session.execute",
+        "inferredType": "sqlalchemy.orm.Session; owning transaction proof pending"
+      },
+      "binding": {
+        "actual": null,
+        "requiredOwner": "existing tenant-scoped Session",
+        "formatter": "validate_lock_timeout(timeout_ms) -> fixed SET LOCAL lock_timeout"
+      },
+      "proof": {
+        "status": "UNRESOLVED_SQL_SCOPE_RETAINED",
+        "parentLedger": "sqlScopeIssues",
+        "parentLedgerSHA256": "ed78ce2d35bf8d7513c115bf22bc09db12335bab6af7d485d5187a3386df4229",
+        "originalReason": "recorded DB API has unresolved SQL scope; no duplicate callgraph unknown"
+      },
       "futureWork": {
         "exactUnknownRef": "sql:cdaeba7d716ef465d4b901997e9eea4c7596623b6fa96c12967b35bfc7051cd0",
-        "affectedEntryRefs": [
-          "saintvision.api.v1.settings.set_resource_offer"
-        ],
-        "action": "Resolve exact SQL/body/scope or receiver dependency before grant"
+        "sourceFunction": "saintvision.api.lock_wait.bound_lock_wait",
+        "line": 82,
+        "action": "Prove bounded validated-integer SET LOCAL formatter and existing transaction/tenant scope; bind P-SQLSCOPE before affected grant"
       },
       "blocksGrant": true
     }
@@ -33448,19 +33461,21 @@
   "missingPortOccurrences": 757,
   "distinctReferencedUnknowns": 598,
   "categoryCounts": {
-    "ANALYSIS_RULE:A2": 153,
-    "DYNAMIC_BLOCK": 228,
-    "ANALYSIS_RULE:A1": 74,
+    "ANALYSIS_RULE:A2": 170,
+    "DYNAMIC_BLOCK": 227,
+    "ANALYSIS_RULE:A1": 76,
     "NAMED_PORT:P-GETATTR": 16,
     "ANALYSIS_RULE:A4": 54,
-    "ANALYSIS_RULE:A6": 7,
-    "NAMED_PORT:T1": 12,
-    "NAMED_PORT:T3": 17,
-    "NAMED_PORT:T2": 18,
+    "ANALYSIS_RULE:A6": 6,
+    "NAMED_PORT:T3": 12,
     "NAMED_PORT:P-INJECT-BUILD": 10,
+    "ANALYSIS_RULE:A3": 4,
+    "NAMED_PORT:T2": 11,
     "NAMED_PORT:P-API-DI": 6,
     "NAMED_PORT:P-DBROLE": 1,
-    "ANALYSIS_RULE:A8": 2
+    "NAMED_PORT:P-DBFUNC": 2,
+    "ANALYSIS_RULE:A8": 2,
+    "NAMED_PORT:P-SQLSCOPE": 1
   },
   "nonPilotEntryStatusChanges": 0,
   "sourceLockPlanCounts": {

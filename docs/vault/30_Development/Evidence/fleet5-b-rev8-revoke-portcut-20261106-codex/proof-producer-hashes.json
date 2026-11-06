@@ -1,8 +1,7 @@
 {
   "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
   "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
-  "scope": "Exact owner proposal/proof producers and derived contract artifacts, final Git SHA supplied to Root after commit",
-  "kst": "2026-11-06T15:43:25.702960+09:00",
+  "scope": "Final corrected producers; original executed producer hashes retained separately at8b8af; followup-checks covers changed category/packet producers",
   "files": [
     {
       "file": "analysis_tests.py",
@@ -41,13 +40,18 @@
     },
     {
       "file": "critical-edge-categories.json",
-      "bytes": 1349099,
-      "sha256": "1106be2a3d5af86fbc9b34b024849237f97c85f1f6799e3cfcb37ea3453b0e94"
+      "bytes": 1350095,
+      "sha256": "197cb68ff78dfdccd878d3b595a13c9e0a9d3c77de48d76218bc80a3f90933a0"
     },
     {
       "file": "edge_categories.py",
-      "bytes": 10366,
-      "sha256": "e0768f5519666e4f6596dad384636775322d890cb4d76e46637a5a36e973084d"
+      "bytes": 11967,
+      "sha256": "3106f2f636df58c8a9a63c02b099ce04dfa98455e19fd5f7659b83884cbdf510"
+    },
+    {
+      "file": "followup_verify.py",
+      "bytes": 2594,
+      "sha256": "05a894e785310df7750ecdae956207cda0f62d3a144309839e09c0c165d4d025"
     },
     {
       "file": "io_contract.py",
@@ -71,8 +75,8 @@
     },
     {
       "file": "packet_checks.py",
-      "bytes": 2987,
-      "sha256": "7861a4c2007cc6491c8f21d7ef1f0b5dbbc2cd12fbf43d854240c0267db3c028"
+      "bytes": 3262,
+      "sha256": "63be8cc94cd9fcbac5a0f6b39838fe76eee24cd88da7a4f44628c44efc590712"
     },
     {
       "file": "pending-interface-contracts.json",
