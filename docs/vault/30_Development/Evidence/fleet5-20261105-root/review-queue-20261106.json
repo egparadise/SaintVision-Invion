@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T17:02:04+09:00",
+  "atKST": "2026-11-06T17:34:35+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,23 +12,17 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": {
-    "task": "task_b234a0f9df1a",
-    "dispatch": "ctx_aabf96f33707",
-    "source": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
-    "scope": "ONE actual final combined-source review PL-R1a/merge/pin/diagnostics",
-    "state": "ready actualdispatch/verdictpending"
-  },
+  "active": null,
   "pending": null,
-  "authorParallelWork": "sameB owner Rev9-T1 bounded docs/static/symbolic per Root exact scope; K2 owner holds frozencombinedac7498",
-  "reason": "B8 actual0440 review delivered; Rootverified combined5353modeblobs/onepin/twoDocs; predecessor exited/releasedbeforeoneClaude start",
+  "authorParallelWork": "K2 sameCodex PL-R1b TEST/README-only fromac7498 beforeCore; B sameCodex existing narrowRev9T1 independent",
+  "reason": "actualcombinedreview accepts merge/pin/diagnostics/publicrefusal buttestgatePLR1b remains; Root chose fixbeforeoneCore",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "handle actual combined verdict first; source acceptance thenRoot exactoneCoredecision; B9 actualreview after immutableDocs/oneClaudeavailability",
+  "nextActualReviewTrigger": "immutable PL-R1b candidate+ownDocs ->ONE actual narrowdelta review; B9 candidate may queue peroneClaudeavailability; no new task before sourceexists",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -230,7 +224,7 @@
     },
     "RootConcreteReply": "msg_256747ff9f44"
   },
-  "sourceIntegratorState": "combinedac7498 frozen/Rootverified; sameownerawaitsactualreview andRootnextCIdecision",
+  "sourceIntegratorState": "sameK2 owner test-onlyscope replydelivered; acceptedcombinedproduct/deploybytes frozen",
   "completedB8": {
     "task": "task_ac6f831f2c53",
     "dispatch": "ctx_a3cf08fa935b",
@@ -252,5 +246,23 @@
       "waitingOnHuman": "unknown"
     },
     "RootConcreteReply": "msg_78b82487362a"
+  },
+  "completedCombinedAc74": {
+    "task": "task_b234a0f9df1a",
+    "dispatch": "ctx_aabf96f33707",
+    "source": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+    "actualReview": "7d979761e6ee91bba254ea04074a6855429320ab",
+    "Docs": 42187672682,
+    "verdict": "REVISION_REQUIRED (narrow: ONE new LOW finding PL-R1b in the test-only source gate). Product/merge/pin/diagnostics axes are accepted. PL-R1a is NOT fully closed.",
+    "acceptedAxes": [
+      "merge",
+      "pin asUNREGISTEREDsourcecandidate",
+      "diagnosticsInfoonly",
+      "combinedpresentpublicrefusal",
+      "PLR1a interfaceConstraintclass(a)"
+    ],
+    "actualWorkerDone": "msg_8f7238a1b51e",
+    "resource": "actual worker-show succeeded/settled/exited/released",
+    "RootConcreteReply": "msg_6f62615d78a9"
   }
 }

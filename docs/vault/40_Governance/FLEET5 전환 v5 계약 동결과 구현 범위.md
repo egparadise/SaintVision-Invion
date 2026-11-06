@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.12"
+version: "1.0.13"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T16:18:44+09:00"
+updated: "2026-11-06T17:34:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -150,3 +150,14 @@ Root는 msg_256747ff9f44로 같은 Codex에게 PL-R1a 시험 코드·README 수�
 leaf-rotation-runtime-lock.json/LOCK06710d85, 다른 module/entry pin, bundle·install :2 schema, K1의28 schema/verifier/resource pin·v5 graph·원본 이력과13/73/0 기준·go.mod는 그대로다. raw7 closure와 launcher hash는 실제 변경 바이트에서 새로 측정하며 source 후보 UNREGISTERED로 기록한다. 이 한 줄은 live trust·설치·배포·PKI 등록이 아니다. 이전 Stage1 helper17378b80은 등록하지 않는다.
 
 Codex는 의미 있는 순차 시험·기존 standalone 시험 불변·실제 문서 gate/commit/push/exact Docs 뒤 새 고정 후보를 제출한다. Root는 먼저 진행 중인 B rev8 실제 검토를 받고, 검토자 exit/release와 후보 준비를 확인한 뒤 PL-R1a/merge/pin/진단을 포함한 단일 실제 결합 검토를 배정한다. 그 판정 후 Root의 다음 정확한 결정으로만 고정 최종 소스의 새 전체 Core·Docs를 한 번 실행한다. 현재 full Core 실행은 아직 부여하지 않았다. 실제 clock/current/authentication/effects·K2 usable·40runtime·5대 인수는 여전히 NULL/HOLD/미실행이다. 기존 de71 Core42164071724와 Stage1 push42170068364 실패·원래 차이 UNKNOWN도 보존한다.
+
+
+## 실제 결합 검토 후 PL-R1b 시험 보강을 먼저 수행
+
+실제 Claude7d979761e6ee91bba254ea04074a6855429320ab/Docs42187672682/job127791774979는 ac7498 결합을 검토했다. Root는 review 원문·9개 고유 추가 문서·remote·exact head/ref/event/path/attempt1/correlation/전체19단계 성공을 확인했다. merge5353개·mismatch0, 단일 pin과 실제 module/launcher/lock/raw7 digest, bounded Stage1 diagnostics는 수락됐다. raw7 closure는 UNREGISTERED source 후보이고 live trust·설치 인수는 없다. PL-R1a interface/constraint 클래스는 닫혔지만 foreign variable 쓰기 클래스는 새 PL-R1b Low 때문에 아직 열려 있다.
+
+실제7개 compile-valid mutant와3개 non-test 파일 전체 suite 사례는 range assignment와 time.UTC/Time.Location 반환 pointer 경유 쓰기가 시험 gate를 통과함을 보였다. 현재7개 production Go 파일에는 해당 쓰기가 없어 제품 동작에 도달하지 않는다. 이전9c37의 수정 문구 자체가 이 경우를 빠뜨렸고 저자는 지시대로 구현했다. Root는 이를 제품 구현 결함으로 바꾸지 않으며 gate·README 한계를 정확히 보강한다.
+
+Root는 msg_6f62615d78a9로 같은 Codex에게 ac7498에서 새 PL-R1b branch를 만들어 effect_gate_test.go·pl_r1a_test.go·README와 고유 History/Evidence만 수정하도록 했다. Assign/Range ASSIGN/IncDec의 모든 write target과 parenthesis/index/selector root를 검사하고 실제 type에 따른 외부 pointee의 명시·암묵 dereference 쓰기를 거부한다. 실제7개 새 mutation·3개 전체 suite 반례의 old RED/new reason-bound 거부, 기존18개 case의 의도한 reason과 local/own-type/UTC 읽기 정상 사례를 보존한다. 비시험 Go·helper·pin·lock·schema·K1·workflow·의존성은 그대로다. 일반 alias/heap ownership 전체가 증명된다는 주장은 하지 않는다.
+
+Root는 전체 Core 전에 이 시험 보강을 하는 선택을 확정했다. 새 불변 후보와 own exact Docs 뒤 실제 Claude가 ac7498 대비 작은 delta만 검토한다. 이미 수락한 merge/pin/diagnostics 전체를 다시 열지 않는다. 그 판정 후 Root의 다음 정확한 결정으로 한 번의 fresh fullCore·Docs를 고정 최종 source에서 실행한다. 현재 ac7498/Core 실행은 부여하지 않았다. 이전 Core/Stage1 실패와 원래 차이 UNKNOWN, 새 hosted race·LAN·mainpytest·build 미실행, 실제 auth/clock/current/effects/설치·40runtime·5대 미완료는 보존한다. 정확한 본문은 k2a-pl-r1b-root-scope.json에 있다.

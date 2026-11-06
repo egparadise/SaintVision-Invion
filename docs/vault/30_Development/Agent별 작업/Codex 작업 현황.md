@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.410"
+version: "1.0.411"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T17:05:20+09:00"
+updated: "2026-11-06T17:34:35+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "combinedac74 actualfinalreviewctxaabactive/5353blobs+onepin+2Docsverified; B8M1+Low -> sameBownerB9T1; combinedCore/physicalNOTRUN"
-active_card_next: "Claude actualcombinedverdict inclPLR1a/merge/pin/diagnostics; Root oneexactCoredecision onlyafteracceptance; B Codex perclaimterminal+hints+rulehardening+narrowT1markoffline; no generic approval"
+active_card_status: "Actual7d97 combinedmerge/pin/diagnosticsaccept; PLR1b testonlyLow open; sameCodex narrow3filefix; B9T1independent; fullCore/5PCnotdone"
+active_card_next: "Codex newPLR1b TESTREADMEcandidate+exactDocs; Root oneactualnarrowreview whenimmutable; thenchooseonefreshCore; B9T1continue; acceptedproductbytes frozen"
 ---
+
+## 2026-11-06T17:34:35+09:00 결합 판정 수신과 PL-R1b 우선 보강
+
+작업한 것과 확인: 실제 결합 검토7d979761/Docs42187672682는 merge·단일 pin·bounded diagnostics와 현재 제품 불변식을 수락했다. 시험 gate의 interface 클래스는 닫혔으나 foreign pointer/range 쓰기 우회의 새 PL-R1b Low가 남았다. Root는 같은 Codex에게 시험·README3파일만 먼저 보강하고 좁은 실제 delta 검토 뒤 전체 Core를 한 번 실행하는 순서를 지시했다. B Rev9-T1은 별도로 계속하며 전체 운영 인수는 미완료다. msg_37790154ccf1에는 msg_6f62615d78a9로 실제 판정과 fix-before-Core 선택을 답했다. 다음 첫 행동/담당은 같은 Codex의 허용3파일 후보·own Docs, Root의 고정 delta 검토 배정이다. 이전 검토자는 실제 exited/released이며 새 후보 전 추가 reviewer는 시작하지 않는다.
 
 ## 2026-11-06T17:02:04+09:00 결합 최종 코드 검토와 B Rev9-T1 지시
 
