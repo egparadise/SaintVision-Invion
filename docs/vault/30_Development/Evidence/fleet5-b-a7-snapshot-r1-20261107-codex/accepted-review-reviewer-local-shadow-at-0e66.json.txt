@@ -1,0 +1,51 @@
+{
+ "producerDir": "fleet5-b-rev9g-20261107-codex",
+ "hasCallerError": true,
+ "cases": [
+  {
+   "case": "b-imported-function-scope-call-shadowed-local",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "f75f5665aad629f327e8a8df7a611bcf399e9e465aaacf70b29aa1e5b3c1c753",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "resolvedTarget": "fixtures.claude_b9f_callee.accept",
+   "pairFound": true,
+   "callerError": null,
+   "solveError": null,
+   "unresolved": [],
+   "ownedFormalsAtAccept": [
+    "slot"
+   ]
+  },
+  {
+   "case": "b-imported-function-scope-call-shadowed-local-param",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "858334a77cc3f2c1b67787880e4e6fe3a7d9fe4f6d40cc69a74df3b781b6f2ab",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "resolvedTarget": "fixtures.claude_b9f_callee.accept",
+   "pairFound": true,
+   "callerError": null,
+   "solveError": null,
+   "unresolved": [],
+   "ownedFormalsAtAccept": [
+    "slot"
+   ]
+  },
+  {
+   "case": "b-control-imported-function-scope-call-no-shadow",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "f9a78a4fe0374a598c93369a2e532b320147fc0f29112a61472165f20fffc281",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "resolvedTarget": "fixtures.claude_b9f_callee.accept",
+   "pairFound": true,
+   "callerError": null,
+   "solveError": null,
+   "unresolved": [],
+   "ownedFormalsAtAccept": [
+    "slot"
+   ]
+  }
+ ]
+}

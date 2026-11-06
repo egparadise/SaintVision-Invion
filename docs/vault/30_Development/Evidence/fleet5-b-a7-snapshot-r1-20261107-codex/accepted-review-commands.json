@@ -1,0 +1,20 @@
+{
+  "environment": "Windows 11, PowerShell + Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B (-I for probes), PYTHONUTF8=1, PYTHONHASHSEED=0 for probes, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9g-0e66-review-20261107 created from exact 0e66b5ab. Times KST. Serial only; no installs, no OS/pagefile/process/service changes. About 310 MB free memory before the probe run.",
+  "provenance": [
+    {"argv": "orca orchestration worker-show --dispatch ctx_7fb26ffb3970 --json", "result": "task_12e7a699ad90 state succeeded, stage settled, liveness exited, terminalState released"},
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9g-20261107 ; git rev-parse FETCH_HEAD ; git switch -c agent/claude/fleet5-b-rev9g-0e66-review-20261107 0e66b5ab... ; git rev-parse HEAD^", "result": "HEAD 0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148, parent 9cea33e8a087981fdedcddb71c4381bdc25c1507"},
+    {"argv": "git diff --name-status 9cea33e8 0e66b5ab", "result": "190 added (189 Evidence/fleet5-b-rev9g-20261107-codex + 1 History), 0 modified/deleted"},
+    {"argv": "git show ce713a85:<review files> ; git rev-parse ce713a85:<result json> ; git hash-object <Rev9g copies>", "result": "ce713 result 0d9c2711, driver 10d748d5, review 05f63381, commands aba802ff = Rev9g copies"},
+    {"argv": "read fleet-five-orchestration-20261105 (read-only): HEAD aaf957a2, Index 1.0.479, Codex board 1.0.440, Claude board 1.2.130, .work/b9g-source-root-verified.json (sha256 6bf4fc6d...)", "result": "read only"}
+  ],
+  "reviewerRuns": [
+    {"argv": "python -B -I reviewer_rev9g_delta_probes.py.txt <rev9g dir abs> <scratch>/ce713-result.json <scratch>/reviewer-rev9g-delta-probes-result.json", "exit": 0, "kstWindow": "2026-11-07T05:19:17..05:30:17", "log": "reviewer-rev9g-delta-probes.log.txt",
+     "cases": 34, "binderFixtures": 11, "reflectionUnits": 10, "peakWorkingSetBytes": 168812544, "run": "single run1, retained as final; first checks all 93 owner-bracketed files against the last proof-final01 after-map (0 mismatches)"},
+    {"argv": "python -B -I reviewer_rev9g_local_shadow_check.py.txt <rev9g dir abs> ; then <rev9f(9cea) dir abs>", "exit": "0 / 0", "kstWindow": "2026-11-07T05:31:18..05:31:20", "files": "reviewer-local-shadow-at-0e66.json.txt, reviewer-local-shadow-at-9cea.json.txt", "peak": "not measured"},
+    {"argv": "python -B -I reviewer_rev9g_l2_guard_attribution.py.txt <rev9g dir abs> <scratch>/reviewer-rev9g-l2-guard-attribution-result.json", "exit": 0, "kstWindow": "2026-11-07T05:32:22..05:33:52", "log": "reviewer-rev9g-l2-guard-attribution.log.txt", "peak": "not measured"},
+    {"argv": "python -B -I reviewer_rev9g_newfile_reach.py.txt <rev9g dir abs> <scratch>/reviewer-rev9g-newfile-reach-result.json", "exit": 0, "kstWindow": "2026-11-07T05:34:30..05:35:09", "peak": "not measured"},
+    {"argv": "python -B reviewer_gate_driver.py.txt 0e66b5ab... <scratch>/canonical-sync-check-before.txt <scratch> sync-only", "exit": 0, "kst": "2026-11-07T05:35:57..05:36:37", "stateSHA": "before 73939c3a6e4e7faa39a10d9273d8c52ce85d3b7d4a09f742fea8204e33ed9fff after 73939c3a6e4e7faa39a10d9273d8c52ce85d3b7d4a09f742fea8204e33ed9fff", "result": "CHECK 4581 managed, 2157 pending exports, 0 conflicts, no writes", "file": "canonical-sync-check-before.txt"}
+  ],
+  "localGates": "see local-doc-gates.txt (8 gates after authoring, own History/Evidence only)",
+  "notRun": "owner run_checks/proof/docs commands, model/terminal/recovery suites, deterministic generation, full assembler; no Obsidian apply/adopt/resolve/state write"
+}

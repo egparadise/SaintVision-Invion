@@ -1,0 +1,236 @@
+{
+  "actualRuntimeB": 0,
+  "cases": [
+    {
+      "accepted": true,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD",
+        "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+        "NODE_LOCK_AND_DB_CLOCK",
+        "NODE_EPOCH_ALWAYS",
+        "NORMAL_ONLINE_HEARTBEAT_0_15",
+        "CHANNEL_READ_SAME_CONNECTION",
+        "CHANNEL_EPOCH_ALWAYS",
+        "CHANNEL_PROOF_DATA",
+        "ASSERT_CURRENT_CHANNEL_ALWAYS",
+        "RETURN_PROOF_DATA",
+        "PROOF_DATA",
+        "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+        "EXECUTION_CONTAINMENT",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE"
+      ],
+      "expectationMet": true,
+      "expected": true,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+      },
+      "inputSHA256": {},
+      "layer": "BODY",
+      "name": "actual-body-normal-and-observation",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": null,
+      "syntaxValid": true
+    },
+    {
+      "accepted": true,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD",
+        "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+        "NODE_LOCK_AND_DB_CLOCK",
+        "NODE_EPOCH_ALWAYS",
+        "NORMAL_ONLINE_HEARTBEAT_0_15",
+        "CHANNEL_READ_SAME_CONNECTION",
+        "CHANNEL_EPOCH_ALWAYS",
+        "CHANNEL_PROOF_DATA",
+        "ASSERT_CURRENT_CHANNEL_ALWAYS",
+        "RETURN_PROOF_DATA",
+        "PROOF_DATA",
+        "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+        "EXECUTION_CONTAINMENT",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE",
+        "FROZEN_USE_SITE_SCOPE"
+      ],
+      "expectationMet": true,
+      "expected": true,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "4ff6b01e7301eb4a2d92897ea15df9ec34b8846fafe6b444e8ad99f4b30ee9b0"
+      },
+      "layer": "BODY",
+      "name": "benign-comment",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": null,
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "5cfaafb11ba30aaabb31e5155665913e79331a1b5b352c86944d1edeead87af3"
+      },
+      "layer": "BODY",
+      "name": "wrong-relative-import-module",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:A7_NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "0f3008e6dd790925e4b98619633bb3d44974d944b1bf694cc1e25d50ecf7e331"
+      },
+      "layer": "BODY",
+      "name": "wrong-import-name-alias",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:A7_NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "1f6ede0f1a84483c8eb5f4563f302b1d7925ef9477c68480b8c42add1ab0d024"
+      },
+      "layer": "BODY",
+      "name": "wrong-import-alias",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:A7_NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "c983e992dd14993e524710a0b45bf0e84288d85d502d0ecda7df7f16a81e23ef"
+      },
+      "layer": "BODY",
+      "name": "conditional-import-shadow",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "287372d971e31aadc338c922f13963937351aa29204b051ee714742c1900dc8f"
+      },
+      "layer": "BODY",
+      "name": "module-helper-rebinding",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "d7034c7b849f0330c0408e33a50aa9eddfdc7584505eab072e8e31f9b4d60f3f"
+      },
+      "layer": "BODY",
+      "name": "remove-normal-containment",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:A7_NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+      "syntaxValid": true
+    },
+    {
+      "accepted": false,
+      "checksBeforeRefusal": [
+        "NODECHANNELS_DATABASE_FIELD"
+      ],
+      "expectationMet": true,
+      "expected": false,
+      "frozenUnchangedOtherSelectedInputs": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+      },
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_channels.py": "142156e6850e163b06c121e0d8b19af632fdee25ba84e4e395271836a58c4efc"
+      },
+      "layer": "BODY",
+      "name": "containment-always-including-observation",
+      "qualification": "new body-gate/source-census counterexample only; baseline all-caller closure unresolved, no full-runtime/DB result or full causal certification claim",
+      "reason": "UNRESOLVED:A7_NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+      "syntaxValid": true
+    }
+  ],
+  "productImportedOrExecuted": false
+}

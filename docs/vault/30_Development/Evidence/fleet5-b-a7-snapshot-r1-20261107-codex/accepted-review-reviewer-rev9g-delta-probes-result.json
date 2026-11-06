@@ -1,0 +1,1475 @@
+{
+ "reviewer": "Claude independent",
+ "target": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+ "frozenRootKeys": 6,
+ "info": {
+  "finalBytes": {
+   "ownerBracketedFiles": 93,
+   "mismatchedAgainstOwnerAfterMap": [],
+   "reflection_audit.pySHA256": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c",
+   "callee_identity.pySHA256": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa",
+   "lexical_bindings.pySHA256": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc",
+   "parameter_flow.pySHA256": "b72a4e160dbc0f94b82f53ff150098a54b5fd871debcd4e59295fb437c6fa606"
+  },
+  "positive": {
+   "unionParsed": 25,
+   "unionAudited": 25,
+   "parsedEqualsAudited": true,
+   "productionParsed": 11,
+   "frozenBindingCount": 576,
+   "frozenUnresolved": 0,
+   "currentProveError": null,
+   "currentBindingCount": 576,
+   "callerBindingProofs": 13,
+   "callerBindingProofRows": [
+    {
+     "path": "services/control-plane/src/inv/app.py",
+     "span": [
+      1323,
+      24,
+      1323,
+      97
+     ],
+     "name": "configured_workspace",
+     "bindingScope": "create_configured_app",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/observer_worker.py",
+     "span": [
+      18,
+      43,
+      18,
+      76
+     ],
+     "name": "NodeObservation",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_api.py",
+     "span": [
+      98,
+      30,
+      98,
+      67
+     ],
+     "name": "NodeObservation",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_api.py",
+     "span": [
+      174,
+      20,
+      174,
+      69
+     ],
+     "name": "BoundDatabase",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_api.py",
+     "span": [
+      305,
+      20,
+      305,
+      69
+     ],
+     "name": "BoundDatabase",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_config.py",
+     "span": [
+      44,
+      13,
+      56,
+      5
+     ],
+     "name": "WorkspaceAPI",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_config.py",
+     "span": [
+      47,
+      8,
+      55,
+      9
+     ],
+     "name": "RestrictedWorkspaceRuntime",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/lan_pilot.py",
+     "span": [
+      903,
+      11,
+      903,
+      71
+     ],
+     "name": "Database",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/lan_pilot.py",
+     "span": [
+      3945,
+      15,
+      3945,
+      82
+     ],
+     "name": "ObservationWorker",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/remote_workspace_entry.py",
+     "span": [
+      63,
+      11,
+      63,
+      72
+     ],
+     "name": "Database",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/remote_workspace_entry.py",
+     "span": [
+      111,
+      16,
+      112,
+      120
+     ],
+     "name": "RestrictedWorkspaceRuntime",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/remote_workspace_entry.py",
+     "span": [
+      113,
+      24,
+      113,
+      123
+     ],
+     "name": "create_app",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    },
+    {
+     "path": "tools/remote_workspace_entry.py",
+     "span": [
+      113,
+      59,
+      113,
+      122
+     ],
+     "name": "WorkspaceAPI",
+     "bindingScope": "",
+     "mode": "EXACT_FROZEN_EVENT_MULTISET",
+     "currentEqualsFrozenMultiset": true,
+     "frozenEventCount": 1,
+     "stars": 0,
+     "reason": null
+    }
+   ],
+   "bindingCallForms": {
+    "Attribute:Name:self": 17,
+    "Name": 559
+   }
+  },
+  "ownPeakWorkingSetBytes": 168812544,
+  "peakScope": "this single reviewer process only; no aggregate or hard quota"
+ },
+ "cases": [
+  {
+   "case": "actual-72028-positive",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {},
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-near-dunder-import-level-hidden-by-starred-args",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": true,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-starred-prefix": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "b27a732d563ba16316d070bf866be00e938469d6e0adcab4c5a2a1c615359a50"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-near-importlib-dunder-import-level1",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": true,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-importlib-dunder": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "1194ca93cba6c27c33c2adb66106ecf011f2128d3802f5ed020596dcc085cd07"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L2-near-imported-callee-global-import-workspace_config",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": true,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "7f3fa416ae4dd0a456039a06331c735befe1d06de610769f5e64b92333bcb8f7"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-starred-at-slot1-level-positional-after",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-starred-prefix": {
+     "observed": "REFUSE",
+     "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "a2cda82551d16d48bea3df76460f44908b5f0bb4c22f1e90ff678ad3f63f78e9"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": "Starred before slot 4 but level also positional after it; args[4] is a literal 1 so the old code also saw it"
+  },
+  {
+   "case": "L1-starred-tail-ends-at-slot3",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-starred-prefix": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5738ea6c6155b44a9622916e92d4e8f467de09e269341332aa5295a23390cf55"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": "syntactic args end before slot 4; level hidden inside the last Starred"
+  },
+  {
+   "case": "L1-starred-name-slot0",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "8f649c12adb1e94e77c8af10e6a3254d95d11aa975bb6ae5816040d86c12b615"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-importlib-dunder-level-keyword",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-importlib-dunder": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "7a79ee9683fe42f325f723e76d33f878b9fd750f4e453fe72bbd91311003a051"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-importlib-dunder-from-alias",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-importlib-dunder": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "f9e3d21eeb24506465d5004e19027547a9beef5ee39b4b57e4a76f52d5b9ea71"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-importlib-dunder-module-alias",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-importlib-dunder": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "66385903ca1bffecf9b05b98c4053fac7470dfb63f5ae283afa918973d2af65a"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-importlib-dunder-starred-level",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "3ac6f5ebef6098c063620715deb30a213c0fe38b6b706ba9a8d1ab5dc3cb6378"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-builtins-module-dunder-starred-level",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L1-starred-prefix": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "ba3845a300c983b7aeee0b077da2dccbb5a821ef60ae5b9290d45710565b8a39"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-control-importlib-dunder-level0-literal",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5681297c289afe0646d01e51f84922c562910e0f7572a47d3ebe4756421ab333"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-control-importlib-dunder-no-level",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "577ede5eed3692429d2dff51daea9fd76007b0053fb0cea1d507308b6c5fde0e"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "absent level with no Starred: signature default 0, not a guessed Starred value"
+  },
+  {
+   "case": "L1-control-builtin-starred-after-level0",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5cb65828b702130cb496f690d4a89743c60bc53ffe2dc1501e88627195a47150"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "Starred only after the queried slot; literal 0 at slot 4"
+  },
+  {
+   "case": "L1-control-level0-positional-literal",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "02875ae5fb56d712bf751ada303e7b1f6285cbb41fc39c2e80eb7870477a0a04"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-control-level0-keyword-literal",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "633e50dbdd16c54795e74b03e933415912dc897dc72fcef067c30af1988370d3"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-outside-benign-database-helper",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": "ACCEPT",
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "85d17fdc376c1c463aa78cac207140eaaef46f0b93507b815db61641df5c49af"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-installer-RestrictedWorkspaceRuntime",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "f3420a929ac3687108077cf70b8816c682ff18cdc699a277117c4360e0019487"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "same installer for the other imported callee of configured_workspace (:47 passes database)"
+  },
+  {
+   "case": "L2-plain-module-reassignment",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "9969d615094898a411a03b2f2825715a26d6e582b60b036ca02f1afa66b03c77"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "ce713 notExercised: caller-side plain reassignment of the imported name"
+  },
+  {
+   "case": "L2-same-line-second-import",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "bc9353dd7226610580bbe90951e8bf6f2608765bc6c666ba906d67afdacb5a1d"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "second import on the frozen line: no line shift, extra import event"
+  },
+  {
+   "case": "L2-equal-count-replaced-import",
+   "observed": "INVALID_PRECONDITION",
+   "reason": "AssertionError(('L2-equal-count-replaced-import', 'ROOTS'))",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": false,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "0a9f9d174145b51e19ba03b1dea87d744167990f8e2844190a0a4219c3f2a5ca"
+   },
+   "note": "equal count, replaced import; the target no longer has a supplied signature | precondition failed: not counted as a semantic result"
+  },
+  {
+   "case": "L2-module-walrus-in-comprehension",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "c9707b41eb87f679a167b9569942d08d0808edbda1b761d404e9077286c9543b"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-global-del-in-function",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "1b0b4c9986651ad5ffae0e76fee87984f24d1696a26d176649d050eaade70ec5"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-class-body-global-import",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "ACCEPT",
+     "reason": null
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "3b3116a50b810488082602fd225fc733346fb6bcbdf0ff29e4a0b5e9e84e2fcb"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-function-scope-import-blank-line",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:result.recovery"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "859dab9726cbabb87124ff119972bc6684a3c2b1bf00a7a084d2d82f06592464"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "function-scope imported callee (SnapshotStore(database, ...) :64) rebound in its own binding scope on a blank line; no line shift"
+  },
+  {
+   "case": "L2-module-star-import-workspace_config",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {
+    "L2-caller-binding": {
+     "observed": "REFUSE",
+     "reason": "UNRESOLVED:CALLEE_REBOUND"
+    }
+   },
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "e0eb609ebf5be1ec4c7c0fc0117e6fa673d315fb7fd2de6f5ce322170ca1c0dd"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "star in the caller binding scope; ablation shows whether the older defining-file/def guard already refuses (not a new full-star proof if so)"
+  },
+  {
+   "case": "L2-control-global-declaration-alone",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI",
+   "expected": "ACCEPT",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "c323d56712e1961c687916499e0cbcc62497b5a3da2f323f33eab49a1a8f8ce7"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-nested-local-same-name",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI",
+   "expected": "ACCEPT",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "7861396d444e9138e4c32a1886d5699b11d57d3958513d17bb511fe4452c1057"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-class-body-same-name",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI",
+   "expected": "ACCEPT",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "fd72315c7fa357717ede537a90869379ae09673455a65f7eb8258090062e2762"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-comprehension-iteration-same-name",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI",
+   "expected": "ACCEPT",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "f121036d53fb459eb74d91a81d7c8c59100d607dc62b103303438451931e2ac7"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-lambda-arg-same-name",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI",
+   "expected": "ACCEPT",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "a125bed0e2f65e62a3fa6817d4a6182f7d987e571555f15a100e7b01241716ca"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-unrelated-alias",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "e210fefcc3daeca8701c8c58639335745e9348322c1c00c6818c18e87ffb8355"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-control-module-shadow-of-function-scope-import",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (full) at final 0e66 producers",
+   "exactActualCe713Input": false,
+   "actualCe713Observed": null,
+   "actualCe713Reason": null,
+   "singleChangeRevertedRuns": {},
+   "compiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "04a5257e4fef42d1144e6eaae5cded45b5086a6e450d23171fccc7b0b77a321e"
+   },
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "SnapshotStore at :64 is bound by the function-scope import at :60; a module-level foreign import of the same name does not reach it"
+  }
+ ],
+ "binderFixtures": [
+  {
+   "case": "control-cross-module-import-plain",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": true,
+   "actualCe713": {
+    "unresolved": [],
+    "ownedFormalsAt": {
+     "accept": [
+      "slot"
+     ]
+    },
+    "matchesExpectation": true
+   },
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "be5fae9a24efa55d6e7f8bf6bbf2da4ab77cc2c6220462bf3a6df26cc81a89b3",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "near-cross-module-imported-callee-star-shadow",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": true,
+   "actualCe713": {
+    "unresolved": [],
+    "ownedFormalsAt": {
+     "accept": [
+      "slot"
+     ]
+    },
+    "matchesExpectation": false
+   },
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "966e2b0cb2ea3564319da1e13106b26f7626504ead6ef6b16b40283d09178938",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "near-cross-module-imported-callee-global-import",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": true,
+   "actualCe713": {
+    "unresolved": [],
+    "ownedFormalsAt": {
+     "accept": [
+      "slot"
+     ]
+    },
+    "matchesExpectation": false
+   },
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "45b6c5d7ac571d0c7a7518b2c809db659b7b95d573b4a0cae8724df5bc8e9755",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-imported-plain-reassignment",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "e8d1733995420348a2e5c1bd8a0033428f7f393c86a89fbb166daeef5816e388",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-imported-duplicate-same-import",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "cc5918831faf4ff9d9ad85f0d01ce0fe7633c4843a805cb827e60d276a49a6b0",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": "binder-only: no frozen path, two identical imports exceed the single-import structure (conservative)"
+  },
+  {
+   "case": "b-imported-global-for-target",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "59d660cc6d8f195d47860a27935f0fe556b189880f49c5d53a18b760f8c14846",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-imported-function-scope-call-shadowed-local",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "f75f5665aad629f327e8a8df7a611bcf399e9e465aaacf70b29aa1e5b3c1c753",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [],
+   "expectedReason": null,
+   "expectedFormalOwned": false,
+   "matchesExpectation": false,
+   "note": "local binding in the call scope: the owned formal must NOT be bound to the imported def"
+  },
+  {
+   "case": "b-control-imported-global-declaration-alone",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "81d2fa8baa9f9ddf649241072b34e8fae8b79a3356ead657aeaed92f2a83404c",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-control-imported-nested-local-other-scope",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "2f1ca6b109fecb7e411f69b318cebd2141e9fb7327ab30d6b2ab6273522bf38a",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-control-imported-unrelated-alias",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "55077fc65d57969e13180ea3ec04e4235ac5310de33d18449e48e744a22619aa",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "b-info-nonlocal",
+   "mode": "BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)",
+   "exactActualCe713Input": false,
+   "actualCe713": null,
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "b5df15ea7b6ffb60b8c78a506b9ba6e6e9a6f667fb24d4418766d6348cad4eed",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "callerModes": [
+    "BINDER_ONLY_SINGLE_EXPLICIT_IMPORT_NOT_A_PROVENANCE_GRANT"
+   ],
+   "expectedReason": null,
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": "INFO only: nonlocal is outside this cut"
+  }
+ ],
+ "reflectionUnits": [
+  {
+   "case": "u-starred-level",
+   "expression": "__import__('workspace_config', *(globals(), None, (), 1))",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-starred-ends-slot3",
+   "expression": "__import__('workspace_config', globals(), None, *((), 1))",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-starred-slot1-only",
+   "expression": "__import__('json', *(globals(),))",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-starred-after-slot4",
+   "expression": "__import__('json', globals(), None, (), 0, *x)",
+   "unknown": false,
+   "reviewerWantsUnknown": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-importlib-dunder-level1",
+   "expression": "importlib.__import__('workspace_config', globals(), None, (), 1)",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-importlib-dunder-level0",
+   "expression": "importlib.__import__('json', globals(), None, (), 0)",
+   "unknown": false,
+   "reviewerWantsUnknown": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-importlib-dunder-dotted-name",
+   "expression": "importlib.__import__('.workspace_config')",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-importlib-dunder-name-variable",
+   "expression": "importlib.__import__(x)",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-import_module-starred-package",
+   "expression": "importlib.import_module('.workspace_config', *('inv',))",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "u-import_module-absolute-plain",
+   "expression": "importlib.import_module('json')",
+   "unknown": false,
+   "reviewerWantsUnknown": false,
+   "matchesExpectation": true
+  }
+ ],
+ "mismatches": [
+  "L2-equal-count-replaced-import",
+  "L2-control-global-declaration-alone",
+  "L2-control-nested-local-same-name",
+  "L2-control-class-body-same-name",
+  "L2-control-comprehension-iteration-same-name",
+  "L2-control-lambda-arg-same-name",
+  "b-imported-function-scope-call-shadowed-local"
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "productFilesWritten": 0
+}

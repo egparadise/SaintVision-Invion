@@ -1,0 +1,2 @@
+CHECK: 4668 managed files, 2244 pending exports, 0 conflicts. No writes.
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\sync_obsidian.py", "peakWorkingSetBytes": 108789760, "elapsedSeconds": 43.396, "OSMemoryLimitEnforced": false, "serial": true}}

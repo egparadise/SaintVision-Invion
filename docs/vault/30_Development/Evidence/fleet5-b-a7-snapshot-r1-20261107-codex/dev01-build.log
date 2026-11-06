@@ -1,0 +1,2 @@
+{"status": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING", "bodyAccepted": true, "bodyReason": null, "constructors": 10, "snapshots": 10, "callerObligations": 16, "actualRuntimeB": 0}
+{"ownerResourceMeasurement": {"target": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/a7_build.py", "peakWorkingSetBytes": 78680064, "elapsedSeconds": 30.265, "OSMemoryLimitEnforced": false, "serial": true}}

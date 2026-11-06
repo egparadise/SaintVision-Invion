@@ -1,0 +1,4 @@
+Scanning 94 frontend production source files under apps/web/src ...
+
+PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+{"ownerResourceMeasurement": {"target": "tools/check_frontend_integrity.py", "peakWorkingSetBytes": 24059904, "elapsedSeconds": 1.162, "OSMemoryLimitEnforced": false, "serial": true}}

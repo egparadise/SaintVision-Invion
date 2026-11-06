@@ -1,0 +1,693 @@
+{
+ "reviewer": "Claude independent",
+ "target": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+ "guardLevel": [
+  {
+   "overlay": "frozen-72028",
+   "sourceSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-near-imported-callee-global-import-workspace_config (exact ce713)",
+   "sourceSHA256": "7f3fa416ae4dd0a456039a06331c735befe1d06de610769f5e64b92333bcb8f7",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-installer-RestrictedWorkspaceRuntime",
+   "sourceSHA256": "f3420a929ac3687108077cf70b8816c682ff18cdc699a277117c4360e0019487",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-plain-module-reassignment",
+   "sourceSHA256": "9969d615094898a411a03b2f2825715a26d6e582b60b036ca02f1afa66b03c77",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-same-line-second-import",
+   "sourceSHA256": "bc9353dd7226610580bbe90951e8bf6f2608765bc6c666ba906d67afdacb5a1d",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-equal-count-replaced-import (invalid full input: roots)",
+   "sourceSHA256": "0a9f9d174145b51e19ba03b1dea87d744167990f8e2844190a0a4219c3f2a5ca",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-module-walrus-in-comprehension",
+   "sourceSHA256": "c9707b41eb87f679a167b9569942d08d0808edbda1b761d404e9077286c9543b",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-global-del-in-function",
+   "sourceSHA256": "1b0b4c9986651ad5ffae0e76fee87984f24d1696a26d176649d050eaade70ec5",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-class-body-global-import",
+   "sourceSHA256": "3b3116a50b810488082602fd225fc733346fb6bcbdf0ff29e4a0b5e9e84e2fcb",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-function-scope-import-blank-line",
+   "sourceSHA256": "859dab9726cbabb87124ff119972bc6684a3c2b1bf00a7a084d2d82f06592464",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 2,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-function-scope-equal-count-replaced-import",
+   "sourceSHA256": "ce707d7475e2c870fc02da07e230b4fff4e3c955a803003e10dfe1c91edab6a7",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-module-star-import-workspace_config",
+   "sourceSHA256": "e0eb609ebf5be1ec4c7c0fc0117e6fa673d315fb7fd2de6f5ce322170ca1c0dd",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 1
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 1
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-global-declaration-alone",
+   "sourceSHA256": "c323d56712e1961c687916499e0cbcc62497b5a3da2f323f33eab49a1a8f8ce7",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-nested-local-same-name",
+   "sourceSHA256": "7861396d444e9138e4c32a1886d5699b11d57d3958513d17bb511fe4452c1057",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-class-body-same-name",
+   "sourceSHA256": "fd72315c7fa357717ede537a90869379ae09673455a65f7eb8258090062e2762",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-comprehension-iteration-same-name",
+   "sourceSHA256": "f121036d53fb459eb74d91a81d7c8c59100d607dc62b103303438451931e2ac7",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-lambda-arg-same-name",
+   "sourceSHA256": "a125bed0e2f65e62a3fa6817d4a6182f7d987e571555f15a100e7b01241716ca",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-unrelated-alias",
+   "sourceSHA256": "e210fefcc3daeca8701c8c58639335745e9348322c1c00c6818c18e87ffb8355",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-control-module-shadow-of-function-scope-import",
+   "sourceSHA256": "04a5257e4fef42d1144e6eaae5cded45b5086a6e450d23171fccc7b0b77a321e",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-local-shadow-in-frozen-function-same-line",
+   "sourceSHA256": "72fd6f7beb20762dedf592936a83cf8562bf191f1cfd5a47000104023f7a116f",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  },
+  {
+   "overlay": "L2-local-shadow-in-new-function",
+   "sourceSHA256": "76f51b1084de7a059e8ed8cca2b1ea541e3c88288086ab8365c61076e17c34f6",
+   "sites": {
+    "44:WorkspaceAPI": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "47:RestrictedWorkspaceRuntime": {
+     "reason": null,
+     "bindingScope": "",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "64:SnapshotStore": {
+     "reason": null,
+     "bindingScope": "configured_workspace",
+     "frozenBindingScope": "configured_workspace",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    },
+    "100:WorkspaceAPI": {
+     "reason": "UNRESOLVED:CALLEE_REBOUND",
+     "bindingScope": "_claude_use",
+     "frozenBindingScope": "",
+     "currentEvents": 1,
+     "frozenEvents": 1,
+     "stars": 0
+    }
+   }
+  }
+ ],
+ "fullFollowUps": [
+  {
+   "case": "L2-function-scope-equal-count-replaced-import",
+   "sourceSHA256": "ce707d7475e2c870fc02da07e230b4fff4e3c955a803003e10dfe1c91edab6a7",
+   "witnessesChecked": 15,
+   "sixFrozenRootsPreserved": true,
+   "newUnboundNames": [],
+   "final": {
+    "observed": "REFUSE",
+    "reason": "UNRESOLVED:CALLEE_REBOUND"
+   },
+   "caller_error-reverted": {
+    "observed": "REFUSE",
+    "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:result.recovery"
+   }
+  },
+  {
+   "case": "L2-control-global-declaration-alone",
+   "sourceSHA256": "c323d56712e1961c687916499e0cbcc62497b5a3da2f323f33eab49a1a8f8ce7",
+   "witnessesChecked": 15,
+   "sixFrozenRootsPreserved": true,
+   "newUnboundNames": [],
+   "final": {
+    "observed": "REFUSE",
+    "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"
+   },
+   "caller_error-reverted": {
+    "observed": "REFUSE",
+    "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"
+   }
+  },
+  {
+   "case": "L2-new-production-file-local-shadow (world overlay)",
+   "path": "services/control-plane/src/inv/claude_new_caller.py",
+   "sourceSHA256": "3ecf783f7f79d45475def4384570d63a0a36e74a30b11958ae37eba39675ba01",
+   "frozenBaselineExists": false,
+   "callerErrorAtNewCall": null,
+   "final": {
+    "observed": "ACCEPT",
+    "reason": null
+   },
+   "caller_error-reverted": {
+    "observed": "ACCEPT",
+    "reason": null
+   }
+  }
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "productFilesWritten": 0
+}

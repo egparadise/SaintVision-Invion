@@ -1,0 +1,280 @@
+"""Claude independent Rev9g narrow delta probes (B9f-L1/L2). Parse-only fixtures.
+
+Usage: python -B -I reviewer_rev9g_delta_probes.py <rev9g evidence dir (absolute)> <actual ce713 result json (absolute)> <out.json>
+Imports the FINAL Rev9g OWNER analysis producers from <evidence dir> (static AST code only) and feeds in-memory
+source overlays over frozen git 72028. No product file is written and no mutant source is imported or executed
+(ast.parse/compile only). Before every full-provenance verdict the mutant is checked: compiles, no new unbound
+names versus the frozen file, all 15 closure witness spans/hashes resolve, six frozen roots preserved.
+Causal attribution: selected cases are re-run with ONE declared Rev9g change reverted in this reviewer process
+(reflection_audit.supplied Starred-prefix line / IMPORTERS={builtins.__import__} / callee_identity.caller_error
+-> None). The reverted functions are copies of the exact 9cea33e8 text. Expected values are reviewer expectations.
+"""
+import ast, builtins, hashlib, json, sys
+from collections import Counter
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); PRIOR = Path(sys.argv[2]).resolve(strict=True); OUT = Path(sys.argv[3]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb
+import forwarding_discovery as fd, parameter_flow as pf, reflection_audit as ra, callee_identity as ci, lexical_bindings as lb
+for m in (t, cg, sb, fd, pf, ra, ci, lb):
+    assert Path(m.__file__).resolve().parent == E, m.__file__
+
+proof = json.loads((E / 'proof-final01.json').read_bytes()); last = proof['commands'][-1]
+after = last.get('producerHashesAfter') or {}
+byte_mismatch = sorted(k for k, v in after.items() if hashlib.sha256((E / k).read_bytes()).hexdigest() != v)
+FINAL = {'ownerBracketedFiles': len(after), 'mismatchedAgainstOwnerAfterMap': byte_mismatch,
+         **{n + 'SHA256': hashlib.sha256((E / n).read_bytes()).hexdigest() for n in ('reflection_audit.py', 'callee_identity.py', 'lexical_bindings.py', 'parameter_flow.py')}}
+print(json.dumps({'finalBytes': FINAL}), flush=True)
+assert after and not byte_mismatch, FINAL
+
+priorj = json.loads(PRIOR.read_bytes())
+prior = {r['case']: r for r in priorj['cases']}; prior_binder = {r['case']: r for r in priorj['binderFixtures']}
+CP = t.CP; LP = 'tools/lan_pilot.py'; WA = CP + 'workspace_api.py'; WC = CP + 'workspace_config.py'; BA = CP + 'business_auth.py'
+core = t.read_batch([CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+S = {**core, **ctors}
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())
+A8 = closure['narrowA8Proof']; g = A8['completeConstructorGraph']
+W = [r['source'] for r in g['productionConstructorProofs']] + [r['source'] for r in g['localHelperProofs']] + \
+    [{'path': r['path'], 'span': r['span'], 'expressionSHA256': r['expressionSHA256']} for r in A8['productionDatabaseConstructors']]
+FROZEN_ROOTS = cg.frozen_root_keys()
+assert sum(FROZEN_ROOTS.values()) == 6 and len(FROZEN_ROOTS) == 6, FROZEN_ROOTS
+R = []; INFO = {'finalBytes': FINAL}
+
+# ---- exact 9cea33e8 text of the two reverted pieces (for ablation only)
+def supplied_9cea(call, index, name, required=False):
+    values = ([call.args[index]] if len(call.args) > index else []) + [k.value for k in call.keywords if k.arg == name]
+    if any(k.arg is None for k in call.keywords): values.append(None)
+    return [None] if len(values) > 1 else values or ([None] if required else [])
+ORIG = {'supplied': ra.supplied, 'IMPORTERS': ra.IMPORTERS, 'caller_error': ci.caller_error}
+def ablate(which):
+    ra.supplied, ra.IMPORTERS, ci.caller_error = ORIG['supplied'], ORIG['IMPORTERS'], ORIG['caller_error']
+    if which == 'L1-starred-prefix': ra.supplied = supplied_9cea
+    elif which == 'L1-importlib-dunder': ra.IMPORTERS = {'builtins.__import__'}
+    elif which == 'L2-caller-binding': ci.caller_error = lambda f, call: None
+    else: assert which is None, which
+    ra.frozen_hits.cache_clear()
+
+def unbound(source):
+    tr = ast.parse(source); bound = set(dir(builtins))
+    for n in ast.walk(tr):
+        if isinstance(n, (ast.Import, ast.ImportFrom)): bound.update((a.asname or a.name).split('.')[0] for a in n.names)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): bound.add(n.name)
+        elif isinstance(n, ast.arg): bound.add(n.arg)
+        elif isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)): bound.add(n.id)
+        elif isinstance(n, ast.ExceptHandler) and n.name: bound.add(n.name)
+        elif isinstance(n, (ast.MatchAs, ast.MatchStar)) and n.name: bound.add(n.name)
+        elif isinstance(n, ast.MatchMapping) and n.rest: bound.add(n.rest)
+    return {n.id for n in ast.walk(tr) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load) and n.id not in bound}
+
+def witnesses(sources):
+    checked = 0
+    for w in W:
+        src = sources.get(w['path']) or sb.frozen_source(w['path']); tree = ast.parse(src)
+        node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == w['span']), None)
+        assert node is not None and sb.sha(ast.get_source_segment(src, node)) == w['expressionSHA256'], ('WITNESS', w)
+        checked += 1
+    return checked
+
+def must_replace(src, old, new):
+    assert src.count(old) == 1, ('ANCHOR', old[:80], src.count(old)); return src.replace(old, new, 1)
+
+def roots_preserved(universe):
+    census = cg.current_census(universe); facts = {p: sb.Facts(p, s) for p, s in universe.items() if p in S}
+    keys = Counter(cg.root_key(r, facts[r['source']['path']]) for r in census['production'] if r['source']['path'] in facts)
+    return census, not (FROZEN_ROOTS - keys)
+
+def run(name, changes=None, world=None, expect=None, note=None, exact_ce713=False, ablations=()):
+    changes = changes or {}; world = world or {}
+    changed = {**S, **changes}
+    mutated = {p: sb.sha(s) for p, s in sorted({**changes, **world}.items())}
+    old = prior.get(name)
+    try:
+        for p, s in {**changes, **world}.items():
+            compile(s, p, 'exec')
+            assert s.count('\n') >= sb.frozen_source(p).count('\n'), (name, 'LINE_LOSS', p)
+            nb = sorted(unbound(s) - unbound(sb.frozen_source(p))); assert not nb, (name, nb)
+        if exact_ce713:
+            assert old and old['observed'] == 'ACCEPT' and old['mutatedSHA256'] == mutated, (name, 'NOT_EXACT_CE713_INPUT')
+        checked = witnesses({**world, **changed}); assert checked == 15, checked
+        universe = {**world, **changed}
+        census, preserved = roots_preserved(universe); assert preserved, (name, 'ROOTS')
+    except AssertionError as e:
+        if exact_ce713: raise
+        row = {'case': name, 'observed': 'INVALID_PRECONDITION', 'reason': repr(e)[:400], 'expected': expect, 'matchesExpectation': False,
+               'mutatedSHA256': mutated, 'note': (note or '') + ' | precondition failed: not counted as a semantic result'}
+        R.append(row); print(json.dumps({'case': name, 'observed': row['observed'], 'reason': row['reason']}), flush=True)
+        return row
+    def once():
+        out, err = t.provenance({p: changed[p] for p in core}, {p: changed[p] for p in ctors}, universe_overrides=world or None)
+        return err
+    ablate(None); err = once()
+    disc, derr = fd.discover(census['production'], universe)
+    audits = {a['path']: [h['kind'] for h in a['newRelevantHits']] for a in census['reflectionAudits'] + (disc['reflectionAudits'] if disc else [])}
+    abl = {}
+    for a in ablations:
+        ablate(a); e2 = once(); abl[a] = {'observed': 'ACCEPT' if e2 is None else 'REFUSE', 'reason': e2}
+    ablate(None)
+    observed = 'ACCEPT' if err is None else 'REFUSE'
+    row = {'case': name, 'observed': observed, 'reason': err, 'expected': expect,
+           'matchesExpectation': expect is None or observed == expect.split(':', 1)[0] and (':' not in expect or (err or '').startswith(expect.split(':', 1)[1])),
+           'mode': 't1_provenance.provenance (full) at final 0e66 producers', 'exactActualCe713Input': exact_ce713,
+           'actualCe713Observed': old['observed'] if old else None, 'actualCe713Reason': old['reason'] if old else None,
+           'singleChangeRevertedRuns': abl,
+           'compiledOnly': True, 'newUnboundNames': [], 'witnessesChecked': checked,
+           'mutatedSHA256': mutated, 'sixFrozenRootsPreserved': preserved, 'discoveryError': derr,
+           'newRelevantReflectionHitsByPath': {p: k for p, k in sorted(audits.items()) if k}, 'note': note}
+    R.append(row); print(json.dumps({'case': name, 'observed': observed, 'reason': err, 'expected': expect, 'ablations': abl}), flush=True)
+    return row
+
+TAILF = '\n\n\ndef _claude_root(tenant, settings):\n    return '
+BAF = sb.frozen_source(BA); WCF = S[WC]
+REL = 'REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:' + BA
+def ba_tail(expr, pre=''): return {BA: BAF + '\n' + pre + TAILF + expr + '.configured_workspace(object(), tenant, settings)\n'}
+
+# ---------------- 0. actual 72028 positive at FINAL producers + inventory + caller proofs
+run('actual-72028-positive', expect='ACCEPT')
+census0 = cg.current_census(S); disc0, _ = fd.discover(census0['production'], S)
+parsed = sorted({x['path'] for x in census0['sourceFiles']} | {x['path'] for x in disc0['sourceFiles']})
+audited = sorted({x['path'] for x in census0['reflectionAudits']} | {x['path'] for x in disc0['reflectionAudits']})
+pd = pf.default_frozen(); cur, cur_err = pf.prove(S, pd['ownerFactorySymbols'])
+cps = cur['callerBindingProofs'] if cur else []
+INFO['positive'] = {'unionParsed': len(parsed), 'unionAudited': len(audited), 'parsedEqualsAudited': parsed == audited,
+                    'productionParsed': len([p for p in parsed if not p.startswith('tests/')]),
+                    'frozenBindingCount': len(pd['bindings']), 'frozenUnresolved': len(pd['unresolved']), 'currentProveError': cur_err,
+                    'currentBindingCount': len(cur['bindings']) if cur else None,
+                    'callerBindingProofs': len(cps),
+                    'callerBindingProofRows': [{'path': c['path'], 'span': c['source']['span'], 'name': c['name'], 'bindingScope': c['bindingScope'], 'mode': c['mode'],
+                                                'currentEqualsFrozenMultiset': c['currentMultiset'] == c['frozenMultiset'], 'frozenEventCount': sum(x['count'] for x in c['frozenMultiset']),
+                                                'stars': len(c['currentStars']), 'reason': c['reason']} for c in cps]}
+# call-form inventory of the current 576 bindings: Name callee vs Attribute callee and the Attribute base
+forms = Counter()
+for b in (cur['bindings'] if cur else []):
+    src = S.get(b['source']['path']) or sb.frozen_source(b['source']['path']); tree = ast.parse(src); sp = b['source']['span']
+    call = next(n for n in ast.walk(tree) if isinstance(n, ast.Call) and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == sp)
+    f = call.func
+    if isinstance(f, ast.Name): forms['Name'] += 1
+    else:
+        base = f
+        while isinstance(base, ast.Attribute): base = base.value
+        forms['Attribute:' + (type(base).__name__ + ':' + (base.id if isinstance(base, ast.Name) else ''))] += 1
+INFO['positive']['bindingCallForms'] = dict(sorted(forms.items()))
+print(json.dumps(INFO['positive'])[:3000], flush=True)
+
+# ---------------- 1. the THREE exact actual ce713 full counterexamples, with single-change reverted runs
+run('L1-near-dunder-import-level-hidden-by-starred-args', world=ba_tail("__import__('workspace_config', *(globals(), None, (), 1))"),
+    expect=REL, exact_ce713=True, ablations=('L1-starred-prefix',))
+run('L1-near-importlib-dunder-import-level1', world=ba_tail("importlib.__import__('workspace_config', globals(), None, (), 1)", "import importlib\n"),
+    expect=REL, exact_ce713=True, ablations=('L1-importlib-dunder',))
+INST = '\n\ndef _claude_install():\n    global WorkspaceAPI\n    from foreign_module import WorkspaceAPI\n\n\n_claude_install()\n'
+run('L2-near-imported-callee-global-import-workspace_config', {WC: WCF + INST}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', exact_ce713=True, ablations=('L2-caller-binding',))
+
+# ---------------- 2. L1 near variants inside the declared category (positional Starred prefix / importlib.__import__ canonical)
+run('L1-starred-at-slot1-level-positional-after', world=ba_tail("__import__('workspace_config', *(globals(),), None, (), 1)"), expect=REL, ablations=('L1-starred-prefix',),
+    note='Starred before slot 4 but level also positional after it; args[4] is a literal 1 so the old code also saw it')
+run('L1-starred-tail-ends-at-slot3', world=ba_tail("__import__('workspace_config', globals(), None, *((), 1))"), expect=REL, ablations=('L1-starred-prefix',),
+    note='syntactic args end before slot 4; level hidden inside the last Starred')
+run('L1-starred-name-slot0', world=ba_tail("__import__(*('workspace_config', globals(), None, (), 1))"), expect=REL)
+run('L1-importlib-dunder-level-keyword', world=ba_tail("importlib.__import__('workspace_config', globals(), None, (), level=1)", "import importlib\n"), expect=REL, ablations=('L1-importlib-dunder',))
+run('L1-importlib-dunder-from-alias', world=ba_tail("_claude_imp('workspace_config', globals(), None, (), 1)", "from importlib import __import__ as _claude_imp\n"), expect=REL, ablations=('L1-importlib-dunder',))
+run('L1-importlib-dunder-module-alias', world=ba_tail("_claude_il.__import__('workspace_config', globals(), None, (), 1)", "import importlib as _claude_il\n"), expect=REL, ablations=('L1-importlib-dunder',))
+run('L1-importlib-dunder-starred-level', world=ba_tail("importlib.__import__('workspace_config', *(globals(), None, (), 1))", "import importlib\n"), expect=REL)
+run('L1-builtins-module-dunder-starred-level', world=ba_tail("builtins.__import__('workspace_config', *(globals(), None, (), 1))", "import builtins\n"), expect=REL, ablations=('L1-starred-prefix',))
+# controls
+run('L1-control-importlib-dunder-level0-literal', world={BA: BAF + "\nimport importlib\n\n\ndef _claude_json():\n    return importlib.__import__('json', globals(), None, (), 0)\n"}, expect='ACCEPT')
+run('L1-control-importlib-dunder-no-level', world={BA: BAF + "\nimport importlib\n\n\ndef _claude_json():\n    return importlib.__import__('json')\n"}, expect='ACCEPT', note='absent level with no Starred: signature default 0, not a guessed Starred value')
+run('L1-control-builtin-starred-after-level0', world={BA: BAF + "\n\n\ndef _claude_json(rest):\n    return __import__('json', globals(), None, (), 0, *rest)\n"}, expect='ACCEPT', note='Starred only after the queried slot; literal 0 at slot 4')
+run('L1-control-level0-positional-literal', world={BA: BAF + "\n\n\ndef _claude_json():\n    return __import__('json', globals(), None, (), 0)\n"}, expect='ACCEPT')
+run('L1-control-level0-keyword-literal', world={BA: BAF + "\n\n\ndef _claude_json():\n    return __import__('json', level=0)\n"}, expect='ACCEPT')
+run('control-outside-benign-database-helper', world={BA: BAF + "\nfrom .db import Database\n\n\ndef _claude_db(dsn):\n    return Database(dsn)\n"}, expect='ACCEPT')
+
+# ---------------- 3. L2 near variants inside the declared category (caller binding scope of an imported callee name)
+run('L2-installer-RestrictedWorkspaceRuntime', {WC: WCF + INST.replace('WorkspaceAPI', 'RestrictedWorkspaceRuntime')}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='same installer for the other imported callee of configured_workspace (:47 passes database)')
+run('L2-plain-module-reassignment', {WC: WCF + '\nfrom foreign_module import wrap as _claude_wrap\nWorkspaceAPI = _claude_wrap(WorkspaceAPI)\n'}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='ce713 notExercised: caller-side plain reassignment of the imported name')
+L9 = 'from .workspace_api import RestrictedWorkspaceRuntime, WorkspaceAPI\n'
+run('L2-same-line-second-import', {WC: must_replace(WCF, L9, L9[:-1] + '; from foreign_module import WorkspaceAPI\n')}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='second import on the frozen line: no line shift, extra import event')
+run('L2-equal-count-replaced-import', {WC: must_replace(WCF, L9, 'from foreign_module import RestrictedWorkspaceRuntime, WorkspaceAPI\n')}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='equal count, replaced import; the target no longer has a supplied signature')
+run('L2-module-walrus-in-comprehension', {WC: WCF + '\nfrom foreign_module import wrap as _claude_wrap\n_claude_w = [(WorkspaceAPI := _claude_wrap(x)) for x in (WorkspaceAPI,)]\n'}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',))
+run('L2-global-del-in-function', {WC: WCF + '\n\ndef _claude_drop():\n    global WorkspaceAPI\n    del WorkspaceAPI\n'}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',))
+run('L2-class-body-global-import', {WC: WCF + '\n\nclass _ClaudeBox:\n    global WorkspaceAPI\n    from foreign_module import WorkspaceAPI\n'}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',))
+L62 = '        from .workspace_recovery import WorkspaceRecovery\n\n        result.recovery'
+run('L2-function-scope-import-blank-line', {WC: must_replace(WCF, L62, '        from .workspace_recovery import WorkspaceRecovery\n        from foreign_module import SnapshotStore\n        result.recovery')}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='function-scope imported callee (SnapshotStore(database, ...) :64) rebound in its own binding scope on a blank line; no line shift')
+run('L2-module-star-import-workspace_config', {WC: WCF + '\nfrom foreign_module import *\n'}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND', ablations=('L2-caller-binding',),
+    note='star in the caller binding scope; ablation shows whether the older defining-file/def guard already refuses (not a new full-star proof if so)')
+# benign controls
+run('L2-control-global-declaration-alone', {WC: WCF + '\n\ndef _claude_g():\n    global WorkspaceAPI\n    return WorkspaceAPI\n'}, expect='ACCEPT')
+run('L2-control-nested-local-same-name', {WC: WCF + '\n\ndef _claude_n():\n    WorkspaceAPI = 1\n    return WorkspaceAPI\n'}, expect='ACCEPT')
+run('L2-control-class-body-same-name', {WC: WCF + '\n\nclass _ClaudeBox:\n    WorkspaceAPI = None\n'}, expect='ACCEPT')
+run('L2-control-comprehension-iteration-same-name', {WC: WCF + '\n_claude_x = [WorkspaceAPI for WorkspaceAPI in ()]\n'}, expect='ACCEPT')
+run('L2-control-lambda-arg-same-name', {WC: WCF + '\n_claude_l = lambda WorkspaceAPI: WorkspaceAPI\n'}, expect='ACCEPT')
+run('L2-control-unrelated-alias', {WC: WCF + '\nfrom foreign_module import helper as _claude_helper\n'}, expect='ACCEPT')
+run('L2-control-module-shadow-of-function-scope-import', {WC: WCF + '\nfrom foreign_module import SnapshotStore\n'}, expect='ACCEPT',
+    note='SnapshotStore at :64 is bound by the function-scope import at :60; a module-level foreign import of the same name does not reach it')
+
+# ---------------- 4. binder-only replay (exact ce713 fixture inputs) + own binder near variants
+P = 'fixtures/claude_b9f_binder.py'; PA = 'fixtures/claude_b9f_callee.py'
+PRE = 'from inv.workspace_api import WorkspaceAPI as Owner\nfrom foreign_module import receive\nheld = Owner(None, None, None)\n'
+DEF = 'def accept(slot):\n    return None\n'
+B = []
+def binder(name, sources, q_path, q, formal, want_reason, want_owned, note=None, exact_ce713=False):
+    for p, s in sources.items(): compile(s, p, 'exec')
+    shas = {p: sb.sha(s) for p, s in sorted(sources.items())}
+    if exact_ce713: assert prior_binder[name]['sourceSHA256'] == shas, (name, 'NOT_EXACT_CE713_BINDER_INPUT')
+    data, error = pf.solve(sources)
+    owned = sorted(data['parameters'].get(q_path, {}).get(q, [])) if data else None
+    reasons = [x['reason'] for x in (data or {}).get('unresolved', [])]
+    ok_reason = (want_reason in reasons) if want_reason else (error is None and not reasons)
+    ok_owned = want_owned is None or (formal in (owned or [])) is want_owned
+    row = {'case': name, 'mode': 'BINDER_ONLY parameter_flow.solve (no frozen path; not full provenance)', 'exactActualCe713Input': exact_ce713,
+           'actualCe713': ({k: prior_binder[name][k] for k in ('unresolved', 'ownedFormalsAt', 'matchesExpectation')} if name in prior_binder else None),
+           'sourceSHA256': shas, 'error': error, 'unresolved': reasons, 'ownedFormalsAt': {q: owned},
+           'callerModes': sorted({c['mode'] for c in (data or {}).get('callerBindingProofs', [])}),
+           'expectedReason': want_reason, 'expectedFormalOwned': want_owned, 'matchesExpectation': ok_reason and ok_owned, 'note': note}
+    B.append(row); print(json.dumps({k: row[k] for k in ('case', 'error', 'unresolved', 'ownedFormalsAt', 'matchesExpectation')}), flush=True)
+one = lambda body: {P: PRE + body}
+binder('control-cross-module-import-plain', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\naccept(held)\n'}, PA, 'accept', 'slot', None, True, exact_ce713=True)
+binder('near-cross-module-imported-callee-star-shadow', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\nfrom foreign_module import *\naccept(held)\n'}, PA, 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None, exact_ce713=True)
+binder('near-cross-module-imported-callee-global-import', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\ndef alter():\n    global accept\n    from foreign_module import accept\nalter()\naccept(held)\n'}, PA, 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None, exact_ce713=True)
+binder('b-imported-plain-reassignment', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\naccept = receive(accept)\naccept(held)\n'}, PA, 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None)
+binder('b-imported-duplicate-same-import', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\nfrom fixtures.claude_b9f_callee import accept\naccept(held)\n'}, PA, 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None, 'binder-only: no frozen path, two identical imports exceed the single-import structure (conservative)')
+binder('b-imported-global-for-target', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\ndef alter():\n    global accept\n    for accept in (receive,):\n        pass\nalter()\naccept(held)\n'}, PA, 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None)
+binder('b-imported-function-scope-call-shadowed-local', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\ndef use():\n    accept = receive\n    return accept(held)\n'}, PA, 'accept', 'slot', None, False, 'local binding in the call scope: the owned formal must NOT be bound to the imported def')
+binder('b-control-imported-global-declaration-alone', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\ndef look():\n    global accept\n    return accept\naccept(held)\n'}, PA, 'accept', 'slot', None, True)
+binder('b-control-imported-nested-local-other-scope', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\ndef other():\n    accept = 1\n    return accept\naccept(held)\n'}, PA, 'accept', 'slot', None, True)
+binder('b-control-imported-unrelated-alias', {PA: DEF, P: PRE + 'from fixtures.claude_b9f_callee import accept\nfrom foreign_module import helper as accept_helper\naccept(held)\n'}, PA, 'accept', 'slot', None, True)
+binder('b-info-nonlocal', one('def outer():\n    from fixtures.claude_b9f_callee import accept\n    def alter():\n        nonlocal accept\n        accept = receive\n    alter()\n    return accept(held)\n') | {PA: DEF}, PA, 'accept', 'slot', None, None, 'INFO only: nonlocal is outside this cut')
+
+# ---------------- 5. direct reflection_audit unit checks (AST only)
+U = []
+for name, expr, want in [('u-starred-level', "__import__('workspace_config', *(globals(), None, (), 1))", True),
+                         ('u-starred-ends-slot3', "__import__('workspace_config', globals(), None, *((), 1))", True),
+                         ('u-starred-slot1-only', "__import__('json', *(globals(),))", True),
+                         ('u-starred-after-slot4', "__import__('json', globals(), None, (), 0, *x)", False),
+                         ('u-importlib-dunder-level1', "importlib.__import__('workspace_config', globals(), None, (), 1)", True),
+                         ('u-importlib-dunder-level0', "importlib.__import__('json', globals(), None, (), 0)", False),
+                         ('u-importlib-dunder-dotted-name', "importlib.__import__('.workspace_config')", True),
+                         ('u-importlib-dunder-name-variable', "importlib.__import__(x)", True),
+                         ('u-import_module-starred-package', "importlib.import_module('.workspace_config', *('inv',))", True),
+                         ('u-import_module-absolute-plain', "importlib.import_module('json')", False)]:
+    src = 'import importlib\nx = ()\n' + expr + '\n'; compile(src, P, 'exec')
+    ablate(None); hits = ra.hits(sb.Facts(P, src)); unk = any(h['kind'] == 'ENUMERATED_REFLECTION_NONLITERAL_KEY' for h in hits)
+    U.append({'case': name, 'expression': expr, 'unknown': unk, 'reviewerWantsUnknown': want, 'matchesExpectation': unk is want})
+    print(json.dumps(U[-1]), flush=True)
+
+def own_peak():
+    import ctypes
+    from ctypes import wintypes
+    class M(ctypes.Structure):
+        _fields_ = [('cb', wintypes.DWORD), ('PageFaultCount', wintypes.DWORD)] + [(n, ctypes.c_size_t) for n in ('PeakWorkingSetSize', 'WorkingSetSize', 'QPPP', 'QPP', 'QPNP', 'QNP', 'PagefileUsage', 'PeakPagefileUsage')]
+    k = ctypes.WinDLL('kernel32'); k.GetCurrentProcess.restype = wintypes.HANDLE
+    ps = ctypes.WinDLL('psapi'); ps.GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(M), wintypes.DWORD]
+    m = M(); m.cb = ctypes.sizeof(m)
+    return m.PeakWorkingSetSize if ps.GetProcessMemoryInfo(k.GetCurrentProcess(), ctypes.byref(m), m.cb) else None
+INFO['ownPeakWorkingSetBytes'] = own_peak(); INFO['peakScope'] = 'this single reviewer process only; no aggregate or hard quota'
+d = {'reviewer': 'Claude independent', 'target': '0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148', 'frozenRootKeys': len(FROZEN_ROOTS), 'info': INFO, 'cases': R, 'binderFixtures': B, 'reflectionUnits': U,
+     'mismatches': [x['case'] for x in R if not x['matchesExpectation']] + [x['case'] for x in B if not x['matchesExpectation']] + [x['case'] for x in U if not x['matchesExpectation']],
+     'effectfulMutantsImportedOrExecuted': False, 'productFilesWritten': 0}
+OUT.write_bytes((json.dumps(d, indent=1, default=str) + '\n').encode()); print(json.dumps({'cases': len(R), 'binder': len(B), 'units': len(U), 'mismatches': d['mismatches']}))

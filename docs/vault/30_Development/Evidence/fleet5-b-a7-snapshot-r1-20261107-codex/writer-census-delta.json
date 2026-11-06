@@ -1,0 +1,53 @@
+{
+  "scope": "All recorded DB writers, incremental A6 closure; no full graph rebuild",
+  "oldWriterLedger": {
+    "file": "writers.jsonl",
+    "rows": 387,
+    "bytes": 2343892,
+    "sha256": "e1be3bbb8cdc35bcb2ed998a8f5b15f1ab572fcc57c74d71eeb225fd466f750b"
+  },
+  "priorWriterRows": 387,
+  "allRecordedDeleteMergeOccurrences": 2,
+  "additionalWriters": [
+    {
+      "function": "remove_member",
+      "line": 168,
+      "column": 4,
+      "endLine": 168,
+      "endColumn": 26,
+      "expression": "session.delete(member)",
+      "expressionSHA256": "3969b23c903027138b44cee90d1848fda35f54628360f1efdf1b7a23c9d6f498",
+      "table": "public.resource_pool_members",
+      "verb": "DELETE",
+      "kind": "ORM_TYPED_UOW",
+      "mode": "FOR UPDATE",
+      "blocksGrant": false,
+      "path": "src/saintvision/services/pools.py"
+    },
+    {
+      "function": "remove_member",
+      "line": 310,
+      "column": 4,
+      "endLine": 310,
+      "endColumn": 28,
+      "expression": "session.delete(existing)",
+      "expressionSHA256": "c1c15c72c5fd6a6c52d061479c6d960b74899b8bd61b6454c75653c6db773136",
+      "table": "public.project_members",
+      "verb": "DELETE",
+      "kind": "ORM_TYPED_UOW",
+      "mode": "FOR UPDATE",
+      "blocksGrant": false,
+      "path": "src/saintvision/services/settings.py"
+    }
+  ],
+  "allWriterRows": 389,
+  "BAuthorityWriters": 34,
+  "BWriterMappingUnchanged": true,
+  "unresolvedDBAndSQLScopesRetained": {
+    "file": "unknownSqlWriters.jsonl",
+    "rows": 267,
+    "bytes": 161230,
+    "sha256": "5424915a272de18ed4a56b3b83bd0b0323549be684094f7f25a85b9c4f2c3ad5"
+  },
+  "actualPG": "NOT_RUN"
+}

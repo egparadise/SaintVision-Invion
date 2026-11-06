@@ -1,0 +1,38 @@
+"""Claude: can an owned database reach a binder-only (no frozen baseline) local-shadow call at full provenance?
+
+Usage: python -B -I reviewer_rev9g_newfile_reach.py <rev9g evidence dir (absolute)> <out.json>
+World overlay: new production file inv/claude_new_caller.py whose use(database) shadows the imported WorkspaceAPI
+with a foreign callable; frozen workspace_config.py gets a same-line call `_claude_use(database)` on line 57 and an
+appended import (no line shift). Full t1_provenance at final producers, then with caller_error reverted.
+AST/compile only; nothing imported or executed.
+"""
+import ast, json, sys
+from collections import Counter
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb, callee_identity as ci
+CP = t.CP; WC = CP + 'workspace_config.py'; NP = CP + 'claude_new_caller.py'
+core = t.read_batch([CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS); S = {**core, **ctors}
+WCF = S[WC]; L57 = '    result.recovery = None\n'; assert WCF.count(L57) == 1
+WCM = WCF.replace(L57, '    result.recovery = None; _claude_use(database)\n', 1) + '\nfrom .claude_new_caller import use as _claude_use\n'
+NSRC = 'from .workspace_api import WorkspaceAPI\nfrom foreign_module import receive\n\n\ndef use(database):\n    WorkspaceAPI = receive\n    return WorkspaceAPI(database, None, None)\n'
+for p, s in ((WC, WCM), (NP, NSRC)): compile(s, p, 'exec')
+assert WCM.count('\n') == WCF.count('\n') + 2
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())['narrowA8Proof']; g = closure['completeConstructorGraph']
+W = [r['source'] for r in g['productionConstructorProofs']] + [r['source'] for r in g['localHelperProofs']] + [{'path': r['path'], 'span': r['span'], 'expressionSHA256': r['expressionSHA256']} for r in closure['productionDatabaseConstructors']]
+changed = {**S, WC: WCM}; universe = {**changed, NP: NSRC}; checked = 0
+for w in W:
+    s = universe.get(w['path']) or sb.frozen_source(w['path']); tree = ast.parse(s)
+    node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == w['span']), None)
+    assert node is not None and sb.sha(ast.get_source_segment(s, node)) == w['expressionSHA256']; checked += 1
+census = cg.current_census(universe); facts = {p: sb.Facts(p, s) for p, s in universe.items() if p in S}
+keys = Counter(cg.root_key(r, facts[r['source']['path']]) for r in census['production'] if r['source']['path'] in facts)
+preserved = not (cg.frozen_root_keys() - keys)
+ORIG = ci.caller_error; res = {}
+for mode in ('final', 'caller_error-reverted'):
+    ci.caller_error = ORIG if mode == 'final' else (lambda f, call: None)
+    _, err = t.provenance({p: changed[p] for p in core}, {p: changed[p] for p in ctors}, universe_overrides={NP: NSRC})
+    res[mode] = {'observed': 'ACCEPT' if err is None else 'REFUSE', 'reason': err}
+ci.caller_error = ORIG
+row = {'case': 'L2-owned-database-to-new-file-local-shadow', 'mutatedSHA256': {WC: sb.sha(WCM), NP: sb.sha(NSRC)}, 'witnessesChecked': checked, 'sixFrozenRootsPreserved': preserved, **res}
+print(json.dumps(row)); OUT.write_bytes((json.dumps(row, indent=1) + '\n').encode())
